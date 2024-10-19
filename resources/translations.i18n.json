@@ -1,0 +1,58 @@
+{
+  "loading": {
+    "en": "Loading",
+    "es": "Cargando"
+  },
+  "home": {
+    "en": "Home",
+    "es": "Pantalla principal"
+  },
+  "contact": {
+    "en": "Contact",
+    "es": "Contacto"
+  },
+  "not.found": {
+    "en": "Not found",
+    "es": "No encontrado"
+  },
+  "hello.world": {
+    "en": "Hello world",
+    "es": "Hola mundo"
+  },
+  "file": {
+    "en": "File",
+    "es": "Archivo"
+  },
+  "open.log.file": {
+    "en": "Open log file",
+    "es": "Abrir logs"
+  },
+  "exit": {
+    "en": "Exit",
+    "es": "Salir"
+  },
+  "contact.us": {
+    "en": "Contact us",
+    "es": "Contáctanos"
+  },
+  "any.trouble": {
+    "en": "Any trouble?",
+    "es": "¿Algún problema?"
+  },
+  "email.us": {
+    "en": "Email us",
+    "es": "Mandanos un mail"
+  },
+  "required": {
+    "en": "Required field",
+    "es": "Campo requerido"
+  },
+  "non.empty": {
+    "en": "This field cannot be empty",
+    "es": "Este campo no puede ser vacio"
+  },
+  "higher.zero": {
+    "en": "Must be higher than 0",
+    "es": "Debe ser mayor que 0"
+  }
+}
