@@ -3,73 +3,35 @@
  *        See https://github.com/webpack-contrib/sass-loader#imports
  */
 :root {
-  --navBarWidth: 200px;
-  --innerPadding: 5px;
+  color-scheme: light dark;
+  --navBarWidth: 12.5em;
+  --innerPadding: 0.313em;
   --transparency: #00000010;
   --transition: 0.5s ease;
+}
+
+#root {
+  background: rgb(25, 25, 25);
+  color: #dcb;
+  outline: 0.313em dashed #000;
 }
 
 html,
 body,
 #root {
   height: 100%;
-  margin: 0px;
+  margin: 0em;
   -webkit-user-select: none;
-}
-
-#navBar {
-  background-color: #ecf2f8;
-  height: 100%;
-  width: var(--navBarWidth);
-  position: fixed;
-  z-index: 1;
-  top: 0;
-  left: 0;
-  border-right: 1px solid lightgray;
-  overflow-x: hidden;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-}
-
-#navBar .navBarEntry {
-  padding: var(--innerPadding);
-  font-weight: bold;
-  transition: var(--transition);
-  border-bottom: 1px solid var(--transparency);
-}
-
-#navBar .navBarEntry:hover {
-  cursor: pointer;
-  background-color: var(--transparency);
-  padding-left: 15px;
-}
-
-#navBar .navBarEntry.active {
-  background-color: var(--transparency);
-  padding-left: 20px;
-  border-left: 5px solid #6666ff;
-}
-
-#navBar .navBarEntry.active:hover {
-  cursor: inherit;
 }
 
 #router {
   height: 100%;
-  top: 0px;
+  top: 0em;
   padding: var(--innerPadding);
-  left: var(--navBarWidth);
   display: flex;
   flex-direction: column;
   position: fixed;
-  width: calc(100% - var(--navBarWidth));
-  background: linear-gradient(
-    270deg,
-    rgb(255, 255, 255) 0%,
-    rgb(255, 255, 255) 0%,
-    rgb(236, 242, 248) 100%
-  );
+  width: 100%;
 }
 
 #router > * {
@@ -79,7 +41,7 @@ body,
 #spinnerWrapper {
   z-index: 2;
   height: 100%;
-  top: 0px;
+  top: 0em;
   padding: 0;
   left: 0;
   display: flex;
@@ -113,38 +75,39 @@ body,
   text-align: center;
 }
 
-.inputpassword .p-input-icon {
-  top: 16px;
+.settingsBlock>fieldset>div {
+  margin-left: 0.313em;
+  padding: 1.5em 0.63em 0.63em 0.63em;
 }
 
-.p-inputnumber {
-  width: 100%;
+.settingsLine {
+  margin-bottom: 1em
 }
 
-.p-inputtext {
-  width: 100%;
+.settingsLine .optionLabel {
+  text-align: right;
 }
 
-.p-password {
-  width: 100%;
-}
-
-.p-password .p-icon-field {
-  width: 100%;
-}
-
-.p-dropdown {
-  width: 100%;
-}
-
-.p-dropdown-items {
-  padding-left: 0px;
-}
-
-.p-multiselect {
-  width: 100%;
-}
-
-.p-multiselect-items {
-  padding-left: 0px;
+@keyframes rainbowWave {
+  0% {
+    stop-color: red;
+  }
+  16% {
+    stop-color: orange;
+  }
+  33% {
+    stop-color: yellow;
+  }
+  50% {
+    stop-color: green;
+  }
+  66% {
+    stop-color: blue;
+  }
+  83% {
+    stop-color: indigo;
+  }
+  100% {
+    stop-color: violet;
+  }
 }

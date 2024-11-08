@@ -1,5 +1,5 @@
 import react from '@vitejs/plugin-react';
-import { defineConfig } from 'electron-vite';
+import { bytecodePlugin, defineConfig } from 'electron-vite';
 import fs from 'fs';
 import path, { resolve } from 'path';
 
@@ -21,18 +21,23 @@ function findFile(fileName: string, dir: string): Array<string> {
 }
 const htmls: Array<string> = findFile('.html', 'src/renderer');
 console.info('HTMLS: ', htmls);
+const commons: Array<string> = findFile('.ts', 'src/commons').map((entry) =>
+  entry.substring(0, entry.length - 3)
+);
+console.info('Commons: ', commons);
 
 export default defineConfig({
   main: {
-    plugins: []
+    plugins: [bytecodePlugin({ transformArrowFunctions: false })]
   },
   preload: {
-    plugins: []
+    plugins: [bytecodePlugin({ transformArrowFunctions: false })]
   },
   renderer: {
     resolve: {
       alias: {
-        '@renderer': resolve('src/renderer/src')
+        '@renderer': resolve('src/renderer/src'),
+        '@commons': resolve('src/commons/src')
       }
     },
     build: {
@@ -40,7 +45,7 @@ export default defineConfig({
         transformMixedEsModules: true
       },
       rollupOptions: {
-        input: htmls
+        input: [...htmls]
       }
     },
     plugins: [react()]

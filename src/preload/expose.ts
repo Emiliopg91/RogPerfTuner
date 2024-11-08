@@ -9,6 +9,8 @@ import { ipcRenderer } from 'electron';
 
 import { author, name } from '../../package.json';
 import translations from '../../resources/translations.i18n.json';
+import { AuraBrightness, AuraLedMode } from '../commons/src/models/Aura';
+import { ThrottleThermalPolicy } from '../commons/src/models/Platform';
 
 const localTranslations = TranslatorRenderer.buildTranslations(translations);
 
@@ -35,11 +37,58 @@ export const defaultExposed = {
 export const exposed = {
   api: {
     ...defaultExposed.api,
-    openWindow(): void {
-      ipcRenderer.send('openWindow');
+    async getChargeThresold(): Promise<number> {
+      return ipcRenderer.invoke('getChargeThreshold');
     },
-    ping(): void {
-      ipcRenderer.invoke('ping');
+    setChargeThresold(thresold: number): void {
+      ipcRenderer.invoke('setChargeThreshold', thresold);
+    },
+    refreshChargeThreshold(callback: (threshold: number) => void): void {
+      ipcRenderer.on('refreshChargeThreshold', (_, threshold: number) => {
+        callback(threshold);
+      });
+    },
+    async getBrightness(): Promise<AuraBrightness> {
+      return ipcRenderer.invoke('getBrightness');
+    },
+    setBrightness(brightness: AuraBrightness): Promise<void> {
+      return ipcRenderer.invoke('setBrightness', brightness);
+    },
+    refreshBrightness(callback: (brightness: AuraBrightness) => void): void {
+      ipcRenderer.on('refreshBrightness', (_, brightness: AuraBrightness) => {
+        callback(brightness);
+      });
+    },
+    async getLedMode(): Promise<AuraLedMode> {
+      return ipcRenderer.invoke('getLedMode');
+    },
+    setLedMode(mode: AuraLedMode): Promise<AuraBrightness> {
+      return ipcRenderer.invoke('setLedMode', mode);
+    },
+    refreshLedMode(callback: (mode: AuraLedMode) => void): void {
+      ipcRenderer.on('refreshLedMode', (_, mode: AuraLedMode) => {
+        callback(mode);
+      });
+    },
+    async getThrottleThermalPolicy(): Promise<ThrottleThermalPolicy> {
+      return ipcRenderer.invoke('getThrottleThermalPolicy');
+    },
+    setThrottleThermalPolicy(policy: ThrottleThermalPolicy): Promise<void> {
+      return ipcRenderer.invoke('setThrottleThermalPolicy', policy);
+    },
+    refreshThrottleThermalPolicy(callback: (policy: ThrottleThermalPolicy) => void): void {
+      ipcRenderer.on('refreshThrottleThermalPolicy', (_, policy: ThrottleThermalPolicy) => {
+        callback(policy);
+      });
+    },
+    allowsAutoStart(): Promise<boolean> {
+      return ipcRenderer.invoke('allowsAutoStart');
+    },
+    checkAutoStart(): Promise<boolean> {
+      return ipcRenderer.invoke('checkAutostart');
+    },
+    setAutoStart(enabled: boolean): Promise<void> {
+      return ipcRenderer.invoke('setAutoStart', enabled);
     }
   },
   app: {

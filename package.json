@@ -1,5 +1,5 @@
 {
-  "name": "electron-app",
+  "name": "RogControlCenter",
   "version": "1.0.0",
   "description": "An Electron application with React and TypeScript",
   "main": "./out/main/index.js",
@@ -10,8 +10,8 @@
   },
   "homepage": "https://electron-vite.org",
   "scripts": {
-    "format": "prettier --write .",
-    "lint": "eslint . --ext .js,.jsx,.cjs,.mjs,.ts,.tsx,.cts,.mts --fix",
+    "format": "prettier --write ./src",
+    "lint": "eslint ./src --ext .js,.jsx,.cjs,.mjs,.ts,.tsx,.cts,.mts --fix",
     "typecheck:node": "tsc --noEmit -p tsconfig.node.json --composite false",
     "typecheck:web": "tsc --noEmit -p tsconfig.web.json --composite false",
     "typecheck": "concurrently 'pnpm:typecheck:node' 'pnpm:typecheck:web'",
@@ -27,15 +27,21 @@
   },
   "dependencies": {
     "@tser-framework/commons": "^2.0.30",
-    "@tser-framework/main": "^2.0.112",
+    "@tser-framework/main": "^2.0.183",
     "@tser-framework/renderer": "^2.0.48",
+    "@types/ws": "^8.5.13",
+    "async-mutex": "^0.5.0",
     "bootstrap": "^5.3.3",
+    "bufferutil": "^4.0.8",
     "electron-updater": "^6.1.8",
     "primereact": "^10.6.6",
     "react": "^18.3.1",
+    "react-bootstrap": "2.10.5",
     "react-dom": "^18.3.1",
     "react-icons": "^5.2.1",
-    "react-router-dom": "^6.23.1"
+    "react-router-dom": "^6.23.1",
+    "utf-8-validate": "^6.0.5",
+    "ws": "^8.18.0"
   },
   "devDependencies": {
     "@electron-toolkit/eslint-config-prettier": "^2.0.0",
@@ -61,5 +67,6 @@
   },
   "extraResources": [
     "./assets/**"
-  ]
+  ],
+  "packageManager": "pnpm@9.12.3+sha512.cce0f9de9c5a7c95bef944169cc5dfe8741abfb145078c0d508b868056848a87c81e626246cb60967cbd7fd29a6c062ef73ff840d96b3c86c40ac92cf4a813ee"
 }

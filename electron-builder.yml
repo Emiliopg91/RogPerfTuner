@@ -11,6 +11,7 @@ files:
   - '!{tsconfig.json,tsconfig.node.json,tsconfig.web.json}'
 asarUnpack:
   - resources/**
+  - pythonBackend/**
 win:
   executableName: electron-app
   icon: resources/icon.png
@@ -30,14 +31,13 @@ mac:
 dmg:
   artifactName: ${name}-${version}.${ext}
 linux:
+  icon: resources/icons/icon-512x512.png
   target:
     - AppImage
-    - snap
-    - deb
   maintainer: electronjs.org
   category: Utility
 appImage:
-  artifactName: ${name}-${version}.${ext}
+  artifactName: ${name}.${ext}
 npmRebuild: false
 publish:
   provider: generic

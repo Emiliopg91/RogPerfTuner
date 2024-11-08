@@ -2,6 +2,7 @@ import { electronApp, is } from '@electron-toolkit/utils';
 import { JsonUtils } from '@tser-framework/commons';
 import { LoggerMain, TranslatorMain, WindowHelper } from '@tser-framework/main';
 import { BrowserWindow, IpcMainInvokeEvent, Menu, app, ipcMain, protocol } from 'electron';
+import { nativeTheme } from 'electron/main';
 import path from 'path';
 
 import { applicationLogic } from './applicationLogic';
@@ -12,28 +13,29 @@ import {
   ipcListeners,
   menuTemplate,
   protocolBindings,
-  trayBuilder,
   windowConfig
 } from './setup';
 
-let mainWindow: BrowserWindow | null = null;
+export let mainWindow: BrowserWindow | null = null;
 const initTime = Date.now();
 
 (async (): Promise<void> => {
   await LoggerMain.initialize();
-  LoggerMain.system('##################################################');
-  LoggerMain.system('#                  Started main                  #');
-  LoggerMain.system('##################################################');
-  LoggerMain.system('Running initializeBeforeReady');
+  const logger = new LoggerMain('main/index.ts');
+  logger.info(`Starting from '${app.getPath('exe')}'`);
+  logger.system('##################################################');
+  logger.system('#                  Started main                  #');
+  logger.system('##################################################');
+  logger.system('Running initializeBeforeReady');
   LoggerMain.addTab();
   await initializeBeforeReady();
   LoggerMain.removeTab();
-  LoggerMain.system('Ended initializeBeforeReady');
+  logger.system('Ended initializeBeforeReady');
   if (!app.requestSingleInstanceLock() && appConfig.singleInstance) {
-    LoggerMain.error('Application already running');
+    logger.error('Application already running');
     app.quit();
   } else {
-    LoggerMain.system('Services registration');
+    logger.system('Services registration');
     LoggerMain.addTab();
     Object.keys(ipcListeners).forEach((id) => {
       const listener = ipcListeners[id];
@@ -42,7 +44,7 @@ const initTime = Date.now();
         ipcMain.handle(id, (event: IpcMainInvokeEvent, ...args: any): unknown => {
           return listener.fn(event, ...args);
         });
-        LoggerMain.system("Synchronous IPC '" + id + "'");
+        logger.system("Synchronous IPC '" + id + "'");
       }
     });
     Object.keys(ipcListeners).forEach((id) => {
@@ -52,7 +54,7 @@ const initTime = Date.now();
         ipcMain.on(id, (event: IpcMainInvokeEvent, ...args: any): void => {
           listener.fn(event, ...args);
         });
-        LoggerMain.system("Asynchronous IPC '" + id + "'");
+        logger.system("Asynchronous IPC '" + id + "'");
       }
     });
 
@@ -67,7 +69,7 @@ const initTime = Date.now();
 
       Object.keys(protocolBindings).forEach((id) => {
         protocol.handle(id, protocolBindings[id].handler);
-        LoggerMain.system("Registered protocol '" + id + "'");
+        logger.system("Registered protocol '" + id + "'");
       });
 
       if (deepLinkBindings) {
@@ -79,11 +81,11 @@ const initTime = Date.now();
           } else {
             app.setAsDefaultProtocolClient(id);
           }
-          LoggerMain.system("Associated deep-link '" + id + "'");
+          logger.system("Associated deep-link '" + id + "'");
         });
       }
       LoggerMain.removeTab();
-      LoggerMain.system('Registration finished');
+      logger.system('Registration finished');
 
       let menu: Menu | null = null;
       if (menuTemplate) {
@@ -93,20 +95,6 @@ const initTime = Date.now();
         menu = Menu.buildFromTemplate(template);
       }
       Menu.setApplicationMenu(menu);
-
-      if (trayBuilder) {
-        const tray = trayBuilder.build();
-        if (windowConfig.closeToTray || windowConfig.minimizeToTray) {
-          tray.on('double-click', () => {
-            if (mainWindow == null) {
-              createWindow();
-            } else {
-              mainWindow.show();
-              mainWindow.maximize();
-            }
-          });
-        }
-      }
 
       app.on('browser-window-created', (_, window) => {
         configureShortcutEvents(window);
@@ -123,10 +111,10 @@ const initTime = Date.now();
           },
           appConfig.splashScreen
         ).then(() => {
-          createWindow();
+          //createWindow();
         });
       } else {
-        createWindow();
+        //createWindow();
       }
 
       app.on('activate', function () {
@@ -137,15 +125,15 @@ const initTime = Date.now();
 
       app.on('quit', function () {
         const msg = ' Stopped main after ' + msToTime(Date.now() - initTime) + ' ';
-        LoggerMain.system('##################################################');
-        LoggerMain.system(
+        logger.system('##################################################');
+        logger.system(
           '#' +
             ''.padEnd((48 - msg.length) / 2, ' ') +
             msg +
             ''.padEnd((48 - msg.length) / 2, ' ') +
             '#'
         );
-        LoggerMain.system('##################################################');
+        logger.system('##################################################');
       });
 
       app.on('window-all-closed', () => {
@@ -177,11 +165,11 @@ const initTime = Date.now();
         }
       });
 
-      LoggerMain.system('Running initializeWhenReady');
+      logger.system('Running initializeWhenReady');
       LoggerMain.addTab();
       await initializeWhenReady();
       LoggerMain.removeTab();
-      LoggerMain.system('Ended initializeWhenReady');
+      logger.system('Ended initializeWhenReady');
 
       applicationLogic();
     });
@@ -223,9 +211,10 @@ function configureShortcutEvents(window: Electron.BrowserWindow): void {
   });
 }
 
-async function createWindow(): Promise<void> {
+export async function createWindow(): Promise<void> {
   mainWindow = WindowHelper.createMainWindow(windowConfig);
   mainWindow.show();
+  nativeTheme.themeSource = 'system';
 }
 
 function msToTime(duration): string {
