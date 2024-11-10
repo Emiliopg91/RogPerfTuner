@@ -40,9 +40,11 @@ export const windowConfig: WindowConfig = {
     backgroundColor: '#191919',
     show: false,
     title: app.getName(),
+    icon: icon512,
     autoHideMenuBar: true,
     ...(process.platform === 'linux' ? { icon512 } : {}),
     webPreferences: {
+      additionalArguments: [],
       preload: path.join(__dirname, '../preload/index.js'),
       sandbox: false
     }

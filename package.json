@@ -22,14 +22,13 @@
     "postinstall": "electron-builder install-app-deps",
     "build:unpack": "pnpm build && electron-builder --dir",
     "build:win": "pnpm build && electron-builder --win",
-    "build:mac": "electron-vite build && electron-builder --mac",
-    "build:linux": "electron-vite build && electron-builder --linux"
+    "build:mac": "pnpm build && electron-builder --mac",
+    "build:linux": "pnpm build && electron-builder --linux"
   },
   "dependencies": {
     "@tser-framework/commons": "^2.0.30",
-    "@tser-framework/main": "^2.0.183",
+    "@tser-framework/main": "^2.0.187",
     "@tser-framework/renderer": "^2.0.48",
-    "@types/ws": "^8.5.13",
     "async-mutex": "^0.5.0",
     "bootstrap": "^5.3.3",
     "bufferutil": "^4.0.8",
@@ -54,6 +53,7 @@
     "@types/react": "^18.3.3",
     "@types/react-dom": "^18.3.0",
     "@vitejs/plugin-react": "^4.3.0",
+    "@types/ws": "^8.5.13",
     "concurrently": "^8.2.2",
     "electron": "^28.3.3",
     "electron-builder": "^24.13.3",

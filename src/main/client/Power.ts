@@ -1,12 +1,33 @@
 import { PowerProfile } from '../../commons/src/models/Platform';
-import { BackendManager } from './Backend';
+import { DbusClient } from '../dbus/client';
+import { DbusString } from '../dbus/types';
 
 export class PowerClient {
-  public static async getActiveProfile(): Promise<PowerProfile> {
-    return (await BackendManager.invokeBackend<string>('getActivePowerProfile')) as PowerProfile;
-  }
+  public static serviceName = 'net.hadess.PowerProfiles';
+  public static objectPath = '/net/hadess/PowerProfiles';
+  public static interfaceName = 'net.hadess.PowerProfiles';
 
   public static async setActiveProfile(value: PowerProfile): Promise<void> {
-    await BackendManager.invokeBackend<void>('setActivePowerProfile', value);
+    await DbusClient.setProperty(
+      'system',
+      PowerClient.serviceName,
+      PowerClient.objectPath,
+      PowerClient.interfaceName,
+      'ActiveProfile',
+      new DbusString(value, true)
+    );
+  }
+
+  public static async getActiveProfile(): Promise<PowerProfile> {
+    return (
+      (await DbusClient.getProperty(
+        'system',
+        PowerClient.serviceName,
+        PowerClient.objectPath,
+        PowerClient.interfaceName,
+        'ActiveProfile',
+        DbusString
+      )) as DbusString
+    ).value as PowerProfile;
   }
 }

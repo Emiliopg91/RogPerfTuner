@@ -1,10 +1,17 @@
 import { electronApp, is } from '@electron-toolkit/utils';
 import { JsonUtils } from '@tser-framework/commons';
-import { LoggerMain, TranslatorMain, WindowHelper } from '@tser-framework/main';
+import {
+  AppUpdater,
+  LoggerMain,
+  Toaster,
+  TranslatorMain,
+  WindowHelper
+} from '@tser-framework/main';
 import { BrowserWindow, IpcMainInvokeEvent, Menu, app, ipcMain, protocol } from 'electron';
-import { nativeTheme } from 'electron/main';
+import { dialog } from 'electron/main';
 import path from 'path';
 
+import rogLogo from '../../resources/icons/icon-512x512.png?asset';
 import { applicationLogic } from './applicationLogic';
 import { initializeBeforeReady, initializeWhenReady } from './initialize';
 import {
@@ -15,7 +22,12 @@ import {
   protocolBindings,
   windowConfig
 } from './setup';
+import { Constants } from './utils/Constants';
 
+process.env.ELECTRON_ENABLE_WAYLAND = '1';
+
+let shownUpdate = false;
+export let appUpdater: AppUpdater | undefined = undefined;
 export let mainWindow: BrowserWindow | null = null;
 const initTime = Date.now();
 
@@ -152,7 +164,7 @@ const initTime = Date.now();
           }
           mainWindow.focus();
         } else {
-          createWindow();
+          Toaster.toast(`${app.getName()} is already running in background`, rogLogo);
         }
 
         if (deepLinkBindings) {
@@ -163,6 +175,32 @@ const initTime = Date.now();
             }
           });
         }
+      });
+
+      appUpdater = new AppUpdater(10 * 1000, (): void => {
+        dialog
+          .showMessageBox({
+            type: 'info',
+            buttons: ['Update now', 'Update on restart'],
+            defaultId: 0,
+            cancelId: 1,
+            title: 'Update available',
+            message: 'Updating requires restart RogControlCenter, do you wish to update now?'
+          })
+          .then((returnValue) => {
+            if (returnValue.response === 0) {
+              if (!shownUpdate) {
+                Constants.mutex.runExclusive(() => {
+                  Toaster.toast(
+                    'Installing update, RogControlCenter will restart after completion'
+                  );
+                  appUpdater?.quitAndInstall(true, true);
+                });
+              }
+            } else {
+              shownUpdate = true;
+            }
+          });
       });
 
       logger.system('Running initializeWhenReady');
@@ -214,7 +252,6 @@ function configureShortcutEvents(window: Electron.BrowserWindow): void {
 export async function createWindow(): Promise<void> {
   mainWindow = WindowHelper.createMainWindow(windowConfig);
   mainWindow.show();
-  nativeTheme.themeSource = 'system';
 }
 
 function msToTime(duration): string {

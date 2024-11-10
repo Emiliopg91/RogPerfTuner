@@ -3,7 +3,6 @@ import { Menu, app } from 'electron/main';
 
 import icon45 from '../../resources/icons/icon-45x45.png?asset';
 import translations from '../../resources/translations.i18n.json';
-import { BackendManager } from './client/Backend';
 import { ApplicationService } from './services/Application';
 import { AuraService } from './services/Aura';
 import { PlatformService } from './services/Platform';
@@ -20,7 +19,6 @@ export async function initializeBeforeReady(): Promise<void> {
 export async function initializeWhenReady(): Promise<void> {
   await Settings.initialize();
   await HttpServer.initialize();
-  BackendManager.initialize();
   PlatformService.initialize();
   AuraService.initialize();
   ApplicationService.initialize();

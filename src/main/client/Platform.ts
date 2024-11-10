@@ -1,22 +1,57 @@
 import { ThrottleThermalPolicy } from '../../commons/src/models/Platform';
-import { BackendManager } from './Backend';
+import { DbusClient } from '../dbus/client';
+import { DbusByte, DbusUint32 } from '../dbus/types';
 
 export class PlatformClient {
+  private static serviceName = 'org.asuslinux.Daemon';
+  private static objectPath = '/org/asuslinux';
+  private static interfaceName = 'org.asuslinux.Platform';
+
   public static async getChargeControlEndThresold(): Promise<number> {
-    return (await BackendManager.invokeBackend<number>('getChargeControlEndThresold'))!;
+    return (
+      await DbusClient.getProperty(
+        'system',
+        PlatformClient.serviceName,
+        PlatformClient.objectPath,
+        PlatformClient.interfaceName,
+        'ChargeControlEndThreshold',
+        DbusByte
+      )
+    )?.value as number;
   }
 
   public static async setChargeControlEndThresold(value: number): Promise<void> {
-    await BackendManager.invokeBackend<void>('setChargeControlEndThresold', value);
+    await DbusClient.setProperty(
+      'system',
+      PlatformClient.serviceName,
+      PlatformClient.objectPath,
+      PlatformClient.interfaceName,
+      'ChargeControlEndThreshold',
+      new DbusByte(value, true)
+    );
   }
 
   public static async getThrottleThermalProfile(): Promise<ThrottleThermalPolicy> {
-    return (await BackendManager.invokeBackend<number>(
-      'getThrottleThermalProfile'
-    )) as ThrottleThermalPolicy;
+    return (
+      await DbusClient.getProperty(
+        'system',
+        PlatformClient.serviceName,
+        PlatformClient.objectPath,
+        PlatformClient.interfaceName,
+        'ThrottleThermalPolicy',
+        DbusUint32
+      )
+    )?.value as ThrottleThermalPolicy;
   }
 
   public static async setThrottleThermalProfile(value: ThrottleThermalPolicy): Promise<void> {
-    await BackendManager.invokeBackend<number>('setThrottleThermalProfile', value);
+    await DbusClient.setProperty(
+      'system',
+      PlatformClient.serviceName,
+      PlatformClient.objectPath,
+      PlatformClient.interfaceName,
+      'ThrottleThermalPolicy',
+      new DbusUint32(value, true)
+    );
   }
 }

@@ -1,3 +1,3 @@
-provider: generic
-url: https://example.com/auto-updates
-updaterCacheDirName: electron-app-updater
+provider: github
+owner: Emiliopg91
+repo: RogControlCenter

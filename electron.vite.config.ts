@@ -21,10 +21,6 @@ function findFile(fileName: string, dir: string): Array<string> {
 }
 const htmls: Array<string> = findFile('.html', 'src/renderer');
 console.info('HTMLS: ', htmls);
-const commons: Array<string> = findFile('.ts', 'src/commons').map((entry) =>
-  entry.substring(0, entry.length - 3)
-);
-console.info('Commons: ', commons);
 
 export default defineConfig({
   main: {

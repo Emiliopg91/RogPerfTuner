@@ -1,6 +1,8 @@
 import { LoggerMain, Toaster } from '@tser-framework/main';
+import { ExecException, exec } from 'child_process';
 import * as fs from 'fs';
 
+import { mainWindow } from '..';
 import rogLogo from '../../../resources/icons/icon-512x512.png?asset';
 import {
   BoostControl,
@@ -8,7 +10,6 @@ import {
   PowerProfile,
   ThrottleThermalPolicy
 } from '../../commons/src/models/Platform';
-import { BackendManager } from '../client/Backend';
 import { FanCurvesClient } from '../client/FanCurves';
 import { PlatformClient } from '../client/Platform';
 import { PowerClient } from '../client/Power';
@@ -82,28 +83,37 @@ export class PlatformService {
   }
 
   public static async setBoost(enabled: boolean): Promise<void> {
-    if (PlatformService.boostControl && enabled != PlatformService.lastBoost) {
-      const target = enabled ? 'on' : 'off';
-      const value = PlatformService.boostControl[target];
-      const path = PlatformService.boostControl.path;
+    return new Promise<void>((resolve, reject) => {
+      if (PlatformService.boostControl && enabled != PlatformService.lastBoost) {
+        const target = enabled ? 'on' : 'off';
+        const value = PlatformService.boostControl[target];
+        const path = PlatformService.boostControl.path;
 
-      const exitCode = await BackendManager.invokeBackend<number>(
-        'runBoostCommand',
-        Settings.password,
-        value,
-        path
-      );
-      if (Number(String(exitCode)) !== 0) {
-        PlatformService.logger.error(`Couldn't set boost mode. Exit code: ${exitCode}`);
+        const command = `echo "${Settings.password}" | sudo -S bash -c "echo '${value}' | tee ${path}"`;
+        exec(command, (error: ExecException | null) => {
+          if (error) {
+            PlatformService.logger.error(`Couldn't set boost mode: ${error}`);
+            reject(error);
+          } else {
+            resolve();
+          }
+        });
+      } else {
+        resolve();
       }
-    }
+    });
   }
 
   private static async onAcEvent(onAc: boolean): Promise<void> {
     if (onAc) {
       await PlatformService.setThrottleThermalPolicy(ThrottleThermalPolicy.PERFORMANCE, true);
+      mainWindow?.webContents.send(
+        'refreshThrottleThermalPolicy',
+        ThrottleThermalPolicy.PERFORMANCE
+      );
     } else {
       await PlatformService.setThrottleThermalPolicy(ThrottleThermalPolicy.QUIET, true);
+      mainWindow?.webContents.send('refreshThrottleThermalPolicy', ThrottleThermalPolicy.QUIET);
     }
     setTimeout(async () => {
       refreshTrayMenu(await generateTrayMenuDef());

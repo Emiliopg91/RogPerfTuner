@@ -1,6 +1,8 @@
 import { FC, ReactNode } from 'react';
 import { Container } from 'react-bootstrap';
 
+import './styles.css';
+
 interface SettingsBlockProps {
   label: string;
   children: ReactNode;
