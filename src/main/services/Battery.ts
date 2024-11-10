@@ -36,14 +36,14 @@ export class BatteryService {
     }
   }
 
-  public static async getChargeThreshold(): Promise<number> {
-    return BatteryService.lastThreshold || (await PlatformClient.getChargeControlEndThresold());
+  public static getChargeThreshold(): number {
+    return BatteryService.lastThreshold || PlatformClient.getChargeControlEndThresold();
   }
 
-  public static async setChargeThreshold(value: number): Promise<void> {
-    if ((await BatteryService.getChargeThreshold()) != value) {
+  public static setChargeThreshold(value: number): void {
+    if (BatteryService.getChargeThreshold() != value) {
       BatteryService.logger.info(`Setting battery charge threshold to ${value}%`);
-      await PlatformClient.setChargeControlEndThresold(value);
+      PlatformClient.setChargeControlEndThresold(value);
       BatteryService.lastThreshold = value;
     } else {
       BatteryService.logger.info(`Battery charge threshold already is ${value}%`);

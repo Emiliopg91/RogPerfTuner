@@ -7,8 +7,8 @@ export class FanCurvesClient {
   private static objectPath = '/org/asuslinux';
   private static interfaceName = 'org.asuslinux.FanCurves';
 
-  public static async resetProfileCurves(profile: ThrottleThermalPolicy): Promise<void> {
-    await DbusClient.executeMethod(
+  public static resetProfileCurves(profile: ThrottleThermalPolicy): void {
+    DbusClient.executeMethod(
       'system',
       FanCurvesClient.serviceName,
       FanCurvesClient.objectPath,
@@ -19,8 +19,8 @@ export class FanCurvesClient {
     );
   }
 
-  public static async setCurvesToDefaults(profile: ThrottleThermalPolicy): Promise<void> {
-    await DbusClient.executeMethod(
+  public static setCurvesToDefaults(profile: ThrottleThermalPolicy): void {
+    DbusClient.executeMethod(
       'system',
       FanCurvesClient.serviceName,
       FanCurvesClient.objectPath,
@@ -31,11 +31,8 @@ export class FanCurvesClient {
     );
   }
 
-  public static async setFanCurvesEnabled(
-    profile: ThrottleThermalPolicy,
-    enabled: boolean
-  ): Promise<void> {
-    await DbusClient.executeMethod(
+  public static setFanCurvesEnabled(profile: ThrottleThermalPolicy, enabled: boolean): void {
+    DbusClient.executeMethod(
       'system',
       FanCurvesClient.serviceName,
       FanCurvesClient.objectPath,

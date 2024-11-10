@@ -8,5 +8,5 @@ export async function applicationLogic(): Promise<void> {
 
   logger.system('Running application logic');
   LoggerMain.addTab();
-  await PlatformService.restoreThrottleThermalPolicy();
+  PlatformService.restoreThrottleThermalPolicy();
 }

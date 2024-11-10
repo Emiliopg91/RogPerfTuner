@@ -112,8 +112,8 @@ export const setTrayMenuRefreshFn = (
   refreshTrayMenu = fn;
 };
 
-const getBrightnessOption: () => Promise<Array<Electron.MenuItemConstructorOptions>> = async () => {
-  const current = await AuraService.getBrightness();
+const getBrightnessOption: () => Array<Electron.MenuItemConstructorOptions> = () => {
+  const current = AuraService.getBrightness();
   const brightnessOptions: Array<Electron.MenuItemConstructorOptions> = [];
   for (const [key, value] of Object.entries(AuraBrightness)) {
     if (isNaN(Number(String(key)))) {
@@ -129,14 +129,14 @@ const getBrightnessOption: () => Promise<Array<Electron.MenuItemConstructorOptio
   }
   return brightnessOptions;
 };
-export const traySetBrightness = async (brightness: AuraBrightness): Promise<void> => {
-  await AuraService.setBrightness(brightness);
-  refreshTrayMenu(await generateTrayMenuDef());
+export const traySetBrightness = (brightness: AuraBrightness): void => {
+  AuraService.setBrightness(brightness);
+  refreshTrayMenu(generateTrayMenuDef());
   mainWindow?.webContents.send('refreshBrightness', brightness);
 };
 
-const getLedModeOptions: () => Promise<Array<Electron.MenuItemConstructorOptions>> = async () => {
-  const current = await AuraService.getLedMode();
+const getLedModeOptions: () => Array<Electron.MenuItemConstructorOptions> = () => {
+  const current = AuraService.getLedMode();
   const ledModeOptions: Array<Electron.MenuItemConstructorOptions> = [];
   for (const [key, value] of Object.entries(AuraLedMode)) {
     if (isNaN(Number(String(key)))) {
@@ -152,15 +152,15 @@ const getLedModeOptions: () => Promise<Array<Electron.MenuItemConstructorOptions
   }
   return ledModeOptions;
 };
-export const traySetLedMode = async (mode: AuraLedMode): Promise<void> => {
-  await AuraService.setLedMode(mode);
-  refreshTrayMenu(await generateTrayMenuDef());
+export const traySetLedMode = (mode: AuraLedMode): void => {
+  AuraService.setLedMode(mode);
+  refreshTrayMenu(generateTrayMenuDef());
   mainWindow?.webContents.send('refreshLedMode', mode);
-  mainWindow?.webContents.send('refreshBrightness', await AuraService.getBrightness());
+  mainWindow?.webContents.send('refreshBrightness', AuraService.getBrightness());
 };
 
-const getThrottleOptions: () => Promise<Array<Electron.MenuItemConstructorOptions>> = async () => {
-  const current = await PlatformService.getThrottleThermalPolicy();
+const getThrottleOptions: () => Array<Electron.MenuItemConstructorOptions> = () => {
+  const current = PlatformService.getThrottleThermalPolicy();
   const throttleOptions: Array<Electron.MenuItemConstructorOptions> = [];
   for (const [key, value] of Object.entries(ThrottleThermalPolicy)) {
     if (isNaN(Number(String(key)))) {
@@ -176,14 +176,14 @@ const getThrottleOptions: () => Promise<Array<Electron.MenuItemConstructorOption
   }
   return throttleOptions;
 };
-export const traySetThrottle = async (policy: ThrottleThermalPolicy): Promise<void> => {
-  await PlatformService.setThrottleThermalPolicy(policy);
-  refreshTrayMenu(await generateTrayMenuDef());
+export const traySetThrottle = (policy: ThrottleThermalPolicy): void => {
+  PlatformService.setThrottleThermalPolicy(policy);
+  refreshTrayMenu(generateTrayMenuDef());
   mainWindow?.webContents.send('refreshThrottleThermalPolicy', policy);
 };
 
-const getThresoldOptions: () => Promise<Array<Electron.MenuItemConstructorOptions>> = async () => {
-  const current = await BatteryService.getChargeThreshold();
+const getThresoldOptions: () => Array<Electron.MenuItemConstructorOptions> = () => {
+  const current = BatteryService.getChargeThreshold();
   return [
     {
       label: '50%',
@@ -211,15 +211,13 @@ const getThresoldOptions: () => Promise<Array<Electron.MenuItemConstructorOption
     }
   ];
 };
-const traySetBatteryThresold = async (thresold: number): Promise<void> => {
-  await BatteryService.setChargeThreshold(thresold);
-  refreshTrayMenu(await generateTrayMenuDef());
+const traySetBatteryThresold = (thresold: number): void => {
+  BatteryService.setChargeThreshold(thresold);
+  refreshTrayMenu(generateTrayMenuDef());
   mainWindow?.webContents.send('refreshChargeThreshold', thresold);
 };
 
-export const generateTrayMenuDef = async (): Promise<
-  Array<Electron.MenuItemConstructorOptions>
-> => {
+export const generateTrayMenuDef = (): Array<Electron.MenuItemConstructorOptions> => {
   return [
     {
       label: 'Battery',
@@ -227,7 +225,7 @@ export const generateTrayMenuDef = async (): Promise<
     },
     {
       label: '  Threshold',
-      submenu: await getThresoldOptions()
+      submenu: getThresoldOptions()
     },
     { type: 'separator' },
     {
@@ -236,11 +234,11 @@ export const generateTrayMenuDef = async (): Promise<
     },
     {
       label: '  Mode',
-      submenu: await getLedModeOptions()
+      submenu: getLedModeOptions()
     },
     {
       label: '  Brightness',
-      submenu: await getBrightnessOption()
+      submenu: getBrightnessOption()
     },
     { type: 'separator' },
     {
@@ -249,7 +247,7 @@ export const generateTrayMenuDef = async (): Promise<
     },
     {
       label: '  Profile',
-      submenu: await getThrottleOptions()
+      submenu: getThrottleOptions()
     },
     { type: 'separator' },
     {
@@ -293,9 +291,9 @@ export const ipcListeners: Record<string, IpcListener> = {
   },
   setChargeThreshold: {
     sync: true,
-    async fn(_, threshold: number) {
-      await BatteryService.setChargeThreshold(threshold);
-      refreshTrayMenu(await generateTrayMenuDef());
+    fn(_, threshold: number) {
+      BatteryService.setChargeThreshold(threshold);
+      refreshTrayMenu(generateTrayMenuDef());
     }
   },
   getLedMode: {
@@ -306,9 +304,9 @@ export const ipcListeners: Record<string, IpcListener> = {
   },
   setLedMode: {
     sync: true,
-    async fn(_, mode: AuraLedMode) {
-      await AuraService.setLedMode(mode);
-      refreshTrayMenu(await generateTrayMenuDef());
+    fn(_, mode: AuraLedMode) {
+      AuraService.setLedMode(mode);
+      refreshTrayMenu(generateTrayMenuDef());
       return AuraService.getBrightness();
     }
   },
@@ -320,9 +318,9 @@ export const ipcListeners: Record<string, IpcListener> = {
   },
   setBrightness: {
     sync: true,
-    async fn(_, brightness: AuraBrightness) {
-      await AuraService.setBrightness(brightness);
-      refreshTrayMenu(await generateTrayMenuDef());
+    fn(_, brightness: AuraBrightness) {
+      AuraService.setBrightness(brightness);
+      refreshTrayMenu(generateTrayMenuDef());
     }
   },
   getThrottleThermalPolicy: {
@@ -333,9 +331,9 @@ export const ipcListeners: Record<string, IpcListener> = {
   },
   setThrottleThermalPolicy: {
     sync: true,
-    async fn(_, policy: ThrottleThermalPolicy) {
-      await PlatformService.setThrottleThermalPolicy(policy);
-      refreshTrayMenu(await generateTrayMenuDef());
+    fn(_, policy: ThrottleThermalPolicy) {
+      PlatformService.setThrottleThermalPolicy(policy);
+      refreshTrayMenu(generateTrayMenuDef());
     }
   },
   allowsAutoStart: {

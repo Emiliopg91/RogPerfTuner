@@ -25,7 +25,7 @@ export async function initializeWhenReady(): Promise<void> {
 
   const trayBuilder: TrayBuilder | undefined = TrayBuilder.builder(icon45)
     .withToolTip(app.name)
-    .withMenu(await generateTrayMenuDef());
+    .withMenu(generateTrayMenuDef());
   const tray = trayBuilder.build();
   setTrayMenuRefreshFn((newMenu: Array<Electron.MenuItemConstructorOptions>) => {
     const contextMenu = Menu.buildFromTemplate(newMenu);

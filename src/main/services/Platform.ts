@@ -1,5 +1,5 @@
 import { LoggerMain, Toaster } from '@tser-framework/main';
-import { ExecException, exec } from 'child_process';
+import { execSync } from 'child_process';
 import * as fs from 'fs';
 
 import { mainWindow } from '..';
@@ -82,37 +82,32 @@ export class PlatformService {
     Settings.configMap.platform.profiles.last = ThrottleThermalPolicy[value];
   }
 
-  public static async setBoost(enabled: boolean): Promise<void> {
-    return new Promise<void>((resolve, reject) => {
-      if (PlatformService.boostControl && enabled != PlatformService.lastBoost) {
-        const target = enabled ? 'on' : 'off';
-        const value = PlatformService.boostControl[target];
-        const path = PlatformService.boostControl.path;
+  public static setBoost(enabled: boolean): void {
+    if (PlatformService.boostControl && enabled != PlatformService.lastBoost) {
+      const target = enabled ? 'on' : 'off';
+      const value = PlatformService.boostControl[target];
+      const path = PlatformService.boostControl.path;
 
-        const command = `echo "${Settings.password}" | sudo -S bash -c "echo '${value}' | tee ${path}"`;
-        exec(command, (error: ExecException | null) => {
-          if (error) {
-            PlatformService.logger.error(`Couldn't set boost mode: ${error}`);
-            reject(error);
-          } else {
-            resolve();
-          }
-        });
-      } else {
-        resolve();
+      const command = `echo "${Settings.password}" | sudo -S bash -c "echo '${value}' | tee ${path}"`;
+      try {
+        execSync(command);
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      } catch (error: any) {
+        PlatformService.logger.error(`Couldn't set boost mode: ${error}`);
+        throw error;
       }
-    });
+    }
   }
 
-  private static async onAcEvent(onAc: boolean): Promise<void> {
+  private static onAcEvent(onAc: boolean): void {
     if (onAc) {
-      await PlatformService.setThrottleThermalPolicy(ThrottleThermalPolicy.PERFORMANCE, true);
+      PlatformService.setThrottleThermalPolicy(ThrottleThermalPolicy.PERFORMANCE, true);
       mainWindow?.webContents.send(
         'refreshThrottleThermalPolicy',
         ThrottleThermalPolicy.PERFORMANCE
       );
     } else {
-      await PlatformService.setThrottleThermalPolicy(ThrottleThermalPolicy.QUIET, true);
+      PlatformService.setThrottleThermalPolicy(ThrottleThermalPolicy.QUIET, true);
       mainWindow?.webContents.send('refreshThrottleThermalPolicy', ThrottleThermalPolicy.QUIET);
     }
     setTimeout(async () => {
@@ -120,32 +115,32 @@ export class PlatformService {
     }, 250);
   }
 
-  public static async getThrottleThermalPolicy(): Promise<ThrottleThermalPolicy> {
-    return (await PlatformClient.getThrottleThermalProfile()) as ThrottleThermalPolicy;
+  public static getThrottleThermalPolicy(): ThrottleThermalPolicy {
+    return PlatformClient.getThrottleThermalProfile() as ThrottleThermalPolicy;
   }
 
-  public static async setThrottleThermalPolicy(
+  public static setThrottleThermalPolicy(
     policy: ThrottleThermalPolicy,
     temporal: boolean = false
-  ): Promise<void> {
+  ): void {
     try {
       const policyName = ThrottleThermalPolicy[policy];
 
       PlatformService.logger.info('Setting profile:');
       LoggerMain.addTab();
       PlatformService.logger.info(`Throttle policy: ${policyName}`);
-      await PlatformClient.setThrottleThermalProfile(policy);
+      PlatformClient.setThrottleThermalProfile(policy);
 
       PlatformService.logger.info(`Fan curve: ${policyName}`);
-      await FanCurvesClient.setCurvesToDefaults(policy);
-      await FanCurvesClient.resetProfileCurves(policy);
-      await FanCurvesClient.setFanCurvesEnabled(policy, true);
+      FanCurvesClient.setCurvesToDefaults(policy);
+      FanCurvesClient.resetProfileCurves(policy);
+      FanCurvesClient.setFanCurvesEnabled(policy, true);
 
       const powerPolicy = PlatformService.throttlePowerAssoc[policy];
       PlatformService.logger.info(
         `Power policy: ${PlatformModels.getPowerProfileName(powerPolicy)}`
       );
-      await PowerClient.setActiveProfile(powerPolicy);
+      PowerClient.setActiveProfile(powerPolicy);
 
       const noBoostReason = !Settings.password
         ? 'missing password'
@@ -157,7 +152,7 @@ export class PlatformService {
       } else {
         const boostEnabled = PlatformService.throttleBoostAssoc[policy];
         PlatformService.logger.info(`Boost: ${boostEnabled ? 'Enabled' : 'Disabled'}`);
-        await PlatformService.setBoost(boostEnabled);
+        PlatformService.setBoost(boostEnabled);
       }
 
       LoggerMain.removeTab();
@@ -172,7 +167,7 @@ export class PlatformService {
     }
   }
 
-  public static async restoreThrottleThermalPolicy(): Promise<void> {
+  public static restoreThrottleThermalPolicy(): void {
     const last =
       ThrottleThermalPolicy[
         Settings.configMap.platform?.profiles?.last ||
@@ -182,7 +177,7 @@ export class PlatformService {
       PlatformService.logger.info('Restoring profile');
       LoggerMain.addTab();
 
-      await PlatformService.setThrottleThermalPolicy(last);
+      PlatformService.setThrottleThermalPolicy(last);
 
       LoggerMain.removeTab();
       PlatformService.logger.info('Profile restored');

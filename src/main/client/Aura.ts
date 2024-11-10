@@ -20,23 +20,21 @@ export class AuraClient {
     }
   }
 
-  public static async getBrightness(): Promise<AuraBrightness> {
+  public static getBrightness(): AuraBrightness {
     AuraClient.initialize();
-    return (
-      await DbusClient.getProperty(
-        'system',
-        AuraClient.serviceName,
-        AuraClient.objectPath,
-        AuraClient.interfaceName,
-        'Brightness',
-        DbusUint32
-      )
+    return DbusClient.getProperty(
+      'system',
+      AuraClient.serviceName,
+      AuraClient.objectPath,
+      AuraClient.interfaceName,
+      'Brightness',
+      DbusUint32
     )?.value as AuraBrightness;
   }
 
-  public static async setBrightness(value: AuraBrightness): Promise<void> {
+  public static setBrightness(value: AuraBrightness): void {
     AuraClient.initialize();
-    await DbusClient.setProperty(
+    DbusClient.setProperty(
       'system',
       AuraClient.serviceName,
       AuraClient.objectPath,
@@ -46,23 +44,21 @@ export class AuraClient {
     );
   }
 
-  public static async getLedMode(): Promise<AuraLedMode> {
+  public static getLedMode(): AuraLedMode {
     AuraClient.initialize();
-    return (
-      await DbusClient.getProperty(
-        'system',
-        AuraClient.serviceName,
-        AuraClient.objectPath,
-        AuraClient.interfaceName,
-        'LedMode',
-        DbusUint32
-      )
+    return DbusClient.getProperty(
+      'system',
+      AuraClient.serviceName,
+      AuraClient.objectPath,
+      AuraClient.interfaceName,
+      'LedMode',
+      DbusUint32
     )?.value as AuraLedMode;
   }
 
-  public static async setLedMode(value: AuraLedMode): Promise<void> {
+  public static setLedMode(value: AuraLedMode): void {
     AuraClient.initialize();
-    await DbusClient.setProperty(
+    DbusClient.setProperty(
       'system',
       AuraClient.serviceName,
       AuraClient.objectPath,

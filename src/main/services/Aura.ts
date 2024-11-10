@@ -1,46 +1,43 @@
 import { LoggerMain } from '@tser-framework/main';
 
-import {
-  AuraBrightness as RgbBrightness,
-  AuraLedMode as RgbLedMode
-} from '../../commons/src/models/Aura';
+import { AuraBrightness, AuraLedMode } from '../../commons/src/models/Aura';
 import { AuraClient } from '../client/Aura';
 
 export class AuraService {
   private static logger = new LoggerMain('AuraService');
-  private static lastMode: RgbLedMode | undefined = undefined;
-  private static lastBrightness: RgbBrightness | undefined = undefined;
+  private static lastMode: AuraLedMode | undefined = undefined;
+  private static lastBrightness: AuraBrightness | undefined = undefined;
 
-  public static async initialize(): Promise<void> {
-    AuraService.lastMode = await AuraService.getLedMode();
-    AuraService.lastBrightness = await AuraService.getBrightness();
+  public static initialize(): void {
+    AuraService.lastMode = AuraService.getLedMode();
+    AuraService.lastBrightness = AuraService.getBrightness();
   }
 
-  public static async getLedMode(): Promise<RgbLedMode> {
-    return AuraService.lastMode || (await AuraClient.getLedMode());
+  public static getLedMode(): AuraLedMode {
+    return AuraService.lastMode || AuraClient.getLedMode();
   }
 
-  public static async setLedMode(mode: RgbLedMode): Promise<void> {
-    if ((await AuraService.getLedMode()) !== mode) {
-      AuraService.logger.info(`Setting LED mode to ${RgbLedMode[mode]}`);
-      await AuraClient.setLedMode(mode);
+  public static setLedMode(mode: AuraLedMode): void {
+    if (AuraService.getLedMode() !== mode) {
+      AuraService.logger.info(`Setting LED mode to ${AuraLedMode[mode]}`);
+      AuraClient.setLedMode(mode);
       AuraService.lastMode = mode;
     } else {
-      AuraService.logger.info(`LED mode already is ${RgbLedMode[mode]}`);
+      AuraService.logger.info(`LED mode already is ${AuraLedMode[mode]}`);
     }
   }
 
-  public static async getBrightness(): Promise<RgbBrightness> {
-    return AuraService.lastBrightness || (await AuraClient.getBrightness());
+  public static getBrightness(): AuraBrightness {
+    return AuraService.lastBrightness || AuraClient.getBrightness();
   }
 
-  public static async setBrightness(level: RgbBrightness): Promise<void> {
-    if ((await AuraService.getBrightness()) !== level) {
-      AuraService.logger.info(`Setting brightness to ${RgbBrightness[level]}`);
-      await AuraClient.setBrightness(level);
+  public static setBrightness(level: AuraBrightness): void {
+    if (AuraService.getBrightness() !== level) {
+      AuraService.logger.info(`Setting brightness to ${AuraBrightness[level]}`);
+      AuraClient.setBrightness(level);
       AuraService.lastBrightness = level;
     } else {
-      AuraService.logger.info(`Brightness already is ${RgbBrightness[level]}`);
+      AuraService.logger.info(`Brightness already is ${AuraBrightness[level]}`);
     }
   }
 }

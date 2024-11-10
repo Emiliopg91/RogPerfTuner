@@ -7,21 +7,19 @@ export class PlatformClient {
   private static objectPath = '/org/asuslinux';
   private static interfaceName = 'org.asuslinux.Platform';
 
-  public static async getChargeControlEndThresold(): Promise<number> {
-    return (
-      await DbusClient.getProperty(
-        'system',
-        PlatformClient.serviceName,
-        PlatformClient.objectPath,
-        PlatformClient.interfaceName,
-        'ChargeControlEndThreshold',
-        DbusByte
-      )
+  public static getChargeControlEndThresold(): number {
+    return DbusClient.getProperty(
+      'system',
+      PlatformClient.serviceName,
+      PlatformClient.objectPath,
+      PlatformClient.interfaceName,
+      'ChargeControlEndThreshold',
+      DbusByte
     )?.value as number;
   }
 
-  public static async setChargeControlEndThresold(value: number): Promise<void> {
-    await DbusClient.setProperty(
+  public static setChargeControlEndThresold(value: number): void {
+    DbusClient.setProperty(
       'system',
       PlatformClient.serviceName,
       PlatformClient.objectPath,
@@ -31,21 +29,19 @@ export class PlatformClient {
     );
   }
 
-  public static async getThrottleThermalProfile(): Promise<ThrottleThermalPolicy> {
-    return (
-      await DbusClient.getProperty(
-        'system',
-        PlatformClient.serviceName,
-        PlatformClient.objectPath,
-        PlatformClient.interfaceName,
-        'ThrottleThermalPolicy',
-        DbusUint32
-      )
+  public static getThrottleThermalProfile(): ThrottleThermalPolicy {
+    return DbusClient.getProperty(
+      'system',
+      PlatformClient.serviceName,
+      PlatformClient.objectPath,
+      PlatformClient.interfaceName,
+      'ThrottleThermalPolicy',
+      DbusUint32
     )?.value as ThrottleThermalPolicy;
   }
 
-  public static async setThrottleThermalProfile(value: ThrottleThermalPolicy): Promise<void> {
-    await DbusClient.setProperty(
+  public static setThrottleThermalProfile(value: ThrottleThermalPolicy): void {
+    DbusClient.setProperty(
       'system',
       PlatformClient.serviceName,
       PlatformClient.objectPath,

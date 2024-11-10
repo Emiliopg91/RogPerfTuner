@@ -7,8 +7,8 @@ export class PowerClient {
   public static objectPath = '/net/hadess/PowerProfiles';
   public static interfaceName = 'net.hadess.PowerProfiles';
 
-  public static async setActiveProfile(value: PowerProfile): Promise<void> {
-    await DbusClient.setProperty(
+  public static setActiveProfile(value: PowerProfile): void {
+    DbusClient.setProperty(
       'system',
       PowerClient.serviceName,
       PowerClient.objectPath,
@@ -18,16 +18,16 @@ export class PowerClient {
     );
   }
 
-  public static async getActiveProfile(): Promise<PowerProfile> {
+  public static getActiveProfile(): PowerProfile {
     return (
-      (await DbusClient.getProperty(
+      DbusClient.getProperty(
         'system',
         PowerClient.serviceName,
         PowerClient.objectPath,
         PowerClient.interfaceName,
         'ActiveProfile',
         DbusString
-      )) as DbusString
+      ) as DbusString
     ).value as PowerProfile;
   }
 }
