@@ -1,5 +1,6 @@
 import { ChangeEvent, FC, useEffect, useState } from 'react';
 import { Form } from 'react-bootstrap';
+import { FaCog } from 'react-icons/fa';
 
 import { SettingsLine } from './commons/SettingLine';
 import { SettingsBlock } from './commons/SettingsBlock';
@@ -25,10 +26,11 @@ export const ApplicationSettings: FC = () => {
     }
   };
   return (
-    <SettingsBlock label="Application settings">
+    <SettingsBlock icon={<FaCog />} label="Settings">
       <SettingsLine label="Start on boot">
         <>
           <Form.Check
+            type="switch"
             checked={autoStart}
             onChange={handleAutoStartChange}
             disabled={!allowsAutoStart}

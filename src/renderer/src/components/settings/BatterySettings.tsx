@@ -2,6 +2,7 @@ import { ChargeThreshold } from '@commons/models/Battery';
 import { GlobalContext } from '@renderer/contexts/GlobalContext';
 import { ChangeEvent, FC, useContext } from 'react';
 import { Form } from 'react-bootstrap';
+import { BsBatteryCharging } from 'react-icons/bs';
 
 import { SettingsLine } from './commons/SettingLine';
 import { SettingsBlock } from './commons/SettingsBlock';
@@ -15,7 +16,7 @@ export const BatterySettings: FC = () => {
     setChargeThreshold(threshold);
   };
   return (
-    <SettingsBlock label="Battery settings">
+    <SettingsBlock icon={<BsBatteryCharging />} label="Battery">
       <SettingsLine label="Charge threshold">
         <>
           <Form.Select value={chargeThreshold} onChange={handleChange}>

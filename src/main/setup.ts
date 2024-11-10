@@ -16,6 +16,7 @@ import path from 'path';
 import { createWindow, mainWindow } from '.';
 import icon512 from '../../resources/icons/icon-512x512.png?asset';
 import { AuraBrightness, AuraLedMode } from '../commons/src/models/Aura';
+import { ChargeThreshold } from '../commons/src/models/Battery';
 import { ThrottleThermalPolicy } from '../commons/src/models/Platform';
 import { ApplicationService } from './services/Application';
 import { AuraService } from './services/Aura';
@@ -184,32 +185,20 @@ export const traySetThrottle = (policy: ThrottleThermalPolicy): void => {
 
 const getThresoldOptions: () => Array<Electron.MenuItemConstructorOptions> = () => {
   const current = BatteryService.getChargeThreshold();
-  return [
-    {
-      label: '50%',
-      type: 'radio',
-      checked: current == 50,
-      click: (): void => {
-        traySetBatteryThresold(50);
-      }
-    },
-    {
-      label: '75%',
-      type: 'radio',
-      checked: current == 75,
-      click: (): void => {
-        traySetBatteryThresold(75);
-      }
-    },
-    {
-      label: '100%',
-      type: 'radio',
-      checked: current == 100,
-      click: (): void => {
-        traySetBatteryThresold(100);
-      }
+  const thresholdOptions: Array<Electron.MenuItemConstructorOptions> = [];
+  for (const [key, value] of Object.entries(ChargeThreshold)) {
+    if (isNaN(Number(String(key)))) {
+      thresholdOptions.push({
+        label: `${value}%`,
+        type: 'radio',
+        checked: value == current,
+        click: () => {
+          traySetBatteryThresold(value as number);
+        }
+      });
     }
-  ];
+  }
+  return thresholdOptions;
 };
 const traySetBatteryThresold = (thresold: number): void => {
   BatteryService.setChargeThreshold(thresold);

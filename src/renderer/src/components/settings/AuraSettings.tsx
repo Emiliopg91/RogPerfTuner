@@ -2,6 +2,7 @@ import { AuraBrightness, AuraLedMode } from '@commons/models/Aura';
 import { GlobalContext } from '@renderer/contexts/GlobalContext';
 import { ChangeEvent, FC, useContext } from 'react';
 import { Form } from 'react-bootstrap';
+import { FaLightbulb } from 'react-icons/fa';
 
 import { SettingsLine } from './commons/SettingLine';
 import { SettingsBlock } from './commons/SettingsBlock';
@@ -25,7 +26,7 @@ export const AuraSettings: FC = () => {
   };
 
   return (
-    <SettingsBlock label="Aura settings">
+    <SettingsBlock icon={<FaLightbulb />} label="Aura">
       <SettingsLine label="RGB animation">
         <>
           <Form.Select value={ledMode} onChange={handleLedModeChange}>

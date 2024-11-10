@@ -30,6 +30,13 @@ export default defineConfig({
     plugins: [bytecodePlugin({ transformArrowFunctions: false })]
   },
   renderer: {
+    css: {
+      preprocessorOptions: {
+        scss: {
+          api: 'modern-compiler'
+        }
+      }
+    },
     resolve: {
       alias: {
         '@renderer': resolve('src/renderer/src'),
