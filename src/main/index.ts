@@ -33,7 +33,7 @@ const initTime = Date.now();
 
 (async (): Promise<void> => {
   await LoggerMain.initialize();
-  const logger = new LoggerMain('main/index.ts');
+  const logger = LoggerMain.for('main/index.ts');
   logger.info(`Starting from '${app.getPath('exe')}'`);
   logger.system('##################################################');
   logger.system('#                  Started main                  #');

@@ -4,7 +4,7 @@ import { AuraBrightness, AuraLedMode } from '../../commons/src/models/Aura';
 import { AuraClient } from '../client/Aura';
 
 export class AuraService {
-  private static logger = new LoggerMain('AuraService');
+  private static logger = LoggerMain.for('AuraService');
   private static lastMode: AuraLedMode | undefined = undefined;
   private static lastBrightness: AuraBrightness | undefined = undefined;
 

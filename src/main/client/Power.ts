@@ -8,7 +8,7 @@ export class PowerClient {
   public static interfaceName = 'net.hadess.PowerProfiles';
 
   public static setActiveProfile(value: PowerProfile): void {
-    DbusClient.setProperty(
+    DbusClient.setProperty<DbusString>(
       'system',
       PowerClient.serviceName,
       PowerClient.objectPath,
@@ -20,7 +20,7 @@ export class PowerClient {
 
   public static getActiveProfile(): PowerProfile {
     return (
-      DbusClient.getProperty(
+      DbusClient.getProperty<DbusString>(
         'system',
         PowerClient.serviceName,
         PowerClient.objectPath,

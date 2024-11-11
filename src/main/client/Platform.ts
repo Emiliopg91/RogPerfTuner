@@ -8,7 +8,7 @@ export class PlatformClient {
   private static interfaceName = 'org.asuslinux.Platform';
 
   public static getChargeControlEndThresold(): number {
-    return DbusClient.getProperty(
+    return DbusClient.getProperty<DbusByte>(
       'system',
       PlatformClient.serviceName,
       PlatformClient.objectPath,
@@ -19,7 +19,7 @@ export class PlatformClient {
   }
 
   public static setChargeControlEndThresold(value: number): void {
-    DbusClient.setProperty(
+    DbusClient.setProperty<DbusByte>(
       'system',
       PlatformClient.serviceName,
       PlatformClient.objectPath,
@@ -30,7 +30,7 @@ export class PlatformClient {
   }
 
   public static getThrottleThermalProfile(): ThrottleThermalPolicy {
-    return DbusClient.getProperty(
+    return DbusClient.getProperty<DbusUint32>(
       'system',
       PlatformClient.serviceName,
       PlatformClient.objectPath,
@@ -41,7 +41,7 @@ export class PlatformClient {
   }
 
   public static setThrottleThermalProfile(value: ThrottleThermalPolicy): void {
-    DbusClient.setProperty(
+    DbusClient.setProperty<DbusUint32>(
       'system',
       PlatformClient.serviceName,
       PlatformClient.objectPath,

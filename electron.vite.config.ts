@@ -2,6 +2,7 @@ import react from '@vitejs/plugin-react';
 import { bytecodePlugin, defineConfig } from 'electron-vite';
 import fs from 'fs';
 import path, { resolve } from 'path';
+import sass from 'sass-embedded';
 
 function findFile(fileName: string, dir: string): Array<string> {
   const result: Array<string> = [];
@@ -32,9 +33,8 @@ export default defineConfig({
   renderer: {
     css: {
       preprocessorOptions: {
-        scss: {
-          api: 'modern-compiler'
-        }
+        scss: { implementation: sass, api: 'modern-compiler' },
+        sass: { implementation: sass, api: 'modern-compiler' }
       }
     },
     resolve: {

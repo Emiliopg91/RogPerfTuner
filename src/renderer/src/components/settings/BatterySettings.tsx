@@ -1,6 +1,6 @@
 import { ChargeThreshold } from '@commons/models/Battery';
-import { GlobalContext } from '@renderer/contexts/GlobalContext';
-import { ChangeEvent, FC, useContext } from 'react';
+import { LoggerRenderer } from '@tser-framework/renderer';
+import { ChangeEvent, FC, useEffect, useState } from 'react';
 import { Form } from 'react-bootstrap';
 import { BsBatteryCharging } from 'react-icons/bs';
 
@@ -8,7 +8,17 @@ import { SettingsLine } from './commons/SettingLine';
 import { SettingsBlock } from './commons/SettingsBlock';
 
 export const BatterySettings: FC = () => {
-  const { chargeThreshold, setChargeThreshold } = useContext(GlobalContext);
+  const [chargeThreshold, setChargeThreshold] = useState(ChargeThreshold.CT_100);
+
+  useEffect(() => {
+    window.api.refreshChargeThreshold((threshold) => {
+      LoggerRenderer.info('Refreshing charge threshold in UI');
+      setChargeThreshold(() => threshold);
+    });
+    window.api.getChargeThresold().then((result: number) => {
+      setChargeThreshold(result);
+    });
+  }, []);
 
   const handleChange = (event: ChangeEvent<HTMLSelectElement>): void => {
     const threshold = parseInt(event.target.value);
@@ -19,7 +29,7 @@ export const BatterySettings: FC = () => {
     <SettingsBlock icon={<BsBatteryCharging />} label="Battery">
       <SettingsLine label="Charge threshold">
         <>
-          <Form.Select value={chargeThreshold} onChange={handleChange}>
+          <Form.Select value={chargeThreshold} onChange={handleChange} data-bs-theme="dark">
             {Object.entries(ChargeThreshold)
               .filter(([key]) => isNaN(Number(String(key))))
               .map(([key, value]) => {

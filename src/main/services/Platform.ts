@@ -18,7 +18,7 @@ import { Settings } from '../utils/Settings';
 import { BatteryService } from './Battery';
 
 export class PlatformService {
-  private static logger = new LoggerMain('PlatformService');
+  private static logger = LoggerMain.for('PlatformService');
   private static initialized = false;
   private static boostControl: BoostControl | undefined = undefined;
   private static lastBoost: boolean | undefined = undefined;

@@ -35,9 +35,10 @@ export const windowConfig: WindowConfig = {
   zoom: false,
   icon: icon512,
   constructorOptions: {
+    fullscreenable: false,
     resizable: false,
     width: 580,
-    height: 700,
+    height: 760,
     backgroundColor: '#191919',
     show: false,
     title: app.getName(),

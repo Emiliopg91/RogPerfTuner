@@ -5,17 +5,20 @@ import { execSync } from 'child_process';
 import { DbusString, DbusType } from './types';
 
 export class DbusClient {
-  private static logger = new LoggerMain('DbusClient');
+  private static logger = LoggerMain.for('DbusClient');
 
-  private static executeDbusSend<T extends DbusType<any>>(
+  private static executeDbusSend<
+    O extends DbusType<any> | void,
+    I extends Array<DbusType<any>> = []
+  >(
     busType: 'system' | 'session',
     destination: string,
     objectPath: string,
     interfaceName: string,
     methodName: string,
-    propertyType: { new (value: any): T } | undefined,
-    ...params: DbusType<any>[]
-  ): T | void {
+    propertyType: { new (value: any): O } | void,
+    ...params: I
+  ): O | void {
     try {
       const paramString = params.map((param) => param.serialize()).join(' ');
       const busCommand = busType === 'system' ? 'dbus-send --system' : 'dbus-send --session';
@@ -34,43 +37,46 @@ export class DbusClient {
         throw error;
       }
 
+      let result: O | void = undefined;
+
       const lines = stdout.trim().split('\n').slice(1);
-      if (lines.length > 0 && propertyType != undefined) {
-        const parsedData = DbusType.parse(lines[0].trim());
-
-        let result: T | void = undefined;
-
-        if (parsedData instanceof propertyType) {
-          result = parsedData;
+      if (propertyType != undefined) {
+        if (lines.length > 0) {
+          const parsedData = DbusType.parse(lines[0].trim());
+          if (parsedData instanceof propertyType) {
+            result = parsedData;
+          } else {
+            DbusClient.logger.error(
+              `Property value doesn't match with expected ${propertyType.name}`
+            );
+            throw new Error(`Property value doesn't match with expected ${propertyType.name}`);
+          }
         } else {
-          DbusClient.logger.error(
-            `Property value doesn't matches with expected ${propertyType.name}`
-          );
-          throw new Error(`Property value doesn't matches with expected ${propertyType.name}`);
+          throw new Error(`No response but expected ${propertyType.name} response`);
         }
-
-        DbusClient.logger.debug(
-          `Dbus command finished after ${(Date.now() - t0) / 1000} with result: ${result}`
-        );
-
-        return result;
       }
+
+      DbusClient.logger.debug(
+        `Dbus command finished after ${(Date.now() - t0) / 1000} ${propertyType ? `with result: ${(result as DbusType<any>).value}` : ''}`
+      );
+
+      return result;
     } catch (error: any) {
       DbusClient.logger.error(`Error while running dbus-send: ${error}`);
       throw new Error(`Error while running dbus-send: ${error}`);
     }
   }
 
-  public static getProperty<T extends DbusType<any>>(
+  public static getProperty<O extends DbusType<any>>(
     busType: 'system' | 'session',
     destination: string,
     objectPath: string,
     interfaceName: string,
     propertyName: string,
-    propertyType: { new (value: any): T }
-  ): T | void {
+    propertyType: { new (value: any): O }
+  ): O {
     try {
-      return DbusClient.executeDbusSend(
+      return DbusClient.executeDbusSend<O, [DbusString, DbusString]>(
         busType,
         destination,
         objectPath,
@@ -79,23 +85,23 @@ export class DbusClient {
         propertyType,
         new DbusString(interfaceName),
         new DbusString(propertyName)
-      );
+      ) as O;
     } catch (error) {
       DbusClient.logger.error(`Error getting property ${propertyName}: ${error}`);
-      return undefined;
+      throw new Error(`Error getting property ${propertyName}: ${error}`);
     }
   }
 
-  public static setProperty<T extends DbusType<any>>(
+  public static setProperty<I extends DbusType<any>>(
     busType: 'system' | 'session',
     destination: string,
     objectPath: string,
     interfaceName: string,
     propertyName: string,
-    propertyValue: T
+    propertyValue: I
   ): void {
     try {
-      DbusClient.executeDbusSend(
+      DbusClient.executeDbusSend<void, [DbusString, DbusString, DbusString]>(
         busType,
         destination,
         objectPath,
@@ -112,17 +118,17 @@ export class DbusClient {
     }
   }
 
-  public static executeMethod<T extends DbusType<any>>(
+  public static executeMethod<O extends DbusType<any> | void, I extends Array<DbusType<any>> = []>(
     busType: 'system' | 'session',
     destination: string,
     objectPath: string,
     interfaceName: string,
     methodName: string,
-    propertyType: { new (value: any): T } | undefined,
-    ...params: DbusType<any>[]
-  ): T | void {
+    propertyType: { new (value: any): O } | void,
+    ...params: I
+  ): DbusType<any> | void {
     try {
-      return DbusClient.executeDbusSend(
+      return DbusClient.executeDbusSend<O, I>(
         busType,
         destination,
         objectPath,

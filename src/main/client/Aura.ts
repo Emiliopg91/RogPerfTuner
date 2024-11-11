@@ -22,7 +22,7 @@ export class AuraClient {
 
   public static getBrightness(): AuraBrightness {
     AuraClient.initialize();
-    return DbusClient.getProperty(
+    return DbusClient.getProperty<DbusUint32>(
       'system',
       AuraClient.serviceName,
       AuraClient.objectPath,
@@ -34,7 +34,7 @@ export class AuraClient {
 
   public static setBrightness(value: AuraBrightness): void {
     AuraClient.initialize();
-    DbusClient.setProperty(
+    DbusClient.setProperty<DbusUint32>(
       'system',
       AuraClient.serviceName,
       AuraClient.objectPath,
@@ -46,7 +46,7 @@ export class AuraClient {
 
   public static getLedMode(): AuraLedMode {
     AuraClient.initialize();
-    return DbusClient.getProperty(
+    return DbusClient.getProperty<DbusUint32>(
       'system',
       AuraClient.serviceName,
       AuraClient.objectPath,
@@ -58,7 +58,7 @@ export class AuraClient {
 
   public static setLedMode(value: AuraLedMode): void {
     AuraClient.initialize();
-    DbusClient.setProperty(
+    DbusClient.setProperty<DbusUint32>(
       'system',
       AuraClient.serviceName,
       AuraClient.objectPath,

@@ -5,7 +5,7 @@ import fs from 'fs';
 import path from 'path';
 
 export class ApplicationService {
-  private static logger = new LoggerMain('ApplicationService');
+  private static logger = LoggerMain.for('ApplicationService');
   private static appImageFileName = `${app.name}.AppImage`;
   private static appImagePath: string | undefined = undefined;
   private static autoStartFile = path.join(

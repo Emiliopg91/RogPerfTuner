@@ -8,7 +8,7 @@ export class FanCurvesClient {
   private static interfaceName = 'org.asuslinux.FanCurves';
 
   public static resetProfileCurves(profile: ThrottleThermalPolicy): void {
-    DbusClient.executeMethod(
+    DbusClient.executeMethod<void, [DbusUint32]>(
       'system',
       FanCurvesClient.serviceName,
       FanCurvesClient.objectPath,
@@ -20,7 +20,7 @@ export class FanCurvesClient {
   }
 
   public static setCurvesToDefaults(profile: ThrottleThermalPolicy): void {
-    DbusClient.executeMethod(
+    DbusClient.executeMethod<void, [DbusUint32]>(
       'system',
       FanCurvesClient.serviceName,
       FanCurvesClient.objectPath,
@@ -32,7 +32,7 @@ export class FanCurvesClient {
   }
 
   public static setFanCurvesEnabled(profile: ThrottleThermalPolicy, enabled: boolean): void {
-    DbusClient.executeMethod(
+    DbusClient.executeMethod<void, [DbusUint32, DbusBoolean]>(
       'system',
       FanCurvesClient.serviceName,
       FanCurvesClient.objectPath,

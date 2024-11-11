@@ -4,7 +4,7 @@ import { exec } from 'child_process';
 import { SudoPasswordResult } from '../../commons/src/models/Dialogs';
 
 export class Dialogs {
-  private static logger = new LoggerMain('Dialogs');
+  private static logger = LoggerMain.for('Dialogs');
 
   public static async askForSudoPassword(
     askForRemember: boolean,

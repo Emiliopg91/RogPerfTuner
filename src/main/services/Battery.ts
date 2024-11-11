@@ -6,7 +6,7 @@ import path from 'path';
 import { PlatformClient } from '../client/Platform';
 
 export class BatteryService {
-  private static logger = new LoggerMain('BatteryStatusService');
+  private static logger = LoggerMain.for('BatteryStatusService');
 
   private static mutex: Mutex = new Mutex();
 

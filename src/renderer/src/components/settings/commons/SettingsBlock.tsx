@@ -14,7 +14,8 @@ export const SettingsBlock: FC<SettingsBlockProps> = (props) => {
     <Container className="settingsBlock">
       <fieldset>
         <legend>
-          {props.icon} {props.label}
+          <div className="blockIcon">{props.icon}</div>
+          <div className="blockName">{props.label}</div>
         </legend>
         <div>{props.children}</div>
       </fieldset>

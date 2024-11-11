@@ -10,7 +10,7 @@ import { PlatformService } from '../services/Platform';
 import { traySetBrightness, traySetLedMode, traySetThrottle } from '../setup';
 
 export class HttpServer {
-  private static logger = new LoggerMain('HttpServer');
+  private static logger = LoggerMain.for('HttpServer');
   public static async initialize(): Promise<void> {
     // Configuración del puerto
     const PORT = 18157;

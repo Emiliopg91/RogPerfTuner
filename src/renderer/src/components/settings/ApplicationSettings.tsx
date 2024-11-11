@@ -31,6 +31,7 @@ export const ApplicationSettings: FC = () => {
         <>
           <Form.Check
             type="switch"
+            className="rotated180"
             checked={autoStart}
             onChange={handleAutoStartChange}
             disabled={!allowsAutoStart}

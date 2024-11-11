@@ -1,6 +1,6 @@
 import { AuraBrightness, AuraLedMode } from '@commons/models/Aura';
-import { GlobalContext } from '@renderer/contexts/GlobalContext';
-import { ChangeEvent, FC, useContext } from 'react';
+import { LoggerRenderer } from '@tser-framework/renderer';
+import { ChangeEvent, FC, useEffect, useState } from 'react';
 import { Form } from 'react-bootstrap';
 import { FaLightbulb } from 'react-icons/fa';
 
@@ -8,7 +8,28 @@ import { SettingsLine } from './commons/SettingLine';
 import { SettingsBlock } from './commons/SettingsBlock';
 
 export const AuraSettings: FC = () => {
-  const { brightness, setBrightness, ledMode, setLedMode } = useContext(GlobalContext);
+  const [ledMode, setLedMode] = useState(AuraLedMode.STATIC);
+  const [brightness, setBrightness] = useState(AuraBrightness.MEDIUM);
+
+  useEffect(() => {
+    //Brightness
+    window.api.refreshBrightness((brightness: AuraBrightness) => {
+      LoggerRenderer.info('Refreshing brightness in UI');
+      setBrightness(() => brightness);
+    });
+    window.api.getBrightness().then((result: AuraBrightness) => {
+      setBrightness(result);
+    });
+
+    //Led Mode
+    window.api.refreshLedMode((mode: AuraLedMode) => {
+      LoggerRenderer.info('Refreshing led mode in UI');
+      setLedMode(() => mode);
+    });
+    window.api.getLedMode().then((result: AuraLedMode) => {
+      setLedMode(result);
+    });
+  }, []);
 
   const handleBrightnessChange = (event: ChangeEvent<HTMLSelectElement>): void => {
     const brightness = parseInt(event.target.value) as AuraBrightness;
@@ -29,7 +50,7 @@ export const AuraSettings: FC = () => {
     <SettingsBlock icon={<FaLightbulb />} label="Aura">
       <SettingsLine label="RGB animation">
         <>
-          <Form.Select value={ledMode} onChange={handleLedModeChange}>
+          <Form.Select value={ledMode} onChange={handleLedModeChange} data-bs-theme="dark">
             {Object.entries(AuraLedMode)
               .filter(([key]) => isNaN(Number(String(key))))
               .map(([key, value]) => {
@@ -44,7 +65,7 @@ export const AuraSettings: FC = () => {
       </SettingsLine>
       <SettingsLine label="Brightness">
         <>
-          <Form.Select value={brightness} onChange={handleBrightnessChange}>
+          <Form.Select value={brightness} onChange={handleBrightnessChange} data-bs-theme="dark">
             {Object.entries(AuraBrightness)
               .filter(([key]) => isNaN(Number(String(key))))
               .map(([key, value]) => {

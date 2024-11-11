@@ -13,7 +13,9 @@ export const SettingsLine: FC<SettingsLineProps> = (props) => {
         <Col sm={4} className="optionLabel">
           <b>{props.label}</b>
         </Col>
-        <Col sm={8}>{props.children}</Col>
+        <Col sm={8} className="optionInput">
+          {props.children}
+        </Col>
       </Row>
     </>
   );
