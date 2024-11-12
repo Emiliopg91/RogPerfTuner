@@ -3,10 +3,10 @@ import { Menu, app } from 'electron/main';
 
 import icon45 from '../../resources/icons/icon-45x45.png?asset';
 import translations from '../../resources/translations.i18n.json';
-import { AuraClient } from './dbus/AuraClient';
-import { FanCurvesClient } from './dbus/FanCurvesClient';
-import { PlatformClient } from './dbus/PlatformClient';
-import { PowerClient } from './dbus/PowerClient';
+import { AsusAuraClient } from './dbus/AsusAuraClient';
+import { AsusFanCurvesClient } from './dbus/AsusFanCurvesClient';
+import { AsusPlatformClient } from './dbus/AsusPlatformClient';
+import { PowerProfilesClient } from './dbus/PowerProfilesClient';
 import { ApplicationService } from './services/Application';
 import { AuraService } from './services/Aura';
 import { PlatformService } from './services/Platform';
@@ -22,10 +22,10 @@ export async function initializeBeforeReady(): Promise<void> {
 // eslint-disable-next-line @typescript-eslint/no-empty-function
 export async function initializeWhenReady(): Promise<void> {
   await Settings.initialize();
-  await AuraClient.getInstance();
-  await FanCurvesClient.getInstance();
-  await PlatformClient.getInstance();
-  await PowerClient.getInstance();
+  await AsusAuraClient.getInstance();
+  await AsusFanCurvesClient.getInstance();
+  await AsusPlatformClient.getInstance();
+  await PowerProfilesClient.getInstance();
   await PlatformService.initialize();
   await AuraService.initialize();
   await ApplicationService.initialize();

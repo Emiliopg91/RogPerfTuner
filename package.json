@@ -1,7 +1,7 @@
 {
   "name": "RogControlCenter",
   "version": "1.0.0",
-  "description": "An Electron application with React and TypeScript",
+  "description": "An utility to manage Asus Rog laptop performance",
   "main": "./out/main/index.js",
   "author": {
     "name": "Emiliopg91",
@@ -21,8 +21,6 @@
     "update": "pnpm store prune && pnpm i",
     "postinstall": "electron-builder install-app-deps",
     "build:unpack": "pnpm build && electron-builder --dir",
-    "build:win": "pnpm build && electron-builder --win",
-    "build:mac": "pnpm build && electron-builder --mac",
     "build:linux": "pnpm build && electron-builder --linux"
   },
   "dependencies": {

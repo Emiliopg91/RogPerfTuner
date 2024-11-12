@@ -10,12 +10,12 @@ import {
   PowerProfile,
   ThrottleThermalPolicy
 } from '../../commons/src/models/Platform';
-import { FanCurvesClient } from '../dbus/FanCurvesClient';
-import { PlatformClient } from '../dbus/PlatformClient';
-import { PowerClient } from '../dbus/PowerClient';
+import { AsusFanCurvesClient } from '../dbus/AsusFanCurvesClient';
+import { AsusPlatformClient } from '../dbus/AsusPlatformClient';
+import { PowerProfilesClient } from '../dbus/PowerProfilesClient';
+import { UPowerClient } from '../dbus/UPowerClient';
 import { generateTrayMenuDef, refreshTrayMenu } from '../setup';
 import { Settings } from '../utils/Settings';
-import { BatteryService } from './Battery';
 
 export class PlatformService {
   private static logger = LoggerMain.for('PlatformService');
@@ -53,7 +53,7 @@ export class PlatformService {
   public static async initialize(): Promise<void> {
     if (!PlatformService.initialized) {
       PlatformService.initialized = true;
-      BatteryService.registerForAcEvents(PlatformService.onAcEvent);
+      UPowerClient.watchForChanges('OnBattery', PlatformService.onBatteryEvent);
 
       for (const control of PlatformService.everyBoostControl) {
         if (fs.existsSync(control.path)) {
@@ -72,8 +72,8 @@ export class PlatformService {
         });
       }
 
-      PlatformService.lastPolicy = await PlatformClient.getThrottleThermalProfile();
-      (await PlatformClient.getInstance()).watchForChanges(
+      PlatformService.lastPolicy = await AsusPlatformClient.getThrottleThermalProfile();
+      AsusPlatformClient.watchForChanges(
         'ThrottleThermalPolicy',
         async (value: ThrottleThermalPolicy) => {
           PlatformService.lastPolicy = value;
@@ -82,13 +82,10 @@ export class PlatformService {
         }
       );
 
-      PlatformService.lastPower = await PowerClient.getActiveProfile();
-      (await PowerClient.getInstance()).watchForChanges(
-        'ActiveProfile',
-        async (value: PowerProfile) => {
-          PlatformService.lastPower = value;
-        }
-      );
+      PlatformService.lastPower = await PowerProfilesClient.getActiveProfile();
+      PowerProfilesClient.watchForChanges('ActiveProfile', async (value: PowerProfile) => {
+        PlatformService.lastPower = value;
+      });
     }
   }
 
@@ -102,23 +99,18 @@ export class PlatformService {
     Settings.configMap.platform.profiles.last = ThrottleThermalPolicy[value];
   }
 
-  private static async onAcEvent(onAc: boolean): Promise<void> {
-    if (onAc) {
-      await PlatformService.setThrottleThermalPolicy(ThrottleThermalPolicy.PERFORMANCE, true);
-      mainWindow?.webContents.send(
-        'refreshThrottleThermalPolicy',
-        ThrottleThermalPolicy.PERFORMANCE
-      );
-    } else {
-      await PlatformService.setThrottleThermalPolicy(ThrottleThermalPolicy.QUIET, true);
-      mainWindow?.webContents.send('refreshThrottleThermalPolicy', ThrottleThermalPolicy.QUIET);
+  private static async onBatteryEvent(onBattery: boolean): Promise<void> {
+    let policy = ThrottleThermalPolicy.PERFORMANCE;
+    if (onBattery) {
+      policy = ThrottleThermalPolicy.QUIET;
     }
-    setTimeout(async () => {
-      refreshTrayMenu(await generateTrayMenuDef());
-    }, 250);
+
+    await PlatformService.setThrottleThermalPolicy(policy, true);
+    mainWindow?.webContents.send('refreshThrottleThermalPolicy', policy);
+    refreshTrayMenu(await generateTrayMenuDef());
   }
 
-  public static async getThrottleThermalPolicy(): Promise<ThrottleThermalPolicy> {
+  public static getThrottleThermalPolicy(): ThrottleThermalPolicy {
     return PlatformService.lastPolicy!;
   }
 
@@ -169,14 +161,14 @@ export class PlatformService {
           }
         })();
         const fansPromise = (async (): Promise<void> => {
-          await FanCurvesClient.setCurvesToDefaults(policy);
-          await FanCurvesClient.resetProfileCurves(policy);
-          await FanCurvesClient.setFanCurvesEnabled(policy, true);
+          await AsusFanCurvesClient.setCurvesToDefaults(policy);
+          await AsusFanCurvesClient.resetProfileCurves(policy);
+          await AsusFanCurvesClient.setFanCurvesEnabled(policy, true);
         })();
-        const throttlePromise = PlatformClient.setThrottleThermalProfile(policy);
+        const throttlePromise = AsusPlatformClient.setThrottleThermalProfile(policy);
         const powerPromise = (async (): Promise<void> => {
           if (PlatformService.lastPower != powerPolicy) {
-            PowerClient.setActiveProfile(powerPolicy);
+            PowerProfilesClient.setActiveProfile(powerPolicy);
           }
         })();
 

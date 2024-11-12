@@ -8,46 +8,42 @@ import { PlatformModels, ThrottleThermalPolicy } from '../../commons/src/models/
 import { AuraService } from '../services/Aura';
 import { PlatformService } from '../services/Platform';
 import { traySetBrightness, traySetLedMode, traySetThrottle } from '../setup';
+import { Constants } from './Constants';
 
 export class HttpServer {
   private static logger = LoggerMain.for('HttpServer');
   public static async initialize(): Promise<void> {
-    // Configuración del puerto
-    const PORT = 18157;
-
-    // Creación del servidor
     const server = createServer(async (req, res) => {
       const t0 = Date.now();
       let response = 'Invalid request';
       if (req.url) {
         HttpServer.logger.info('Received request to ' + req.url);
         LoggerMain.addTab();
-        // Parsear la URL para obtener el path
+
         const parsedUrl = parse(req.url, true);
         const path = parsedUrl.pathname;
 
-        // Verificar y extraer el servicio
         if (path && path.startsWith('/')) {
-          const service = path.slice(1); // Remueve el primer "/" de la ruta
+          const service = path.slice(1);
           switch (service) {
             case 'nextProfile':
-              const oldVal = await PlatformService.getThrottleThermalPolicy();
+              const oldVal = PlatformService.getThrottleThermalPolicy();
               const newVal = PlatformModels.getNext(oldVal);
               await traySetThrottle(newVal);
               response = ThrottleThermalPolicy[newVal];
               break;
             case 'nextLedMode':
-              const newVal2 = AuraModels.getNextMode(await AuraService.getLedMode());
+              const newVal2 = AuraModels.getNextMode(AuraService.getLedMode());
               await traySetLedMode(newVal2);
               response = AuraLedMode[newVal2];
               break;
             case 'increaseBrightness':
-              const newVal3 = AuraModels.getNextBrightness(await AuraService.getBrightness());
+              const newVal3 = AuraModels.getNextBrightness(AuraService.getBrightness());
               await traySetBrightness(newVal3);
               response = AuraBrightness[newVal3];
               break;
             case 'decreaseBrightness':
-              const newVal4 = AuraModels.getPreviousBrightness(await AuraService.getBrightness());
+              const newVal4 = AuraModels.getPreviousBrightness(AuraService.getBrightness());
               await traySetBrightness(newVal4);
               response = AuraBrightness[newVal4];
               break;
@@ -65,8 +61,8 @@ export class HttpServer {
     });
 
     await new Promise<void>((resolve) => {
-      server.listen(PORT, '127.0.0.1', () => {
-        HttpServer.logger.info(`Server listening http://localhost:${PORT}`);
+      server.listen(Constants.httpPort, '127.0.0.1', () => {
+        HttpServer.logger.info(`Server listening http://localhost:${Constants.httpPort}`);
         resolve();
       });
     });

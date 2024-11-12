@@ -2,7 +2,7 @@ import { LoggerMain } from '@tser-framework/main';
 
 import { mainWindow } from '..';
 import { AuraBrightness, AuraLedMode } from '../../commons/src/models/Aura';
-import { AuraClient } from '../dbus/AuraClient';
+import { AsusAuraClient } from '../dbus/AsusAuraClient';
 import { generateTrayMenuDef, refreshTrayMenu } from '../setup';
 
 export class AuraService {
@@ -11,17 +11,14 @@ export class AuraService {
   private static lastBrightness: AuraBrightness | undefined = undefined;
 
   public static async initialize(): Promise<void> {
-    AuraService.lastMode = await AuraClient.getLedMode();
-    AuraService.lastBrightness = await AuraClient.getBrightness();
-    (await AuraClient.getInstance()).watchForChanges(
-      'Brightness',
-      async (value: AuraBrightness) => {
-        AuraService.lastBrightness = value;
-        refreshTrayMenu(await generateTrayMenuDef());
-        mainWindow?.webContents.send('refreshBrightness', value);
-      }
-    );
-    (await AuraClient.getInstance()).watchForChanges('LedMode', async (value: AuraLedMode) => {
+    AuraService.lastMode = await AsusAuraClient.getLedMode();
+    AuraService.lastBrightness = await AsusAuraClient.getBrightness();
+    AsusAuraClient.watchForChanges('Brightness', async (value: AuraBrightness) => {
+      AuraService.lastBrightness = value;
+      refreshTrayMenu(await generateTrayMenuDef());
+      mainWindow?.webContents.send('refreshBrightness', value);
+    });
+    AsusAuraClient.watchForChanges('LedMode', async (value: AuraLedMode) => {
       AuraService.lastMode = value;
       refreshTrayMenu(await generateTrayMenuDef());
       mainWindow?.webContents.send('refreshLedMode', value);
@@ -35,7 +32,7 @@ export class AuraService {
   public static async setLedMode(mode: AuraLedMode): Promise<void> {
     if (AuraService.getLedMode() !== mode) {
       AuraService.logger.info(`Setting LED mode to ${AuraLedMode[mode]}`);
-      await AuraClient.setLedMode(mode);
+      await AsusAuraClient.setLedMode(mode);
       if (AuraService.getBrightness() == AuraBrightness.OFF) {
         await AuraService.setBrightness(AuraBrightness.MEDIUM);
       }
@@ -51,7 +48,7 @@ export class AuraService {
   public static async setBrightness(level: AuraBrightness): Promise<void> {
     if (AuraService.getBrightness() !== level) {
       AuraService.logger.info(`Setting brightness to ${AuraBrightness[level]}`);
-      await AuraClient.setBrightness(level);
+      await AsusAuraClient.setBrightness(level);
     } else {
       AuraService.logger.info(`Brightness already is ${AuraBrightness[level]}`);
     }

@@ -5,11 +5,13 @@ import fs from 'fs';
 import path from 'path';
 
 import icon from '../../../resources/icons/icon.png?asset';
+import { Constants } from '../utils/Constants';
 
 export class ApplicationService {
   private static logger = LoggerMain.for('ApplicationService');
   private static appImageFileName = `${app.name}.AppImage`;
   private static appImagePath: string | undefined = undefined;
+  private static appScriptsPath: string = path.join(FileHelper.APP_DIR, 'scripts');
   private static appIconPath: File = new File({
     file: path.join(FileHelper.APP_DIR, 'icons', `${app.getName()}.png`)
   });
@@ -25,11 +27,19 @@ export class ApplicationService {
     if (!ApplicationService.initialized) {
       if (ApplicationService.allowsAutoStart()) {
         try {
-          ApplicationService.appImagePath = execSync(
-            `ps aux | grep '${app.name}.AppImage' | grep -v 'grep' | awk '{print $11}'`
+          const stdout = execSync(
+            `ps aux | grep -i '${app.name}.AppImage' | grep -v 'grep' | awk '{print $11}'`
           )
             .toString()
             .trim();
+
+          for (const line of stdout.split('\n')) {
+            if (line.toLowerCase().trim().endsWith('.appimage')) {
+              ApplicationService.appImagePath = line;
+              break;
+            }
+          }
+
           ApplicationService.logger.debug('AppImage path: ', ApplicationService.appImagePath);
           if (!ApplicationService.appIconPath.exists()) {
             ApplicationService.appIconPath.getParentFile().mkdir(true);
@@ -42,6 +52,48 @@ export class ApplicationService {
       } else {
         ApplicationService.logger.debug('Not getting AppImage path due to development mode');
       }
+
+      const scriptsFolder = new File({ file: ApplicationService.appScriptsPath });
+      if (!scriptsFolder.exists()) {
+        scriptsFolder.mkdir(true);
+      }
+      const nextProfileFile = new File({
+        file: path.join(ApplicationService.appScriptsPath, 'nextProfile.sh')
+      });
+      FileHelper.write(
+        nextProfileFile.getAbsolutePath(),
+        `#!/bin/bash
+curl http://localhost:${Constants.httpPort}/nextProfile
+`
+      );
+      const nextAnimation = new File({
+        file: path.join(ApplicationService.appScriptsPath, 'nextAnimation.sh')
+      });
+      FileHelper.write(
+        nextAnimation.getAbsolutePath(),
+        `#!/bin/bash
+curl http://localhost:${Constants.httpPort}/nextLedMode
+`
+      );
+      const incBrightness = new File({
+        file: path.join(ApplicationService.appScriptsPath, 'incBrightness.sh')
+      });
+      FileHelper.write(
+        incBrightness.getAbsolutePath(),
+        `#!/bin/bash
+curl http://localhost:${Constants.httpPort}/increaseBrightness
+`
+      );
+      const decBrightness = new File({
+        file: path.join(ApplicationService.appScriptsPath, 'decBrightness.sh')
+      });
+      FileHelper.write(
+        decBrightness.getAbsolutePath(),
+        `#!/bin/bash
+curl http://localhost:${Constants.httpPort}/decreaseBrightness
+`
+      );
+      execSync(`chmod 777 ${path.join(scriptsFolder.getAbsolutePath(), '*')}`);
     }
     ApplicationService.initialized = true;
   }

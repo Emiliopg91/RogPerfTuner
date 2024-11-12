@@ -59,7 +59,7 @@ export abstract class AbstractDbusClient {
   }
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  public watchForChanges(property: string, callback: (value: any) => void): () => void {
+  protected watchForChanges(property: string, callback: (value: any) => void): () => void {
     if (!this.callbacks[property]) {
       this.callbacks[property] = [];
     }

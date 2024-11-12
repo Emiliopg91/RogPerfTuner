@@ -29,14 +29,14 @@
   },
   "led.mode.RAINBOW_WAVE": {
     "en": "Rainbow wave",
-    "es": "Ola arcoiris"
+    "es": "Onda arcoiris"
   },
   "led.brightness": {
     "en": "Brightness",
     "es": "Brillo"
   },
   "led.brightness.HIGH": {
-    "en": "HIGH",
+    "en": "High",
     "es": "Alto"
   },
   "led.brightness.MEDIUM": {
@@ -95,36 +95,8 @@
     "en": "{appName} is already running in background",
     "es": "{appName} está ejecutandose de fondo"
   },
-  "": {
-    "en": "",
-    "es": ""
-  },
-  "": {
-    "en": "",
-    "es": ""
-  },
-  "": {
-    "en": "",
-    "es": ""
-  },
-  "": {
-    "en": "",
-    "es": ""
-  },
-  "": {
-    "en": "",
-    "es": ""
-  },
-  "": {
-    "en": "",
-    "es": ""
-  },
-  "": {
-    "en": "",
-    "es": ""
-  },
-  "": {
-    "en": "",
-    "es": ""
+  "settings": {
+    "en": "Settings",
+    "es": "Configuración"
   }
 }

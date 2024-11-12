@@ -4,7 +4,7 @@ import fs_promises from 'fs/promises';
 import path from 'path';
 
 import { mainWindow } from '..';
-import { PlatformClient } from '../dbus/PlatformClient';
+import { AsusPlatformClient } from '../dbus/AsusPlatformClient';
 import { generateTrayMenuDef, refreshTrayMenu } from '../setup';
 
 export class BatteryService {
@@ -23,15 +23,12 @@ export class BatteryService {
         BatteryService.checkBatteryStatus();
       }, 5000);
 
-      BatteryService.lastThreshold = await PlatformClient.getChargeControlEndThresold();
-      (await PlatformClient.getInstance()).watchForChanges(
-        'ChargeControlEndThreshold',
-        async (value: number) => {
-          BatteryService.lastThreshold = value;
-          refreshTrayMenu(await generateTrayMenuDef());
-          mainWindow?.webContents.send('refreshChargeThreshold', value);
-        }
-      );
+      BatteryService.lastThreshold = await AsusPlatformClient.getChargeControlEndThresold();
+      AsusPlatformClient.watchForChanges('ChargeControlEndThreshold', async (value: number) => {
+        BatteryService.lastThreshold = value;
+        refreshTrayMenu(await generateTrayMenuDef());
+        mainWindow?.webContents.send('refreshChargeThreshold', value);
+      });
     }
   }
 
@@ -44,13 +41,13 @@ export class BatteryService {
   }
 
   public static async getChargeThreshold(): Promise<number> {
-    return BatteryService.lastThreshold ?? (await PlatformClient.getChargeControlEndThresold());
+    return BatteryService.lastThreshold ?? (await AsusPlatformClient.getChargeControlEndThresold());
   }
 
   public static async setChargeThreshold(value: number): Promise<void> {
     if ((await BatteryService.getChargeThreshold()) !== value) {
       BatteryService.logger.info(`Setting battery charge threshold to ${value}%`);
-      await PlatformClient.setChargeControlEndThresold(value);
+      await AsusPlatformClient.setChargeControlEndThresold(value);
     } else {
       BatteryService.logger.info(`Battery charge threshold already is ${value}%`);
     }
