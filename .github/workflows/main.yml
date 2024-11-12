@@ -1,0 +1,97 @@
+name: Release production build
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  build:
+    permissions: write-all
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v2
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v2
+        with:
+          node-version: '18'
+
+      - name: Install pnpm
+        run: npm install -g pnpm
+
+      - name: Install project
+        run: pnpm i
+
+      - name: Extract version from package.json
+        id: extract_version
+        run: |
+          VERSION=$(node -p "require('./package.json').version")
+          echo "version=$VERSION" >> $GITHUB_ENV
+
+      - name: Build for Linux
+        run: pnpm build:linux
+
+      - name: Changelog
+        uses: Bullrich/generate-release-changelog@master
+        id: Changelog
+        env:
+          REPO: ${{ github.repository }}
+
+      - name: Tag and prepare for next iteration
+        env:
+          GITHUB_TOKEN: ${{ secrets.GH_ACTION_PAT }}
+        run: |
+          VERSION=${{ env.version }}
+          git config --global user.email "actions@github.com"
+          git config --global user.name "github-actions"
+          git tag "$VERSION"
+          git push origin "$VERSION"
+          CURRENT_VERSION=$(node -p "require('./package.json').version")
+          NEW_VERSION=$(echo $CURRENT_VERSION | awk -F. '{print $1"."$2"."($3+1)}')
+          echo "Updating version from $CURRENT_VERSION to $NEW_VERSION"
+          jq --arg new_version "$NEW_VERSION" '.version = $new_version' package.json > package.tmp.json
+          mv package.tmp.json package.json
+          git add -u
+          git reset -- .github/workflows/main.yml
+          git commit -m "[ci skip] Prepare for next development iteration"
+          git push origin main
+          git fetch
+          git checkout --force develop
+          git reset --hard main
+          git push --force
+
+      - name: Create GitHub Release
+        id: create_release
+        uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GH_ACTION_PAT }}
+        with:
+          tag_name: '${{ env.version }}'
+          release_name: '${{ env.version }}'
+          body: |
+            ${{ steps.Changelog.outputs.changelog }}
+          draft: false
+          prerelease: false
+
+      - name: Upload Release latest-linux.yml file
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GH_ACTION_PAT }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: ./dist/latest-linux.yml
+          asset_name: latest-linux.yml
+          asset_content_type: text/yaml
+
+      - name: Upload Release RogControlCenter.AppImage file
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GH_ACTION_PAT }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: ./dist/RogControlCenter.AppImage
+          asset_name: RogControlCenter.AppImage
+          asset_content_type: application/octet-stream
