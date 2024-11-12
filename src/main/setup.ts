@@ -269,7 +269,7 @@ export const generateTrayMenuDef = async (): Promise<
 };
 
 export const ipcListeners: Record<string, IpcListener> = {
-  ...defaultIpcListeners,
+  log: defaultIpcListeners.log,
   getChargeThreshold: {
     sync: true,
     async fn() {

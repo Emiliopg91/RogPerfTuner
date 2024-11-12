@@ -1,19 +1,13 @@
 import { electronApp, is } from '@electron-toolkit/utils';
 import { JsonUtils } from '@tser-framework/commons';
-import {
-  AppUpdater,
-  LoggerMain,
-  Toaster,
-  TranslatorMain,
-  WindowHelper
-} from '@tser-framework/main';
+import { AppUpdater, LoggerMain, TranslatorMain, WindowHelper } from '@tser-framework/main';
 import { BrowserWindow, IpcMainInvokeEvent, Menu, app, ipcMain, protocol } from 'electron';
 import { dialog } from 'electron/main';
 import path from 'path';
 
-import rogLogo from '../../resources/icons/icon-512x512.png?asset';
 import { applicationLogic } from './applicationLogic';
 import { initializeBeforeReady, initializeWhenReady } from './initialize';
+import { NotificationService } from './services/NotificationService';
 import {
   appConfig,
   deepLinkBindings,
@@ -164,9 +158,8 @@ const initTime = Date.now();
           }
           mainWindow.focus();
         } else {
-          Toaster.toast(
-            TranslatorMain.translate('already.running', { appName: app.getName() }),
-            rogLogo
+          NotificationService.toast(
+            TranslatorMain.translate('already.running', { appName: app.getName() })
           );
         }
 
@@ -184,18 +177,21 @@ const initTime = Date.now();
         dialog
           .showMessageBox({
             type: 'info',
-            buttons: ['Update now', 'Update on restart'],
+            buttons: [
+              TranslatorMain.translate('update.now'),
+              TranslatorMain.translate('update.on.restart')
+            ],
             defaultId: 0,
             cancelId: 1,
-            title: 'Update available',
-            message: 'Updating requires restart RogControlCenter, do you wish to update now?'
+            title: TranslatorMain.translate('update.available'),
+            message: TranslatorMain.translate('update.requires', { appName: app.getName() })
           })
           .then((returnValue) => {
             if (returnValue.response === 0) {
               if (!shownUpdate) {
                 Constants.mutex.runExclusive(() => {
-                  Toaster.toast(
-                    'Installing update, RogControlCenter will restart after completion'
+                  NotificationService.toast(
+                    TranslatorMain.translate('update.installing', { appName: app.getName() })
                   );
                   appUpdater?.quitAndInstall(true, true);
                 });
