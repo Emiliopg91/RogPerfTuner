@@ -98,5 +98,25 @@
   "settings": {
     "en": "Settings",
     "es": "Configuración"
+  },
+  "update.installing": {
+    "en": "Installing update, RogControlCenter will restart after completion",
+    "es": "Instalando actualización, RogControlCenter se reiniciará tras finalizar"
+  },
+  "update.available": {
+    "en": "Update available",
+    "es": "Actualización disponible"
+  },
+  "update.requires": {
+    "en": "Updating requires restart RogControlCenter, do you wish to update now?",
+    "es": "Actualizar requiere de reiniciar RogControlCenter ¿Actualizar ahora?"
+  },
+  "update.now": {
+    "en": "Now",
+    "es": "Ahora"
+  },
+  "update.on.restart": {
+    "en": "On restart",
+    "es": "Al reiniciar"
   }
 }
