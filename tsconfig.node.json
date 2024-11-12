@@ -5,6 +5,16 @@
     "composite": true,
     "types": ["electron-vite/node"],
     "emitDecoratorMetadata": true,
-    "experimentalDecorators": true
+    "experimentalDecorators": true,
+    "baseUrl": ".",
+    "paths": {
+      "@main/*": [
+        "src/main/src/*"
+      ],
+      "@commons/*": [
+        "src/commons/src/*"
+      ]
+    }
   }
 }
+ 

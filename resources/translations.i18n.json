@@ -100,16 +100,16 @@
     "es": "Configuración"
   },
   "update.installing": {
-    "en": "Installing update, RogControlCenter will restart after completion",
-    "es": "Instalando actualización, RogControlCenter se reiniciará tras finalizar"
+    "en": "Installing update, {appName} will restart after completion",
+    "es": "Instalando actualización, {appName} se reiniciará tras finalizar"
   },
   "update.available": {
     "en": "Update available",
     "es": "Actualización disponible"
   },
   "update.requires": {
-    "en": "Updating requires restart RogControlCenter, do you wish to update now?",
-    "es": "Actualizar requiere de reiniciar RogControlCenter ¿Actualizar ahora?"
+    "en": "Updating requires restart {appName}, do you wish to update now?",
+    "es": "Actualizar requiere de reiniciar {appName} ¿Actualizar ahora?"
   },
   "update.now": {
     "en": "Now",

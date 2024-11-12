@@ -1,4 +1,5 @@
-import { ThrottleThermalPolicy } from '../../commons/src/models/Platform';
+import { ThrottleThermalPolicy } from '@commons/models/Platform';
+
 import { AbstractDbusClient } from './base/AbstractDbusClient';
 
 export class AsusFanCurvesClient extends AbstractDbusClient {

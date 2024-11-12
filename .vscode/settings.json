@@ -1,7 +1,8 @@
 {
   "editor.formatOnSave": true,
   "editor.codeActionsOnSave": {
-    "source.organizeImports": "always"
+    "source.organizeImports": "always",
+    "source.addMissingImports.ts": true
   },
   "[typescript]": {
     "editor.defaultFormatter": "esbenp.prettier-vscode"

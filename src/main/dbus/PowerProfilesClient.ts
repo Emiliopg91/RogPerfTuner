@@ -1,6 +1,6 @@
+import { PowerProfile } from '@commons/models/Platform';
 import { Variant } from 'dbus-next';
 
-import { PowerProfile } from '../../commons/src/models/Platform';
 import { AbstractDbusClient } from './base/AbstractDbusClient';
 
 export class PowerProfilesClient extends AbstractDbusClient {

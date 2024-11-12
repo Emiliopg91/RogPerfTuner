@@ -1,14 +1,14 @@
-import { LoggerMain, TranslatorMain } from '@tser-framework/main';
-import { execSync } from 'child_process';
-import * as fs from 'fs';
-
-import { mainWindow } from '..';
 import {
   BoostControl,
   PlatformModels,
   PowerProfile,
   ThrottleThermalPolicy
-} from '../../commons/src/models/Platform';
+} from '@commons/models/Platform';
+import { LoggerMain, TranslatorMain } from '@tser-framework/main';
+import { execSync } from 'child_process';
+import * as fs from 'fs';
+
+import { mainWindow } from '..';
 import { AsusFanCurvesClient } from '../dbus/AsusFanCurvesClient';
 import { AsusPlatformClient } from '../dbus/AsusPlatformClient';
 import { PowerProfilesClient } from '../dbus/PowerProfilesClient';
