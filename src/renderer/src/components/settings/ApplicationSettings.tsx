@@ -1,3 +1,4 @@
+import { TranslatorRenderer } from '@tser-framework/renderer';
 import { ChangeEvent, FC, useEffect, useState } from 'react';
 import { Form } from 'react-bootstrap';
 import { FaCog } from 'react-icons/fa';
@@ -26,8 +27,8 @@ export const ApplicationSettings: FC = () => {
     }
   };
   return (
-    <SettingsBlock icon={<FaCog />} label="Settings">
-      <SettingsLine label="Start on boot">
+    <SettingsBlock icon={<FaCog />} label={TranslatorRenderer.translate('settings')}>
+      <SettingsLine label={TranslatorRenderer.translate('start.on.boot')}>
         <>
           <Form.Check
             type="switch"

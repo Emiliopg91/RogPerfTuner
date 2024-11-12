@@ -3,6 +3,10 @@ import { Menu, app } from 'electron/main';
 
 import icon45 from '../../resources/icons/icon-45x45.png?asset';
 import translations from '../../resources/translations.i18n.json';
+import { AuraClient } from './dbus/AuraClient';
+import { FanCurvesClient } from './dbus/FanCurvesClient';
+import { PlatformClient } from './dbus/PlatformClient';
+import { PowerClient } from './dbus/PowerClient';
 import { ApplicationService } from './services/Application';
 import { AuraService } from './services/Aura';
 import { PlatformService } from './services/Platform';
@@ -18,14 +22,18 @@ export async function initializeBeforeReady(): Promise<void> {
 // eslint-disable-next-line @typescript-eslint/no-empty-function
 export async function initializeWhenReady(): Promise<void> {
   await Settings.initialize();
+  await AuraClient.getInstance();
+  await FanCurvesClient.getInstance();
+  await PlatformClient.getInstance();
+  await PowerClient.getInstance();
+  await PlatformService.initialize();
+  await AuraService.initialize();
+  await ApplicationService.initialize();
   await HttpServer.initialize();
-  PlatformService.initialize();
-  AuraService.initialize();
-  ApplicationService.initialize();
 
   const trayBuilder: TrayBuilder | undefined = TrayBuilder.builder(icon45)
     .withToolTip(app.name)
-    .withMenu(generateTrayMenuDef());
+    .withMenu(await generateTrayMenuDef());
   const tray = trayBuilder.build();
   setTrayMenuRefreshFn((newMenu: Array<Electron.MenuItemConstructorOptions>) => {
     const contextMenu = Menu.buildFromTemplate(newMenu);

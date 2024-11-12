@@ -1,5 +1,5 @@
 import { AuraBrightness, AuraLedMode } from '@commons/models/Aura';
-import { LoggerRenderer } from '@tser-framework/renderer';
+import { LoggerRenderer, TranslatorRenderer } from '@tser-framework/renderer';
 import { ChangeEvent, FC, useEffect, useState } from 'react';
 import { Form } from 'react-bootstrap';
 import { FaLightbulb } from 'react-icons/fa';
@@ -48,7 +48,7 @@ export const AuraSettings: FC = () => {
 
   return (
     <SettingsBlock icon={<FaLightbulb />} label="Aura">
-      <SettingsLine label="RGB animation">
+      <SettingsLine label={TranslatorRenderer.translate('led.mode')}>
         <>
           <Form.Select value={ledMode} onChange={handleLedModeChange} data-bs-theme="dark">
             {Object.entries(AuraLedMode)
@@ -56,14 +56,14 @@ export const AuraSettings: FC = () => {
               .map(([key, value]) => {
                 return (
                   <option key={key} value={value}>
-                    {key.substring(0, 1) + key.substring(1).toLowerCase().replace('_', ' ')}
+                    {TranslatorRenderer.translate('led.mode.' + key)}
                   </option>
                 );
               })}
           </Form.Select>
         </>
       </SettingsLine>
-      <SettingsLine label="Brightness">
+      <SettingsLine label={TranslatorRenderer.translate('led.brightness')}>
         <>
           <Form.Select value={brightness} onChange={handleBrightnessChange} data-bs-theme="dark">
             {Object.entries(AuraBrightness)
@@ -71,7 +71,7 @@ export const AuraSettings: FC = () => {
               .map(([key, value]) => {
                 return (
                   <option key={key} value={value}>
-                    {key.substring(0, 1) + key.substring(1).toLowerCase()}
+                    {TranslatorRenderer.translate('led.brightness.' + key)}
                   </option>
                 );
               })}

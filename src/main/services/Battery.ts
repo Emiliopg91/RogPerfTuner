@@ -3,56 +3,62 @@ import { Mutex } from 'async-mutex';
 import fs_promises from 'fs/promises';
 import path from 'path';
 
-import { PlatformClient } from '../client/Platform';
+import { mainWindow } from '..';
+import { PlatformClient } from '../dbus/PlatformClient';
+import { generateTrayMenuDef, refreshTrayMenu } from '../setup';
 
 export class BatteryService {
   private static logger = LoggerMain.for('BatteryStatusService');
-
   private static mutex: Mutex = new Mutex();
-
   private static lastAcConnected: boolean | null = null;
-  private static acCallbacks: Array<(connected: boolean) => void> = []; // Array para almacenar callbacks
-
+  private static acCallbacks: Array<(connected: boolean) => void> = [];
   private static initialized: boolean = false;
   private static interval: NodeJS.Timeout | undefined = undefined;
-
   private static lastThreshold: number | undefined = undefined;
 
-  private static initialize(): void {
+  private static async initialize(): Promise<void> {
     if (!BatteryService.initialized) {
       BatteryService.initialized = true;
-      (BatteryService.interval = setInterval(() => {
+      BatteryService.interval = setInterval(() => {
         BatteryService.checkBatteryStatus();
-      })),
-        5000;
+      }, 5000);
+
+      BatteryService.lastThreshold = await PlatformClient.getChargeControlEndThresold();
+      (await PlatformClient.getInstance()).watchForChanges(
+        'ChargeControlEndThreshold',
+        async (value: number) => {
+          BatteryService.lastThreshold = value;
+          refreshTrayMenu(await generateTrayMenuDef());
+          mainWindow?.webContents.send('refreshChargeThreshold', value);
+        }
+      );
     }
   }
 
   private static shutdown(): void {
-    if (BatteryService.interval && BatteryService.acCallbacks.length == 0) {
+    if (BatteryService.interval && BatteryService.acCallbacks.length === 0) {
       clearInterval(BatteryService.interval);
       BatteryService.initialized = false;
       BatteryService.interval = undefined;
     }
   }
 
-  public static getChargeThreshold(): number {
-    return BatteryService.lastThreshold || PlatformClient.getChargeControlEndThresold();
+  public static async getChargeThreshold(): Promise<number> {
+    return BatteryService.lastThreshold ?? (await PlatformClient.getChargeControlEndThresold());
   }
 
-  public static setChargeThreshold(value: number): void {
-    if (BatteryService.getChargeThreshold() != value) {
+  public static async setChargeThreshold(value: number): Promise<void> {
+    if ((await BatteryService.getChargeThreshold()) !== value) {
       BatteryService.logger.info(`Setting battery charge threshold to ${value}%`);
-      PlatformClient.setChargeControlEndThresold(value);
-      BatteryService.lastThreshold = value;
+      await PlatformClient.setChargeControlEndThresold(value);
     } else {
       BatteryService.logger.info(`Battery charge threshold already is ${value}%`);
     }
   }
 
   public static registerForAcEvents(callback: (connected: boolean) => void): () => void {
-    BatteryService.mutex.runExclusive(() => {
-      BatteryService.initialize();
+    BatteryService.mutex.runExclusive(async () => {
+      await BatteryService.initialize();
       if (!BatteryService.acCallbacks.includes(callback)) {
         BatteryService.acCallbacks.push(callback);
         BatteryService.logger.info('Registered callback for AC events');
@@ -60,7 +66,7 @@ export class BatteryService {
     });
 
     return () => {
-      BatteryService.mutex.runExclusive(() => {
+      BatteryService.mutex.runExclusive(async () => {
         const index = BatteryService.acCallbacks.indexOf(callback);
         if (index !== -1) {
           BatteryService.acCallbacks.splice(index, 1);
@@ -73,7 +79,7 @@ export class BatteryService {
   public static async checkBatteryStatus(): Promise<void> {
     await BatteryService.mutex.runExclusive(async () => {
       const current = (await BatteryService.getBatteryStatus()).powerPlugged;
-      const actualCurrent = current === null ? true : current; // Maneja el caso donde current es null
+      const actualCurrent = current === null ? true : current;
 
       if (
         BatteryService.lastAcConnected !== null &&
@@ -102,7 +108,6 @@ export class BatteryService {
 
   private static async getBatteryStatus(): Promise<{ powerPlugged: boolean | null }> {
     const powerPlugged = await BatteryService.isChargerConnected();
-
     return { powerPlugged };
   }
 
@@ -111,20 +116,17 @@ export class BatteryService {
 
     try {
       const directories = await fs_promises.readdir(basePath);
-
       const adapterDirs = directories.filter((dir) => /^(AC|ADP)\d*$/.test(dir));
 
       for (const dir of adapterDirs) {
         const onlinePath = path.join(basePath, dir, 'online');
-
         try {
-          // Intentar leer el archivo `online` en el directorio del adaptador
           const status = await fs_promises.readFile(onlinePath, 'utf8');
           if (status.trim() === '1') {
             return true;
           }
         } catch {
-          // Ignorar si el archivo `online` no existe o no se puede leer
+          // Ignore if online file cannot be read or doesn't exist
         }
       }
     } catch (error) {

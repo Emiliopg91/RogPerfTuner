@@ -6,6 +6,7 @@ import {
   IpcListener,
   LoggerMain,
   ProtocolBinding,
+  TranslatorMain,
   WindowConfig,
   defaultIpcListeners,
   defaultProtocolBindings
@@ -113,79 +114,74 @@ export const setTrayMenuRefreshFn = (
 ): void => {
   refreshTrayMenu = fn;
 };
-
-const getBrightnessOption: () => Array<Electron.MenuItemConstructorOptions> = () => {
+const getBrightnessOption: () => Promise<Array<Electron.MenuItemConstructorOptions>> = async () => {
   const current = AuraService.getBrightness();
   const brightnessOptions: Array<Electron.MenuItemConstructorOptions> = [];
   for (const [key, value] of Object.entries(AuraBrightness)) {
     if (isNaN(Number(String(key)))) {
       brightnessOptions.push({
-        label: key.substring(0, 1).toUpperCase() + key.substring(1).toLowerCase(),
+        label: TranslatorMain.translate('led.brightness.' + key),
         type: 'radio',
         checked: value == current,
-        click: () => {
-          traySetBrightness(value as AuraBrightness);
+        click: async () => {
+          await traySetBrightness(value as AuraBrightness);
         }
       });
     }
   }
   return brightnessOptions;
 };
-export const traySetBrightness = (brightness: AuraBrightness): void => {
-  AuraService.setBrightness(brightness);
-  refreshTrayMenu(generateTrayMenuDef());
-  mainWindow?.webContents.send('refreshBrightness', brightness);
+
+export const traySetBrightness = async (brightness: AuraBrightness): Promise<void> => {
+  await AuraService.setBrightness(brightness);
 };
 
-const getLedModeOptions: () => Array<Electron.MenuItemConstructorOptions> = () => {
+const getLedModeOptions: () => Promise<Array<Electron.MenuItemConstructorOptions>> = async () => {
   const current = AuraService.getLedMode();
   const ledModeOptions: Array<Electron.MenuItemConstructorOptions> = [];
   for (const [key, value] of Object.entries(AuraLedMode)) {
     if (isNaN(Number(String(key)))) {
       ledModeOptions.push({
-        label: key.substring(0, 1).toUpperCase() + key.substring(1).toLowerCase().replace('_', ' '),
+        label: TranslatorMain.translate('led.mode.' + key),
         type: 'radio',
         checked: value == current,
-        click: () => {
-          traySetLedMode(value as AuraLedMode);
+        click: async () => {
+          await traySetLedMode(value as AuraLedMode);
         }
       });
     }
   }
   return ledModeOptions;
 };
-export const traySetLedMode = (mode: AuraLedMode): void => {
-  AuraService.setLedMode(mode);
-  refreshTrayMenu(generateTrayMenuDef());
-  mainWindow?.webContents.send('refreshLedMode', mode);
-  mainWindow?.webContents.send('refreshBrightness', AuraService.getBrightness());
+
+export const traySetLedMode = async (mode: AuraLedMode): Promise<void> => {
+  await AuraService.setLedMode(mode);
 };
 
-const getThrottleOptions: () => Array<Electron.MenuItemConstructorOptions> = () => {
-  const current = PlatformService.getThrottleThermalPolicy();
+const getThrottleOptions: () => Promise<Array<Electron.MenuItemConstructorOptions>> = async () => {
+  const current = await PlatformService.getThrottleThermalPolicy();
   const throttleOptions: Array<Electron.MenuItemConstructorOptions> = [];
   for (const [key, value] of Object.entries(ThrottleThermalPolicy)) {
     if (isNaN(Number(String(key)))) {
       throttleOptions.push({
-        label: key.substring(0, 1).toUpperCase() + key.substring(1).toLowerCase().replace('_', ' '),
+        label: TranslatorMain.translate('performance.profile.' + key),
         type: 'radio',
         checked: value == current,
-        click: () => {
-          traySetThrottle(value as ThrottleThermalPolicy);
+        click: async () => {
+          await traySetThrottle(value as ThrottleThermalPolicy);
         }
       });
     }
   }
   return throttleOptions;
 };
-export const traySetThrottle = (policy: ThrottleThermalPolicy): void => {
-  PlatformService.setThrottleThermalPolicy(policy);
-  refreshTrayMenu(generateTrayMenuDef());
-  mainWindow?.webContents.send('refreshThrottleThermalPolicy', policy);
+
+export const traySetThrottle = async (policy: ThrottleThermalPolicy): Promise<void> => {
+  await PlatformService.setThrottleThermalPolicy(policy);
 };
 
-const getThresoldOptions: () => Array<Electron.MenuItemConstructorOptions> = () => {
-  const current = BatteryService.getChargeThreshold();
+const getThresoldOptions: () => Promise<Array<Electron.MenuItemConstructorOptions>> = async () => {
+  const current = await BatteryService.getChargeThreshold();
   const thresholdOptions: Array<Electron.MenuItemConstructorOptions> = [];
   for (const [key, value] of Object.entries(ChargeThreshold)) {
     if (isNaN(Number(String(key)))) {
@@ -193,29 +189,30 @@ const getThresoldOptions: () => Array<Electron.MenuItemConstructorOptions> = () 
         label: `${value}%`,
         type: 'radio',
         checked: value == current,
-        click: () => {
-          traySetBatteryThresold(value as number);
+        click: async () => {
+          await traySetBatteryThresold(value as number);
         }
       });
     }
   }
   return thresholdOptions;
 };
-const traySetBatteryThresold = (thresold: number): void => {
-  BatteryService.setChargeThreshold(thresold);
-  refreshTrayMenu(generateTrayMenuDef());
-  mainWindow?.webContents.send('refreshChargeThreshold', thresold);
+
+const traySetBatteryThresold = async (threshold: number): Promise<void> => {
+  await BatteryService.setChargeThreshold(threshold);
 };
 
-export const generateTrayMenuDef = (): Array<Electron.MenuItemConstructorOptions> => {
+export const generateTrayMenuDef = async (): Promise<
+  Array<Electron.MenuItemConstructorOptions>
+> => {
   return [
     {
-      label: 'Battery',
+      label: TranslatorMain.translate('battery'),
       enabled: false
     },
     {
-      label: '  Threshold',
-      submenu: getThresoldOptions()
+      label: '  ' + TranslatorMain.translate('charge.threshold'),
+      submenu: await getThresoldOptions()
     },
     { type: 'separator' },
     {
@@ -223,25 +220,25 @@ export const generateTrayMenuDef = (): Array<Electron.MenuItemConstructorOptions
       enabled: false
     },
     {
-      label: '  Mode',
-      submenu: getLedModeOptions()
+      label: '  ' + TranslatorMain.translate('led.mode'),
+      submenu: await getLedModeOptions()
     },
     {
-      label: '  Brightness',
-      submenu: getBrightnessOption()
+      label: '  ' + TranslatorMain.translate('led.brightness'),
+      submenu: await getBrightnessOption()
     },
     { type: 'separator' },
     {
-      label: 'Platform',
+      label: TranslatorMain.translate('performance'),
       enabled: false
     },
     {
-      label: '  Profile',
-      submenu: getThrottleOptions()
+      label: '  ' + TranslatorMain.translate('performance.profile'),
+      submenu: await getThrottleOptions()
     },
     { type: 'separator' },
     {
-      label: 'Open log',
+      label: TranslatorMain.translate('open.log'),
       type: 'normal',
       click: (): void => {
         FileHelper.openWithDefaulApp(LoggerMain.LOG_FILE);
@@ -249,7 +246,7 @@ export const generateTrayMenuDef = (): Array<Electron.MenuItemConstructorOptions
     },
     { type: 'separator' },
     {
-      label: 'Open GUI',
+      label: TranslatorMain.translate('open.gui'),
       type: 'normal',
       click: (): void => {
         if (mainWindow == null) {
@@ -262,7 +259,7 @@ export const generateTrayMenuDef = (): Array<Electron.MenuItemConstructorOptions
     },
     { type: 'separator' },
     {
-      label: 'Quit',
+      label: TranslatorMain.translate('quit'),
       type: 'normal',
       click: (): void => {
         app.quit();
@@ -275,55 +272,50 @@ export const ipcListeners: Record<string, IpcListener> = {
   ...defaultIpcListeners,
   getChargeThreshold: {
     sync: true,
-    fn() {
-      return BatteryService.getChargeThreshold();
+    async fn() {
+      return await BatteryService.getChargeThreshold();
     }
   },
   setChargeThreshold: {
     sync: true,
-    fn(_, threshold: number) {
-      BatteryService.setChargeThreshold(threshold);
-      refreshTrayMenu(generateTrayMenuDef());
+    async fn(_, threshold: number) {
+      await BatteryService.setChargeThreshold(threshold);
     }
   },
   getLedMode: {
     sync: true,
-    fn() {
+    async fn() {
       return AuraService.getLedMode();
     }
   },
   setLedMode: {
     sync: true,
-    fn(_, mode: AuraLedMode) {
-      AuraService.setLedMode(mode);
-      refreshTrayMenu(generateTrayMenuDef());
-      return AuraService.getBrightness();
+    async fn(_, mode: AuraLedMode) {
+      await AuraService.setLedMode(mode);
     }
   },
   getBrightness: {
     sync: true,
-    fn() {
+    async fn() {
       return AuraService.getBrightness();
     }
   },
   setBrightness: {
     sync: true,
-    fn(_, brightness: AuraBrightness) {
-      AuraService.setBrightness(brightness);
-      refreshTrayMenu(generateTrayMenuDef());
+    async fn(_, brightness: AuraBrightness) {
+      await AuraService.setBrightness(brightness);
     }
   },
   getThrottleThermalPolicy: {
     sync: true,
-    fn() {
-      return PlatformService.getThrottleThermalPolicy();
+    async fn() {
+      return await PlatformService.getThrottleThermalPolicy();
     }
   },
   setThrottleThermalPolicy: {
     sync: true,
-    fn(_, policy: ThrottleThermalPolicy) {
-      PlatformService.setThrottleThermalPolicy(policy);
-      refreshTrayMenu(generateTrayMenuDef());
+    async fn(_, policy: ThrottleThermalPolicy) {
+      await PlatformService.setThrottleThermalPolicy(policy);
     }
   },
   allowsAutoStart: {

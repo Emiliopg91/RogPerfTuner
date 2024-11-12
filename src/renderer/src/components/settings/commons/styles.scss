@@ -6,7 +6,7 @@
     border-radius: 1em;
     margin-bottom: 2em;
     > legend {
-      display:flex;
+      display: flex;
       position: relative;
       top: -0.8em;
       left: 1em;
@@ -14,7 +14,7 @@
       padding: 0em 0.5em;
       width: auto;
       .blockIcon {
-        margin-right:0.8em
+        margin-right: 0.8em;
       }
       .blockName {
       }
@@ -23,16 +23,16 @@
       margin-left: 0.313em;
       padding: 0em 0.8em;
     }
-    > div{
+    > div {
       > .settingsLine {
         margin-bottom: 1em;
         > .optionLabel {
-          text-align: right; 
+          text-align: right;
         }
         > .optionInput {
           select {
             position: relative;
-            top: -0.4em
+            top: -0.4em;
           }
         }
       }

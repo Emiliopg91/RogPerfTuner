@@ -1,58 +1,122 @@
 {
-  "loading": {
-    "en": "Loading",
-    "es": "Cargando"
+  "battery": {
+    "en": "Battery",
+    "es": "Batería"
   },
-  "home": {
-    "en": "Home",
-    "es": "Pantalla principal"
+  "charge.threshold": {
+    "en": "Charge threshold",
+    "es": "Umbral de carga"
   },
-  "contact": {
-    "en": "Contact",
-    "es": "Contacto"
+  "led.mode": {
+    "en": "Animation",
+    "es": "Animación"
   },
-  "not.found": {
-    "en": "Not found",
-    "es": "No encontrado"
+  "led.mode.STATIC": {
+    "en": "Static",
+    "es": "Estático"
   },
-  "hello.world": {
-    "en": "Hello world",
-    "es": "Hola mundo"
+  "led.mode.BREATHE": {
+    "en": "Breathe",
+    "es": "Respiración"
   },
-  "file": {
-    "en": "File",
-    "es": "Archivo"
+  "led.mode.PULSE": {
+    "en": "Pulse",
+    "es": "Latido"
   },
-  "open.log.file": {
-    "en": "Open log file",
-    "es": "Abrir logs"
+  "led.mode.RAINBOW_CYCLE": {
+    "en": "Rainbow cycle",
+    "es": "Ciclo arcoiris"
   },
-  "exit": {
-    "en": "Exit",
+  "led.mode.RAINBOW_WAVE": {
+    "en": "Rainbow wave",
+    "es": "Ola arcoiris"
+  },
+  "led.brightness": {
+    "en": "Brightness",
+    "es": "Brillo"
+  },
+  "led.brightness.HIGH": {
+    "en": "HIGH",
+    "es": "Alto"
+  },
+  "led.brightness.MEDIUM": {
+    "en": "Medium",
+    "es": "Medio"
+  },
+  "led.brightness.LOW": {
+    "en": "Low",
+    "es": "Bajo"
+  },
+  "led.brightness.OFF": {
+    "en": "Off",
+    "es": "Apagado"
+  },
+  "performance": {
+    "en": "Performance",
+    "es": "Rendimiento"
+  },
+  "performance.profile": {
+    "en": "Profile",
+    "es": "Perfil"
+  },
+  "performance.profile.QUIET": {
+    "en": "Quiet",
+    "es": "Silencioso"
+  },
+  "performance.profile.BALANCED": {
+    "en": "Balanced",
+    "es": "Equilibrado"
+  },
+  "performance.profile.PERFORMANCE": {
+    "en": "Performance",
+    "es": "Rendimiento"
+  },
+  "open.log": {
+    "en": "Open log",
+    "es": "Abrir registro"
+  },
+  "open.gui": {
+    "en": "Open GUI",
+    "es": "Abrir interfaz"
+  },
+  "quit": {
+    "en": "Quit",
     "es": "Salir"
   },
-  "contact.us": {
-    "en": "Contact us",
-    "es": "Contáctanos"
+  "start.on.boot": {
+    "en": "Start on boot",
+    "es": "Iniciar al arrancar"
   },
-  "any.trouble": {
-    "en": "Any trouble?",
-    "es": "¿Algún problema?"
+  "": {
+    "en": "",
+    "es": ""
   },
-  "email.us": {
-    "en": "Email us",
-    "es": "Mandanos un mail"
+  "": {
+    "en": "",
+    "es": ""
   },
-  "required": {
-    "en": "Required field",
-    "es": "Campo requerido"
+  "": {
+    "en": "",
+    "es": ""
   },
-  "non.empty": {
-    "en": "This field cannot be empty",
-    "es": "Este campo no puede ser vacio"
+  "": {
+    "en": "",
+    "es": ""
   },
-  "higher.zero": {
-    "en": "Must be higher than 0",
-    "es": "Debe ser mayor que 0"
+  "": {
+    "en": "",
+    "es": ""
+  },
+  "": {
+    "en": "",
+    "es": ""
+  },
+  "": {
+    "en": "",
+    "es": ""
+  },
+  "": {
+    "en": "",
+    "es": ""
   }
 }

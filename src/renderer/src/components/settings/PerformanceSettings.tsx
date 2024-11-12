@@ -1,5 +1,5 @@
 import { ThrottleThermalPolicy } from '@commons/models/Platform';
-import { LoggerRenderer } from '@tser-framework/renderer';
+import { LoggerRenderer, TranslatorRenderer } from '@tser-framework/renderer';
 import { ChangeEvent, FC, useEffect, useState } from 'react';
 import { Form } from 'react-bootstrap';
 import { IoIosSpeedometer } from 'react-icons/io';
@@ -29,8 +29,8 @@ export const PerformanceSettings: FC = () => {
     setThrottleThermalPolicy(policy);
   };
   return (
-    <SettingsBlock icon={<IoIosSpeedometer />} label="Performance">
-      <SettingsLine label="Throttle policy">
+    <SettingsBlock icon={<IoIosSpeedometer />} label={TranslatorRenderer.translate('performance')}>
+      <SettingsLine label={TranslatorRenderer.translate('performance.profile')}>
         <>
           <Form.Select
             value={throttleThermalPolicy}
@@ -42,7 +42,7 @@ export const PerformanceSettings: FC = () => {
               .map(([key, value]) => {
                 return (
                   <option key={key} value={value}>
-                    {key.substring(0, 1) + key.substring(1).toLowerCase()}
+                    {TranslatorRenderer.translate('performance.profile.' + key)}
                   </option>
                 );
               })}

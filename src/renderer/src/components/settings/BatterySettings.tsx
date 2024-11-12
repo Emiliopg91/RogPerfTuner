@@ -1,5 +1,5 @@
 import { ChargeThreshold } from '@commons/models/Battery';
-import { LoggerRenderer } from '@tser-framework/renderer';
+import { LoggerRenderer, TranslatorRenderer } from '@tser-framework/renderer';
 import { ChangeEvent, FC, useEffect, useState } from 'react';
 import { Form } from 'react-bootstrap';
 import { BsBatteryCharging } from 'react-icons/bs';
@@ -26,8 +26,8 @@ export const BatterySettings: FC = () => {
     setChargeThreshold(threshold);
   };
   return (
-    <SettingsBlock icon={<BsBatteryCharging />} label="Battery">
-      <SettingsLine label="Charge threshold">
+    <SettingsBlock icon={<BsBatteryCharging />} label={TranslatorRenderer.translate('battery')}>
+      <SettingsLine label={TranslatorRenderer.translate('charge.threshold')}>
         <>
           <Form.Select value={chargeThreshold} onChange={handleChange} data-bs-theme="dark">
             {Object.entries(ChargeThreshold)
