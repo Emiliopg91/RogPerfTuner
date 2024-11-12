@@ -180,7 +180,7 @@ const initTime = Date.now();
         }
       });
 
-      appUpdater = new AppUpdater(10 * 1000, (): void => {
+      appUpdater = new AppUpdater(24 * 60 * 60 * 1000, (): void => {
         dialog
           .showMessageBox({
             type: 'info',
