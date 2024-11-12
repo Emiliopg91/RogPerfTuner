@@ -32,6 +32,8 @@ jobs:
           echo "version=$VERSION" >> $GITHUB_ENV
 
       - name: Build for Linux
+        env:
+          GITHUB_TOKEN: ${{ secrets.GH_ACTION_PAT }}
         run: pnpm build:linux
 
       - name: Changelog
