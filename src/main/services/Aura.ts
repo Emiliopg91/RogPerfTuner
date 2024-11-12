@@ -1,7 +1,7 @@
+import { AuraBrightness, AuraLedMode } from '@commons/models/Aura';
 import { LoggerMain } from '@tser-framework/main';
 
 import { mainWindow } from '..';
-import { AuraBrightness, AuraLedMode } from '../../commons/src/models/Aura';
 import { AsusAuraClient } from '../dbus/AsusAuraClient';
 import { generateTrayMenuDef, refreshTrayMenu } from '../setup';
 

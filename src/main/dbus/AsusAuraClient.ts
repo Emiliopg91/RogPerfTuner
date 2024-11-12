@@ -1,7 +1,7 @@
+import { AuraBrightness, AuraLedMode } from '@commons/models/Aura';
 import { execSync } from 'child_process';
 import { Variant } from 'dbus-next';
 
-import { AuraBrightness, AuraLedMode } from '../../commons/src/models/Aura';
 import { AbstractDbusClient } from './base/AbstractDbusClient';
 
 export class AsusAuraClient extends AbstractDbusClient {

@@ -1,21 +1,21 @@
-import { LoggerMain, Toaster, TranslatorMain } from '@tser-framework/main';
-import { execSync } from 'child_process';
-import * as fs from 'fs';
-
-import { mainWindow } from '..';
-import rogLogo from '../../../resources/icons/icon-512x512.png?asset';
 import {
   BoostControl,
   PlatformModels,
   PowerProfile,
   ThrottleThermalPolicy
-} from '../../commons/src/models/Platform';
+} from '@commons/models/Platform';
+import { LoggerMain, TranslatorMain } from '@tser-framework/main';
+import { execSync } from 'child_process';
+import * as fs from 'fs';
+
+import { mainWindow } from '..';
 import { AsusFanCurvesClient } from '../dbus/AsusFanCurvesClient';
 import { AsusPlatformClient } from '../dbus/AsusPlatformClient';
 import { PowerProfilesClient } from '../dbus/PowerProfilesClient';
 import { UPowerClient } from '../dbus/UPowerClient';
 import { generateTrayMenuDef, refreshTrayMenu } from '../setup';
 import { Settings } from '../utils/Settings';
+import { NotificationService } from './NotificationService';
 
 export class PlatformService {
   private static logger = LoggerMain.for('PlatformService');
@@ -120,6 +120,15 @@ export class PlatformService {
   ): Promise<void> {
     const policyName = ThrottleThermalPolicy[policy];
     const powerPolicy = PlatformService.throttlePowerAssoc[policy];
+
+    const showToastOk = (): void => {
+      NotificationService.toast(
+        TranslatorMain.translate('performance.profile.setted', {
+          policy: TranslatorMain.translate('performance.profile.' + policyName).toLocaleLowerCase()
+        })
+      );
+    };
+
     if (PlatformService.lastPolicy != policy || PlatformService.lastPower != powerPolicy) {
       try {
         const boostEnabled = PlatformService.throttleBoostAssoc[policy];
@@ -149,7 +158,7 @@ export class PlatformService {
               const value = PlatformService.boostControl[target];
               const path = PlatformService.boostControl.path;
 
-              const command = `echo "${Settings.password}" | sudo -S bash -c "echo '${value}' | tee ${path}" > /dev/null`;
+              const command = `echo "${Settings.password}" | sudo -S bash -c "echo '${value}' | tee ${path}" &>> /dev/null`;
               try {
                 execSync(command);
                 // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -179,14 +188,7 @@ export class PlatformService {
             if (!temporal) {
               PlatformService.setLastProfile(policy);
             }
-            Toaster.toast(
-              TranslatorMain.translate('performance.profile.setted', {
-                policy: TranslatorMain.translate(
-                  'performance.profile.' + policyName
-                ).toLocaleLowerCase()
-              }),
-              rogLogo
-            );
+            showToastOk();
           })
           .catch((error: unknown) => {
             LoggerMain.removeTab();
@@ -197,12 +199,7 @@ export class PlatformService {
       }
     } else {
       PlatformService.logger.info(`Profile already is ${policyName}`);
-      Toaster.toast(
-        TranslatorMain.translate('performance.profile.setted', {
-          policy: TranslatorMain.translate('performance.profile.' + policyName).toLocaleLowerCase()
-        }),
-        rogLogo
-      );
+      showToastOk();
     }
   }
 

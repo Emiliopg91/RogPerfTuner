@@ -25,24 +25,26 @@ console.info('HTMLS: ', htmls);
 
 export default defineConfig({
   main: {
-    plugins: [bytecodePlugin({ transformArrowFunctions: false })]
-  },
-  preload: {
-    plugins: [bytecodePlugin({ transformArrowFunctions: false })]
-  },
-  renderer: {
-    css: {
-      preprocessorOptions: {
-        scss: { implementation: sass, api: 'modern-compiler' },
-        sass: { implementation: sass, api: 'modern-compiler' }
-      }
-    },
+    build: {},
+    plugins: [bytecodePlugin({ transformArrowFunctions: false })],
     resolve: {
       alias: {
-        '@renderer': resolve('src/renderer/src'),
+        '@main': resolve('src/main/src'),
         '@commons': resolve('src/commons/src')
       }
-    },
+    }
+  },
+  preload: {
+    build: {},
+    plugins: [bytecodePlugin({ transformArrowFunctions: false })],
+    resolve: {
+      alias: {
+        '@main': resolve('src/main/src'),
+        '@commons': resolve('src/commons/src')
+      }
+    }
+  },
+  renderer: {
     build: {
       commonjsOptions: {
         transformMixedEsModules: true
@@ -51,6 +53,18 @@ export default defineConfig({
         input: [...htmls]
       }
     },
-    plugins: [react()]
+    plugins: [react()],
+    resolve: {
+      alias: {
+        '@renderer': resolve('src/renderer/src'),
+        '@commons': resolve('src/commons/src')
+      }
+    },
+    css: {
+      preprocessorOptions: {
+        scss: { implementation: sass, api: 'modern-compiler' },
+        sass: { implementation: sass, api: 'modern-compiler' }
+      }
+    }
   }
 });

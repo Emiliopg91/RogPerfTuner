@@ -1,3 +1,6 @@
+import { AuraBrightness, AuraLedMode } from '@commons/models/Aura';
+import { ChargeThreshold } from '@commons/models/Battery';
+import { ThrottleThermalPolicy } from '@commons/models/Platform';
 import { is } from '@electron-toolkit/utils';
 import {
   AppConfig,
@@ -16,9 +19,6 @@ import path from 'path';
 
 import { createWindow, mainWindow } from '.';
 import icon512 from '../../resources/icons/icon-512x512.png?asset';
-import { AuraBrightness, AuraLedMode } from '../commons/src/models/Aura';
-import { ChargeThreshold } from '../commons/src/models/Battery';
-import { ThrottleThermalPolicy } from '../commons/src/models/Platform';
 import { ApplicationService } from './services/Application';
 import { AuraService } from './services/Aura';
 import { BatteryService } from './services/Battery';
@@ -26,7 +26,8 @@ import { PlatformService } from './services/Platform';
 
 export const appConfig: AppConfig = {
   singleInstance: true,
-  splashScreen: 3000
+  splashScreen: undefined
+  //splashScreen: 3000
 };
 export const windowConfig: WindowConfig = {
   hideMenu: false,
@@ -269,7 +270,7 @@ export const generateTrayMenuDef = async (): Promise<
 };
 
 export const ipcListeners: Record<string, IpcListener> = {
-  ...defaultIpcListeners,
+  log: defaultIpcListeners.log,
   getChargeThreshold: {
     sync: true,
     async fn() {

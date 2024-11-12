@@ -1,10 +1,10 @@
 /* eslint-disable no-case-declarations */
+import { AuraBrightness, AuraLedMode, AuraModels } from '@commons/models/Aura';
+import { PlatformModels, ThrottleThermalPolicy } from '@commons/models/Platform';
 import { LoggerMain } from '@tser-framework/main';
 import { createServer } from 'http';
 import { parse } from 'url';
 
-import { AuraBrightness, AuraLedMode, AuraModels } from '../../commons/src/models/Aura';
-import { PlatformModels, ThrottleThermalPolicy } from '../../commons/src/models/Platform';
 import { AuraService } from '../services/Aura';
 import { PlatformService } from '../services/Platform';
 import { traySetBrightness, traySetLedMode, traySetThrottle } from '../setup';

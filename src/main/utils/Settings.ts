@@ -1,6 +1,6 @@
+import { SettingsType } from '@commons/models/Settings';
 import { ConfigurationHelper } from '@tser-framework/main';
 
-import { SettingsType } from '../../commons/src/models/Settings';
 import { Dialogs } from './Dialogs';
 
 export class Settings {
