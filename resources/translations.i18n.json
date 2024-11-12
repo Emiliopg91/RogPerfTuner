@@ -71,6 +71,10 @@
     "en": "Performance",
     "es": "Rendimiento"
   },
+  "performance.profile.setted": {
+    "en": "Profile {policy} set successfully",
+    "es": "Perfil {policy} establecido correctamente"
+  },
   "open.log": {
     "en": "Open log",
     "es": "Abrir registro"
@@ -86,6 +90,10 @@
   "start.on.boot": {
     "en": "Start on boot",
     "es": "Iniciar al arrancar"
+  },
+  "already.running": {
+    "en": "{appName} is already running in background",
+    "es": "{appName} está ejecutandose de fondo"
   },
   "": {
     "en": "",

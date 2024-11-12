@@ -164,7 +164,10 @@ const initTime = Date.now();
           }
           mainWindow.focus();
         } else {
-          Toaster.toast(`${app.getName()} is already running in background`, rogLogo);
+          Toaster.toast(
+            TranslatorMain.translate('already.running', { appName: app.getName() }),
+            rogLogo
+          );
         }
 
         if (deepLinkBindings) {

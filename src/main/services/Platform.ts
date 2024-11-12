@@ -1,4 +1,4 @@
-import { LoggerMain, Toaster } from '@tser-framework/main';
+import { LoggerMain, Toaster, TranslatorMain } from '@tser-framework/main';
 import { execSync } from 'child_process';
 import * as fs from 'fs';
 
@@ -157,7 +157,7 @@ export class PlatformService {
               const value = PlatformService.boostControl[target];
               const path = PlatformService.boostControl.path;
 
-              const command = `echo "${Settings.password}" | sudo -S bash -c "echo '${value}' | tee ${path}"`;
+              const command = `echo "${Settings.password}" | sudo -S bash -c "echo '${value}' | tee ${path}" > /dev/null`;
               try {
                 execSync(command);
                 // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -187,7 +187,14 @@ export class PlatformService {
             if (!temporal) {
               PlatformService.setLastProfile(policy);
             }
-            Toaster.toast(`Profile '${policyName}' set successfully`, rogLogo);
+            Toaster.toast(
+              TranslatorMain.translate('performance.profile.setted', {
+                policy: TranslatorMain.translate(
+                  'performance.profile.' + policyName
+                ).toLocaleLowerCase()
+              }),
+              rogLogo
+            );
           })
           .catch((error: unknown) => {
             LoggerMain.removeTab();
@@ -198,7 +205,12 @@ export class PlatformService {
       }
     } else {
       PlatformService.logger.info(`Profile already is ${policyName}`);
-      Toaster.toast(`Profile '${policyName}' set successfully`, rogLogo);
+      Toaster.toast(
+        TranslatorMain.translate('performance.profile.setted', {
+          policy: TranslatorMain.translate('performance.profile.' + policyName).toLocaleLowerCase()
+        }),
+        rogLogo
+      );
     }
   }
 

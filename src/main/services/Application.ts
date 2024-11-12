@@ -1,13 +1,18 @@
-import { LoggerMain } from '@tser-framework/main';
+import { File, FileHelper, LoggerMain } from '@tser-framework/main';
 import { execSync } from 'child_process';
 import { app } from 'electron/main';
 import fs from 'fs';
 import path from 'path';
 
+import icon from '../../../resources/icons/icon.png?asset';
+
 export class ApplicationService {
   private static logger = LoggerMain.for('ApplicationService');
   private static appImageFileName = `${app.name}.AppImage`;
   private static appImagePath: string | undefined = undefined;
+  private static appIconPath: File = new File({
+    file: path.join(FileHelper.APP_DIR, 'icons', `${app.getName()}.png`)
+  });
   private static autoStartFile = path.join(
     process.env.HOME || '',
     '.config',
@@ -25,12 +30,17 @@ export class ApplicationService {
           )
             .toString()
             .trim();
-          ApplicationService.logger.info('AppImage path: ', ApplicationService.appImagePath);
+          ApplicationService.logger.debug('AppImage path: ', ApplicationService.appImagePath);
+          if (!ApplicationService.appIconPath.exists()) {
+            ApplicationService.appIconPath.getParentFile().mkdir(true);
+            new File({ file: icon }).copy(ApplicationService.appIconPath);
+            ApplicationService.logger.debug('Icon path: ', ApplicationService.appImagePath);
+          }
         } catch (error) {
           ApplicationService.logger.error('Error getting AppImage path', error);
         }
       } else {
-        ApplicationService.logger.info('Not getting AppImage path due to development mode');
+        ApplicationService.logger.debug('Not getting AppImage path due to development mode');
       }
     }
     ApplicationService.initialized = true;
@@ -49,7 +59,7 @@ export class ApplicationService {
       ApplicationService.logger.info('Creating autostart file');
       const desktopEntryContent = `[Desktop Entry]
 Exec=${ApplicationService.appImagePath}
-Icon=
+Icon=${ApplicationService.appIconPath}
 Name=${ApplicationService.appImageFileName}
 Path=
 Terminal=False

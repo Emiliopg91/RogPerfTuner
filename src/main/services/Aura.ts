@@ -13,7 +13,6 @@ export class AuraService {
   public static async initialize(): Promise<void> {
     AuraService.lastMode = await AuraClient.getLedMode();
     AuraService.lastBrightness = await AuraClient.getBrightness();
-    console.log('', AuraService.lastBrightness);
     (await AuraClient.getInstance()).watchForChanges(
       'Brightness',
       async (value: AuraBrightness) => {
