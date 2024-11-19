@@ -104,7 +104,6 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GH_ACTION_PAT }}
         run: |
-          cd src
           VERSION=${{ needs.generate-appimage.outputs.is_update == 'true' }}
           git config --global user.email "actions@github.com"
           git config --global user.name "github-actions"
