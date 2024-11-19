@@ -66,7 +66,6 @@ jobs:
       - name: Extract binaries
         run: |
           tar -xzf binaries-*
-          ls
 
       - name: Generate AppImage
         id: generate-appimage-file
@@ -83,6 +82,7 @@ jobs:
           repo_token: ${{ secrets.GITHUB_TOKEN }}
           files: |
             binaries-${{ env.APP_VERSION }}.tar.gz
+            ${{ env.LATEST_LINUX_PATH }}
             ${{ env.APPIMAGE_PATH }}
             ${{ env.APPIMAGE_PATH }}.zsync
 
@@ -104,7 +104,7 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GH_ACTION_PAT }}
         run: |
-          VERSION=${{ needs.generate-appimage.outputs.is_update == 'true' }}
+          VERSION=${{ needs.generate-appimage.outputs.version == 'true' }}
           git config --global user.email "actions@github.com"
           git config --global user.name "github-actions"
           NEW_VERSION=$(echo $VERSION | awk -F. '{print $1"."$2"."($3+1)}')
