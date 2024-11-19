@@ -1,5 +1,5 @@
 import react from '@vitejs/plugin-react';
-import { bytecodePlugin, defineConfig } from 'electron-vite';
+import { bytecodePlugin, defineConfig, swcPlugin } from 'electron-vite';
 import fs from 'fs';
 import path, { resolve } from 'path';
 import sass from 'sass-embedded';
@@ -26,7 +26,7 @@ console.info('HTMLS: ', htmls);
 export default defineConfig({
   main: {
     build: {},
-    plugins: [bytecodePlugin({ transformArrowFunctions: false })],
+    plugins: [bytecodePlugin({ transformArrowFunctions: false }), swcPlugin()],
     resolve: {
       alias: {
         '@main': resolve('src/main/src'),

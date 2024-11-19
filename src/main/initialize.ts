@@ -15,6 +15,8 @@ import { HttpServer } from './utils/HttpServer';
 import { Settings } from './utils/Settings';
 
 export async function initializeBeforeReady(): Promise<void> {
+  app.disableHardwareAcceleration();
+
   ConfigurationHelper.initialize();
   TranslatorMain.initialize(translations);
 }
@@ -28,8 +30,8 @@ export async function initializeWhenReady(): Promise<void> {
   await PowerProfilesClient.getInstance();
   await PlatformService.initialize();
   await AuraService.initialize();
-  await ApplicationService.initialize();
   await HttpServer.initialize();
+  ApplicationService.initialize();
 
   const trayBuilder: TrayBuilder | undefined = TrayBuilder.builder(icon45)
     .withToolTip(app.name)

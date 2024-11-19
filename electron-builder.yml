@@ -25,3 +25,7 @@ publish:
   owner: Emiliopg91
   repo: RogControlCenter
   updaterCacheDirName: RogControlCenter
+electronLanguages:
+  - en-GB
+  - en-US
+afterPack: ./hooks/afterPack.js
