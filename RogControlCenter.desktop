@@ -1,0 +1,16 @@
+[Desktop Entry]
+Version=1.0
+Type=Application
+Name=ROG Control Center
+Comment=Manage the performance of your Asus ROG laptop.
+X-AppImage-Version={version}
+Icon={icon}
+Exec={entrypoint}
+Categories=Utility;System;
+Keywords=asus;rog;control;center;
+
+[AppImage Creator]
+Entrypoint=./RogControlCenter/RogControlCenter/rogcontrolcenter
+Icon=./RogControlCenter/resources/app.asar.unpacked/resources/icons/icon.png
+Version-Cmd=cat ./RogControlCenter/RogControlCenter/resources/app.asar.unpacked/package.json | jq -r .version
+
