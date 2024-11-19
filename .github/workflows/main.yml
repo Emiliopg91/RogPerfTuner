@@ -7,15 +7,11 @@ on:
 
 jobs:
   build:
+    name: Build App
     permissions: write-all
     runs-on: ubuntu-latest
 
     steps:
-      - name: Change directory
-        run: |
-          mkdir src
-          cd src
-
       - name: Checkout repository
         uses: actions/checkout@v2
 
@@ -25,10 +21,12 @@ jobs:
           node-version: '20'
 
       - name: Install pnpm
-        run: npm install -g pnpm
+        run: |
+          npm install -g pnpm
 
       - name: Install project
-        run: pnpm i
+        run: |
+          pnpm i
 
       - name: Extract version from package.json
         id: extract_version
@@ -39,9 +37,36 @@ jobs:
       - name: Build and package binaries
         run: |
           pnpm build:unpack
-          mv dist/linux-unpacked/ ../RogControlCenter
-          cd ..
-          tar -czf binaries-${{ env.version }}.tar.gz RogControlCenter/
+          mv dist/linux-unpacked/ dist/RogControlCenter
+          cd dist
+          tar -czf ../binaries-${{ env.version }}.tar.gz RogControlCenter/
+
+      - name: Upload binaries
+        uses: actions/upload-artifact@v4
+        with:
+          name: binaries
+          path: binaries-${{ env.version }}.tar.gz
+
+  appimage:
+    name: Generate AppImage
+    needs: build
+    permissions: write-all
+    runs-on: ubuntu-latest
+    outputs:
+      version: ${{ steps.consolidate_output.outputs.version }} # Definir la salida de la versión
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v2
+
+      - name: Download artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: binaries
+
+      - name: Extract binaries
+        run: |
+          tar -xzf binaries-*
+          ls
 
       - name: Generate AppImage
         id: generate-appimage-file
@@ -52,32 +77,42 @@ jobs:
         if: env.IS_UPDATE == 'true'
         uses: marvinpinto/action-automatic-releases@latest
         with:
-          title: ${{ env.version }}
-          automatic_release_tag: ${{ env.version }}
+          title: ${{ env.APP_VERSION }}
+          automatic_release_tag: ${{ env.APP_VERSION }}
           prerelease: false
+          repo_token: ${{ secrets.GITHUB_TOKEN }}
           files: |
             binaries-${{ env.APP_VERSION }}.tar.gz
             ${{ env.APPIMAGE_PATH }}
             ${{ env.APPIMAGE_PATH }}.zsync
 
-          repo_token: ${{ secrets.GITHUB_TOKEN }}
+      - name: Consolidate output
+        id: consolidate_output
+        run: |
+          echo "version=${{ env.APP_VERSION }}" >> $GITHUB_OUTPUT
 
-      - name: Tag and prepare for next iteration
+  iteration:
+    name: Prepare for next development iteration
+    needs: appimage
+    permissions: write-all
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v2
+
+      - name: Updating versions on repository
         env:
           GITHUB_TOKEN: ${{ secrets.GH_ACTION_PAT }}
         run: |
           cd src
-          VERSION=${{ env.version }}
+          VERSION=${{ needs.generate-appimage.outputs.is_update == 'true' }}
           git config --global user.email "actions@github.com"
           git config --global user.name "github-actions"
-          git tag "$VERSION"
-          git push origin "$VERSION"
           NEW_VERSION=$(echo $VERSION | awk -F. '{print $1"."$2"."($3+1)}')
           echo "Updating version from $VERSION to $NEW_VERSION"
           jq --arg new_version "$NEW_VERSION" '.version = $new_version' package.json > package.tmp.json
           mv package.tmp.json package.json
           git add -u
-          git reset -- .github/workflows/main.yml
           git commit -m "[ci skip] Prepare for next development iteration"
           git push origin main
           git fetch
