@@ -11,6 +11,7 @@ files:
   - '!{tsconfig.json,tsconfig.node.json,tsconfig.web.json}'
 asarUnpack:
   - resources/**
+  - package.json
 linux:
   icon: resources/icons/icon-512x512.png
   target:
@@ -25,3 +26,7 @@ publish:
   owner: Emiliopg91
   repo: RogControlCenter
   updaterCacheDirName: RogControlCenter
+electronLanguages:
+  - en-GB
+  - en-US
+afterPack: ./hooks/afterPack.js

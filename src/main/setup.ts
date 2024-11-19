@@ -21,7 +21,6 @@ import { createWindow, mainWindow } from '.';
 import icon512 from '../../resources/icons/icon-512x512.png?asset';
 import { ApplicationService } from './services/Application';
 import { AuraService } from './services/Aura';
-import { BatteryService } from './services/Battery';
 import { PlatformService } from './services/Platform';
 
 export const appConfig: AppConfig = {
@@ -182,7 +181,7 @@ export const traySetThrottle = async (policy: ThrottleThermalPolicy): Promise<vo
 };
 
 const getThresoldOptions: () => Promise<Array<Electron.MenuItemConstructorOptions>> = async () => {
-  const current = await BatteryService.getChargeThreshold();
+  const current = PlatformService.getChargeThreshold();
   const thresholdOptions: Array<Electron.MenuItemConstructorOptions> = [];
   for (const [key, value] of Object.entries(ChargeThreshold)) {
     if (isNaN(Number(String(key)))) {
@@ -200,7 +199,7 @@ const getThresoldOptions: () => Promise<Array<Electron.MenuItemConstructorOption
 };
 
 const traySetBatteryThresold = async (threshold: number): Promise<void> => {
-  await BatteryService.setChargeThreshold(threshold);
+  await PlatformService.setChargeThreshold(threshold);
 };
 
 export const generateTrayMenuDef = async (): Promise<
@@ -273,14 +272,14 @@ export const ipcListeners: Record<string, IpcListener> = {
   log: defaultIpcListeners.log,
   getChargeThreshold: {
     sync: true,
-    async fn() {
-      return await BatteryService.getChargeThreshold();
+    fn() {
+      return PlatformService.getChargeThreshold();
     }
   },
   setChargeThreshold: {
     sync: true,
     async fn(_, threshold: number) {
-      await BatteryService.setChargeThreshold(threshold);
+      await PlatformService.setChargeThreshold(threshold);
     }
   },
   getLedMode: {
