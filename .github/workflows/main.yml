@@ -22,7 +22,7 @@ jobs:
       - name: Set up environment
         run: |
           sudo apt-get update
-          sudo apt-get install -y zsync fuse
+          sudo apt-get install -y zsync fuse desktop-file-utils
           wget -qO appimagetool https://raw.githubusercontent.com/Emiliopg91/AppImage-Creator/main/appimagetool
           chmod +x appimagetool
 
