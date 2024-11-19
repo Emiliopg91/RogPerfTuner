@@ -24,6 +24,7 @@ export class PlatformService {
   private static lastBoost: boolean | undefined = undefined;
   private static lastPolicy: ThrottleThermalPolicy | undefined = undefined;
   private static lastPower: PowerProfile | undefined = undefined;
+  private static lastThreshold: number | undefined = undefined;
 
   private static throttlePowerAssoc: Record<ThrottleThermalPolicy, PowerProfile> = {
     [ThrottleThermalPolicy.QUIET]: PowerProfile.POWER_SAVER,
@@ -81,6 +82,13 @@ export class PlatformService {
           mainWindow?.webContents.send('refreshThrottleThermalPolicy', value);
         }
       );
+
+      PlatformService.lastThreshold = await AsusPlatformClient.getChargeControlEndThresold();
+      AsusPlatformClient.watchForChanges('ChargeControlEndThreshold', async (value: number) => {
+        PlatformService.lastThreshold = value;
+        refreshTrayMenu(await generateTrayMenuDef());
+        mainWindow?.webContents.send('refreshChargeThreshold', value);
+      });
 
       PlatformService.lastPower = await PowerProfilesClient.getActiveProfile();
       PowerProfilesClient.watchForChanges('ActiveProfile', async (value: PowerProfile) => {
@@ -217,6 +225,19 @@ export class PlatformService {
 
       LoggerMain.removeTab();
       PlatformService.logger.info('Profile restored');
+    }
+  }
+
+  public static getChargeThreshold(): number {
+    return PlatformService.lastThreshold!;
+  }
+
+  public static async setChargeThreshold(value: number): Promise<void> {
+    if ((await PlatformService.getChargeThreshold()) !== value) {
+      PlatformService.logger.info(`Setting battery charge threshold to ${value}%`);
+      await AsusPlatformClient.setChargeControlEndThresold(value);
+    } else {
+      PlatformService.logger.info(`Battery charge threshold already is ${value}%`);
     }
   }
 }

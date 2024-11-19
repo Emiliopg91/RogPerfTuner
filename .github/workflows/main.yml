@@ -11,13 +11,18 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+      - name: Change directory
+        run: |
+          mkdir src
+          cd src
+
       - name: Checkout repository
         uses: actions/checkout@v2
 
       - name: Set up Node.js
         uses: actions/setup-node@v2
         with:
-          node-version: '18'
+          node-version: '20'
 
       - name: Install pnpm
         run: npm install -g pnpm
@@ -28,19 +33,36 @@ jobs:
       - name: Extract version from package.json
         id: extract_version
         run: |
-          VERSION=$(node -p "require('./package.json').version")
+          VERSION=$(cat ./package.json | jq -r .version)
           echo "version=$VERSION" >> $GITHUB_ENV
 
-      - name: Build for Linux
+      - name: Build and package binaries
         env:
           GITHUB_TOKEN: ${{ secrets.GH_ACTION_PAT }}
-        run: pnpm build:linux
+        run: |
+          pnpm build:unpack
+          mv dist/linux-unpacked/ ../RogControlCenter
+          tar -czf binaries-${{ env.version }}.tar.gz RogControlCenter/
+          cd ..
 
-      - name: Changelog
-        uses: Bullrich/generate-release-changelog@master
-        id: Changelog
-        env:
-          REPO: ${{ github.repository }}
+      - name: Generate AppImage
+        id: generate-appimage-file
+        uses: Emiliopg91/AppImage-Creator@latest
+
+      - name: Create GitHub Release
+        id: create_release
+        if: env.IS_UPDATE == 'true'
+        uses: marvinpinto/action-automatic-releases@latest
+        with:
+          title: ${{ env.version }}
+          automatic_release_tag: ${{ env.version }}
+          prerelease: false
+          files: |
+            binaries-${{ env.APP_VERSION }}.tar.gz
+            ${{ env.APPIMAGE_PATH }}
+            ${{ env.APPIMAGE_PATH }}.zsync
+
+          repo_token: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Tag and prepare for next iteration
         env:
@@ -64,36 +86,3 @@ jobs:
           git checkout --force develop
           git reset --hard main
           git push --force
-
-      - name: Create GitHub Release
-        id: create_release
-        uses: actions/create-release@v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.GH_ACTION_PAT }}
-        with:
-          tag_name: '${{ env.version }}'
-          release_name: '${{ env.version }}'
-          body: |
-            ${{ steps.Changelog.outputs.changelog }}
-          draft: false
-          prerelease: false
-
-      - name: Upload Release latest-linux.yml file
-        uses: actions/upload-release-asset@v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.GH_ACTION_PAT }}
-        with:
-          upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: ./dist/latest-linux.yml
-          asset_name: latest-linux.yml
-          asset_content_type: text/yaml
-
-      - name: Upload Release RogControlCenter.AppImage file
-        uses: actions/upload-release-asset@v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.GH_ACTION_PAT }}
-        with:
-          upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: ./dist/RogControlCenter.AppImage
-          asset_name: RogControlCenter.AppImage
-          asset_content_type: application/octet-stream
