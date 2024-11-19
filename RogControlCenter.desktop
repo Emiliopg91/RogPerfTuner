@@ -10,7 +10,7 @@ Categories=Utility;System;
 Keywords=asus;rog;control;center;
 
 [AppImage Creator]
-Entrypoint=./RogControlCenter/RogControlCenter/rogcontrolcenter
+Entrypoint=./RogControlCenter/rogcontrolcenter
 Icon=./RogControlCenter/resources/app.asar.unpacked/resources/icons/icon.png
-Version-Cmd=cat ./RogControlCenter/RogControlCenter/resources/app.asar.unpacked/package.json | jq -r .version
+Version-Cmd=cat ./RogControlCenter/resources/app.asar.unpacked/package.json | jq -r .version
 
