@@ -19,6 +19,13 @@ jobs:
         with:
           node-version: '18'
 
+      - name: Set up environment
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y zsync fuse
+          wget -qO appimagetool https://raw.githubusercontent.com/Emiliopg91/AppImage-Creator/main/appimagetool
+          chmod +x appimagetool
+
       - name: Install pnpm
         run: npm install -g pnpm
 
@@ -35,6 +42,13 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GH_ACTION_PAT }}
         run: pnpm build:linux
+
+      - name: Embed update info
+        run: |
+          cd dist
+          IFS='/' read -r namespace repo <<< "$GITHUB_REPOSITORY"
+          ../appimagetool -u "gh-releases-zsync|$namespace|$repo|latest|RogControlCenter-*.AppImage.zsync" RogControlCenter.AppImage
+          zsyncmake RogControlCenter.AppImage
 
       - name: Changelog
         uses: Bullrich/generate-release-changelog@master
@@ -96,4 +110,14 @@ jobs:
           upload_url: ${{ steps.create_release.outputs.upload_url }}
           asset_path: ./dist/RogControlCenter.AppImage
           asset_name: RogControlCenter.AppImage
+          asset_content_type: application/octet-stream
+
+      - name: Upload Release RogControlCenter.AppImage.zsync file
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GH_ACTION_PAT }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: ./dist/RogControlCenter.AppImage.zzsync
+          asset_name: RogControlCenter.AppImage.zsync
           asset_content_type: application/octet-stream
