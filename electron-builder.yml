@@ -27,6 +27,4 @@ publish:
   repo: RogControlCenter
   updaterCacheDirName: RogControlCenter
 electronLanguages:
-  - en-GB
   - en-US
-afterPack: ./hooks/afterPack.js
