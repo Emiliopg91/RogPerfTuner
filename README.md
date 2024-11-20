@@ -26,7 +26,7 @@ $ npm run dev
 # For windows
 $ npm run build:win
 
-# For macOS
+# For macOS 
 $ npm run build:mac
 
 # For Linux
