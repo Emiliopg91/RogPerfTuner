@@ -14,7 +14,7 @@ An Electron application with React and TypeScript
 $ npm install
 ```
   
-### Development
+### Development 
 
 ```bash
 $ npm run dev
