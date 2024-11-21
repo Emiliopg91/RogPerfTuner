@@ -90,7 +90,7 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GH_ACTION_PAT }}
         with:
           upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: ./dist/latest-linux.yml
+          asset_path: ${{ env.LATEST_LINUX_PATH }}
           asset_name: latest-linux.yml
           asset_content_type: text/yaml
 
@@ -100,16 +100,16 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GH_ACTION_PAT }}
         with:
           upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: ./dist/RogControlCenter.AppImage
+          asset_path: ${{ env.APPIMAGE_PATH }}
           asset_name: RogControlCenter.AppImage
           asset_content_type: application/octet-stream
 
-      - name: Upload Release RogControlCenter.AppImage file
+      - name: Upload Release RogControlCenter.AppImage.zsync file
         uses: actions/upload-release-asset@v1
         env:
           GITHUB_TOKEN: ${{ secrets.GH_ACTION_PAT }}
         with:
           upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: ./dist/RogControlCenter.AppImage.zsync
+          asset_path: ${{ env.APPIMAGE_PATH }}.zsync
           asset_name: RogControlCenter.AppImage.zsync
           asset_content_type: application/octet-stream
