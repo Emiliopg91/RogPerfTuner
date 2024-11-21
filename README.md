@@ -20,7 +20,7 @@ $ npm install
 $ npm run dev
 ```
 
-### Build
+### Build 
 
 ```bash
 # For windows
