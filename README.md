@@ -12,7 +12,7 @@ An Electron application with React and TypeScript
 
 ```bash
 $ npm install
-```
+``` 
   
 ### Development 
 
