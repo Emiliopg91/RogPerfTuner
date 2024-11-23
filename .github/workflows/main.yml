@@ -104,12 +104,12 @@ jobs:
           asset_name: RogControlCenter.AppImage
           asset_content_type: application/octet-stream
 
-      - name: Upload Release RogControlCenter.AppImage.zsync file
+      - name: Upload Release RogControlCenter.AppImage.msync file
         uses: actions/upload-release-asset@v1
         env:
           GITHUB_TOKEN: ${{ secrets.GH_ACTION_PAT }}
         with:
           upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: ${{ env.APPIMAGE_PATH }}.zsync
-          asset_name: RogControlCenter.AppImage.zsync
+          asset_path: ${{ env.APPIMAGE_PATH }}.msync
+          asset_name: RogControlCenter.AppImage.msync
           asset_content_type: application/octet-stream
