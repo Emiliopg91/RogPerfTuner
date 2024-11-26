@@ -43,7 +43,7 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
-          is_electron: true
+          is_electron: 'true'
 
       - name: Changelog
         uses: Bullrich/generate-release-changelog@master
