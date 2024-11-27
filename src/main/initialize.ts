@@ -34,7 +34,7 @@ export async function initializeWhenReady(): Promise<void> {
   ApplicationService.initialize();
 
   const trayBuilder: TrayBuilder | undefined = TrayBuilder.builder(icon45)
-    .withToolTip(app.name)
+    .withToolTip(app.name + ' v' + app.getVersion())
     .withMenu(await generateTrayMenuDef());
   const tray = trayBuilder.build();
   setTrayMenuRefreshFn((newMenu: Array<Electron.MenuItemConstructorOptions>) => {
