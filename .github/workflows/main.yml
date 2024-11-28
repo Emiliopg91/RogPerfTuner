@@ -36,7 +36,7 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GH_ACTION_PAT }}
         run: pnpm build:linux
 
-      - name: Generate AppImage
+      - name: Regenerate AppImage
         id: generate-appimage-file
         uses: Emiliopg91/AppImage-Creator-2@latest
         env:
