@@ -6,11 +6,10 @@ import path from 'path';
 
 import icon from '../../../resources/icons/icon.png?asset';
 import { Constants } from '../utils/Constants';
+import { HttpServer } from '../utils/HttpServer';
 
 export class ApplicationService {
   private static logger = LoggerMain.for('ApplicationService');
-  private static appImageFileName = `${app.name}.AppImage`;
-  private static appImagePath: string | undefined = undefined;
   private static appScriptsPath: string = path.join(FileHelper.APP_DIR, 'scripts');
   private static appIconPath: File = new File({
     file: path.join(FileHelper.APP_DIR, 'icons', `${app.getName()}.png`)
@@ -19,38 +18,35 @@ export class ApplicationService {
     process.env.HOME || '',
     '.config',
     'autostart',
-    ApplicationService.appImageFileName + '.desktop'
+    `${app.name}.AppImage.desktop`
   );
   private static initialized = false;
+  private static appImagePath = process.env.APPIMAGE;
 
   public static initialize(): void {
     if (!ApplicationService.initialized) {
       if (ApplicationService.allowsAutoStart()) {
         try {
-          const stdout = execSync(
-            `ps aux | grep -i '${app.name}.AppImage' | grep -v 'grep' | awk '{print $11}'`
-          )
-            .toString()
-            .trim();
-
-          for (const line of stdout.split('\n')) {
-            if (line.toLowerCase().trim().endsWith('.appimage')) {
-              ApplicationService.appImagePath = line;
-              break;
-            }
-          }
-
-          ApplicationService.logger.debug('AppImage path: ', ApplicationService.appImagePath);
-          if (!ApplicationService.appIconPath.exists()) {
-            ApplicationService.appIconPath.getParentFile().mkdir(true);
-            new File({ file: icon }).copy(ApplicationService.appIconPath);
-            ApplicationService.logger.debug('Icon path: ', ApplicationService.appImagePath);
+          ApplicationService.logger.info('AppImage path: ', ApplicationService.appImagePath);
+          if (ApplicationService.checkAutoStart()) {
+            ApplicationService.logger.info('Refreshing autostart file');
+            LoggerMain.addTab();
+            ApplicationService.setAutoStart(false);
+            ApplicationService.setAutoStart(true);
+            LoggerMain.removeTab();
+            ApplicationService.logger.info('File refreshed');
           }
         } catch (error) {
           ApplicationService.logger.error('Error getting AppImage path', error);
         }
       } else {
         ApplicationService.logger.debug('Not getting AppImage path due to development mode');
+      }
+
+      if (!ApplicationService.appIconPath.exists()) {
+        ApplicationService.appIconPath.getParentFile().mkdir(true);
+        new File({ file: icon }).copy(ApplicationService.appIconPath);
+        ApplicationService.logger.debug('Icon path: ', ApplicationService.appImagePath);
       }
 
       const scriptsFolder = new File({ file: ApplicationService.appScriptsPath });
@@ -63,7 +59,7 @@ export class ApplicationService {
       FileHelper.write(
         nextProfileFile.getAbsolutePath(),
         `#!/bin/bash
-curl http://localhost:${Constants.httpPort}/nextProfile
+curl http://localhost:${Constants.httpPort}/nextProfile?token=${HttpServer.token}
 `
       );
       const nextAnimation = new File({
@@ -72,7 +68,7 @@ curl http://localhost:${Constants.httpPort}/nextProfile
       FileHelper.write(
         nextAnimation.getAbsolutePath(),
         `#!/bin/bash
-curl http://localhost:${Constants.httpPort}/nextLedMode
+curl http://localhost:${Constants.httpPort}/nextLedMode?token=${HttpServer.token}
 `
       );
       const incBrightness = new File({
@@ -81,7 +77,7 @@ curl http://localhost:${Constants.httpPort}/nextLedMode
       FileHelper.write(
         incBrightness.getAbsolutePath(),
         `#!/bin/bash
-curl http://localhost:${Constants.httpPort}/increaseBrightness
+curl http://localhost:${Constants.httpPort}/increaseBrightness?token=${HttpServer.token}
 `
       );
       const decBrightness = new File({
@@ -90,7 +86,7 @@ curl http://localhost:${Constants.httpPort}/increaseBrightness
       FileHelper.write(
         decBrightness.getAbsolutePath(),
         `#!/bin/bash
-curl http://localhost:${Constants.httpPort}/decreaseBrightness
+curl http://localhost:${Constants.httpPort}/decreaseBrightness?token=${HttpServer.token}
 `
       );
       execSync(`chmod 777 ${path.join(scriptsFolder.getAbsolutePath(), '*')}`);
@@ -99,7 +95,7 @@ curl http://localhost:${Constants.httpPort}/decreaseBrightness
   }
 
   public static allowsAutoStart(): boolean {
-    return process.env.NODE_ENV != 'development';
+    return process.env.NODE_ENV != 'development' && process.env.APPIMAGE != undefined;
   }
 
   public static checkAutoStart(): boolean {
@@ -112,7 +108,7 @@ curl http://localhost:${Constants.httpPort}/decreaseBrightness
       const desktopEntryContent = `[Desktop Entry]
 Exec=${ApplicationService.appImagePath}
 Icon=${ApplicationService.appIconPath}
-Name=${ApplicationService.appImageFileName}
+Name=${app.name}
 Path=
 Terminal=False
 Type=Application

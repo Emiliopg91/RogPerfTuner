@@ -17,7 +17,7 @@ import {
 import { BrowserWindow, MenuItemConstructorOptions, app } from 'electron';
 import path from 'path';
 
-import { createWindow, mainWindow } from '.';
+import { createWindow, mainWindow, requestExit } from '.';
 import icon512 from '../../resources/icons/icon-512x512.png?asset';
 import { ApplicationService } from './services/Application';
 import { AuraService } from './services/Aura';
@@ -29,7 +29,7 @@ export const appConfig: AppConfig = {
   //splashScreen: 3000
 };
 export const windowConfig: WindowConfig = {
-  hideMenu: false,
+  hideMenu: true,
   minimizeToTray: true,
   closeToTray: true,
   escCloseWindow: false,
@@ -262,6 +262,7 @@ export const generateTrayMenuDef = async (): Promise<
       label: TranslatorMain.translate('quit'),
       type: 'normal',
       click: (): void => {
+        requestExit();
         app.quit();
       }
     }

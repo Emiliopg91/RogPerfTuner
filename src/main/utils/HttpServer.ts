@@ -4,6 +4,7 @@ import { PlatformModels, ThrottleThermalPolicy } from '@commons/models/Platform'
 import { LoggerMain } from '@tser-framework/main';
 import { createServer } from 'http';
 import { parse } from 'url';
+import { v4 as uuidv4 } from 'uuid';
 
 import { AuraService } from '../services/Aura';
 import { PlatformService } from '../services/Platform';
@@ -12,16 +13,31 @@ import { Constants } from './Constants';
 
 export class HttpServer {
   private static logger = LoggerMain.for('HttpServer');
+  public static token = uuidv4();
+
   public static async initialize(): Promise<void> {
     const server = createServer(async (req, res) => {
       const t0 = Date.now();
       let response = 'Invalid request';
       if (req.url) {
-        HttpServer.logger.info('Received request to ' + req.url);
-        LoggerMain.addTab();
-
         const parsedUrl = parse(req.url, true);
         const path = parsedUrl.pathname;
+        const query = parsedUrl.query;
+
+        HttpServer.logger.info(
+          `Received request to http://${Constants.httpIface}:${Constants.httpPort}${path}${query.token ? `/token=${query.token}` : ''}`
+        );
+        LoggerMain.addTab();
+
+        // Validar token
+        if (!query.token || query.token !== HttpServer.token) {
+          res.statusCode = 401;
+          res.setHeader('Content-Type', 'text/plain');
+          res.end('Unauthorized\n');
+          LoggerMain.removeTab();
+          HttpServer.logger.warn('Rejected request with invalid or missing token');
+          return;
+        }
 
         if (path && path.startsWith('/')) {
           const service = path.slice(1);
@@ -61,8 +77,10 @@ export class HttpServer {
     });
 
     await new Promise<void>((resolve) => {
-      server.listen(Constants.httpPort, '127.0.0.1', () => {
-        HttpServer.logger.info(`Server listening http://localhost:${Constants.httpPort}`);
+      server.listen(Constants.httpPort, Constants.httpIface, () => {
+        HttpServer.logger.info(
+          `Server listening http://${Constants.httpIface}:${Constants.httpPort}`
+        );
         resolve();
       });
     });

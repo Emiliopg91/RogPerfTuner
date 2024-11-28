@@ -208,6 +208,8 @@ const initTime = Date.now();
       LoggerMain.removeTab();
       logger.system('Ended initializeWhenReady');
 
+      await createWindow();
+      mainWindow?.close();
       applicationLogic();
     });
   }
@@ -248,9 +250,22 @@ function configureShortcutEvents(window: Electron.BrowserWindow): void {
   });
 }
 
+let requestedExit = false;
+export function requestExit(): void {
+  requestedExit = true;
+}
+
 export async function createWindow(): Promise<void> {
   mainWindow = WindowHelper.createMainWindow(windowConfig);
-  mainWindow.show();
+  mainWindow.on('close', (event) => {
+    if (!requestedExit) {
+      event.preventDefault();
+      mainWindow?.minimize();
+    }
+  });
+  return new Promise<void>((resolve) => {
+    mainWindow?.once('ready-to-show', resolve);
+  });
 }
 
 function msToTime(duration): string {
