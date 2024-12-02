@@ -1,5 +1,6 @@
 export interface SettingsType {
   platform: PlatformSettingsType | undefined;
+  openRgb: OpenRgbSettingsType | undefined;
 }
 
 export interface PlatformSettingsType {
@@ -8,4 +9,10 @@ export interface PlatformSettingsType {
 
 export interface ProfilesPlatformSettingsType {
   last: string | undefined;
+}
+
+export interface OpenRgbSettingsType {
+  mode: string;
+  brightness: number;
+  color: string;
 }

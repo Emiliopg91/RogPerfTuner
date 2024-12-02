@@ -24,8 +24,13 @@ export class BackendClient {
   private static uuid = uuidv4();
   private static pendingRequests: Record<
     string,
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    { resolve: (res: any | undefined) => void; clearTimeout: () => void }
+    {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      resolve: (res: any | undefined) => void;
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      reject: (err: any) => void;
+      clearTimeout: () => void;
+    }
   > = {};
   public static port: number = 6472;
   private static openRgbPath = new File({
@@ -40,11 +45,6 @@ export class BackendClient {
             BackendClient.logger.info('Initializing backend');
             LoggerMain.addTab();
             BackendClient.startWebSocket(async () => {
-              await BackendClient.invoke('available_modes');
-              await BackendClient.invoke('set_mode', 'Static', '1', '#FF00FF');
-              setTimeout(() => {
-                BackendClient.invoke('set_mode', 'Spectrum Cycle', '1');
-              }, 5000);
               LoggerMain.removeTab();
               resolve();
             }, reject);
@@ -146,14 +146,19 @@ export class BackendClient {
                   BackendClient.logger.warn(`No pending message found for id ${msg.getId()}`);
                 } else {
                   pendingMsg.clearTimeout();
-                  const response =
-                    msg.getParams() && msg.getParams()!.length > 0
-                      ? msg.getParams()![0]
-                      : undefined;
-                  BackendClient.logger.info(
-                    `Received response from backend: ${JSON.stringify(response)}`
-                  );
-                  pendingMsg.resolve(response);
+                  if (msg.getError()) {
+                    pendingMsg.reject(msg.getError());
+                    BackendClient.logger.info(`Raised exception from backend: ${msg.getError()}`);
+                  } else {
+                    const response =
+                      msg.getParams() && msg.getParams()!.length > 0
+                        ? msg.getParams()![0]
+                        : undefined;
+                    BackendClient.logger.info(
+                      `Received response from backend: ${JSON.stringify(response)}`
+                    );
+                    pendingMsg.resolve(response);
+                  }
                 }
               }
             }
@@ -179,7 +184,7 @@ export class BackendClient {
   }
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  public static async invoke(method: string, ...params: any[]): Promise<any> {
+  public static async invoke<I extends any[], O>(method: string, ...params: I): Promise<O> {
     if (!BackendClient.client) {
       throw new Error('No client connected');
     }
@@ -193,6 +198,7 @@ export class BackendClient {
       }, 3000);
       BackendClient.pendingRequests[message.getId()] = {
         resolve,
+        reject,
         clearTimeout: (): void => {
           clearTimeout(timeout);
         }

@@ -51,19 +51,19 @@ class OpenRgbClient:
 
         self.cli.update_profiles()
 
-    async def set_mode_async(self, device:Device, mode:ModeData, brightness:BrightnessLevel, color:str = None):    
+    async def set_mode_async(self, device:Device, mode:ModeData, brightness:BrightnessLevel, color:str):    
         old_brightness = mode.brightness
         if mode.brightness_min is not None:
-            if brightness == BrightnessLevel.OFF:
+            if brightness == BrightnessLevel.OFF.value:
                 mode.brightness = mode.brightness_min
-            elif brightness == BrightnessLevel.LOW:
+            elif brightness == BrightnessLevel.LOW.value:
                 mode.brightness = round((mode.brightness_max + mode.brightness_min)/3)
-            elif brightness == BrightnessLevel.MED:
+            elif brightness == BrightnessLevel.MED.value:
                 mode.brightness = round(2*(mode.brightness_max + mode.brightness_min)/3)
             else:
                 mode.brightness = mode.brightness_max
-        
-        color = RGBColor.fromHEX(color if color is not None else "#FF0000")
+
+        color = RGBColor.fromHEX(color)
         if mode.color_mode is ModeColors.MODE_SPECIFIC:
             old_colors = mode.colors
             mode.colors = [color]
