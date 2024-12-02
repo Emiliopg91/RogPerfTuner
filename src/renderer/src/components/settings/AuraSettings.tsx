@@ -1,4 +1,4 @@
-import { AuraBrightness, AuraLedMode } from '@commons/models/Aura';
+import { AuraBrightness } from '@commons/models/Aura';
 import { LoggerRenderer, TranslatorRenderer } from '@tser-framework/renderer';
 import { ChangeEvent, FC, useEffect, useState } from 'react';
 import { Form } from 'react-bootstrap';
@@ -8,7 +8,8 @@ import { SettingsLine } from './commons/SettingLine';
 import { SettingsBlock } from './commons/SettingsBlock';
 
 export const AuraSettings: FC = () => {
-  const [ledMode, setLedMode] = useState(AuraLedMode.STATIC);
+  const [available, setAvailable] = useState<Array<string>>([]);
+  const [ledMode, setLedMode] = useState('Static');
   const [brightness, setBrightness] = useState(AuraBrightness.MEDIUM);
 
   useEffect(() => {
@@ -22,13 +23,14 @@ export const AuraSettings: FC = () => {
     });
 
     //Led Mode
-    window.api.refreshLedMode((mode: AuraLedMode) => {
+    window.api.refreshLedMode((mode: string) => {
       LoggerRenderer.info('Refreshing led mode in UI');
       setLedMode(() => mode);
     });
-    window.api.getLedMode().then((result: AuraLedMode) => {
+    window.api.getLedMode().then((result: string) => {
       setLedMode(result);
     });
+    window.api.getAvailableLedModes().then((modes) => setAvailable(modes));
   }, []);
 
   const handleBrightnessChange = (event: ChangeEvent<HTMLSelectElement>): void => {
@@ -39,7 +41,7 @@ export const AuraSettings: FC = () => {
   };
 
   const handleLedModeChange = (event: ChangeEvent<HTMLSelectElement>): void => {
-    const mode = parseInt(event.target.value) as AuraLedMode;
+    const mode = event.target.value;
     window.api.setLedMode(mode).then((brightness: AuraBrightness) => {
       setLedMode(mode);
       setBrightness(brightness);
@@ -51,15 +53,13 @@ export const AuraSettings: FC = () => {
       <SettingsLine label={TranslatorRenderer.translate('led.mode')}>
         <>
           <Form.Select value={ledMode} onChange={handleLedModeChange} data-bs-theme="dark">
-            {Object.entries(AuraLedMode)
-              .filter(([key]) => isNaN(Number(String(key))))
-              .map(([key, value]) => {
-                return (
-                  <option key={key} value={value}>
-                    {TranslatorRenderer.translate('led.mode.' + key)}
-                  </option>
-                );
-              })}
+            {available.map((mode) => {
+              return (
+                <option key={mode} value={mode}>
+                  {mode}
+                </option>
+              );
+            })}
           </Form.Select>
         </>
       </SettingsLine>

@@ -1,7 +1,9 @@
 import { AuraBrightness } from '@commons/models/Aura';
 import { LoggerMain } from '@tser-framework/main';
 
+import { mainWindow } from '..';
 import { BackendClient } from '../clients/backend/BackendClient';
+import { generateTrayMenuDef, refreshTrayMenu } from '../setup';
 import { Settings } from '../utils/Settings';
 
 export class OpenRgbService {
@@ -33,6 +35,9 @@ export class OpenRgbService {
       OpenRgbService.availableModes = await BackendClient.invoke<[], Array<string>>(
         'available_modes'
       );
+      OpenRgbService.availableModes = OpenRgbService.availableModes.sort((a, b) =>
+        a.localeCompare(b)
+      );
 
       OpenRgbService.logger.info('Restoring state');
       OpenRgbService.setMode(OpenRgbService.lastMode);
@@ -55,6 +60,8 @@ export class OpenRgbService {
         brightness: OpenRgbService.lastBrightness,
         color: OpenRgbService.color
       };
+      refreshTrayMenu(await generateTrayMenuDef());
+      mainWindow?.webContents.send('refreshLedMode', mode);
     } else {
       OpenRgbService.logger.info(`Mode ${mode} is not available`);
     }
@@ -74,6 +81,8 @@ export class OpenRgbService {
       brightness,
       color: OpenRgbService.color
     };
+    refreshTrayMenu(await generateTrayMenuDef());
+    mainWindow?.webContents.send('refreshBrightness', brightness);
   }
 
   public static async setColor(color: string): Promise<void> {
@@ -90,5 +99,25 @@ export class OpenRgbService {
       brightness: OpenRgbService.lastBrightness,
       color
     };
+    refreshTrayMenu(await generateTrayMenuDef());
+  }
+
+  public static getAvailableModes(): Array<string> {
+    return OpenRgbService.availableModes;
+  }
+
+  public static getBrightness(): AuraBrightness {
+    return OpenRgbService.lastBrightness;
+  }
+
+  public static getMode(): string {
+    return OpenRgbService.lastMode;
+  }
+
+  public static getNextMode(): string {
+    return OpenRgbService.availableModes[
+      (OpenRgbService.availableModes.indexOf(OpenRgbService.lastMode) + 1) %
+        OpenRgbService.availableModes.length
+    ];
   }
 }

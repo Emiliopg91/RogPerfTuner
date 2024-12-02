@@ -1,4 +1,4 @@
-import { AuraBrightness, AuraLedMode } from '@commons/models/Aura';
+import { AuraBrightness } from '@commons/models/Aura';
 import { ThrottleThermalPolicy } from '@commons/models/Platform';
 import {
   DefaulLevel,
@@ -58,6 +58,9 @@ export const exposed = {
       ipcRenderer.on('refreshBrightness', (_, brightness: AuraBrightness) => {
         callback(brightness);
       });
+    },
+    getAvailableLedModes(): Promise<Array<string>> {
+      return ipcRenderer.invoke('getAvailableModes');
     },
     async getLedMode(): Promise<AuraLedMode> {
       return ipcRenderer.invoke('getLedMode');

@@ -9,7 +9,6 @@ import { AsusFanCurvesClient } from './clients/dbus/AsusFanCurvesClient';
 import { AsusPlatformClient } from './clients/dbus/AsusPlatformClient';
 import { PowerProfilesClient } from './clients/dbus/PowerProfilesClient';
 import { ApplicationService } from './services/Application';
-import { AuraService } from './services/Aura';
 import { OpenRgbService } from './services/OpenRgb';
 import { PlatformService } from './services/Platform';
 import { generateTrayMenuDef, setTrayMenuRefreshFn } from './setup';
@@ -33,7 +32,6 @@ export async function initializeWhenReady(): Promise<void> {
   await AsusPlatformClient.getInstance();
   await PowerProfilesClient.getInstance();
   await PlatformService.initialize();
-  await AuraService.initialize();
   await HttpServer.initialize();
   ApplicationService.initialize();
 
