@@ -3,10 +3,11 @@ import { Menu, app } from 'electron/main';
 
 import icon45 from '../../resources/icons/icon-45x45.png?asset';
 import translations from '../../resources/translations.i18n.json';
-import { AsusAuraClient } from './dbus/AsusAuraClient';
-import { AsusFanCurvesClient } from './dbus/AsusFanCurvesClient';
-import { AsusPlatformClient } from './dbus/AsusPlatformClient';
-import { PowerProfilesClient } from './dbus/PowerProfilesClient';
+import { BackendClient } from './clients/backend/BackendClient';
+import { AsusAuraClient } from './clients/dbus/AsusAuraClient';
+import { AsusFanCurvesClient } from './clients/dbus/AsusFanCurvesClient';
+import { AsusPlatformClient } from './clients/dbus/AsusPlatformClient';
+import { PowerProfilesClient } from './clients/dbus/PowerProfilesClient';
 import { ApplicationService } from './services/Application';
 import { AuraService } from './services/Aura';
 import { PlatformService } from './services/Platform';
@@ -24,6 +25,7 @@ export async function initializeBeforeReady(): Promise<void> {
 // eslint-disable-next-line @typescript-eslint/no-empty-function
 export async function initializeWhenReady(): Promise<void> {
   await Settings.initialize();
+  await BackendClient.initialize();
   await AsusAuraClient.getInstance();
   await AsusFanCurvesClient.getInstance();
   await AsusPlatformClient.getInstance();
@@ -41,4 +43,8 @@ export async function initializeWhenReady(): Promise<void> {
     const contextMenu = Menu.buildFromTemplate(newMenu);
     tray.setContextMenu(contextMenu);
   });
+}
+
+export function stop(): void {
+  BackendClient.stop();
 }

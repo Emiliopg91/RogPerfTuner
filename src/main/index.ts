@@ -6,7 +6,7 @@ import { dialog } from 'electron/main';
 import path from 'path';
 
 import { applicationLogic } from './applicationLogic';
-import { initializeBeforeReady, initializeWhenReady } from './initialize';
+import { initializeBeforeReady, initializeWhenReady, stop } from './lifecycle';
 import { NotificationService } from './services/NotificationService';
 import {
   appConfig,
@@ -129,7 +129,8 @@ const initTime = Date.now();
         }
       });
 
-      app.on('quit', function () {
+      app.on('quit', () => {
+        stop();
         const msg = ' Stopped main after ' + msToTime(Date.now() - initTime) + ' ';
         logger.system('##################################################');
         logger.system(

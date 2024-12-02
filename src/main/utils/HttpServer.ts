@@ -25,7 +25,7 @@ export class HttpServer {
         const query = parsedUrl.query;
 
         HttpServer.logger.info(
-          `Received request to http://${Constants.httpIface}:${Constants.httpPort}${path}${query.token ? `/token=${query.token}` : ''}`
+          `Received request to http://${Constants.localhost}:${Constants.httpPort}${path}${query.token ? `/token=${query.token}` : ''}`
         );
         LoggerMain.addTab();
 
@@ -77,9 +77,9 @@ export class HttpServer {
     });
 
     await new Promise<void>((resolve) => {
-      server.listen(Constants.httpPort, Constants.httpIface, () => {
+      server.listen(Constants.httpPort, Constants.localhost, () => {
         HttpServer.logger.info(
-          `Server listening http://${Constants.httpIface}:${Constants.httpPort}`
+          `Server listening http://${Constants.localhost}:${Constants.httpPort}`
         );
         resolve();
       });

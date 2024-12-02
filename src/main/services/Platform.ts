@@ -9,10 +9,10 @@ import { execSync } from 'child_process';
 import * as fs from 'fs';
 
 import { mainWindow } from '..';
-import { AsusFanCurvesClient } from '../dbus/AsusFanCurvesClient';
-import { AsusPlatformClient } from '../dbus/AsusPlatformClient';
-import { PowerProfilesClient } from '../dbus/PowerProfilesClient';
-import { UPowerClient } from '../dbus/UPowerClient';
+import { AsusFanCurvesClient } from '../clients/dbus/AsusFanCurvesClient';
+import { AsusPlatformClient } from '../clients/dbus/AsusPlatformClient';
+import { PowerProfilesClient } from '../clients/dbus/PowerProfilesClient';
+import { UPowerClient } from '../clients/dbus/UPowerClient';
 import { generateTrayMenuDef, refreshTrayMenu } from '../setup';
 import { Settings } from '../utils/Settings';
 import { NotificationService } from './NotificationService';

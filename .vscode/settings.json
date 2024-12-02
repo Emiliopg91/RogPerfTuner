@@ -15,5 +15,8 @@
   },
   "[json]": {
     "editor.defaultFormatter": "esbenp.prettier-vscode"
-  }
+  },
+  "python.analysis.extraPaths": [
+    "./resources/python/lib/*"
+  ]
 }
