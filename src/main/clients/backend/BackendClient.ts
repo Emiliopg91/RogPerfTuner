@@ -2,8 +2,9 @@ import { is } from '@electron-toolkit/utils';
 import { File, FileHelper, LoggerMain } from '@tser-framework/main';
 import AdmZip from 'adm-zip';
 import { ChildProcess, exec, spawn } from 'child_process';
+import { https } from 'follow-redirects';
 import fs from 'fs';
-import net from 'net';
+import net, { AddressInfo } from 'net';
 import os from 'os';
 import path from 'path';
 import { clearTimeout, setTimeout } from 'timers';
@@ -13,6 +14,7 @@ import { WebSocket, WebSocketServer } from 'ws';
 import pythonMain from '../../../../resources/python/main.py?asset&asarUnpack';
 import BackendMessage from '../../models/Backend';
 import { Constants } from '../../utils/Constants';
+import { Settings } from '../../utils/Settings';
 
 export class BackendClient {
   private static logger = LoggerMain.for('BackendClient');
@@ -148,13 +150,13 @@ export class BackendClient {
                   pendingMsg.clearTimeout();
                   if (msg.getError()) {
                     pendingMsg.reject(msg.getError());
-                    BackendClient.logger.info(`Raised exception from backend: ${msg.getError()}`);
+                    BackendClient.logger.error(`Raised exception from backend: ${msg.getError()}`);
                   } else {
                     const response =
                       msg.getParams() && msg.getParams()!.length > 0
                         ? msg.getParams()![0]
                         : undefined;
-                    BackendClient.logger.info(
+                    BackendClient.logger.debug(
                       `Received response from backend: ${JSON.stringify(response)}`
                     );
                     pendingMsg.resolve(response);
@@ -204,7 +206,7 @@ export class BackendClient {
         }
       };
 
-      BackendClient.logger.info(
+      BackendClient.logger.debug(
         `Invoking backend method ${method}(${params.map((v) => JSON.stringify(v)).join(', ')})`
       );
       BackendClient.client!.send(message.toJson());
@@ -219,46 +221,29 @@ export class BackendClient {
         if (!BackendClient.openRgbPath.getParentFile().exists()) {
           BackendClient.openRgbPath.getParentFile().mkdir(true);
         }
-        if (!BackendClient.openRgbPath.exists()) {
-          await new Promise<void>((resolve, reject) => {
-            BackendClient.logger.info('Downloading OpenRGB experimental');
 
-            const tmpFile = path.join(os.tmpdir(), `openrgb-${uuidv4()}.zip`);
+        const url =
+          'https://gitlab.com/CalcProgrammer1/OpenRGB/-/jobs/artifacts/master/download?job=Linux%20amd64%20AppImage';
+        const latestBuild = (await BackendClient.getOpenRgbBuild(url)) || 'unknown';
 
-            const url =
-              'https://gitlab.com/CalcProgrammer1/OpenRGB/-/jobs/artifacts/master/download?job=Linux%20amd64%20AppImage';
+        if (
+          !BackendClient.openRgbPath.exists() ||
+          Settings.configMap.openRgb?.build != latestBuild
+        ) {
+          BackendClient.logger.info(`Downloading OpenRgb experimental build ${latestBuild}`);
+          await BackendClient.downloadOpenRgb(url);
 
-            exec(`wget -O ${tmpFile} ${url}`, (error, _, stderr) => {
-              if (error) {
-                BackendClient.logger.error(`Error on download: \n${stderr}`);
-                reject(stderr);
-              } else {
-                BackendClient.logger.info('Download successful, extracting zip');
-
-                const zip = new AdmZip(tmpFile);
-                const zipEntries = zip.getEntries();
-                const appImageEntry = zipEntries.find((entry) =>
-                  entry.entryName.endsWith('.AppImage')
-                );
-                if (!appImageEntry) {
-                  reject('AppImage not found in OpenRGB distributables');
-                } else {
-                  fs.writeFileSync(
-                    BackendClient.openRgbPath.getAbsolutePath(),
-                    appImageEntry.getData()
-                  );
-                  fs.chmodSync(BackendClient.openRgbPath.getAbsolutePath(), 0o755);
-                  resolve();
-                }
-              }
-            });
-          });
+          if (!Settings.configMap.openRgb) {
+            Settings.configMap.openRgb = { build: latestBuild };
+          } else {
+            Settings.configMap.openRgb.build = latestBuild;
+          }
         }
 
         BackendClient.port = await new Promise((resolve) => {
           const server = net.createServer();
           server.listen(0, () => {
-            const port = server.address()!.port;
+            const port = (server.address() as AddressInfo)!.port;
             server.close(() => resolve(port));
           });
         });
@@ -294,6 +279,53 @@ export class BackendClient {
           resolve();
         }, 1000);
       })();
+    });
+  }
+
+  private static async getOpenRgbBuild(url): Promise<string | undefined> {
+    return new Promise<string | undefined>((resolve, reject) => {
+      const request = https.get(url, (response) => {
+        if (response.statusCode < 400) {
+          const contentDisposition = response.headers['content-disposition'];
+          if (contentDisposition) {
+            const match = contentDisposition.match(/filename="(.+?)"/);
+            if (match) {
+              const filename = String(match[1]);
+              resolve(filename.substring(filename.lastIndexOf('_') + 1, filename.lastIndexOf('.')));
+              return;
+            }
+          }
+        }
+        resolve(undefined);
+      });
+
+      request.on('error', (err) => reject(err));
+    });
+  }
+
+  private static async downloadOpenRgb(url): Promise<void> {
+    return new Promise<void>((resolve, reject) => {
+      const tmpFile = path.join(os.tmpdir(), `openrgb-${uuidv4()}.zip`);
+
+      exec(`wget -O ${tmpFile} ${url}`, (error, _, stderr) => {
+        if (error) {
+          BackendClient.logger.error(`Error on download: \n${stderr}`);
+          reject(stderr);
+        } else {
+          BackendClient.logger.info('Download successful, extracting zip');
+
+          const zip = new AdmZip(tmpFile);
+          const zipEntries = zip.getEntries();
+          const appImageEntry = zipEntries.find((entry) => entry.entryName.endsWith('.AppImage'));
+          if (!appImageEntry) {
+            reject('AppImage not found in OpenRGB distributables');
+          } else {
+            fs.writeFileSync(BackendClient.openRgbPath.getAbsolutePath(), appImageEntry.getData());
+            fs.chmodSync(BackendClient.openRgbPath.getAbsolutePath(), 0o755);
+            resolve();
+          }
+        }
+      });
     });
   }
 }

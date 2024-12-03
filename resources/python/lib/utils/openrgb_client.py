@@ -29,7 +29,7 @@ class OpenRgbClient:
         for device in self.cli.ee_devices:
             """active_mode = [mode for mode in device.modes if mode.id == device.active_mode][0]"""
             devices.append(device.name)
-            device_modes = {mode.name for mode in device.modes if mode.name != "Direct" and mode.name != "Off"  and mode.name != "Off" and "Reactive" not in mode.name}
+            device_modes = {mode.name for mode in device.modes if mode.name != "Direct" and mode.name != "Rainbow Wave" and mode.name != "Off"  and mode.name != "Off" and "Reactive" not in mode.name}
             
             if common_modes is None:
                 common_modes = device_modes
@@ -86,14 +86,7 @@ class OpenRgbClient:
                 if self.device_mode_data[device.name] is not None:
                     mode_data = self.device_mode_data[device.name][mode]
                     tasks.append(self.set_mode_async(device, mode_data, brightness, color))
-            await asyncio.gather(*tasks)        
-            await self.save_profile(mode)
+            await asyncio.gather(*tasks)       
             print(f"Mode setted in {time.time() - t0}s")
         else:
             print(f"Mode {mode} not available")
-
-    async def save_profile(self, name):
-        print(f"Saving profile {name}", file=sys.stderr)
-        self.cli.save_profile(name)
-        self.cli.update_profiles()
-        print(f"Profile saved {name}")

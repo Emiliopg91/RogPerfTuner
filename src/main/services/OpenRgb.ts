@@ -20,15 +20,14 @@ export class OpenRgbService {
       LoggerMain.addTab();
       OpenRgbService.initialized = true;
 
-      OpenRgbService.logger.info('Loading last state from configuration');
-      OpenRgbService.lastMode = Settings.configMap.openRgb?.mode
-        ? Settings.configMap.openRgb?.mode
+      OpenRgbService.lastMode = Settings.configMap.openRgb?.state?.mode
+        ? Settings.configMap.openRgb?.state?.mode
         : OpenRgbService.lastMode;
-      OpenRgbService.lastBrightness = Settings.configMap.openRgb?.brightness
-        ? (Settings.configMap.openRgb?.brightness as AuraBrightness)
+      OpenRgbService.lastBrightness = Settings.configMap.openRgb?.state?.brightness
+        ? (Settings.configMap.openRgb?.state?.brightness as AuraBrightness)
         : AuraBrightness.OFF;
-      OpenRgbService.color = Settings.configMap.openRgb?.color
-        ? Settings.configMap.openRgb?.color
+      OpenRgbService.color = Settings.configMap.openRgb?.state?.color
+        ? Settings.configMap.openRgb?.state?.color
         : OpenRgbService.color;
 
       OpenRgbService.logger.info('Retrieving available modes');
@@ -55,7 +54,7 @@ export class OpenRgbService {
       );
 
       OpenRgbService.lastMode = mode;
-      Settings.configMap.openRgb = {
+      Settings.configMap.openRgb!.state = {
         mode,
         brightness: OpenRgbService.lastBrightness,
         color: OpenRgbService.color
@@ -76,7 +75,7 @@ export class OpenRgbService {
     );
 
     OpenRgbService.lastBrightness = brightness;
-    Settings.configMap.openRgb = {
+    Settings.configMap.openRgb!.state = {
       mode: OpenRgbService.lastMode,
       brightness,
       color: OpenRgbService.color
@@ -94,7 +93,7 @@ export class OpenRgbService {
     );
 
     OpenRgbService.color = color;
-    Settings.configMap.openRgb = {
+    Settings.configMap.openRgb!.state = {
       mode: OpenRgbService.lastMode,
       brightness: OpenRgbService.lastBrightness,
       color

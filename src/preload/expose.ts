@@ -62,14 +62,14 @@ export const exposed = {
     getAvailableLedModes(): Promise<Array<string>> {
       return ipcRenderer.invoke('getAvailableModes');
     },
-    async getLedMode(): Promise<AuraLedMode> {
+    async getLedMode(): Promise<string> {
       return ipcRenderer.invoke('getLedMode');
     },
-    setLedMode(mode: AuraLedMode): Promise<AuraBrightness> {
+    setLedMode(mode: string): Promise<AuraBrightness> {
       return ipcRenderer.invoke('setLedMode', mode);
     },
-    refreshLedMode(callback: (mode: AuraLedMode) => void): void {
-      ipcRenderer.on('refreshLedMode', (_, mode: AuraLedMode) => {
+    refreshLedMode(callback: (mode: string) => void): void {
+      ipcRenderer.on('refreshLedMode', (_, mode: string) => {
         callback(mode);
       });
     },

@@ -12,6 +12,11 @@ export interface ProfilesPlatformSettingsType {
 }
 
 export interface OpenRgbSettingsType {
+  state?: OpenRgbStateSettingsType;
+  build: string;
+}
+
+export interface OpenRgbStateSettingsType {
   mode: string;
   brightness: number;
   color: string;
