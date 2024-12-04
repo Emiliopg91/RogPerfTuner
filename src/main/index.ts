@@ -37,183 +37,190 @@ const initTime = Date.now();
   await initializeBeforeReady();
   LoggerMain.removeTab();
   logger.system('Ended initializeBeforeReady');
+
+  if (process.argv.includes('--restart')) {
+    while (!app.requestSingleInstanceLock()) {
+      await new Promise<void>((resolve) => setTimeout(resolve, 100));
+    }
+  }
+
   if (!app.requestSingleInstanceLock() && appConfig.singleInstance) {
     logger.error('Application already running');
     app.quit();
-  } else {
-    logger.system('Services registration');
-    LoggerMain.addTab();
-    Object.keys(ipcListeners).forEach((id) => {
-      const listener = ipcListeners[id];
-      if (listener.sync) {
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        ipcMain.handle(id, (event: IpcMainInvokeEvent, ...args: any): unknown => {
-          return listener.fn(event, ...args);
-        });
-        logger.system("Synchronous IPC '" + id + "'");
-      }
-    });
-    Object.keys(ipcListeners).forEach((id) => {
-      const listener = ipcListeners[id];
-      if (!listener.sync) {
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        ipcMain.on(id, (event: IpcMainInvokeEvent, ...args: any): void => {
-          listener.fn(event, ...args);
-        });
-        logger.system("Asynchronous IPC '" + id + "'");
-      }
-    });
+  }
+
+  logger.system('Services registration');
+  LoggerMain.addTab();
+  Object.keys(ipcListeners).forEach((id) => {
+    const listener = ipcListeners[id];
+    if (listener.sync) {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      ipcMain.handle(id, (event: IpcMainInvokeEvent, ...args: any): unknown => {
+        return listener.fn(event, ...args);
+      });
+      logger.system("Synchronous IPC '" + id + "'");
+    }
+  });
+  Object.keys(ipcListeners).forEach((id) => {
+    const listener = ipcListeners[id];
+    if (!listener.sync) {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      ipcMain.on(id, (event: IpcMainInvokeEvent, ...args: any): void => {
+        listener.fn(event, ...args);
+      });
+      logger.system("Asynchronous IPC '" + id + "'");
+    }
+  });
+
+  Object.keys(protocolBindings).forEach((id) => {
+    protocol.registerSchemesAsPrivileged([
+      { scheme: id, privileges: protocolBindings[id].privileges }
+    ]);
+  });
+
+  app.whenReady().then(async () => {
+    electronApp.setAppUserModelId(app.getName());
 
     Object.keys(protocolBindings).forEach((id) => {
-      protocol.registerSchemesAsPrivileged([
-        { scheme: id, privileges: protocolBindings[id].privileges }
-      ]);
+      protocol.handle(id, protocolBindings[id].handler);
+      logger.system("Registered protocol '" + id + "'");
     });
 
-    app.whenReady().then(async () => {
-      electronApp.setAppUserModelId(app.getName());
-
-      Object.keys(protocolBindings).forEach((id) => {
-        protocol.handle(id, protocolBindings[id].handler);
-        logger.system("Registered protocol '" + id + "'");
+    if (deepLinkBindings) {
+      Object.keys(deepLinkBindings).forEach((id) => {
+        if (process.defaultApp) {
+          if (process.argv.length >= 2) {
+            app.setAsDefaultProtocolClient(id, process.execPath, [path.resolve(process.argv[1])]);
+          }
+        } else {
+          app.setAsDefaultProtocolClient(id);
+        }
+        logger.system("Associated deep-link '" + id + "'");
       });
+    }
+    LoggerMain.removeTab();
+    logger.system('Registration finished');
+
+    let menu: Menu | null = null;
+    if (menuTemplate) {
+      const template = JsonUtils.modifyObject(menuTemplate, ['label'], (_, value: unknown) => {
+        return TranslatorMain.translate(value as string);
+      });
+      menu = Menu.buildFromTemplate(template);
+    }
+    Menu.setApplicationMenu(menu);
+
+    app.on('browser-window-created', (_, window) => {
+      configureShortcutEvents(window);
+    });
+
+    if (appConfig.splashScreen) {
+      WindowHelper.createSplashScreen(
+        {
+          width: 500,
+          height: 300,
+          transparent: true,
+          frame: false,
+          alwaysOnTop: true
+        },
+        appConfig.splashScreen
+      ).then(() => {
+        //createWindow();
+      });
+    } else {
+      //createWindow();
+    }
+
+    app.on('activate', function () {
+      if (BrowserWindow.getAllWindows().length === 0) {
+        createWindow();
+      }
+    });
+
+    app.on('quit', () => {
+      stop();
+      const msg = ' Stopped main after ' + msToTime(Date.now() - initTime) + ' ';
+      logger.system('##################################################');
+      logger.system(
+        '#' +
+          ''.padEnd((48 - msg.length) / 2, ' ') +
+          msg +
+          ''.padEnd((48 - msg.length) / 2, ' ') +
+          '#'
+      );
+      logger.system('##################################################');
+    });
+
+    app.on('window-all-closed', () => {
+      if (windowConfig.closeToTray) {
+        mainWindow = null;
+      } else {
+        app.quit();
+      }
+    });
+
+    app.on('second-instance', (_, commandLine: Array<string>) => {
+      // Someone tried to run a second instance, we should focus our window.
+      if (mainWindow) {
+        if (mainWindow.isMinimized()) {
+          mainWindow.restore();
+        }
+        mainWindow.focus();
+      } else {
+        NotificationService.toast(
+          TranslatorMain.translate('already.running', { appName: app.getName() })
+        );
+      }
 
       if (deepLinkBindings) {
+        const uri = commandLine.pop();
         Object.keys(deepLinkBindings).forEach((id) => {
-          if (process.defaultApp) {
-            if (process.argv.length >= 2) {
-              app.setAsDefaultProtocolClient(id, process.execPath, [path.resolve(process.argv[1])]);
+          if (uri?.startsWith(id + '://')) {
+            deepLinkBindings[id].handler(uri);
+          }
+        });
+      }
+    });
+
+    appUpdater = new AppUpdater(24 * 60 * 60 * 1000, (): void => {
+      dialog
+        .showMessageBox({
+          type: 'info',
+          buttons: [
+            TranslatorMain.translate('update.now'),
+            TranslatorMain.translate('update.on.restart')
+          ],
+          defaultId: 0,
+          cancelId: 1,
+          title: TranslatorMain.translate('update.available'),
+          message: TranslatorMain.translate('update.requires', { appName: app.getName() })
+        })
+        .then((returnValue) => {
+          if (returnValue.response === 0) {
+            if (!shownUpdate) {
+              Constants.mutex.runExclusive(() => {
+                NotificationService.toast(
+                  TranslatorMain.translate('update.installing', { appName: app.getName() })
+                );
+                appUpdater?.quitAndInstall(true, true);
+              });
             }
           } else {
-            app.setAsDefaultProtocolClient(id);
+            shownUpdate = true;
           }
-          logger.system("Associated deep-link '" + id + "'");
         });
-      }
-      LoggerMain.removeTab();
-      logger.system('Registration finished');
-
-      let menu: Menu | null = null;
-      if (menuTemplate) {
-        const template = JsonUtils.modifyObject(menuTemplate, ['label'], (_, value: unknown) => {
-          return TranslatorMain.translate(value as string);
-        });
-        menu = Menu.buildFromTemplate(template);
-      }
-      Menu.setApplicationMenu(menu);
-
-      app.on('browser-window-created', (_, window) => {
-        configureShortcutEvents(window);
-      });
-
-      if (appConfig.splashScreen) {
-        WindowHelper.createSplashScreen(
-          {
-            width: 500,
-            height: 300,
-            transparent: true,
-            frame: false,
-            alwaysOnTop: true
-          },
-          appConfig.splashScreen
-        ).then(() => {
-          //createWindow();
-        });
-      } else {
-        //createWindow();
-      }
-
-      app.on('activate', function () {
-        if (BrowserWindow.getAllWindows().length === 0) {
-          createWindow();
-        }
-      });
-
-      app.on('quit', () => {
-        stop();
-        const msg = ' Stopped main after ' + msToTime(Date.now() - initTime) + ' ';
-        logger.system('##################################################');
-        logger.system(
-          '#' +
-            ''.padEnd((48 - msg.length) / 2, ' ') +
-            msg +
-            ''.padEnd((48 - msg.length) / 2, ' ') +
-            '#'
-        );
-        logger.system('##################################################');
-      });
-
-      app.on('window-all-closed', () => {
-        if (windowConfig.closeToTray) {
-          mainWindow = null;
-        } else {
-          app.quit();
-        }
-      });
-
-      app.on('second-instance', (_, commandLine: Array<string>) => {
-        // Someone tried to run a second instance, we should focus our window.
-        if (mainWindow) {
-          if (mainWindow.isMinimized()) {
-            mainWindow.restore();
-          }
-          mainWindow.focus();
-        } else {
-          NotificationService.toast(
-            TranslatorMain.translate('already.running', { appName: app.getName() })
-          );
-        }
-
-        if (deepLinkBindings) {
-          const uri = commandLine.pop();
-          Object.keys(deepLinkBindings).forEach((id) => {
-            if (uri?.startsWith(id + '://')) {
-              deepLinkBindings[id].handler(uri);
-            }
-          });
-        }
-      });
-
-      appUpdater = new AppUpdater(24 * 60 * 60 * 1000, (): void => {
-        dialog
-          .showMessageBox({
-            type: 'info',
-            buttons: [
-              TranslatorMain.translate('update.now'),
-              TranslatorMain.translate('update.on.restart')
-            ],
-            defaultId: 0,
-            cancelId: 1,
-            title: TranslatorMain.translate('update.available'),
-            message: TranslatorMain.translate('update.requires', { appName: app.getName() })
-          })
-          .then((returnValue) => {
-            if (returnValue.response === 0) {
-              if (!shownUpdate) {
-                Constants.mutex.runExclusive(() => {
-                  NotificationService.toast(
-                    TranslatorMain.translate('update.installing', { appName: app.getName() })
-                  );
-                  appUpdater?.quitAndInstall(true, true);
-                });
-              }
-            } else {
-              shownUpdate = true;
-            }
-          });
-      });
-
-      logger.system('Running initializeWhenReady');
-      LoggerMain.addTab();
-      await initializeWhenReady();
-      LoggerMain.removeTab();
-      logger.system('Ended initializeWhenReady');
-
-      await createWindow();
-      mainWindow?.close();
-      applicationLogic();
     });
-  }
+
+    logger.system('Running initializeWhenReady');
+    LoggerMain.addTab();
+    await initializeWhenReady();
+    LoggerMain.removeTab();
+    logger.system('Ended initializeWhenReady');
+
+    await createWindow();
+    mainWindow?.close();
+    applicationLogic();
+  });
 })();
 
 function configureShortcutEvents(window: Electron.BrowserWindow): void {
@@ -254,6 +261,13 @@ function configureShortcutEvents(window: Electron.BrowserWindow): void {
 let requestedExit = false;
 export function requestExit(): void {
   requestedExit = true;
+  mainWindow?.close();
+  mainWindow = null;
+  app.quit();
+}
+export function requestRestart(): void {
+  app.relaunch();
+  requestExit();
 }
 
 export async function createWindow(): Promise<void> {
@@ -264,6 +278,27 @@ export async function createWindow(): Promise<void> {
       mainWindow?.minimize();
     }
   });
+  mainWindow.webContents.session.setPermissionCheckHandler((_, permission, __, details) => {
+    if (
+      permission === 'hid' &&
+      (details.securityOrigin === 'file://' ||
+        details.securityOrigin?.startsWith('http://localhost'))
+    ) {
+      return true;
+    }
+    return false;
+  });
+
+  mainWindow.webContents.session.setDevicePermissionHandler((details) => {
+    if (
+      details.deviceType === 'hid' &&
+      (details.origin === 'file://' || details.origin.startsWith('http://localhost'))
+    ) {
+      return true;
+    }
+    return false;
+  });
+
   return new Promise<void>((resolve) => {
     mainWindow?.once('ready-to-show', resolve);
   });

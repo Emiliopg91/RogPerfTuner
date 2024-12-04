@@ -3,10 +3,10 @@ import { Menu, app } from 'electron/main';
 
 import icon45 from '../../resources/icons/icon-45x45.png?asset';
 import translations from '../../resources/translations.i18n.json';
-import { BackendClient } from './clients/backend/BackendClient';
 import { AsusFanCurvesClient } from './clients/dbus/AsusFanCurvesClient';
 import { AsusPlatformClient } from './clients/dbus/AsusPlatformClient';
 import { PowerProfilesClient } from './clients/dbus/PowerProfilesClient';
+import { BackendClient } from './clients/openrgb/BackendClient';
 import { ApplicationService } from './services/Application';
 import { OpenRgbService } from './services/OpenRgb';
 import { PlatformService } from './services/Platform';

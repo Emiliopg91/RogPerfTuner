@@ -124,7 +124,8 @@ export class PlatformService {
 
   public static async setThrottleThermalPolicy(
     policy: ThrottleThermalPolicy,
-    temporal: boolean = false
+    temporal: boolean = false,
+    notify: boolean = true
   ): Promise<void> {
     const policyName = ThrottleThermalPolicy[policy];
     const powerPolicy = PlatformService.throttlePowerAssoc[policy];
@@ -196,7 +197,9 @@ export class PlatformService {
             if (!temporal) {
               PlatformService.setLastProfile(policy);
             }
-            showToastOk();
+            if (notify) {
+              showToastOk();
+            }
           })
           .catch((error: unknown) => {
             LoggerMain.removeTab();
@@ -221,7 +224,11 @@ export class PlatformService {
       PlatformService.logger.info('Restoring profile');
       LoggerMain.addTab();
 
-      await PlatformService.setThrottleThermalPolicy(last);
+      await PlatformService.setThrottleThermalPolicy(
+        last,
+        false,
+        !process.argv.includes('--restart')
+      );
 
       LoggerMain.removeTab();
       PlatformService.logger.info('Profile restored');

@@ -39,7 +39,7 @@ export const windowConfig: WindowConfig = {
     fullscreenable: false,
     resizable: false,
     width: 580,
-    height: 760,
+    height: 780,
     backgroundColor: '#191919',
     show: false,
     title: app.getName(),
@@ -339,6 +339,25 @@ export const ipcListeners: Record<string, IpcListener> = {
     sync: true,
     fn(_, enabled: boolean) {
       return ApplicationService.setAutoStart(enabled);
+    }
+  },
+  devicesChanged: {
+    sync: true,
+    fn() {
+      LoggerMain.for('main/setup.ts').info('New connected device, reloading');
+      ApplicationService.restart();
+    }
+  },
+  getColor: {
+    sync: true,
+    fn() {
+      return OpenRgbService.getColor();
+    }
+  },
+  setColor: {
+    sync: true,
+    async fn(_, color) {
+      return await OpenRgbService.setColor(color);
     }
   }
 };

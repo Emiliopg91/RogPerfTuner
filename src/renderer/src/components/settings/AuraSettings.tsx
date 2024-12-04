@@ -1,5 +1,6 @@
 import { AuraBrightness } from '@commons/models/Aura';
 import { LoggerRenderer, TranslatorRenderer } from '@tser-framework/renderer';
+import { debounce } from 'lodash';
 import { ChangeEvent, FC, useEffect, useState } from 'react';
 import { Form } from 'react-bootstrap';
 import { FaLightbulb } from 'react-icons/fa';
@@ -11,6 +12,7 @@ export const AuraSettings: FC = () => {
   const [available, setAvailable] = useState<Array<string>>([]);
   const [ledMode, setLedMode] = useState('Static');
   const [brightness, setBrightness] = useState(AuraBrightness.MEDIUM);
+  const [color, setColor] = useState('#FF0000');
 
   useEffect(() => {
     //Brightness
@@ -31,6 +33,7 @@ export const AuraSettings: FC = () => {
       setLedMode(result);
     });
     window.api.getAvailableLedModes().then((modes) => setAvailable(modes));
+    window.api.getColor().then((color) => setColor(color));
   }, []);
 
   const handleBrightnessChange = (event: ChangeEvent<HTMLSelectElement>): void => {
@@ -46,6 +49,17 @@ export const AuraSettings: FC = () => {
       setLedMode(mode);
       setBrightness(brightness);
     });
+  };
+
+  const apiSetColor = async (newColor: string): Promise<void> => {
+    await window.api.setColor(newColor);
+  };
+  const apiSetColorDebounced = debounce(apiSetColor, 1000);
+
+  const handleColorChange = async (event: ChangeEvent<HTMLInputElement>): Promise<void> => {
+    const newColor = event.target.value;
+    await apiSetColorDebounced(newColor);
+    setColor(newColor);
   };
 
   return (
@@ -76,6 +90,16 @@ export const AuraSettings: FC = () => {
                 );
               })}
           </Form.Select>
+        </>
+      </SettingsLine>
+      <SettingsLine label={TranslatorRenderer.translate('led.color')}>
+        <>
+          <Form.Control
+            type="color"
+            value={color}
+            data-bs-theme="dark"
+            onChange={handleColorChange}
+          />
         </>
       </SettingsLine>
     </SettingsBlock>

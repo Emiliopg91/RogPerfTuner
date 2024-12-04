@@ -2,15 +2,14 @@ import { AuraBrightness } from '@commons/models/Aura';
 import { LoggerMain } from '@tser-framework/main';
 
 import { mainWindow } from '..';
-import { BackendClient } from '../clients/backend/BackendClient';
+import { BackendClient } from '../clients/openrgb/BackendClient';
 import { generateTrayMenuDef, refreshTrayMenu } from '../setup';
 import { Settings } from '../utils/Settings';
 
 export class OpenRgbService {
   private static logger = LoggerMain.for('OpenRgbService');
-  private static availableModes: Array<string> = [];
-  private static lastMode: string = 'Static';
-  private static lastBrightness: AuraBrightness = AuraBrightness.OFF;
+  private static mode: string = 'Static';
+  private static brightness: AuraBrightness = AuraBrightness.OFF;
   private static color: string = '#FF0000';
   private static initialized = false;
 
@@ -20,43 +19,30 @@ export class OpenRgbService {
       LoggerMain.addTab();
       OpenRgbService.initialized = true;
 
-      OpenRgbService.lastMode = Settings.configMap.openRgb?.state?.mode
+      OpenRgbService.mode = Settings.configMap.openRgb?.state?.mode
         ? Settings.configMap.openRgb?.state?.mode
-        : OpenRgbService.lastMode;
-      OpenRgbService.lastBrightness = Settings.configMap.openRgb?.state?.brightness
+        : OpenRgbService.mode;
+      OpenRgbService.brightness = Settings.configMap.openRgb?.state?.brightness
         ? (Settings.configMap.openRgb?.state?.brightness as AuraBrightness)
         : AuraBrightness.OFF;
       OpenRgbService.color = Settings.configMap.openRgb?.state?.color
         ? Settings.configMap.openRgb?.state?.color
         : OpenRgbService.color;
 
-      OpenRgbService.logger.info('Retrieving available modes');
-      OpenRgbService.availableModes = await BackendClient.invoke<[], Array<string>>(
-        'available_modes'
-      );
-      OpenRgbService.availableModes = OpenRgbService.availableModes.sort((a, b) =>
-        a.localeCompare(b)
-      );
-
       OpenRgbService.logger.info('Restoring state');
-      OpenRgbService.setMode(OpenRgbService.lastMode);
+      OpenRgbService.setMode(OpenRgbService.mode);
       LoggerMain.removeTab();
     }
   }
 
   public static async setMode(mode: string): Promise<void> {
-    if (OpenRgbService.availableModes.includes(mode)) {
-      BackendClient.invoke<[mode: string, brightness: number, color: string], void>(
-        'set_mode',
-        mode,
-        OpenRgbService.lastBrightness,
-        OpenRgbService.color
-      );
+    if (BackendClient.availableModes.includes(mode)) {
+      BackendClient.applyEffect(mode, OpenRgbService.brightness, OpenRgbService.color);
 
-      OpenRgbService.lastMode = mode;
+      OpenRgbService.mode = mode;
       Settings.configMap.openRgb!.state = {
         mode,
-        brightness: OpenRgbService.lastBrightness,
+        brightness: OpenRgbService.brightness,
         color: OpenRgbService.color
       };
       refreshTrayMenu(await generateTrayMenuDef());
@@ -67,16 +53,11 @@ export class OpenRgbService {
   }
 
   public static async setBrightness(brightness: AuraBrightness): Promise<void> {
-    await BackendClient.invoke<[mode: string, brightness: number, color: string], void>(
-      'set_mode',
-      OpenRgbService.lastMode,
-      brightness,
-      OpenRgbService.color
-    );
+    BackendClient.applyEffect(OpenRgbService.mode, brightness, OpenRgbService.color);
 
-    OpenRgbService.lastBrightness = brightness;
+    OpenRgbService.brightness = brightness;
     Settings.configMap.openRgb!.state = {
-      mode: OpenRgbService.lastMode,
+      mode: OpenRgbService.mode,
       brightness,
       color: OpenRgbService.color
     };
@@ -85,38 +66,37 @@ export class OpenRgbService {
   }
 
   public static async setColor(color: string): Promise<void> {
-    BackendClient.invoke<[mode: string, brightness: number, color: string], void>(
-      'set_mode',
-      OpenRgbService.lastMode,
-      OpenRgbService.lastBrightness,
-      color
-    );
+    BackendClient.applyEffect(OpenRgbService.mode, OpenRgbService.brightness, color);
 
     OpenRgbService.color = color;
     Settings.configMap.openRgb!.state = {
-      mode: OpenRgbService.lastMode,
-      brightness: OpenRgbService.lastBrightness,
+      mode: OpenRgbService.mode,
+      brightness: OpenRgbService.brightness,
       color
     };
     refreshTrayMenu(await generateTrayMenuDef());
   }
 
   public static getAvailableModes(): Array<string> {
-    return OpenRgbService.availableModes;
+    return BackendClient.availableModes;
   }
 
   public static getBrightness(): AuraBrightness {
-    return OpenRgbService.lastBrightness;
+    return OpenRgbService.brightness;
   }
 
   public static getMode(): string {
-    return OpenRgbService.lastMode;
+    return OpenRgbService.mode;
+  }
+
+  public static getColor(): string {
+    return OpenRgbService.color;
   }
 
   public static getNextMode(): string {
-    return OpenRgbService.availableModes[
-      (OpenRgbService.availableModes.indexOf(OpenRgbService.lastMode) + 1) %
-        OpenRgbService.availableModes.length
+    return BackendClient.availableModes[
+      (BackendClient.availableModes.indexOf(OpenRgbService.mode) + 1) %
+        BackendClient.availableModes.length
     ];
   }
 }

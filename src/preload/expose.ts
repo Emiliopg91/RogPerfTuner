@@ -92,6 +92,15 @@ export const exposed = {
     },
     setAutoStart(enabled: boolean): Promise<void> {
       return ipcRenderer.invoke('setAutoStart', enabled);
+    },
+    devicesChanged(): Promise<void> {
+      return ipcRenderer.invoke('devicesChanged');
+    },
+    getColor(): Promise<string> {
+      return ipcRenderer.invoke('getColor');
+    },
+    setColor(color: string): Promise<void> {
+      return ipcRenderer.invoke('setColor', color);
     }
   },
   app: {
