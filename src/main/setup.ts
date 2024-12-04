@@ -1,4 +1,4 @@
-import { AuraBrightness, AuraLedMode } from '@commons/models/Aura';
+import { AuraBrightness } from '@commons/models/Aura';
 import { ChargeThreshold } from '@commons/models/Battery';
 import { ThrottleThermalPolicy } from '@commons/models/Platform';
 import { is } from '@electron-toolkit/utils';
@@ -20,7 +20,7 @@ import path from 'path';
 import { createWindow, mainWindow, requestExit } from '.';
 import icon512 from '../../resources/icons/icon-512x512.png?asset';
 import { ApplicationService } from './services/Application';
-import { AuraService } from './services/Aura';
+import { OpenRgbService } from './services/OpenRgb';
 import { PlatformService } from './services/Platform';
 
 export const appConfig: AppConfig = {
@@ -39,7 +39,7 @@ export const windowConfig: WindowConfig = {
     fullscreenable: false,
     resizable: false,
     width: 580,
-    height: 760,
+    height: 780,
     backgroundColor: '#191919',
     show: false,
     title: app.getName(),
@@ -115,7 +115,7 @@ export const setTrayMenuRefreshFn = (
   refreshTrayMenu = fn;
 };
 const getBrightnessOption: () => Promise<Array<Electron.MenuItemConstructorOptions>> = async () => {
-  const current = AuraService.getBrightness();
+  const current = OpenRgbService.getBrightness();
   const brightnessOptions: Array<Electron.MenuItemConstructorOptions> = [];
   for (const [key, value] of Object.entries(AuraBrightness)) {
     if (isNaN(Number(String(key)))) {
@@ -133,29 +133,27 @@ const getBrightnessOption: () => Promise<Array<Electron.MenuItemConstructorOptio
 };
 
 export const traySetBrightness = async (brightness: AuraBrightness): Promise<void> => {
-  await AuraService.setBrightness(brightness);
+  await OpenRgbService.setBrightness(brightness);
 };
 
 const getLedModeOptions: () => Promise<Array<Electron.MenuItemConstructorOptions>> = async () => {
-  const current = AuraService.getLedMode();
+  const current = OpenRgbService.getMode();
   const ledModeOptions: Array<Electron.MenuItemConstructorOptions> = [];
-  for (const [key, value] of Object.entries(AuraLedMode)) {
-    if (isNaN(Number(String(key)))) {
-      ledModeOptions.push({
-        label: TranslatorMain.translate('led.mode.' + key),
-        type: 'radio',
-        checked: value == current,
-        click: async () => {
-          await traySetLedMode(value as AuraLedMode);
-        }
-      });
-    }
-  }
+  OpenRgbService.getAvailableModes().forEach((value) => {
+    ledModeOptions.push({
+      label: value,
+      type: 'radio',
+      checked: value == current,
+      click: async () => {
+        await traySetLedMode(value);
+      }
+    });
+  });
   return ledModeOptions;
 };
 
-export const traySetLedMode = async (mode: AuraLedMode): Promise<void> => {
-  await AuraService.setLedMode(mode);
+export const traySetLedMode = async (mode: string): Promise<void> => {
+  await OpenRgbService.setMode(mode);
 };
 
 const getThrottleOptions: () => Promise<Array<Electron.MenuItemConstructorOptions>> = async () => {
@@ -283,28 +281,34 @@ export const ipcListeners: Record<string, IpcListener> = {
       await PlatformService.setChargeThreshold(threshold);
     }
   },
+  getAvailableModes: {
+    sync: true,
+    fn() {
+      return OpenRgbService.getAvailableModes();
+    }
+  },
   getLedMode: {
     sync: true,
     async fn() {
-      return AuraService.getLedMode();
+      return OpenRgbService.getMode();
     }
   },
   setLedMode: {
     sync: true,
-    async fn(_, mode: AuraLedMode) {
-      await AuraService.setLedMode(mode);
+    async fn(_, mode: string) {
+      await OpenRgbService.setMode(mode);
     }
   },
   getBrightness: {
     sync: true,
     async fn() {
-      return AuraService.getBrightness();
+      return OpenRgbService.getBrightness();
     }
   },
   setBrightness: {
     sync: true,
     async fn(_, brightness: AuraBrightness) {
-      await AuraService.setBrightness(brightness);
+      await OpenRgbService.setBrightness(brightness);
     }
   },
   getThrottleThermalPolicy: {
@@ -335,6 +339,25 @@ export const ipcListeners: Record<string, IpcListener> = {
     sync: true,
     fn(_, enabled: boolean) {
       return ApplicationService.setAutoStart(enabled);
+    }
+  },
+  devicesChanged: {
+    sync: true,
+    fn() {
+      LoggerMain.for('main/setup.ts').info('New connected device, reloading');
+      ApplicationService.restart();
+    }
+  },
+  getColor: {
+    sync: true,
+    fn() {
+      return OpenRgbService.getColor();
+    }
+  },
+  setColor: {
+    sync: true,
+    async fn(_, color) {
+      return await OpenRgbService.setColor(color);
     }
   }
 };

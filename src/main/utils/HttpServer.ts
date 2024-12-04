@@ -1,12 +1,12 @@
 /* eslint-disable no-case-declarations */
-import { AuraBrightness, AuraLedMode, AuraModels } from '@commons/models/Aura';
+import { AuraBrightness, AuraModels } from '@commons/models/Aura';
 import { PlatformModels, ThrottleThermalPolicy } from '@commons/models/Platform';
 import { LoggerMain } from '@tser-framework/main';
 import { createServer } from 'http';
 import { parse } from 'url';
 import { v4 as uuidv4 } from 'uuid';
 
-import { AuraService } from '../services/Aura';
+import { OpenRgbService } from '../services/OpenRgb';
 import { PlatformService } from '../services/Platform';
 import { traySetBrightness, traySetLedMode, traySetThrottle } from '../setup';
 import { Constants } from './Constants';
@@ -25,7 +25,7 @@ export class HttpServer {
         const query = parsedUrl.query;
 
         HttpServer.logger.info(
-          `Received request to http://${Constants.httpIface}:${Constants.httpPort}${path}${query.token ? `/token=${query.token}` : ''}`
+          `Received request to http://${Constants.localhost}:${Constants.httpPort}${path}${query.token ? `/token=${query.token}` : ''}`
         );
         LoggerMain.addTab();
 
@@ -49,17 +49,17 @@ export class HttpServer {
               response = ThrottleThermalPolicy[newVal];
               break;
             case 'nextLedMode':
-              const newVal2 = AuraModels.getNextMode(AuraService.getLedMode());
+              const newVal2 = OpenRgbService.getNextMode();
               await traySetLedMode(newVal2);
-              response = AuraLedMode[newVal2];
+              response = newVal2;
               break;
             case 'increaseBrightness':
-              const newVal3 = AuraModels.getNextBrightness(AuraService.getBrightness());
+              const newVal3 = AuraModels.getNextBrightness(OpenRgbService.getBrightness());
               await traySetBrightness(newVal3);
               response = AuraBrightness[newVal3];
               break;
             case 'decreaseBrightness':
-              const newVal4 = AuraModels.getPreviousBrightness(AuraService.getBrightness());
+              const newVal4 = AuraModels.getPreviousBrightness(OpenRgbService.getBrightness());
               await traySetBrightness(newVal4);
               response = AuraBrightness[newVal4];
               break;
@@ -77,9 +77,9 @@ export class HttpServer {
     });
 
     await new Promise<void>((resolve) => {
-      server.listen(Constants.httpPort, Constants.httpIface, () => {
+      server.listen(Constants.httpPort, Constants.localhost, () => {
         HttpServer.logger.info(
-          `Server listening http://${Constants.httpIface}:${Constants.httpPort}`
+          `Server listening http://${Constants.localhost}:${Constants.httpPort}`
         );
         resolve();
       });

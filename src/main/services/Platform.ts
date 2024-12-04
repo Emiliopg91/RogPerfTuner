@@ -9,10 +9,10 @@ import { execSync } from 'child_process';
 import * as fs from 'fs';
 
 import { mainWindow } from '..';
-import { AsusFanCurvesClient } from '../dbus/AsusFanCurvesClient';
-import { AsusPlatformClient } from '../dbus/AsusPlatformClient';
-import { PowerProfilesClient } from '../dbus/PowerProfilesClient';
-import { UPowerClient } from '../dbus/UPowerClient';
+import { AsusFanCurvesClient } from '../clients/dbus/AsusFanCurvesClient';
+import { AsusPlatformClient } from '../clients/dbus/AsusPlatformClient';
+import { PowerProfilesClient } from '../clients/dbus/PowerProfilesClient';
+import { UPowerClient } from '../clients/dbus/UPowerClient';
 import { generateTrayMenuDef, refreshTrayMenu } from '../setup';
 import { Settings } from '../utils/Settings';
 import { NotificationService } from './NotificationService';
@@ -124,7 +124,8 @@ export class PlatformService {
 
   public static async setThrottleThermalPolicy(
     policy: ThrottleThermalPolicy,
-    temporal: boolean = false
+    temporal: boolean = false,
+    notify: boolean = true
   ): Promise<void> {
     const policyName = ThrottleThermalPolicy[policy];
     const powerPolicy = PlatformService.throttlePowerAssoc[policy];
@@ -196,7 +197,9 @@ export class PlatformService {
             if (!temporal) {
               PlatformService.setLastProfile(policy);
             }
-            showToastOk();
+            if (notify) {
+              showToastOk();
+            }
           })
           .catch((error: unknown) => {
             LoggerMain.removeTab();
@@ -221,7 +224,11 @@ export class PlatformService {
       PlatformService.logger.info('Restoring profile');
       LoggerMain.addTab();
 
-      await PlatformService.setThrottleThermalPolicy(last);
+      await PlatformService.setThrottleThermalPolicy(
+        last,
+        false,
+        !process.argv.includes('--restart')
+      );
 
       LoggerMain.removeTab();
       PlatformService.logger.info('Profile restored');

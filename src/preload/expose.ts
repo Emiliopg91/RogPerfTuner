@@ -1,4 +1,4 @@
-import { AuraBrightness, AuraLedMode } from '@commons/models/Aura';
+import { AuraBrightness } from '@commons/models/Aura';
 import { ThrottleThermalPolicy } from '@commons/models/Platform';
 import {
   DefaulLevel,
@@ -59,14 +59,17 @@ export const exposed = {
         callback(brightness);
       });
     },
-    async getLedMode(): Promise<AuraLedMode> {
+    getAvailableLedModes(): Promise<Array<string>> {
+      return ipcRenderer.invoke('getAvailableModes');
+    },
+    async getLedMode(): Promise<string> {
       return ipcRenderer.invoke('getLedMode');
     },
-    setLedMode(mode: AuraLedMode): Promise<AuraBrightness> {
+    setLedMode(mode: string): Promise<AuraBrightness> {
       return ipcRenderer.invoke('setLedMode', mode);
     },
-    refreshLedMode(callback: (mode: AuraLedMode) => void): void {
-      ipcRenderer.on('refreshLedMode', (_, mode: AuraLedMode) => {
+    refreshLedMode(callback: (mode: string) => void): void {
+      ipcRenderer.on('refreshLedMode', (_, mode: string) => {
         callback(mode);
       });
     },
@@ -89,6 +92,15 @@ export const exposed = {
     },
     setAutoStart(enabled: boolean): Promise<void> {
       return ipcRenderer.invoke('setAutoStart', enabled);
+    },
+    devicesChanged(): Promise<void> {
+      return ipcRenderer.invoke('devicesChanged');
+    },
+    getColor(): Promise<string> {
+      return ipcRenderer.invoke('getColor');
+    },
+    setColor(color: string): Promise<void> {
+      return ipcRenderer.invoke('setColor', color);
     }
   },
   app: {

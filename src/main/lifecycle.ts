@@ -3,12 +3,12 @@ import { Menu, app } from 'electron/main';
 
 import icon45 from '../../resources/icons/icon-45x45.png?asset';
 import translations from '../../resources/translations.i18n.json';
-import { AsusAuraClient } from './dbus/AsusAuraClient';
-import { AsusFanCurvesClient } from './dbus/AsusFanCurvesClient';
-import { AsusPlatformClient } from './dbus/AsusPlatformClient';
-import { PowerProfilesClient } from './dbus/PowerProfilesClient';
+import { AsusFanCurvesClient } from './clients/dbus/AsusFanCurvesClient';
+import { AsusPlatformClient } from './clients/dbus/AsusPlatformClient';
+import { PowerProfilesClient } from './clients/dbus/PowerProfilesClient';
+import { BackendClient } from './clients/openrgb/BackendClient';
 import { ApplicationService } from './services/Application';
-import { AuraService } from './services/Aura';
+import { OpenRgbService } from './services/OpenRgb';
 import { PlatformService } from './services/Platform';
 import { generateTrayMenuDef, setTrayMenuRefreshFn } from './setup';
 import { HttpServer } from './utils/HttpServer';
@@ -24,12 +24,12 @@ export async function initializeBeforeReady(): Promise<void> {
 // eslint-disable-next-line @typescript-eslint/no-empty-function
 export async function initializeWhenReady(): Promise<void> {
   await Settings.initialize();
-  await AsusAuraClient.getInstance();
+  await BackendClient.initialize();
+  await OpenRgbService.initialize();
   await AsusFanCurvesClient.getInstance();
   await AsusPlatformClient.getInstance();
   await PowerProfilesClient.getInstance();
   await PlatformService.initialize();
-  await AuraService.initialize();
   await HttpServer.initialize();
   ApplicationService.initialize();
 
@@ -41,4 +41,8 @@ export async function initializeWhenReady(): Promise<void> {
     const contextMenu = Menu.buildFromTemplate(newMenu);
     tray.setContextMenu(contextMenu);
   });
+}
+
+export function stop(): void {
+  BackendClient.stop();
 }

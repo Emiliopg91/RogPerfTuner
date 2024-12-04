@@ -12,6 +12,7 @@ files:
 asarUnpack:
   - resources/**
   - package.json
+  - python/**
 linux:
   icon: resources/icons/icon-512x512.png
   target:

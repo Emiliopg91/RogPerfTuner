@@ -8,32 +8,16 @@
     "es": "Umbral de carga"
   },
   "led.mode": {
-    "en": "Animation",
-    "es": "Animación"
-  },
-  "led.mode.STATIC": {
-    "en": "Static",
-    "es": "Estático"
-  },
-  "led.mode.BREATHE": {
-    "en": "Breathe",
-    "es": "Respiración"
-  },
-  "led.mode.PULSE": {
-    "en": "Pulse",
-    "es": "Latido"
-  },
-  "led.mode.RAINBOW_CYCLE": {
-    "en": "Rainbow cycle",
-    "es": "Ciclo arcoiris"
-  },
-  "led.mode.RAINBOW_WAVE": {
-    "en": "Rainbow wave",
-    "es": "Onda arcoiris"
+    "en": "Effect",
+    "es": "Efecto"
   },
   "led.brightness": {
     "en": "Brightness",
     "es": "Brillo"
+  },
+  "led.color": {
+    "en": "Color",
+    "es": "Color"
   },
   "led.brightness.HIGH": {
     "en": "High",

@@ -1,9 +1,10 @@
 import { File, FileHelper, LoggerMain } from '@tser-framework/main';
-import { execSync } from 'child_process';
+import { execSync, spawn } from 'child_process';
 import { app } from 'electron/main';
 import fs from 'fs';
 import path from 'path';
 
+import { requestExit } from '..';
 import icon from '../../../resources/icons/icon.png?asset';
 import { Constants } from '../utils/Constants';
 import { HttpServer } from '../utils/HttpServer';
@@ -126,6 +127,18 @@ Type=Application
       ApplicationService.logger.info('Deleting autostart file');
       fs.unlinkSync(ApplicationService.autoStartFile);
       ApplicationService.logger.info('Autostart file deleted succesfully');
+    }
+  }
+
+  public static restart(): void {
+    if (ApplicationService.appImagePath) {
+      const newAppInstance = spawn(ApplicationService.appImagePath, ['--restart'], {
+        detached: true,
+        stdio: 'ignore'
+      });
+
+      newAppInstance.unref();
+      requestExit();
     }
   }
 }

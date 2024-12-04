@@ -8,14 +8,6 @@ export enum AuraBrightness {
   OFF = 0
 }
 
-export enum AuraLedMode {
-  STATIC = 0,
-  BREATHE = 1,
-  PULSE = 10,
-  RAINBOW_CYCLE = 2,
-  RAINBOW_WAVE = 3
-}
-
 // Clase que contiene lógica para AuraBrightness y AuraMode
 export class AuraModels {
   // Métodos para AuraBrightness
@@ -50,30 +42,5 @@ export class AuraModels {
       throw new Error(`No se encontró un nivel para el valor '${value}'`);
     }
     return value as AuraBrightness;
-  }
-
-  // Métodos para AuraMode
-  static getNextMode(mode: AuraLedMode): AuraLedMode {
-    switch (+mode) {
-      case AuraLedMode.STATIC:
-        return AuraLedMode.BREATHE;
-      case AuraLedMode.BREATHE:
-        return AuraLedMode.PULSE;
-      case AuraLedMode.PULSE:
-        return AuraLedMode.RAINBOW_CYCLE;
-      case AuraLedMode.RAINBOW_CYCLE:
-        return AuraLedMode.RAINBOW_WAVE;
-      case AuraLedMode.RAINBOW_WAVE:
-        return AuraLedMode.STATIC;
-      default:
-        return mode;
-    }
-  }
-
-  static modeFromValue(value: number): AuraLedMode {
-    if (!(value in AuraLedMode)) {
-      throw new Error(`No se encontró un modo para el valor '${value}'`);
-    }
-    return value as AuraLedMode;
   }
 }

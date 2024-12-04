@@ -1,5 +1,6 @@
-import { AuraBrightness, AuraLedMode } from '@commons/models/Aura';
+import { AuraBrightness } from '@commons/models/Aura';
 import { LoggerRenderer, TranslatorRenderer } from '@tser-framework/renderer';
+import { debounce } from 'lodash';
 import { ChangeEvent, FC, useEffect, useState } from 'react';
 import { Form } from 'react-bootstrap';
 import { FaLightbulb } from 'react-icons/fa';
@@ -8,8 +9,10 @@ import { SettingsLine } from './commons/SettingLine';
 import { SettingsBlock } from './commons/SettingsBlock';
 
 export const AuraSettings: FC = () => {
-  const [ledMode, setLedMode] = useState(AuraLedMode.STATIC);
+  const [available, setAvailable] = useState<Array<string>>([]);
+  const [ledMode, setLedMode] = useState('Static');
   const [brightness, setBrightness] = useState(AuraBrightness.MEDIUM);
+  const [color, setColor] = useState('#FF0000');
 
   useEffect(() => {
     //Brightness
@@ -22,13 +25,15 @@ export const AuraSettings: FC = () => {
     });
 
     //Led Mode
-    window.api.refreshLedMode((mode: AuraLedMode) => {
+    window.api.refreshLedMode((mode: string) => {
       LoggerRenderer.info('Refreshing led mode in UI');
       setLedMode(() => mode);
     });
-    window.api.getLedMode().then((result: AuraLedMode) => {
+    window.api.getLedMode().then((result: string) => {
       setLedMode(result);
     });
+    window.api.getAvailableLedModes().then((modes) => setAvailable(modes));
+    window.api.getColor().then((color) => setColor(color));
   }, []);
 
   const handleBrightnessChange = (event: ChangeEvent<HTMLSelectElement>): void => {
@@ -39,11 +44,22 @@ export const AuraSettings: FC = () => {
   };
 
   const handleLedModeChange = (event: ChangeEvent<HTMLSelectElement>): void => {
-    const mode = parseInt(event.target.value) as AuraLedMode;
+    const mode = event.target.value;
     window.api.setLedMode(mode).then((brightness: AuraBrightness) => {
       setLedMode(mode);
       setBrightness(brightness);
     });
+  };
+
+  const apiSetColor = async (newColor: string): Promise<void> => {
+    await window.api.setColor(newColor);
+  };
+  const apiSetColorDebounced = debounce(apiSetColor, 1000);
+
+  const handleColorChange = async (event: ChangeEvent<HTMLInputElement>): Promise<void> => {
+    const newColor = event.target.value;
+    await apiSetColorDebounced(newColor);
+    setColor(newColor);
   };
 
   return (
@@ -51,15 +67,13 @@ export const AuraSettings: FC = () => {
       <SettingsLine label={TranslatorRenderer.translate('led.mode')}>
         <>
           <Form.Select value={ledMode} onChange={handleLedModeChange} data-bs-theme="dark">
-            {Object.entries(AuraLedMode)
-              .filter(([key]) => isNaN(Number(String(key))))
-              .map(([key, value]) => {
-                return (
-                  <option key={key} value={value}>
-                    {TranslatorRenderer.translate('led.mode.' + key)}
-                  </option>
-                );
-              })}
+            {available.map((mode) => {
+              return (
+                <option key={mode} value={mode}>
+                  {mode}
+                </option>
+              );
+            })}
           </Form.Select>
         </>
       </SettingsLine>
@@ -76,6 +90,16 @@ export const AuraSettings: FC = () => {
                 );
               })}
           </Form.Select>
+        </>
+      </SettingsLine>
+      <SettingsLine label={TranslatorRenderer.translate('led.color')}>
+        <>
+          <Form.Control
+            type="color"
+            value={color}
+            data-bs-theme="dark"
+            onChange={handleColorChange}
+          />
         </>
       </SettingsLine>
     </SettingsBlock>
