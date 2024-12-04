@@ -55,7 +55,7 @@ export class Temperature extends AbstractEffect {
             if (this.isRunning) {
               transition(color1, color2, offset + 1, resolve);
             } else {
-              resolve;
+              resolve();
             }
           }, 10);
         } else {
@@ -77,7 +77,6 @@ export class Temperature extends AbstractEffect {
 
         prevCol = color;
       }
-      console.log('Finished');
     })();
   }
 }

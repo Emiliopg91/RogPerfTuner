@@ -3,6 +3,7 @@ import { LoggerMain } from '@tser-framework/main';
 
 import Client from '../client/client';
 import Device, { RGBColor } from '../client/device';
+import { hexColor } from '../client/utils';
 
 export abstract class AbstractEffect {
   protected isRunning = false;
@@ -24,26 +25,33 @@ export abstract class AbstractEffect {
       await this.stop();
     }
 
-    switch (brightness) {
-      case AuraBrightness.OFF:
-        this.brightness = 0;
-        break;
-      case AuraBrightness.LOW:
-        this.brightness = 0.33;
-        break;
-      case AuraBrightness.MEDIUM:
-        this.brightness = 0.67;
-        break;
-      case AuraBrightness.HIGH:
-        this.brightness = 1;
-        break;
+    if (brightness == AuraBrightness.OFF) {
+      devices.forEach((dev, i) =>
+        client.updateLeds(i, Array(dev.leds.length).fill(hexColor('#000000')))
+      );
+      this.isRunning = true;
+      return;
+    } else {
+      switch (brightness) {
+        case AuraBrightness.LOW:
+          this.brightness = 0.33;
+          break;
+        case AuraBrightness.MEDIUM:
+          this.brightness = 0.67;
+          break;
+        case AuraBrightness.HIGH:
+          this.brightness = 1;
+          break;
+      }
+
+      this.color = color;
+      this.logger.info('Starting effect');
+      this.isRunning = true;
+
+      ((): void => {
+        this.applyEffect(client, devices);
+      })();
     }
-
-    this.color = color;
-    this.logger.info('Starting effect');
-    this.isRunning = true;
-
-    this.applyEffect(client, devices);
   }
 
   public async stop(): Promise<void> {
