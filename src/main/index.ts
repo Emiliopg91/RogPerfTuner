@@ -273,7 +273,7 @@ export function requestRestart(): void {
 export async function createWindow(): Promise<void> {
   mainWindow = WindowHelper.createMainWindow(windowConfig);
   mainWindow.on('close', (event) => {
-    if (!requestedExit) {
+    if (!is.dev && !requestedExit) {
       event.preventDefault();
       mainWindow?.minimize();
     }
