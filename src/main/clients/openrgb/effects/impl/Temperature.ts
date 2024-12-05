@@ -9,75 +9,62 @@ export class Temperature extends AbstractEffect {
   private static minTemp = 40;
   private static steps = Temperature.maxTemp - Temperature.minTemp;
   private static increment = Math.floor(255 / Temperature.steps);
+  private colorsByTemp: Record<number, RGBColor> = {};
 
   public getName(): string {
     return 'Temperature';
   }
 
-  protected applyEffect(client: Client, devices: Array<Device>): void {
-    const colorsByTemp: Record<number, RGBColor> = {};
-    for (let i = 0; i <= Temperature.steps; i++) {
-      const color = {
-        red: i * Temperature.increment * this.brightness,
-        green: (255 - i * Temperature.increment) * this.brightness,
-        blue: 0
-      };
-      colorsByTemp[Temperature.minTemp + i] = color;
-    }
+  protected async applyEffect(client: Client, devices: Array<Device>): Promise<void> {
+    this.updateColorsByTemp();
 
-    const getNewColor = async (): Promise<RGBColor> => {
-      const cpuTemp = await systeminformation.cpuTemperature();
-      const index = Math.min(Math.max(cpuTemp.main, Temperature.minTemp), Temperature.maxTemp);
-      let color = colorsByTemp[index];
-      if (index >= Temperature.maxTemp) {
-        color = { red: 255 * this.brightness, green: 0, blue: 0 };
-      }
+    let prevColor = await this.getNewColor();
+    while (this.isRunning) {
+      const newColor = await this.getNewColor();
 
-      return color;
-    };
-
-    const transition = (color1, color2, offset, resolve): void => {
-      if (this.isRunning) {
-        let color = color2;
+      for (let offset = 0; offset < 20 && this.isRunning; offset++) {
+        let color = newColor;
         if (offset < 19) {
           color = {
-            red: color1.red + (offset * (color2.red - color1.red)) / 20,
-            green: color1.green + (offset * (color2.green - color1.green)) / 20,
-            blue: color1.blue + (offset * (color2.blue - color1.blue)) / 20
+            red: prevColor.red + (offset * (newColor.red - prevColor.red)) / 20,
+            green: prevColor.green + (offset * (newColor.green - prevColor.green)) / 20,
+            blue: prevColor.blue + (offset * (newColor.blue - prevColor.blue)) / 20
           };
         }
         devices.forEach((dev, i) => {
           client.updateLeds(i, Array(dev.leds.length).fill(color));
         });
 
-        if (offset < 19) {
-          setTimeout(() => {
-            if (this.isRunning) {
-              transition(color1, color2, offset + 1, resolve);
-            } else {
-              resolve();
-            }
-          }, 10);
-        } else {
-          resolve();
+        if (this.isRunning) {
+          await new Promise((resolve) => setTimeout(resolve, 10));
         }
-      } else {
-        resolve();
       }
-    };
 
-    (async (): Promise<void> => {
-      let prevCol = await getNewColor();
-      while (this.isRunning) {
-        const color = await getNewColor();
+      prevColor = newColor;
+    }
+    this.hasFinished = true;
+  }
 
-        await new Promise<void>((resolve) => {
-          transition(prevCol, color, 0, resolve);
-        });
+  private async getNewColor(): Promise<RGBColor> {
+    const cpuTemp = (await systeminformation.cpuTemperature()).main;
+    if (cpuTemp >= Temperature.maxTemp) {
+      return { red: 255 * this.brightness, green: 0, blue: 0 };
+    } else if (cpuTemp < Temperature.minTemp) {
+      return { red: 0, green: 255 * this.brightness, blue: 0 };
+    } else {
+      return this.colorsByTemp[cpuTemp];
+    }
+  }
 
-        prevCol = color;
-      }
-      this.hasFinished = true;
-    })();
+  private updateColorsByTemp(): void {
+    this.colorsByTemp = {};
+    for (let i = 0; i <= Temperature.steps; i++) {
+      const color = {
+        red: i * Temperature.increment * this.brightness,
+        green: (255 - i * Temperature.increment) * this.brightness,
+        blue: 0
+      };
+      this.colorsByTemp[Temperature.minTemp + i] = color;
+    }
   }
 }

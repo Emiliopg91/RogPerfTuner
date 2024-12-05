@@ -8,24 +8,13 @@ export class SpectrumCycle extends AbstractEffect {
     return 'Spectrum Cycle';
   }
 
-  protected applyEffect(client: Client, devices: Array<Device>): void {
-    const loop = (offset = 0): void => {
-      if (this.isRunning) {
-        let color = HSVColor(offset, 1, 1);
-        color = {
-          red: color.red * this.brightness,
-          green: color.green * this.brightness,
-          blue: color.blue * this.brightness
-        };
-        devices.forEach((element, i) => {
-          if (!element) return;
-          client.updateLeds(i, Array(element.leds.length).fill(color));
-        });
-        setTimeout(() => loop((offset + 1) % 360), 40);
-      } else {
-        this.hasFinished = true;
-      }
-    };
-    loop();
+  protected async applyEffect(client: Client, devices: Array<Device>): Promise<void> {
+    for (let offset = 0; this.isRunning; offset = (offset + 1) % 360) {
+      devices.forEach((element, i) => {
+        client.updateLeds(i, Array(element.leds.length).fill(HSVColor(offset, 1, this.brightness)));
+      });
+      await new Promise<void>((resolve) => setTimeout(resolve, 40));
+    }
+    this.hasFinished = true;
   }
 }

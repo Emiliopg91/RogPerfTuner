@@ -31,7 +31,7 @@ export abstract class AbstractEffect {
       devices.forEach((dev, i) =>
         client.updateLeds(i, Array(dev.leds.length).fill(hexColor('#000000')))
       );
-      this.isRunning = true;
+      this.hasFinished = true;
       return;
     } else {
       switch (brightness) {

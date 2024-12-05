@@ -9,15 +9,10 @@ export class StarryNight extends AbstractEffect {
   }
 
   private getRandom(): RGBColor {
-    const color = HSVColor(Math.floor(Math.random() * 360), 1, 1);
-    return {
-      red: color.red * this.brightness,
-      green: color.green * this.brightness,
-      blue: color.blue * this.brightness
-    };
+    return HSVColor(Math.floor(Math.random() * 360), 1, this.brightness);
   }
 
-  protected applyEffect(client: Client, devices: Array<Device>): void {
+  protected async applyEffect(client: Client, devices: Array<Device>): Promise<void> {
     const leds: Array<Array<RGBColor>> = [];
     const lenghts: Array<number> = [];
     devices.forEach((element, i) => {
@@ -30,42 +25,41 @@ export class StarryNight extends AbstractEffect {
     const mcm = this.lcmOfArray(lenghts);
     const decrements: Array<number> = [];
     lenghts.forEach((len, i) => {
-      decrements[i] = 1 - len / this.brightness / mcm / 5;
+      decrements[i] = 1 - len / this.brightness / mcm / 20;
     });
 
-    const loop = (offset = 0): void => {
-      if (this.isRunning) {
-        devices.forEach((_, i) => {
-          let changed = false;
-          leds[i].forEach((led) => {
-            if (led.red != 0 || led.green != 0 || led.blue != 0) {
-              led.red = Math.max(0, Math.floor(decrements[i] * led.red));
-              led.green = Math.max(0, Math.floor(decrements[i] * led.green));
-              led.blue = Math.max(0, Math.floor(decrements[i] * led.blue));
-              changed = true;
-            }
-          });
-          if (offset % (mcm / lenghts[i]) == 0) {
-            let newOn = Math.floor(Math.random() * leds[i].length);
-            let led = leds[i][newOn];
-            while (led.red != 0 || led.green != 0 || led.blue != 0) {
-              newOn = Math.floor(Math.random() * leds[i].length);
-              led = leds[i][newOn];
-            }
-
-            leds[i][newOn] = this.getRandom();
+    for (let offset = 0; this.isRunning; offset = (offset + 1) % mcm) {
+      devices.forEach((_, i) => {
+        let changed = false;
+        leds[i].forEach((led) => {
+          1;
+          if (led.red != 0 || led.green != 0 || led.blue != 0) {
+            led.red = Math.max(0, Math.floor(decrements[i] * led.red));
+            led.green = Math.max(0, Math.floor(decrements[i] * led.green));
+            led.blue = Math.max(0, Math.floor(decrements[i] * led.blue));
             changed = true;
           }
-          if (changed) {
-            client.updateLeds(i, leds[i]);
-          }
         });
-        setTimeout(() => loop((offset + 1) % mcm), 50);
-      } else {
-        this.hasFinished = true;
-      }
-    };
-    loop();
+        if (offset % (mcm / lenghts[i]) == 0) {
+          let newOn = Math.floor(Math.random() * leds[i].length);
+          let led = leds[i][newOn];
+          while (led.red != 0 || led.green != 0 || led.blue != 0) {
+            newOn = Math.floor(Math.random() * leds[i].length);
+            led = leds[i][newOn];
+          }
+
+          leds[i][newOn] = this.getRandom();
+          changed = true;
+        }
+        if (changed) {
+          client.updateLeds(i, leds[i]);
+        }
+      });
+      await new Promise<void>((resolve) => {
+        setTimeout(resolve, 25);
+      });
+    }
+    this.hasFinished = true;
   }
 
   private lcm(a: number, b: number): number {
