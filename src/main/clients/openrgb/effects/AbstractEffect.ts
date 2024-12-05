@@ -9,7 +9,7 @@ export abstract class AbstractEffect {
   protected isRunning = false;
   protected hasFinished = false;
   protected brightness = 0;
-  protected color: RGBColor | undefined = undefined;
+  protected color: RGBColor = hexColor('#FF0000');
   protected logger: LoggerMain;
 
   constructor() {

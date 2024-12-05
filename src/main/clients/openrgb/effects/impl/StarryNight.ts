@@ -23,24 +23,24 @@ export class StarryNight extends AbstractEffect {
     });
 
     const mcm = this.lcmOfArray(lenghts);
-    const decrements: Array<number> = [];
-    lenghts.forEach((len, i) => {
-      decrements[i] = 1 - len / this.brightness / mcm / 20;
+    const decrements: Array<Array<RGBColor>> = [];
+    devices.forEach((dev, i) => {
+      decrements[i] = Array(dev.colors.length).fill(hexColor('#000000'));
     });
-
     for (let offset = 0; this.isRunning; offset = (offset + 1) % mcm) {
       devices.forEach((_, i) => {
         let changed = false;
-        leds[i].forEach((led) => {
+        leds[i].forEach((led, j) => {
           1;
           if (led.red != 0 || led.green != 0 || led.blue != 0) {
-            led.red = Math.max(0, Math.floor(decrements[i] * led.red));
-            led.green = Math.max(0, Math.floor(decrements[i] * led.green));
-            led.blue = Math.max(0, Math.floor(decrements[i] * led.blue));
+            led.red = Math.max(0, led.red - decrements[i][j].red);
+            led.green = Math.max(0, led.green - decrements[i][j].green);
+            led.blue = Math.max(0, led.blue - decrements[i][j].blue);
             changed = true;
           }
         });
-        if (offset % (mcm / lenghts[i]) == 0) {
+        const onLeds = leds[i].filter((led) => led.red != 0 || led.green != 0 || led.blue != 0);
+        if (offset % (mcm / lenghts[i]) == 0 || onLeds.length == 0) {
           let newOn = Math.floor(Math.random() * leds[i].length);
           let led = leds[i][newOn];
           while (led.red != 0 || led.green != 0 || led.blue != 0) {
@@ -49,6 +49,11 @@ export class StarryNight extends AbstractEffect {
           }
 
           leds[i][newOn] = this.getRandom();
+          decrements[i][newOn] = {
+            red: leds[i][newOn].red / 30,
+            green: leds[i][newOn].green / 30,
+            blue: leds[i][newOn].blue / 30
+          };
           changed = true;
         }
         if (changed) {
@@ -56,7 +61,7 @@ export class StarryNight extends AbstractEffect {
         }
       });
       await new Promise<void>((resolve) => {
-        setTimeout(resolve, 25);
+        setTimeout(resolve, 33);
       });
     }
     this.hasFinished = true;

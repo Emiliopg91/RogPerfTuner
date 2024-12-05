@@ -11,7 +11,7 @@ export class DanceFloor extends AbstractEffect {
   private getRandom(length): Array<RGBColor> {
     const random: Array<RGBColor> = [];
     for (let i = 0; i < length; ++i) {
-      const hsv = HSVColor(Math.random() * 359, Math.random(), this.brightness);
+      const hsv = HSVColor(Math.random() * 359, Math.random() * 0.4 + 0.6, this.brightness);
 
       const red = Math.floor(hsv.red);
       const green = Math.floor(hsv.green);
