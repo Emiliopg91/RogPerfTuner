@@ -23,14 +23,7 @@ export class Temperature extends AbstractEffect {
       const newColor = await this.getNewColor();
 
       for (let offset = 0; offset < 20 && this.isRunning; offset++) {
-        let color = newColor;
-        if (offset < 19) {
-          color = {
-            red: prevColor.red + (offset * (newColor.red - prevColor.red)) / 20,
-            green: prevColor.green + (offset * (newColor.green - prevColor.green)) / 20,
-            blue: prevColor.blue + (offset * (newColor.blue - prevColor.blue)) / 20
-          };
-        }
+        const color = this.transition(prevColor, newColor, offset, 20);
         devices.forEach((dev, i) => {
           client.updateLeds(i, Array(dev.leds.length).fill(color));
         });
@@ -43,6 +36,23 @@ export class Temperature extends AbstractEffect {
       prevColor = newColor;
     }
     this.hasFinished = true;
+  }
+
+  private transition(
+    prevColor: RGBColor,
+    newColor: RGBColor,
+    step: number,
+    steps: number
+  ): RGBColor {
+    let color = newColor;
+    if (step < steps - 1) {
+      color = {
+        red: prevColor.red + (step * (newColor.red - prevColor.red)) / steps,
+        green: prevColor.green + (step * (newColor.green - prevColor.green)) / steps,
+        blue: prevColor.blue + (step * (newColor.blue - prevColor.blue)) / steps
+      };
+    }
+    return color;
   }
 
   private async getNewColor(): Promise<RGBColor> {
