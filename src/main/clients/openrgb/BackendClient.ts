@@ -16,7 +16,7 @@ import Device from './client/device';
 import { hexColor } from './client/utils';
 import { AbstractEffect } from './effects/AbstractEffect';
 import { Breathing } from './effects/impl/Breathing';
-import { Random } from './effects/impl/Random';
+import { DanceFloor } from './effects/impl/DanceFloor';
 import { SpectrumCycle } from './effects/impl/SpectrumCycle';
 import { StarryNight } from './effects/impl/StarryNight';
 import { Static } from './effects/impl/Static';
@@ -31,7 +31,7 @@ export class BackendClient {
     new SpectrumCycle(),
     new StarryNight(),
     new Temperature(),
-    new Random()
+    new DanceFloor()
   ];
   public static availableModes: Array<string> = [];
   public static availableDevices: Array<Device> = [];

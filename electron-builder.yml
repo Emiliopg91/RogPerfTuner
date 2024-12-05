@@ -27,5 +27,3 @@ publish:
   owner: Emiliopg91
   repo: RogControlCenter
   updaterCacheDirName: RogControlCenter
-electronLanguages:
-  - en-US

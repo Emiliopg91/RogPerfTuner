@@ -26,6 +26,8 @@ export class Breathing extends AbstractEffect {
         });
 
         setTimeout(() => loop(offset + 0.1), 50);
+      } else {
+        this.hasFinished = true;
       }
     };
 

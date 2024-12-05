@@ -7,6 +7,7 @@ import { hexColor } from '../client/utils';
 
 export abstract class AbstractEffect {
   protected isRunning = false;
+  protected hasFinished = false;
   protected brightness = 0;
   protected color: RGBColor | undefined = undefined;
   protected logger: LoggerMain;
@@ -25,6 +26,7 @@ export abstract class AbstractEffect {
       await this.stop();
     }
 
+    this.hasFinished = false;
     if (brightness == AuraBrightness.OFF) {
       devices.forEach((dev, i) =>
         client.updateLeds(i, Array(dev.leds.length).fill(hexColor('#000000')))
@@ -55,14 +57,18 @@ export abstract class AbstractEffect {
   }
 
   public async stop(): Promise<void> {
-    this.logger.info('Stopping effect');
-    this.isRunning = false;
+    if (this.isRunning) {
+      this.logger.info('Stopping effect');
+      this.isRunning = false;
 
-    return new Promise((resolve) => {
-      setTimeout(() => {
-        resolve();
-      }, 100);
-    });
+      while (!this.hasFinished) {
+        await new Promise<void>((resolve) => {
+          setTimeout(() => {
+            resolve();
+          }, 100);
+        });
+      }
+    }
   }
 
   protected abstract applyEffect(client: Client, devices: Array<Device>): void;

@@ -21,7 +21,9 @@ export class SpectrumCycle extends AbstractEffect {
           if (!element) return;
           client.updateLeds(i, Array(element.leds.length).fill(color));
         });
-        setTimeout(() => loop((offset + 1) % 360), 50);
+        setTimeout(() => loop((offset + 1) % 360), 40);
+      } else {
+        this.hasFinished = true;
       }
     };
     loop();

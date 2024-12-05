@@ -77,6 +77,7 @@ export class Temperature extends AbstractEffect {
 
         prevCol = color;
       }
+      this.hasFinished = true;
     })();
   }
 }

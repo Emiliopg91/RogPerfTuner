@@ -61,6 +61,8 @@ export class StarryNight extends AbstractEffect {
           }
         });
         setTimeout(() => loop((offset + 1) % mcm), 50);
+      } else {
+        this.hasFinished = true;
       }
     };
     loop();

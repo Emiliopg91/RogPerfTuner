@@ -1,19 +1,25 @@
 import Client from '../../client/client';
 import Device, { RGBColor } from '../../client/device';
+import { HSVColor } from '../../client/utils';
 import { AbstractEffect } from '../AbstractEffect';
 
-export class Random extends AbstractEffect {
+export class DanceFloor extends AbstractEffect {
   public getName(): string {
-    return 'Random';
+    return 'Dance floor';
   }
 
   private getRandom(length): Array<RGBColor> {
     const random: Array<RGBColor> = [];
     for (let i = 0; i < length; ++i) {
-      const red = Math.floor(Math.random() * 255) * this.brightness;
-      const green = Math.floor(Math.random() * 255) * this.brightness;
-      const blue = Math.floor(Math.random() * 255) * this.brightness;
+      const hsv = HSVColor(
+        Math.random() * 359,
+        Math.random() * 0.5 + 0.5,
+        Math.random() * 0.5 + 0.5
+      );
 
+      const red = Math.floor(hsv.red * this.brightness);
+      const green = Math.floor(hsv.green * this.brightness);
+      const blue = Math.floor(hsv.blue * this.brightness);
       random.push({ red, green, blue });
     }
 
@@ -26,7 +32,9 @@ export class Random extends AbstractEffect {
         devices.forEach((dev) => {
           client.updateLeds(dev.deviceId, this.getRandom(dev.colors.length));
         });
-        setTimeout(loop, 400);
+        setTimeout(loop, 500);
+      } else {
+        this.hasFinished = true;
       }
     };
 

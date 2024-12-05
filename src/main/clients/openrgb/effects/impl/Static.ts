@@ -17,5 +17,6 @@ export class Static extends AbstractEffect {
       if (!element) return;
       client.updateLeds(i, Array(element.colors.length).fill(color));
     });
+    this.hasFinished = true;
   }
 }
