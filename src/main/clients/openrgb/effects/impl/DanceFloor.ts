@@ -1,6 +1,6 @@
+import Device from '../../client/classes/Device';
+import { RGBColor } from '../../client/classes/RGBColor';
 import Client from '../../client/client';
-import Device, { RGBColor } from '../../client/device';
-import { HSVColor } from '../../client/utils';
 import { AbstractEffect } from '../AbstractEffect';
 
 export class DanceFloor extends AbstractEffect {
@@ -11,12 +11,9 @@ export class DanceFloor extends AbstractEffect {
   private getRandom(length): Array<RGBColor> {
     const random: Array<RGBColor> = [];
     for (let i = 0; i < length; ++i) {
-      const hsv = HSVColor(Math.random() * 359, Math.random() * 0.4 + 0.6, this.brightness);
-
-      const red = Math.floor(hsv.red);
-      const green = Math.floor(hsv.green);
-      const blue = Math.floor(hsv.blue);
-      random.push({ red, green, blue });
+      random.push(
+        RGBColor.fromHSV(Math.random() * 359, Math.random() * 0.4 + 0.6, this.brightness)
+      );
     }
 
     return random;
