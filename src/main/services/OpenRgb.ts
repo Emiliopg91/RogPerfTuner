@@ -1,10 +1,12 @@
 import { AuraBrightness } from '@commons/models/Aura';
 import { LoggerMain } from '@tser-framework/main';
+import { execSync } from 'child_process';
 
 import { mainWindow } from '..';
 import { BackendClient } from '../clients/openrgb/BackendClient';
 import { generateTrayMenuDef, refreshTrayMenu } from '../setup';
 import { Settings } from '../utils/Settings';
+import { ApplicationService } from './Application';
 
 export class OpenRgbService {
   private static logger = LoggerMain.for('OpenRgbService');
@@ -12,6 +14,7 @@ export class OpenRgbService {
   private static brightness: AuraBrightness = AuraBrightness.OFF;
   private static color: string = '#FF0000';
   private static initialized = false;
+  private static lastConnectedUsbs = -1;
 
   public static async initialize(): Promise<void> {
     if (!OpenRgbService.initialized) {
@@ -32,6 +35,15 @@ export class OpenRgbService {
       OpenRgbService.logger.info('Restoring state');
       OpenRgbService.setMode(OpenRgbService.mode);
       LoggerMain.removeTab();
+
+      setInterval(() => {
+        const count = Number(execSync('lsusb | wc -l').toString().trim());
+        if (OpenRgbService.lastConnectedUsbs >= 0 && count > OpenRgbService.lastConnectedUsbs) {
+          OpenRgbService.logger.info('New USB Device connected, restarting...');
+          ApplicationService.restart();
+        }
+        OpenRgbService.lastConnectedUsbs = count;
+      }, 500);
     }
   }
 

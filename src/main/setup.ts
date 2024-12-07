@@ -17,7 +17,7 @@ import {
 import { BrowserWindow, MenuItemConstructorOptions, app } from 'electron';
 import path from 'path';
 
-import { createWindow, mainWindow, requestExit } from '.';
+import { createWindow, mainWindow } from '.';
 import icon512 from '../../resources/icons/icon-512x512.png?asset';
 import { ApplicationService } from './services/Application';
 import { OpenRgbService } from './services/OpenRgb';
@@ -246,13 +246,12 @@ export const generateTrayMenuDef = async (): Promise<
     {
       label: TranslatorMain.translate('open.gui'),
       type: 'normal',
-      click: (): void => {
+      click: async (): Promise<void> => {
         if (mainWindow == null) {
-          createWindow();
-        } else {
-          mainWindow.show();
-          mainWindow.maximize();
+          await createWindow();
         }
+        mainWindow?.show();
+        mainWindow?.maximize();
       }
     },
     { type: 'separator' },
@@ -260,7 +259,6 @@ export const generateTrayMenuDef = async (): Promise<
       label: TranslatorMain.translate('quit'),
       type: 'normal',
       click: (): void => {
-        requestExit();
         app.quit();
       }
     }
@@ -339,13 +337,6 @@ export const ipcListeners: Record<string, IpcListener> = {
     sync: true,
     fn(_, enabled: boolean) {
       return ApplicationService.setAutoStart(enabled);
-    }
-  },
-  devicesChanged: {
-    sync: true,
-    fn() {
-      LoggerMain.for('main/setup.ts').info('New connected device, reloading');
-      ApplicationService.restart();
     }
   },
   getColor: {

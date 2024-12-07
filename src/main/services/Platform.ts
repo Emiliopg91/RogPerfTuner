@@ -15,6 +15,7 @@ import { PowerProfilesClient } from '../clients/dbus/PowerProfilesClient';
 import { UPowerClient } from '../clients/dbus/UPowerClient';
 import { generateTrayMenuDef, refreshTrayMenu } from '../setup';
 import { Settings } from '../utils/Settings';
+import { ApplicationService } from './Application';
 import { NotificationService } from './NotificationService';
 
 export class PlatformService {
@@ -131,11 +132,15 @@ export class PlatformService {
     const powerPolicy = PlatformService.throttlePowerAssoc[policy];
 
     const showToastOk = (): void => {
-      NotificationService.toast(
-        TranslatorMain.translate('performance.profile.setted', {
-          policy: TranslatorMain.translate('performance.profile.' + policyName).toLocaleLowerCase()
-        })
-      );
+      if (notify) {
+        NotificationService.toast(
+          TranslatorMain.translate('performance.profile.setted', {
+            policy: TranslatorMain.translate(
+              'performance.profile.' + policyName
+            ).toLocaleLowerCase()
+          })
+        );
+      }
     };
 
     if (PlatformService.lastPolicy != policy || PlatformService.lastPower != powerPolicy) {
@@ -197,9 +202,7 @@ export class PlatformService {
             if (!temporal) {
               PlatformService.setLastProfile(policy);
             }
-            if (notify) {
-              showToastOk();
-            }
+            showToastOk();
           })
           .catch((error: unknown) => {
             LoggerMain.removeTab();
@@ -224,11 +227,7 @@ export class PlatformService {
       PlatformService.logger.info('Restoring profile');
       LoggerMain.addTab();
 
-      await PlatformService.setThrottleThermalPolicy(
-        last,
-        false,
-        !process.argv.includes('--restart')
-      );
+      await PlatformService.setThrottleThermalPolicy(last, false, !ApplicationService.fromReload);
 
       LoggerMain.removeTab();
       PlatformService.logger.info('Profile restored');

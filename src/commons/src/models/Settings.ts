@@ -1,6 +1,7 @@
 export interface SettingsType {
   platform: PlatformSettingsType | undefined;
   openRgb: OpenRgbSettingsType | undefined;
+  reload: boolean | undefined;
 }
 
 export interface PlatformSettingsType {

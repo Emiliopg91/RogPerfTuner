@@ -4,10 +4,10 @@ import { app } from 'electron/main';
 import fs from 'fs';
 import path from 'path';
 
-import { requestExit } from '..';
 import icon from '../../../resources/icons/icon.png?asset';
 import { Constants } from '../utils/Constants';
 import { HttpServer } from '../utils/HttpServer';
+import { Settings } from '../utils/Settings';
 
 export class ApplicationService {
   private static logger = LoggerMain.for('ApplicationService');
@@ -22,10 +22,12 @@ export class ApplicationService {
     `${app.name}.AppImage.desktop`
   );
   private static initialized = false;
+  public static fromReload = false;
   private static appImagePath = process.env.APPIMAGE;
 
   public static initialize(): void {
     if (!ApplicationService.initialized) {
+      ApplicationService.fromReload = Settings.configMap.reload || false;
       if (ApplicationService.allowsAutoStart()) {
         try {
           ApplicationService.logger.info('AppImage path: ', ApplicationService.appImagePath);
@@ -132,13 +134,15 @@ Type=Application
 
   public static restart(): void {
     if (ApplicationService.appImagePath) {
-      const newAppInstance = spawn(ApplicationService.appImagePath, ['--restart'], {
+      Settings.configMap.reload = true;
+
+      const newAppInstance = spawn(ApplicationService.appImagePath, [], {
         detached: true,
         stdio: 'ignore'
       });
-
       newAppInstance.unref();
-      requestExit();
+
+      app.quit();
     }
   }
 }

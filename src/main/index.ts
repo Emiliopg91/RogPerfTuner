@@ -38,15 +38,16 @@ const initTime = Date.now();
   LoggerMain.removeTab();
   logger.system('Ended initializeBeforeReady');
 
-  if (process.argv.includes('--restart')) {
-    while (!app.requestSingleInstanceLock()) {
-      await new Promise<void>((resolve) => setTimeout(resolve, 100));
-    }
-  }
-
   if (!app.requestSingleInstanceLock() && appConfig.singleInstance) {
-    logger.error('Application already running');
-    app.quit();
+    if (process.argv.includes('--restart')) {
+      while (!app.requestSingleInstanceLock()) {
+        await new Promise<void>((resolve) => setTimeout(resolve, 100));
+      }
+    } else {
+      logger.error('Application already running');
+      app.quit();
+      await new Promise<void>((resolve) => setTimeout(resolve, 1000));
+    }
   }
 
   logger.system('Services registration');
@@ -217,8 +218,8 @@ const initTime = Date.now();
     LoggerMain.removeTab();
     logger.system('Ended initializeWhenReady');
 
-    await createWindow();
-    mainWindow?.close();
+    //await createWindow();
+    //mainWindow?.close();
     applicationLogic();
   });
 })();
@@ -258,26 +259,8 @@ function configureShortcutEvents(window: Electron.BrowserWindow): void {
   });
 }
 
-let requestedExit = false;
-export function requestExit(): void {
-  requestedExit = true;
-  mainWindow?.close();
-  mainWindow = null;
-  app.quit();
-}
-export function requestRestart(): void {
-  app.relaunch();
-  requestExit();
-}
-
 export async function createWindow(): Promise<void> {
   mainWindow = WindowHelper.createMainWindow(windowConfig);
-  mainWindow.on('close', (event) => {
-    if (!is.dev && !requestedExit) {
-      event.preventDefault();
-      mainWindow?.minimize();
-    }
-  });
   mainWindow.webContents.session.setPermissionCheckHandler((_, permission, __, details) => {
     if (
       permission === 'hid' &&

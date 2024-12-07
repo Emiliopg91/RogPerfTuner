@@ -29,9 +29,9 @@ export async function initializeWhenReady(): Promise<void> {
   await AsusFanCurvesClient.getInstance();
   await AsusPlatformClient.getInstance();
   await PowerProfilesClient.getInstance();
-  await PlatformService.initialize();
   await HttpServer.initialize();
   ApplicationService.initialize();
+  await PlatformService.initialize();
 
   const trayBuilder: TrayBuilder | undefined = TrayBuilder.builder(icon45)
     .withToolTip(app.name + ' v' + app.getVersion())
