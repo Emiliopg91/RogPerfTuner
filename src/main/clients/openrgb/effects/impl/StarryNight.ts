@@ -1,6 +1,6 @@
+import Device from '../../client/classes/Device';
+import { RGBColor } from '../../client/classes/RGBColor';
 import Client from '../../client/client';
-import Device, { RGBColor } from '../../client/device';
-import { HSVColor, hexColor } from '../../client/utils';
 import { AbstractEffect } from '../AbstractEffect';
 
 export class StarryNight extends AbstractEffect {
@@ -9,7 +9,7 @@ export class StarryNight extends AbstractEffect {
   }
 
   private getRandom(): RGBColor {
-    return HSVColor(Math.floor(Math.random() * 360), 1, this.brightness);
+    return RGBColor.fromHSV(Math.floor(Math.random() * 360), 1, this.brightness);
   }
 
   protected async applyEffect(client: Client, devices: Array<Device>): Promise<void> {
@@ -17,7 +17,7 @@ export class StarryNight extends AbstractEffect {
     const lenghts: Array<number> = [];
     devices.forEach((element, i) => {
       if (!element) return;
-      leds[i] = Array(element.leds.length).fill(hexColor('#000000'));
+      leds[i] = Array(element.leds.length).fill(RGBColor.fromHex('#000000'));
       client.updateLeds(i, leds[i]);
       lenghts[i] = element.leds.length;
     });
@@ -25,7 +25,7 @@ export class StarryNight extends AbstractEffect {
     const mcm = this.lcmOfArray(lenghts);
     const decrements: Array<Array<RGBColor>> = [];
     devices.forEach((dev, i) => {
-      decrements[i] = Array(dev.colors.length).fill(hexColor('#000000'));
+      decrements[i] = Array(dev.colors.length).fill(RGBColor.fromHex('#000000'));
     });
     for (let offset = 0; this.isRunning; offset = (offset + 1) % mcm) {
       devices.forEach((_, i) => {
@@ -33,9 +33,9 @@ export class StarryNight extends AbstractEffect {
         leds[i].forEach((led, j) => {
           1;
           if (led.red != 0 || led.green != 0 || led.blue != 0) {
-            led.red = Math.max(0, led.red - decrements[i][j].red);
-            led.green = Math.max(0, led.green - decrements[i][j].green);
-            led.blue = Math.max(0, led.blue - decrements[i][j].blue);
+            led.red = Math.max(0, Math.floor(led.red - decrements[i][j].red));
+            led.green = Math.max(0, Math.floor(led.green - decrements[i][j].green));
+            led.blue = Math.max(0, Math.floor(led.blue - decrements[i][j].blue));
             changed = true;
           }
         });
@@ -49,11 +49,11 @@ export class StarryNight extends AbstractEffect {
           }
 
           leds[i][newOn] = this.getRandom();
-          decrements[i][newOn] = {
-            red: leds[i][newOn].red / 30,
-            green: leds[i][newOn].green / 30,
-            blue: leds[i][newOn].blue / 30
-          };
+          decrements[i][newOn] = new RGBColor(
+            Math.ceil(leds[i][newOn].red / 30),
+            Math.ceil(leds[i][newOn].green / 30),
+            Math.ceil(leds[i][newOn].blue / 30)
+          );
           changed = true;
         }
         if (changed) {
