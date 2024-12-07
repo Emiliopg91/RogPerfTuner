@@ -11,9 +11,9 @@ import { v4 as uuidv4 } from 'uuid';
 
 import { Constants } from '../../utils/Constants';
 import { Settings } from '../../utils/Settings';
+import Device from './client/classes/Device';
+import { RGBColor } from './client/classes/RGBColor';
 import Client from './client/client';
-import Device from './client/device';
-import { hexColor } from './client/utils';
 import { AbstractEffect } from './effects/AbstractEffect';
 import { Breathing } from './effects/impl/Breathing';
 import { DanceFloor } from './effects/impl/DanceFloor';
@@ -248,7 +248,7 @@ export class BackendClient {
         BackendClient.client!,
         BackendClient.availableDevices,
         brightness,
-        hexColor(color || '#000000')
+        RGBColor.fromHex(color || '#000000')
       );
       BackendClient.activeMode = inst[0];
     }

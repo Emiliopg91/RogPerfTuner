@@ -1,7 +1,8 @@
 import systeminformation from 'systeminformation';
 
+import Device from '../../client/classes/Device';
+import { RGBColor } from '../../client/classes/RGBColor';
 import Client from '../../client/client';
-import Device, { RGBColor } from '../../client/device';
 import { AbstractEffect } from '../AbstractEffect';
 
 export class Temperature extends AbstractEffect {
@@ -22,14 +23,14 @@ export class Temperature extends AbstractEffect {
     while (this.isRunning) {
       const newColor = await this.getNewColor();
 
-      for (let offset = 0; offset < 20 && this.isRunning; offset++) {
-        const color = this.transition(prevColor, newColor, offset, 20);
+      for (let offset = 0; offset < 10 && this.isRunning; offset++) {
+        const color = this.transition(prevColor, newColor, offset, 10);
         devices.forEach((dev, i) => {
           client.updateLeds(i, Array(dev.leds.length).fill(color));
         });
 
         if (this.isRunning) {
-          await new Promise((resolve) => setTimeout(resolve, 10));
+          await new Promise((resolve) => setTimeout(resolve, 30));
         }
       }
 
@@ -46,11 +47,11 @@ export class Temperature extends AbstractEffect {
   ): RGBColor {
     let color = newColor;
     if (step < steps - 1) {
-      color = {
-        red: prevColor.red + (step * (newColor.red - prevColor.red)) / steps,
-        green: prevColor.green + (step * (newColor.green - prevColor.green)) / steps,
-        blue: prevColor.blue + (step * (newColor.blue - prevColor.blue)) / steps
-      };
+      color = new RGBColor(
+        prevColor.red + (step * (newColor.red - prevColor.red)) / steps,
+        prevColor.green + (step * (newColor.green - prevColor.green)) / steps,
+        prevColor.blue + (step * (newColor.blue - prevColor.blue)) / steps
+      );
     }
     return color;
   }
@@ -58,9 +59,9 @@ export class Temperature extends AbstractEffect {
   private async getNewColor(): Promise<RGBColor> {
     const cpuTemp = (await systeminformation.cpuTemperature()).main;
     if (cpuTemp >= Temperature.maxTemp) {
-      return { red: 255 * this.brightness, green: 0, blue: 0 };
+      return new RGBColor(255 * this.brightness, 0, 0);
     } else if (cpuTemp < Temperature.minTemp) {
-      return { red: 0, green: 255 * this.brightness, blue: 0 };
+      return new RGBColor(0, 255 * this.brightness, 0);
     } else {
       return this.colorsByTemp[cpuTemp];
     }
@@ -69,12 +70,11 @@ export class Temperature extends AbstractEffect {
   private updateColorsByTemp(): void {
     this.colorsByTemp = {};
     for (let i = 0; i <= Temperature.steps; i++) {
-      const color = {
-        red: i * Temperature.increment * this.brightness,
-        green: (255 - i * Temperature.increment) * this.brightness,
-        blue: 0
-      };
-      this.colorsByTemp[Temperature.minTemp + i] = color;
+      this.colorsByTemp[Temperature.minTemp + i] = new RGBColor(
+        i * Temperature.increment * this.brightness,
+        (255 - i * Temperature.increment) * this.brightness,
+        0
+      );
     }
   }
 }

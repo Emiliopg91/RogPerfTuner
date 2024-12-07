@@ -1,5 +1,5 @@
+import Device from '../../client/classes/Device';
 import Client from '../../client/client';
-import Device from '../../client/device';
 import { AbstractEffect } from '../AbstractEffect';
 
 export class Static extends AbstractEffect {

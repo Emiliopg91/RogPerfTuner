@@ -1,15 +1,15 @@
 import { AuraBrightness } from '@commons/models/Aura';
 import { LoggerMain } from '@tser-framework/main';
 
+import Device from '../client/classes/Device';
+import { RGBColor } from '../client/classes/RGBColor';
 import Client from '../client/client';
-import Device, { RGBColor } from '../client/device';
-import { hexColor } from '../client/utils';
 
 export abstract class AbstractEffect {
   protected isRunning = false;
   protected hasFinished = false;
   protected brightness = 0;
-  protected color: RGBColor = hexColor('#FF0000');
+  protected color: RGBColor = RGBColor.fromHex('#FF0000');
   protected logger: LoggerMain;
 
   constructor() {
@@ -29,7 +29,7 @@ export abstract class AbstractEffect {
     this.hasFinished = false;
     if (brightness == AuraBrightness.OFF) {
       devices.forEach((dev, i) =>
-        client.updateLeds(i, Array(dev.leds.length).fill(hexColor('#000000')))
+        client.updateLeds(i, Array(dev.leds.length).fill(RGBColor.fromHex('#000000')))
       );
       this.hasFinished = true;
       return;
