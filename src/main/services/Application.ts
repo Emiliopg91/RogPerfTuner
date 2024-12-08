@@ -28,6 +28,7 @@ export class ApplicationService {
   public static initialize(): void {
     if (!ApplicationService.initialized) {
       ApplicationService.fromReload = Settings.configMap.reload || false;
+      Settings.configMap.reload = false;
       if (ApplicationService.allowsAutoStart()) {
         try {
           ApplicationService.logger.info('AppImage path: ', ApplicationService.appImagePath);
