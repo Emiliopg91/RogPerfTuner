@@ -9,37 +9,37 @@ import { execSync } from 'child_process';
 import * as fs from 'fs';
 
 import { mainWindow } from '..';
-import { AsusFanCurvesClient } from '../clients/dbus/AsusFanCurvesClient';
-import { AsusPlatformClient } from '../clients/dbus/AsusPlatformClient';
-import { PowerProfilesClient } from '../clients/dbus/PowerProfilesClient';
-import { UPowerClient } from '../clients/dbus/UPowerClient';
+import { asusFanCurvesClient } from '../clients/dbus/AsusFanCurvesClient';
+import { asusPlatformClient } from '../clients/dbus/AsusPlatformClient';
+import { powerProfilesClient } from '../clients/dbus/PowerProfilesClient';
+import { uPowerClient } from '../clients/dbus/UPowerClient';
 import { generateTrayMenuDef, refreshTrayMenu } from '../setup';
-import { Settings } from '../utils/Settings';
-import { ApplicationService } from './Application';
-import { NotificationService } from './NotificationService';
+import { settings } from '../utils/Settings';
+import { applicationService } from './Application';
+import { notificationService } from './NotificationService';
 
-export class PlatformService {
-  private static logger = LoggerMain.for('PlatformService');
-  private static initialized = false;
-  private static boostControl: BoostControl | undefined = undefined;
-  private static lastBoost: boolean | undefined = undefined;
-  private static lastPolicy: ThrottleThermalPolicy | undefined = undefined;
-  private static lastPower: PowerProfile | undefined = undefined;
-  private static lastThreshold: number | undefined = undefined;
+class PlatformService {
+  private logger = LoggerMain.for('PlatformService');
+  private initialized = false;
+  private boostControl: BoostControl | undefined = undefined;
+  private lastBoost: boolean | undefined = undefined;
+  private lastPolicy: ThrottleThermalPolicy | undefined = undefined;
+  private lastPower: PowerProfile | undefined = undefined;
+  private lastThreshold: number | undefined = undefined;
 
-  private static throttlePowerAssoc: Record<ThrottleThermalPolicy, PowerProfile> = {
+  private throttlePowerAssoc: Record<ThrottleThermalPolicy, PowerProfile> = {
     [ThrottleThermalPolicy.QUIET]: PowerProfile.POWER_SAVER,
     [ThrottleThermalPolicy.BALANCED]: PowerProfile.BALANCED,
     [ThrottleThermalPolicy.PERFORMANCE]: PowerProfile.PERFORMANCE
   };
 
-  private static throttleBoostAssoc: Record<ThrottleThermalPolicy, boolean> = {
+  private throttleBoostAssoc: Record<ThrottleThermalPolicy, boolean> = {
     [ThrottleThermalPolicy.QUIET]: false,
     [ThrottleThermalPolicy.BALANCED]: false,
     [ThrottleThermalPolicy.PERFORMANCE]: true
   };
 
-  private static everyBoostControl: Array<BoostControl> = [
+  private everyBoostControl: Array<BoostControl> = [
     {
       path: '/sys/devices/system/cpu/intel_pstate/no_turbo',
       on: '0',
@@ -52,88 +52,83 @@ export class PlatformService {
     }
   ];
 
-  public static async initialize(): Promise<void> {
-    if (!PlatformService.initialized) {
-      PlatformService.initialized = true;
-      UPowerClient.watchForChanges('OnBattery', PlatformService.onBatteryEvent);
+  public async initialize(): Promise<void> {
+    if (!this.initialized) {
+      this.initialized = true;
+      uPowerClient.on('OnBattery', async (onBattery) => {
+        let policy = ThrottleThermalPolicy.PERFORMANCE;
+        if (onBattery) {
+          policy = ThrottleThermalPolicy.QUIET;
+        }
 
-      for (const control of PlatformService.everyBoostControl) {
+        await this.setThrottleThermalPolicy(policy, true);
+        mainWindow?.webContents.send('refreshThrottleThermalPolicy', policy);
+        refreshTrayMenu(await generateTrayMenuDef());
+      });
+
+      for (const control of this.everyBoostControl) {
         if (fs.existsSync(control.path)) {
-          PlatformService.boostControl = control;
+          this.boostControl = control;
         }
       }
-      if (PlatformService.boostControl) {
-        const content = fs.readFileSync(PlatformService.boostControl.path, 'utf-8');
-        PlatformService.lastBoost = PlatformService.boostControl.on === content.trim();
+      if (this.boostControl) {
+        const content = fs.readFileSync(this.boostControl.path, 'utf-8');
+        this.lastBoost = this.boostControl.on === content.trim();
 
-        fs.watch(PlatformService.boostControl.path, (eventType) => {
+        fs.watch(this.boostControl.path, (eventType) => {
           if (eventType === 'change') {
-            const content = fs.readFileSync(PlatformService.boostControl!.path, 'utf-8').trim();
-            PlatformService.lastBoost = content === PlatformService.boostControl!.on;
+            const content = fs.readFileSync(this.boostControl!.path, 'utf-8').trim();
+            this.lastBoost = content === this.boostControl!.on;
           }
         });
       }
 
-      PlatformService.lastPolicy = await AsusPlatformClient.getThrottleThermalProfile();
-      AsusPlatformClient.watchForChanges(
-        'ThrottleThermalPolicy',
-        async (value: ThrottleThermalPolicy) => {
-          PlatformService.lastPolicy = value;
-          refreshTrayMenu(await generateTrayMenuDef());
-          mainWindow?.webContents.send('refreshThrottleThermalPolicy', value);
-        }
-      );
+      this.lastPolicy = await asusPlatformClient.getThrottleThermalProfile();
+      asusPlatformClient.on('ThrottleThermalPolicy', async (value: ThrottleThermalPolicy) => {
+        this.lastPolicy = value;
+        refreshTrayMenu(await generateTrayMenuDef());
+        mainWindow?.webContents.send('refreshThrottleThermalPolicy', value);
+      });
 
-      PlatformService.lastThreshold = await AsusPlatformClient.getChargeControlEndThresold();
-      AsusPlatformClient.watchForChanges('ChargeControlEndThreshold', async (value: number) => {
-        PlatformService.lastThreshold = value;
+      this.lastThreshold = await asusPlatformClient.getChargeControlEndThresold();
+      asusPlatformClient.on('ChargeControlEndThreshold', async (value: number) => {
+        this.lastThreshold = value;
         refreshTrayMenu(await generateTrayMenuDef());
         mainWindow?.webContents.send('refreshChargeThreshold', value);
       });
 
-      PlatformService.lastPower = await PowerProfilesClient.getActiveProfile();
-      PowerProfilesClient.watchForChanges('ActiveProfile', async (value: PowerProfile) => {
-        PlatformService.lastPower = value;
+      this.lastPower = await powerProfilesClient.getActiveProfile();
+      powerProfilesClient.on('ActiveProfile', async (value: PowerProfile) => {
+        this.lastPower = value;
       });
     }
   }
 
-  private static setLastProfile(value: ThrottleThermalPolicy): void {
-    if (!Settings.configMap.platform) {
-      Settings.configMap.platform = { profiles: undefined };
+  private setLastProfile(value: ThrottleThermalPolicy): void {
+    if (!settings.configMap.platform) {
+      settings.configMap.platform = { profiles: undefined };
     }
-    if (!Settings.configMap.platform.profiles) {
-      Settings.configMap.platform.profiles = { last: undefined };
+    if (!settings.configMap.platform.profiles) {
+      settings.configMap.platform.profiles = { last: undefined };
     }
-    Settings.configMap.platform.profiles.last = ThrottleThermalPolicy[value];
+    settings.configMap.platform.profiles.last = ThrottleThermalPolicy[value];
   }
 
-  private static async onBatteryEvent(onBattery: boolean): Promise<void> {
-    let policy = ThrottleThermalPolicy.PERFORMANCE;
-    if (onBattery) {
-      policy = ThrottleThermalPolicy.QUIET;
-    }
-
-    await PlatformService.setThrottleThermalPolicy(policy, true);
-    mainWindow?.webContents.send('refreshThrottleThermalPolicy', policy);
-    refreshTrayMenu(await generateTrayMenuDef());
+  public getThrottleThermalPolicy(): ThrottleThermalPolicy {
+    return this.lastPolicy!;
   }
 
-  public static getThrottleThermalPolicy(): ThrottleThermalPolicy {
-    return PlatformService.lastPolicy!;
-  }
-
-  public static async setThrottleThermalPolicy(
+  public async setThrottleThermalPolicy(
     policy: ThrottleThermalPolicy,
     temporal: boolean = false,
     notify: boolean = true
   ): Promise<void> {
     const policyName = ThrottleThermalPolicy[policy];
-    const powerPolicy = PlatformService.throttlePowerAssoc[policy];
+    const powerPolicy = this.throttlePowerAssoc[policy];
 
     const showToastOk = (): void => {
       if (notify) {
-        NotificationService.toast(
+        notificationService.toast(
           TranslatorMain.translate('performance.profile.setted', {
             policy: TranslatorMain.translate(
               'performance.profile.' + policyName
@@ -143,107 +138,107 @@ export class PlatformService {
       }
     };
 
-    if (PlatformService.lastPolicy != policy || PlatformService.lastPower != powerPolicy) {
+    if (this.lastPolicy != policy || this.lastPower != powerPolicy) {
       try {
-        const boostEnabled = PlatformService.throttleBoostAssoc[policy];
-        const noBoostReason = !Settings.password
+        const boostEnabled = this.throttleBoostAssoc[policy];
+        const noBoostReason = !settings.password
           ? 'missing password'
-          : !PlatformService.boostControl
+          : !this.boostControl
             ? 'unsupported'
             : undefined;
 
-        PlatformService.logger.info('Setting profile:');
+        this.logger.info('Setting profile:');
         LoggerMain.addTab();
-        PlatformService.logger.info(`Throttle policy: ${policyName}`);
-        PlatformService.logger.info(`Fan curve: ${policyName}`);
-        PlatformService.logger.info(
-          `Power policy: ${PlatformModels.getPowerProfileName(powerPolicy)}`
-        );
+        this.logger.info(`Throttle policy: ${policyName}`);
+        this.logger.info(`Fan curve: ${policyName}`);
+        this.logger.info(`Power policy: ${PlatformModels.getPowerProfileName(powerPolicy)}`);
         if (noBoostReason) {
-          PlatformService.logger.info(`Boost: omitted due to ${noBoostReason}`);
+          this.logger.info(`Boost: omitted due to ${noBoostReason}`);
         } else {
-          PlatformService.logger.info(`Boost: ${boostEnabled ? 'Enabled' : 'Disabled'}`);
+          this.logger.info(`Boost: ${boostEnabled ? 'Enabled' : 'Disabled'}`);
         }
 
         const boostPromise = (async (): Promise<void> => {
           if (!noBoostReason) {
-            if (PlatformService.boostControl && boostEnabled != PlatformService.lastBoost) {
+            if (this.boostControl && boostEnabled != this.lastBoost) {
               const target = boostEnabled ? 'on' : 'off';
-              const value = PlatformService.boostControl[target];
-              const path = PlatformService.boostControl.path;
+              const value = this.boostControl[target];
+              const path = this.boostControl.path;
 
-              const command = `echo "${Settings.password}" | sudo -S bash -c "echo '${value}' | tee ${path}" &>> /dev/null`;
+              const command = `echo "${settings.password}" | sudo -S bash -c "echo '${value}' | tee ${path}" &>> /dev/null`;
               try {
                 execSync(command);
                 // eslint-disable-next-line @typescript-eslint/no-explicit-any
               } catch (error: any) {
-                PlatformService.logger.error(`Couldn't set boost mode: ${error}`);
+                this.logger.error(`Couldn't set boost mode: ${error}`);
                 throw error;
               }
             }
           }
         })();
         const fansPromise = (async (): Promise<void> => {
-          await AsusFanCurvesClient.setCurvesToDefaults(policy);
-          await AsusFanCurvesClient.resetProfileCurves(policy);
-          await AsusFanCurvesClient.setFanCurvesEnabled(policy, true);
+          await asusFanCurvesClient.setCurvesToDefaults(policy);
+          await asusFanCurvesClient.resetProfileCurves(policy);
+          await asusFanCurvesClient.setFanCurvesEnabled(policy, true);
         })();
-        const throttlePromise = AsusPlatformClient.setThrottleThermalProfile(policy);
+        const throttlePromise = asusPlatformClient.setThrottleThermalProfile(policy);
         const powerPromise = (async (): Promise<void> => {
-          if (PlatformService.lastPower != powerPolicy) {
-            PowerProfilesClient.setActiveProfile(powerPolicy);
+          if (this.lastPower != powerPolicy) {
+            powerProfilesClient.setActiveProfile(powerPolicy);
           }
         })();
 
         Promise.all([throttlePromise, fansPromise, powerPromise, boostPromise])
           .then(() => {
             LoggerMain.removeTab();
-            PlatformService.logger.info('Profile set successfully');
+            this.logger.info('Profile set successfully');
             if (!temporal) {
-              PlatformService.setLastProfile(policy);
+              this.setLastProfile(policy);
             }
             showToastOk();
           })
           .catch((error: unknown) => {
             LoggerMain.removeTab();
-            PlatformService.logger.error(`Error while setting profile: ${error}`);
+            this.logger.error(`Error while setting profile: ${error}`);
           });
       } catch (e) {
-        PlatformService.logger.info(`Error setting ThrottleThermalPolicy: ${e}`);
+        this.logger.info(`Error setting ThrottleThermalPolicy: ${e}`);
       }
     } else {
-      PlatformService.logger.info(`Profile already is ${policyName}`);
+      this.logger.info(`Profile already is ${policyName}`);
       showToastOk();
     }
   }
 
-  public static async restoreThrottleThermalPolicy(): Promise<void> {
+  public async restoreThrottleThermalPolicy(): Promise<void> {
     const last =
       ThrottleThermalPolicy[
-        Settings.configMap.platform?.profiles?.last ||
+        settings.configMap.platform?.profiles?.last ||
           ThrottleThermalPolicy[ThrottleThermalPolicy.PERFORMANCE]
       ];
     if (last !== null) {
-      PlatformService.logger.info('Restoring profile');
+      this.logger.info('Restoring profile');
       LoggerMain.addTab();
 
-      await PlatformService.setThrottleThermalPolicy(last, false, !ApplicationService.fromReload);
+      await this.setThrottleThermalPolicy(last, false, !applicationService.fromReload);
 
       LoggerMain.removeTab();
-      PlatformService.logger.info('Profile restored');
+      this.logger.info('Profile restored');
     }
   }
 
-  public static getChargeThreshold(): number {
-    return PlatformService.lastThreshold!;
+  public getChargeThreshold(): number {
+    return this.lastThreshold!;
   }
 
-  public static async setChargeThreshold(value: number): Promise<void> {
-    if ((await PlatformService.getChargeThreshold()) !== value) {
-      PlatformService.logger.info(`Setting battery charge threshold to ${value}%`);
-      await AsusPlatformClient.setChargeControlEndThresold(value);
+  public async setChargeThreshold(value: number): Promise<void> {
+    if ((await this.getChargeThreshold()) !== value) {
+      this.logger.info(`Setting battery charge threshold to ${value}%`);
+      await asusPlatformClient.setChargeControlEndThresold(value);
     } else {
-      PlatformService.logger.info(`Battery charge threshold already is ${value}%`);
+      this.logger.info(`Battery charge threshold already is ${value}%`);
     }
   }
 }
+
+export const platformService = new PlatformService();

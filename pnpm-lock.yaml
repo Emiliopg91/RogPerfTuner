@@ -35,9 +35,6 @@ importers:
       dbus-next:
         specifier: ^0.10.2
         version: 0.10.2
-      electron-updater:
-        specifier: ^6.3.9
-        version: 6.3.9
       follow-redirects:
         specifier: ^1.15.9
         version: 1.15.9

@@ -2,8 +2,9 @@
 import { LoggerMain } from '@tser-framework/main';
 import { Mutex } from 'async-mutex';
 import { ClientInterface, ProxyObject, Variant, sessionBus, systemBus } from 'dbus-next';
+import EventEmitter from 'events';
 
-export abstract class AbstractDbusClient {
+export abstract class AbstractDbusClient extends EventEmitter {
   private static mutex: Mutex = new Mutex();
   protected logger: LoggerMain;
   protected busType: 'system' | 'session';
@@ -16,6 +17,7 @@ export abstract class AbstractDbusClient {
   protected callbacks: Record<string, Array<(value: any) => void>> = {};
 
   constructor(busType: 'system' | 'session', srvName: string, objName: string, ifcName: string) {
+    super();
     this.logger = LoggerMain.for(this.constructor.name);
     this.busType = busType;
     this.srvName = srvName;
@@ -23,7 +25,7 @@ export abstract class AbstractDbusClient {
     this.ifcName = ifcName;
   }
 
-  protected async initialize(): Promise<void> {
+  public async initialize(): Promise<void> {
     return new Promise<void>((resolve) => {
       AbstractDbusClient.mutex.runExclusive(async () => {
         this.logger.info(`Initializing ${this.constructor.name}`);
@@ -41,12 +43,10 @@ export abstract class AbstractDbusClient {
         this.properties.on('PropertiesChanged', (iface, changed) => {
           if (iface == this.ifcName) {
             for (const prop of Object.keys(changed)) {
-              if (this.callbacks[prop]) {
-                this.callbacks[prop].forEach(
-                  async (cb) =>
-                    await cb(changed[prop].value != undefined ? changed[prop].value : changed[prop])
-                );
-              }
+              this.emit(
+                prop,
+                changed[prop].value != undefined ? changed[prop].value : changed[prop]
+              );
             }
           }
         });
@@ -56,20 +56,6 @@ export abstract class AbstractDbusClient {
         resolve();
       });
     });
-  }
-
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  protected watchForChanges(property: string, callback: (value: any) => void): () => void {
-    if (!this.callbacks[property]) {
-      this.callbacks[property] = [];
-    }
-    if (!this.callbacks[property].includes(callback)) {
-      this.callbacks[property].push(callback);
-    }
-
-    return () => {
-      this.callbacks[property].splice(this.callbacks[property].indexOf(callback), 1);
-    };
   }
 
   protected async getProperty(property: string): Promise<unknown> {

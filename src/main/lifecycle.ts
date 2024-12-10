@@ -3,16 +3,17 @@ import { Menu, app } from 'electron/main';
 
 import icon45 from '../../resources/icons/icon-45x45.png?asset';
 import translations from '../../resources/translations.i18n.json';
-import { AsusFanCurvesClient } from './clients/dbus/AsusFanCurvesClient';
-import { AsusPlatformClient } from './clients/dbus/AsusPlatformClient';
-import { PowerProfilesClient } from './clients/dbus/PowerProfilesClient';
-import { BackendClient } from './clients/openrgb/BackendClient';
-import { ApplicationService } from './services/Application';
-import { OpenRgbService } from './services/OpenRgb';
-import { PlatformService } from './services/Platform';
+import { asusFanCurvesClient } from './clients/dbus/AsusFanCurvesClient';
+import { asusPlatformClient } from './clients/dbus/AsusPlatformClient';
+import { powerProfilesClient } from './clients/dbus/PowerProfilesClient';
+import { uPowerClient } from './clients/dbus/UPowerClient';
+import { openRgbClient } from './clients/openrgb/OpenRgbClient';
+import { applicationService } from './services/Application';
+import { openRgbService } from './services/OpenRgb';
+import { platformService } from './services/Platform';
 import { generateTrayMenuDef, setTrayMenuRefreshFn } from './setup';
-import { HttpServer } from './utils/HttpServer';
-import { Settings } from './utils/Settings';
+import { httpServer } from './utils/HttpServer';
+import { settings } from './utils/Settings';
 
 export async function initializeBeforeReady(): Promise<void> {
   app.disableHardwareAcceleration();
@@ -23,15 +24,16 @@ export async function initializeBeforeReady(): Promise<void> {
 
 // eslint-disable-next-line @typescript-eslint/no-empty-function
 export async function initializeWhenReady(): Promise<void> {
-  await Settings.initialize();
-  await BackendClient.initialize();
-  await OpenRgbService.initialize();
-  await AsusFanCurvesClient.getInstance();
-  await AsusPlatformClient.getInstance();
-  await PowerProfilesClient.getInstance();
-  await HttpServer.initialize();
-  ApplicationService.initialize();
-  await PlatformService.initialize();
+  await settings.initialize();
+  await asusFanCurvesClient.initialize();
+  await asusPlatformClient.initialize();
+  await powerProfilesClient.initialize();
+  await uPowerClient.initialize();
+  await openRgbClient.initialize();
+  await openRgbService.initialize();
+  await httpServer.initialize();
+  applicationService.initialize();
+  await platformService.initialize();
 
   const trayBuilder: TrayBuilder | undefined = TrayBuilder.builder(icon45)
     .withToolTip(app.name + ' v' + app.getVersion())
@@ -44,5 +46,5 @@ export async function initializeWhenReady(): Promise<void> {
 }
 
 export function stop(): void {
-  BackendClient.stop();
+  openRgbClient.stop();
 }

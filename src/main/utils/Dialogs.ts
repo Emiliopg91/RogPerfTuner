@@ -3,14 +3,14 @@ import { exec } from 'child_process';
 
 import { SudoPasswordResult } from '../../commons/src/models/Dialogs';
 
-export class Dialogs {
-  private static logger = LoggerMain.for('Dialogs');
+class Dialogs {
+  private logger = LoggerMain.for('Dialogs');
 
-  public static async askForSudoPassword(
+  public async askForSudoPassword(
     askForRemember: boolean,
     retry: number = 0
   ): Promise<SudoPasswordResult> {
-    Dialogs.logger.info('Asking for sudo password');
+    this.logger.info('Asking for sudo password');
     return new Promise<SudoPasswordResult>((resolve) => {
       let command = 'zenity --password --title="Password required to set CPU boost"';
       if (retry != 0) {
@@ -19,23 +19,23 @@ export class Dialogs {
 
       exec(command, async (err, stdout) => {
         if (err || !stdout) {
-          Dialogs.logger.info('User declined to provide password');
+          this.logger.info('User declined to provide password');
           resolve({ password: undefined, remember: false });
         } else {
-          Dialogs.logger.info('User provided password');
+          this.logger.info('User provided password');
           const password = stdout.trim();
-          const valid = await Dialogs.checkPassword(password);
+          const valid = await this.checkPassword(password);
           if (valid) {
-            Dialogs.logger.info('Asking if want to remember');
+            this.logger.info('Asking if want to remember');
             if (askForRemember) {
               exec(
                 'zenity --question --title="Remember password?" --text="If you dont save it, you\'ll be prompted on every boot."',
                 (err) => {
                   const remember = !err?.code;
                   if (remember) {
-                    Dialogs.logger.info('User allows saving password');
+                    this.logger.info('User allows saving password');
                   } else {
-                    Dialogs.logger.info('User declined to save password');
+                    this.logger.info('User declined to save password');
                   }
                   resolve({ password, remember });
                 }
@@ -45,9 +45,9 @@ export class Dialogs {
             }
           } else {
             if (retry < 2) {
-              resolve(await Dialogs.askForSudoPassword(askForRemember, retry + 1));
+              resolve(await this.askForSudoPassword(askForRemember, retry + 1));
             } else {
-              await Dialogs.showErrorDialog(
+              await this.showErrorDialog(
                 'Authentication failed',
                 'CPU boost feature will be disabled'
               );
@@ -59,7 +59,7 @@ export class Dialogs {
     });
   }
 
-  public static showErrorDialog(title: string, message: string): Promise<void> {
+  public showErrorDialog(title: string, message: string): Promise<void> {
     return new Promise<void>((resolve) => {
       const command = `zenity --error --text="${message}" --title="${title}"`;
       exec(command, () => {
@@ -68,18 +68,20 @@ export class Dialogs {
     });
   }
 
-  private static async checkPassword(password: string): Promise<boolean> {
+  private async checkPassword(password: string): Promise<boolean> {
     return new Promise<boolean>((resolve) => {
-      Dialogs.logger.info('Checking password');
+      this.logger.info('Checking password');
       exec(`echo "${password}" | sudo -S echo "Password correct"`, (err) => {
         if (err) {
-          Dialogs.logger.info('Authentication failed');
+          this.logger.info('Authentication failed');
           resolve(false);
         } else {
-          Dialogs.logger.info('Authentication successful');
+          this.logger.info('Authentication successful');
           resolve(true);
         }
       });
     });
   }
 }
+
+export const dialogs = new Dialogs();

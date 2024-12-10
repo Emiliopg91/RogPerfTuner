@@ -1,5 +1,5 @@
 import react from '@vitejs/plugin-react';
-import { bytecodePlugin, defineConfig, swcPlugin } from 'electron-vite';
+import { defineConfig, swcPlugin } from 'electron-vite';
 import fs from 'fs';
 import path, { resolve } from 'path';
 import sass from 'sass-embedded';
@@ -25,8 +25,8 @@ console.info('HTMLS: ', htmls);
 
 export default defineConfig({
   main: {
-    build: {},
-    plugins: [bytecodePlugin({ transformArrowFunctions: false }), swcPlugin()],
+    build: { minify: true, sourcemap: false, rollupOptions: { treeshake: true } },
+    plugins: [swcPlugin()],
     resolve: {
       alias: {
         '@main': resolve('src/main/src'),
@@ -35,8 +35,8 @@ export default defineConfig({
     }
   },
   preload: {
-    build: {},
-    plugins: [bytecodePlugin({ transformArrowFunctions: false })],
+    build: { minify: true, sourcemap: false, rollupOptions: { treeshake: true } },
+    plugins: [],
     resolve: {
       alias: {
         '@main': resolve('src/main/src'),
@@ -51,7 +51,9 @@ export default defineConfig({
       },
       rollupOptions: {
         input: [...htmls]
-      }
+      },
+      minify: true,
+      sourcemap: false
     },
     plugins: [react()],
     resolve: {

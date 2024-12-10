@@ -1,13 +1,12 @@
 import { electronApp, is } from '@electron-toolkit/utils';
 import { JsonUtils } from '@tser-framework/commons';
-import { AppUpdater, LoggerMain, TranslatorMain, WindowHelper } from '@tser-framework/main';
+import { LoggerMain, TranslatorMain, WindowHelper } from '@tser-framework/main';
 import { BrowserWindow, IpcMainInvokeEvent, Menu, app, ipcMain, protocol } from 'electron';
-import { dialog } from 'electron/main';
 import path from 'path';
 
 import { applicationLogic } from './applicationLogic';
 import { initializeBeforeReady, initializeWhenReady, stop } from './lifecycle';
-import { NotificationService } from './services/NotificationService';
+import { notificationService } from './services/NotificationService';
 import {
   appConfig,
   deepLinkBindings,
@@ -16,12 +15,9 @@ import {
   protocolBindings,
   windowConfig
 } from './setup';
-import { Constants } from './utils/Constants';
 
 process.env.ELECTRON_ENABLE_WAYLAND = '1';
 
-let shownUpdate = false;
-export let appUpdater: AppUpdater | undefined = undefined;
 export let mainWindow: BrowserWindow | null = null;
 const initTime = Date.now();
 
@@ -168,7 +164,7 @@ const initTime = Date.now();
         }
         mainWindow.focus();
       } else {
-        NotificationService.toast(
+        notificationService.toast(
           TranslatorMain.translate('already.running', { appName: app.getName() })
         );
       }
@@ -181,35 +177,6 @@ const initTime = Date.now();
           }
         });
       }
-    });
-
-    appUpdater = new AppUpdater(24 * 60 * 60 * 1000, (): void => {
-      dialog
-        .showMessageBox({
-          type: 'info',
-          buttons: [
-            TranslatorMain.translate('update.now'),
-            TranslatorMain.translate('update.on.restart')
-          ],
-          defaultId: 0,
-          cancelId: 1,
-          title: TranslatorMain.translate('update.available'),
-          message: TranslatorMain.translate('update.requires', { appName: app.getName() })
-        })
-        .then((returnValue) => {
-          if (returnValue.response === 0) {
-            if (!shownUpdate) {
-              Constants.mutex.runExclusive(() => {
-                NotificationService.toast(
-                  TranslatorMain.translate('update.installing', { appName: app.getName() })
-                );
-                appUpdater?.quitAndInstall(true, true);
-              });
-            }
-          } else {
-            shownUpdate = true;
-          }
-        });
     });
 
     logger.system('Running initializeWhenReady');

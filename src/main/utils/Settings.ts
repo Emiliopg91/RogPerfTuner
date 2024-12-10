@@ -1,21 +1,21 @@
 import { SettingsType } from '@commons/models/Settings';
 import { ConfigurationHelper } from '@tser-framework/main';
 
-import { Dialogs } from './Dialogs';
+import { dialogs } from './Dialogs';
 
-export class Settings {
-  public static password: string | undefined = '';
-  public static configMap: SettingsType;
+class Settings {
+  public password: string | undefined = '';
+  public configMap: SettingsType = { openRgb: undefined, platform: undefined, reload: undefined };
 
-  public static async initialize(): Promise<void> {
-    Settings.configMap = ConfigurationHelper.configAsInterface();
+  public async initialize(): Promise<void> {
+    this.configMap = ConfigurationHelper.configAsInterface();
 
     const password = ConfigurationHelper.getSecretValue('settings.password');
     if (password) {
-      Settings.password = password;
+      this.password = password;
     } else {
-      const result = await Dialogs.askForSudoPassword(true);
-      Settings.password = result.password;
+      const result = await dialogs.askForSudoPassword(true);
+      this.password = result.password;
       if (result.password !== undefined) {
         if (result.remember) {
           ConfigurationHelper.setSecretValue('settings.password', result.password);
@@ -24,3 +24,5 @@ export class Settings {
     }
   }
 }
+
+export const settings = new Settings();

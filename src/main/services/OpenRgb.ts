@@ -1,114 +1,122 @@
 import { AuraBrightness } from '@commons/models/Aura';
 import { LoggerMain } from '@tser-framework/main';
 import { execSync } from 'child_process';
+import { debounce } from 'lodash';
 
 import { mainWindow } from '..';
-import { BackendClient } from '../clients/openrgb/BackendClient';
+import { openRgbClient } from '../clients/openrgb/OpenRgbClient';
 import { generateTrayMenuDef, refreshTrayMenu } from '../setup';
-import { Settings } from '../utils/Settings';
-import { ApplicationService } from './Application';
+import { settings } from '../utils/Settings';
 
-export class OpenRgbService {
-  private static logger = LoggerMain.for('OpenRgbService');
-  private static mode: string = 'Static';
-  private static brightness: AuraBrightness = AuraBrightness.OFF;
-  private static color: string = '#FF0000';
-  private static initialized = false;
-  private static lastConnectedUsbs = -1;
+class OpenRgbService {
+  private logger = LoggerMain.for('OpenRgbService');
+  private mode: string = 'Static';
+  private brightness: AuraBrightness = AuraBrightness.OFF;
+  private color: string = '#FF0000';
+  private initialized = false;
+  private lastConnectedUsbs = -1;
 
-  public static async initialize(): Promise<void> {
-    if (!OpenRgbService.initialized) {
-      OpenRgbService.logger.info('Initializing OpenRgbService');
+  private bouncedReload = async (): Promise<void> => {
+    this.logger.info('New USB Device connected, restarting...');
+    LoggerMain.addTab();
+    await openRgbClient.restart();
+    await this.setMode(this.mode);
+    LoggerMain.removeTab();
+  };
+  private debouncedReload = debounce(this.bouncedReload, 1000);
+
+  public async initialize(): Promise<void> {
+    if (!this.initialized) {
+      this.logger.info('Initializing OpenRgbService');
       LoggerMain.addTab();
-      OpenRgbService.initialized = true;
+      this.initialized = true;
 
-      OpenRgbService.mode = Settings.configMap.openRgb?.state?.mode
-        ? Settings.configMap.openRgb?.state?.mode
-        : OpenRgbService.mode;
-      OpenRgbService.brightness = Settings.configMap.openRgb?.state?.brightness
-        ? (Settings.configMap.openRgb?.state?.brightness as AuraBrightness)
+      this.mode = settings.configMap.openRgb?.state?.mode
+        ? settings.configMap.openRgb?.state?.mode
+        : this.mode;
+      this.brightness = settings.configMap.openRgb?.state?.brightness
+        ? (settings.configMap.openRgb?.state?.brightness as AuraBrightness)
         : AuraBrightness.OFF;
-      OpenRgbService.color = Settings.configMap.openRgb?.state?.color
-        ? Settings.configMap.openRgb?.state?.color
-        : OpenRgbService.color;
+      this.color = settings.configMap.openRgb?.state?.color
+        ? settings.configMap.openRgb?.state?.color
+        : this.color;
 
-      OpenRgbService.logger.info('Restoring state');
-      OpenRgbService.setMode(OpenRgbService.mode);
+      this.logger.info('Restoring state');
+      this.setMode(this.mode);
       LoggerMain.removeTab();
-
       setInterval(() => {
         const count = Number(execSync('lsusb | wc -l').toString().trim());
-        if (OpenRgbService.lastConnectedUsbs >= 0 && count > OpenRgbService.lastConnectedUsbs) {
-          OpenRgbService.logger.info('New USB Device connected, restarting...');
-          ApplicationService.restart();
+        if (this.lastConnectedUsbs >= 0 && count > this.lastConnectedUsbs) {
+          this.debouncedReload();
         }
-        OpenRgbService.lastConnectedUsbs = count;
+        this.lastConnectedUsbs = count;
       }, 500);
     }
   }
 
-  public static async setMode(mode: string): Promise<void> {
-    if (BackendClient.availableModes.includes(mode)) {
-      BackendClient.applyEffect(mode, OpenRgbService.brightness, OpenRgbService.color);
+  public async setMode(mode: string): Promise<void> {
+    if (openRgbClient.availableModes.includes(mode)) {
+      openRgbClient.applyEffect(mode, this.brightness, this.color);
 
-      OpenRgbService.mode = mode;
-      Settings.configMap.openRgb!.state = {
+      this.mode = mode;
+      settings.configMap.openRgb!.state = {
         mode,
-        brightness: OpenRgbService.brightness,
-        color: OpenRgbService.color
+        brightness: this.brightness,
+        color: this.color
       };
       refreshTrayMenu(await generateTrayMenuDef());
       mainWindow?.webContents.send('refreshLedMode', mode);
     } else {
-      OpenRgbService.logger.info(`Mode ${mode} is not available`);
+      this.logger.info(`Mode ${mode} is not available`);
     }
   }
 
-  public static async setBrightness(brightness: AuraBrightness): Promise<void> {
-    BackendClient.applyEffect(OpenRgbService.mode, brightness, OpenRgbService.color);
+  public async setBrightness(brightness: AuraBrightness): Promise<void> {
+    openRgbClient.applyEffect(this.mode, brightness, this.color);
 
-    OpenRgbService.brightness = brightness;
-    Settings.configMap.openRgb!.state = {
-      mode: OpenRgbService.mode,
+    this.brightness = brightness;
+    settings.configMap.openRgb!.state = {
+      mode: this.mode,
       brightness,
-      color: OpenRgbService.color
+      color: this.color
     };
     refreshTrayMenu(await generateTrayMenuDef());
     mainWindow?.webContents.send('refreshBrightness', brightness);
   }
 
-  public static async setColor(color: string): Promise<void> {
-    BackendClient.applyEffect(OpenRgbService.mode, OpenRgbService.brightness, color);
+  public async setColor(color: string): Promise<void> {
+    openRgbClient.applyEffect(this.mode, this.brightness, color);
 
-    OpenRgbService.color = color;
-    Settings.configMap.openRgb!.state = {
-      mode: OpenRgbService.mode,
-      brightness: OpenRgbService.brightness,
+    this.color = color;
+    settings.configMap.openRgb!.state = {
+      mode: this.mode,
+      brightness: this.brightness,
       color
     };
     refreshTrayMenu(await generateTrayMenuDef());
   }
 
-  public static getAvailableModes(): Array<string> {
-    return BackendClient.availableModes;
+  public getAvailableModes(): Array<string> {
+    return openRgbClient.availableModes;
   }
 
-  public static getBrightness(): AuraBrightness {
-    return OpenRgbService.brightness;
+  public getBrightness(): AuraBrightness {
+    return this.brightness;
   }
 
-  public static getMode(): string {
-    return OpenRgbService.mode;
+  public getMode(): string {
+    return this.mode;
   }
 
-  public static getColor(): string {
-    return OpenRgbService.color;
+  public getColor(): string {
+    return this.color;
   }
 
-  public static getNextMode(): string {
-    return BackendClient.availableModes[
-      (BackendClient.availableModes.indexOf(OpenRgbService.mode) + 1) %
-        BackendClient.availableModes.length
+  public getNextMode(): string {
+    return openRgbClient.availableModes[
+      (openRgbClient.availableModes.indexOf(this.mode) + 1) % openRgbClient.availableModes.length
     ];
   }
 }
+
+export const openRgbService = new OpenRgbService();

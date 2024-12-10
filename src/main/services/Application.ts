@@ -6,138 +6,136 @@ import path from 'path';
 
 import icon from '../../../resources/icons/icon.png?asset';
 import { Constants } from '../utils/Constants';
-import { HttpServer } from '../utils/HttpServer';
-import { Settings } from '../utils/Settings';
+import { httpServer } from '../utils/HttpServer';
+import { settings } from '../utils/Settings';
 
-export class ApplicationService {
-  private static logger = LoggerMain.for('ApplicationService');
-  private static appScriptsPath: string = path.join(FileHelper.APP_DIR, 'scripts');
-  private static appIconPath: File = new File({
+class ApplicationService {
+  private logger = LoggerMain.for('ApplicationService');
+  private appScriptsPath: string = path.join(FileHelper.APP_DIR, 'scripts');
+  private appIconPath: File = new File({
     file: path.join(FileHelper.APP_DIR, 'icons', `${app.getName()}.png`)
   });
-  private static autoStartFile = path.join(
+  private autoStartFile = path.join(
     process.env.HOME || '',
     '.config',
     'autostart',
     `${app.name}.AppImage.desktop`
   );
-  private static initialized = false;
-  public static fromReload = false;
-  private static appImagePath = process.env.APPIMAGE;
+  private initialized = false;
+  public fromReload = false;
+  private appImagePath = process.env.APPIMAGE;
 
-  public static initialize(): void {
-    if (!ApplicationService.initialized) {
-      ApplicationService.fromReload = Settings.configMap.reload || false;
-      Settings.configMap.reload = false;
-      if (ApplicationService.allowsAutoStart()) {
+  public initialize(): void {
+    if (!this.initialized) {
+      this.fromReload = settings.configMap.reload || false;
+      settings.configMap.reload = false;
+      if (this.allowsAutoStart()) {
         try {
-          ApplicationService.logger.info('AppImage path: ', ApplicationService.appImagePath);
-          if (ApplicationService.checkAutoStart()) {
-            ApplicationService.logger.info('Refreshing autostart file');
+          this.logger.info('AppImage path: ', this.appImagePath);
+          if (this.checkAutoStart()) {
+            this.logger.info('Refreshing autostart file');
             LoggerMain.addTab();
-            ApplicationService.setAutoStart(false);
-            ApplicationService.setAutoStart(true);
+            this.setAutoStart(false);
+            this.setAutoStart(true);
             LoggerMain.removeTab();
-            ApplicationService.logger.info('File refreshed');
+            this.logger.info('File refreshed');
           }
         } catch (error) {
-          ApplicationService.logger.error('Error getting AppImage path', error);
+          this.logger.error('Error getting AppImage path', error);
         }
       } else {
-        ApplicationService.logger.debug('Not getting AppImage path due to development mode');
+        this.logger.debug('Not getting AppImage path due to development mode');
       }
 
-      if (!ApplicationService.appIconPath.exists()) {
-        ApplicationService.appIconPath.getParentFile().mkdir(true);
-        new File({ file: icon }).copy(ApplicationService.appIconPath);
-        ApplicationService.logger.debug('Icon path: ', ApplicationService.appImagePath);
+      if (!this.appIconPath.exists()) {
+        this.appIconPath.getParentFile().mkdir(true);
+        new File({ file: icon }).copy(this.appIconPath);
+        this.logger.debug('Icon path: ', this.appImagePath);
       }
 
-      const scriptsFolder = new File({ file: ApplicationService.appScriptsPath });
+      const scriptsFolder = new File({ file: this.appScriptsPath });
       if (!scriptsFolder.exists()) {
         scriptsFolder.mkdir(true);
       }
       const nextProfileFile = new File({
-        file: path.join(ApplicationService.appScriptsPath, 'nextProfile.sh')
+        file: path.join(this.appScriptsPath, 'nextProfile.sh')
       });
       FileHelper.write(
         nextProfileFile.getAbsolutePath(),
         `#!/bin/bash
-curl http://localhost:${Constants.httpPort}/nextProfile?token=${HttpServer.token}
+curl http://localhost:${Constants.httpPort}/nextProfile?token=${httpServer.token}
 `
       );
       const nextAnimation = new File({
-        file: path.join(ApplicationService.appScriptsPath, 'nextAnimation.sh')
+        file: path.join(this.appScriptsPath, 'nextAnimation.sh')
       });
       FileHelper.write(
         nextAnimation.getAbsolutePath(),
         `#!/bin/bash
-curl http://localhost:${Constants.httpPort}/nextLedMode?token=${HttpServer.token}
+curl http://localhost:${Constants.httpPort}/nextLedMode?token=${httpServer.token}
 `
       );
       const incBrightness = new File({
-        file: path.join(ApplicationService.appScriptsPath, 'incBrightness.sh')
+        file: path.join(this.appScriptsPath, 'incBrightness.sh')
       });
       FileHelper.write(
         incBrightness.getAbsolutePath(),
         `#!/bin/bash
-curl http://localhost:${Constants.httpPort}/increaseBrightness?token=${HttpServer.token}
+curl http://localhost:${Constants.httpPort}/increaseBrightness?token=${httpServer.token}
 `
       );
       const decBrightness = new File({
-        file: path.join(ApplicationService.appScriptsPath, 'decBrightness.sh')
+        file: path.join(this.appScriptsPath, 'decBrightness.sh')
       });
       FileHelper.write(
         decBrightness.getAbsolutePath(),
         `#!/bin/bash
-curl http://localhost:${Constants.httpPort}/decreaseBrightness?token=${HttpServer.token}
+curl http://localhost:${Constants.httpPort}/decreaseBrightness?token=${httpServer.token}
 `
       );
       execSync(`chmod 777 ${path.join(scriptsFolder.getAbsolutePath(), '*')}`);
     }
-    ApplicationService.initialized = true;
+    this.initialized = true;
   }
 
-  public static allowsAutoStart(): boolean {
+  public allowsAutoStart(): boolean {
     return process.env.NODE_ENV != 'development' && process.env.APPIMAGE != undefined;
   }
 
-  public static checkAutoStart(): boolean {
-    return fs.existsSync(ApplicationService.autoStartFile);
+  public checkAutoStart(): boolean {
+    return fs.existsSync(this.autoStartFile);
   }
 
-  public static setAutoStart(enabled: boolean): void {
+  public setAutoStart(enabled: boolean): void {
     if (enabled) {
-      ApplicationService.logger.info('Creating autostart file');
+      this.logger.info('Creating autostart file');
       const desktopEntryContent = `[Desktop Entry]
-Exec=${ApplicationService.appImagePath}
-Icon=${ApplicationService.appIconPath}
+Exec=${this.appImagePath}
+Icon=${this.appIconPath}
 Name=${app.name}
 Path=
 Terminal=False
 Type=Application
 `;
 
-      const dirPath = path.dirname(ApplicationService.autoStartFile);
+      const dirPath = path.dirname(this.autoStartFile);
       if (!fs.existsSync(dirPath)) {
         fs.mkdirSync(dirPath, { recursive: true });
       }
-      fs.writeFileSync(ApplicationService.autoStartFile, desktopEntryContent, 'utf8');
-      ApplicationService.logger.info(
-        `Autostart file '${ApplicationService.autoStartFile}' written succesfully`
-      );
+      fs.writeFileSync(this.autoStartFile, desktopEntryContent, 'utf8');
+      this.logger.info(`Autostart file '${this.autoStartFile}' written succesfully`);
     } else {
-      ApplicationService.logger.info('Deleting autostart file');
-      fs.unlinkSync(ApplicationService.autoStartFile);
-      ApplicationService.logger.info('Autostart file deleted succesfully');
+      this.logger.info('Deleting autostart file');
+      fs.unlinkSync(this.autoStartFile);
+      this.logger.info('Autostart file deleted succesfully');
     }
   }
 
-  public static restart(): void {
-    if (ApplicationService.appImagePath) {
-      Settings.configMap.reload = true;
+  public restart(): void {
+    if (this.appImagePath) {
+      settings.configMap.reload = true;
 
-      const newAppInstance = spawn(ApplicationService.appImagePath, [], {
+      const newAppInstance = spawn(this.appImagePath, [], {
         detached: true,
         stdio: 'ignore'
       });
@@ -147,3 +145,5 @@ Type=Application
     }
   }
 }
+
+export const applicationService = new ApplicationService();

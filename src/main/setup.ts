@@ -19,9 +19,9 @@ import path from 'path';
 
 import { createWindow, mainWindow } from '.';
 import icon512 from '../../resources/icons/icon-512x512.png?asset';
-import { ApplicationService } from './services/Application';
-import { OpenRgbService } from './services/OpenRgb';
-import { PlatformService } from './services/Platform';
+import { applicationService } from './services/Application';
+import { openRgbService } from './services/OpenRgb';
+import { platformService } from './services/Platform';
 
 export const appConfig: AppConfig = {
   singleInstance: true,
@@ -115,7 +115,7 @@ export const setTrayMenuRefreshFn = (
   refreshTrayMenu = fn;
 };
 const getBrightnessOption: () => Promise<Array<Electron.MenuItemConstructorOptions>> = async () => {
-  const current = OpenRgbService.getBrightness();
+  const current = openRgbService.getBrightness();
   const brightnessOptions: Array<Electron.MenuItemConstructorOptions> = [];
   for (const [key, value] of Object.entries(AuraBrightness)) {
     if (isNaN(Number(String(key)))) {
@@ -133,13 +133,13 @@ const getBrightnessOption: () => Promise<Array<Electron.MenuItemConstructorOptio
 };
 
 export const traySetBrightness = async (brightness: AuraBrightness): Promise<void> => {
-  await OpenRgbService.setBrightness(brightness);
+  await openRgbService.setBrightness(brightness);
 };
 
 const getLedModeOptions: () => Promise<Array<Electron.MenuItemConstructorOptions>> = async () => {
-  const current = OpenRgbService.getMode();
+  const current = openRgbService.getMode();
   const ledModeOptions: Array<Electron.MenuItemConstructorOptions> = [];
-  OpenRgbService.getAvailableModes().forEach((value) => {
+  openRgbService.getAvailableModes().forEach((value) => {
     ledModeOptions.push({
       label: value,
       type: 'radio',
@@ -153,11 +153,11 @@ const getLedModeOptions: () => Promise<Array<Electron.MenuItemConstructorOptions
 };
 
 export const traySetLedMode = async (mode: string): Promise<void> => {
-  await OpenRgbService.setMode(mode);
+  await openRgbService.setMode(mode);
 };
 
 const getThrottleOptions: () => Promise<Array<Electron.MenuItemConstructorOptions>> = async () => {
-  const current = await PlatformService.getThrottleThermalPolicy();
+  const current = await platformService.getThrottleThermalPolicy();
   const throttleOptions: Array<Electron.MenuItemConstructorOptions> = [];
   for (const [key, value] of Object.entries(ThrottleThermalPolicy)) {
     if (isNaN(Number(String(key)))) {
@@ -175,11 +175,11 @@ const getThrottleOptions: () => Promise<Array<Electron.MenuItemConstructorOption
 };
 
 export const traySetThrottle = async (policy: ThrottleThermalPolicy): Promise<void> => {
-  await PlatformService.setThrottleThermalPolicy(policy);
+  await platformService.setThrottleThermalPolicy(policy);
 };
 
 const getThresoldOptions: () => Promise<Array<Electron.MenuItemConstructorOptions>> = async () => {
-  const current = PlatformService.getChargeThreshold();
+  const current = platformService.getChargeThreshold();
   const thresholdOptions: Array<Electron.MenuItemConstructorOptions> = [];
   for (const [key, value] of Object.entries(ChargeThreshold)) {
     if (isNaN(Number(String(key)))) {
@@ -197,7 +197,7 @@ const getThresoldOptions: () => Promise<Array<Electron.MenuItemConstructorOption
 };
 
 const traySetBatteryThresold = async (threshold: number): Promise<void> => {
-  await PlatformService.setChargeThreshold(threshold);
+  await platformService.setChargeThreshold(threshold);
 };
 
 export const generateTrayMenuDef = async (): Promise<
@@ -270,85 +270,85 @@ export const ipcListeners: Record<string, IpcListener> = {
   getChargeThreshold: {
     sync: true,
     fn() {
-      return PlatformService.getChargeThreshold();
+      return platformService.getChargeThreshold();
     }
   },
   setChargeThreshold: {
     sync: true,
     async fn(_, threshold: number) {
-      await PlatformService.setChargeThreshold(threshold);
+      await platformService.setChargeThreshold(threshold);
     }
   },
   getAvailableModes: {
     sync: true,
     fn() {
-      return OpenRgbService.getAvailableModes();
+      return openRgbService.getAvailableModes();
     }
   },
   getLedMode: {
     sync: true,
     async fn() {
-      return OpenRgbService.getMode();
+      return openRgbService.getMode();
     }
   },
   setLedMode: {
     sync: true,
     async fn(_, mode: string) {
-      await OpenRgbService.setMode(mode);
+      await openRgbService.setMode(mode);
     }
   },
   getBrightness: {
     sync: true,
     async fn() {
-      return OpenRgbService.getBrightness();
+      return openRgbService.getBrightness();
     }
   },
   setBrightness: {
     sync: true,
     async fn(_, brightness: AuraBrightness) {
-      await OpenRgbService.setBrightness(brightness);
+      await openRgbService.setBrightness(brightness);
     }
   },
   getThrottleThermalPolicy: {
     sync: true,
     async fn() {
-      return await PlatformService.getThrottleThermalPolicy();
+      return await platformService.getThrottleThermalPolicy();
     }
   },
   setThrottleThermalPolicy: {
     sync: true,
     async fn(_, policy: ThrottleThermalPolicy) {
-      await PlatformService.setThrottleThermalPolicy(policy);
+      await platformService.setThrottleThermalPolicy(policy);
     }
   },
   allowsAutoStart: {
     sync: true,
     fn() {
-      return ApplicationService.allowsAutoStart();
+      return applicationService.allowsAutoStart();
     }
   },
   checkAutostart: {
     sync: true,
     fn() {
-      return ApplicationService.checkAutoStart();
+      return applicationService.checkAutoStart();
     }
   },
   setAutoStart: {
     sync: true,
     fn(_, enabled: boolean) {
-      return ApplicationService.setAutoStart(enabled);
+      return applicationService.setAutoStart(enabled);
     }
   },
   getColor: {
     sync: true,
     fn() {
-      return OpenRgbService.getColor();
+      return openRgbService.getColor();
     }
   },
   setColor: {
     sync: true,
     async fn(_, color) {
-      return await OpenRgbService.setColor(color);
+      return await openRgbService.setColor(color);
     }
   }
 };

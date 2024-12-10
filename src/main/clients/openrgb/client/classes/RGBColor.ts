@@ -33,6 +33,10 @@ export class RGBColor {
     this._blue = Math.floor(isNaN(+value) ? 0 : +value > 255 ? 255 : +value);
   }
 
+  public isOff(): boolean {
+    return Math.floor(this.red) == 0 && Math.floor(this.green) == 0 && Math.floor(this.blue) == 0;
+  }
+
   /**
    * Converts HSL values to an RGBColor object
    * @param {number} h Hue value [0, 359]

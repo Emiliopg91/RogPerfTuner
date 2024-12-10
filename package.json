@@ -1,6 +1,6 @@
 {
   "name": "RogControlCenter",
-  "version": "1.4.0",
+  "version": "1.5.0",
   "description": "An utility to manage Asus Rog laptop performance",
   "main": "./out/main/index.js",
   "author": {
@@ -33,7 +33,6 @@
     "bufferpack": "0.0.6",
     "bufferutil": "^4.0.8",
     "dbus-next": "^0.10.2",
-    "electron-updater": "^6.3.9",
     "follow-redirects": "^1.15.9",
     "lodash": "^4.17.21",
     "primereact": "^10.8.4",
