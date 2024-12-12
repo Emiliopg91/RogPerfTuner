@@ -28,6 +28,7 @@
     "@tser-framework/main": "^2.0.189",
     "@tser-framework/renderer": "2.0.48",
     "adm-zip": "^0.5.16",
+    "assert-plus": "^1.0.0",
     "async-mutex": "^0.5.0",
     "bootstrap": "^5.3.3",
     "bufferpack": "0.0.6",
