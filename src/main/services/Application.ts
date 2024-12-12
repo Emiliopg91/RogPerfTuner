@@ -1,13 +1,15 @@
-import { File, FileHelper, LoggerMain } from '@tser-framework/main';
 import { execSync, spawn } from 'child_process';
 import { app } from 'electron/main';
 import fs from 'fs';
 import path from 'path';
 
-import icon from '../../../resources/icons/icon.png?asset';
-import { Constants } from '../utils/Constants';
-import { httpServer } from '../utils/HttpServer';
-import { settings } from '../utils/Settings';
+import { File, FileHelper, LoggerMain } from '@tser-framework/main';
+
+import { Constants } from '@main/utils/Constants';
+import { httpServer } from '@main/utils/HttpServer';
+import { settings } from '@main/utils/Settings';
+
+import icon from '@resources/icons/icon.png?asset';
 
 class ApplicationService {
   private logger = LoggerMain.for('ApplicationService');

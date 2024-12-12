@@ -1,9 +1,9 @@
 import { Mutex } from 'async-mutex';
 
-import Device from '../client/classes/Device';
-import { RGBColor } from '../client/classes/RGBColor';
-import Client from '../client/client';
-import { AbstractEffect } from './base/AbstractEffect';
+import Device from '@main/clients/openrgb/client/classes/Device';
+import { RGBColor } from '@main/clients/openrgb/client/classes/RGBColor';
+import Client from '@main/clients/openrgb/client/client';
+import { AbstractEffect } from '@main/clients/openrgb/effects/base/AbstractEffect';
 
 class StarryNight extends AbstractEffect {
   private mutex: Mutex = new Mutex();
@@ -15,6 +15,8 @@ class StarryNight extends AbstractEffect {
     return RGBColor.fromHSV(Math.floor(Math.random() * 360), 1, this.brightness);
   }
 
+  private maxSteps = 30;
+
   protected async applyEffect(client: Client, devices: Array<Device>): Promise<void> {
     const promises: Array<Promise<void>> = [];
     for (let i = 0; i < devices.length; i++) {
@@ -24,29 +26,28 @@ class StarryNight extends AbstractEffect {
             const leds: Array<RGBColor> = Array(devices[i].leds.length).fill(
               RGBColor.fromHex('#000000')
             );
-            const decs: Array<RGBColor> = Array(devices[i].leds.length).fill(
-              RGBColor.fromHex('#000000')
-            );
-            let ledOn = -1;
-            while (this.isRunning) {
-              if (ledOn == -1 || leds[ledOn].isOff()) {
-                ledOn = Math.floor(Math.random() * leds.length);
-                leds[ledOn] = this.getRandom();
-                decs[ledOn].red = Math.ceil(leds[ledOn].red / 29);
-                decs[ledOn].green = Math.ceil(leds[ledOn].green / 29);
-                decs[ledOn].blue = Math.ceil(leds[ledOn].blue / 29);
-              } else {
-                leds.forEach((led, j) => {
-                  if (led.red != 0 || led.green != 0 || led.blue != 0) {
-                    led.red = Math.max(0, Math.floor(led.red - decs[j].red));
-                    led.green = Math.max(0, Math.floor(led.green - decs[j].green));
-                    led.blue = Math.max(0, Math.floor(led.blue - decs[j].blue));
-                  }
-                });
+            const steps: Array<number> = Array(devices[i].leds.length).fill(0);
+            for (let iter = 0; this.isRunning; iter = (iter + 1) % this.maxSteps) {
+              const newColors = Array(devices[i].leds.length);
+
+              for (let j = 0; j < leds.length; j++) {
+                steps[j] = Math.max(0, steps[j] - 1);
+                newColors[j] = leds[j].getDimmed(steps[j] / this.maxSteps);
               }
-              this.setLeds(client, i, leds);
+
+              const canTurnOn = steps.filter((i) => i > 0).length / steps.length < 0.1;
+              if (iter == 0 || canTurnOn) {
+                let ledOn = -1;
+                do {
+                  ledOn = Math.floor(Math.random() * leds.length);
+                } while (steps[ledOn] > 0);
+                newColors[ledOn] = leds[ledOn] = this.getRandom();
+                steps[ledOn] = 15 + Math.floor(Math.random() * 15);
+              }
+
+              this.setLeds(client, i, newColors);
               await new Promise<void>((resolve) => {
-                setTimeout(resolve, 10 + Math.random() * 50);
+                setTimeout(resolve, Math.random() * 150);
               });
             }
             resolve();

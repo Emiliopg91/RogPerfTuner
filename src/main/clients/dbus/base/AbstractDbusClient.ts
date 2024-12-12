@@ -1,8 +1,9 @@
 /* eslint-disable no-unsafe-optional-chaining */
-import { LoggerMain } from '@tser-framework/main';
 import { Mutex } from 'async-mutex';
 import { ClientInterface, ProxyObject, Variant, sessionBus, systemBus } from 'dbus-next';
 import EventEmitter from 'events';
+
+import { LoggerMain } from '@tser-framework/main';
 
 export abstract class AbstractDbusClient extends EventEmitter {
   private static mutex: Mutex = new Mutex();

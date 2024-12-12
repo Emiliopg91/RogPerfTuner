@@ -5,7 +5,12 @@ semi: true
 printWidth: 100
 trailingComma: none
 importOrder:
-  - '^components/(.*)$'
+  - '^[^@]'
+  - '^@(?!commons|main|renderer|resources)(.*)$'
+  - '^@commons/(.*)$'
+  - '^@main/(.*)$'
+  - '^@renderer/(.*)$'
+  - '^@resources/(.*)$'
   - '^[./]'
 importOrderSeparation: true
 importOrderSortSpecifiers: true

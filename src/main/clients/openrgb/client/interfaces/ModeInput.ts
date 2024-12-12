@@ -1,4 +1,4 @@
-import { RGBColor } from '../classes/RGBColor';
+import { RGBColor } from '@main/clients/openrgb/client/classes/RGBColor';
 
 export interface ModeInput {
   id?: number;

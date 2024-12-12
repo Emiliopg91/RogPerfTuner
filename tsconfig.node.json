@@ -9,12 +9,14 @@
     "baseUrl": ".",
     "paths": {
       "@main/*": [
-        "src/main/src/*"
+        "src/main/*"
       ],
       "@commons/*": [
         "src/commons/src/*"
+      ],
+      "@resources/*": [
+        "resources/*"
       ]
     }
   }
 }
- 

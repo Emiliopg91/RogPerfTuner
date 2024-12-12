@@ -1,8 +1,9 @@
-import react from '@vitejs/plugin-react';
 import { defineConfig, swcPlugin } from 'electron-vite';
 import fs from 'fs';
 import path, { resolve } from 'path';
 import sass from 'sass-embedded';
+
+import react from '@vitejs/plugin-react';
 
 function findFile(fileName: string, dir: string): Array<string> {
   const result: Array<string> = [];
@@ -29,8 +30,9 @@ export default defineConfig({
     plugins: [swcPlugin()],
     resolve: {
       alias: {
-        '@main': resolve('src/main/src'),
-        '@commons': resolve('src/commons/src')
+        '@main': resolve('src/main'),
+        '@commons': resolve('src/commons/src'),
+        '@resources': resolve('resources')
       }
     }
   },
@@ -39,8 +41,9 @@ export default defineConfig({
     plugins: [],
     resolve: {
       alias: {
-        '@main': resolve('src/main/src'),
-        '@commons': resolve('src/commons/src')
+        '@main': resolve('src/main'),
+        '@commons': resolve('src/commons/src'),
+        '@resources': resolve('resources')
       }
     }
   },

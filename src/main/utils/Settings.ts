@@ -1,7 +1,8 @@
-import { SettingsType } from '@commons/models/Settings';
 import { ConfigurationHelper } from '@tser-framework/main';
 
-import { dialogs } from './Dialogs';
+import { SettingsType } from '@commons/models/Settings';
+
+import { dialogs } from '@main/utils/Dialogs';
 
 class Settings {
   public password: string | undefined = '';

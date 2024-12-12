@@ -37,6 +37,10 @@ export class RGBColor {
     return Math.floor(this.red) == 0 && Math.floor(this.green) == 0 && Math.floor(this.blue) == 0;
   }
 
+  public getDimmed(factor: number): RGBColor {
+    return new RGBColor(this._red * factor, this._green * factor, this._blue * factor);
+  }
+
   /**
    * Converts HSL values to an RGBColor object
    * @param {number} h Hue value [0, 359]

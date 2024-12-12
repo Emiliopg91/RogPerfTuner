@@ -1,7 +1,7 @@
-import Device from '../client/classes/Device';
-import { RGBColor } from '../client/classes/RGBColor';
-import Client from '../client/client';
-import { AbstractEffect } from './base/AbstractEffect';
+import Device from '@main/clients/openrgb/client/classes/Device';
+import { RGBColor } from '@main/clients/openrgb/client/classes/RGBColor';
+import Client from '@main/clients/openrgb/client/client';
+import { AbstractEffect } from '@main/clients/openrgb/effects/base/AbstractEffect';
 
 class DanceFloor extends AbstractEffect {
   public getName(): string {

@@ -1,19 +1,21 @@
-import { ConfigurationHelper, TranslatorMain, TrayBuilder } from '@tser-framework/main';
 import { Menu, app } from 'electron/main';
 
-import icon45 from '../../resources/icons/icon-45x45.png?asset';
-import translations from '../../resources/translations.i18n.json';
-import { asusFanCurvesClient } from './clients/dbus/AsusFanCurvesClient';
-import { asusPlatformClient } from './clients/dbus/AsusPlatformClient';
-import { powerProfilesClient } from './clients/dbus/PowerProfilesClient';
-import { uPowerClient } from './clients/dbus/UPowerClient';
-import { openRgbClient } from './clients/openrgb/OpenRgbClient';
-import { applicationService } from './services/Application';
-import { openRgbService } from './services/OpenRgb';
-import { platformService } from './services/Platform';
-import { generateTrayMenuDef, setTrayMenuRefreshFn } from './setup';
-import { httpServer } from './utils/HttpServer';
-import { settings } from './utils/Settings';
+import { ConfigurationHelper, TranslatorMain, TrayBuilder } from '@tser-framework/main';
+
+import { asusFanCurvesClient } from '@main/clients/dbus/AsusFanCurvesClient';
+import { asusPlatformClient } from '@main/clients/dbus/AsusPlatformClient';
+import { powerProfilesClient } from '@main/clients/dbus/PowerProfilesClient';
+import { uPowerClient } from '@main/clients/dbus/UPowerClient';
+import { openRgbClient } from '@main/clients/openrgb/OpenRgbClient';
+import { applicationService } from '@main/services/Application';
+import { openRgbService } from '@main/services/OpenRgb';
+import { platformService } from '@main/services/Platform';
+import { generateTrayMenuDef, setTrayMenuRefreshFn } from '@main/setup';
+import { httpServer } from '@main/utils/HttpServer';
+import { settings } from '@main/utils/Settings';
+
+import icon45 from '@resources/icons/icon-45x45.png?asset';
+import translations from '@resources/translations.i18n.json';
 
 export async function initializeBeforeReady(): Promise<void> {
   app.disableHardwareAcceleration();

@@ -1,7 +1,7 @@
-import { Reader } from '../utils/Reader';
-import { Mode } from './Mode';
-import { RGBColor } from './RGBColor';
-import { Zone } from './Zone';
+import { Mode } from '@main/clients/openrgb/client/classes/Mode';
+import { RGBColor } from '@main/clients/openrgb/client/classes/RGBColor';
+import { Zone } from '@main/clients/openrgb/client/classes/Zone';
+import { Reader } from '@main/clients/openrgb/client/utils/Reader';
 
 export default class Device {
   deviceId: number;

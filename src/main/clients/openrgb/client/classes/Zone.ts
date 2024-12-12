@@ -1,5 +1,5 @@
-import { Matrix } from './Matrix';
-import { Segment } from './Segment';
+import { Matrix } from '@main/clients/openrgb/client/classes/Matrix';
+import { Segment } from '@main/clients/openrgb/client/classes/Segment';
 
 export class Zone {
   private _name: string;

@@ -17,6 +17,9 @@
       ],
       "@commons/*": [
         "src/commons/src/*"
+      ],
+      "@resources/*": [
+        "resources/*"
       ]
     }
   }

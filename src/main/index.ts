@@ -1,12 +1,13 @@
-import { electronApp, is } from '@electron-toolkit/utils';
-import { JsonUtils } from '@tser-framework/commons';
-import { LoggerMain, TranslatorMain, WindowHelper } from '@tser-framework/main';
 import { BrowserWindow, IpcMainInvokeEvent, Menu, app, ipcMain, protocol } from 'electron';
 import path from 'path';
 
-import { applicationLogic } from './applicationLogic';
-import { initializeBeforeReady, initializeWhenReady, stop } from './lifecycle';
-import { notificationService } from './services/NotificationService';
+import { electronApp, is } from '@electron-toolkit/utils';
+import { JsonUtils } from '@tser-framework/commons';
+import { LoggerMain, TranslatorMain, WindowHelper } from '@tser-framework/main';
+
+import { applicationLogic } from '@main/applicationLogic';
+import { initializeBeforeReady, initializeWhenReady } from '@main/lifecycle';
+import { notificationService } from '@main/services/NotificationService';
 import {
   appConfig,
   deepLinkBindings,
@@ -14,7 +15,7 @@ import {
   menuTemplate,
   protocolBindings,
   windowConfig
-} from './setup';
+} from '@main/setup';
 
 process.env.ELECTRON_ENABLE_WAYLAND = '1';
 
@@ -24,6 +25,7 @@ const initTime = Date.now();
 (async (): Promise<void> => {
   await LoggerMain.initialize();
   const logger = LoggerMain.for('main/index.ts');
+  logger.info(`Powered by Electron ${process.versions.electron}`);
   logger.info(`Starting from '${app.getPath('exe')}'`);
   logger.system('##################################################');
   logger.system('#                  Started main                  #');

@@ -1,22 +1,24 @@
+import { execSync } from 'child_process';
+import * as fs from 'fs';
+
+import { LoggerMain, TranslatorMain } from '@tser-framework/main';
+
 import {
   BoostControl,
   PlatformModels,
   PowerProfile,
   ThrottleThermalPolicy
 } from '@commons/models/Platform';
-import { LoggerMain, TranslatorMain } from '@tser-framework/main';
-import { execSync } from 'child_process';
-import * as fs from 'fs';
 
-import { mainWindow } from '..';
-import { asusFanCurvesClient } from '../clients/dbus/AsusFanCurvesClient';
-import { asusPlatformClient } from '../clients/dbus/AsusPlatformClient';
-import { powerProfilesClient } from '../clients/dbus/PowerProfilesClient';
-import { uPowerClient } from '../clients/dbus/UPowerClient';
-import { generateTrayMenuDef, refreshTrayMenu } from '../setup';
-import { settings } from '../utils/Settings';
-import { applicationService } from './Application';
-import { notificationService } from './NotificationService';
+import { asusFanCurvesClient } from '@main/clients/dbus/AsusFanCurvesClient';
+import { asusPlatformClient } from '@main/clients/dbus/AsusPlatformClient';
+import { powerProfilesClient } from '@main/clients/dbus/PowerProfilesClient';
+import { uPowerClient } from '@main/clients/dbus/UPowerClient';
+import { mainWindow } from '@main/index';
+import { applicationService } from '@main/services/Application';
+import { notificationService } from '@main/services/NotificationService';
+import { generateTrayMenuDef, refreshTrayMenu } from '@main/setup';
+import { settings } from '@main/utils/Settings';
 
 class PlatformService {
   private logger = LoggerMain.for('PlatformService');

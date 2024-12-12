@@ -1,6 +1,6 @@
-import { AuraBrightness } from '@commons/models/Aura';
-import { ChargeThreshold } from '@commons/models/Battery';
-import { ThrottleThermalPolicy } from '@commons/models/Platform';
+import { BrowserWindow, MenuItemConstructorOptions, app } from 'electron';
+import path from 'path';
+
 import { is } from '@electron-toolkit/utils';
 import {
   AppConfig,
@@ -14,14 +14,17 @@ import {
   defaultIpcListeners,
   defaultProtocolBindings
 } from '@tser-framework/main';
-import { BrowserWindow, MenuItemConstructorOptions, app } from 'electron';
-import path from 'path';
 
-import { createWindow, mainWindow } from '.';
-import icon512 from '../../resources/icons/icon-512x512.png?asset';
-import { applicationService } from './services/Application';
-import { openRgbService } from './services/OpenRgb';
-import { platformService } from './services/Platform';
+import { AuraBrightness } from '@commons/models/Aura';
+import { ChargeThreshold } from '@commons/models/Battery';
+import { ThrottleThermalPolicy } from '@commons/models/Platform';
+
+import { createWindow, mainWindow } from '@main/index';
+import { applicationService } from '@main/services/Application';
+import { openRgbService } from '@main/services/OpenRgb';
+import { platformService } from '@main/services/Platform';
+
+import icon512 from '@resources/icons/icon-512x512.png?asset';
 
 export const appConfig: AppConfig = {
   singleInstance: true,

@@ -1,4 +1,4 @@
-import { RGBColor } from './RGBColor';
+import { RGBColor } from '@main/clients/openrgb/client/classes/RGBColor';
 
 export class Mode {
   private _id: number;

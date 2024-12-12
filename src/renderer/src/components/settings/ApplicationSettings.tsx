@@ -1,10 +1,10 @@
-import { TranslatorRenderer } from '@tser-framework/renderer';
+import { SettingsLine } from './commons/SettingLine';
+import { SettingsBlock } from './commons/SettingsBlock';
 import { ChangeEvent, FC, useEffect, useState } from 'react';
 import { Form } from 'react-bootstrap';
 import { FaCog } from 'react-icons/fa';
 
-import { SettingsLine } from './commons/SettingLine';
-import { SettingsBlock } from './commons/SettingsBlock';
+import { TranslatorRenderer } from '@tser-framework/renderer';
 
 export const ApplicationSettings: FC = () => {
   const [allowsAutoStart, setAllowsAutoStart] = useState(true);

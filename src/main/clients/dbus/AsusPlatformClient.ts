@@ -1,8 +1,9 @@
-import { ChargeThreshold } from '@commons/models/Battery';
-import { ThrottleThermalPolicy } from '@commons/models/Platform';
 import { Variant } from 'dbus-next';
 
-import { AbstractDbusClient } from './base/AbstractDbusClient';
+import { ChargeThreshold } from '@commons/models/Battery';
+import { ThrottleThermalPolicy } from '@commons/models/Platform';
+
+import { AbstractDbusClient } from '@main/clients/dbus/base/AbstractDbusClient';
 
 export class AsusPlatformClient extends AbstractDbusClient {
   constructor() {

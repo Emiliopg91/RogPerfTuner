@@ -1,5 +1,6 @@
-import { AuraBrightness } from '@commons/models/Aura';
-import { ThrottleThermalPolicy } from '@commons/models/Platform';
+import { author, name } from '../../package.json';
+import { ipcRenderer } from 'electron';
+
 import {
   DefaulLevel,
   LoggerRequest,
@@ -7,10 +8,11 @@ import {
   RestClientResponse
 } from '@tser-framework/commons';
 import { TranslatorRenderer } from '@tser-framework/renderer';
-import { ipcRenderer } from 'electron';
 
-import { author, name } from '../../package.json';
-import translations from '../../resources/translations.i18n.json';
+import { AuraBrightness } from '@commons/models/Aura';
+import { ThrottleThermalPolicy } from '@commons/models/Platform';
+
+import translations from '@resources/translations.i18n.json';
 
 const localTranslations = TranslatorRenderer.buildTranslations(translations);
 

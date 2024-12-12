@@ -3,13 +3,13 @@ import bufferpack from 'bufferpack';
 import EventEmitter from 'events';
 import { Socket } from 'net';
 
-import Device from './classes/Device';
-import { Mode } from './classes/Mode';
-import { RGBColor } from './classes/RGBColor';
-import { command } from './constants/Command';
-import { ModeInput } from './interfaces/ModeInput';
-import { ResolveObject } from './interfaces/ResolveObject';
-import { Settings } from './interfaces/Settings';
+import Device from '@main/clients/openrgb/client/classes/Device';
+import { Mode } from '@main/clients/openrgb/client/classes/Mode';
+import { RGBColor } from '@main/clients/openrgb/client/classes/RGBColor';
+import { command } from '@main/clients/openrgb/client/constants/Command';
+import { ModeInput } from '@main/clients/openrgb/client/interfaces/ModeInput';
+import { ResolveObject } from '@main/clients/openrgb/client/interfaces/ResolveObject';
+import { Settings } from '@main/clients/openrgb/client/interfaces/Settings';
 
 const HEADER_SIZE = 16;
 const CLIENT_PROTOCOL_VERSION = 4;

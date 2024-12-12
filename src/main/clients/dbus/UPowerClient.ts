@@ -1,4 +1,4 @@
-import { AbstractDbusClient } from './base/AbstractDbusClient';
+import { AbstractDbusClient } from '@main/clients/dbus/base/AbstractDbusClient';
 
 class UPowerClient extends AbstractDbusClient {
   constructor() {

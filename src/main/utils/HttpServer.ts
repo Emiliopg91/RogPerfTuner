@@ -1,15 +1,17 @@
 /* eslint-disable no-case-declarations */
-import { AuraBrightness, AuraModels } from '@commons/models/Aura';
-import { PlatformModels, ThrottleThermalPolicy } from '@commons/models/Platform';
-import { LoggerMain } from '@tser-framework/main';
 import { createServer } from 'http';
 import { parse } from 'url';
 import { v4 as uuidv4 } from 'uuid';
 
-import { openRgbService } from '../services/OpenRgb';
-import { platformService } from '../services/Platform';
-import { traySetBrightness, traySetLedMode, traySetThrottle } from '../setup';
-import { Constants } from './Constants';
+import { LoggerMain } from '@tser-framework/main';
+
+import { AuraBrightness, AuraModels } from '@commons/models/Aura';
+import { PlatformModels, ThrottleThermalPolicy } from '@commons/models/Platform';
+
+import { openRgbService } from '@main/services/OpenRgb';
+import { platformService } from '@main/services/Platform';
+import { traySetBrightness, traySetLedMode, traySetThrottle } from '@main/setup';
+import { Constants } from '@main/utils/Constants';
 
 class HttpServer {
   private logger = LoggerMain.for('HttpServer');

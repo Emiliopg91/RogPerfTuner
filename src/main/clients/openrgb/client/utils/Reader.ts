@@ -1,8 +1,8 @@
-import { Matrix } from '../classes/Matrix';
-import { Mode } from '../classes/Mode';
-import { RGBColor } from '../classes/RGBColor';
-import { Segment } from '../classes/Segment';
-import { Zone } from '../classes/Zone';
+import { Matrix } from '@main/clients/openrgb/client/classes/Matrix';
+import { Mode } from '@main/clients/openrgb/client/classes/Mode';
+import { RGBColor } from '@main/clients/openrgb/client/classes/RGBColor';
+import { Segment } from '@main/clients/openrgb/client/classes/Segment';
+import { Zone } from '@main/clients/openrgb/client/classes/Zone';
 
 export class Reader {
   public static readModes(

@@ -1,7 +1,6 @@
+import './styles.scss';
 import { FC, ReactNode } from 'react';
 import { Container } from 'react-bootstrap';
-
-import './styles.scss';
 
 interface SettingsBlockProps {
   icon: ReactNode;

@@ -1,12 +1,14 @@
-import { AuraBrightness } from '@commons/models/Aura';
-import { LoggerMain } from '@tser-framework/main';
 import { execSync } from 'child_process';
 import { debounce } from 'lodash';
 
-import { mainWindow } from '..';
-import { openRgbClient } from '../clients/openrgb/OpenRgbClient';
-import { generateTrayMenuDef, refreshTrayMenu } from '../setup';
-import { settings } from '../utils/Settings';
+import { LoggerMain } from '@tser-framework/main';
+
+import { AuraBrightness } from '@commons/models/Aura';
+
+import { openRgbClient } from '@main/clients/openrgb/OpenRgbClient';
+import { mainWindow } from '@main/index';
+import { generateTrayMenuDef, refreshTrayMenu } from '@main/setup';
+import { settings } from '@main/utils/Settings';
 
 class OpenRgbService {
   private logger = LoggerMain.for('OpenRgbService');
@@ -14,14 +16,16 @@ class OpenRgbService {
   private brightness: AuraBrightness = AuraBrightness.OFF;
   private color: string = '#FF0000';
   private initialized = false;
-  private lastConnectedUsbs = -1;
+  private connectedUsb: Array<string> | undefined = undefined;
 
   private bouncedReload = async (): Promise<void> => {
-    this.logger.info('New USB Device connected, restarting...');
+    const t0 = Date.now();
+    this.logger.info('Reloading OpenRGB server');
     LoggerMain.addTab();
     await openRgbClient.restart();
     await this.setMode(this.mode);
     LoggerMain.removeTab();
+    this.logger.info(`Reloaded after ${(Date.now() - t0) / 1000} seconds`);
   };
   private debouncedReload = debounce(this.bouncedReload, 1000);
 
@@ -45,12 +49,39 @@ class OpenRgbService {
       this.setMode(this.mode);
       LoggerMain.removeTab();
       setInterval(() => {
-        const count = Number(execSync('lsusb | wc -l').toString().trim());
-        if (this.lastConnectedUsbs >= 0 && count > this.lastConnectedUsbs) {
-          this.debouncedReload();
+        const currentUsb = execSync('lsusb')
+          .toString()
+          .trim()
+          .split('\n')
+          .map((line) => {
+            const columns = line.trim().split(' ');
+            return columns.slice(6).join(' ');
+          });
+
+        if (this.connectedUsb) {
+          const added = currentUsb.filter((item) => !this.connectedUsb?.includes(item));
+          const removed = this.connectedUsb.filter((item) => !currentUsb?.includes(item));
+
+          if (removed.length > 0) {
+            this.logger.info('Removed USB devices:');
+            LoggerMain.addTab();
+            removed.forEach((item) => this.logger.info(item));
+            LoggerMain.removeTab();
+          }
+
+          if (added.length > 0) {
+            this.logger.info('Connected USB devices:');
+            LoggerMain.addTab();
+            added.forEach((item) => this.logger.info(item));
+            LoggerMain.removeTab();
+
+            LoggerMain.addTab();
+            this.debouncedReload();
+            LoggerMain.removeTab();
+          }
         }
-        this.lastConnectedUsbs = count;
-      }, 500);
+        this.connectedUsb = currentUsb;
+      }, 200);
     }
   }
 

@@ -1,6 +1,5 @@
-import { contextBridge } from 'electron';
-
 import { exposed } from './expose';
+import { contextBridge } from 'electron';
 
 try {
   Object.keys(exposed).forEach((id) => {

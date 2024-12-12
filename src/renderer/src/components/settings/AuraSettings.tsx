@@ -1,12 +1,13 @@
-import { AuraBrightness } from '@commons/models/Aura';
-import { LoggerRenderer, TranslatorRenderer } from '@tser-framework/renderer';
+import { SettingsLine } from './commons/SettingLine';
+import { SettingsBlock } from './commons/SettingsBlock';
 import { debounce } from 'lodash';
 import { ChangeEvent, FC, useEffect, useState } from 'react';
 import { Form } from 'react-bootstrap';
 import { FaLightbulb } from 'react-icons/fa';
 
-import { SettingsLine } from './commons/SettingLine';
-import { SettingsBlock } from './commons/SettingsBlock';
+import { LoggerRenderer, TranslatorRenderer } from '@tser-framework/renderer';
+
+import { AuraBrightness } from '@commons/models/Aura';
 
 export const AuraSettings: FC = () => {
   const [available, setAvailable] = useState<Array<string>>([]);

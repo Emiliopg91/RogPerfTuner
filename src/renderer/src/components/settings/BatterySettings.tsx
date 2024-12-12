@@ -1,11 +1,12 @@
-import { ChargeThreshold } from '@commons/models/Battery';
-import { LoggerRenderer, TranslatorRenderer } from '@tser-framework/renderer';
+import { SettingsLine } from './commons/SettingLine';
+import { SettingsBlock } from './commons/SettingsBlock';
 import { ChangeEvent, FC, useEffect, useState } from 'react';
 import { Form } from 'react-bootstrap';
 import { BsBatteryCharging } from 'react-icons/bs';
 
-import { SettingsLine } from './commons/SettingLine';
-import { SettingsBlock } from './commons/SettingsBlock';
+import { LoggerRenderer, TranslatorRenderer } from '@tser-framework/renderer';
+
+import { ChargeThreshold } from '@commons/models/Battery';
 
 export const BatterySettings: FC = () => {
   const [chargeThreshold, setChargeThreshold] = useState(ChargeThreshold.CT_100);

@@ -1,7 +1,7 @@
-import { Loading } from '@tser-framework/renderer';
+import { Index } from './Index';
 import { MemoryRouter } from 'react-router-dom';
 
-import { Index } from './Index';
+import { Loading } from '@tser-framework/renderer';
 
 export function App(): JSX.Element {
   return (

@@ -1,11 +1,12 @@
-import { ThrottleThermalPolicy } from '@commons/models/Platform';
-import { LoggerRenderer, TranslatorRenderer } from '@tser-framework/renderer';
+import { SettingsLine } from './commons/SettingLine';
+import { SettingsBlock } from './commons/SettingsBlock';
 import { ChangeEvent, FC, useEffect, useState } from 'react';
 import { Form } from 'react-bootstrap';
 import { IoIosSpeedometer } from 'react-icons/io';
 
-import { SettingsLine } from './commons/SettingLine';
-import { SettingsBlock } from './commons/SettingsBlock';
+import { LoggerRenderer, TranslatorRenderer } from '@tser-framework/renderer';
+
+import { ThrottleThermalPolicy } from '@commons/models/Platform';
 
 export const PerformanceSettings: FC = () => {
   const [throttleThermalPolicy, setThrottleThermalPolicy] = useState(

@@ -4,6 +4,7 @@
     "source.organizeImports": "always",
     "source.addMissingImports.ts": "explicit"
   },
+  "typescript.preferences.importModuleSpecifier": "non-relative",
   "[typescript]": {
     "editor.defaultFormatter": "esbenp.prettier-vscode"
   },
@@ -15,8 +16,5 @@
   },
   "[json]": {
     "editor.defaultFormatter": "esbenp.prettier-vscode"
-  },
-  "python.analysis.extraPaths": [
-    "./resources/python/lib/*"
-  ]
+  }
 }

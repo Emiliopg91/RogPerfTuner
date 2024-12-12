@@ -1,6 +1,6 @@
-import Device from '../client/classes/Device';
-import Client from '../client/client';
-import { AbstractEffect } from './base/AbstractEffect';
+import Device from '@main/clients/openrgb/client/classes/Device';
+import Client from '@main/clients/openrgb/client/client';
+import { AbstractEffect } from '@main/clients/openrgb/effects/base/AbstractEffect';
 
 class Static extends AbstractEffect {
   public getName(): string {

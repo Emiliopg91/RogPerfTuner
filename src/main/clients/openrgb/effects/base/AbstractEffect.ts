@@ -1,9 +1,10 @@
-import { AuraBrightness } from '@commons/models/Aura';
 import { LoggerMain } from '@tser-framework/main';
 
-import Device from '../../client/classes/Device';
-import { RGBColor } from '../../client/classes/RGBColor';
-import Client from '../../client/client';
+import { AuraBrightness } from '@commons/models/Aura';
+
+import Device from '@main/clients/openrgb/client/classes/Device';
+import { RGBColor } from '@main/clients/openrgb/client/classes/RGBColor';
+import Client from '@main/clients/openrgb/client/client';
 
 export abstract class AbstractEffect {
   protected isRunning = false;

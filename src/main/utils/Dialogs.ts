@@ -1,7 +1,8 @@
-import { LoggerMain } from '@tser-framework/main';
 import { exec } from 'child_process';
 
-import { SudoPasswordResult } from '../../commons/src/models/Dialogs';
+import { LoggerMain } from '@tser-framework/main';
+
+import { SudoPasswordResult } from '@commons/models/Dialogs';
 
 class Dialogs {
   private logger = LoggerMain.for('Dialogs');
