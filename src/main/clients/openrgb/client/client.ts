@@ -195,7 +195,7 @@ export default class Client extends EventEmitter {
       deviceId
     );
     const buffer = await this.readMessage(command.requestControllerData, deviceId);
-    return new Device(buffer, deviceId, this.protocolVersion!);
+    return new Device(buffer, deviceId, this.protocolVersion!, this);
   }
 
   /**

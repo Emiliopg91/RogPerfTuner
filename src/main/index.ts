@@ -6,7 +6,7 @@ import { JsonUtils } from '@tser-framework/commons';
 import { LoggerMain, TranslatorMain, WindowHelper } from '@tser-framework/main';
 
 import { applicationLogic } from '@main/applicationLogic';
-import { initializeBeforeReady, initializeWhenReady } from '@main/lifecycle';
+import { initializeBeforeReady, initializeWhenReady, stop } from '@main/lifecycle';
 import { notificationService } from '@main/services/NotificationService';
 import {
   appConfig,
@@ -23,6 +23,8 @@ export let mainWindow: BrowserWindow | null = null;
 const initTime = Date.now();
 
 (async (): Promise<void> => {
+  process.noDeprecation = true;
+  Menu.setApplicationMenu(null);
   await LoggerMain.initialize();
   const logger = LoggerMain.for('main/index.ts');
   logger.info(`Powered by Electron ${process.versions.electron}`);
@@ -136,8 +138,8 @@ const initTime = Date.now();
       }
     });
 
-    app.on('quit', () => {
-      stop();
+    app.on('quit', async (): Promise<void> => {
+      await stop();
       const msg = ' Stopped main after ' + msToTime(Date.now() - initTime) + ' ';
       logger.system('##################################################');
       logger.system(

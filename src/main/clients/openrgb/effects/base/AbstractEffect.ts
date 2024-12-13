@@ -4,7 +4,6 @@ import { AuraBrightness } from '@commons/models/Aura';
 
 import Device from '@main/clients/openrgb/client/classes/Device';
 import { RGBColor } from '@main/clients/openrgb/client/classes/RGBColor';
-import Client from '@main/clients/openrgb/client/client';
 
 export abstract class AbstractEffect {
   protected isRunning = false;
@@ -18,7 +17,6 @@ export abstract class AbstractEffect {
   }
 
   public async start(
-    client: Client,
     devices: Array<Device>,
     brightness: AuraBrightness,
     color: RGBColor
@@ -26,17 +24,21 @@ export abstract class AbstractEffect {
     if (this.isRunning) {
       await this.stop();
     }
-
-    this.logger.info('Starting effect');
     this.isRunning = true;
     this.hasFinished = false;
     if (brightness == AuraBrightness.OFF) {
-      devices.forEach((dev, i) =>
-        client.updateLeds(i, Array(dev.leds.length).fill(RGBColor.fromHex('#000000')))
+      devices.forEach((dev) =>
+        dev.updateLeds(Array(dev.leds.length).fill(RGBColor.fromHex('#000000')))
       );
       this.hasFinished = true;
       return;
     } else {
+      this.color = color;
+
+      this.logger.info(
+        `Starting effect with brightness ${AuraBrightness[brightness]} and color ${color.toHex()}`
+      );
+
       this.hasFinished = false;
       switch (brightness) {
         case AuraBrightness.LOW:
@@ -50,10 +52,9 @@ export abstract class AbstractEffect {
           break;
       }
 
-      this.color = color;
       this.isRunning = true;
 
-      await this.applyEffect(client, devices);
+      await this.applyEffect(devices);
       this.logger.info('Effect finished');
     }
   }
@@ -73,7 +74,7 @@ export abstract class AbstractEffect {
     }
   }
 
-  protected abstract applyEffect(client: Client, devices: Array<Device>): Promise<void>;
+  protected abstract applyEffect(devices: Array<Device>): Promise<void>;
 
   public abstract getName(): string;
 }

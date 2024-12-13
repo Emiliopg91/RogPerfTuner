@@ -13,13 +13,13 @@ files:
 asarUnpack:
   - resources/**
   - package.json
-  - python/**
 linux:
   icon: resources/icons/icon-512x512.png
   target:
     - AppImage
   maintainer: Emiliopg91
   category: Utility
+  compression: store
 appImage:
   artifactName: ${name}.${ext}
 npmRebuild: false

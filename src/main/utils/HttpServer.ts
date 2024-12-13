@@ -1,5 +1,5 @@
 /* eslint-disable no-case-declarations */
-import { createServer } from 'http';
+import { Server, createServer } from 'http';
 import { parse } from 'url';
 import { v4 as uuidv4 } from 'uuid';
 
@@ -15,10 +15,11 @@ import { Constants } from '@main/utils/Constants';
 
 class HttpServer {
   private logger = LoggerMain.for('HttpServer');
+  private server: Server | undefined;
   public token = uuidv4();
 
   public async initialize(): Promise<void> {
-    const server = createServer(async (req, res) => {
+    this.server = createServer(async (req, res) => {
       const t0 = Date.now();
       let response = 'Invalid request';
       if (req.url) {
@@ -29,14 +30,12 @@ class HttpServer {
         this.logger.info(
           `Received request to http://${Constants.localhost}:${Constants.httpPort}${path}${query.token ? `/token=${query.token}` : ''}`
         );
-        LoggerMain.addTab();
 
         // Validar token
         if (!query.token || query.token !== this.token) {
           res.statusCode = 401;
           res.setHeader('Content-Type', 'text/plain');
           res.end('Unauthorized\n');
-          LoggerMain.removeTab();
           this.logger.warn('Rejected request with invalid or missing token');
           return;
         }
@@ -47,23 +46,23 @@ class HttpServer {
             case 'nextProfile':
               const oldVal = platformService.getThrottleThermalPolicy();
               const newVal = PlatformModels.getNext(oldVal);
-              await traySetThrottle(newVal);
               response = ThrottleThermalPolicy[newVal];
+              traySetThrottle(newVal);
               break;
             case 'nextLedMode':
               const newVal2 = openRgbService.getNextMode();
-              await traySetLedMode(newVal2);
               response = newVal2;
+              traySetLedMode(newVal2);
               break;
             case 'increaseBrightness':
               const newVal3 = AuraModels.getNextBrightness(openRgbService.getBrightness());
-              await traySetBrightness(newVal3);
               response = AuraBrightness[newVal3];
+              traySetBrightness(newVal3);
               break;
             case 'decreaseBrightness':
               const newVal4 = AuraModels.getPreviousBrightness(openRgbService.getBrightness());
-              await traySetBrightness(newVal4);
               response = AuraBrightness[newVal4];
+              traySetBrightness(newVal4);
               break;
           }
         }
@@ -74,14 +73,21 @@ class HttpServer {
       res.setHeader('Content-Type', 'text/plain');
       res.end(response + '\n');
       const tdif = Math.round((Date.now() - t0) * 1000) / 1000000;
-      LoggerMain.removeTab();
       this.logger.info('Ended request after ' + tdif + ' with response: ', response);
     });
 
     await new Promise<void>((resolve) => {
-      server.listen(Constants.httpPort, Constants.localhost, () => {
+      this.server!.listen(Constants.httpPort, Constants.localhost, () => {
         this.logger.info(`Server listening http://${Constants.localhost}:${Constants.httpPort}`);
         resolve();
+      });
+    });
+  }
+
+  public async stop(): Promise<void> {
+    await new Promise<void>((resolve) => {
+      this.server?.close(() => {
+        resolve;
       });
     });
   }

@@ -41,6 +41,10 @@ export class RGBColor {
     return new RGBColor(this._red * factor, this._green * factor, this._blue * factor);
   }
 
+  public toHex(): string {
+    return `#${this._red.toString(16).padStart(2, '0')}${this._green.toString(16).padStart(2, '0')}${this._blue.toString(16).padStart(2, '0')}`.toUpperCase();
+  }
+
   /**
    * Converts HSL values to an RGBColor object
    * @param {number} h Hue value [0, 359]

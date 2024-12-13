@@ -1,9 +1,11 @@
 import { Mode } from '@main/clients/openrgb/client/classes/Mode';
 import { RGBColor } from '@main/clients/openrgb/client/classes/RGBColor';
 import { Zone } from '@main/clients/openrgb/client/classes/Zone';
+import Client from '@main/clients/openrgb/client/client';
 import { Reader } from '@main/clients/openrgb/client/utils/Reader';
 
 export default class Device {
+  client: Client;
   deviceId: number;
   type: number;
   name: string;
@@ -20,7 +22,7 @@ export default class Device {
     value: number;
   }[];
   colors: RGBColor[];
-  constructor(buffer: Buffer, deviceId: number, protocolVersion: number) {
+  constructor(buffer: Buffer, deviceId: number, protocolVersion: number, client: Client) {
     this.deviceId = deviceId;
 
     let offset = 4;
@@ -98,5 +100,11 @@ export default class Device {
       this.colors.push(Reader.readColor(buffer, offset));
       offset += 4;
     }
+
+    this.client = client;
+  }
+
+  public updateLeds(colors: Array<RGBColor>): void {
+    this.client.updateLeds(this.deviceId, colors);
   }
 }

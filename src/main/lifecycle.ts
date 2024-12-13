@@ -47,6 +47,7 @@ export async function initializeWhenReady(): Promise<void> {
   });
 }
 
-export function stop(): void {
-  openRgbClient.stop();
+export async function stop(): Promise<void> {
+  await openRgbClient.stop();
+  await httpServer.stop();
 }

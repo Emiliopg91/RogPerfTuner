@@ -1,5 +1,4 @@
 import Device from '@main/clients/openrgb/client/classes/Device';
-import Client from '@main/clients/openrgb/client/client';
 import { AbstractEffect } from '@main/clients/openrgb/effects/base/AbstractEffect';
 
 class Breathing extends AbstractEffect {
@@ -9,7 +8,7 @@ class Breathing extends AbstractEffect {
 
   private static frequency = 0.75;
 
-  protected async applyEffect(client: Client, devices: Array<Device>): Promise<void> {
+  protected async applyEffect(devices: Array<Device>): Promise<void> {
     for (let offset = 0; this.isRunning; offset = offset + 0.1) {
       const factor = Math.abs(Math.sin(offset * Breathing.frequency));
 
@@ -19,9 +18,9 @@ class Breathing extends AbstractEffect {
         blue: this.color!.blue * factor * this.brightness
       };
 
-      devices.forEach((element, i) => {
-        if (!element) return;
-        client.updateLeds(i, Array(element.colors.length).fill(new_color));
+      devices.forEach((dev) => {
+        if (!dev) return;
+        dev.updateLeds(Array(dev.colors.length).fill(new_color));
       });
 
       await new Promise<void>((resolve) => setTimeout(resolve, 75));

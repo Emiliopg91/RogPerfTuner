@@ -2,7 +2,6 @@ import { Mutex } from 'async-mutex';
 
 import Device from '@main/clients/openrgb/client/classes/Device';
 import { RGBColor } from '@main/clients/openrgb/client/classes/RGBColor';
-import Client from '@main/clients/openrgb/client/client';
 import { AbstractEffect } from '@main/clients/openrgb/effects/base/AbstractEffect';
 
 class StarryNight extends AbstractEffect {
@@ -17,7 +16,7 @@ class StarryNight extends AbstractEffect {
 
   private maxSteps = 30;
 
-  protected async applyEffect(client: Client, devices: Array<Device>): Promise<void> {
+  protected async applyEffect(devices: Array<Device>): Promise<void> {
     const promises: Array<Promise<void>> = [];
     for (let i = 0; i < devices.length; i++) {
       promises.push(
@@ -41,11 +40,13 @@ class StarryNight extends AbstractEffect {
                 do {
                   ledOn = Math.floor(Math.random() * leds.length);
                 } while (steps[ledOn] > 0);
-                newColors[ledOn] = leds[ledOn] = this.getRandom();
                 steps[ledOn] = 15 + Math.floor(Math.random() * 15);
+                newColors[ledOn] = leds[ledOn] = this.getRandom().getDimmed(
+                  steps[ledOn] / this.maxSteps
+                );
               }
 
-              this.setLeds(client, i, newColors);
+              this.setLeds(devices[i], newColors);
               await new Promise<void>((resolve) => {
                 setTimeout(resolve, Math.random() * 150);
               });
@@ -60,9 +61,9 @@ class StarryNight extends AbstractEffect {
     this.hasFinished = true;
   }
 
-  private setLeds(client: Client, devId: number, colors: Array<RGBColor>): void {
+  private setLeds(dev: Device, colors: Array<RGBColor>): void {
     this.mutex.runExclusive(() => {
-      client.updateLeds(devId, colors);
+      dev.updateLeds(colors);
     });
   }
 }

@@ -2,7 +2,6 @@ import systeminformation from 'systeminformation';
 
 import Device from '@main/clients/openrgb/client/classes/Device';
 import { RGBColor } from '@main/clients/openrgb/client/classes/RGBColor';
-import Client from '@main/clients/openrgb/client/client';
 import { AbstractEffect } from '@main/clients/openrgb/effects/base/AbstractEffect';
 
 class Temperature extends AbstractEffect {
@@ -16,7 +15,7 @@ class Temperature extends AbstractEffect {
     return 'Temperature';
   }
 
-  protected async applyEffect(client: Client, devices: Array<Device>): Promise<void> {
+  protected async applyEffect(devices: Array<Device>): Promise<void> {
     this.updateColorsByTemp();
 
     let prevColor = await this.getNewColor();
@@ -25,8 +24,8 @@ class Temperature extends AbstractEffect {
 
       for (let offset = 0; offset < 10 && this.isRunning; offset++) {
         const color = this.transition(prevColor, newColor, offset, 10);
-        devices.forEach((dev, i) => {
-          client.updateLeds(i, Array(dev.leds.length).fill(color));
+        devices.forEach((dev) => {
+          dev.updateLeds(Array(dev.leds.length).fill(color));
         });
 
         if (this.isRunning) {

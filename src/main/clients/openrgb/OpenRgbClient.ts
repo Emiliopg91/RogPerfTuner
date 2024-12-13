@@ -42,7 +42,7 @@ class OpenRgbClient {
       (async (): Promise<void> => {
         if (!this.initialized) {
           try {
-            this.logger.info('Initializing backend');
+            this.logger.info('Initializing client');
             LoggerMain.addTab();
             await this.startOpenRgbProccess();
             await this.connectClient();
@@ -59,11 +59,14 @@ class OpenRgbClient {
   }
 
   public async stop(): Promise<void> {
-    this.logger.info('Stopping backend');
+    this.logger.info('Stopping client');
     LoggerMain.addTab();
     for (let i = 0; i < this.availableModesInst.length; i++) {
       await this.availableModesInst[i].stop();
     }
+    this.availableDevices.forEach((dev) =>
+      dev.updateLeds(Array(dev.leds.length).fill(RGBColor.fromHex('#000000')))
+    );
     await this.disconnectClient();
     await this.stopOpenRgbServer();
     this.initialized = false;
@@ -79,7 +82,7 @@ class OpenRgbClient {
   public async startOpenRgbProccess(): Promise<void> {
     return new Promise<void>((resolve) => {
       (async (): Promise<void> => {
-        this.logger.info('Initializing BackendClient');
+        this.logger.info('Initializing OpenRGB');
         LoggerMain.addTab();
 
         this.port = await new Promise((resolve) => {
@@ -145,7 +148,7 @@ class OpenRgbClient {
   }
 
   private async stopOpenRgbServer(): Promise<void> {
-    this.logger.info('Stopping OpenRGB process');
+    this.logger.info('Stopping OpenRGB');
     await new Promise<void>((resolve) => {
       this.openRgbProc?.on('exit', () => {
         resolve();
@@ -166,18 +169,19 @@ class OpenRgbClient {
     this.logger.info('Connecting to OpenRGB server on port ' + this.port);
     await this.client.connect();
 
-    const count = await this.client!.getControllerCount();
     this.logger.info('Getting available devices');
+    const count = await this.client!.getControllerCount();
+    const promises: Array<Promise<Device>> = [];
     for (let i = 0; i < count; i++) {
-      const dev = await this.client!.getControllerData(i);
+      promises.push(this.client!.getControllerData(i));
+    }
+
+    const allDevs = await Promise.all(promises);
+    allDevs.forEach((dev) => {
       const direct = dev.modes.filter((m) => m.name == 'Direct');
       if (direct && direct.length > 0) {
         this.availableDevices.push(dev);
       }
-    }
-
-    this.availableDevices.forEach((dev, i) => {
-      this.client?.updateLeds(i, Array(dev.colors.length).fill(new RGBColor(0, 0, 0)));
     });
   }
 
@@ -191,12 +195,7 @@ class OpenRgbClient {
       for (let i = 0; i < this.availableModesInst.length; i++) {
         await this.availableModesInst[i].stop();
       }
-      await inst[0].start(
-        this.client!,
-        this.availableDevices,
-        brightness,
-        RGBColor.fromHex(color || '#000000')
-      );
+      await inst[0].start(this.availableDevices, brightness, RGBColor.fromHex(color || '#000000'));
     }
   }
 }

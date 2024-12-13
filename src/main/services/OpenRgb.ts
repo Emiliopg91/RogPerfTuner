@@ -87,7 +87,7 @@ class OpenRgbService {
 
   public async setMode(mode: string): Promise<void> {
     if (openRgbClient.availableModes.includes(mode)) {
-      openRgbClient.applyEffect(mode, this.brightness, this.color);
+      await openRgbClient.applyEffect(mode, this.brightness, this.color);
 
       this.mode = mode;
       settings.configMap.openRgb!.state = {
@@ -103,7 +103,7 @@ class OpenRgbService {
   }
 
   public async setBrightness(brightness: AuraBrightness): Promise<void> {
-    openRgbClient.applyEffect(this.mode, brightness, this.color);
+    await openRgbClient.applyEffect(this.mode, brightness, this.color);
 
     this.brightness = brightness;
     settings.configMap.openRgb!.state = {
@@ -116,7 +116,7 @@ class OpenRgbService {
   }
 
   public async setColor(color: string): Promise<void> {
-    openRgbClient.applyEffect(this.mode, this.brightness, color);
+    await openRgbClient.applyEffect(this.mode, this.brightness, color);
 
     this.color = color;
     settings.configMap.openRgb!.state = {

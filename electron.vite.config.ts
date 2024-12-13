@@ -1,4 +1,4 @@
-import { defineConfig, swcPlugin } from 'electron-vite';
+import { bytecodePlugin, defineConfig, swcPlugin } from 'electron-vite';
 import fs from 'fs';
 import path, { resolve } from 'path';
 import sass from 'sass-embedded';
@@ -27,7 +27,7 @@ console.info('HTMLS: ', htmls);
 export default defineConfig({
   main: {
     build: { minify: true, sourcemap: false, rollupOptions: { treeshake: true } },
-    plugins: [swcPlugin()],
+    plugins: [swcPlugin(), bytecodePlugin({ transformArrowFunctions: false })],
     resolve: {
       alias: {
         '@main': resolve('src/main'),
@@ -38,7 +38,7 @@ export default defineConfig({
   },
   preload: {
     build: { minify: true, sourcemap: false, rollupOptions: { treeshake: true } },
-    plugins: [],
+    plugins: [swcPlugin(), bytecodePlugin({ transformArrowFunctions: false })],
     resolve: {
       alias: {
         '@main': resolve('src/main'),
