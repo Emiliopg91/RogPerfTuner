@@ -86,5 +86,29 @@
   "settings": {
     "en": "Settings",
     "es": "Configuración"
+  },
+  "initializing": {
+    "en": "Initializing application",
+    "es": "Inicializando aplicación"
+  },
+  "update.available": {
+    "en": "Update available",
+    "es": "Actualización disponible"
+  },
+  "update.available.msg": {
+    "en": "New version {version} downloaded. Please restart application now to complete update",
+    "es": "Nueva versión {version} descargada. Reinicie aplicación ahora para completar actualización"
+  },
+  "restart.now": {
+    "en": "Restart now",
+    "es": "Reiniciar ahora"
+  },
+  "update.on.restart": {
+    "en": "Later",
+    "es": "Mas tarde"
+  },
+  "installing.update": {
+    "en": "Installing update... Please wait",
+    "es": "Instalando actualización... Por favor, espere"
   }
 }

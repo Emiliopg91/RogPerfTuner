@@ -36,15 +36,6 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GH_ACTION_PAT }}
         run: pnpm build:linux
 
-      - name: Regenerate AppImage
-        id: generate-appimage-file
-        uses: Emiliopg91/AppImage-Creator-2@latest
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          token: ${{ secrets.GITHUB_TOKEN }}
-          electron: 'true'
-
       - name: Changelog
         uses: Bullrich/generate-release-changelog@master
         id: Changelog
@@ -93,7 +84,7 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GH_ACTION_PAT }}
         with:
           upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: ${{ env.LATEST_LINUX_PATH }}
+          asset_path: ./dist/latest-linux.yml
           asset_name: latest-linux.yml
           asset_content_type: text/yaml
 
@@ -103,16 +94,6 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GH_ACTION_PAT }}
         with:
           upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: ${{ env.APPIMAGE_PATH }}
+          asset_path: ./dist/RogControlCenter.AppImage
           asset_name: RogControlCenter.AppImage
-          asset_content_type: application/octet-stream
-
-      - name: Upload Release RogControlCenter.AppImage.msync file
-        uses: actions/upload-release-asset@v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.GH_ACTION_PAT }}
-        with:
-          upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: ${{ env.APPIMAGE_PATH }}.msync
-          asset_name: RogControlCenter.AppImage.msync
           asset_content_type: application/octet-stream

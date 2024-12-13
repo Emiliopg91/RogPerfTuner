@@ -34,7 +34,6 @@ class OpenRgbService {
     if (!this.initialized) {
       this.logger.info('Initializing OpenRgbService');
       LoggerMain.addTab();
-      this.initialized = true;
 
       this.mode = settings.configMap.openRgb?.state?.mode
         ? settings.configMap.openRgb?.state?.mode
@@ -103,6 +102,8 @@ class OpenRgbService {
         }
         this.connectedUsb = currentUsb;
       }, 200);
+
+      this.initialized = true;
     }
   }
 

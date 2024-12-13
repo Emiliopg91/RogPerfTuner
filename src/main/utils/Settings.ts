@@ -5,7 +5,7 @@ import { dialogs } from '@main/utils/Dialogs';
 
 class Settings {
   public password: string | undefined = '';
-  public configMap: SettingsType = { openRgb: undefined, platform: undefined, reload: undefined };
+  public configMap: SettingsType = { openRgb: undefined, platform: undefined };
 
   public async initialize(): Promise<void> {
     this.configMap = ConfigurationHelper.configAsInterface();

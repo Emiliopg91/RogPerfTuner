@@ -1,7 +1,8 @@
-import { BrowserWindow, IpcMainInvokeEvent, Menu, app, ipcMain } from 'electron';
+import console from 'console';
+import { BrowserWindow, IpcMainInvokeEvent, Menu, app, dialog, ipcMain } from 'electron';
 
 import { electronApp, is } from '@electron-toolkit/utils';
-import { LoggerMain, TranslatorMain, WindowHelper } from '@tser-framework/main';
+import { AppUpdater, LoggerMain, TranslatorMain, WindowHelper } from '@tser-framework/main';
 
 import { applicationLogic } from '@main/applicationLogic';
 import { initializeBeforeReady, initializeWhenReady, stop } from '@main/lifecycle';
@@ -13,6 +14,10 @@ process.env.ELECTRON_ENABLE_WAYLAND = '1';
 export let mainWindow: BrowserWindow | null = null;
 const initTime = Date.now();
 
+let appUpdater: AppUpdater | undefined = undefined;
+let shownUpdate = false;
+
+console.log(`Starting process ${process.pid} from '${app.getPath('exe')}'`);
 console.log(`Powered by Electron ${process.versions.electron}`);
 
 (async (): Promise<void> => {
@@ -20,7 +25,6 @@ console.log(`Powered by Electron ${process.versions.electron}`);
   Menu.setApplicationMenu(null);
   await LoggerMain.initialize();
   const logger = LoggerMain.for('main/index.ts');
-  logger.info(`Starting from '${app.getPath('exe')}'`);
   logger.system('##################################################');
   logger.system('#                  Started main                  #');
   logger.system('##################################################');
@@ -72,23 +76,6 @@ console.log(`Powered by Electron ${process.versions.electron}`);
     app.on('browser-window-created', (_, window) => {
       configureShortcutEvents(window);
     });
-
-    if (appConfig.splashScreen) {
-      WindowHelper.createSplashScreen(
-        {
-          width: 500,
-          height: 300,
-          transparent: true,
-          frame: false,
-          alwaysOnTop: true
-        },
-        appConfig.splashScreen
-      ).then(() => {
-        //createWindow();
-      });
-    } else {
-      //createWindow();
-    }
 
     let flagQuit = false;
     app.on('activate', function () {
@@ -155,6 +142,31 @@ console.log(`Powered by Electron ${process.versions.electron}`);
     LoggerMain.removeTab();
     logger.system('Running application');
     LoggerMain.addTab();
+
+    appUpdater = new AppUpdater(60 * 60 * 1000, (event): void => {
+      if (!shownUpdate) {
+        dialog
+          .showMessageBox({
+            type: 'info',
+            buttons: [
+              TranslatorMain.translate('restart.now'),
+              TranslatorMain.translate('update.on.restart')
+            ],
+            defaultId: 0,
+            cancelId: 1,
+            title: TranslatorMain.translate('update.available'),
+            message: TranslatorMain.translate('update.available.msg', { version: event.version })
+          })
+          .then((returnValue) => {
+            if (returnValue.response === 0) {
+              notificationService.toast(TranslatorMain.translate('installing.update'));
+              appUpdater?.quitAndInstall(true, true);
+            }
+            shownUpdate = true;
+          });
+      }
+    });
+
     applicationLogic();
   });
 })();

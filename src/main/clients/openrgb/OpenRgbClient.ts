@@ -114,12 +114,12 @@ class OpenRgbClient {
     await this.stopOpenRgbServer();
     this.initialized = false;
     LoggerMain.removeTab();
+    LoggerMain.removeTab();
   }
 
   public async restart(): Promise<void> {
     await this.stop();
     await this.initialize();
-    LoggerMain.removeTab();
   }
 
   private async startOpenRgbProccess(): Promise<void> {
@@ -209,7 +209,7 @@ class OpenRgbClient {
   private async connectClient(): Promise<void> {
     this.availableDevices = [];
     this.client = new Client('RogControlCenter', this.port, Constants.localhost);
-    this.logger.info('Connecting to OpenRGB server on port ' + this.port);
+    this.logger.info('Connecting to OpenRGB');
     await this.client.connect();
 
     this.logger.info('Getting available devices');

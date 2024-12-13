@@ -5,7 +5,6 @@ export const Header: FC = () => {
   return (
     <div id="header">
       <RogLogo />
-      <h4>{window.app.name}</h4>
     </div>
   );
 };

@@ -37,7 +37,7 @@ export const windowConfig: WindowConfig = {
     fullscreenable: false,
     resizable: false,
     width: 580,
-    height: 780,
+    height: 700,
     backgroundColor: '#191919',
     show: false,
     title: app.getName(),

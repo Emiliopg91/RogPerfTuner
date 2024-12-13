@@ -11,7 +11,7 @@ import { applicationService } from '@main/services/Application';
 import { openRgbService } from '@main/services/OpenRgb';
 import { platformService } from '@main/services/Platform';
 import { generateTrayMenuDef, setTrayMenuRefreshFn } from '@main/setup';
-import { httpServer } from '@main/utils/HttpServer';
+import { fifoServer } from '@main/utils/FifoServer';
 import { settings } from '@main/utils/Settings';
 
 import icon45 from '@resources/icons/icon-45x45.png?asset';
@@ -33,9 +33,9 @@ export async function initializeWhenReady(): Promise<void> {
   await uPowerClient.initialize();
   await openRgbClient.initialize();
   await openRgbService.initialize();
-  await httpServer.initialize();
   applicationService.initialize();
   await platformService.initialize();
+  await fifoServer.initialize();
 
   const trayBuilder: TrayBuilder | undefined = TrayBuilder.builder(icon45)
     .withToolTip(app.name + ' v' + app.getVersion())
@@ -49,5 +49,5 @@ export async function initializeWhenReady(): Promise<void> {
 
 export async function stop(): Promise<void> {
   await openRgbClient.stop();
-  await httpServer.stop();
+  await fifoServer.stop();
 }

@@ -56,7 +56,6 @@ class PlatformService {
 
   public async initialize(): Promise<void> {
     if (!this.initialized) {
-      this.initialized = true;
       uPowerClient.on('OnBattery', async (onBattery) => {
         let policy = ThrottleThermalPolicy.PERFORMANCE;
         if (onBattery) {
@@ -103,6 +102,8 @@ class PlatformService {
       powerProfilesClient.on('ActiveProfile', async (value: PowerProfile) => {
         this.lastPower = value;
       });
+
+      this.initialized = true;
     }
   }
 

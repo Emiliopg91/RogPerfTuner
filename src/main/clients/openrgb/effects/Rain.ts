@@ -39,13 +39,14 @@ class Rain extends AbstractEffect {
               const next = this.getNext(i, devices[i]);
               leds[next.index] = next.color;
               this.setLeds(devices[i], leds);
-              await new Promise<void>((resolve) => {
+              const naps = 4;
+              for (let nap = 0; nap < naps; nap++) {
                 if (this.isRunning) {
-                  setTimeout(resolve, 2500 / leds.length / (0.5 + Math.random() * 0.5));
-                } else {
-                  resolve();
+                  await new Promise<void>((resolve) => {
+                    setTimeout(resolve, 2500 / leds.length / (0.5 + Math.random() * 0.5) / naps);
+                  });
                 }
-              });
+              }
             }
             resolve();
           })();
