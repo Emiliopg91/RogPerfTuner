@@ -41,18 +41,21 @@ export abstract class AbstractEffect {
       this.color = color;
 
       this.logger.info(
-        `Starting effect with ${AuraBrightness[brightness].toLowerCase()} brightness and ${color.toHex()} color`
+        `Starting effect with ${AuraBrightness[brightness].toLowerCase()} brightness ${this._supportsColor ? `and ${color.toHex()} color` : ''}`
       );
 
       this.hasFinished = false;
       switch (brightness) {
         case AuraBrightness.LOW:
-          this.brightness = 0.33;
+          this.brightness = 0.25;
           break;
         case AuraBrightness.MEDIUM:
-          this.brightness = 0.67;
+          this.brightness = 0.5;
           break;
         case AuraBrightness.HIGH:
+          this.brightness = 0.75;
+          break;
+        case AuraBrightness.MAX:
           this.brightness = 1;
           break;
       }

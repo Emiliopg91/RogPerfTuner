@@ -1,5 +1,8 @@
 import { ChildProcess, spawn } from 'child_process';
+import { existsSync, readFileSync, readdirSync } from 'fs';
 import net, { AddressInfo } from 'net';
+import os from 'os';
+import path from 'path';
 
 import { LoggerMain } from '@tser-framework/main';
 
@@ -15,6 +18,7 @@ import { spectrumCycle } from '@main/clients/openrgb/effects/SpectrumCycle';
 import { starryNight } from '@main/clients/openrgb/effects/StarryNight';
 import { staticEffect } from '@main/clients/openrgb/effects/Static';
 import { temperature } from '@main/clients/openrgb/effects/Temperature';
+import { UsbIdentifier } from '@main/models/OpenRgb';
 import { Constants } from '@main/utils/Constants';
 
 import openRgbAppImage from '@resources/OpenRGB.AppImage?asset&asarUnpack';
@@ -33,6 +37,7 @@ class OpenRgbClient {
   ];
   public availableModes: Array<string> = [];
   public availableDevices: Array<Device> = [];
+  public compatibleDevices: Array<UsbIdentifier> | undefined = undefined;
   private openRgbProc: ChildProcess | undefined = undefined;
   public port: number = 6472;
   private client: Client | undefined = undefined;
@@ -45,6 +50,7 @@ class OpenRgbClient {
             this.logger.info('Initializing client');
             LoggerMain.addTab();
             await this.startOpenRgbProccess();
+            await this.loadSupportedDevices();
             await this.connectClient();
             LoggerMain.removeTab();
             resolve();
@@ -56,6 +62,42 @@ class OpenRgbClient {
     });
 
     this.availableModes = this.availableModesInst.map((mode) => mode.name);
+  }
+
+  private loadSupportedDevices(): void {
+    this.compatibleDevices = undefined;
+    const mountDir = readdirSync(os.tmpdir(), { withFileTypes: true }).find((entry) =>
+      entry.name.startsWith('.mount_' + path.basename(openRgbAppImage).substring(0, 6))
+    );
+    if (mountDir) {
+      const uDevPath = path.join(
+        mountDir.path,
+        mountDir.name,
+        'usr',
+        'lib',
+        'udev',
+        'rules.d',
+        '60-openrgb.rules'
+      );
+      if (existsSync(uDevPath)) {
+        const content = readFileSync(uDevPath).toString();
+        const lines = content.split('\n');
+
+        const regex =
+          /SUBSYSTEMS==".*?", ATTRS\{idVendor\}=="([\da-fA-F]+)", ATTRS\{idProduct\}=="([\da-fA-F]+)"/;
+
+        const results = lines
+          .map((line) => regex.exec(line)) // Buscar coincidencias
+          .filter((match) => match !== null) // Filtrar solo las líneas que coincidan
+          .map(
+            (match): UsbIdentifier => ({
+              idVendor: match[1],
+              idProduct: match[2]
+            })
+          );
+        this.compatibleDevices = results;
+      }
+    }
   }
 
   public async stop(): Promise<void> {
@@ -80,7 +122,7 @@ class OpenRgbClient {
     LoggerMain.removeTab();
   }
 
-  public async startOpenRgbProccess(): Promise<void> {
+  private async startOpenRgbProccess(): Promise<void> {
     return new Promise<void>((resolve) => {
       (async (): Promise<void> => {
         this.logger.info('Initializing OpenRGB');

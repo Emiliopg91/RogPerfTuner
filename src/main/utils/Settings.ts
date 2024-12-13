@@ -1,7 +1,6 @@
 import { ConfigurationHelper } from '@tser-framework/main';
 
-import { SettingsType } from '@commons/models/Settings';
-
+import { SettingsType } from '@main/models/Settings';
 import { dialogs } from '@main/utils/Dialogs';
 
 class Settings {

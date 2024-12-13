@@ -2,6 +2,7 @@
 
 // Enumerados
 export enum AuraBrightness {
+  MAX = 4,
   HIGH = 3,
   MEDIUM = 2,
   LOW = 1,
@@ -13,6 +14,8 @@ export class AuraModels {
   // Métodos para AuraBrightness
   static getNextBrightness(brightness: AuraBrightness): AuraBrightness {
     switch (brightness) {
+      case AuraBrightness.HIGH:
+        return AuraBrightness.MAX;
       case AuraBrightness.MEDIUM:
         return AuraBrightness.HIGH;
       case AuraBrightness.LOW:
@@ -26,6 +29,8 @@ export class AuraModels {
 
   static getPreviousBrightness(brightness: AuraBrightness): AuraBrightness {
     switch (brightness) {
+      case AuraBrightness.MAX:
+        return AuraBrightness.HIGH;
       case AuraBrightness.HIGH:
         return AuraBrightness.MEDIUM;
       case AuraBrightness.MEDIUM:

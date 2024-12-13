@@ -7,6 +7,7 @@ import { AuraBrightness } from '@commons/models/Aura';
 
 import { openRgbClient } from '@main/clients/openrgb/OpenRgbClient';
 import { mainWindow } from '@main/index';
+import { UsbIdentifier } from '@main/models/OpenRgb';
 import { generateTrayMenuDef, refreshTrayMenu } from '@main/setup';
 import { settings } from '@main/utils/Settings';
 
@@ -16,7 +17,7 @@ class OpenRgbService {
   private brightness: AuraBrightness = AuraBrightness.OFF;
   private color: string = '#FF0000';
   private initialized = false;
-  private connectedUsb: Array<string> | undefined = undefined;
+  private connectedUsb: Array<UsbIdentifier> | undefined = undefined;
 
   private bouncedReload = async (): Promise<void> => {
     const t0 = Date.now();
@@ -27,7 +28,7 @@ class OpenRgbService {
     LoggerMain.removeTab();
     this.logger.info(`Reloaded after ${(Date.now() - t0) / 1000} seconds`);
   };
-  private debouncedReload = debounce(this.bouncedReload, 1000);
+  private debouncedReload = debounce(this.bouncedReload, 500);
 
   public async initialize(): Promise<void> {
     if (!this.initialized) {
@@ -53,26 +54,46 @@ class OpenRgbService {
           .toString()
           .trim()
           .split('\n')
-          .map((line) => {
+          .map((line): UsbIdentifier => {
             const columns = line.trim().split(' ');
-            return columns.slice(6).join(' ');
-          });
+
+            const idVendor = columns[5].split(':')[0];
+            const idProduct = columns[5].split(':')[1];
+            const name = columns.slice(6).join(' ');
+
+            return { idVendor, idProduct, name };
+          })
+          .filter((dev) =>
+            openRgbClient.compatibleDevices?.find(
+              (cd) => cd.idVendor == dev.idVendor && cd.idProduct == dev.idProduct
+            )
+          );
 
         if (this.connectedUsb) {
-          const added = currentUsb.filter((item) => !this.connectedUsb?.includes(item));
-          const removed = this.connectedUsb.filter((item) => !currentUsb?.includes(item));
+          const added = currentUsb.filter(
+            (curr) =>
+              !this.connectedUsb?.find(
+                (old) => old.idVendor == curr.idVendor && old.idProduct == curr.idProduct
+              )
+          );
+          const removed = this.connectedUsb.filter(
+            (old) =>
+              !currentUsb?.find(
+                (curr) => old.idVendor == curr.idVendor && old.idProduct == curr.idProduct
+              )
+          );
 
           if (removed.length > 0) {
-            this.logger.info('Removed USB devices:');
+            this.logger.info('Removed compatible device(s):');
             LoggerMain.addTab();
-            removed.forEach((item) => this.logger.info(item));
+            removed.forEach((item) => this.logger.info(item.name));
             LoggerMain.removeTab();
           }
 
           if (added.length > 0) {
-            this.logger.info('Connected USB devices:');
+            this.logger.info('Connected compatible device(s):');
             LoggerMain.addTab();
-            added.forEach((item) => this.logger.info(item));
+            added.forEach((item) => this.logger.info(item.name));
             LoggerMain.removeTab();
 
             LoggerMain.addTab();
