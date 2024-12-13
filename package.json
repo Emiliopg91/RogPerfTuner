@@ -1,6 +1,6 @@
 {
   "name": "RogControlCenter",
-  "version": "1.5.2",
+  "version": "1.5.3",
   "description": "An utility to manage Asus Rog laptop performance",
   "main": "./out/main/index.js",
   "author": {
