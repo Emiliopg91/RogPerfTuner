@@ -6,8 +6,9 @@ import { AbstractEffect } from '@main/clients/openrgb/effects/base/AbstractEffec
 
 class StarryNight extends AbstractEffect {
   private mutex: Mutex = new Mutex();
-  public getName(): string {
-    return 'Starry night';
+
+  public constructor() {
+    super('Starry Night', false);
   }
 
   private getRandom(): RGBColor {

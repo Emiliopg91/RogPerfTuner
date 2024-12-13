@@ -3,8 +3,8 @@ import { RGBColor } from '@main/clients/openrgb/client/classes/RGBColor';
 import { AbstractEffect } from '@main/clients/openrgb/effects/base/AbstractEffect';
 
 class DanceFloor extends AbstractEffect {
-  public getName(): string {
-    return 'Dance floor';
+  public constructor() {
+    super('Dance floor', false);
   }
 
   private getRandom(length): Array<RGBColor> {

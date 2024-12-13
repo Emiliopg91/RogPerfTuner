@@ -87,23 +87,28 @@ class OpenRgbService {
 
   public async setMode(mode: string): Promise<void> {
     if (openRgbClient.availableModes.includes(mode)) {
-      await openRgbClient.applyEffect(mode, this.brightness, this.color);
+      const brightness =
+        this.brightness == AuraBrightness.OFF ? AuraBrightness.MEDIUM : this.brightness;
+      openRgbClient.applyEffect(mode, brightness, this.color);
 
       this.mode = mode;
+      this.brightness = brightness;
       settings.configMap.openRgb!.state = {
         mode,
-        brightness: this.brightness,
+        brightness: brightness,
         color: this.color
       };
+
       refreshTrayMenu(await generateTrayMenuDef());
       mainWindow?.webContents.send('refreshLedMode', mode);
+      mainWindow?.webContents.send('refreshBrightness', brightness);
     } else {
       this.logger.info(`Mode ${mode} is not available`);
     }
   }
 
   public async setBrightness(brightness: AuraBrightness): Promise<void> {
-    await openRgbClient.applyEffect(this.mode, brightness, this.color);
+    openRgbClient.applyEffect(this.mode, brightness, this.color);
 
     this.brightness = brightness;
     settings.configMap.openRgb!.state = {
@@ -116,7 +121,7 @@ class OpenRgbService {
   }
 
   public async setColor(color: string): Promise<void> {
-    await openRgbClient.applyEffect(this.mode, this.brightness, color);
+    openRgbClient.applyEffect(this.mode, this.brightness, color);
 
     this.color = color;
     settings.configMap.openRgb!.state = {
@@ -137,6 +142,10 @@ class OpenRgbService {
 
   public getMode(): string {
     return this.mode;
+  }
+
+  public allowsColor(): boolean {
+    return openRgbClient.allowsColor(this.mode);
   }
 
   public getColor(): string {

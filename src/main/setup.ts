@@ -1,18 +1,14 @@
-import { BrowserWindow, MenuItemConstructorOptions, app } from 'electron';
+import { app } from 'electron';
 import path from 'path';
 
-import { is } from '@electron-toolkit/utils';
 import {
   AppConfig,
-  DeepLinkBinding,
   FileHelper,
   IpcListener,
   LoggerMain,
-  ProtocolBinding,
   TranslatorMain,
   WindowConfig,
-  defaultIpcListeners,
-  defaultProtocolBindings
+  defaultIpcListeners
 } from '@tser-framework/main';
 
 import { AuraBrightness } from '@commons/models/Aura';
@@ -29,7 +25,6 @@ import icon512 from '@resources/icons/icon-512x512.png?asset';
 export const appConfig: AppConfig = {
   singleInstance: true,
   splashScreen: undefined
-  //splashScreen: 3000
 };
 export const windowConfig: WindowConfig = {
   hideMenu: true,
@@ -56,56 +51,6 @@ export const windowConfig: WindowConfig = {
     }
   }
 };
-
-export const menuTemplate: Array<MenuItemConstructorOptions> | undefined = [
-  {
-    label: 'file',
-    submenu: [
-      {
-        label: 'Open new window',
-        click(): void {
-          const auxWindow = new BrowserWindow({
-            width: 900,
-            height: 670,
-            maximizable: false,
-            minimizable: false,
-            resizable: false,
-            show: false,
-            autoHideMenuBar: windowConfig.hideMenu,
-            ...(process.platform === 'linux' ? { icon512 } : {}),
-            webPreferences: {
-              preload: path.join(__dirname, '../preload/index.js'),
-              sandbox: false
-            }
-          });
-
-          auxWindow.setMenu(null);
-          if (is.dev && process.env['ELECTRON_RENDERER_URL']) {
-            auxWindow.loadURL(process.env['ELECTRON_RENDERER_URL'] + '/auxPopup.html');
-          } else {
-            auxWindow.loadFile(path.join(__dirname, '../renderer/auxPopup.html'));
-          }
-        }
-      },
-      {
-        label: 'open.log.file',
-        click(): void {
-          FileHelper.openWithDefaulApp(LoggerMain.LOG_FILE);
-        }
-      },
-      {
-        type: 'separator'
-      },
-      {
-        label: 'exit',
-        accelerator: 'ctrl+Q',
-        click(): void {
-          app.quit();
-        }
-      }
-    ]
-  }
-];
 
 // eslint-disable-next-line @typescript-eslint/no-empty-function
 export let refreshTrayMenu: (
@@ -342,6 +287,12 @@ export const ipcListeners: Record<string, IpcListener> = {
       return applicationService.setAutoStart(enabled);
     }
   },
+  supportsColor: {
+    sync: true,
+    fn() {
+      return openRgbService.allowsColor();
+    }
+  },
   getColor: {
     sync: true,
     fn() {
@@ -355,9 +306,3 @@ export const ipcListeners: Record<string, IpcListener> = {
     }
   }
 };
-
-export const protocolBindings: Record<string, ProtocolBinding> = {
-  ...defaultProtocolBindings
-};
-
-export const deepLinkBindings: Record<string, DeepLinkBinding> = {};

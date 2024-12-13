@@ -2,8 +2,8 @@ import Device from '@main/clients/openrgb/client/classes/Device';
 import { AbstractEffect } from '@main/clients/openrgb/effects/base/AbstractEffect';
 
 class Breathing extends AbstractEffect {
-  public getName(): string {
-    return 'Breathing';
+  public constructor() {
+    super('Breathing', true);
   }
 
   private static frequency = 0.75;

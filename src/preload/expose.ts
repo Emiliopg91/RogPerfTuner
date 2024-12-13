@@ -100,6 +100,9 @@ export const exposed = {
     },
     setColor(color: string): Promise<void> {
       return ipcRenderer.invoke('setColor', color);
+    },
+    supportsColor(): Promise<boolean> {
+      return ipcRenderer.invoke('supportsColor');
     }
   },
   app: {

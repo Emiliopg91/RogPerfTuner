@@ -11,8 +11,8 @@ class Temperature extends AbstractEffect {
   private static increment = Math.floor(255 / Temperature.steps);
   private colorsByTemp: Record<number, RGBColor> = {};
 
-  public getName(): string {
-    return 'Temperature';
+  public constructor() {
+    super('Temperature', false);
   }
 
   protected async applyEffect(devices: Array<Device>): Promise<void> {

@@ -20,8 +20,8 @@ class Rain extends AbstractEffect {
     new RGBColor(0, 255, 255)
   ];
 
-  public getName(): string {
-    return 'Rain';
+  public constructor() {
+    super('Rain', false);
   }
 
   protected async applyEffect(devices: Array<Device>): Promise<void> {

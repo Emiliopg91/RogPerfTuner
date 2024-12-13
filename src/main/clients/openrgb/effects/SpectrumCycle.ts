@@ -3,8 +3,8 @@ import { RGBColor } from '@main/clients/openrgb/client/classes/RGBColor';
 import { AbstractEffect } from '@main/clients/openrgb/effects/base/AbstractEffect';
 
 class SpectrumCycle extends AbstractEffect {
-  public getName(): string {
-    return 'Spectrum Cycle';
+  public constructor() {
+    super('Spectrum Cycle', false);
   }
 
   protected async applyEffect(devices: Array<Device>): Promise<void> {

@@ -2,8 +2,8 @@ import Device from '@main/clients/openrgb/client/classes/Device';
 import { AbstractEffect } from '@main/clients/openrgb/effects/base/AbstractEffect';
 
 class Static extends AbstractEffect {
-  public getName(): string {
-    return 'Static';
+  public constructor() {
+    super('Static', true);
   }
 
   protected async applyEffect(devices: Array<Device>): Promise<void> {

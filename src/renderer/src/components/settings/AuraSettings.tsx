@@ -14,6 +14,7 @@ export const AuraSettings: FC = () => {
   const [ledMode, setLedMode] = useState('Static');
   const [brightness, setBrightness] = useState(AuraBrightness.MEDIUM);
   const [color, setColor] = useState('#FF0000');
+  const [supportsColor, setSupportsColor] = useState(false);
 
   useEffect(() => {
     //Brightness
@@ -29,6 +30,10 @@ export const AuraSettings: FC = () => {
     window.api.refreshLedMode((mode: string) => {
       LoggerRenderer.info('Refreshing led mode in UI');
       setLedMode(() => mode);
+      window.api.supportsColor().then((res) => setSupportsColor(res));
+    });
+    window.api.supportsColor().then((result: boolean) => {
+      setSupportsColor(result);
     });
     window.api.getLedMode().then((result: string) => {
       setLedMode(result);
@@ -96,6 +101,7 @@ export const AuraSettings: FC = () => {
       <SettingsLine label={TranslatorRenderer.translate('led.color')}>
         <>
           <Form.Control
+            disabled={!supportsColor}
             type="color"
             value={color}
             data-bs-theme="dark"

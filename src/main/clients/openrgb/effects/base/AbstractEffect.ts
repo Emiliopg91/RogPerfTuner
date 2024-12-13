@@ -9,11 +9,15 @@ export abstract class AbstractEffect {
   protected isRunning = false;
   protected hasFinished = true;
   protected brightness = 0;
+  protected _supportsColor: boolean;
+  protected _name: string;
   protected color: RGBColor = RGBColor.fromHex('#FF0000');
   protected logger: LoggerMain;
 
-  constructor() {
+  constructor(name: string, supportsColor = false) {
     this.logger = LoggerMain.for(this.constructor.name);
+    this._name = name;
+    this._supportsColor = supportsColor;
   }
 
   public async start(
@@ -27,6 +31,7 @@ export abstract class AbstractEffect {
     this.isRunning = true;
     this.hasFinished = false;
     if (brightness == AuraBrightness.OFF) {
+      this.logger.info(`Turning off RGB`);
       devices.forEach((dev) =>
         dev.updateLeds(Array(dev.leds.length).fill(RGBColor.fromHex('#000000')))
       );
@@ -36,7 +41,7 @@ export abstract class AbstractEffect {
       this.color = color;
 
       this.logger.info(
-        `Starting effect with brightness ${AuraBrightness[brightness]} and color ${color.toHex()}`
+        `Starting effect with ${AuraBrightness[brightness].toLowerCase()} brightness and ${color.toHex()} color`
       );
 
       this.hasFinished = false;
@@ -74,7 +79,13 @@ export abstract class AbstractEffect {
     }
   }
 
-  protected abstract applyEffect(devices: Array<Device>): Promise<void>;
+  public get supportsColor(): boolean {
+    return this._supportsColor;
+  }
 
-  public abstract getName(): string;
+  public get name(): string {
+    return this._name;
+  }
+
+  protected abstract applyEffect(devices: Array<Device>): Promise<void>;
 }

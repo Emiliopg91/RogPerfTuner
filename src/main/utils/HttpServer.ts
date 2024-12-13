@@ -87,7 +87,7 @@ class HttpServer {
   public async stop(): Promise<void> {
     await new Promise<void>((resolve) => {
       this.server?.close(() => {
-        resolve;
+        resolve();
       });
     });
   }

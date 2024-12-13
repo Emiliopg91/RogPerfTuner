@@ -1,42 +1,33 @@
-import { BrowserWindow, IpcMainInvokeEvent, Menu, app, ipcMain, protocol } from 'electron';
-import path from 'path';
+import { BrowserWindow, IpcMainInvokeEvent, Menu, app, ipcMain } from 'electron';
 
 import { electronApp, is } from '@electron-toolkit/utils';
-import { JsonUtils } from '@tser-framework/commons';
 import { LoggerMain, TranslatorMain, WindowHelper } from '@tser-framework/main';
 
 import { applicationLogic } from '@main/applicationLogic';
 import { initializeBeforeReady, initializeWhenReady, stop } from '@main/lifecycle';
 import { notificationService } from '@main/services/NotificationService';
-import {
-  appConfig,
-  deepLinkBindings,
-  ipcListeners,
-  menuTemplate,
-  protocolBindings,
-  windowConfig
-} from '@main/setup';
+import { appConfig, ipcListeners, windowConfig } from '@main/setup';
 
 process.env.ELECTRON_ENABLE_WAYLAND = '1';
 
 export let mainWindow: BrowserWindow | null = null;
 const initTime = Date.now();
 
+console.log(`Powered by Electron ${process.versions.electron}`);
+
 (async (): Promise<void> => {
   process.noDeprecation = true;
   Menu.setApplicationMenu(null);
   await LoggerMain.initialize();
   const logger = LoggerMain.for('main/index.ts');
-  logger.info(`Powered by Electron ${process.versions.electron}`);
   logger.info(`Starting from '${app.getPath('exe')}'`);
   logger.system('##################################################');
   logger.system('#                  Started main                  #');
   logger.system('##################################################');
-  logger.system('Running initializeBeforeReady');
+  logger.system('Running eager initialization');
   LoggerMain.addTab();
   await initializeBeforeReady();
   LoggerMain.removeTab();
-  logger.system('Ended initializeBeforeReady');
 
   if (!app.requestSingleInstanceLock() && appConfig.singleInstance) {
     if (process.argv.includes('--restart')) {
@@ -50,7 +41,7 @@ const initTime = Date.now();
     }
   }
 
-  logger.system('Services registration');
+  logger.debug('Services registration');
   LoggerMain.addTab();
   Object.keys(ipcListeners).forEach((id) => {
     const listener = ipcListeners[id];
@@ -59,7 +50,7 @@ const initTime = Date.now();
       ipcMain.handle(id, (event: IpcMainInvokeEvent, ...args: any): unknown => {
         return listener.fn(event, ...args);
       });
-      logger.system("Synchronous IPC '" + id + "'");
+      logger.debug("Synchronous IPC '" + id + "'");
     }
   });
   Object.keys(ipcListeners).forEach((id) => {
@@ -69,47 +60,14 @@ const initTime = Date.now();
       ipcMain.on(id, (event: IpcMainInvokeEvent, ...args: any): void => {
         listener.fn(event, ...args);
       });
-      logger.system("Asynchronous IPC '" + id + "'");
+      logger.debug("Asynchronous IPC '" + id + "'");
     }
-  });
-
-  Object.keys(protocolBindings).forEach((id) => {
-    protocol.registerSchemesAsPrivileged([
-      { scheme: id, privileges: protocolBindings[id].privileges }
-    ]);
   });
 
   app.whenReady().then(async () => {
     electronApp.setAppUserModelId(app.getName());
-
-    Object.keys(protocolBindings).forEach((id) => {
-      protocol.handle(id, protocolBindings[id].handler);
-      logger.system("Registered protocol '" + id + "'");
-    });
-
-    if (deepLinkBindings) {
-      Object.keys(deepLinkBindings).forEach((id) => {
-        if (process.defaultApp) {
-          if (process.argv.length >= 2) {
-            app.setAsDefaultProtocolClient(id, process.execPath, [path.resolve(process.argv[1])]);
-          }
-        } else {
-          app.setAsDefaultProtocolClient(id);
-        }
-        logger.system("Associated deep-link '" + id + "'");
-      });
-    }
     LoggerMain.removeTab();
-    logger.system('Registration finished');
-
-    let menu: Menu | null = null;
-    if (menuTemplate) {
-      const template = JsonUtils.modifyObject(menuTemplate, ['label'], (_, value: unknown) => {
-        return TranslatorMain.translate(value as string);
-      });
-      menu = Menu.buildFromTemplate(template);
-    }
-    Menu.setApplicationMenu(menu);
+    logger.debug('Registration finished');
 
     app.on('browser-window-created', (_, window) => {
       configureShortcutEvents(window);
@@ -132,24 +90,37 @@ const initTime = Date.now();
       //createWindow();
     }
 
+    let flagQuit = false;
     app.on('activate', function () {
       if (BrowserWindow.getAllWindows().length === 0) {
         createWindow();
       }
     });
 
-    app.on('quit', async (): Promise<void> => {
-      await stop();
-      const msg = ' Stopped main after ' + msToTime(Date.now() - initTime) + ' ';
-      logger.system('##################################################');
-      logger.system(
-        '#' +
-          ''.padEnd((48 - msg.length) / 2, ' ') +
-          msg +
-          ''.padEnd((48 - msg.length) / 2, ' ') +
-          '#'
-      );
-      logger.system('##################################################');
+    app.on('before-quit', async (event): Promise<void> => {
+      if (!flagQuit) {
+        event.preventDefault();
+
+        logger.system('Requested application exit');
+        LoggerMain.addTab();
+        await stop();
+        LoggerMain.removeTab();
+
+        flagQuit = true;
+
+        app.quit();
+      } else {
+        const msg = ' Stopped main after ' + msToTime(Date.now() - initTime) + ' ';
+        logger.system('##################################################');
+        logger.system(
+          '#' +
+            ''.padEnd((48 - msg.length) / 2, ' ') +
+            msg +
+            ''.padEnd((48 - msg.length) / 2, ' ') +
+            '#'
+        );
+        logger.system('##################################################');
+      }
     });
 
     app.on('window-all-closed', () => {
@@ -160,7 +131,7 @@ const initTime = Date.now();
       }
     });
 
-    app.on('second-instance', (_, commandLine: Array<string>) => {
+    app.on('second-instance', () => {
       // Someone tried to run a second instance, we should focus our window.
       if (mainWindow) {
         if (mainWindow.isMinimized()) {
@@ -172,25 +143,18 @@ const initTime = Date.now();
           TranslatorMain.translate('already.running', { appName: app.getName() })
         );
       }
-
-      if (deepLinkBindings) {
-        const uri = commandLine.pop();
-        Object.keys(deepLinkBindings).forEach((id) => {
-          if (uri?.startsWith(id + '://')) {
-            deepLinkBindings[id].handler(uri);
-          }
-        });
-      }
     });
 
-    logger.system('Running initializeWhenReady');
+    logger.system('Running delayed initialization');
     LoggerMain.addTab();
     await initializeWhenReady();
     LoggerMain.removeTab();
-    logger.system('Ended initializeWhenReady');
 
     //await createWindow();
     //mainWindow?.close();
+    LoggerMain.removeTab();
+    logger.system('Running application');
+    LoggerMain.addTab();
     applicationLogic();
   });
 })();

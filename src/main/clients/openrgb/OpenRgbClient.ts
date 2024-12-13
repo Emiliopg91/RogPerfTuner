@@ -55,7 +55,7 @@ class OpenRgbClient {
       })();
     });
 
-    this.availableModes = this.availableModesInst.map((mode) => mode.getName());
+    this.availableModes = this.availableModesInst.map((mode) => mode.name);
   }
 
   public async stop(): Promise<void> {
@@ -67,6 +67,7 @@ class OpenRgbClient {
     this.availableDevices.forEach((dev) =>
       dev.updateLeds(Array(dev.leds.length).fill(RGBColor.fromHex('#000000')))
     );
+    await new Promise<void>((resolve) => setTimeout(resolve, 50));
     await this.disconnectClient();
     await this.stopOpenRgbServer();
     this.initialized = false;
@@ -190,13 +191,17 @@ class OpenRgbClient {
     brightness: AuraBrightness,
     color?: string
   ): Promise<void> {
-    const inst = this.availableModesInst.filter((i) => i.getName() == effect);
+    const inst = this.availableModesInst.filter((i) => i.name == effect);
     if (inst && inst.length > 0) {
       for (let i = 0; i < this.availableModesInst.length; i++) {
         await this.availableModesInst[i].stop();
       }
       await inst[0].start(this.availableDevices, brightness, RGBColor.fromHex(color || '#000000'));
     }
+  }
+
+  public allowsColor(mode: string): boolean {
+    return this.availableModesInst.find((inst) => inst.name == mode)!.supportsColor;
   }
 }
 
