@@ -20,6 +20,9 @@ linux:
   maintainer: Emiliopg91
   category: Utility
   compression: store
+  executableArgs:
+    - --disable-gpu-compositing
+    - --ozone-platform=auto
 appImage:
   artifactName: ${name}.${ext}
 npmRebuild: false
