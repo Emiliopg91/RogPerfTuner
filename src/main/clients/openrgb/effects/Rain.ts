@@ -1,5 +1,3 @@
-import { Mutex } from 'async-mutex';
-
 import Device from '@main/clients/openrgb/client/classes/Device';
 import { RGBColor } from '@main/clients/openrgb/client/classes/RGBColor';
 import { AbstractEffect } from '@main/clients/openrgb/effects/base/AbstractEffect';
@@ -10,7 +8,6 @@ interface BufferEntry {
 }
 
 class Rain extends AbstractEffect {
-  private mutex: Mutex = new Mutex();
   private buffer: Array<Array<BufferEntry>> = [];
   private availableColors: Array<RGBColor> = [
     new RGBColor(0, 0, 0),
@@ -24,27 +21,26 @@ class Rain extends AbstractEffect {
     super('Rain', false);
   }
 
-  protected async applyEffect(devices: Array<Device>): Promise<void> {
+  protected async applyEffect(): Promise<void> {
     const promises: Array<Promise<void>> = [];
-    for (let i = 0; i < devices.length; i++) {
+    for (let i = 0; i < this.devices.length; i++) {
       this.buffer[i] = [];
       promises.push(
         new Promise<void>((resolve) => {
           (async (): Promise<void> => {
-            const leds: Array<RGBColor> = Array(devices[i].leds.length).fill(
+            const leds: Array<RGBColor> = Array(this.devices[i].leds.length).fill(
               RGBColor.fromHex('#000000')
             );
 
             while (this.isRunning) {
-              const next = this.getNext(i, devices[i]);
+              const next = this.getNext(i, this.devices[i]);
               leds[next.index] = next.color;
-              this.setLeds(devices[i], leds);
+              this.setColors(this.devices[i], leds);
               const naps = 4;
               for (let nap = 0; nap < naps; nap++) {
                 if (this.isRunning) {
-                  await new Promise<void>((resolve) => {
-                    setTimeout(resolve, 2500 / leds.length / (0.5 + Math.random() * 0.5) / naps);
-                  });
+                  const napTime = 2500 / leds.length / (0.5 + Math.random() * 0.5) / naps;
+                  await this.sleep(napTime);
                 }
               }
             }
@@ -63,9 +59,7 @@ class Rain extends AbstractEffect {
       for (let i = 0; i < dev.leds.length; i++) {
         this.buffer[devIndex].push({
           index: i,
-          color: this.availableColors[
-            Math.floor(Math.random() * this.availableColors.length)
-          ].getDimmed(this.brightness)
+          color: this.availableColors[Math.floor(Math.random() * this.availableColors.length)]
         });
       }
       for (let i = 0; i < dev.leds.length; i++) {
@@ -77,12 +71,6 @@ class Rain extends AbstractEffect {
     }
 
     return this.buffer[devIndex].shift()!;
-  }
-
-  private setLeds(dev: Device, colors: Array<RGBColor>): void {
-    this.mutex.runExclusive(() => {
-      dev.updateLeds(colors);
-    });
   }
 }
 

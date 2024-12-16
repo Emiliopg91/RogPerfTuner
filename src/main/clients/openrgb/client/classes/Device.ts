@@ -105,6 +105,10 @@ export default class Device {
   }
 
   public updateLeds(colors: Array<RGBColor>): void {
-    this.client.updateLeds(this.deviceId, colors);
+    try {
+      this.client.updateLeds(this.deviceId, colors);
+    } catch (err) {
+      console.error('Error while updating leds:', err);
+    }
   }
 }

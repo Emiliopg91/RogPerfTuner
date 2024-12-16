@@ -4,6 +4,7 @@ export const command = {
   requestProtocolVersion: 40,
   setClientName: 50,
   deviceListUpdated: 100,
+  updateDeviceList: 101,
   requestProfileList: 150,
   saveProfile: 151,
   loadProfile: 152,

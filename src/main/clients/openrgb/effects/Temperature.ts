@@ -1,6 +1,5 @@
 import systeminformation from 'systeminformation';
 
-import Device from '@main/clients/openrgb/client/classes/Device';
 import { RGBColor } from '@main/clients/openrgb/client/classes/RGBColor';
 import { AbstractEffect } from '@main/clients/openrgb/effects/base/AbstractEffect';
 
@@ -15,7 +14,7 @@ class Temperature extends AbstractEffect {
     super('Temperature', false);
   }
 
-  protected async applyEffect(devices: Array<Device>): Promise<void> {
+  protected async applyEffect(): Promise<void> {
     this.updateColorsByTemp();
 
     let prevColor = await this.getNewColor();
@@ -24,12 +23,12 @@ class Temperature extends AbstractEffect {
 
       for (let offset = 0; offset < 10 && this.isRunning; offset++) {
         const color = this.transition(prevColor, newColor, offset, 10);
-        devices.forEach((dev) => {
-          dev.updateLeds(Array(dev.leds.length).fill(color));
+        this.devices.forEach((dev) => {
+          this.setColors(dev, Array(dev.leds.length).fill(color));
         });
 
         if (this.isRunning) {
-          await new Promise((resolve) => setTimeout(resolve, 30));
+          await this.sleep(30);
         }
       }
 
@@ -58,9 +57,9 @@ class Temperature extends AbstractEffect {
   private async getNewColor(): Promise<RGBColor> {
     const cpuTemp = (await systeminformation.cpuTemperature()).main;
     if (cpuTemp >= Temperature.maxTemp) {
-      return new RGBColor(255 * this.brightness, 0, 0);
+      return new RGBColor(255, 0, 0);
     } else if (cpuTemp < Temperature.minTemp) {
-      return new RGBColor(0, 255 * this.brightness, 0);
+      return new RGBColor(0, 255, 0);
     } else {
       return this.colorsByTemp[cpuTemp];
     }
@@ -70,8 +69,8 @@ class Temperature extends AbstractEffect {
     this.colorsByTemp = {};
     for (let i = 0; i <= Temperature.steps; i++) {
       this.colorsByTemp[Temperature.minTemp + i] = new RGBColor(
-        i * Temperature.increment * this.brightness,
-        (255 - i * Temperature.increment) * this.brightness,
+        i * Temperature.increment,
+        255 - i * Temperature.increment,
         0
       );
     }

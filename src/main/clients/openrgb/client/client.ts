@@ -170,6 +170,16 @@ export default class Client extends EventEmitter {
   }
 
   /**
+   * get the amount of devices
+   * @returns {Promise<number>}
+   */
+  async updateDeviceList(): Promise<number> {
+    this.sendMessage(command.updateDeviceList);
+    const buffer = await this.readMessage(command.deviceListUpdated);
+    return buffer.readUInt32LE();
+  }
+
+  /**
    * get the protocol version
    * @returns {Promise<number>}
    */

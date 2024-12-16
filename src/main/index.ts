@@ -25,6 +25,11 @@ console.log(`Powered by Electron ${process.versions.electron}`);
   Menu.setApplicationMenu(null);
   await LoggerMain.initialize();
   const logger = LoggerMain.for('main/index.ts');
+
+  process.on('uncaughtException', (err) => {
+    logger.error('Uncaught exception:', err);
+  });
+
   logger.system('##################################################');
   logger.system('#                  Started main                  #');
   logger.system('##################################################');

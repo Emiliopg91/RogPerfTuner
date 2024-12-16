@@ -26,7 +26,7 @@ console.info('HTMLS: ', htmls);
 
 export default defineConfig({
   main: {
-    build: { minify: true, sourcemap: false, rollupOptions: { treeshake: true } },
+    build: { minify: false, sourcemap: false, rollupOptions: { treeshake: true } },
     plugins: [swcPlugin(), bytecodePlugin({ transformArrowFunctions: false })],
     resolve: {
       alias: {

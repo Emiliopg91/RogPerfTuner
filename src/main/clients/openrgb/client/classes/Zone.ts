@@ -1,10 +1,11 @@
 import { Matrix } from '@main/clients/openrgb/client/classes/Matrix';
 import { Segment } from '@main/clients/openrgb/client/classes/Segment';
+import { ZoneType } from '@main/clients/openrgb/client/interfaces/ZoneType';
 
 export class Zone {
   private _name: string;
   private _id: number;
-  private _type: number;
+  private _type: ZoneType;
   private _ledsMin: number;
   private _ledsMax: number;
   private _ledsCount: number;
@@ -15,7 +16,7 @@ export class Zone {
   constructor(
     name: string,
     id: number,
-    type: number,
+    type: ZoneType,
     ledsMin: number,
     ledsMax: number,
     ledsCount: number,
@@ -50,11 +51,11 @@ export class Zone {
     this._id = value;
   }
 
-  get type(): number {
+  get type(): ZoneType {
     return this._type;
   }
 
-  set type(value: number) {
+  set type(value: ZoneType) {
     this._type = value;
   }
 

@@ -1,4 +1,3 @@
-import Device from '@main/clients/openrgb/client/classes/Device';
 import { RGBColor } from '@main/clients/openrgb/client/classes/RGBColor';
 import { AbstractEffect } from '@main/clients/openrgb/effects/base/AbstractEffect';
 
@@ -10,20 +9,18 @@ class DanceFloor extends AbstractEffect {
   private getRandom(length): Array<RGBColor> {
     const random: Array<RGBColor> = [];
     for (let i = 0; i < length; ++i) {
-      random.push(
-        RGBColor.fromHSV(Math.random() * 359, Math.random() * 0.25 + 0.75, this.brightness)
-      );
+      random.push(RGBColor.fromHSV(Math.random() * 359, Math.random() * 0.25 + 0.75, 1));
     }
 
     return random;
   }
 
-  protected async applyEffect(devices: Array<Device>): Promise<void> {
+  protected async applyEffect(): Promise<void> {
     while (this.isRunning) {
-      devices.forEach((dev) => {
-        dev.updateLeds(this.getRandom(dev.colors.length));
+      this.devices.forEach((dev) => {
+        this.setColors(dev, this.getRandom(dev.colors.length));
       });
-      await new Promise<void>((resolve) => setTimeout(resolve, 500));
+      await this.sleep(500);
     }
     this.hasFinished = true;
   }

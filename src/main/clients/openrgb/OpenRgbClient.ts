@@ -1,5 +1,5 @@
 import { ChildProcess, spawn } from 'child_process';
-import { existsSync, readFileSync, readdirSync } from 'fs';
+import { Dirent, existsSync, readFileSync, readdirSync, statSync } from 'fs';
 import net, { AddressInfo } from 'net';
 import os from 'os';
 import path from 'path';
@@ -13,7 +13,9 @@ import { RGBColor } from '@main/clients/openrgb/client/classes/RGBColor';
 import Client from '@main/clients/openrgb/client/client';
 import { breathing } from '@main/clients/openrgb/effects/Breathing';
 import { danceFloor } from '@main/clients/openrgb/effects/DanceFloor';
+import { matrix } from '@main/clients/openrgb/effects/Matrix';
 import { rain } from '@main/clients/openrgb/effects/Rain';
+import { rainbowWave } from '@main/clients/openrgb/effects/RainbowWave';
 import { spectrumCycle } from '@main/clients/openrgb/effects/SpectrumCycle';
 import { starryNight } from '@main/clients/openrgb/effects/StarryNight';
 import { staticEffect } from '@main/clients/openrgb/effects/Static';
@@ -30,9 +32,11 @@ class OpenRgbClient {
     staticEffect,
     breathing,
     spectrumCycle,
+    rainbowWave,
     starryNight,
     temperature,
     danceFloor,
+    matrix,
     rain
   ];
   public availableModes: Array<string> = [];
@@ -41,8 +45,16 @@ class OpenRgbClient {
   private openRgbProc: ChildProcess | undefined = undefined;
   public port: number = 6472;
   private client: Client | undefined = undefined;
+  private stopRequested = false;
+  private stopInProcess = false;
+  private fromUnexpectedStop = false;
+  private effect: string | undefined;
+  private brightness: AuraBrightness | undefined;
+  private color: string | undefined;
 
   public async initialize(): Promise<void> {
+    this.stopRequested = false;
+    this.fromUnexpectedStop = false;
     await new Promise<void>((resolve, reject) => {
       (async (): Promise<void> => {
         if (!this.initialized) {
@@ -66,13 +78,39 @@ class OpenRgbClient {
 
   private loadSupportedDevices(): void {
     this.compatibleDevices = undefined;
-    const mountDir = readdirSync(os.tmpdir(), { withFileTypes: true }).find((entry) =>
+    const entries: Array<Dirent> = readdirSync(os.tmpdir(), { withFileTypes: true });
+
+    // Filtrar los directorios que comienzan con '.mount_' + los primeros 6 caracteres de openRgbAppImage
+    const matchingEntries: Array<Dirent> = entries.filter((entry) =>
       entry.name.startsWith('.mount_' + path.basename(openRgbAppImage).substring(0, 6))
     );
+
+    // Obtener el archivo con la fecha de modificación más reciente
+    const mountDir = matchingEntries
+      .map((entry: Dirent) => {
+        const fullPath = path.join(os.tmpdir(), entry.name);
+        try {
+          const stats = statSync(fullPath);
+          return { path: path.join(entry.path, entry.name), mtime: stats.mtime.getTime() };
+        } catch (err) {
+          return { path: '', mtime: 0 };
+        }
+      })
+      .filter((entry) => entry.path.length > 0)
+      .reduce(
+        (previousValue, currentValue) => {
+          if (previousValue.mtime < currentValue.mtime) {
+            return currentValue;
+          } else {
+            return previousValue;
+          }
+        },
+        { path: '', mtime: 0 }
+      );
+
     if (mountDir) {
       const uDevPath = path.join(
         mountDir.path,
-        mountDir.name,
         'usr',
         'lib',
         'udev',
@@ -101,20 +139,29 @@ class OpenRgbClient {
   }
 
   public async stop(): Promise<void> {
+    this.stopRequested = true;
+    this.stopInProcess = true;
     this.logger.info('Stopping client');
     LoggerMain.addTab();
-    for (let i = 0; i < this.availableModesInst.length; i++) {
-      await this.availableModesInst[i].stop();
-    }
-    this.availableDevices.forEach((dev) =>
-      dev.updateLeds(Array(dev.leds.length).fill(RGBColor.fromHex('#000000')))
-    );
+    await this.stopEffects();
+    if (!this.fromUnexpectedStop)
+      this.availableDevices.forEach((dev) =>
+        dev.updateLeds(Array(dev.leds.length).fill(RGBColor.fromHex('#000000')))
+      );
     await new Promise<void>((resolve) => setTimeout(resolve, 50));
     await this.disconnectClient();
     await this.stopOpenRgbServer();
     this.initialized = false;
     LoggerMain.removeTab();
     LoggerMain.removeTab();
+    this.stopInProcess = false;
+    this.stopRequested = false;
+  }
+
+  private async stopEffects(): Promise<void> {
+    for (let i = 0; i < this.availableModesInst.length; i++) {
+      await this.availableModesInst[i].stop();
+    }
   }
 
   public async restart(): Promise<void> {
@@ -128,14 +175,16 @@ class OpenRgbClient {
         this.logger.info('Initializing OpenRGB');
         LoggerMain.addTab();
 
+        this.logger.debug('Looking for free port');
         this.port = await new Promise((resolve) => {
           const server = net.createServer();
           server.listen(0, () => {
             const port = (server.address() as AddressInfo)!.port;
+            this.logger.debug(`Selected port ${port}`);
             server.close(() => resolve(port));
           });
         });
-        this.logger.info('Launching OpenRGB server using port ' + this.port);
+        this.logger.info('Launching OpenRGB server');
         this.openRgbProc = spawn(openRgbAppImage, [
           '--server-host',
           String(Constants.localhost),
@@ -150,13 +199,21 @@ class OpenRgbClient {
           this.logger.error(data.toString());
         });
 
-        this.openRgbProc.on('close', (code) => {
+        this.openRgbProc.on('close', async (code) => {
           if (code) {
             this.logger.info(`Finished with code ${code}`);
           } else {
             this.logger.info(`Process killed`);
           }
           this.openRgbProc = undefined;
+          this.fromUnexpectedStop = !this.stopRequested;
+          if (!this.stopInProcess) await this.stop();
+
+          if (!this.stopRequested) {
+            this.logger.info('Restarting OpenRGB');
+            await this.initialize();
+            this.applyEffect(this.effect!, this.brightness!, this.color);
+          }
         });
 
         this.openRgbProc.on('error', (error) => {
@@ -191,13 +248,15 @@ class OpenRgbClient {
   }
 
   private async stopOpenRgbServer(): Promise<void> {
-    this.logger.info('Stopping OpenRGB');
-    await new Promise<void>((resolve) => {
-      this.openRgbProc?.on('exit', () => {
-        resolve();
+    if (this.openRgbProc) {
+      this.logger.info('Stopping OpenRGB');
+      await new Promise<void>((resolve) => {
+        this.openRgbProc?.on('exit', () => {
+          resolve();
+        });
+        this.openRgbProc?.kill('SIGKILL');
       });
-      this.openRgbProc?.kill('SIGKILL');
-    });
+    }
   }
 
   private async disconnectClient(): Promise<void> {
@@ -210,20 +269,25 @@ class OpenRgbClient {
     this.availableDevices = [];
     this.client = new Client('RogControlCenter', this.port, Constants.localhost);
     this.logger.info('Connecting to OpenRGB');
+    this.client.on('disconnect', () => {
+      this.stopEffects();
+    });
     await this.client.connect();
 
     this.logger.info('Getting available devices');
     const count = await this.client!.getControllerCount();
-    const promises: Array<Promise<Device>> = [];
+    const promises: Array<Promise<Device | undefined>> = [];
     for (let i = 0; i < count; i++) {
       promises.push(this.client!.getControllerData(i));
     }
 
     const allDevs = await Promise.all(promises);
     allDevs.forEach((dev) => {
-      const direct = dev.modes.filter((m) => m.name == 'Direct');
-      if (direct && direct.length > 0) {
-        this.availableDevices.push(dev);
+      if (dev) {
+        const direct = dev.modes.filter((m) => m.name == 'Direct');
+        if (direct && direct.length > 0) {
+          this.availableDevices.push(dev);
+        }
       }
     });
   }
@@ -239,6 +303,9 @@ class OpenRgbClient {
         await this.availableModesInst[i].stop();
       }
       await inst[0].start(this.availableDevices, brightness, RGBColor.fromHex(color || '#000000'));
+      this.effect = effect;
+      this.brightness = brightness;
+      this.color = color;
     }
   }
 

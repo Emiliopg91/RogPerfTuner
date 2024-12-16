@@ -1,3 +1,5 @@
+import { Mutex } from 'async-mutex';
+
 import { LoggerMain } from '@tser-framework/main';
 
 import { AuraBrightness } from '@commons/models/Aura';
@@ -8,11 +10,13 @@ import { RGBColor } from '@main/clients/openrgb/client/classes/RGBColor';
 export abstract class AbstractEffect {
   protected isRunning = false;
   protected hasFinished = true;
-  protected brightness = 0;
+  private brightness = 0;
   protected _supportsColor: boolean;
   protected _name: string;
   protected color: RGBColor = RGBColor.fromHex('#FF0000');
   protected logger: LoggerMain;
+  protected mutex: Mutex = new Mutex();
+  protected devices: Array<Device> = [];
 
   constructor(name: string, supportsColor = false) {
     this.logger = LoggerMain.for(this.constructor.name);
@@ -39,6 +43,7 @@ export abstract class AbstractEffect {
       return;
     } else {
       this.color = color;
+      this.devices = devices;
 
       this.logger.info(
         `Starting effect with ${AuraBrightness[brightness].toLowerCase()} brightness ${this._supportsColor ? `and ${color.toHex()} color` : ''}`
@@ -62,7 +67,7 @@ export abstract class AbstractEffect {
 
       this.isRunning = true;
 
-      await this.applyEffect(devices);
+      await this.applyEffect();
       this.logger.info('Effect finished');
     }
   }
@@ -82,6 +87,28 @@ export abstract class AbstractEffect {
     }
   }
 
+  protected async sleep(ms: number): Promise<void> {
+    if (this.isRunning) {
+      await new Promise<void>((resolve) => {
+        setTimeout(resolve, ms);
+      });
+    }
+  }
+
+  protected async setColors(dev: Device, colors: Array<RGBColor>): Promise<void> {
+    if (this.isRunning) {
+      await this.mutex.runExclusive(() => {
+        if (this.isRunning) {
+          const cols = Array(colors.length);
+          colors.forEach((c, i) => {
+            cols[i] = c.getDimmed(this.brightness);
+          });
+          dev.updateLeds(cols);
+        }
+      });
+    }
+  }
+
   public get supportsColor(): boolean {
     return this._supportsColor;
   }
@@ -90,5 +117,5 @@ export abstract class AbstractEffect {
     return this._name;
   }
 
-  protected abstract applyEffect(devices: Array<Device>): Promise<void>;
+  protected abstract applyEffect(): Promise<void>;
 }
