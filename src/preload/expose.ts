@@ -103,6 +103,11 @@ export const exposed = {
     },
     supportsColor(): Promise<boolean> {
       return ipcRenderer.invoke('supportsColor');
+    },
+    refreshColor(callback: (color: string) => void): void {
+      ipcRenderer.on('refreshColor', (_, color: string) => {
+        callback(color);
+      });
     }
   },
   app: {

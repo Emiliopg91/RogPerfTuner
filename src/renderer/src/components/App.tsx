@@ -1,15 +1,15 @@
-import { Index } from './Index';
-import { MemoryRouter } from 'react-router-dom';
-
-import { Loading } from '@tser-framework/renderer';
+import { Header } from '@renderer/components/Header';
+import { ApplicationSettings } from '@renderer/components/settings/ApplicationSettings';
+import { AuraSettings } from '@renderer/components/settings/AuraSettings';
+import { PerformanceSettings } from '@renderer/components/settings/PerformanceSettings';
 
 export function App(): JSX.Element {
   return (
-    <MemoryRouter>
-      <Loading color="white" />
-      <div id="router">
-        <Index />
-      </div>
-    </MemoryRouter>
+    <>
+      <Header />
+      <PerformanceSettings />
+      <AuraSettings />
+      <ApplicationSettings />
+    </>
   );
 }

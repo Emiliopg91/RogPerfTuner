@@ -13,7 +13,7 @@ import { RGBColor } from '@main/clients/openrgb/client/classes/RGBColor';
 import Client from '@main/clients/openrgb/client/client';
 import { breathing } from '@main/clients/openrgb/effects/Breathing';
 import { danceFloor } from '@main/clients/openrgb/effects/DanceFloor';
-import { matrix } from '@main/clients/openrgb/effects/Matrix';
+import { digitalRain } from '@main/clients/openrgb/effects/DigitalRain';
 import { rain } from '@main/clients/openrgb/effects/Rain';
 import { rainbowWave } from '@main/clients/openrgb/effects/RainbowWave';
 import { spectrumCycle } from '@main/clients/openrgb/effects/SpectrumCycle';
@@ -36,7 +36,7 @@ class OpenRgbClient {
     starryNight,
     temperature,
     danceFloor,
-    matrix,
+    digitalRain,
     rain
   ];
   public availableModes: Array<string> = [];
@@ -86,7 +86,7 @@ class OpenRgbClient {
     );
 
     // Obtener el archivo con la fecha de modificación más reciente
-    const mountDir = matchingEntries
+    const mountDirs = matchingEntries
       .map((entry: Dirent) => {
         const fullPath = path.join(os.tmpdir(), entry.name);
         try {
@@ -96,44 +96,40 @@ class OpenRgbClient {
           return { path: '', mtime: 0 };
         }
       })
-      .filter((entry) => entry.path.length > 0)
-      .reduce(
-        (previousValue, currentValue) => {
-          if (previousValue.mtime < currentValue.mtime) {
-            return currentValue;
-          } else {
-            return previousValue;
-          }
-        },
-        { path: '', mtime: 0 }
-      );
+      .filter((entry) => entry.path.length > 0);
 
-    if (mountDir) {
-      const uDevPath = path.join(
-        mountDir.path,
-        'usr',
-        'lib',
-        'udev',
-        'rules.d',
-        '60-openrgb.rules'
-      );
-      if (existsSync(uDevPath)) {
-        const content = readFileSync(uDevPath).toString();
-        const lines = content.split('\n');
+    for (let f = 0; this.compatibleDevices == undefined && f < mountDirs.length; f++) {
+      const mountDir = mountDirs[f];
 
-        const regex =
-          /SUBSYSTEMS==".*?", ATTRS\{idVendor\}=="([\da-fA-F]+)", ATTRS\{idProduct\}=="([\da-fA-F]+)"/;
+      try {
+        const uDevPath = path.join(
+          mountDir.path,
+          'usr',
+          'lib',
+          'udev',
+          'rules.d',
+          '60-openrgb.rules'
+        );
+        if (existsSync(uDevPath)) {
+          const content = readFileSync(uDevPath).toString();
+          const lines = content.split('\n');
 
-        const results = lines
-          .map((line) => regex.exec(line)) // Buscar coincidencias
-          .filter((match) => match !== null) // Filtrar solo las líneas que coincidan
-          .map(
-            (match): UsbIdentifier => ({
-              idVendor: match[1],
-              idProduct: match[2]
-            })
-          );
-        this.compatibleDevices = results;
+          const regex =
+            /SUBSYSTEMS==".*?", ATTRS\{idVendor\}=="([\da-fA-F]+)", ATTRS\{idProduct\}=="([\da-fA-F]+)"/;
+
+          const results = lines
+            .map((line) => regex.exec(line)) // Buscar coincidencias
+            .filter((match) => match !== null) // Filtrar solo las líneas que coincidan
+            .map(
+              (match): UsbIdentifier => ({
+                idVendor: match[1],
+                idProduct: match[2]
+              })
+            );
+          this.compatibleDevices = results;
+        }
+      } catch (err) {
+        ('');
       }
     }
   }

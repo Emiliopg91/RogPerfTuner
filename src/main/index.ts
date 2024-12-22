@@ -82,7 +82,6 @@ console.log(`Powered by Electron ${process.versions.electron}`);
       configureShortcutEvents(window);
     });
 
-    let flagQuit = false;
     app.on('activate', function () {
       if (BrowserWindow.getAllWindows().length === 0) {
         createWindow();
@@ -90,29 +89,26 @@ console.log(`Powered by Electron ${process.versions.electron}`);
     });
 
     app.on('before-quit', async (event): Promise<void> => {
-      if (!flagQuit) {
-        event.preventDefault();
+      event.preventDefault();
 
-        logger.system('Requested application exit');
-        LoggerMain.addTab();
-        await stop();
-        LoggerMain.removeTab();
+      logger.system('Requested application exit');
+      LoggerMain.addTab();
+      await stop();
+      LoggerMain.removeTab();
 
-        flagQuit = true;
-
-        app.quit();
-      } else {
-        const msg = ' Stopped main after ' + msToTime(Date.now() - initTime) + ' ';
-        logger.system('##################################################');
-        logger.system(
-          '#' +
-            ''.padEnd((48 - msg.length) / 2, ' ') +
-            msg +
-            ''.padEnd((48 - msg.length) / 2, ' ') +
-            '#'
-        );
-        logger.system('##################################################');
-      }
+      const msg = ' Stopped main after ' + msToTime(Date.now() - initTime) + ' ';
+      logger.system('##################################################');
+      logger.system(
+        '#' +
+          ''.padEnd((48 - msg.length) / 2, ' ') +
+          msg +
+          ''.padEnd((48 - msg.length) / 2, ' ') +
+          '#'
+      );
+      logger.system('##################################################');
+      setTimeout(() => {
+        process.kill(process.pid, 9);
+      }, 500);
     });
 
     app.on('window-all-closed', () => {

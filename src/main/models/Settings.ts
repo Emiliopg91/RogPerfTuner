@@ -12,12 +12,11 @@ export interface ProfilesPlatformSettingsType {
 }
 
 export interface OpenRgbSettingsType {
-  state?: OpenRgbStateSettingsType;
-  build: string;
+  lastEffect: string;
+  effects?: Record<string, OpenRgbEffectSettingsType>;
 }
 
-export interface OpenRgbStateSettingsType {
-  mode: string;
+export interface OpenRgbEffectSettingsType {
   brightness: number;
-  color: string;
+  color?: string;
 }

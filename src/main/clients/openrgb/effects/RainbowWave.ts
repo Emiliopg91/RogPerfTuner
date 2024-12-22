@@ -46,7 +46,7 @@ class RainbowWave extends AbstractEffect {
         });
         this.setColors(dev, colors);
       });
-      await this.sleep(100);
+      await this.sleep(75);
 
       for (let idx = rainbow.length - 1; idx >= 1; idx--) {
         rainbow[idx] = rainbow[idx - 1];

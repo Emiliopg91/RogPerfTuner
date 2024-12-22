@@ -32,12 +32,19 @@ export const AuraSettings: FC = () => {
       setLedMode(() => mode);
       window.api.supportsColor().then((res) => setSupportsColor(res));
     });
-    window.api.supportsColor().then((result: boolean) => {
-      setSupportsColor(result);
-    });
     window.api.getLedMode().then((result: string) => {
       setLedMode(result);
     });
+
+    //Led Color
+    window.api.refreshColor((color: string) => {
+      LoggerRenderer.info('Refreshing color in UI');
+      setColor(() => color);
+    });
+    window.api.supportsColor().then((result: boolean) => {
+      setSupportsColor(result);
+    });
+
     window.api.getAvailableLedModes().then((modes) => setAvailable(modes));
     window.api.getColor().then((color) => setColor(color));
   }, []);
@@ -100,13 +107,18 @@ export const AuraSettings: FC = () => {
       </SettingsLine>
       <SettingsLine label={TranslatorRenderer.translate('led.color')}>
         <>
-          <Form.Control
-            disabled={!supportsColor}
-            type="color"
-            value={color}
-            data-bs-theme="dark"
-            onChange={handleColorChange}
-          />
+          {supportsColor && (
+            <Form.Control
+              disabled={!supportsColor}
+              type="color"
+              value={color}
+              data-bs-theme="dark"
+              onChange={handleColorChange}
+            />
+          )}
+          {!supportsColor && (
+            <span>{TranslatorRenderer.translate('color.selection.not.available')}</span>
+          )}
         </>
       </SettingsLine>
     </SettingsBlock>

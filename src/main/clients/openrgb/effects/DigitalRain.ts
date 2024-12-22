@@ -4,9 +4,9 @@ import { Zone } from '@main/clients/openrgb/client/classes/Zone';
 import { ZoneType } from '@main/clients/openrgb/client/interfaces/ZoneType';
 import { AbstractEffect } from '@main/clients/openrgb/effects/base/AbstractEffect';
 
-class MatrixEf extends AbstractEffect {
+class DigitalRain extends AbstractEffect {
   public constructor() {
-    super('Matrix', true);
+    super('Digital Rain', true);
   }
 
   private initializeMatrix(zoneStatus: Array<Array<number>>, zone: Zone): void {
@@ -60,7 +60,11 @@ class MatrixEf extends AbstractEffect {
     for (let r = 0; r < zone.matrix!.height; r++) {
       for (let c = 0; c < zone.matrix!.width; c++) {
         if (matrix.keys[r][c] != undefined) {
-          colors[matrix.keys[r][c]!] = this.color.getDimmed(zoneStatus[r][c] / this.maxCount);
+          if (zoneStatus[r][c] == this.maxCount) {
+            colors[matrix.keys[r][c]!] = new RGBColor(255, 255, 255);
+          } else {
+            colors[matrix.keys[r][c]!] = this.color.getDimmed(zoneStatus[r][c] / this.maxCount);
+          }
         }
       }
     }
@@ -180,7 +184,7 @@ class MatrixEf extends AbstractEffect {
                 offset += zone.ledsCount;
               });
               this.setColors(dev, finalColors);
-              await this.sleep(25 + Math.floor(Math.random() * 76));
+              await this.sleep(75);
             }
             resolve();
           })();
@@ -193,4 +197,4 @@ class MatrixEf extends AbstractEffect {
   }
 }
 
-export const matrix = new MatrixEf();
+export const digitalRain = new DigitalRain();
