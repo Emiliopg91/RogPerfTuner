@@ -2,6 +2,8 @@ import { Menu, app } from 'electron/main';
 
 import { ConfigurationHelper, TranslatorMain, TrayBuilder } from '@tser-framework/main';
 
+import { translations } from '@commons/translations';
+
 import { asusFanCurvesClient } from '@main/clients/dbus/AsusFanCurvesClient';
 import { asusPlatformClient } from '@main/clients/dbus/AsusPlatformClient';
 import { powerProfilesClient } from '@main/clients/dbus/PowerProfilesClient';
@@ -15,7 +17,6 @@ import { fifoServer } from '@main/utils/FifoServer';
 import { settings } from '@main/utils/Settings';
 
 import icon45 from '@resources/icons/icon-45x45.png?asset';
-import translations from '@resources/translations.i18n.json';
 
 export async function initializeBeforeReady(): Promise<void> {
   app.disableHardwareAcceleration();

@@ -11,8 +11,7 @@ import { TranslatorRenderer } from '@tser-framework/renderer';
 
 import { AuraBrightness } from '@commons/models/Aura';
 import { ThrottleThermalPolicy } from '@commons/models/Platform';
-
-import translations from '@resources/translations.i18n.json';
+import { translations } from '@commons/translations';
 
 const localTranslations = TranslatorRenderer.buildTranslations(translations);
 

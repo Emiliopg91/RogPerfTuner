@@ -31,7 +31,7 @@ export default defineConfig({
     resolve: {
       alias: {
         '@main': resolve('src/main'),
-        '@commons': resolve('src/commons/src'),
+        '@commons': resolve('src/commons'),
         '@resources': resolve('resources')
       }
     }
@@ -42,7 +42,7 @@ export default defineConfig({
     resolve: {
       alias: {
         '@main': resolve('src/main'),
-        '@commons': resolve('src/commons/src'),
+        '@commons': resolve('src/commons'),
         '@resources': resolve('resources')
       }
     }
@@ -61,8 +61,8 @@ export default defineConfig({
     plugins: [react()],
     resolve: {
       alias: {
-        '@renderer': resolve('src/renderer/src'),
-        '@commons': resolve('src/commons/src')
+        '@renderer': resolve('src/renderer'),
+        '@commons': resolve('src/commons')
       }
     },
     css: {

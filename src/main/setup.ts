@@ -1,3 +1,4 @@
+import { exec } from 'child_process';
 import { app } from 'electron';
 import path from 'path';
 
@@ -172,6 +173,33 @@ export const generateTrayMenuDef = async (): Promise<
     {
       label: '  ' + TranslatorMain.translate('led.brightness'),
       submenu: await getBrightnessOption()
+    },
+    {
+      label: '  ' + TranslatorMain.translate('led.color'),
+      submenu: [
+        {
+          label: openRgbService.getColor().toUpperCase(),
+          click: async (): Promise<void> => {
+            exec(
+              `zenity --color-selection --color=${openRgbService.getColor().toUpperCase()}`,
+              (error, stdout) => {
+                if (!error) {
+                  const result = stdout.match(/\d+/g);
+                  if (result) {
+                    const [r, g, b] = result.map((num) => {
+                      const hex = parseInt(num, 10).toString(16);
+                      return hex.length === 1 ? '0' + hex : hex;
+                    });
+
+                    openRgbService.setColor(`#${r}${g}${b}`);
+                  }
+                }
+              }
+            );
+          }
+        }
+      ],
+      enabled: openRgbService.allowsColor()
     },
     { type: 'separator' },
     {

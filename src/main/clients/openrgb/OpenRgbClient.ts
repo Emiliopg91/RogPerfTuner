@@ -53,39 +53,39 @@ class OpenRgbClient {
   private color: string | undefined;
 
   public async initialize(): Promise<void> {
-    this.stopRequested = false;
-    this.fromUnexpectedStop = false;
-    await new Promise<void>((resolve, reject) => {
-      (async (): Promise<void> => {
-        if (!this.initialized) {
-          try {
-            this.logger.info('Initializing client');
-            LoggerMain.addTab();
-            await this.startOpenRgbProccess();
-            await this.loadSupportedDevices();
-            await this.connectClient();
-            LoggerMain.removeTab();
-            resolve();
-          } catch (err) {
-            reject(err);
+    if (!this.stopInProcess) {
+      this.stopRequested = false;
+      this.fromUnexpectedStop = false;
+      await new Promise<void>((resolve, reject) => {
+        (async (): Promise<void> => {
+          if (!this.initialized) {
+            try {
+              this.logger.info('Initializing client');
+              LoggerMain.addTab();
+              await this.startOpenRgbProccess();
+              await this.loadSupportedDevices();
+              await this.connectClient();
+              LoggerMain.removeTab();
+              resolve();
+            } catch (err) {
+              reject(err);
+            }
           }
-        }
-      })();
-    });
+        })();
+      });
 
-    this.availableModes = this.availableModesInst.map((mode) => mode.name);
+      this.availableModes = this.availableModesInst.map((mode) => mode.name);
+    }
   }
 
   private loadSupportedDevices(): void {
     this.compatibleDevices = undefined;
     const entries: Array<Dirent> = readdirSync(os.tmpdir(), { withFileTypes: true });
 
-    // Filtrar los directorios que comienzan con '.mount_' + los primeros 6 caracteres de openRgbAppImage
     const matchingEntries: Array<Dirent> = entries.filter((entry) =>
       entry.name.startsWith('.mount_' + path.basename(openRgbAppImage).substring(0, 6))
     );
 
-    // Obtener el archivo con la fecha de modificación más reciente
     const mountDirs = matchingEntries
       .map((entry: Dirent) => {
         const fullPath = path.join(os.tmpdir(), entry.name);
@@ -118,8 +118,8 @@ class OpenRgbClient {
             /SUBSYSTEMS==".*?", ATTRS\{idVendor\}=="([\da-fA-F]+)", ATTRS\{idProduct\}=="([\da-fA-F]+)"/;
 
           const results = lines
-            .map((line) => regex.exec(line)) // Buscar coincidencias
-            .filter((match) => match !== null) // Filtrar solo las líneas que coincidan
+            .map((line) => regex.exec(line))
+            .filter((match) => match !== null)
             .map(
               (match): UsbIdentifier => ({
                 idVendor: match[1],

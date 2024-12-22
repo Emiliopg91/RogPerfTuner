@@ -159,11 +159,13 @@ class DigitalRain extends AbstractEffect {
                 new RGBColor(0, 0, 0)
               );
               dev.zones.forEach((zone, iz) => {
+                const canAdd =
+                  iter % 7 == 0 || (iter % 10 == 0 && iter == Math.floor(Math.random() * 10));
                 let colors: Array<RGBColor> | undefined = undefined;
                 switch (zone.type) {
                   case ZoneType.MATRIX:
                     this.decrementMatrix(zoneStatus[id][iz] as Array<Array<number>>, zone);
-                    if (iter % 7 == 0)
+                    if (canAdd)
                       this.getNextMatrix(zoneStatus[id][iz] as Array<Array<number>>, zone.matrix!);
                     colors = this.toColorMatrix(
                       zoneStatus[id][iz] as Array<Array<number>>,
@@ -174,8 +176,7 @@ class DigitalRain extends AbstractEffect {
                   case ZoneType.LINEAR:
                   case ZoneType.SINGLE:
                     this.decrementLinear(zoneStatus[id][iz] as Array<number>, zone);
-                    if (iter % 7 == 0)
-                      this.getNextLinear(zoneStatus[id][iz] as Array<number>, zone);
+                    if (canAdd) this.getNextLinear(zoneStatus[id][iz] as Array<number>, zone);
                     colors = this.toColorLinear(zoneStatus[id][iz] as Array<number>, zone);
                 }
                 for (let i = 0; i < colors!.length; i++) {
@@ -184,7 +185,7 @@ class DigitalRain extends AbstractEffect {
                 offset += zone.ledsCount;
               });
               this.setColors(dev, finalColors);
-              await this.sleep(75);
+              await this.sleep(60 + Math.floor(Math.random() * 20));
             }
             resolve();
           })();

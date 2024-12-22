@@ -39,11 +39,8 @@ console.log(`Powered by Electron ${process.versions.electron}`);
   LoggerMain.removeTab();
 
   if (!app.requestSingleInstanceLock() && appConfig.singleInstance) {
-    if (process.argv.includes('--restart')) {
-      while (!app.requestSingleInstanceLock()) {
-        await new Promise<void>((resolve) => setTimeout(resolve, 100));
-      }
-    } else {
+    await new Promise<void>((resolve) => setTimeout(resolve, 500));
+    if (!app.requestSingleInstanceLock()) {
       logger.error('Application already running');
       app.quit();
       await new Promise<void>((resolve) => setTimeout(resolve, 1000));
@@ -108,7 +105,7 @@ console.log(`Powered by Electron ${process.versions.electron}`);
       logger.system('##################################################');
       setTimeout(() => {
         process.kill(process.pid, 9);
-      }, 500);
+      }, 100);
     });
 
     app.on('window-all-closed', () => {

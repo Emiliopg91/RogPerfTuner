@@ -12,7 +12,7 @@
         "src/main/*"
       ],
       "@commons/*": [
-        "src/commons/src/*"
+        "src/commons/*"
       ],
       "@resources/*": [
         "resources/*"
