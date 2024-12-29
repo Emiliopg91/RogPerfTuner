@@ -1,0 +1,90 @@
+{
+  "performance": {
+    "en": "Performance",
+    "es": "Rendimiento"
+  },
+  "profile": {
+    "en": "Profile",
+    "es": "Perfil"
+  },
+  "label.profile.PERFORMANCE": {
+    "en": "Performance",
+    "es": "Rendimiento"
+  },
+  "label.profile.BALANCED": {
+    "en": "Balanced",
+    "es": "Equilibrado"
+  },
+  "label.profile.QUIET": {
+    "en": "Quiet",
+    "es": "Silencioso"
+  },
+  "effect": {
+    "en": "Effect",
+    "es": "Efecto"
+  },
+  "brightness": {
+    "en": "Brightness",
+    "es": "Brillo"
+  },
+  "label.brightness.MAX": {
+    "en": "Maximum",
+    "es": "Máximo"
+  },
+  "label.brightness.HIGH": {
+    "en": "High",
+    "es": "Alto"
+  },
+  "label.brightness.MEDIUM": {
+    "en": "Medium",
+    "es": "Medio"
+  },
+  "label.brightness.LOW": {
+    "en": "Low",
+    "es": "Bajo"
+  },
+  "label.brightness.OFF": {
+    "en": "Off",
+    "es": "Apagado"
+  },
+  "color": {
+    "en": "Color",
+    "es": "Color"
+  },
+  "color.select": {
+    "en": "Select color",
+    "es": "Seleccione color"
+  },
+  "battery": {
+    "en": "Battery",
+    "es": "Bateria"
+  },
+  "charge.threshold": {
+    "en": "Charge limit",
+    "es": "Límite de carga"
+  },
+  "profile.applied": {
+    "en": "Profile {profile} applied succesfully",
+    "es": "Perfil {profile} aplicado con éxito"
+  },
+  "applied.battery.threshold": {
+    "en": "Battery charge limit setted to {value}%",
+    "es": "Límite de carga de bateria establecido al {value}%"
+  },
+  "open.ui": {
+    "en": "Show interface",
+    "es": "Mostrar interfaz"
+  },
+  "open.logs": {
+    "en": "Open log file",
+    "es": "Abrir registro"
+  },
+  "close": {
+    "en": "Quit",
+    "es": "Salir"
+  },
+  "select.color": {
+    "en": "Pick color",
+    "es": "Elegir color"
+  }
+}

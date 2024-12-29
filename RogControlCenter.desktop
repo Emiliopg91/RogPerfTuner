@@ -1,16 +1,15 @@
 [Desktop Entry]
-Version=1.0
+Comment=
+Exec=python3 /var/mnt/Datos/Desarrollo/Workspace/VSCode/qt-test/dist/main
+GenericName=
+Icon=/var/mnt/Datos/Desarrollo/Workspace/VSCode/qt-test/assets/icons/rog-logo.svg
+MimeType=
+Name=Enlace a aplicación
+Path=/var/mnt/Datos/Desarrollo/Workspace/VSCode/qt-test
+PrefersNonDefaultGPU=false
+StartupNotify=true
+Terminal=false
+TerminalOptions=
 Type=Application
-Name=ROG Control Center
-Comment=Manage the performance of your Asus ROG laptop.
-X-AppImage-Version={version}
-Icon={icon}
-Exec={entrypoint}
-Categories=Utility;System;
-Keywords=asus;rog;control;center;
-
-[AppImage Creator]
-Entrypoint=./RogControlCenter/rogcontrolcenter
-Icon=./RogControlCenter/resources/app.asar.unpacked/resources/icons/icon.png
-Version-Cmd=cat ./RogControlCenter/resources/app.asar.unpacked/package.json | jq -r .version
-
+X-KDE-SubstituteUID=false
+X-KDE-Username=

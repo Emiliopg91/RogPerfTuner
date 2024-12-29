@@ -1,0 +1,162 @@
+import dbus
+from abc import ABC, abstractmethod
+
+class AbstractDbusClient(ABC):
+    def __init__(self, systemBus: bool, service_name: str, object_path: str, interface_name: str):
+        # Conectar al bus de sistema o sesión según el parámetro systemBus
+        self.bus = dbus.SystemBus() if systemBus else dbus.SessionBus()
+
+        # Obtener el objeto remoto (servicio)
+        self.service = self.bus.get_object(service_name, object_path)
+
+        # Obtener la interfaz del servicio D-Bus
+        self.interface = dbus.Interface(self.service, interface_name)
+        self.interface_name = interface_name
+
+        # Interfaz para las propiedades (debe ser 'org.freedesktop.DBus.Properties')
+        self.prop_interface = dbus.Interface(self.service, 'org.freedesktop.DBus.Properties')
+
+    def getProperty(self, property_name: str):
+        """Obtener una propiedad usando la interfaz Get de D-Bus."""
+        try:
+            # El primer parámetro es el nombre de la interfaz y el segundo es el nombre de la propiedad
+            property_value = self.prop_interface.Get(self.interface_name, property_name)
+            return property_value
+        except dbus.DBusException as e:
+            raise Exception(f"Error getting property {property_name}: {str(e)}")
+
+    def setProperty(self, property_name: str, value):
+        """Establecer una propiedad usando la interfaz Set de D-Bus."""
+        try:
+            # El primer parámetro es el nombre de la interfaz y el segundo es el nombre de la propiedad
+            self.prop_interface.Set(self.interface_name, property_name, value)
+        except dbus.DBusException as e:
+            raise Exception(f"Error setting property {property_name}: {str(e)}")
+
+    def invokeMethod(self, method_name: str, *args):
+        """Invocar un método usando la interfaz del objeto D-Bus."""
+        try:
+            # Llamar al método en la interfaz usando *args como parámetros
+            result = getattr(self.interface, method_name)(*args)
+            return result
+        except dbus.DBusException as e:
+            raise Exception(f"Error invoking method {method_name}: {str(e)}")[2024-12-23 11:19:20][INFO    ][Translator] - Initializing translator for es
+[2024-12-23 11:19:20][DEBUG   ][Translator] - 	Loading translations from /var/mnt/Datos/Desarrollo/Workspace/VSCode/qt-test/assets/translations.json
+[2024-12-23 11:19:20][INFO    ][Translator] - 	Loaded 16 entries
+[2024-12-23 11:19:49][INFO    ][Translator] - Initializing translator for es
+[2024-12-23 11:19:49][DEBUG   ][Translator] - 	Loading translations from /var/mnt/Datos/Desarrollo/Workspace/VSCode/qt-test/assets/translations.json
+[2024-12-23 11:19:49][INFO    ][Translator] - 	Loaded 16 entries
+[2024-12-23 11:20:04][INFO    ][Translator] - Initializing translator for es
+[2024-12-23 11:20:04][DEBUG   ][Translator] - 	Loading translations from /var/mnt/Datos/Desarrollo/Workspace/VSCode/qt-test/assets/translations.json
+[2024-12-23 11:20:04][INFO    ][Translator] - 	Loaded 16 entries
+[2024-12-23 11:20:18][INFO    ][Translator] - Initializing translator for es
+[2024-12-23 11:20:18][DEBUG   ][Translator] - 	Loading translations from /var/mnt/Datos/Desarrollo/Workspace/VSCode/qt-test/assets/translations.json
+[2024-12-23 11:20:18][INFO    ][Translator] - 	Loaded 16 entries
+[2024-12-23 11:21:58][INFO    ][Translator] - Initializing translator for es
+[2024-12-23 11:21:58][DEBUG   ][Translator] - 	Loading translations from /var/mnt/Datos/Desarrollo/Workspace/VSCode/qt-test/assets/translations.json
+[2024-12-23 11:21:58][INFO    ][Translator] - 	Loaded 16 entries
+[2024-12-23 11:22:29][INFO    ][Translator] - Initializing translator for es
+[2024-12-23 11:22:29][DEBUG   ][Translator] - 	Loading translations from /var/mnt/Datos/Desarrollo/Workspace/VSCode/qt-test/assets/translations.json
+[2024-12-23 11:22:29][INFO    ][Translator] - 	Loaded 16 entries
+[2024-12-23 11:25:33][INFO    ][Translator] - Initializing translator for es
+[2024-12-23 11:25:33][DEBUG   ][Translator] - 	Loading translations from /var/mnt/Datos/Desarrollo/Workspace/VSCode/qt-test/assets/translations.json
+[2024-12-23 11:25:33][INFO    ][Translator] - 	Loaded 16 entries
+[2024-12-23 11:29:55][INFO    ][Translator] - Initializing translator for es
+[2024-12-23 11:29:55][DEBUG   ][Translator] - 	Loading translations from /var/mnt/Datos/Desarrollo/Workspace/VSCode/qt-test/assets/translations.json
+[2024-12-23 11:29:55][INFO    ][Translator] - 	Loaded 16 entries
+[2024-12-23 11:30:09][INFO    ][Translator] - Initializing translator for es
+[2024-12-23 11:30:09][DEBUG   ][Translator] - 	Loading translations from /var/mnt/Datos/Desarrollo/Workspace/VSCode/qt-test/assets/translations.json
+[2024-12-23 11:30:09][INFO    ][Translator] - 	Loaded 16 entries
+[2024-12-23 11:32:26][INFO    ][Translator] - Initializing translator for es
+[2024-12-23 11:32:26][DEBUG   ][Translator] - 	Loading translations from /var/mnt/Datos/Desarrollo/Workspace/VSCode/qt-test/assets/translations.json
+[2024-12-23 11:32:26][INFO    ][Translator] - 	Loaded 16 entries
+[2024-12-23 11:36:45][INFO    ][Translator] - Initializing translator for es
+[2024-12-23 11:36:45][DEBUG   ][Translator] - 	Loading translations from /var/mnt/Datos/Desarrollo/Workspace/VSCode/qt-test/assets/translations.json
+[2024-12-23 11:36:45][INFO    ][Translator] - 	Loaded 16 entries
+[2024-12-23 11:37:46][INFO    ][Translator] - Initializing translator for es
+[2024-12-23 11:37:46][DEBUG   ][Translator] - 	Loading translations from /var/mnt/Datos/Desarrollo/Workspace/VSCode/qt-test/assets/translations.json
+[2024-12-23 11:37:46][INFO    ][Translator] - 	Loaded 16 entries
+[2024-12-23 11:38:12][INFO    ][Translator] - Initializing translator for es
+[2024-12-23 11:38:12][DEBUG   ][Translator] - 	Loading translations from /var/mnt/Datos/Desarrollo/Workspace/VSCode/qt-test/assets/translations.json
+[2024-12-23 11:38:12][INFO    ][Translator] - 	Loaded 16 entries
+[2024-12-23 11:39:00][INFO    ][Translator] - Initializing translator for es
+[2024-12-23 11:39:00][DEBUG   ][Translator] - 	Loading translations from /var/mnt/Datos/Desarrollo/Workspace/VSCode/qt-test/assets/translations.json
+[2024-12-23 11:39:00][INFO    ][Translator] - 	Loaded 16 entries
+[2024-12-23 11:39:22][INFO    ][Translator] - Initializing translator for es
+[2024-12-23 11:39:22][DEBUG   ][Translator] - 	Loading translations from /var/mnt/Datos/Desarrollo/Workspace/VSCode/qt-test/assets/translations.json
+[2024-12-23 11:39:22][INFO    ][Translator] - 	Loaded 16 entries
+[2024-12-23 14:19:10][INFO    ][Translator] - Initializing translator for es
+[2024-12-23 14:19:10][DEBUG   ][Translator] - 	Loading translations from /var/mnt/Datos/Desarrollo/Workspace/VSCode/qt-test/assets/translations.json
+[2024-12-23 14:19:10][INFO    ][Translator] - 	Loaded 16 entries
+[2024-12-23 14:19:58][INFO    ][Translator] - Initializing translator for es
+[2024-12-23 14:19:58][DEBUG   ][Translator] - 	Loading translations from /var/mnt/Datos/Desarrollo/Workspace/VSCode/qt-test/assets/translations.json
+[2024-12-23 14:19:58][INFO    ][Translator] - 	Loaded 16 entries
+[2024-12-23 14:20:52][INFO    ][Translator] - Initializing translator for es
+[2024-12-23 14:20:52][DEBUG   ][Translator] - 	Loading translations from /var/mnt/Datos/Desarrollo/Workspace/VSCode/qt-test/assets/translations.json
+[2024-12-23 14:20:52][INFO    ][Translator] - 	Loaded 16 entries
+[2024-12-23 14:22:33][INFO    ][Translator] - Initializing translator for es
+[2024-12-23 14:22:33][DEBUG   ][Translator] - 	Loading translations from /var/mnt/Datos/Desarrollo/Workspace/VSCode/qt-test/assets/translations.json
+[2024-12-23 14:22:33][INFO    ][Translator] - 	Loaded 16 entries
+[2024-12-23 14:24:29][INFO    ][Translator] - Initializing translator for es
+[2024-12-23 14:24:29][DEBUG   ][Translator] - 	Loading translations from /var/mnt/Datos/Desarrollo/Workspace/VSCode/qt-test/assets/translations.json
+[2024-12-23 14:24:29][INFO    ][Translator] - 	Loaded 16 entries
+[2024-12-23 14:27:02][INFO    ][Translator] - Initializing translator for es
+[2024-12-23 14:27:02][DEBUG   ][Translator] - 	Loading translations from /var/mnt/Datos/Desarrollo/Workspace/VSCode/qt-test/assets/translations.json
+[2024-12-23 14:27:02][INFO    ][Translator] - 	Loaded 16 entries
+[2024-12-23 14:27:57][INFO    ][Translator] - Initializing translator for es
+[2024-12-23 14:27:57][DEBUG   ][Translator] - 	Loading translations from /var/mnt/Datos/Desarrollo/Workspace/VSCode/qt-test/assets/translations.json
+[2024-12-23 14:27:57][INFO    ][Translator] - 	Loaded 16 entries
+[2024-12-23 14:30:19][INFO    ][Translator] - Initializing translator for es
+[2024-12-23 14:30:19][DEBUG   ][Translator] - 	Loading translations from /var/mnt/Datos/Desarrollo/Workspace/VSCode/qt-test/assets/translations.json
+[2024-12-23 14:30:19][INFO    ][Translator] - 	Loaded 16 entries
+[2024-12-23 14:31:54][INFO    ][Translator] - Initializing translator for es
+[2024-12-23 14:31:54][DEBUG   ][Translator] - 	Loading translations from /var/mnt/Datos/Desarrollo/Workspace/VSCode/qt-test/assets/translations.json
+[2024-12-23 14:31:54][INFO    ][Translator] - 	Loaded 16 entries
+[2024-12-23 15:04:31][INFO    ][Translator] - Initializing translator for es
+[2024-12-23 15:04:31][DEBUG   ][Translator] - 	Loading translations from /var/mnt/Datos/Desarrollo/Workspace/VSCode/qt-test/assets/translations.json
+[2024-12-23 15:04:31][INFO    ][Translator] - 	Loaded 16 entries
+[2024-12-23 15:04:56][INFO    ][Translator] - Initializing translator for es
+[2024-12-23 15:04:56][DEBUG   ][Translator] - 	Loading translations from /var/mnt/Datos/Desarrollo/Workspace/VSCode/qt-test/assets/translations.json
+[2024-12-23 15:04:56][INFO    ][Translator] - 	Loaded 16 entries
+[2024-12-23 15:05:19][INFO    ][Translator] - Initializing translator for es
+[2024-12-23 15:05:19][DEBUG   ][Translator] - 	Loading translations from /var/mnt/Datos/Desarrollo/Workspace/VSCode/qt-test/assets/translations.json
+[2024-12-23 15:05:19][INFO    ][Translator] - 	Loaded 16 entries
+[2024-12-23 15:06:50][INFO    ][Translator] - Initializing translator for es
+[2024-12-23 15:06:50][DEBUG   ][Translator] - 	Loading translations from /var/mnt/Datos/Desarrollo/Workspace/VSCode/qt-test/assets/translations.json
+[2024-12-23 15:06:50][INFO    ][Translator] - 	Loaded 16 entries
+[2024-12-23 15:07:40][INFO    ][Translator] - Initializing translator for es
+[2024-12-23 15:07:40][DEBUG   ][Translator] - 	Loading translations from /var/mnt/Datos/Desarrollo/Workspace/VSCode/qt-test/assets/translations.json
+[2024-12-23 15:07:40][INFO    ][Translator] - 	Loaded 16 entries
+[2024-12-23 15:08:29][INFO    ][Translator] - Initializing translator for es
+[2024-12-23 15:08:29][DEBUG   ][Translator] - 	Loading translations from /var/mnt/Datos/Desarrollo/Workspace/VSCode/qt-test/assets/translations.json
+[2024-12-23 15:08:29][INFO    ][Translator] - 	Loaded 16 entries
+[2024-12-23 15:08:53][INFO    ][Translator] - Initializing translator for es
+[2024-12-23 15:08:53][DEBUG   ][Translator] - 	Loading translations from /var/mnt/Datos/Desarrollo/Workspace/VSCode/qt-test/assets/translations.json
+[2024-12-23 15:08:53][INFO    ][Translator] - 	Loaded 16 entries
+[2024-12-23 15:19:08][INFO    ][Translator] - Initializing translator for es
+[2024-12-23 15:19:08][DEBUG   ][Translator] - 	Loading translations from /var/mnt/Datos/Desarrollo/Workspace/VSCode/qt-test/assets/translations.json
+[2024-12-23 15:19:08][INFO    ][Translator] - 	Loaded 16 entries
+[2024-12-23 15:19:33][INFO    ][Translator] - Initializing translator for es
+[2024-12-23 15:19:33][DEBUG   ][Translator] - 	Loading translations from /var/mnt/Datos/Desarrollo/Workspace/VSCode/qt-test/assets/translations.json
+[2024-12-23 15:19:33][INFO    ][Translator] - 	Loaded 16 entries
+[2024-12-23 15:19:41][INFO    ][Translator] - Initializing translator for es
+[2024-12-23 15:19:41][DEBUG   ][Translator] - 	Loading translations from /var/mnt/Datos/Desarrollo/Workspace/VSCode/qt-test/assets/translations.json
+[2024-12-23 15:19:41][INFO    ][Translator] - 	Loaded 16 entries
+[2024-12-23 15:19:54][INFO    ][Translator] - Initializing translator for es
+[2024-12-23 15:19:54][DEBUG   ][Translator] - 	Loading translations from /var/mnt/Datos/Desarrollo/Workspace/VSCode/qt-test/assets/translations.json
+[2024-12-23 15:19:54][INFO    ][Translator] - 	Loaded 16 entries
+[2024-12-23 16:57:04][INFO    ][Translator] - Initializing translator for es
+[2024-12-23 16:57:04][DEBUG   ][Translator] - 	Loading translations from /var/mnt/Datos/Desarrollo/Workspace/VSCode/qt-test/assets/translations.json
+[2024-12-23 16:57:04][INFO    ][Translator] - 	Loaded 16 entries
+[2024-12-23 16:57:16][INFO    ][Translator] - Initializing translator for es
+[2024-12-23 16:57:16][DEBUG   ][Translator] - 	Loading translations from /var/mnt/Datos/Desarrollo/Workspace/VSCode/qt-test/assets/translations.json
+[2024-12-23 16:57:16][INFO    ][Translator] - 	Loaded 16 entries
+[2024-12-23 16:57:59][INFO    ][Translator] - Initializing translator for es
+[2024-12-23 16:57:59][DEBUG   ][Translator] - 	Loading translations from /var/mnt/Datos/Desarrollo/Workspace/VSCode/qt-test/assets/translations.json
+[2024-12-23 16:57:59][INFO    ][Translator] - 	Loaded 16 entries
+[2024-12-23 17:00:31][INFO    ][Translator] - Initializing translator for es
+[2024-12-23 17:00:31][DEBUG   ][Translator] - 	Loading translations from /var/mnt/Datos/Desarrollo/Workspace/VSCode/qt-test/assets/translations.json
+[2024-12-23 17:00:31][INFO    ][Translator] - 	Loaded 16 entries
+[2024-12-23 17:00:40][INFO    ][Translator] - Initializing translator for es
+[2024-12-23 17:00:40][DEBUG   ][Translator] - 	Loading translations from /var/mnt/Datos/Desarrollo/Workspace/VSCode/qt-test/assets/translations.json
+[2024-12-23 17:00:40][INFO    ][Translator] - 	Loaded 16 entries

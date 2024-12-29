@@ -1,11 +1,2 @@
-node_modules
-dist
-out
-.DS_Store
-*.log*
-
-*.pyc
-
-electron.vite.config.1733702751164.mjs
-
-electron.vite.config.1733944230950.mjs
+build/**/*
+dist/**/*
