@@ -4,3 +4,5 @@ dist/**/*
 clients/dbus/base/__pycache__/
 
 *.pyc
+
+assets/OpenRGB.AppImage

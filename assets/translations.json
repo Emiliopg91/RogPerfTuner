@@ -86,5 +86,45 @@
   "select.color": {
     "en": "Pick color",
     "es": "Elegir color"
+  },
+  "authentication.required": {
+    "en": "Authentication required",
+    "es": "Autenticación requerida"
+  },
+  "enter.sudo.password": {
+    "en": "Enter sudo password",
+    "es": "Introduzca contraseña sudo"
+  },
+  "accept": {
+    "en": "Accept",
+    "es": "Aceptar"
+  },
+  "cancel": {
+    "en": "Cancel",
+    "es": "Cancelar"
+  },
+  "canceled": {
+    "en": "Canceled",
+    "es": "Cancelado"
+  },
+  "user.canceled.operation": {
+    "en": "User canceled operation",
+    "es": "El usuario canceló la operación"
+  },
+  "authentication.failed": {
+    "en": "Authentication failed",
+    "es": "Fallo de autenticación"
+  },
+  "applying.update": {
+    "en": "Applying update, please wait",
+    "es": "Aplicando actualizacion, espere"
+  },
+  "update.available": {
+    "en": "Update availabe",
+    "es": "Actualización disponible"
+  },
+  "apply.now": {
+    "en": "Apply now",
+    "es": "Aplicar ahora"
   }
 }

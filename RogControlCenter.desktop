@@ -1,15 +1,8 @@
 [Desktop Entry]
-Comment=
-Exec=python3 /var/mnt/Datos/Desarrollo/Workspace/VSCode/qt-test/dist/main
-GenericName=
-Icon=/var/mnt/Datos/Desarrollo/Workspace/VSCode/qt-test/assets/icons/rog-logo.svg
-MimeType=
-Name=Enlace a aplicación
-Path=/var/mnt/Datos/Desarrollo/Workspace/VSCode/qt-test
-PrefersNonDefaultGPU=false
-StartupNotify=true
+Name=RogControlCenter
+Comment=An utility to manage Asus Rog laptop performance
+Exec=main/main
+Icon=icon
 Terminal=false
-TerminalOptions=
 Type=Application
-X-KDE-SubstituteUID=false
-X-KDE-Username=
+Categories=Utility;
