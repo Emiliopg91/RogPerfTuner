@@ -27,6 +27,13 @@ logger.info(f"Version {__version__}")
 logger.info("Starting initialization")
 logger.addTab()
 
+
+if not dev_mode:
+    from lib.utils.application import application
+
+    application.create_menu_entry()
+    application.enable_autostart()
+
 from lib.gui.password_dialog import password_dialog
 from lib.utils.configuration import configuration
 

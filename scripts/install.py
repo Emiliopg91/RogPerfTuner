@@ -1,10 +1,21 @@
 import datetime
 import os
 import requests
+import subprocess
 
 openrgb_path = os.path.abspath(
     os.path.join(os.path.dirname(__file__), "..", "assets", "OpenRGB.AppImage")
 )
+
+pip_dependencies = ["black"]
+
+
+def install_pip_deps():
+    print("  Installing PIP packages...")
+    command = ["pip", "install"]
+    command.extend(pip_dependencies)
+    subprocess.run(command, check=True)
+    print("  Dependencies installed")
 
 
 def get_openrgb():
@@ -52,4 +63,5 @@ def get_openrgb():
 
 
 print("Installing dependencies...")
+install_pip_deps()
 get_openrgb()

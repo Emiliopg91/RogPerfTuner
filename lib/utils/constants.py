@@ -1,9 +1,28 @@
+from .. import __app_name__
 from pathlib import Path
 
 import os
 import sys
 
 dev_mode = not hasattr(sys, "frozen") or not sys.frozen
+
+user_folder = os.path.expanduser(os.path.join("~", __app_name__))
+
+if not os.path.exists(user_folder):
+    os.makedirs(user_folder)
+
+user_icon_folder = os.path.join(user_folder, "icons")
+
+if not os.path.exists(user_icon_folder):
+    os.makedirs(user_icon_folder)
+
+autostart_file = os.path.expanduser(
+    os.path.join("~", ".config", "autostart", f"{__app_name__}.desktop")
+)
+
+app_draw_file = os.path.expanduser(
+    os.path.join("~", ".local", "share", "applications", f"{__app_name__}.desktop")
+)
 
 base_path = Path(os.path.join(os.path.dirname(__file__), "..", "..")).resolve()
 
@@ -14,11 +33,6 @@ icons_path = os.path.join(base_path, "assets", "icons")
 translations_path = os.path.join(base_path, "assets", "translations.json")
 
 orgb_path = os.path.join(base_path, "assets", "OpenRGB.AppImage")
-
-user_folder = os.path.expanduser(os.path.join("~", "RogControlCenter"))
-
-if not os.path.exists(user_folder):
-    os.makedirs(user_folder)
 
 lock_file = os.path.join(user_folder, ".lock")
 
