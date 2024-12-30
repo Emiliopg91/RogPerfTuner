@@ -15,7 +15,7 @@ class EventBus:
             self.callbacks[event] = []
             self.callbacks[event].append(callback)
 
-    def emit(self, event: str, value: any):
+    def emit(self, event: str, value: any = None):
         try:
             for i in range(len(self.callbacks[event])):
                 try:

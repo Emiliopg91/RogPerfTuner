@@ -31,6 +31,7 @@ logger.addTab()
 if not dev_mode:
     from lib.utils.application import application
 
+    application.generate_run()
     application.create_menu_entry()
     application.enable_autostart()
 

@@ -1,7 +1,6 @@
-from .. import is_newer
-from ..gui.apply_update import apply_update
-from .constants import autoupdate_path, dev_mode
-from .event_bus import event_bus
+from .. import is_newer, __app_name__
+from .application import application
+from .constants import autoupdate_path, user_update_folder
 from .logger import Logger
 from threading import Thread
 
@@ -9,7 +8,6 @@ import json
 import os
 import requests
 import shutil
-import subprocess
 import tempfile
 import time
 
@@ -39,18 +37,8 @@ class AutoUpdater:
             self.logger.info(
                 f"AutoUpdater configured for repository {self.owner}/{self.repository}"
             )
-
-            event_bus.on("update", self._apply)
         else:
             self.logger.warning("Auto update is only available for AppImage version")
-
-    def _apply(self, _):
-        subprocess.Popen(
-            f"nohup {self.app_image} &",
-            shell=True,
-            stdout=subprocess.DEVNULL,
-            stderr=subprocess.DEVNULL,
-        )
 
     def start(self):
         if self.app_image is not None:
@@ -67,17 +55,13 @@ class AutoUpdater:
             else:
                 self.download_update(data.url, data.size)
                 self.copy_file(self.update_path)
-                apply_update.show()
+                application.relaunch_application()
 
     def copy_file(self, tmp_file):
         try:
-            if not dev_mode:
-                shutil.copy2(tmp_file, self.app_image)
-                os.chmod(self.app_image, 0o755)
-            else:
-                self.logger.info(
-                    f"In production mode, {tmp_file} would be copied to {self.app_image}"
-                )
+            shutil.copy2(
+                tmp_file, os.path.join(user_update_folder, f"{__app_name__}.AppImage")
+            )
         except Exception as e:
             self.logger.error(f"Error while copying file: {e}")
 
