@@ -1,12 +1,18 @@
-from .base.abstract_effect import AbstractEffect
-from ..sdk.utils import RGBColor, ZoneType
-from ....utils.singleton import singleton
-
 import math
+
+# pylint: disable=E0611, E0401
+from openrgb.utils import RGBColor, ZoneType
+
+
+from lib.clients.openrgb.effects.base.abstract_effect import AbstractEffect
+from lib.utils.singleton import singleton
+from lib.utils.openrgb import OpenRGBUtils
 
 
 @singleton
 class RainbowWave(AbstractEffect):
+    """Rainbow wave effect"""
+
     def __init__(self):
         super().__init__("Rainbow wave")
 
@@ -22,8 +28,7 @@ class RainbowWave(AbstractEffect):
         for idx in range(len(rainbow) - 1, -1, -1):
             rainbow[idx] = (len(rainbow) - idx) * 7
 
-        i = 0
-        while self.is_running:
+        while self.is_running:  # pylint: disable=R1702
             for dev in self.devices:
                 colors = [RGBColor(0, 0, 0)] * len(dev.leds)
                 offset = 0
@@ -36,20 +41,22 @@ class RainbowWave(AbstractEffect):
                                         len(rainbow) * (c / zone.mat_width)
                                     )
                                     colors[offset + zone.matrix_map[r][c]] = (
-                                        RGBColor.fromHSV(rainbow[rainbow_index], 1, 1)
+                                        OpenRGBUtils.from_hsv(
+                                            rainbow[rainbow_index], 1, 1
+                                        )
                                     )
                     else:
                         for l in range(len(zone.leds)):
                             rainbow_index = math.floor(
                                 len(rainbow) * (l / len(zone.leds))
                             )
-                            colors[offset + l] = RGBColor.fromHSV(
+                            colors[offset + l] = OpenRGBUtils.from_hsv(
                                 rainbow[rainbow_index], 1, 1
                             )
                     offset += len(zone.leds)
-                self.set_colors(dev, colors)
+                self._set_colors(dev, colors)
 
-            self.sleep(0.15)
+            self._sleep(0.15)
 
             for idx in range(len(rainbow) - 1, 0, -1):
                 rainbow[idx] = rainbow[idx - 1]

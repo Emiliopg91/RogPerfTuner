@@ -1,11 +1,8 @@
-from ..utils.configuration import configuration
-from ..utils.cryptography import cryptography
-from ..utils.logger import Logger
-from ..utils.translator import translator
+import subprocess
+import sys
 
-from PyQt5.QtGui import QCursor
+# pylint: disable=E0611, E0401
 from PyQt5.QtWidgets import (
-    QApplication,
     QDialog,
     QVBoxLayout,
     QLabel,
@@ -14,13 +11,18 @@ from PyQt5.QtWidgets import (
     QMessageBox,
 )
 
-import subprocess
-import sys
+from lib.utils.configuration import configuration
+from lib.utils.cryptography import cryptography
+from lib.utils.gui_utils import GuiUtils
+from lib.utils.logger import Logger
+from lib.utils.translator import translator
 
 
 class PasswordDialog(QDialog):
+    """Sudo password dialog"""
+
     def __init__(self):
-        self.logger = Logger(self.__class__.__name__)
+        self.logger = Logger()
 
         super().__init__()
         self.setWindowTitle(translator.translate("authentication.required"))
@@ -50,9 +52,10 @@ class PasswordDialog(QDialog):
 
         self.setLayout(layout)
 
-        self.center_window_on_current_screen()
+        GuiUtils.center_window_on_current_screen(self)
 
     def on_accept(self):
+        """Accept event handler"""
         self.ok_button.setDisabled(True)
         self.cancel_button.setDisabled(True)
 
@@ -69,19 +72,8 @@ class PasswordDialog(QDialog):
                 None, "Error", translator.translate("authentication.failed")
             )
 
-    def center_window_on_current_screen(self):
-        cursor_position = QCursor.pos()
-        screen = QApplication.screenAt(cursor_position)
-        if screen is not None:
-            screen_geometry = screen.availableGeometry()
-            x = int((screen_geometry.width() - self.width()) / 2) + screen_geometry.x()
-            y = (
-                int((screen_geometry.height() - self.height()) / 2)
-                + screen_geometry.y()
-            )
-            self.move(x, y)
-
     def check_password(self, password: str) -> bool:
+        """check current password"""
         self.logger.info("Checking password")
         try:
             process = subprocess.run(
@@ -89,18 +81,20 @@ class PasswordDialog(QDialog):
                 input=password + "\n",
                 text=True,
                 capture_output=True,
+                check=False,
             )
             if process.returncode == 0:
                 self.logger.info("Authentication successful")
                 return True
-            else:
-                self.logger.error("Authentication failed")
-                return False
+
+            self.logger.error("Authentication failed")
+            return False
         except Exception as e:
             self.logger.error(f"Error during authentication: {e}")
             return False
 
     def show(self):
+        """Show dialog"""
         if self.exec_() != QDialog.Accepted:
             QMessageBox.information(
                 None,

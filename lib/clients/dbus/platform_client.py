@@ -1,38 +1,44 @@
-from .base.abstract_dbus_client import AbstractDbusClient
-from ...models.battery_threshold import BatteryThreshold
-from ...models.thermal_throttle_profile import ThermalThrottleProfile
-from ...utils.singleton import singleton
+# pylint: disable=E0611, E0401
 from PyQt5.QtCore import QMetaType
 from PyQt5.QtDBus import QDBusVariant, QDBusArgument
+
+from lib.clients.dbus.base.abstract_dbus_client import AbstractDbusClient
+from lib.models.battery_threshold import BatteryThreshold
+from lib.models.thermal_throttle_profile import ThermalThrottleProfile
+from lib.utils.singleton import singleton
 
 
 @singleton
 class PlatformClient(AbstractDbusClient):
+    """DBus platform client"""
+
     def __init__(self):
         super().__init__(
             True, "org.asuslinux.Daemon", "/org/asuslinux", "org.asuslinux.Platform"
         )
 
     @property
-    def chargeControlEndThreshold(self) -> BatteryThreshold:
+    def charge_control_end_threshold(self) -> BatteryThreshold:
+        """Battery charge limit"""
         return BatteryThreshold(
-            int.from_bytes(self.getProperty("ChargeControlEndThreshold"))
+            int.from_bytes(self.get_property("ChargeControlEndThreshold"))
         )
 
-    @chargeControlEndThreshold.setter
-    def chargeControlEndThreshold(self, val: BatteryThreshold) -> None:
-        self.setProperty(
+    @charge_control_end_threshold.setter
+    def charge_control_end_threshold(self, val: BatteryThreshold) -> None:
+        self.set_property(
             "ChargeControlEndThreshold",
             QDBusVariant(QDBusArgument(val.value, QMetaType.UChar)),
         )
 
     @property
-    def throttleThermalPolicy(self) -> ThermalThrottleProfile:
-        return ThermalThrottleProfile(self.getProperty("ThrottleThermalPolicy"))
+    def throttle_thermal_policy(self) -> ThermalThrottleProfile:
+        """Thermal throttle policy"""
+        return ThermalThrottleProfile(self.get_property("ThrottleThermalPolicy"))
 
-    @throttleThermalPolicy.setter
-    def throttleThermalPolicy(self, val: ThermalThrottleProfile) -> None:
-        self.setProperty(
+    @throttle_thermal_policy.setter
+    def throttle_thermal_policy(self, val: ThermalThrottleProfile) -> None:
+        self.set_property(
             "ThrottleThermalPolicy",
             QDBusVariant(QDBusArgument(val.value, QMetaType.UInt)),
         )

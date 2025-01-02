@@ -2,6 +2,8 @@ from enum import IntEnum
 
 
 class RgbBrightness(IntEnum):
+    """RGB Brightness enum"""
+
     MAX = 4
     HIGH = 3
     MEDIUM = 2
@@ -9,27 +11,29 @@ class RgbBrightness(IntEnum):
     OFF = 0
 
 
-def getNextBrightness(brightness: RgbBrightness) -> RgbBrightness:
+def get_next_brightness(brightness: RgbBrightness) -> RgbBrightness:
+    """Get the following brightness level"""
     if brightness == RgbBrightness.HIGH:
         return RgbBrightness.MAX
-    elif brightness == RgbBrightness.MEDIUM:
+    if brightness == RgbBrightness.MEDIUM:
         return RgbBrightness.HIGH
-    elif brightness == RgbBrightness.LOW:
+    if brightness == RgbBrightness.LOW:
         return RgbBrightness.MEDIUM
-    elif brightness == RgbBrightness.OFF:
+    if brightness == RgbBrightness.OFF:
         return RgbBrightness.LOW
-    else:
-        return brightness
+
+    return brightness
 
 
-def getPreviousBrightness(brightness: RgbBrightness) -> RgbBrightness:
+def get_previous_brightness(brightness: RgbBrightness) -> RgbBrightness:
+    """Get the previous brightness level"""
     if brightness == RgbBrightness.MAX:
         return RgbBrightness.HIGH
-    elif brightness == RgbBrightness.HIGH:
+    if brightness == RgbBrightness.HIGH:
         return RgbBrightness.MEDIUM
-    elif brightness == RgbBrightness.MEDIUM:
+    if brightness == RgbBrightness.MEDIUM:
         return RgbBrightness.LOW
-    elif brightness == RgbBrightness.LOW:
+    if brightness == RgbBrightness.LOW:
         return RgbBrightness.OFF
-    else:
-        return brightness
+
+    return brightness

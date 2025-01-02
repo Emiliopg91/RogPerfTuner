@@ -1,4 +1,5 @@
 #!/bin/env python3
+# pylint: disable=C0413, C0412, C0411, E0611
 from lib import __version__
 from lib.utils.single_instance import single_instance
 
@@ -11,8 +12,12 @@ app = QApplication(sys.argv)
 
 from lib.utils.constants import dev_mode
 
+from datetime import datetime
+
+start_time = datetime.now()
+
 if dev_mode:
-    print(f"Running in dev mode")
+    print("Running in dev mode")
 else:
     print(f"Running bundled file from '{sys.executable}'")
 
@@ -25,8 +30,13 @@ logger.info("#            Starting RogControlCenter            #")
 logger.info("###################################################")
 logger.info(f"Version {__version__}")
 logger.info("Starting initialization")
-logger.addTab()
+logger.add_tab()
 
+
+from lib.gui.notifier import notifier
+from lib.utils.translator import translator
+
+notifier.show_toast(translator.translate("initializing"))
 
 if not dev_mode:
     from lib.utils.application import application
@@ -52,7 +62,7 @@ from lib.utils.autoupdater import auto_updater
 
 auto_updater.start()
 
-logger.remTab()
+logger.rem_tab()
 logger.info("Application ready")
 
 sys.exit(app.exec_())

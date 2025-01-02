@@ -1,7 +1,5 @@
-from typing import Callable, Any
-
-
 def singleton(cls):
+    """Decorator for singleton"""
     instances = {}
 
     def get_instance(*args, **kwargs):

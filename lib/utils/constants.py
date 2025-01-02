@@ -1,9 +1,11 @@
-from .. import __app_name__
 from pathlib import Path
 
 import os
 import sys
 
+from lib import __app_name__
+
+# pylint: disable=E1101
 dev_mode = not hasattr(sys, "frozen") or not sys.frozen
 
 user_folder = os.path.expanduser(os.path.join("~", __app_name__))

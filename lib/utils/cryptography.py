@@ -1,18 +1,21 @@
-from .logger import Logger
-
 from base64 import urlsafe_b64encode, urlsafe_b64decode
+
+import os
+
+# pylint: disable=E0611,E0401
 from cryptography.hazmat.primitives.ciphers import Cipher, algorithms, modes
 from cryptography.hazmat.backends import default_backend
-from cryptography.hazmat.primitives.kdf.pbkdf2 import PBKDF2HMAC
-from cryptography.hazmat.primitives import hashes
 
 import keyring
-import os
+
+from lib.utils.logger import Logger
 
 
 class Cryptography:
+    """Class for access cryptography methods"""
+
     def __init__(self):
-        self.logger = Logger("Cryptography")
+        self.logger = Logger()
         self.service = "RogControlCenter"
         self.username = os.getlogin()
 
@@ -22,7 +25,8 @@ class Cryptography:
             )
             print("Encryption key generated and stored in keyring.")
 
-    def retrieve_key_from_keyring(self):
+    def retrieve_key_from_keyring(self) -> bytes:
+        """Get key from keyring"""
         encoded_key = keyring.get_password(self.service, self.username)
         if not encoded_key:
             raise ValueError(
@@ -30,7 +34,8 @@ class Cryptography:
             )
         return urlsafe_b64decode(encoded_key.encode())
 
-    def encrypt_string(self, plaintext: str):
+    def encrypt_string(self, plaintext: str) -> bytes:
+        """Encrypt string"""
         nonce = os.urandom(12)
 
         cipher = Cipher(
@@ -44,7 +49,8 @@ class Cryptography:
 
         return urlsafe_b64encode(nonce + encryptor.tag + ciphertext).decode()
 
-    def decrypt_string(self, encrypted_text):
+    def decrypt_string(self, encrypted_text) -> str:
+        """Decrypt string"""
         encrypted_data = urlsafe_b64decode(encrypted_text)
 
         nonce = encrypted_data[:12]

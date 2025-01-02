@@ -1,10 +1,12 @@
-from .base.abstract_dbus_client import AbstractDbusClient
-from ...models.power_profile import PowerProfile
-from ...utils.singleton import singleton
+from lib.clients.dbus.base.abstract_dbus_client import AbstractDbusClient
+from lib.models.power_profile import PowerProfile
+from lib.utils.singleton import singleton
 
 
 @singleton
 class PowerProfilesClient(AbstractDbusClient):
+    """DBus power profile client"""
+
     def __init__(self):
         super().__init__(
             True,
@@ -14,12 +16,13 @@ class PowerProfilesClient(AbstractDbusClient):
         )
 
     @property
-    def activeProfile(self) -> PowerProfile:
-        return PowerProfile(self.getProperty("ActiveProfile"))
+    def active_profile(self) -> PowerProfile:
+        """Active power profile"""
+        return PowerProfile(self.get_property("ActiveProfile"))
 
-    @activeProfile.setter
-    def activeProfile(self, val: PowerProfile) -> None:
-        self.setProperty("ActiveProfile", val.value)
+    @active_profile.setter
+    def active_profile(self, val: PowerProfile) -> None:
+        self.set_property("ActiveProfile", val.value)
 
 
 power_profile_client = PowerProfilesClient()

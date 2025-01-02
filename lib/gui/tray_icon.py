@@ -1,29 +1,31 @@
-from .main_window import main_window
-
-from ..models.thermal_throttle_profile import ThermalThrottleProfile
-from ..models.rgb_brightness import RgbBrightness
-from ..models.battery_threshold import BatteryThreshold
-from ..services.openrgb_service import open_rgb_service
-from ..services.platform_service import platform_service
-from ..utils.constants import icons_path, log_file
-from ..utils.event_bus import event_bus
-from ..utils.logger import Logger
-from ..utils.singleton import singleton
-from ..utils.translator import translator
-
-from PyQt5.QtWidgets import QSystemTrayIcon, QMenu, QAction, QActionGroup, QColorDialog
-from PyQt5.QtGui import QIcon, QColor
-
 import os
 import signal
 import subprocess
-import time
+
+# pylint: disable=E0611, E0401
+from PyQt5.QtWidgets import QSystemTrayIcon, QMenu, QAction, QActionGroup, QColorDialog
+from PyQt5.QtGui import QIcon, QColor
+
+from lib.gui.main_window import main_window
+
+from lib.models.thermal_throttle_profile import ThermalThrottleProfile
+from lib.models.rgb_brightness import RgbBrightness
+from lib.models.battery_threshold import BatteryThreshold
+from lib.services.openrgb_service import open_rgb_service
+from lib.services.platform_service import platform_service
+from lib.utils.constants import icons_path, log_file
+from lib.utils.event_bus import event_bus
+from lib.utils.logger import Logger
+from lib.utils.singleton import singleton
+from lib.utils.translator import translator
 
 
 @singleton
-class TrayIcon:
+class TrayIcon:  # pylint: disable=R0902
+    """Tray icon class"""
+
     def __init__(self):
-        self.logger = Logger("MainWindow")
+        self.logger = Logger()
 
         icon = QIcon.fromTheme(os.path.join(icons_path, "icon-45x45.png"))
 
@@ -161,13 +163,16 @@ class TrayIcon:
         event_bus.on("OpenRgbService.aura_changed", self.set_aura_state)
 
     def set_battery_charge_limit(self, value: BatteryThreshold):
+        """Set battery charge limit"""
         self.threshold_actions[value].setChecked(True)
 
     def set_thermal_throttle_policy(self, value: ThermalThrottleProfile):
+        """Set performance profile"""
         self.logger.debug("Refreshing throttle policy in UI")
         self.performance_actions[value].setChecked(True)
 
     def set_aura_state(self, value):
+        """Set aura state"""
         effect, brightness, color = value
 
         self.effect_actions[effect].setChecked(True)
@@ -179,21 +184,27 @@ class TrayIcon:
             self.color_action.setText(color)
 
     def show(self):
+        """Show tray"""
         self.tray.setVisible(True)
 
     def on_threshold_selected(self, threshold: BatteryThreshold):
+        """Battery limit event handler"""
         platform_service.set_battery_threshold(threshold)
 
     def on_effect_selected(self, effect: str):
+        """Effect event handler"""
         open_rgb_service.apply_effect(effect)
 
     def on_brightness_selected(self, brightness: RgbBrightness):
+        """Brightness event handler"""
         open_rgb_service.apply_brightness(brightness)
 
     def on_profile_selected(self, profile: ThermalThrottleProfile):
+        """Profile event handler"""
         platform_service.set_thermal_throttle_policy(profile)
 
     def pick_color(self):
+        """Open color picker"""
         color = QColorDialog.getColor(
             QColor(self.color_action.text()), None, translator.translate("color.select")
         )
@@ -202,16 +213,19 @@ class TrayIcon:
 
     @staticmethod
     def on_open():
+        """Open main window"""
         main_window.show()
 
     @staticmethod
     def on_open_logs():
-        subprocess.run(["xdg-open", log_file])
+        """Open log file"""
+        subprocess.run(["xdg-open", log_file], check=False)
 
     @staticmethod
     def on_quit():
+        """Quit application"""
         event_bus.emit("stop", None)
-        os.kill(os.getpid(), signal.SIGKILL)
+        event_bus.emit("end", None)
 
 
 tray_icon = TrayIcon()

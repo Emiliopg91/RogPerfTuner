@@ -1,16 +1,18 @@
-from .logger import Logger
-from .constants import translations_path
-
 import json
 import locale
 
+from lib.utils.logger import Logger
+from lib.utils.constants import translations_path
+
 
 class Translator:
+    """Class for locale translation"""
+
     _translation_file = translations_path
-    _language = locale.getdefaultlocale()[0].split("_")[0]
+    _language = locale.getdefaultlocale()[0].split("_")[0]  # pylint: disable=W4902
 
     def __init__(self):
-        self.logger = Logger("Translator")
+        self.logger = Logger()
         self.logger.debug(f"Initializing translator for {Translator._language}")
 
         data = {}
@@ -24,11 +26,13 @@ class Translator:
             except KeyError:
                 self._translations[key] = data[key]["en"]
 
-    def translate(self, msg: str, replacement: dict[str, any] = {}):
+    def translate(self, msg: str, replacement: dict[str, any] = None) -> str:
+        """Translate literal with optional replacements"""
         try:
             result: str = self._translations[msg]
-            for key in replacement.keys():
-                result = result.replace("{" + key + "}", str(replacement[key]))
+            if replacement is not None:
+                for key in replacement.keys():
+                    result = result.replace("{" + key + "}", str(replacement[key]))
 
             return result
         except KeyError:

@@ -126,5 +126,9 @@
   "apply.now": {
     "en": "Apply now",
     "es": "Aplicar ahora"
+  },
+  "initializing": {
+    "en": "Initializing application",
+    "es": "Inicializando aplicación"
   }
 }

@@ -1,32 +1,37 @@
-from .base.abstract_effect import AbstractEffect
-from ..sdk.orgb import Device
-from ..sdk.utils import RGBColor, ZoneType
-from ....utils.singleton import singleton
-
 import math
 import random
 import threading
 
+# pylint: disable=E0611, E0401
+from openrgb.orgb import Device
+from openrgb.utils import RGBColor, ZoneType
+
+from lib.clients.openrgb.effects.base.abstract_effect import AbstractEffect
+from lib.utils.singleton import singleton
+from lib.utils.openrgb import OpenRGBUtils
+
 
 @singleton
 class DigitalRain(AbstractEffect):
+    """Digital rain effect"""
+
     def __init__(self):
         super().__init__("Digital rain", "#00FF00")
         self.decrement = 1.4
         self.max_count = int(pow(self.decrement, 32))
         self.matrix_on_rate = 0
 
-    def initialize_matrix(self, zone_status, zone):
+    def _initialize_matrix(self, zone_status, zone):
         for i in range(zone.mat_height):
             zone_status.append([])
-            for j in range(zone.mat_width):
+            for _ in range(zone.mat_width):
                 zone_status[i].append(0)
 
-    def initialize_linear(self, zone_status, zone):
-        for i in range(len(zone.leds)):
+    def _initialize_linear(self, zone_status, zone):
+        for _ in range(len(zone.leds)):
             zone_status.append(0)
 
-    def decrement_matrix(self, zone_status, zone):
+    def _decrement_matrix(self, zone_status, zone):
         for r in range(zone.mat_height - 1, -1, -1):
             for c in range(zone.mat_width):
                 if r == 0:
@@ -37,7 +42,7 @@ class DigitalRain(AbstractEffect):
                 else:
                     zone_status[r][c] = zone_status[r - 1][c]
 
-    def decrement_linear(self, zone_status, zone):
+    def _decrement_linear(self, zone_status, zone):
         for r in range(len(zone.leds) - 1, -1, -1):
             if r == 0:
                 if zone_status[r] > 0:
@@ -45,7 +50,7 @@ class DigitalRain(AbstractEffect):
             else:
                 zone_status[r] = zone_status[r - 1]
 
-    def to_color_matrix(self, zone_status, zone):
+    def _to_color_matrix(self, zone_status, zone):
         colors = [RGBColor(0, 0, 0) for _ in range(len(zone.leds))]
         for r in range(zone.mat_height):
             for c in range(zone.mat_width):
@@ -53,28 +58,29 @@ class DigitalRain(AbstractEffect):
                     if zone_status[r][c] == self.max_count:
                         colors[zone.matrix_map[r][c]] = RGBColor(255, 255, 255)
                     else:
-                        colors[zone.matrix_map[r][c]] = self._color.dim(
-                            zone_status[r][c] / self.max_count
+                        colors[zone.matrix_map[r][c]] = OpenRGBUtils.dim(
+                            self._color, zone_status[r][c] / self.max_count
                         )
         return colors
 
-    def to_color_linear(self, zone_status, zone):
+    def _to_color_linear(self, zone_status, zone):
         colors = [RGBColor(0, 0, 0) for _ in range(len(zone.leds))]
         for r in range(len(zone.leds)):
             if zone_status[r] == self.max_count:
                 colors[r] = RGBColor(255, 255, 255)
             else:
-                colors[r] = self._color.dim(zone_status[r] / self.max_count)
+                colors[r] = OpenRGBUtils.dim(
+                    self._color, zone_status[r] / self.max_count
+                )
         return colors
 
-    def get_next_matrix(self, status, zone):
+    def _get_next_matrix(self, status, zone):
         count_off = 0
         for c in range(zone.mat_width):
             for r in range(zone.mat_height):
                 if status[r][c] != 0:
                     break
-                elif r == zone.mat_height - 1:
-                    count_off += 1
+                count_off += 1
         if count_off / zone.mat_width > self.matrix_on_rate:
             next_col = -1
             iters = 0
@@ -87,7 +93,7 @@ class DigitalRain(AbstractEffect):
                     else:
                         status[0][next_col] = self.max_count
 
-    def get_next_linear(self, status, zone):
+    def _get_next_linear(self, status, zone):
         count_off = sum(1 for c in status if c == 0)
         if count_off / len(zone.leds) > self.matrix_on_rate:
             next_idx = -1
@@ -105,18 +111,17 @@ class DigitalRain(AbstractEffect):
 
         def device_thread(dev: Device, dev_id):
             colors.append([RGBColor(0, 0, 0) for _ in dev.colors])
-            self.set_colors(dev, colors[dev_id])
-            zone_status.append([])
+            self._set_colors(dev, colors[dev_id])
 
             for iz, zone in enumerate(dev.zones):
                 zone_status[dev_id].append([])
 
                 if zone.type == ZoneType.MATRIX:
-                    self.initialize_matrix(zone_status[dev_id][iz], zone)
+                    self._initialize_matrix(zone_status[dev_id][iz], zone)
                 elif zone.type in (ZoneType.LINEAR, ZoneType.SINGLE):
-                    self.initialize_linear(zone_status[dev_id][iz], zone)
+                    self._initialize_linear(zone_status[dev_id][iz], zone)
 
-            self.sleep(random.randint(0, 100) / 1000)
+            self._sleep(random.randint(0, 100) / 1000)
 
             iter_count = 0
             while self.is_running:
@@ -128,17 +133,17 @@ class DigitalRain(AbstractEffect):
                     zone_colors = None
 
                     if zone.type == ZoneType.MATRIX:
-                        self.decrement_matrix(zone_status[dev_id][iz], zone)
+                        self._decrement_matrix(zone_status[dev_id][iz], zone)
                         if can_add:
-                            self.get_next_matrix(zone_status[dev_id][iz], zone)
-                        zone_colors = self.to_color_matrix(
+                            self._get_next_matrix(zone_status[dev_id][iz], zone)
+                        zone_colors = self._to_color_matrix(
                             zone_status[dev_id][iz], zone
                         )
                     elif zone.type in (ZoneType.LINEAR, ZoneType.SINGLE):
-                        self.decrement_linear(zone_status[dev_id][iz], zone)
+                        self._decrement_linear(zone_status[dev_id][iz], zone)
                         if can_add:
-                            self.get_next_linear(zone_status[dev_id][iz], zone)
-                        zone_colors = self.to_color_linear(
+                            self._get_next_linear(zone_status[dev_id][iz], zone)
+                        zone_colors = self._to_color_linear(
                             zone_status[dev_id][iz], zone
                         )
 
@@ -146,11 +151,12 @@ class DigitalRain(AbstractEffect):
                         final_colors[offset + i] = color
                     offset += len(zone.leds)
 
-                self.set_colors(dev, final_colors)
-                self.sleep(0.05 + random.randint(0, 50) / 1000)
+                self._set_colors(dev, final_colors)
+                self._sleep(0.05 + random.randint(0, 50) / 1000)
                 iter_count = (iter_count + 1) % 50
 
         for dev_id, dev in enumerate(self.devices):
+            zone_status.append([])
             thread = threading.Thread(
                 name=f"DigitalRain-dev-{dev_id}",
                 target=device_thread,

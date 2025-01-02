@@ -1,16 +1,17 @@
-from ..models.thermal_throttle_profile import getNextThermalThrottleProfile
-from ..models.rgb_brightness import getNextBrightness, getPreviousBrightness
-from ..services.openrgb_service import open_rgb_service
-from ..services.platform_service import platform_service
-from ..utils.constants import scripts_folder
-from ..utils.logger import Logger
-from ..utils.singleton import singleton
+import os
+import sys
 
+# pylint: disable=E0611
 from PyQt5.QtCore import QObject, pyqtSlot, Q_CLASSINFO
 from PyQt5.QtDBus import QDBusConnection, QDBusAbstractAdaptor
 
-import os
-import sys
+from lib.models.thermal_throttle_profile import get_next_thermal_throttle_profile
+from lib.models.rgb_brightness import get_next_brightness, get_previous_brightness
+from lib.services.openrgb_service import open_rgb_service
+from lib.services.platform_service import platform_service
+from lib.utils.constants import scripts_folder
+from lib.utils.logger import Logger
+from lib.utils.singleton import singleton
 
 
 SERVICE_NAME = "es.emiliopg91.RogControlCenter"
@@ -20,35 +21,44 @@ INTERFACE_NAME = "es.emiliopg91.RogControlCenter"
 
 @singleton
 class HelloService(QObject):
-    def __init__(self):
-        super().__init__()
+    """Dbus service"""
 
+    # pylint: disable=C0103
     def nextProfile(self):
+        """Activate next profile"""
         current = platform_service.thermal_throttle_profile
-        next = getNextThermalThrottleProfile(current)
-        platform_service.set_thermal_throttle_policy(next)
-        return next.name
+        next_t = get_next_thermal_throttle_profile(current)
+        platform_service.set_thermal_throttle_policy(next_t)
+        return next_t.name
 
+    # pylint: disable=C0103
     def nextEffect(self):
-        next = open_rgb_service.get_next_effect()
-        open_rgb_service.apply_effect(next)
-        return next
+        """Activate next effect"""
+        next_t = open_rgb_service.get_next_effect()
+        open_rgb_service.apply_effect(next_t)
+        return next_t
 
+    # pylint: disable=C0103
     def increaseBrightness(self):
+        """Increase brightness"""
         current = open_rgb_service.brightness
-        next = getNextBrightness(current)
-        open_rgb_service.apply_brightness(next)
-        return next.name
+        next_t = get_next_brightness(current)
+        open_rgb_service.apply_brightness(next_t)
+        return next_t.name
 
+    # pylint: disable=C0103
     def decreaseBrightness(self):
+        """Decrease brightness"""
         current = open_rgb_service.brightness
-        next = getPreviousBrightness(current)
-        open_rgb_service.apply_brightness(next)
-        return next.name
+        next_t = get_previous_brightness(current)
+        open_rgb_service.apply_brightness(next_t)
+        return next_t.name
 
 
 @singleton
 class HelloServiceAdaptor(QDBusAbstractAdaptor):
+    """Adaptor for dbus service"""
+
     Q_CLASSINFO("D-Bus Interface", INTERFACE_NAME)
 
     def __init__(self, service: HelloService):
@@ -56,26 +66,36 @@ class HelloServiceAdaptor(QDBusAbstractAdaptor):
         self.service = service
 
     @pyqtSlot(result=str)
+    # pylint: disable=C0103
     def nextProfile(self):
+        """Activate next profile"""
         return self.service.nextProfile()
 
     @pyqtSlot(result=str)
+    # pylint: disable=C0103
     def nextEffect(self):
+        """Activate next effect"""
         return self.service.nextEffect()
 
     @pyqtSlot(result=str)
+    # pylint: disable=C0103
     def increaseBrightness(self):
+        """Increase brightness"""
         return self.service.increaseBrightness()
 
     @pyqtSlot(result=str)
+    # pylint: disable=C0103
     def decreaseBrightness(self):
+        """Decrease brightness"""
         return self.service.decreaseBrightness()
 
 
 @singleton
 class DBusServer:
+    """Dbus server to expose functionality"""
+
     def __init__(self):
-        self.logger = Logger(self.__class__.__name__)
+        self.logger = Logger()
         self.file_actions: dict[str, str] = {
             "decBrightness.sh": "decreaseBrightness",
             "incBrightness.sh": "increaseBrightness",
@@ -97,6 +117,7 @@ class DBusServer:
             os.chmod(file_path, 0o755)
 
     def start(self):
+        """Start dbus server"""
         session_bus = QDBusConnection.sessionBus()
 
         if not session_bus.registerService(SERVICE_NAME):
@@ -112,7 +133,7 @@ class DBusServer:
 
         session_bus.registerObject(OBJECT_PATH, adaptor)
 
-        self.logger.info(f"D-Bus service started")
+        self.logger.info("D-Bus service started")
 
 
 dbus_server = DBusServer()

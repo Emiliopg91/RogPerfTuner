@@ -1,15 +1,5 @@
-from ..models.battery_threshold import BatteryThreshold
-from ..models.rgb_brightness import RgbBrightness
-from ..models.thermal_throttle_profile import ThermalThrottleProfile
-from ..services.openrgb_service import open_rgb_service
-from ..services.platform_service import platform_service
-from ..utils.constants import icons_path
-from ..utils.event_bus import event_bus
-from ..utils.logger import Logger
-from ..utils.translator import translator
-
+# pylint: disable=E0611, E0401
 from PyQt5.QtWidgets import (
-    QApplication,
     QVBoxLayout,
     QFormLayout,
     QLabel,
@@ -20,26 +10,39 @@ from PyQt5.QtWidgets import (
     QPushButton,
     QColorDialog,
 )
-from PyQt5.QtGui import QPixmap, QColor, QCursor, QIcon
+from PyQt5.QtGui import QPixmap, QColor, QIcon
 from PyQt5.QtCore import Qt
+
+from lib.models.battery_threshold import BatteryThreshold
+from lib.models.rgb_brightness import RgbBrightness
+from lib.models.thermal_throttle_profile import ThermalThrottleProfile
+from lib.services.openrgb_service import open_rgb_service
+from lib.services.platform_service import platform_service
+from lib.utils.constants import icons_path
+from lib.utils.event_bus import event_bus
+from lib.utils.gui_utils import GuiUtils
+from lib.utils.logger import Logger
+from lib.utils.translator import translator
 
 
 class MainWindow(QMainWindow):
-    def __init__(self):
-        self.logger = Logger("MainWindow")
+    """Aplication main window"""
 
-        self.profile_items = [profile for profile in ThermalThrottleProfile]
+    def __init__(self):
+        self.logger = Logger()
+
+        self.profile_items = list(ThermalThrottleProfile)
         self.profile_labels = [
             translator.translate(f"label.profile.{profile.name}")
             for profile in ThermalThrottleProfile
         ]
         self.effect_labels = open_rgb_service.get_available_effects()
-        self.brightness_items = [brightness for brightness in RgbBrightness]
+        self.brightness_items = list(RgbBrightness)
         self.brightness_labels = [
             translator.translate(f"label.brightness.{brightness.name}")
             for brightness in RgbBrightness
         ]
-        self.battery_items = [limit for limit in BatteryThreshold]
+        self.battery_items = list(BatteryThreshold)
         self.battery_labels = [f"{limit.value}%" for limit in BatteryThreshold]
 
         super().__init__()
@@ -123,12 +126,13 @@ class MainWindow(QMainWindow):
             f"background-color: {self.current_color if self.current_color is not None else "#00000000"};"
         )
         self.color_button.clicked.connect(self.pick_color)
-        self.color_button.setDisabled(
-            not open_rgb_service.supports_color(open_rgb_service.effect)
-        )
-        aura_layout.addRow(
-            QLabel(f"{translator.translate('color')}:"), self.color_button
-        )
+        supports_color = open_rgb_service.supports_color(open_rgb_service.effect)
+        self.color_button.setDisabled(not supports_color)
+        self.color_button.setHidden(not supports_color)
+
+        self.color_label = QLabel(f"{translator.translate('color')}:")
+        self.color_label.setHidden(not supports_color)
+        aura_layout.addRow(self.color_label, self.color_button)
 
         aura_group.setLayout(aura_layout)
         main_layout.addWidget(aura_group)
@@ -157,7 +161,7 @@ class MainWindow(QMainWindow):
 
         # Configurar el widget central
         self.setCentralWidget(central_widget)
-        self.center_window_on_current_screen()
+        GuiUtils.center_window_on_current_screen(self)
 
         event_bus.on("PlatformService.battery_threshold", self.set_battery_charge_limit)
         event_bus.on(
@@ -165,12 +169,13 @@ class MainWindow(QMainWindow):
         )
         event_bus.on("OpenRgbService.aura_changed", self.set_aura_state)
 
-    def closeEvent(self, event):
+    def close_event(self, event):
         """Override the close event to hide the window instead of closing it."""
         event.ignore()
         self.hide()
 
     def pick_color(self):
+        """Open color picker"""
         color = QColorDialog.getColor(
             QColor(self.current_color), self, translator.translate("color.select")
         )
@@ -179,25 +184,16 @@ class MainWindow(QMainWindow):
             self.color_button.setStyleSheet(f"background-color: {self.current_color};")
             self.on_color_change()
 
-    def center_window_on_current_screen(self):
-        cursor_position = QCursor.pos()
-        screen = QApplication.screenAt(cursor_position)
-        if screen is not None:
-            screen_geometry = screen.availableGeometry()
-            x = int((screen_geometry.width() - self.width()) / 2) + screen_geometry.x()
-            y = (
-                int((screen_geometry.height() - self.height()) / 2)
-                + screen_geometry.y()
-            )
-            self.move(x, y)
-
     def set_thermal_throttle_policy(self, value: ThermalThrottleProfile):
+        """Set profile policy"""
         self.profile_dropdown.setCurrentIndex(self.profile_items.index(value))
 
     def set_battery_charge_limit(self, value: BatteryThreshold):
+        """Set battery limit"""
         self.threshold_dropdown.setCurrentIndex(self.battery_items.index(value))
 
     def set_aura_state(self, value):
+        """Set aura state"""
         effect, brightness, color = value
 
         self.effect_dropdown.setCurrentIndex(self.effect_labels.index(effect))
@@ -207,24 +203,31 @@ class MainWindow(QMainWindow):
         self.current_color = color if color is not None else "#00000000"
         self.color_button.setStyleSheet(f"background-color: {self.current_color};")
         self.color_button.setDisabled(color is None)
+        self.color_button.setHidden(color is None)
+        self.color_label.setHidden(color is None)
 
     def on_profile_changed(self):
+        """Handler for profile change"""
         index = self.profile_dropdown.currentIndex()
         platform_service.set_thermal_throttle_policy(self.profile_items[index])
 
     def on_battery_limit_changed(self):
+        """Handler for battery limit change"""
         index = self.threshold_dropdown.currentIndex()
         platform_service.set_battery_threshold(self.battery_items[index])
 
     def on_effect_change(self):
+        """Handler for effect change"""
         effect = self.effect_labels[self.effect_dropdown.currentIndex()]
         open_rgb_service.apply_effect(effect)
 
     def on_brightness_change(self):
+        """Handler for brightness change"""
         brightness = self.brightness_items[self.brightness_dropdown.currentIndex()]
         open_rgb_service.apply_brightness(brightness)
 
     def on_color_change(self):
+        """Handler for color change"""
         open_rgb_service.apply_color(self.current_color)
 
 
