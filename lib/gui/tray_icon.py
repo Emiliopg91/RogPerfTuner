@@ -8,6 +8,7 @@ from PyQt5.QtGui import QIcon, QColor
 
 from lib.gui.main_window import main_window
 
+from lib.models.boost import Boost
 from lib.models.thermal_throttle_profile import ThermalThrottleProfile
 from lib.models.rgb_brightness import RgbBrightness
 from lib.models.battery_threshold import BatteryThreshold
@@ -114,17 +115,30 @@ class TrayIcon:  # pylint: disable=R0902
         self.menu.addAction(self.performance_section)
 
         self.profile_menu = QMenu("    " + translator.translate("profile"))
-        self.profile_group = QActionGroup(self.profile_menu)
-        self.profile_group.setExclusive(True)
+        self.boost_group = QActionGroup(self.profile_menu)
+        self.boost_group.setExclusive(True)
         self.performance_actions: dict[ThermalThrottleProfile, QAction] = {}
         for profile in ThermalThrottleProfile:
             action = QAction(translator.translate(f"label.profile.{profile.name}"), checkable=True)
-            action.setActionGroup(self.profile_group)
+            action.setActionGroup(self.boost_group)
             action.setChecked(profile == platform_service.thermal_throttle_profile)
             action.triggered.connect(lambda _, p=profile: self.on_profile_selected(p))
             self.performance_actions[profile] = action
             self.profile_menu.addAction(action)
         self.menu.addMenu(self.profile_menu)
+
+        self.boost_menu = QMenu("    " + translator.translate("boost"))
+        self.boost_group = QActionGroup(self.boost_menu)
+        self.boost_group.setExclusive(True)
+        self.boost_actions: dict[Boost, QAction] = {}
+        for mode in Boost:
+            action = QAction(translator.translate(f"label.boost.{mode.name}"), checkable=True)
+            action.setActionGroup(self.boost_group)
+            action.setChecked(mode == platform_service.get_boost_mode())
+            action.triggered.connect(lambda _, m=mode: self.on_boost_selected(m))
+            self.boost_actions[mode] = action
+            self.boost_menu.addAction(action)
+        self.menu.addMenu(self.boost_menu)
 
         self.menu.addSeparator()
 
@@ -151,12 +165,17 @@ class TrayIcon:  # pylint: disable=R0902
         self.tray.setContextMenu(self.menu)
 
         event_bus.on("PlatformService.battery_threshold", self.set_battery_charge_limit)
+        event_bus.on("PlatformService.boost", self.set_boost_mode)
         event_bus.on("PlatformService.thermal_throttle_profile", self.set_thermal_throttle_policy)
         event_bus.on("OpenRgbService.aura_changed", self.set_aura_state)
 
     def set_battery_charge_limit(self, value: BatteryThreshold):
         """Set battery charge limit"""
         self.threshold_actions[value].setChecked(True)
+
+    def set_boost_mode(self, value: Boost):
+        """Set boost mode"""
+        self.boost_actions[value].setChecked(True)
 
     def set_thermal_throttle_policy(self, value: ThermalThrottleProfile):
         """Set performance profile"""
@@ -194,6 +213,10 @@ class TrayIcon:  # pylint: disable=R0902
     def on_profile_selected(self, profile: ThermalThrottleProfile):
         """Profile event handler"""
         platform_service.set_thermal_throttle_policy(profile)
+
+    def on_boost_selected(self, boost: Boost):
+        """Boost event handler"""
+        platform_service.set_boost_mode(boost)
 
     def pick_color(self):
         """Open color picker"""

@@ -22,6 +22,7 @@ class PlatformProfiles:
     """Configuration helper class"""
 
     last: int
+    boost: int
 
 
 @dataclass

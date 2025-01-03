@@ -11,6 +11,7 @@ from lib.models.settings import (
     OpenRgb,
     Effect,
 )
+from lib.models.boost import Boost
 from lib.models.thermal_throttle_profile import ThermalThrottleProfile
 from lib.utils.singleton import singleton
 from lib.utils.constants import config_file, config_folder
@@ -30,6 +31,10 @@ class Configuration:
         try:
             with open(config_file, "r") as f:
                 raw_config = yaml.safe_load(f) or {}
+
+            if "boost" not in raw_config["platform"]["profiles"]:
+                raw_config["platform"]["profiles"]["boost"] = Boost.AUTO.value
+
             self.config = Config(
                 settings=Settings(**raw_config.get("settings", {})),
                 platform=Platform(profiles=PlatformProfiles(**raw_config.get("platform", {}).get("profiles", {}))),
@@ -41,13 +46,17 @@ class Configuration:
                     },
                 ),
             )
+
+            self.save_config()
         except FileNotFoundError:
             if not os.path.exists(config_folder):
                 os.makedirs(config_folder, exist_ok=True)
 
             self.config = Config(
                 settings=Settings(None),
-                platform=Platform(profiles=PlatformProfiles(ThermalThrottleProfile.PERFORMANCE.value)),
+                platform=Platform(
+                    profiles=PlatformProfiles(ThermalThrottleProfile.PERFORMANCE.value, Boost.AUTO.value)
+                ),
                 open_rgb=OpenRgb(last_effect="Static", effects={}),
             )
             self.save_config()

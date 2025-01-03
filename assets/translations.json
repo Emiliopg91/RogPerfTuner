@@ -130,5 +130,21 @@
   "initializing": {
     "en": "Initializing application",
     "es": "Inicializando aplicación"
+  },
+  "boost": {
+    "en": "Boost",
+    "es": "Boost"
+  },
+  "label.boost.AUTO": {
+    "en": "Auto",
+    "es": "Automatico"
+  },
+  "label.boost.ON": {
+    "en": "Enabled",
+    "es": "Activado"
+  },
+  "label.boost.OFF": {
+    "en": "Disabled",
+    "es": "Desactivado"
   }
 }

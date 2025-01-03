@@ -14,6 +14,7 @@ from PyQt5.QtWidgets import (
 )
 
 from lib.models.battery_threshold import BatteryThreshold
+from lib.models.boost import Boost
 from lib.models.rgb_brightness import RgbBrightness
 from lib.models.thermal_throttle_profile import ThermalThrottleProfile
 from lib.services.openrgb_service import open_rgb_service
@@ -69,6 +70,14 @@ class MainWindow(QMainWindow):
         self.profile_dropdown.currentIndexChanged.connect(self.on_profile_changed)
         self.set_thermal_throttle_policy(platform_service.get_thermal_throttle_profile())
         performance_layout.addRow(QLabel(f"{translator.translate('profile')}:"), self.profile_dropdown)
+
+        # Label y Dropdown para "Boost"
+        self.boost_dropdown = QComboBox()
+        for item in Boost:
+            self.boost_dropdown.addItem(translator.translate(f"label.boost.{item.name}"), item)
+        self.boost_dropdown.currentIndexChanged.connect(self.on_boost_changed)
+        self.set_boost_mode(platform_service.get_boost_mode())
+        performance_layout.addRow(QLabel(f"{translator.translate('boost')}:"), self.boost_dropdown)
 
         performance_group.setLayout(performance_layout)
         main_layout.addWidget(performance_group)
@@ -137,6 +146,7 @@ class MainWindow(QMainWindow):
         GuiUtils.center_window_on_current_screen(self)
 
         event_bus.on("PlatformService.battery_threshold", self.set_battery_charge_limit)
+        event_bus.on("PlatformService.boost", self.set_boost_mode)
         event_bus.on("PlatformService.thermal_throttle_profile", self.set_thermal_throttle_policy)
         event_bus.on("OpenRgbService.aura_changed", self.set_aura_state)
 
@@ -157,6 +167,10 @@ class MainWindow(QMainWindow):
         """Set profile policy"""
         self.profile_dropdown.setCurrentIndex(self.profile_dropdown.findData(value))
 
+    def set_boost_mode(self, value: Boost):
+        """Set boost mode"""
+        self.boost_dropdown.setCurrentIndex(self.boost_dropdown.findData(value))
+
     def set_battery_charge_limit(self, value: BatteryThreshold):
         """Set battery limit"""
         self.threshold_dropdown.setCurrentIndex(self.threshold_dropdown.findData(value))
@@ -176,6 +190,10 @@ class MainWindow(QMainWindow):
     def on_profile_changed(self, index):
         """Handler for profile change"""
         platform_service.set_thermal_throttle_policy(self.profile_dropdown.itemData(index))
+
+    def on_boost_changed(self, index):
+        """Handler for boost change"""
+        platform_service.set_boost_mode(self.boost_dropdown.itemData(index))
 
     def on_battery_limit_changed(self, index):
         """Handler for battery limit change"""

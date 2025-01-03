@@ -14,6 +14,7 @@ from lib.clients.dbus.power_profiles_client import power_profile_client
 from lib.clients.dbus.upower_client import upower_client
 from lib.gui.notifier import notifier
 from lib.models.battery_threshold import BatteryThreshold
+from lib.models.boost import Boost
 from lib.models.power_profile import PowerProfile
 from lib.models.thermal_throttle_profile import ThermalThrottleProfile
 from lib.utils.configuration import configuration
@@ -102,6 +103,11 @@ class PlatformService:
                 recursive=False,
             )
             self.observer.start()
+            self.boost_mode = Boost(configuration.platform.profiles.boost)
+        else:
+            self.boost_mode = Boost.OFF
+            configuration.platform.profiles.boost = Boost.OFF
+            configuration.save_config()
 
         self.set_thermal_throttle_policy(
             ThermalThrottleProfile(configuration.config.platform.profiles.last),
@@ -116,6 +122,10 @@ class PlatformService:
     def get_thermal_throttle_profile(self) -> ThermalThrottleProfile:
         """Get current profile"""
         return self.thermal_throttle_profile
+
+    def get_boost_mode(self) -> Boost:
+        """Get current boost mode"""
+        return self.boost_mode
 
     def get_battery_charge_limit(self) -> BatteryThreshold:
         """Get current battery charge limit"""
@@ -164,11 +174,8 @@ class PlatformService:
 
             if self.thermal_throttle_profile != policy or force:
                 try:
-                    boost_enabled = self.throttle_boost_assoc[policy]
                     no_boost_reason = None
-                    if configuration.settings.password is None:
-                        no_boost_reason = "missing password"
-                    elif self.boost_control is None:
+                    if self.boost_control is None:
                         no_boost_reason = "unsupported"
 
                     self.logger.info(f"Setting {policy_name.lower()} profile")
@@ -188,19 +195,8 @@ class PlatformService:
 
                     if no_boost_reason is not None:
                         self.logger.info(f"Boost: omitted due to {no_boost_reason}")
-                    else:
-                        if boost_enabled:
-                            self.logger.info("Boost: Enabled")
-                        else:
-                            self.logger.info("Boost: Disabled")
-
-                        if self.boost_control is not None and boost_enabled != self.last_boost:
-                            target = "on" if boost_enabled else "off"
-                            value = self.boost_control[target]
-                            path = self.boost_control["path"]
-
-                            command = f'echo "{cryptography.decrypt_string(configuration.settings.password)}" | sudo -S bash -c "echo \'{value}\' | tee {path}" &>> /dev/null'  # pylint: disable=C0301
-                            subprocess.run(command, shell=True, check=True)
+                    elif self.boost_mode == Boost.AUTO:
+                        self._apply_boost(self.throttle_boost_assoc[policy])
                     self.logger.rem_tab()
                     self.logger.info("Profile setted succesfully")
 
@@ -224,6 +220,42 @@ class PlatformService:
         if value != self.battery_charge_limit:
             platform_client.charge_control_end_threshold = value
             notifier.show_toast(translator.translate("applied.battery.threshold", {"value": value.value}))
+
+    def _apply_boost(self, enabled: bool):
+        if enabled:
+            self.logger.info("Boost: Enabled")
+        else:
+            self.logger.info("Boost: Disabled")
+
+        if self.boost_control is not None and enabled != self.last_boost:
+            target = "on" if enabled else "off"
+            value = self.boost_control[target]
+            path = self.boost_control["path"]
+
+            command = f'echo "{cryptography.decrypt_string(configuration.settings.password)}" | sudo -S bash -c "echo \'{value}\' | tee {path}" &>> /dev/null'  # pylint: disable=C0301
+            subprocess.run(command, shell=True, check=True)
+
+    def set_boost_mode(self, boost: Boost) -> None:
+        """Set boost mode"""
+        if boost != self.boost_mode:
+            self.logger.info(f"Changing boost mode to {boost.name}")
+            self.logger.add_tab()
+
+            enabled = self.throttle_boost_assoc[self.thermal_throttle_profile]
+            if boost == Boost.ON:
+                enabled = True
+            elif boost == Boost.OFF:
+                enabled = False
+
+            if enabled != self.last_boost:
+                self._apply_boost(enabled)
+            self.logger.rem_tab()
+
+            self.boost_mode = boost
+            configuration.config.platform.profiles.boost = boost.value
+            configuration.save_config()
+
+            event_bus.emit("PlatformService.boost", self.boost_mode)
 
 
 platform_service = PlatformService()
