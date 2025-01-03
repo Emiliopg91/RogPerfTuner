@@ -55,9 +55,7 @@ class StarryNight(AbstractEffect):
                 while led_on < 0 or steps[led_on] > 0:
                     led_on = random.randint(0, len(leds) - 1)
                 steps[led_on] = 15 + random.randint(0, 15)
-                new_colors[led_on] = leds[led_on] = OpenRGBUtils.dim(
-                    self._get_random(), steps[led_on] / self.max_steps
-                )
+                new_colors[led_on] = leds[led_on] = OpenRGBUtils.dim(self._get_random(), steps[led_on] / self.max_steps)
 
             self._set_colors(device, new_colors)
             self._sleep(random.randint(0, 150) / 1000)

@@ -40,9 +40,7 @@ class AutoUpdater:
             self.repository = data["repository"]
             self.update_path = None
 
-            self.logger.debug(
-                f"AutoUpdater configured for repository {self.owner}/{self.repository}"
-            )
+            self.logger.debug(f"AutoUpdater configured for repository {self.owner}/{self.repository}")
         else:
             self.logger.warning("Auto update is only available for AppImage version")
 
@@ -68,9 +66,7 @@ class AutoUpdater:
     def copy_file(self, tmp_file: str) -> None:
         """Copy temporal file to pending update path"""
         try:
-            shutil.copy2(
-                tmp_file, os.path.join(user_update_folder, f"{__app_name__}.AppImage")
-            )
+            shutil.copy2(tmp_file, os.path.join(user_update_folder, f"{__app_name__}.AppImage"))
         except Exception as e:
             self.logger.error(f"Error while copying file: {e}")
 

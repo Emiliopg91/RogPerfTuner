@@ -49,9 +49,7 @@ class TrayIcon:  # pylint: disable=R0902
             action = QAction(f"{threshold.value}%", checkable=True)
             action.setActionGroup(self.threshold_group)
             action.setChecked(threshold == platform_service.battery_charge_limit)
-            action.triggered.connect(
-                lambda _, t=threshold: self.on_threshold_selected(t)
-            )
+            action.triggered.connect(lambda _, t=threshold: self.on_threshold_selected(t))
             self.threshold_actions[threshold] = action
             self.umbral_menu.addAction(action)
         self.menu.addMenu(self.umbral_menu)
@@ -89,9 +87,7 @@ class TrayIcon:  # pylint: disable=R0902
             )
             action.setActionGroup(self.brightness_group)
             action.setChecked(brightness == open_rgb_service.brightness)
-            action.triggered.connect(
-                lambda _, b=brightness: self.on_brightness_selected(b)
-            )
+            action.triggered.connect(lambda _, b=brightness: self.on_brightness_selected(b))
             self.brightness_actions[brightness] = action
             self.brightness_menu.addAction(action)
         self.menu.addMenu(self.brightness_menu)
@@ -122,9 +118,7 @@ class TrayIcon:  # pylint: disable=R0902
         self.profile_group.setExclusive(True)
         self.performance_actions: dict[ThermalThrottleProfile, QAction] = {}
         for profile in ThermalThrottleProfile:
-            action = QAction(
-                translator.translate(f"label.profile.{profile.name}"), checkable=True
-            )
+            action = QAction(translator.translate(f"label.profile.{profile.name}"), checkable=True)
             action.setActionGroup(self.profile_group)
             action.setChecked(profile == platform_service.thermal_throttle_profile)
             action.triggered.connect(lambda _, p=profile: self.on_profile_selected(p))
@@ -157,9 +151,7 @@ class TrayIcon:  # pylint: disable=R0902
         self.tray.setContextMenu(self.menu)
 
         event_bus.on("PlatformService.battery_threshold", self.set_battery_charge_limit)
-        event_bus.on(
-            "PlatformService.thermal_throttle_profile", self.set_thermal_throttle_policy
-        )
+        event_bus.on("PlatformService.thermal_throttle_profile", self.set_thermal_throttle_policy)
         event_bus.on("OpenRgbService.aura_changed", self.set_aura_state)
 
     def set_battery_charge_limit(self, value: BatteryThreshold):
@@ -205,9 +197,7 @@ class TrayIcon:  # pylint: disable=R0902
 
     def pick_color(self):
         """Open color picker"""
-        color = QColorDialog.getColor(
-            QColor(self.color_action.text()), None, translator.translate("color.select")
-        )
+        color = QColorDialog.getColor(QColor(self.color_action.text()), None, translator.translate("color.select"))
         if color.isValid():
             open_rgb_service.apply_color(color.name().upper())
 
@@ -225,7 +215,7 @@ class TrayIcon:  # pylint: disable=R0902
     def on_quit():
         """Quit application"""
         event_bus.emit("stop", None)
-        event_bus.emit("end", None)
+        os.kill(os.getpid(), signal.SIGKILL)
 
 
 tray_icon = TrayIcon()

@@ -31,23 +31,13 @@ class OpenRgbService:
             self.effect = configuration.open_rgb.last_effect
 
         self.color = static_effect.color
-        if (
-            configuration.open_rgb.last_effect
-            and configuration.open_rgb.last_effect in configuration.open_rgb.effects
-        ):
-            self.color = configuration.open_rgb.effects[
-                configuration.open_rgb.last_effect
-            ].color
+        if configuration.open_rgb.last_effect and configuration.open_rgb.last_effect in configuration.open_rgb.effects:
+            self.color = configuration.open_rgb.effects[configuration.open_rgb.last_effect].color
 
         self.brightness = RgbBrightness.MEDIUM
-        if (
-            configuration.open_rgb.last_effect
-            and configuration.open_rgb.last_effect in configuration.open_rgb.effects
-        ):
+        if configuration.open_rgb.last_effect and configuration.open_rgb.last_effect in configuration.open_rgb.effects:
             self.brightness = RgbBrightness(
-                configuration.open_rgb.effects[
-                    configuration.open_rgb.last_effect
-                ].brightness
+                configuration.open_rgb.effects[configuration.open_rgb.last_effect].brightness
             )
 
         self.connected_usb: list[UsbIdentifier] = []
@@ -92,8 +82,7 @@ class OpenRgbService:
             usb_dev = UsbIdentifier(id_vendor, id_product, name)
 
             if any(
-                cd.id_vendor == usb_dev.id_vendor
-                and cd.id_product == usb_dev.id_product
+                cd.id_vendor == usb_dev.id_vendor and cd.id_product == usb_dev.id_product
                 for cd in open_rgb_client.compatible_devices
             ):
                 self.connected_usb.append(usb_dev)
@@ -102,9 +91,7 @@ class OpenRgbService:
             if action in ["add", "remove"]:
                 self.usb_mutex.acquire(True)
                 try:
-                    lsusb_output = (
-                        subprocess.check_output(["lsusb"]).decode("utf-8").strip()
-                    )
+                    lsusb_output = subprocess.check_output(["lsusb"]).decode("utf-8").strip()
 
                     current_usb = []
                     for line in lsusb_output.split("\n"):
@@ -116,8 +103,7 @@ class OpenRgbService:
                         usb_dev = UsbIdentifier(id_vendor, id_product, name)
 
                         if any(
-                            cd.id_vendor == usb_dev.id_vendor
-                            and cd.id_product == usb_dev.id_product
+                            cd.id_vendor == usb_dev.id_vendor and cd.id_product == usb_dev.id_product
                             for cd in open_rgb_client.compatible_devices
                         ):
                             current_usb.append(usb_dev)
@@ -126,11 +112,7 @@ class OpenRgbService:
                     for dev1 in current_usb:
                         found = False
                         for dev2 in self.connected_usb:
-                            if (
-                                not found
-                                and dev1.id_vendor == dev2.id_vendor
-                                and dev1.id_product == dev2.id_product
-                            ):
+                            if not found and dev1.id_vendor == dev2.id_vendor and dev1.id_product == dev2.id_product:
                                 found = True
                         if not found:
                             added.append(dev1)
@@ -139,11 +121,7 @@ class OpenRgbService:
                     for dev1 in self.connected_usb:
                         found = False
                         for dev2 in current_usb:
-                            if (
-                                not found
-                                and dev1.id_vendor == dev2.id_vendor
-                                and dev1.id_product == dev2.id_product
-                            ):
+                            if not found and dev1.id_vendor == dev2.id_vendor and dev1.id_product == dev2.id_product:
                                 found = True
                         if not found:
                             removed.append(dev1)
@@ -207,13 +185,9 @@ class OpenRgbService:
 
         brightness = RgbBrightness.MEDIUM
         if effect in configuration.open_rgb.effects:
-            brightness = RgbBrightness(
-                configuration.open_rgb.effects[effect].brightness
-            )
+            brightness = RgbBrightness(configuration.open_rgb.effects[effect].brightness)
 
-        brightness = (
-            brightness if brightness != RgbBrightness.OFF else RgbBrightness.MEDIUM
-        )
+        brightness = brightness if brightness != RgbBrightness.OFF else RgbBrightness.MEDIUM
 
         self._apply_aura(effect, brightness, color)
 
@@ -233,11 +207,7 @@ class OpenRgbService:
         force=False,
     ) -> None:
         color = color if open_rgb_client.supports_color(effect) else None
-        if (
-            self.effect != effect
-            or self.brightness != brightness
-            or self.color != color
-        ) or force:
+        if (self.effect != effect or self.brightness != brightness or self.color != color) or force:
             self.logger.info("Applying effect")
             self.logger.add_tab()
             open_rgb_client.apply_effect(effect, brightness, color)
@@ -250,9 +220,7 @@ class OpenRgbService:
                 {effect: effect, brightness: brightness, color: color},
             )
             configuration.config.open_rgb.last_effect = effect
-            configuration.config.open_rgb.effects[effect] = Effect(
-                brightness.value, color
-            )
+            configuration.config.open_rgb.effects[effect] = Effect(brightness.value, color)
             configuration.save_config()
             self.logger.rem_tab()
 

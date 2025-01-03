@@ -15,11 +15,7 @@ class DanceFloor(AbstractEffect):
     def _get_random(self, length):
         randoms = []
         for _ in range(length):
-            randoms.append(
-                OpenRGBUtils.from_hsv(
-                    random.random() * 359, random.random() * 0.25 + 0.75, 1
-                )
-            )
+            randoms.append(OpenRGBUtils.from_hsv(random.random() * 359, random.random() * 0.25 + 0.75, 1))
         return randoms
 
     def apply_effect(self):

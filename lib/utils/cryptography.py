@@ -20,18 +20,14 @@ class Cryptography:
         self.username = os.getlogin()
 
         if keyring.get_password(self.service, self.username) is None:
-            keyring.set_password(
-                self.service, self.username, urlsafe_b64encode(os.urandom(32)).decode()
-            )
+            keyring.set_password(self.service, self.username, urlsafe_b64encode(os.urandom(32)).decode())
             print("Encryption key generated and stored in keyring.")
 
     def retrieve_key_from_keyring(self) -> bytes:
         """Get key from keyring"""
         encoded_key = keyring.get_password(self.service, self.username)
         if not encoded_key:
-            raise ValueError(
-                "No encryption key found for the specified service and username."
-            )
+            raise ValueError("No encryption key found for the specified service and username.")
         return urlsafe_b64decode(encoded_key.encode())
 
     def encrypt_string(self, plaintext: str) -> bytes:

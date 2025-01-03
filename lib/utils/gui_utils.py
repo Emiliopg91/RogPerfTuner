@@ -17,12 +17,6 @@ class GuiUtils:
         screen = QApplication.screenAt(cursor_position)
         if screen is not None:
             screen_geometry = screen.availableGeometry()
-            x = (
-                int((screen_geometry.width() - element.width()) / 2)
-                + screen_geometry.x()
-            )
-            y = (
-                int((screen_geometry.height() - element.height()) / 2)
-                + screen_geometry.y()
-            )
+            x = int((screen_geometry.width() - element.width()) / 2) + screen_geometry.x()
+            y = int((screen_geometry.height() - element.height()) / 2) + screen_geometry.y()
             element.move(x, y)

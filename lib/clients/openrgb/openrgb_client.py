@@ -105,9 +105,7 @@ class OpenRgbClient:
             s.bind(("", 0))
             self.port = s.getsockname()[1]
 
-        self.orgb_thread = threading.Thread(
-            name="ORGBServer", target=self._run_in_background
-        )
+        self.orgb_thread = threading.Thread(name="ORGBServer", target=self._run_in_background)
         self.orgb_thread.start()
 
         self._wait_for_server()
@@ -153,30 +151,26 @@ class OpenRgbClient:
         matching_entries = [
             entry.absolute()
             for entry in entries
-            if entry.name.startswith(
-                ".mount_" + pathlib.Path(os.path.basename(orgb_path)).stem[:6]
-            )
+            if entry.name.startswith(".mount_" + pathlib.Path(os.path.basename(orgb_path)).stem[:6])
         ]
 
         for mount_dir in matching_entries:  # pylint: disable=R1702
             try:
                 if compatible_devices is None:
-                    udev_path = os.path.join(
-                        mount_dir, "usr", "lib", "udev", "rules.d", "60-openrgb.rules"
-                    )
+                    udev_path = os.path.join(mount_dir, "usr", "lib", "udev", "rules.d", "60-openrgb.rules")
                     if os.path.exists(udev_path):
                         with open(udev_path, "r") as file:
                             content = file.read()
                         lines = content.split("\n")
 
-                        regex = r'SUBSYSTEMS==".*?", ATTRS{idVendor}=="([0-9a-fA-F]+)", ATTRS{idProduct}=="([0-9a-fA-F]+)"'
+                        regex = (
+                            r'SUBSYSTEMS==".*?", ATTRS{idVendor}=="([0-9a-fA-F]+)", ATTRS{idProduct}=="([0-9a-fA-F]+)"'
+                        )
                         results = []
                         for line in lines:
                             match = re.search(regex, line)
                             if match:
-                                results.append(
-                                    UsbIdentifier(match.group(1), match.group(2))
-                                )
+                                results.append(UsbIdentifier(match.group(1), match.group(2)))
                         compatible_devices = results
             except Exception:
                 pass
@@ -201,18 +195,14 @@ class OpenRgbClient:
             return effects[0].color
         return None
 
-    def apply_effect(
-        self, effect: str, brightness: RgbBrightness, color: Optional[str] = None
-    ) -> None:
+    def apply_effect(self, effect: str, brightness: RgbBrightness, color: Optional[str] = None) -> None:
         """Apply effect with specified brightness and color"""
         inst = [i for i in self.available_effects if i.name == effect]
         if inst:
             for mode in self.available_effects:
                 mode.stop()
 
-            inst[0].start(
-                self.available_devices, brightness, RGBColor.fromHEX(color or "#000000")
-            )
+            inst[0].start(self.available_devices, brightness, RGBColor.fromHEX(color or "#000000"))
 
 
 open_rgb_client = OpenRgbClient()

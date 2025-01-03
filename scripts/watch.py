@@ -1,16 +1,17 @@
-from watchdog.observers import Observer
-from watchdog.events import FileSystemEventHandler
 import subprocess
 import time
 import os
 import threading
 
-workspace = os.path.abspath(
-    os.path.join(os.path.dirname(os.path.abspath(__file__)), "..")
-)
+from watchdog.observers import Observer
+from watchdog.events import FileSystemEventHandler
+
+workspace = os.path.abspath(os.path.join(os.path.dirname(os.path.abspath(__file__)), ".."))
 
 
 class ChangeHandler(FileSystemEventHandler):
+    """Change handler class"""
+
     def __init__(self, restart_callback, debounce_interval=1):
         super().__init__()
         self.restart_callback = restart_callback
@@ -19,7 +20,7 @@ class ChangeHandler(FileSystemEventHandler):
         self._timer = None
 
     def _reset_timer(self):
-        """Reinicia el temporizador de debounce."""
+        """Reset debounce timer."""
         if self._timer:
             self._timer.cancel()
         self._timer = threading.Timer(self.debounce_interval, self.restart_callback)
@@ -45,22 +46,20 @@ def run_main():
 
 if __name__ == "__main__":
     paths = [os.path.join(workspace, "main.py"), os.path.join(workspace, "lib")]
-
-    # Variable para almacenar el proceso en ejecución
-    main_process = None
+    UPPER_CASE = None
 
     def restart_main():
         """Reinicia el subproceso que ejecuta main.py."""
-        global main_process
-        if main_process:
+        global UPPER_CASE  # pylint: disable=W0603
+        if UPPER_CASE:
             print("Changes detected, restarting main.py...")
-            main_process.terminate()
-            main_process.wait()
+            UPPER_CASE.terminate()
+            UPPER_CASE.wait()
             time.sleep(1)
-        main_process = run_main()
+        UPPER_CASE = run_main()
 
     # Inicializar el proceso al inicio
-    main_process = run_main()
+    UPPER_CASE = run_main()
 
     # Configurar Watchdog
     event_handler = ChangeHandler(restart_callback=restart_main)
@@ -79,6 +78,6 @@ if __name__ == "__main__":
             observer.stop()
         for observer in observers:
             observer.join()
-        if main_process:
-            main_process.terminate()
-            main_process.wait()
+        if UPPER_CASE:
+            UPPER_CASE.terminate()
+            UPPER_CASE.wait()

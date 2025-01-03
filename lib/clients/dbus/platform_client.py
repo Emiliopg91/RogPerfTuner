@@ -13,16 +13,12 @@ class PlatformClient(AbstractDbusClient):
     """DBus platform client"""
 
     def __init__(self):
-        super().__init__(
-            True, "org.asuslinux.Daemon", "/org/asuslinux", "org.asuslinux.Platform"
-        )
+        super().__init__(True, "org.asuslinux.Daemon", "/org/asuslinux", "org.asuslinux.Platform")
 
     @property
     def charge_control_end_threshold(self) -> BatteryThreshold:
         """Battery charge limit"""
-        return BatteryThreshold(
-            int.from_bytes(self.get_property("ChargeControlEndThreshold"))
-        )
+        return BatteryThreshold(int.from_bytes(self.get_property("ChargeControlEndThreshold")))
 
     @charge_control_end_threshold.setter
     def charge_control_end_threshold(self, val: BatteryThreshold) -> None:

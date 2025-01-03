@@ -9,23 +9,26 @@ dist_dir = os.path.join(workspace_dir, "dist")
 
 
 def copy_icon():
+    """Copy application icon"""
     src_icon_file_path = os.path.join(workspace_dir, "assets", "icons", "rog-logo.svg")
     dst_icon_file_path = os.path.join(output_dir, "icon.svg")
 
-    print(f"Copying icon file to {dst_icon_file_path}")
+    print(f"Copying icon file to {dst_icon_file_path}...")
     shutil.copy2(src_icon_file_path, dst_icon_file_path)
 
 
 def generate_desktop():
+    """Generate .desktop file"""
     src_file_path = os.path.join(workspace_dir, "RogControlCenter.desktop")
     dst_file_path = os.path.join(output_dir, "RogControlCenter.desktop")
 
-    print(f"Copying .desktop file to {dst_file_path}")
+    print(f"Copying .desktop file to {dst_file_path}...")
     shutil.copy2(src_file_path, dst_file_path)
     os.chmod(dst_file_path, 0o755)
 
 
 def generate_apprun():
+    """Generate AppRun file"""
     content = """#!/bin/bash
 set -e
 
@@ -63,7 +66,7 @@ fi
 """
     apprun_file_path = os.path.join(output_dir, "AppRun")
 
-    print(f"Generating AppRun file {apprun_file_path}")
+    print(f"Generating AppRun file {apprun_file_path}...")
 
     with open(apprun_file_path, "w") as f:
         f.write(content)
@@ -73,6 +76,9 @@ fi
 
 
 def generate_appimage():
+    """Generate AppImage file for application"""
+    output = os.path.join(dist_dir, "RogControlCenter.AppImage")
+    print(f"Generating AppImage file to {output}...")
     appimagetool_path = os.path.join(workspace_dir, "resources", "appimagetool")
     cwd = os.getcwd()
     os.makedirs(dist_dir)
@@ -83,7 +89,7 @@ def generate_appimage():
             [
                 appimagetool_path,
                 output_dir,
-                os.path.join(dist_dir, "RogControlCenter.AppImage"),
+                output,
             ],
             check=True,
         )
@@ -92,6 +98,8 @@ def generate_appimage():
 
 
 def package_python():
+    """Package Python application"""
+    print("Packaging Python code...")
     subprocess.run(
         [
             "pyinstaller",
@@ -101,27 +109,27 @@ def package_python():
             "--add-data",
             os.path.join(workspace_dir, "assets") + ":assets",
             os.path.join(workspace_dir, "main.py"),
-        ]
+        ],
+        check=False,
     )
 
 
 def prepare_workspace():
+    """Prepare workspace for build"""
+    print("Preparing workspace...")
     shutil.rmtree(output_dir, ignore_errors=True)
     shutil.rmtree(build_dir, ignore_errors=True)
     shutil.rmtree(dist_dir, ignore_errors=True)
 
 
 def clear_workspace():
+    """Clear workspace"""
+    print("Cleaning workspace...")
     shutil.rmtree(output_dir, ignore_errors=True)
     shutil.rmtree(build_dir, ignore_errors=True)
 
 
-def format_code():
-    subprocess.run(["python", "-m", "black", "."])
-
-
 prepare_workspace()
-format_code()
 package_python()
 copy_icon()
 generate_desktop()

@@ -1,18 +1,21 @@
 #!/bin/env python3
+
 # pylint: disable=C0413, C0412, C0411, E0611
+
 from lib import __version__
 from lib.utils.single_instance import single_instance
 
 single_instance.acquire()
 
-from PyQt5.QtWidgets import QApplication
 import sys
+
+from PyQt5.QtWidgets import QApplication
 
 app = QApplication(sys.argv)
 
-from lib.utils.constants import dev_mode
-
 from datetime import datetime
+
+from lib.utils.constants import dev_mode
 
 start_time = datetime.now()
 
@@ -51,8 +54,8 @@ from lib.utils.configuration import configuration
 if configuration.settings.password is None:
     password_dialog.show()
 
-from lib.server.dbus_server import dbus_server
 from lib.gui.tray_icon import tray_icon
+from lib.server.dbus_server import dbus_server
 
 tray_icon.show()
 

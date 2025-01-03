@@ -1,17 +1,17 @@
 # pylint: disable=E0611, E0401
-from PyQt5.QtWidgets import (
-    QVBoxLayout,
-    QFormLayout,
-    QLabel,
-    QComboBox,
-    QGroupBox,
-    QMainWindow,
-    QWidget,
-    QPushButton,
-    QColorDialog,
-)
-from PyQt5.QtGui import QPixmap, QColor, QIcon
 from PyQt5.QtCore import Qt
+from PyQt5.QtGui import QColor, QIcon, QPixmap
+from PyQt5.QtWidgets import (
+    QColorDialog,
+    QComboBox,
+    QFormLayout,
+    QGroupBox,
+    QLabel,
+    QMainWindow,
+    QPushButton,
+    QVBoxLayout,
+    QWidget,
+)
 
 from lib.models.battery_threshold import BatteryThreshold
 from lib.models.rgb_brightness import RgbBrightness
@@ -31,19 +31,7 @@ class MainWindow(QMainWindow):
     def __init__(self):
         self.logger = Logger()
 
-        self.profile_items = list(ThermalThrottleProfile)
-        self.profile_labels = [
-            translator.translate(f"label.profile.{profile.name}")
-            for profile in ThermalThrottleProfile
-        ]
         self.effect_labels = open_rgb_service.get_available_effects()
-        self.brightness_items = list(RgbBrightness)
-        self.brightness_labels = [
-            translator.translate(f"label.brightness.{brightness.name}")
-            for brightness in RgbBrightness
-        ]
-        self.battery_items = list(BatteryThreshold)
-        self.battery_labels = [f"{limit.value}%" for limit in BatteryThreshold]
 
         super().__init__()
 
@@ -63,15 +51,11 @@ class MainWindow(QMainWindow):
         # Primera fila: Imagen centrada
         image_label = QLabel()
         pixmap = QPixmap(f"{icons_path}/rog-logo.svg")  # Ruta a tu archivo de imagen
-        scaled_pixmap = pixmap.scaled(
-            350, 350, Qt.KeepAspectRatio, Qt.SmoothTransformation
-        )  # Escalar la imagen
+        scaled_pixmap = pixmap.scaled(350, 350, Qt.KeepAspectRatio, Qt.SmoothTransformation)  # Escalar la imagen
         image_label.setPixmap(scaled_pixmap)
         image_label.setAlignment(Qt.AlignCenter)
 
-        main_layout.addWidget(
-            image_label, alignment=Qt.AlignCenter
-        )  # Centrar la imagen
+        main_layout.addWidget(image_label, alignment=Qt.AlignCenter)  # Centrar la imagen
 
         # Grupo 1: Rendimiento
         performance_group = QGroupBox(translator.translate("performance"))
@@ -80,14 +64,11 @@ class MainWindow(QMainWindow):
 
         # Label y Dropdown para "Perfil"
         self.profile_dropdown = QComboBox()
-        self.profile_dropdown.addItems(self.profile_labels)
+        for item in ThermalThrottleProfile:
+            self.profile_dropdown.addItem(translator.translate(f"label.profile.{item.name}"), item)
         self.profile_dropdown.currentIndexChanged.connect(self.on_profile_changed)
-        self.set_thermal_throttle_policy(
-            platform_service.get_thermal_throttle_profile()
-        )
-        performance_layout.addRow(
-            QLabel(f"{translator.translate('profile')}:"), self.profile_dropdown
-        )
+        self.set_thermal_throttle_policy(platform_service.get_thermal_throttle_profile())
+        performance_layout.addRow(QLabel(f"{translator.translate('profile')}:"), self.profile_dropdown)
 
         performance_group.setLayout(performance_layout)
         main_layout.addWidget(performance_group)
@@ -100,24 +81,17 @@ class MainWindow(QMainWindow):
         # Dropdown para "Efecto"
         self.effect_dropdown = QComboBox()
         self.effect_dropdown.addItems(self.effect_labels)
-        self.effect_dropdown.setCurrentIndex(
-            self.effect_labels.index(open_rgb_service.effect)
-        )
+        self.effect_dropdown.setCurrentIndex(self.effect_labels.index(open_rgb_service.effect))
         self.effect_dropdown.currentIndexChanged.connect(self.on_effect_change)
-        aura_layout.addRow(
-            QLabel(f"{translator.translate("effect")}:"), self.effect_dropdown
-        )
+        aura_layout.addRow(QLabel(f"{translator.translate("effect")}:"), self.effect_dropdown)
 
         # Dropdown para "Brillo"
         self.brightness_dropdown = QComboBox()
-        self.brightness_dropdown.addItems(self.brightness_labels)
-        self.brightness_dropdown.setCurrentIndex(
-            self.brightness_items.index(open_rgb_service.brightness)
-        )
+        for brightness in RgbBrightness:
+            self.brightness_dropdown.addItem(translator.translate(f"label.brightness.{brightness.name}"), brightness)
+        self.brightness_dropdown.setCurrentIndex(self.brightness_dropdown.findData(open_rgb_service.brightness))
         self.brightness_dropdown.currentIndexChanged.connect(self.on_brightness_change)
-        aura_layout.addRow(
-            QLabel(f"{translator.translate("brightness")}:"), self.brightness_dropdown
-        )
+        aura_layout.addRow(QLabel(f"{translator.translate("brightness")}:"), self.brightness_dropdown)
 
         # Botón de color
         self.color_button = QPushButton()
@@ -144,10 +118,9 @@ class MainWindow(QMainWindow):
 
         # Dropdown para "Umbral"
         self.threshold_dropdown = QComboBox()
-        self.threshold_dropdown.addItems(self.battery_labels)
-        self.threshold_dropdown.currentIndexChanged.connect(
-            self.on_battery_limit_changed
-        )
+        for item in BatteryThreshold:
+            self.threshold_dropdown.addItem(f"{item.value}%", item)
+        self.threshold_dropdown.currentIndexChanged.connect(self.on_battery_limit_changed)
         self.set_battery_charge_limit(platform_service.get_battery_charge_limit())
         settings_layout.addRow(
             QLabel(
@@ -164,9 +137,7 @@ class MainWindow(QMainWindow):
         GuiUtils.center_window_on_current_screen(self)
 
         event_bus.on("PlatformService.battery_threshold", self.set_battery_charge_limit)
-        event_bus.on(
-            "PlatformService.thermal_throttle_profile", self.set_thermal_throttle_policy
-        )
+        event_bus.on("PlatformService.thermal_throttle_profile", self.set_thermal_throttle_policy)
         event_bus.on("OpenRgbService.aura_changed", self.set_aura_state)
 
     def close_event(self, event):
@@ -176,9 +147,7 @@ class MainWindow(QMainWindow):
 
     def pick_color(self):
         """Open color picker"""
-        color = QColorDialog.getColor(
-            QColor(self.current_color), self, translator.translate("color.select")
-        )
+        color = QColorDialog.getColor(QColor(self.current_color), self, translator.translate("color.select"))
         if color.isValid():
             self.current_color = color.name().upper()
             self.color_button.setStyleSheet(f"background-color: {self.current_color};")
@@ -186,45 +155,40 @@ class MainWindow(QMainWindow):
 
     def set_thermal_throttle_policy(self, value: ThermalThrottleProfile):
         """Set profile policy"""
-        self.profile_dropdown.setCurrentIndex(self.profile_items.index(value))
+        self.profile_dropdown.setCurrentIndex(self.profile_dropdown.findData(value))
 
     def set_battery_charge_limit(self, value: BatteryThreshold):
         """Set battery limit"""
-        self.threshold_dropdown.setCurrentIndex(self.battery_items.index(value))
+        self.threshold_dropdown.setCurrentIndex(self.threshold_dropdown.findData(value))
 
     def set_aura_state(self, value):
         """Set aura state"""
         effect, brightness, color = value
 
         self.effect_dropdown.setCurrentIndex(self.effect_labels.index(effect))
-        self.brightness_dropdown.setCurrentIndex(
-            self.brightness_items.index(brightness)
-        )
+        self.brightness_dropdown.setCurrentIndex(self.brightness_dropdown.findData(brightness))
         self.current_color = color if color is not None else "#00000000"
         self.color_button.setStyleSheet(f"background-color: {self.current_color};")
         self.color_button.setDisabled(color is None)
         self.color_button.setHidden(color is None)
         self.color_label.setHidden(color is None)
 
-    def on_profile_changed(self):
+    def on_profile_changed(self, index):
         """Handler for profile change"""
-        index = self.profile_dropdown.currentIndex()
-        platform_service.set_thermal_throttle_policy(self.profile_items[index])
+        platform_service.set_thermal_throttle_policy(self.profile_dropdown.itemData(index))
 
-    def on_battery_limit_changed(self):
+    def on_battery_limit_changed(self, index):
         """Handler for battery limit change"""
-        index = self.threshold_dropdown.currentIndex()
-        platform_service.set_battery_threshold(self.battery_items[index])
+        platform_service.set_battery_threshold(self.threshold_dropdown.itemData(index))
 
     def on_effect_change(self):
         """Handler for effect change"""
         effect = self.effect_labels[self.effect_dropdown.currentIndex()]
         open_rgb_service.apply_effect(effect)
 
-    def on_brightness_change(self):
+    def on_brightness_change(self, index):
         """Handler for brightness change"""
-        brightness = self.brightness_items[self.brightness_dropdown.currentIndex()]
-        open_rgb_service.apply_brightness(brightness)
+        open_rgb_service.apply_brightness(self.brightness_dropdown.itemData(index))
 
     def on_color_change(self):
         """Handler for color change"""

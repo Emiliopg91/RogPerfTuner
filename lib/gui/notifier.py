@@ -11,7 +11,9 @@ class Notifier:
 
     def show_toast(self, message):
         """Show notification"""
-        command = f'notify-send " " "{message}" -a "RogControlCenter" -t 3000 -i {os.path.join(icons_path, "icon-45x45.png")}'
+        command = (
+            f'notify-send " " "{message}" -a "RogControlCenter" -t 3000 -i {os.path.join(icons_path, "icon-45x45.png")}'
+        )
         subprocess.run(command, shell=True, check=False)
 
 

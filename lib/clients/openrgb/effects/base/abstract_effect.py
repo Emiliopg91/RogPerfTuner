@@ -21,9 +21,7 @@ class AbstractEffect(ABC):
         self.brightness = 0
         self._supports_color = default_color is not None
         self._name = name
-        self._color = (
-            RGBColor.fromHEX(default_color) if default_color is not None else None
-        )
+        self._color = RGBColor.fromHEX(default_color) if default_color is not None else None
         self.logger = Logger()
         self.mutex = Lock()
         self.devices: List[Device] = []
@@ -81,9 +79,7 @@ class AbstractEffect(ABC):
         if self.is_running:
             with self.mutex:
                 if self.is_running:
-                    dimmed_colors = [
-                        OpenRGBUtils.dim(color, self.brightness) for color in colors
-                    ]
+                    dimmed_colors = [OpenRGBUtils.dim(color, self.brightness) for color in colors]
                     dev.set_colors(dimmed_colors, True)
 
     @property

@@ -2,13 +2,13 @@ import math
 import random
 import threading
 
-# pylint: disable=E0611, E0401
+import psutil
 from openrgb.orgb import Device
 from openrgb.utils import RGBColor, ZoneType
 
 from lib.clients.openrgb.effects.base.abstract_effect import AbstractEffect
-from lib.utils.singleton import singleton
 from lib.utils.openrgb import OpenRGBUtils
+from lib.utils.singleton import singleton
 
 
 @singleton
@@ -18,7 +18,7 @@ class DigitalRain(AbstractEffect):
     def __init__(self):
         super().__init__("Digital rain", "#00FF00")
         self.decrement = 1.4
-        self.max_count = int(pow(self.decrement, 32))
+        self.max_count = int(pow(self.decrement, 10))
         self.matrix_on_rate = 0
 
     def _initialize_matrix(self, zone_status, zone):
@@ -36,9 +36,7 @@ class DigitalRain(AbstractEffect):
             for c in range(zone.mat_width):
                 if r == 0:
                     if zone_status[r][c] > 0:
-                        zone_status[r][c] = math.floor(
-                            zone_status[r][c] / self.decrement
-                        )
+                        zone_status[r][c] = math.floor(zone_status[r][c] / self.decrement)
                 else:
                     zone_status[r][c] = zone_status[r - 1][c]
 
@@ -69,9 +67,7 @@ class DigitalRain(AbstractEffect):
             if zone_status[r] == self.max_count:
                 colors[r] = RGBColor(255, 255, 255)
             else:
-                colors[r] = OpenRGBUtils.dim(
-                    self._color, zone_status[r] / self.max_count
-                )
+                colors[r] = OpenRGBUtils.dim(self._color, zone_status[r] / self.max_count)
         return colors
 
     def _get_next_matrix(self, status, zone):
@@ -127,33 +123,29 @@ class DigitalRain(AbstractEffect):
             while self.is_running:
                 offset = 0
                 final_colors = [RGBColor(0, 0, 0) for _ in dev.colors]
-
+                cpu = psutil.cpu_percent() / 100
                 for iz, zone in enumerate(dev.zones):
-                    can_add = (iter_count % 7) == 0
+                    can_add = (iter_count % (8 - math.ceil(4 * cpu))) == 0
                     zone_colors = None
 
                     if zone.type == ZoneType.MATRIX:
                         self._decrement_matrix(zone_status[dev_id][iz], zone)
                         if can_add:
                             self._get_next_matrix(zone_status[dev_id][iz], zone)
-                        zone_colors = self._to_color_matrix(
-                            zone_status[dev_id][iz], zone
-                        )
+                        zone_colors = self._to_color_matrix(zone_status[dev_id][iz], zone)
                     elif zone.type in (ZoneType.LINEAR, ZoneType.SINGLE):
                         self._decrement_linear(zone_status[dev_id][iz], zone)
                         if can_add:
                             self._get_next_linear(zone_status[dev_id][iz], zone)
-                        zone_colors = self._to_color_linear(
-                            zone_status[dev_id][iz], zone
-                        )
+                        zone_colors = self._to_color_linear(zone_status[dev_id][iz], zone)
 
                     for i, color in enumerate(zone_colors):
                         final_colors[offset + i] = color
                     offset += len(zone.leds)
 
                 self._set_colors(dev, final_colors)
-                self._sleep(0.05 + random.randint(0, 50) / 1000)
-                iter_count = (iter_count + 1) % 50
+                self._sleep(((75 * (1 - (cpu * 0.4)) / 1000)))
+                iter_count = (iter_count + 1) % 100
 
         for dev_id, dev in enumerate(self.devices):
             zone_status.append([])

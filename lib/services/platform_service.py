@@ -53,9 +53,7 @@ class PlatformService:
         self.observer = Observer()
 
         self.thermal_throttle_profile = platform_client.throttle_thermal_policy
-        platform_client.on(
-            "ThrottleThermalPolicy", self._set_thermal_throttle_profile_async
-        )
+        platform_client.on("ThrottleThermalPolicy", self._set_thermal_throttle_profile_async)
 
         self.battery_charge_limit = platform_client.charge_control_end_threshold
         platform_client.on("ChargeControlEndThreshold", self._set_battery_threshold)
@@ -196,10 +194,7 @@ class PlatformService:
                         else:
                             self.logger.info("Boost: Disabled")
 
-                        if (
-                            self.boost_control is not None
-                            and boost_enabled != self.last_boost
-                        ):
+                        if self.boost_control is not None and boost_enabled != self.last_boost:
                             target = "on" if boost_enabled else "off"
                             value = self.boost_control[target]
                             path = self.boost_control["path"]
@@ -217,11 +212,7 @@ class PlatformService:
                         notifier.show_toast(
                             translator.translate(
                                 "profile.applied",
-                                {
-                                    "profile": translator.translate(
-                                        f"label.profile.{policy_name}"
-                                    ).lower()
-                                },
+                                {"profile": translator.translate(f"label.profile.{policy_name}").lower()},
                             )
                         )
                 except Exception as error:
@@ -232,11 +223,7 @@ class PlatformService:
         """Set battery charge threshold"""
         if value != self.battery_charge_limit:
             platform_client.charge_control_end_threshold = value
-            notifier.show_toast(
-                translator.translate(
-                    "applied.battery.threshold", {"value": value.value}
-                )
-            )
+            notifier.show_toast(translator.translate("applied.battery.threshold", {"value": value.value}))
 
 
 platform_service = PlatformService()

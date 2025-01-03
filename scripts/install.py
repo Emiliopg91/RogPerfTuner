@@ -1,16 +1,15 @@
 import datetime
 import os
-import requests
 import subprocess
+import requests
 
-openrgb_path = os.path.abspath(
-    os.path.join(os.path.dirname(__file__), "..", "assets", "OpenRGB.AppImage")
-)
+openrgb_path = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "assets", "OpenRGB.AppImage"))
 
 pip_dependencies = ["black", "openrgb-python", "psutil", "pyinstaller", "PyQt5"]
 
 
 def install_pip_deps():
+    """Install dependencies from PIP"""
     print("  Installing PIP packages...")
     command = ["pip", "install"]
     command.extend(pip_dependencies)
@@ -19,24 +18,19 @@ def install_pip_deps():
 
 
 def get_openrgb():
+    """Download latest OpenRGB"""
     print("  Installing OpenRGB...")
 
-    url = f"https://api.github.com/repos/Emiliopg91/OpenRGB/releases/latest"
+    url = "https://api.github.com/repos/Emiliopg91/OpenRGB/releases/latest"
     response = requests.get(url)
 
     file_mod_date = (
-        datetime.datetime.fromtimestamp(os.path.getmtime(openrgb_path))
-        if os.path.exists(openrgb_path)
-        else None
+        datetime.datetime.fromtimestamp(os.path.getmtime(openrgb_path)) if os.path.exists(openrgb_path) else None
     )
 
     if response.status_code == 200:
         release_data = response.json()
-        data = [
-            asset
-            for asset in release_data["assets"]
-            if asset["name"].endswith(".AppImage")
-        ]
+        data = [asset for asset in release_data["assets"] if asset["name"].endswith(".AppImage")]
         if len(data) > 0:
             asset = data[0]
             if file_mod_date is None or file_mod_date < datetime.datetime.strptime(

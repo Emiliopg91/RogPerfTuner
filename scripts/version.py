@@ -2,15 +2,14 @@ import os
 import re
 import sys
 
-init_file_path = os.path.abspath(
-    os.path.join(os.path.dirname(__file__), "..", "lib", "__init__.py")
-)
+init_file_path = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "lib", "__init__.py"))
 
 if not os.path.exists(init_file_path):
     raise FileNotFoundError(f"File {init_file_path} not found")
 
 
 def get_version() -> str:
+    """Get version from application module file"""
     with open(init_file_path, "r") as file:
         content = file.read()
 
@@ -22,6 +21,7 @@ def get_version() -> str:
 
 
 def increment_version():
+    """Increment path version number"""
     with open(init_file_path, "r") as file:
         content = file.read()
 
@@ -37,11 +37,7 @@ def increment_version():
     patch += 1
     new_version = f"{major}.{minor}.{patch}"
 
-    updated_content = (
-        content[: match.start()]
-        + f"{prefix}{new_version}{suffix}"
-        + content[match.end() :]
-    )
+    updated_content = content[: match.start()] + f"{prefix}{new_version}{suffix}" + content[match.end() :]
 
     with open(init_file_path, "w") as file:
         file.write(updated_content)

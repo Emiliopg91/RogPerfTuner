@@ -28,13 +28,9 @@ user_bin_folder = os.path.join(user_folder, "bin")
 if not os.path.exists(user_bin_folder):
     os.makedirs(user_bin_folder)
 
-autostart_file = os.path.expanduser(
-    os.path.join("~", ".config", "autostart", f"{__app_name__}.desktop")
-)
+autostart_file = os.path.expanduser(os.path.join("~", ".config", "autostart", f"{__app_name__}.desktop"))
 
-app_draw_file = os.path.expanduser(
-    os.path.join("~", ".local", "share", "applications", f"{__app_name__}.desktop")
-)
+app_draw_file = os.path.expanduser(os.path.join("~", ".local", "share", "applications", f"{__app_name__}.desktop"))
 
 base_path = Path(os.path.join(os.path.dirname(__file__), "..", "..")).resolve()
 

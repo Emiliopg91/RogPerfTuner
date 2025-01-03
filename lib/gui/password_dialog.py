@@ -60,17 +60,13 @@ class PasswordDialog(QDialog):
         self.cancel_button.setDisabled(True)
 
         if self.check_password(self.password_input.text()):
-            configuration.config.settings.password = cryptography.encrypt_string(
-                self.password_input.text()
-            )
+            configuration.config.settings.password = cryptography.encrypt_string(self.password_input.text())
             configuration.save_config()
             self.accept()
         else:
             self.ok_button.setDisabled(False)
             self.cancel_button.setDisabled(False)
-            QMessageBox.warning(
-                None, "Error", translator.translate("authentication.failed")
-            )
+            QMessageBox.warning(None, "Error", translator.translate("authentication.failed"))
 
     def check_password(self, password: str) -> bool:
         """check current password"""

@@ -17,6 +17,9 @@
     "${workspaceFolder}/lib"
   ],
   "python.linting.pylintArgs": [
-    "--rcfile=${workspaceFolder}/.pylintrc lib main.py"
-]
+    "--rcfile=${workspaceFolder}/.pylintrc ${workspaceFolder}"
+  ],
+  "black-formatter.args": [
+    "--line-length", "120"
+  ]
 }

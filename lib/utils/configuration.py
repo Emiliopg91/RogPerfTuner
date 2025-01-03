@@ -32,20 +32,12 @@ class Configuration:
                 raw_config = yaml.safe_load(f) or {}
             self.config = Config(
                 settings=Settings(**raw_config.get("settings", {})),
-                platform=Platform(
-                    profiles=PlatformProfiles(
-                        **raw_config.get("platform", {}).get("profiles", {})
-                    )
-                ),
+                platform=Platform(profiles=PlatformProfiles(**raw_config.get("platform", {}).get("profiles", {}))),
                 open_rgb=OpenRgb(
-                    last_effect=raw_config.get("open_rgb", {}).get(
-                        "last_effect", "Static"
-                    ),
+                    last_effect=raw_config.get("open_rgb", {}).get("last_effect", "Static"),
                     effects={
                         name: Effect(**effect)
-                        for name, effect in raw_config.get("open_rgb", {})
-                        .get("effects", {})
-                        .items()
+                        for name, effect in raw_config.get("open_rgb", {}).get("effects", {}).items()
                     },
                 ),
             )
@@ -55,9 +47,7 @@ class Configuration:
 
             self.config = Config(
                 settings=Settings(None),
-                platform=Platform(
-                    profiles=PlatformProfiles(ThermalThrottleProfile.PERFORMANCE.value)
-                ),
+                platform=Platform(profiles=PlatformProfiles(ThermalThrottleProfile.PERFORMANCE.value)),
                 open_rgb=OpenRgb(last_effect="Static", effects={}),
             )
             self.save_config()

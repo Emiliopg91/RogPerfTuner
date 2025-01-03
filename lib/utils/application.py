@@ -4,19 +4,18 @@ import signal
 import subprocess
 
 from lib import __app_name__
-
+from lib.gui.notifier import notifier
 from lib.utils.constants import (
-    autostart_file,
     app_draw_file,
+    autostart_file,
     icons_path,
-    user_icon_folder,
     user_bin_folder,
+    user_icon_folder,
     user_update_folder,
 )
 from lib.utils.event_bus import event_bus
 from lib.utils.logger import Logger
 from lib.utils.translator import translator
-from lib.gui.notifier import notifier
 
 
 class Application:
@@ -56,11 +55,11 @@ fi
             file.write(content)
         os.chmod(self.runner_file, 0o755)
 
-        self.logger.info(f"Launch file '{self.runner_file}' written successfully")
+        self.logger.debug(f"Launch file '{self.runner_file}' written successfully")
 
     def enable_autostart(self) -> None:
         """Create file to enable autostart on login"""
-        self.logger.info("Creating autostart file")
+        self.logger.debug("Creating autostart file")
         dir_path = os.path.dirname(autostart_file)
         if not os.path.exists(dir_path):
             os.makedirs(dir_path, exist_ok=True)
@@ -68,11 +67,11 @@ fi
         with open(autostart_file, "w", encoding="utf-8") as file:
             file.write(self.desktop_content)
 
-        self.logger.info(f"Autostart file '{autostart_file}' written successfully")
+        self.logger.debug(f"Autostart file '{autostart_file}' written successfully")
 
     def create_menu_entry(self) -> None:
         """Create file to add application to menu"""
-        self.logger.info("Creating app menu file")
+        self.logger.debug("Creating app menu file")
         dir_path = os.path.dirname(app_draw_file)
         if not os.path.exists(dir_path):
             os.makedirs(dir_path, exist_ok=True)
@@ -80,7 +79,7 @@ fi
         with open(app_draw_file, "w", encoding="utf-8") as file:
             file.write(self.desktop_content)
 
-        self.logger.info(f"Menu entry file '{app_draw_file}' written successfully")
+        self.logger.debug(f"Menu entry file '{app_draw_file}' written successfully")
 
     def relaunch_application(self) -> None:
         """Relaunch the application after 1 second"""

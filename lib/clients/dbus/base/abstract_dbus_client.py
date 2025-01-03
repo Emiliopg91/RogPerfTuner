@@ -62,20 +62,14 @@ propertyChangeListener = PropertyChangeListener()
 class AbstractDbusClient(ABC):
     """Base class for dbus clients"""
 
-    def __init__(
-        self, system_bus: bool, service_name: str, object_path: str, interface_name: str
-    ):
+    def __init__(self, system_bus: bool, service_name: str, object_path: str, interface_name: str):
         self.system_bus = system_bus
         self.bus = (
             QDBusConnection.systemBus() if system_bus else QDBusConnection.sessionBus()
         )  # Conectar al bus D-Bus de sesión
-        self.interface = QDBusInterface(
-            service_name, object_path, interface_name, self.bus
-        )
+        self.interface = QDBusInterface(service_name, object_path, interface_name, self.bus)
         self.interface_name = interface_name
-        self.props_interface = QDBusInterface(
-            service_name, object_path, "org.freedesktop.DBus.Properties", self.bus
-        )
+        self.props_interface = QDBusInterface(service_name, object_path, "org.freedesktop.DBus.Properties", self.bus)
         propertyChangeListener.add_interface(interface_name)
 
     def on(self, prop_name, function: Callable[[Any], None]):
@@ -85,25 +79,17 @@ class AbstractDbusClient(ABC):
     def get_property(self, property_name: str):
         """Get dbus property"""
 
-        reply = QDBusReply(
-            self.props_interface.call("Get", self.interface_name, property_name)
-        )
+        reply = QDBusReply(self.props_interface.call("Get", self.interface_name, property_name))
         if reply.isValid():
             return reply.value()
 
-        raise Exception(
-            f"Error getting property {property_name}: {reply.error().message()}"
-        )
+        raise Exception(f"Error getting property {property_name}: {reply.error().message()}")
 
     def set_property(self, property_name: str, value):
         """Set dbus property"""
-        reply = QDBusReply(
-            self.props_interface.call("Set", self.interface_name, property_name, value)
-        )
+        reply = QDBusReply(self.props_interface.call("Set", self.interface_name, property_name, value))
         if not reply.isValid():
-            raise Exception(
-                f"Error setting property {property_name}: {reply.error().message()}"
-            )
+            raise Exception(f"Error setting property {property_name}: {reply.error().message()}")
 
     def invoke_method(self, method_name: str, *args):
         """Invoke dbus method"""
@@ -111,6 +97,4 @@ class AbstractDbusClient(ABC):
         if reply.isValid():
             return reply.value()
 
-        raise Exception(
-            f"Error invoking method {method_name}: {reply.error().message()}"
-        )
+        raise Exception(f"Error invoking method {method_name}: {reply.error().message()}")

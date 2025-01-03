@@ -58,9 +58,7 @@ class Rain(AbstractEffect):
                 self.buffer[dev_index].append(
                     {
                         "index": i,
-                        "color": self.available_colors[
-                            int(random.random() * len(self.available_colors))
-                        ],
+                        "color": self.available_colors[int(random.random() * len(self.available_colors))],
                     }
                 )
             for i in range(len(dev.leds)):
