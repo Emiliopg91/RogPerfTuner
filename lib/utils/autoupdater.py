@@ -66,7 +66,7 @@ class AutoUpdater:
     def copy_file(self, tmp_file: str) -> None:
         """Copy temporal file to pending update path"""
         try:
-            shutil.copy2(tmp_file, os.path.join(user_update_folder, f"{__app_name__}.AppImage"))
+            shutil.move(tmp_file, os.path.join(user_update_folder, f"{__app_name__}.AppImage"))
         except Exception as e:
             self.logger.error(f"Error while copying file: {e}")
 
