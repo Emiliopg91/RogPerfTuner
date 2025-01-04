@@ -109,8 +109,8 @@ class OpenRgbClient:
         self.orgb_thread.start()
 
         self._wait_for_server()
-        self.logger.info("OpenRgb server ready")
         self.compatible_devices = self._find_compatible_devices()
+        self.logger.info("OpenRgb server ready")
         self.logger.rem_tab()
 
     def _stop_orgb_process(self):
@@ -143,7 +143,7 @@ class OpenRgbClient:
                 time.sleep(0.1)
 
     def _find_compatible_devices(self):
-        self.logger.info("Reading udev rules")
+        self.logger.debug("Reading udev rules")
         compatible_devices = None
         tmp_dir = pathlib.Path(tempfile.gettempdir())
         entries = [entry for entry in tmp_dir.iterdir() if entry.is_dir()]

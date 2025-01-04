@@ -1,8 +1,9 @@
 import inspect
 import logging
 import os
+import shutil
 
-from lib.utils.constants import log_file, log_folder
+from lib.utils.constants import log_file, log_folder, log_old_folder
 
 
 class Logger:
@@ -18,18 +19,31 @@ class Logger:
         if not Logger.initialized:
             if not os.path.exists(log_folder):
                 os.makedirs(log_folder, exist_ok=True)
+            if not os.path.exists(log_old_folder):
+                os.makedirs(log_old_folder, exist_ok=True)
 
-            # Crear un formateador con el formato solicitado
+            for lf in [file for file in os.listdir(log_folder) if file.endswith(".log")]:
+                shutil.move(os.path.join(log_folder, lf), log_old_folder)
+
+            old_files = [
+                os.path.join(log_old_folder, archivo)
+                for archivo in os.listdir(log_old_folder)
+                if archivo.endswith(".log")
+            ]
+            old_files.sort(key=os.path.getmtime)
+            to_rem = old_files[:-10] if len(old_files) > 10 else []
+
+            for rf in to_rem:
+                os.unlink(rf)
+
             formatter = logging.Formatter(
                 "[%(asctime)s.%(msecs)03d]][%(threadName)-15s][%(levelname)-8s][%(name)-20s] - %(message)s",
                 datefmt="%Y-%m-%d %H:%M:%S",
             )
 
-            # Crear un manejador de archivo
             Logger.file_handler = logging.FileHandler(log_file)
             Logger.file_handler.setFormatter(formatter)
 
-            # Crear un manejador para la consola
             Logger.console_handler = logging.StreamHandler()
             Logger.console_handler.setFormatter(formatter)
 
@@ -57,23 +71,23 @@ class Logger:
 
     def info(self, message: str):
         """Write info log"""
-        self.logger.info(Logger._tag_msg(message))
+        self.logger.info(Logger._tab_msg(message))
 
     def debug(self, message: str):
         """Write debug log"""
-        self.logger.debug(Logger._tag_msg(message))
+        self.logger.debug(Logger._tab_msg(message))
 
     def warning(self, message: str):
         """Write warning log"""
-        self.logger.warning(Logger._tag_msg(message))
+        self.logger.warning(Logger._tab_msg(message))
 
     def error(self, message: str):
         """Write error log"""
-        self.logger.error(Logger._tag_msg(message))
+        self.logger.error(Logger._tab_msg(message))
 
     def critical(self, message: str):
         """Write critical log"""
-        self.logger.critical(Logger._tag_msg(message))
+        self.logger.critical(Logger._tab_msg(message))
 
     def add_tab(self):
         """Add tab to logger"""
@@ -84,5 +98,5 @@ class Logger:
         Logger.tabs -= 1
 
     @staticmethod
-    def _tag_msg(msg: str):
+    def _tab_msg(msg: str):
         return ("  " * Logger.tabs) + msg

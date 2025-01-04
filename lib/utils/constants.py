@@ -1,3 +1,4 @@
+from datetime import datetime
 from pathlib import Path
 
 import os
@@ -52,4 +53,6 @@ config_file = os.path.join(config_folder, "config.yml")
 
 log_folder = os.path.join(user_folder, "logs")
 
-log_file = os.path.join(log_folder, "application.log")
+log_old_folder = os.path.join(log_folder, "old")
+
+log_file = os.path.join(log_folder, f"{datetime.now().strftime("%Y-%m-%d %H:%M:%S")}.log")

@@ -150,7 +150,7 @@ class MainWindow(QMainWindow):
         event_bus.on("PlatformService.thermal_throttle_profile", self.set_thermal_throttle_policy)
         event_bus.on("OpenRgbService.aura_changed", self.set_aura_state)
 
-    def close_event(self, event):
+    def closeEvent(self, event):  # pylint: disable=C0103
         """Override the close event to hide the window instead of closing it."""
         event.ignore()
         self.hide()

@@ -68,4 +68,5 @@ auto_updater.start()
 logger.rem_tab()
 logger.info("Application ready")
 
+app.setQuitOnLastWindowClosed(False)
 sys.exit(app.exec_())

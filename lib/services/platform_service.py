@@ -190,13 +190,18 @@ class PlatformService:
                     fan_curves_client.reset_profile_curves(policy)
                     fan_curves_client.set_fan_curves_enabled(policy, True)
 
-                    self.logger.info(f"Power policy: {power_profile.name}")
+                    self.logger.info(f"Power profile: {power_profile.name}")
                     power_profile_client.active_profile = power_profile
 
                     if no_boost_reason is not None:
                         self.logger.info(f"Boost: omitted due to {no_boost_reason}")
                     elif self.boost_mode == Boost.AUTO:
-                        self._apply_boost(self.throttle_boost_assoc[policy])
+                        enabled = self.throttle_boost_assoc[policy]
+                        if enabled:
+                            self.logger.info("Boost: ENABLED")
+                        else:
+                            self.logger.info("Boost: DISABLED")
+                        self._apply_boost(enabled)
                     self.logger.rem_tab()
                     self.logger.info("Profile setted succesfully")
 
@@ -222,11 +227,6 @@ class PlatformService:
             notifier.show_toast(translator.translate("applied.battery.threshold", {"value": value.value}))
 
     def _apply_boost(self, enabled: bool):
-        if enabled:
-            self.logger.info("Boost: Enabled")
-        else:
-            self.logger.info("Boost: Disabled")
-
         if self.boost_control is not None and enabled != self.last_boost:
             target = "on" if enabled else "off"
             value = self.boost_control[target]
@@ -238,7 +238,7 @@ class PlatformService:
     def set_boost_mode(self, boost: Boost) -> None:
         """Set boost mode"""
         if boost != self.boost_mode:
-            self.logger.info(f"Changing boost mode to {boost.name}")
+            self.logger.info(f"Setting boost mode to {boost.name}")
             self.logger.add_tab()
 
             enabled = self.throttle_boost_assoc[self.thermal_throttle_profile]
@@ -254,6 +254,7 @@ class PlatformService:
             self.boost_mode = boost
             configuration.config.platform.profiles.boost = boost.value
             configuration.save_config()
+            self.logger.info("Boost mode setted succesfully")
 
             event_bus.emit("PlatformService.boost", self.boost_mode)
 

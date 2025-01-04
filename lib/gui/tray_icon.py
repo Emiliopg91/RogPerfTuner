@@ -8,6 +8,7 @@ from PyQt5.QtGui import QIcon, QColor
 
 from lib.gui.main_window import main_window
 
+from lib import __app_name__, __version__
 from lib.models.boost import Boost
 from lib.models.thermal_throttle_profile import ThermalThrottleProfile
 from lib.models.rgb_brightness import RgbBrightness
@@ -32,6 +33,7 @@ class TrayIcon:  # pylint: disable=R0902
 
         self.tray = QSystemTrayIcon()
         self.tray.setIcon(icon)
+        self.tray.setToolTip(f"{__app_name__} v{__version__}")
 
         # Create the menu
         self.menu = QMenu()
@@ -98,18 +100,17 @@ class TrayIcon:  # pylint: disable=R0902
         self.color_menu.setEnabled(open_rgb_service.supports_color())
 
         self.color_action = QAction(open_rgb_service.get_color())
+        self.color_action.setEnabled(False)
         self.color_menu.addAction(self.color_action)
 
-        """
-        self.colorpicker_action = QAction(translator.translate("select.color"))
+        self.colorpicker_action = QAction(f"{translator.translate("select.color")}...")
         self.colorpicker_action.triggered.connect(self.pick_color)
         self.color_menu.addAction(self.colorpicker_action)
         self.menu.addMenu(self.color_menu)
-        """
 
         self.menu.addSeparator()
 
-        # Add "Performance" option (disabled)
+        # Add "Performance" option
         self.performance_section = QAction(translator.translate("performance"))
         self.performance_section.setEnabled(False)
         self.menu.addAction(self.performance_section)
@@ -127,6 +128,7 @@ class TrayIcon:  # pylint: disable=R0902
             self.profile_menu.addAction(action)
         self.menu.addMenu(self.profile_menu)
 
+        # Add "Boost" option
         self.boost_menu = QMenu("    " + translator.translate("boost"))
         self.boost_group = QActionGroup(self.boost_menu)
         self.boost_group.setExclusive(True)
@@ -168,6 +170,13 @@ class TrayIcon:  # pylint: disable=R0902
         event_bus.on("PlatformService.boost", self.set_boost_mode)
         event_bus.on("PlatformService.thermal_throttle_profile", self.set_thermal_throttle_policy)
         event_bus.on("OpenRgbService.aura_changed", self.set_aura_state)
+
+        self.tray.activated.connect(self.on_tray_icon_activated)
+
+    def on_tray_icon_activated(self, reason):
+        """Restore main window"""
+        if reason == QSystemTrayIcon.Trigger:
+            self.on_open()
 
     def set_battery_charge_limit(self, value: BatteryThreshold):
         """Set battery charge limit"""
