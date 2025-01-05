@@ -20,6 +20,7 @@
     "--rcfile=${workspaceFolder}/.pylintrc ${workspaceFolder}"
   ],
   "black-formatter.args": [
-    "--line-length", "120"
-  ]
+    "--line-length=120"
+  ],
+  "python.analysis.autoImportCompletions": true
 }
