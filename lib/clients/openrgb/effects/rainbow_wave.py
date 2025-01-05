@@ -43,7 +43,7 @@ class RainbowWave(AbstractEffect):
                     offset += len(zone.leds)
                 self._set_colors(dev, colors)
 
-            self._sleep(0.15)
+            self._sleep(0.13)
 
             for idx in range(len(rainbow) - 1, 0, -1):
                 rainbow[idx] = rainbow[idx - 1]

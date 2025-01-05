@@ -25,7 +25,7 @@ class Rain(AbstractEffect):
     def apply_effect(self):
         self.buffer = [None] * len(self.devices)
         threads = []
-        for i, _ in self.devices:
+        for i in range(len(self.devices)):  # pylint: disable=C0200
             self.buffer[i] = []
             thread = threading.Thread(
                 name=f"Rain-dev-{i}",
@@ -49,7 +49,7 @@ class Rain(AbstractEffect):
             naps = 4
             for _ in range(naps):
                 if self.is_running:
-                    nap_time = 2500 / len(leds) / (0.5 + random.random() * 0.5) / naps
+                    nap_time = 2500 / len(leds) / (random.randint(6, 10) / 10) / naps
                     self._sleep(nap_time / 1000)
 
     def _get_next(self, dev_index, dev):
@@ -58,11 +58,11 @@ class Rain(AbstractEffect):
                 self.buffer[dev_index].append(
                     {
                         "index": i,
-                        "color": self.available_colors[int(random.random() * len(self.available_colors))],
+                        "color": self.available_colors[random.randint(0, len(self.available_colors) - 1)],
                     }
                 )
             for i in range(len(dev.leds)):
-                swap = int(random.random() * len(self.buffer[dev_index]))
+                swap = random.randint(0, len(self.buffer[dev_index]) - 1)
                 tmp = self.buffer[dev_index][i]
                 self.buffer[dev_index][i] = self.buffer[dev_index][swap]
                 self.buffer[dev_index][swap] = tmp

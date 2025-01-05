@@ -10,19 +10,13 @@ class BreathingEffect(AbstractEffect):
     """Breathing effect"""
 
     def __init__(self):
-        super().__init__("Breathing")
+        super().__init__("Breathing", "#FF0000")
         self.frequency = 0.75
 
     def apply_effect(self):
         offset = 0
-        hue = -102
         while self.is_running:
             factor = abs(math.sin(offset * self.frequency))
-
-            if offset == 0:
-                hue += 102
-                self._color = OpenRGBUtils.from_hsv(hue, 1, 1)
-
             new_color = OpenRGBUtils.dim(self._color, factor)
 
             for dev in self.devices:
