@@ -2,6 +2,7 @@
 
 # pylint: disable=C0413, C0412, C0411, E0611
 
+import os
 from lib import __version__
 from lib.utils.single_instance import single_instance
 
@@ -22,7 +23,7 @@ start_time = datetime.now()
 if dev_mode:
     print("Running in dev mode")
 else:
-    print(f"Running bundled file from '{sys.executable}'")
+    print(f"Running bundled file from '{os.getenv("APPIMAGE")}'")
 
 from lib.utils.logger import Logger
 
