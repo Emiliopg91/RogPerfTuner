@@ -68,6 +68,10 @@ class AbstractDbusClient(ABC):
             QDBusConnection.systemBus() if system_bus else QDBusConnection.sessionBus()
         )  # Conectar al bus D-Bus de sesión
         self.interface = QDBusInterface(service_name, object_path, interface_name, self.bus)
+        if not self.interface.isValid():
+            raise Exception(
+                f"Not found {"system" if system_bus else "session"} DBus service {service_name} with path {object_path} and interface {interface_name}"  # pylint: disable=C0301
+            )
         self.interface_name = interface_name
         self.props_interface = QDBusInterface(service_name, object_path, "org.freedesktop.DBus.Properties", self.bus)
         propertyChangeListener.add_interface(interface_name)
