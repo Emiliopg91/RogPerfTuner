@@ -15,7 +15,7 @@ from lib.models.rgb_brightness import RgbBrightness
 from lib.models.battery_threshold import BatteryThreshold
 from lib.services.openrgb_service import open_rgb_service
 from lib.services.platform_service import platform_service
-from lib.utils.constants import icons_path, log_file
+from lib.utils.constants import icons_path, log_file, dev_mode
 from lib.utils.event_bus import event_bus
 from lib.utils.logger import Logger
 from lib.utils.singleton import singleton
@@ -26,7 +26,7 @@ from lib.utils.translator import translator
 class TrayIcon:  # pylint: disable=R0902
     """Tray icon class"""
 
-    def __init__(self):
+    def __init__(self):  # pylint: disable=R0915
         self.logger = Logger()
 
         icon = QIcon.fromTheme(os.path.join(icons_path, "icon-45x45.png"))
@@ -97,7 +97,6 @@ class TrayIcon:  # pylint: disable=R0902
 
         # Add "Color" submenu
         self.color_menu = QMenu("    " + translator.translate("color"))
-        self.color_menu.setEnabled(open_rgb_service.supports_color())
 
         self.color_action = QAction(open_rgb_service.get_color())
         self.color_action.setEnabled(False)
@@ -106,7 +105,9 @@ class TrayIcon:  # pylint: disable=R0902
         self.colorpicker_action = QAction(f"{translator.translate("select.color")}...")
         self.colorpicker_action.triggered.connect(self.pick_color)
         self.color_menu.addAction(self.colorpicker_action)
-        self.menu.addMenu(self.color_menu)
+
+        self.submenu_color = self.menu.addMenu(self.color_menu)
+        self.submenu_color.setVisible(open_rgb_service.supports_color())
 
         self.menu.addSeparator()
 
@@ -144,12 +145,13 @@ class TrayIcon:  # pylint: disable=R0902
 
         self.menu.addSeparator()
 
-        # Add "Open" option
-        self.open_logs_action = QAction(translator.translate("open.logs"))
-        self.open_logs_action.triggered.connect(self.on_open_logs)
-        self.menu.addAction(self.open_logs_action)
+        if dev_mode:
+            # Add "Open log" option
+            self.open_logs_action = QAction(translator.translate("open.logs"))
+            self.open_logs_action.triggered.connect(self.on_open_logs)
+            self.menu.addAction(self.open_logs_action)
 
-        self.menu.addSeparator()
+            self.menu.addSeparator()
 
         # Add "Open" option
         self.open_action = QAction(translator.translate("open.ui"))
@@ -198,9 +200,9 @@ class TrayIcon:  # pylint: disable=R0902
         self.effect_actions[effect].setChecked(True)
         self.brightness_actions[brightness].setChecked(True)
         if color is None:
-            self.color_menu.setDisabled(True)
+            self.submenu_color.setVisible(False)
         else:
-            self.color_menu.setDisabled(False)
+            self.submenu_color.setVisible(True)
             self.color_action.setText(color)
 
     def show(self):
