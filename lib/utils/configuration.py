@@ -62,8 +62,6 @@ class Configuration:
             )
             self.save_config()
 
-        print("Loaded configuration")
-
     def save_config(self) -> None:
         "Persist config to file"
         self._logger.debug("Persisting settings to file")

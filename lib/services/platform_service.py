@@ -45,6 +45,31 @@ class BoostControlHandler(FileSystemEventHandler):
 class PlatformService:
     """Service for platform setting"""
 
+    THROTTLE_POWER_ASSOC: dict[ThermalThrottleProfile, PowerProfile] = {
+        ThermalThrottleProfile.QUIET: PowerProfile.POWER_SAVER,
+        ThermalThrottleProfile.BALANCED: PowerProfile.BALANCED,
+        ThermalThrottleProfile.PERFORMANCE: PowerProfile.PERFORMANCE,
+    }
+
+    THROTTLE_BOOST_ASSOC: dict[ThermalThrottleProfile, bool] = {
+        ThermalThrottleProfile.QUIET: False,
+        ThermalThrottleProfile.BALANCED: False,
+        ThermalThrottleProfile.PERFORMANCE: True,
+    }
+
+    BOOST_CONTROLS: List[Dict[str, str]] = [
+        {
+            "path": "/sys/devices/system/cpu/intel_pstate/no_turbo",
+            "on": "0",
+            "off": "1",
+        },
+        {
+            "path": "/sys/devices/system/cpu/cpufreq/boost",
+            "on": "1",
+            "off": "0",
+        },
+    ]
+
     def __init__(self):
         self._logger = Logger()
         self._lock = Lock()
@@ -54,35 +79,9 @@ class PlatformService:
         self._observer = Observer()
 
         self._thermal_throttle_profile = platform_client.throttle_thermal_policy
-        platform_client.on("ThrottleThermalPolicy", self._set_thermal_throttle_profile_async)
-
         self._battery_charge_limit = platform_client.charge_control_end_threshold
-        platform_client.on("ChargeControlEndThreshold", self._set_battery_threshold)
 
-        upower_client.on("OnBattery", self._on_ac_battery_change)
-
-        self._throttle_power_assoc: dict[ThermalThrottleProfile, PowerProfile] = {
-            ThermalThrottleProfile.QUIET: PowerProfile.POWER_SAVER,
-            ThermalThrottleProfile.BALANCED: PowerProfile.BALANCED,
-            ThermalThrottleProfile.PERFORMANCE: PowerProfile.PERFORMANCE,
-        }
-
-        self._throttle_boost_assoc: dict[ThermalThrottleProfile, bool] = {
-            ThermalThrottleProfile.QUIET: False,
-            ThermalThrottleProfile.BALANCED: False,
-            ThermalThrottleProfile.PERFORMANCE: True,
-        }
-
-        self._every_boost_control: List[Dict[str, str]] = [
-            {
-                "path": "/sys/devices/system/cpu/intel_pstate/no_turbo",
-                "on": "0",
-                "off": "1",
-            },
-            {"path": "/sys/devices/system/cpu/cpufreq/boost", "on": "1", "off": "0"},
-        ]
-
-        for control in self._every_boost_control:
+        for control in self.BOOST_CONTROLS:
             if os.path.exists(control["path"]):
                 self._boost_control = control
                 break
@@ -115,6 +114,10 @@ class PlatformService:
             True,
             True,
         )
+
+        platform_client.on("ThrottleThermalPolicy", self._set_thermal_throttle_profile_async)
+        platform_client.on("ChargeControlEndThreshold", self._set_battery_threshold)
+        upower_client.on("OnBattery", self._on_ac_battery_change)
 
     @property
     def thermal_throttle_profile(self):
@@ -159,11 +162,13 @@ class PlatformService:
         self._thermal_throttle_profile = PowerProfile(value)
 
     def _on_ac_battery_change(self, on_battery):
+        """
         policy = ThermalThrottleProfile.PERFORMANCE
         if on_battery:
             policy = ThermalThrottleProfile.QUIET
 
         self.set_thermal_throttle_policy(policy, True)
+        """
 
     def set_thermal_throttle_policy(
         self,
@@ -175,7 +180,7 @@ class PlatformService:
         """Establish thermal throttle policy"""
         with self._lock:
             policy_name = policy.name
-            power_profile = self._throttle_power_assoc[policy]
+            power_profile = self.THROTTLE_POWER_ASSOC[policy]
 
             if self._thermal_throttle_profile != policy or force:
                 try:
@@ -201,7 +206,7 @@ class PlatformService:
                     if no_boost_reason is not None:
                         self._logger.info(f"Boost: omitted due to {no_boost_reason}")
                     elif self._boost_mode == Boost.AUTO:
-                        enabled = self._throttle_boost_assoc[policy]
+                        enabled = self.THROTTLE_BOOST_ASSOC[policy]
                         if enabled:
                             self._logger.info("Boost: ENABLED")
                         else:
@@ -246,7 +251,7 @@ class PlatformService:
             self._logger.info(f"Setting boost mode to {boost.name}")
             self._logger.add_tab()
 
-            enabled = self._throttle_boost_assoc[self._thermal_throttle_profile]
+            enabled = self.THROTTLE_BOOST_ASSOC[self._thermal_throttle_profile]
             if boost == Boost.ON:
                 enabled = True
             elif boost == Boost.OFF:
