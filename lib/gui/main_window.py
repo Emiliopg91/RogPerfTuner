@@ -30,9 +30,9 @@ class MainWindow(QMainWindow):
     """Aplication main window"""
 
     def __init__(self):
-        self.logger = Logger()
+        self._logger = Logger()
 
-        self.effect_labels = open_rgb_service.get_available_effects()
+        self._effect_labels = open_rgb_service.get_available_effects()
 
         super().__init__()
 
@@ -41,7 +41,7 @@ class MainWindow(QMainWindow):
         self.setFixedSize(580, 800)
         self.setWindowIcon(QIcon(f"{icons_path}/icon-45x45.png"))
 
-        self.current_color = open_rgb_service.get_color(open_rgb_service.effect)
+        self._current_color = open_rgb_service.get_color(open_rgb_service._effect)
 
         # Widget central
         central_widget = QWidget(self)
@@ -64,20 +64,20 @@ class MainWindow(QMainWindow):
         performance_layout.setContentsMargins(20, 20, 20, 20)
 
         # Label y Dropdown para "Perfil"
-        self.profile_dropdown = QComboBox()
+        self._profile_dropdown = QComboBox()
         for item in ThermalThrottleProfile:
-            self.profile_dropdown.addItem(translator.translate(f"label.profile.{item.name}"), item)
-        self.profile_dropdown.currentIndexChanged.connect(self.on_profile_changed)
+            self._profile_dropdown.addItem(translator.translate(f"label.profile.{item.name}"), item)
+        self._profile_dropdown.currentIndexChanged.connect(self.on_profile_changed)
         self.set_thermal_throttle_policy(platform_service.get_thermal_throttle_profile())
-        performance_layout.addRow(QLabel(f"{translator.translate('profile')}:"), self.profile_dropdown)
+        performance_layout.addRow(QLabel(f"{translator.translate('profile')}:"), self._profile_dropdown)
 
         # Label y Dropdown para "Boost"
-        self.boost_dropdown = QComboBox()
+        self._boost_dropdown = QComboBox()
         for item in Boost:
-            self.boost_dropdown.addItem(translator.translate(f"label.boost.{item.name}"), item)
-        self.boost_dropdown.currentIndexChanged.connect(self.on_boost_changed)
+            self._boost_dropdown.addItem(translator.translate(f"label.boost.{item.name}"), item)
+        self._boost_dropdown.currentIndexChanged.connect(self.on_boost_changed)
         self.set_boost_mode(platform_service.get_boost_mode())
-        performance_layout.addRow(QLabel(f"{translator.translate('boost')}:"), self.boost_dropdown)
+        performance_layout.addRow(QLabel(f"{translator.translate('boost')}:"), self._boost_dropdown)
 
         performance_group.setLayout(performance_layout)
         main_layout.addWidget(performance_group)
@@ -88,34 +88,34 @@ class MainWindow(QMainWindow):
         aura_layout.setContentsMargins(20, 20, 20, 20)
 
         # Dropdown para "Efecto"
-        self.effect_dropdown = QComboBox()
-        self.effect_dropdown.addItems(self.effect_labels)
-        self.effect_dropdown.setCurrentIndex(self.effect_labels.index(open_rgb_service.effect))
-        self.effect_dropdown.currentIndexChanged.connect(self.on_effect_change)
-        aura_layout.addRow(QLabel(f"{translator.translate("effect")}:"), self.effect_dropdown)
+        self._effect_dropdown = QComboBox()
+        self._effect_dropdown.addItems(self._effect_labels)
+        self._effect_dropdown.setCurrentIndex(self._effect_labels.index(open_rgb_service._effect))
+        self._effect_dropdown.currentIndexChanged.connect(self.on_effect_change)
+        aura_layout.addRow(QLabel(f"{translator.translate("effect")}:"), self._effect_dropdown)
 
         # Dropdown para "Brillo"
-        self.brightness_dropdown = QComboBox()
+        self._brightness_dropdown = QComboBox()
         for brightness in RgbBrightness:
-            self.brightness_dropdown.addItem(translator.translate(f"label.brightness.{brightness.name}"), brightness)
-        self.brightness_dropdown.setCurrentIndex(self.brightness_dropdown.findData(open_rgb_service.brightness))
-        self.brightness_dropdown.currentIndexChanged.connect(self.on_brightness_change)
-        aura_layout.addRow(QLabel(f"{translator.translate("brightness")}:"), self.brightness_dropdown)
+            self._brightness_dropdown.addItem(translator.translate(f"label.brightness.{brightness.name}"), brightness)
+        self._brightness_dropdown.setCurrentIndex(self._brightness_dropdown.findData(open_rgb_service._brightness))
+        self._brightness_dropdown.currentIndexChanged.connect(self.on_brightness_change)
+        aura_layout.addRow(QLabel(f"{translator.translate("brightness")}:"), self._brightness_dropdown)
 
         # Botón de color
-        self.color_button = QPushButton()
-        self.color_button.setFixedSize(50, 50)
-        self.color_button.setStyleSheet(
-            f"background-color: {self.current_color if self.current_color is not None else "#00000000"};"
+        self._color_button = QPushButton()
+        self._color_button.setFixedSize(50, 50)
+        self._color_button.setStyleSheet(
+            f"background-color: {self._current_color if self._current_color is not None else "#00000000"};"
         )
-        self.color_button.clicked.connect(self.pick_color)
-        supports_color = open_rgb_service.supports_color(open_rgb_service.effect)
-        self.color_button.setDisabled(not supports_color)
-        self.color_button.setHidden(not supports_color)
+        self._color_button.clicked.connect(self.pick_color)
+        supports_color = open_rgb_service.supports_color(open_rgb_service._effect)
+        self._color_button.setDisabled(not supports_color)
+        self._color_button.setHidden(not supports_color)
 
-        self.color_label = QLabel(f"{translator.translate('color')}:")
-        self.color_label.setHidden(not supports_color)
-        aura_layout.addRow(self.color_label, self.color_button)
+        self._color_label = QLabel(f"{translator.translate('color')}:")
+        self._color_label.setHidden(not supports_color)
+        aura_layout.addRow(self._color_label, self._color_button)
 
         aura_group.setLayout(aura_layout)
         main_layout.addWidget(aura_group)
@@ -126,16 +126,16 @@ class MainWindow(QMainWindow):
         settings_layout.setContentsMargins(20, 20, 20, 20)
 
         # Dropdown para "Umbral"
-        self.threshold_dropdown = QComboBox()
+        self._threshold_dropdown = QComboBox()
         for item in BatteryThreshold:
-            self.threshold_dropdown.addItem(f"{item.value}%", item)
-        self.threshold_dropdown.currentIndexChanged.connect(self.on_battery_limit_changed)
+            self._threshold_dropdown.addItem(f"{item.value}%", item)
+        self._threshold_dropdown.currentIndexChanged.connect(self.on_battery_limit_changed)
         self.set_battery_charge_limit(platform_service.get_battery_charge_limit())
         settings_layout.addRow(
             QLabel(
                 f"{translator.translate("charge.threshold")}:",
             ),
-            self.threshold_dropdown,
+            self._threshold_dropdown,
         )
 
         settings_group.setLayout(settings_layout)
@@ -157,60 +157,60 @@ class MainWindow(QMainWindow):
 
     def pick_color(self):
         """Open color picker"""
-        color = QColorDialog.getColor(QColor(self.current_color), self, translator.translate("color.select"))
+        color = QColorDialog.getColor(QColor(self._current_color), self, translator.translate("color.select"))
         if color.isValid():
-            self.current_color = color.name().upper()
-            self.color_button.setStyleSheet(f"background-color: {self.current_color};")
+            self._current_color = color.name().upper()
+            self._color_button.setStyleSheet(f"background-color: {self._current_color};")
             self.on_color_change()
 
     def set_thermal_throttle_policy(self, value: ThermalThrottleProfile):
         """Set profile policy"""
-        self.profile_dropdown.setCurrentIndex(self.profile_dropdown.findData(value))
+        self._profile_dropdown.setCurrentIndex(self._profile_dropdown.findData(value))
 
     def set_boost_mode(self, value: Boost):
         """Set boost mode"""
-        self.boost_dropdown.setCurrentIndex(self.boost_dropdown.findData(value))
+        self._boost_dropdown.setCurrentIndex(self._boost_dropdown.findData(value))
 
     def set_battery_charge_limit(self, value: BatteryThreshold):
         """Set battery limit"""
-        self.threshold_dropdown.setCurrentIndex(self.threshold_dropdown.findData(value))
+        self._threshold_dropdown.setCurrentIndex(self._threshold_dropdown.findData(value))
 
     def set_aura_state(self, value):
         """Set aura state"""
         effect, brightness, color = value
 
-        self.effect_dropdown.setCurrentIndex(self.effect_labels.index(effect))
-        self.brightness_dropdown.setCurrentIndex(self.brightness_dropdown.findData(brightness))
-        self.current_color = color if color is not None else "#00000000"
-        self.color_button.setStyleSheet(f"background-color: {self.current_color};")
-        self.color_button.setDisabled(color is None)
-        self.color_button.setHidden(color is None)
-        self.color_label.setHidden(color is None)
+        self._effect_dropdown.setCurrentIndex(self._effect_labels.index(effect))
+        self._brightness_dropdown.setCurrentIndex(self._brightness_dropdown.findData(brightness))
+        self._current_color = color if color is not None else "#00000000"
+        self._color_button.setStyleSheet(f"background-color: {self._current_color};")
+        self._color_button.setDisabled(color is None)
+        self._color_button.setHidden(color is None)
+        self._color_label.setHidden(color is None)
 
     def on_profile_changed(self, index):
         """Handler for profile change"""
-        platform_service.set_thermal_throttle_policy(self.profile_dropdown.itemData(index))
+        platform_service.set_thermal_throttle_policy(self._profile_dropdown.itemData(index))
 
     def on_boost_changed(self, index):
         """Handler for boost change"""
-        platform_service.set_boost_mode(self.boost_dropdown.itemData(index))
+        platform_service.set_boost_mode(self._boost_dropdown.itemData(index))
 
     def on_battery_limit_changed(self, index):
         """Handler for battery limit change"""
-        platform_service.set_battery_threshold(self.threshold_dropdown.itemData(index))
+        platform_service.set_battery_threshold(self._threshold_dropdown.itemData(index))
 
     def on_effect_change(self):
         """Handler for effect change"""
-        effect = self.effect_labels[self.effect_dropdown.currentIndex()]
+        effect = self._effect_labels[self._effect_dropdown.currentIndex()]
         open_rgb_service.apply_effect(effect)
 
     def on_brightness_change(self, index):
         """Handler for brightness change"""
-        open_rgb_service.apply_brightness(self.brightness_dropdown.itemData(index))
+        open_rgb_service.apply_brightness(self._brightness_dropdown.itemData(index))
 
     def on_color_change(self):
         """Handler for color change"""
-        open_rgb_service.apply_color(self.current_color)
+        open_rgb_service.apply_color(self._current_color)
 
 
 main_window = MainWindow()

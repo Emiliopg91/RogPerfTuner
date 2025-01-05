@@ -12,8 +12,8 @@ class Translator:
     _language = locale.getdefaultlocale()[0].split("_")[0]  # pylint: disable=W4902
 
     def __init__(self):
-        self.logger = Logger()
-        self.logger.debug(f"Initializing translator for {Translator._language}")
+        self._logger = Logger()
+        self._logger.debug(f"Initializing translator for {Translator._language}")
 
         data = {}
         with open(Translator._translation_file, "r") as file:
@@ -36,7 +36,7 @@ class Translator:
 
             return result
         except KeyError:
-            self.logger.warning(f"Missing translation for '{msg}'")
+            self._logger.warning(f"Missing translation for '{msg}'")
             return msg
 
 

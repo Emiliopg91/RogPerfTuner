@@ -17,14 +17,14 @@ class RainbowWave(AbstractEffect):
         super().__init__("Rainbow wave")
 
     def apply_effect(self):
-        longest_zone = max(set(max(set(zone.mat_width or len(zone.leds) for zone in el.zones)) for el in self.devices))
+        longest_zone = max(set(max(set(zone.mat_width or len(zone.leds) for zone in el.zones)) for el in self._devices))
 
         rainbow = [0] * longest_zone
         for idx in range(len(rainbow) - 1, -1, -1):
             rainbow[idx] = (len(rainbow) - idx) * 7
 
-        while self.is_running:  # pylint: disable=R1702
-            for dev in self.devices:
+        while self._is_running:  # pylint: disable=R1702
+            for dev in self._devices:
                 colors = [RGBColor(0, 0, 0)] * len(dev.leds)
                 offset = 0
                 for zone in dev.zones:

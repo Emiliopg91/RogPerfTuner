@@ -22,7 +22,7 @@ class PasswordDialog(QDialog):
     """Sudo password dialog"""
 
     def __init__(self):
-        self.logger = Logger()
+        self._logger = Logger()
 
         super().__init__()
         self.setWindowTitle(translator.translate("authentication.required"))
@@ -32,23 +32,23 @@ class PasswordDialog(QDialog):
         layout = QVBoxLayout()
 
         # Etiqueta de instrucción
-        self.label = QLabel(f"{translator.translate("enter.sudo.password")}:")
-        layout.addWidget(self.label)
+        self._label = QLabel(f"{translator.translate("enter.sudo.password")}:")
+        layout.addWidget(self._label)
 
         # Campo de entrada de contraseña
-        self.password_input = QLineEdit()
-        self.password_input.setEchoMode(QLineEdit.Password)
-        layout.addWidget(self.password_input)
+        self._password_input = QLineEdit()
+        self._password_input.setEchoMode(QLineEdit.Password)
+        layout.addWidget(self._password_input)
 
         # Botón de aceptar
-        self.ok_button = QPushButton(translator.translate("accept"))
-        self.ok_button.clicked.connect(self.on_accept)
-        layout.addWidget(self.ok_button)
+        self._ok_button = QPushButton(translator.translate("accept"))
+        self._ok_button.clicked.connect(self.on_accept)
+        layout.addWidget(self._ok_button)
 
         # Botón de cancelar
-        self.cancel_button = QPushButton(translator.translate("cancel"))
-        self.cancel_button.clicked.connect(self.reject)
-        layout.addWidget(self.cancel_button)
+        self._cancel_button = QPushButton(translator.translate("cancel"))
+        self._cancel_button.clicked.connect(self.reject)
+        layout.addWidget(self._cancel_button)
 
         self.setLayout(layout)
 
@@ -56,21 +56,21 @@ class PasswordDialog(QDialog):
 
     def on_accept(self):
         """Accept event handler"""
-        self.ok_button.setDisabled(True)
-        self.cancel_button.setDisabled(True)
+        self._ok_button.setDisabled(True)
+        self._cancel_button.setDisabled(True)
 
-        if self.check_password(self.password_input.text()):
-            configuration.config.settings.password = cryptography.encrypt_string(self.password_input.text())
+        if self.check_password(self._password_input.text()):
+            configuration.settings.password = cryptography.encrypt_string(self._password_input.text())
             configuration.save_config()
             self.accept()
         else:
-            self.ok_button.setDisabled(False)
-            self.cancel_button.setDisabled(False)
+            self._ok_button.setDisabled(False)
+            self._cancel_button.setDisabled(False)
             QMessageBox.warning(None, "Error", translator.translate("authentication.failed"))
 
     def check_password(self, password: str) -> bool:
         """check current password"""
-        self.logger.info("Checking password")
+        self._logger.info("Checking password")
         try:
             process = subprocess.run(
                 ["sudo", "-S", "echo", "Password correct"],
@@ -80,13 +80,13 @@ class PasswordDialog(QDialog):
                 check=False,
             )
             if process.returncode == 0:
-                self.logger.info("Authentication successful")
+                self._logger.info("Authentication successful")
                 return True
 
-            self.logger.error("Authentication failed")
+            self._logger.error("Authentication failed")
             return False
         except Exception as e:
-            self.logger.error(f"Error during authentication: {e}")
+            self._logger.error(f"Error during authentication: {e}")
             return False
 
     def show(self):

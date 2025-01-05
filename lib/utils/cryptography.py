@@ -15,17 +15,17 @@ class Cryptography:
     """Class for access cryptography methods"""
 
     def __init__(self):
-        self.logger = Logger()
-        self.service = "RogControlCenter"
-        self.username = os.getlogin()
+        self._logger = Logger()
+        self._service = "RogControlCenter"
+        self._username = os.getlogin()
 
-        if keyring.get_password(self.service, self.username) is None:
-            keyring.set_password(self.service, self.username, urlsafe_b64encode(os.urandom(32)).decode())
+        if keyring.get_password(self._service, self._username) is None:
+            keyring.set_password(self._service, self._username, urlsafe_b64encode(os.urandom(32)).decode())
             print("Encryption key generated and stored in keyring.")
 
     def retrieve_key_from_keyring(self) -> bytes:
         """Get key from keyring"""
-        encoded_key = keyring.get_password(self.service, self.username)
+        encoded_key = keyring.get_password(self._service, self._username)
         if not encoded_key:
             raise ValueError("No encryption key found for the specified service and username.")
         return urlsafe_b64decode(encoded_key.encode())

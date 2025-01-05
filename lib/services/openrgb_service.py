@@ -22,49 +22,54 @@ class OpenRgbService:
     """Service for mangeing RGB lightning"""
 
     def __init__(self):
-        self.logger = Logger()
-        self.logger.info("Initializing OpenRgbService")
-        self.logger.add_tab()
+        self._logger = Logger()
+        self._logger.info("Initializing OpenRgbService")
+        self._logger.add_tab()
 
-        self.effect = static_effect.name
+        self._effect = static_effect.name
         if configuration.open_rgb.last_effect:
-            self.effect = configuration.open_rgb.last_effect
+            self._effect = configuration.open_rgb.last_effect
 
-        self.color = static_effect.color
+        self._color = static_effect.color
         if configuration.open_rgb.last_effect and configuration.open_rgb.last_effect in configuration.open_rgb.effects:
-            self.color = configuration.open_rgb.effects[configuration.open_rgb.last_effect].color
+            self._color = configuration.open_rgb.effects[configuration.open_rgb.last_effect].color
 
-        self.brightness = RgbBrightness.MEDIUM
+        self._brightness = RgbBrightness.MEDIUM
         if configuration.open_rgb.last_effect and configuration.open_rgb.last_effect in configuration.open_rgb.effects:
-            self.brightness = RgbBrightness(
+            self._brightness = RgbBrightness(
                 configuration.open_rgb.effects[configuration.open_rgb.last_effect].brightness
             )
 
-        self.connected_usb: list[UsbIdentifier] = []
-        self.usb_mutex = Lock()
+        self._connected_usb: list[UsbIdentifier] = []
+        self._usb_mutex = Lock()
         thread = Thread(name="UsbChecker", target=self.monitor_for_usb)
         thread.start()
 
-        self.logger.info("Restoring effect")
-        self.logger.add_tab()
-        open_rgb_client.apply_effect(self.effect, self.brightness, self.color)
-        self.logger.rem_tab()
-        self.logger.rem_tab()
+        self._logger.info("Restoring effect")
+        self._logger.add_tab()
+        open_rgb_client.apply_effect(self._effect, self._brightness, self._color)
+        self._logger.rem_tab()
+        self._logger.rem_tab()
+
+    @property
+    def brightness(self) -> RgbBrightness:
+        """Getter for brightness"""
+        return self._brightness
 
     def bounced_reload(self) -> None:
         """Reload OpenRGB Server"""
-        self.usb_mutex.acquire(True)
+        self._usb_mutex.acquire(True)
         try:
             t0 = time.time()
-            self.logger.info("Reloading OpenRGB server")
-            self.logger.add_tab()
+            self._logger.info("Reloading OpenRGB server")
+            self._logger.add_tab()
             open_rgb_client.stop()
             open_rgb_client.start()
-            self.logger.rem_tab()
-            self._apply_aura(self.effect, self.brightness, self.color, True)
-            self.logger.info(f"Reloaded after {(time.time() - t0):.2f} seconds")
+            self._logger.rem_tab()
+            self._apply_aura(self._effect, self._brightness, self._color, True)
+            self._logger.info(f"Reloaded after {(time.time() - t0):.2f} seconds")
         finally:
-            self.usb_mutex.release()
+            self._usb_mutex.release()
 
     def monitor_for_usb(self) -> None:  # pylint: disable=R0914, R0912
         """Monitor for usb devices changes"""
@@ -83,13 +88,13 @@ class OpenRgbService:
 
             if any(
                 cd.id_vendor == usb_dev.id_vendor and cd.id_product == usb_dev.id_product
-                for cd in open_rgb_client.compatible_devices
+                for cd in open_rgb_client.get_compatible_devices()
             ):
-                self.connected_usb.append(usb_dev)
+                self._connected_usb.append(usb_dev)
 
         for action, _ in monitor:  # pylint: disable=R1702
             if action in ["add", "remove"]:
-                self.usb_mutex.acquire(True)
+                self._usb_mutex.acquire(True)
                 try:
                     lsusb_output = subprocess.check_output(["lsusb"]).decode("utf-8").strip()
 
@@ -111,14 +116,14 @@ class OpenRgbService:
                     added = []
                     for dev1 in current_usb:
                         found = False
-                        for dev2 in self.connected_usb:
+                        for dev2 in self._connected_usb:
                             if not found and dev1.id_vendor == dev2.id_vendor and dev1.id_product == dev2.id_product:
                                 found = True
                         if not found:
                             added.append(dev1)
 
                     removed = []
-                    for dev1 in self.connected_usb:
+                    for dev1 in self._connected_usb:
                         found = False
                         for dev2 in current_usb:
                             if not found and dev1.id_vendor == dev2.id_vendor and dev1.id_product == dev2.id_product:
@@ -127,27 +132,27 @@ class OpenRgbService:
                             removed.append(dev1)
 
                     if len(removed) > 0:
-                        self.logger.info("Removed compatible device(s):")
-                        self.logger.add_tab()
+                        self._logger.info("Removed compatible device(s):")
+                        self._logger.add_tab()
                         for item in removed:
-                            self.logger.info(item.name)
-                        self.logger.rem_tab()
+                            self._logger.info(item.name)
+                        self._logger.rem_tab()
 
                     if len(added) > 0:
-                        self.logger.info("Connected compatible device(s):")
-                        self.logger.add_tab()
+                        self._logger.info("Connected compatible device(s):")
+                        self._logger.add_tab()
                         for item in added:
-                            self.logger.info(item.name)
-                        self.logger.rem_tab()
+                            self._logger.info(item.name)
+                        self._logger.rem_tab()
 
-                        self.usb_mutex.release()
+                        self._usb_mutex.release()
                         self.bounced_reload()
                     else:
-                        self.usb_mutex.release()
+                        self._usb_mutex.release()
 
-                    self.connected_usb = current_usb
+                    self._connected_usb = current_usb
                 except Exception:
-                    self.usb_mutex.release()
+                    self._usb_mutex.release()
 
     def get_available_effects(self) -> list[str]:
         """Get all available effects"""
@@ -156,13 +161,13 @@ class OpenRgbService:
     def supports_color(self, effect=None) -> bool:
         """Check if effect supports color"""
         if effect is None:
-            effect = self.effect
+            effect = self._effect
         return open_rgb_client.supports_color(effect)
 
     def get_color(self, effect=None) -> str | None:
         """Get color for effect"""
         if effect is None:
-            effect = self.effect
+            effect = self._effect
 
         if effect in configuration.open_rgb.effects:
             return configuration.open_rgb.effects[effect].color
@@ -193,11 +198,11 @@ class OpenRgbService:
 
     def apply_brightness(self, brightness: RgbBrightness) -> None:
         """Apply brightness"""
-        self._apply_aura(self.effect, brightness, self.color)
+        self._apply_aura(self._effect, brightness, self._color)
 
     def apply_color(self, color: str) -> None:
         """Apply color"""
-        self._apply_aura(self.effect, self.brightness, color)
+        self._apply_aura(self._effect, self._brightness, color)
 
     def _apply_aura(
         self,
@@ -207,27 +212,27 @@ class OpenRgbService:
         force=False,
     ) -> None:
         color = color if open_rgb_client.supports_color(effect) else None
-        if (self.effect != effect or self.brightness != brightness or self.color != color) or force:
-            self.logger.info("Applying effect")
-            self.logger.add_tab()
+        if (self._effect != effect or self._brightness != brightness or self._color != color) or force:
+            self._logger.info("Applying effect")
+            self._logger.add_tab()
             open_rgb_client.apply_effect(effect, brightness, color)
 
-            self.effect = effect
-            self.brightness = brightness
-            self.color = color
+            self._effect = effect
+            self._brightness = brightness
+            self._color = color
             event_bus.emit(
                 "OpenRgbService.aura_changed",
                 {effect: effect, brightness: brightness, color: color},
             )
-            configuration.config.open_rgb.last_effect = effect
-            configuration.config.open_rgb.effects[effect] = Effect(brightness.value, color)
+            configuration.open_rgb.last_effect = effect
+            configuration.open_rgb.effects[effect] = Effect(brightness.value, color)
             configuration.save_config()
-            self.logger.rem_tab()
+            self._logger.rem_tab()
 
     def get_next_effect(self) -> str:
         """Get next effect name"""
         effects = self.get_available_effects()
-        index = (effects.index(self.effect) + 1) % len(effects)
+        index = (effects.index(self._effect) + 1) % len(effects)
         return effects[index]
 
 

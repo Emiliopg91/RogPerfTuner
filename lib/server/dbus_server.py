@@ -95,8 +95,8 @@ class DBusServer:
     """Dbus server to expose functionality"""
 
     def __init__(self):
-        self.logger = Logger()
-        self.file_actions: dict[str, str] = {
+        self._logger = Logger()
+        self._file_actions: dict[str, str] = {
             "decBrightness.sh": "decreaseBrightness",
             "incBrightness.sh": "increaseBrightness",
             "nextAnimation.sh": "nextEffect",
@@ -105,7 +105,7 @@ class DBusServer:
 
         os.makedirs(scripts_folder, exist_ok=True)
 
-        for file, action in self.file_actions.items():
+        for file, action in self._file_actions.items():
             file_path = os.path.join(scripts_folder, file)
             script_content = f"""#!/bin/bash
                 gdbus call --session --dest {SERVICE_NAME} --object-path {OBJECT_PATH} --method {INTERFACE_NAME}.{action}
@@ -121,19 +121,19 @@ class DBusServer:
         session_bus = QDBusConnection.sessionBus()
 
         if not session_bus.registerService(SERVICE_NAME):
-            self.logger.error(f"Error: Couldn't register service {SERVICE_NAME}")
+            self._logger.error(f"Error: Couldn't register service {SERVICE_NAME}")
             sys.exit(1)
 
         service = HelloService()
         adaptor = HelloServiceAdaptor(service)
 
         if not session_bus.registerObject(OBJECT_PATH, service):
-            self.logger.error(f"Error: Couldn't register object {OBJECT_PATH}")
+            self._logger.error(f"Error: Couldn't register object {OBJECT_PATH}")
             sys.exit(1)
 
         session_bus.registerObject(OBJECT_PATH, adaptor)
 
-        self.logger.info("D-Bus service started")
+        self._logger.info("D-Bus service started")
 
 
 dbus_server = DBusServer()

@@ -12,8 +12,8 @@ class SpectrumCycle(AbstractEffect):
 
     def apply_effect(self):
         offset = 0
-        while self.is_running:
-            for dev in self.devices:
+        while self._is_running:
+            for dev in self._devices:
                 colors = [OpenRGBUtils.from_hsv(offset, 1, 1)] * len(dev.leds)
                 self._set_colors(dev, colors)
             offset = (offset + 1) % 360

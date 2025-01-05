@@ -62,32 +62,32 @@ class Logger:
                 frame = frame.f_back
             else:
                 class_name = "Unknown"
-        self.class_name = class_name
+        self._class_name = class_name
 
-        self.logger = logging.getLogger(self.class_name)
-        self.logger.setLevel(logging.INFO)
-        self.logger.addHandler(Logger.file_handler)
-        self.logger.addHandler(Logger.console_handler)
+        self._logger = logging.getLogger(self._class_name)
+        self._logger.setLevel(logging.INFO)
+        self._logger.addHandler(Logger.file_handler)
+        self._logger.addHandler(Logger.console_handler)
 
     def info(self, message: str):
         """Write info log"""
-        self.logger.info(Logger._tab_msg(message))
+        self._logger.info(Logger._tab_msg(message))
 
     def debug(self, message: str):
         """Write debug log"""
-        self.logger.debug(Logger._tab_msg(message))
+        self._logger.debug(Logger._tab_msg(message))
 
     def warning(self, message: str):
         """Write warning log"""
-        self.logger.warning(Logger._tab_msg(message))
+        self._logger.warning(Logger._tab_msg(message))
 
     def error(self, message: str):
         """Write error log"""
-        self.logger.error(Logger._tab_msg(message))
+        self._logger.error(Logger._tab_msg(message))
 
     def critical(self, message: str):
         """Write critical log"""
-        self.logger.critical(Logger._tab_msg(message))
+        self._logger.critical(Logger._tab_msg(message))
 
     def add_tab(self):
         """Add tab to logger"""

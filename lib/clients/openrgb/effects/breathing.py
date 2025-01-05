@@ -11,15 +11,15 @@ class BreathingEffect(AbstractEffect):
 
     def __init__(self):
         super().__init__("Breathing", "#FF0000")
-        self.frequency = 0.75
+        self._frequency = 0.75
 
     def apply_effect(self):
         offset = 0
-        while self.is_running:
-            factor = abs(math.sin(offset * self.frequency))
+        while self._is_running:
+            factor = abs(math.sin(offset * self._frequency))
             new_color = OpenRGBUtils.dim(self._color, factor)
 
-            for dev in self.devices:
+            for dev in self._devices:
                 self._set_colors(dev, [new_color] * len(dev.colors))
 
             if round(offset * 10) == 42:

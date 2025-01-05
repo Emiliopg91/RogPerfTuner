@@ -22,11 +22,11 @@ class Application:
     """Class for managing applicaion aspects"""
 
     def __init__(self):
-        self.logger = Logger()
-        self.runner_file = os.path.join(user_bin_folder, "launch.sh")
+        self._logger = Logger()
+        self._runner_file = os.path.join(user_bin_folder, "launch.sh")
 
-        self.desktop_content = f"""[Desktop Entry]
-Exec={self.runner_file}
+        self._desktop_content = f"""[Desktop Entry]
+Exec={self._runner_file}
 Icon={os.path.join(user_icon_folder, "icon.svg")}
 Name={__app_name__}
 Comment=An utility to manage Asus Rog laptop performance
@@ -51,42 +51,42 @@ fi
 
 "{os.getenv("APPIMAGE")}"
 """
-        with open(self.runner_file, "w", encoding="utf-8") as file:
+        with open(self._runner_file, "w", encoding="utf-8") as file:
             file.write(content)
-        os.chmod(self.runner_file, 0o755)
+        os.chmod(self._runner_file, 0o755)
 
-        self.logger.debug(f"Launch file '{self.runner_file}' written successfully")
+        self._logger.debug(f"Launch file '{self._runner_file}' written successfully")
 
     def enable_autostart(self) -> None:
         """Create file to enable autostart on login"""
-        self.logger.debug("Creating autostart file")
+        self._logger.debug("Creating autostart file")
         dir_path = os.path.dirname(autostart_file)
         if not os.path.exists(dir_path):
             os.makedirs(dir_path, exist_ok=True)
 
         with open(autostart_file, "w", encoding="utf-8") as file:
-            file.write(self.desktop_content)
+            file.write(self._desktop_content)
 
-        self.logger.debug(f"Autostart file '{autostart_file}' written successfully")
+        self._logger.debug(f"Autostart file '{autostart_file}' written successfully")
 
     def create_menu_entry(self) -> None:
         """Create file to add application to menu"""
-        self.logger.debug("Creating app menu file")
+        self._logger.debug("Creating app menu file")
         dir_path = os.path.dirname(app_draw_file)
         if not os.path.exists(dir_path):
             os.makedirs(dir_path, exist_ok=True)
 
         with open(app_draw_file, "w", encoding="utf-8") as file:
-            file.write(self.desktop_content)
+            file.write(self._desktop_content)
 
-        self.logger.debug(f"Menu entry file '{app_draw_file}' written successfully")
+        self._logger.debug(f"Menu entry file '{app_draw_file}' written successfully")
 
     def relaunch_application(self) -> None:
         """Relaunch the application after 1 second"""
         notifier.show_toast(translator.translate("applying.update"))
         event_bus.emit("stop")
         subprocess.run(
-            f'nohup bash -c "sleep 1 && {self.runner_file}" > /dev/null 2>&1 &',
+            f'nohup bash -c "sleep 1 && {self._runner_file}" > /dev/null 2>&1 &',
             check=False,
             shell=True,
         )

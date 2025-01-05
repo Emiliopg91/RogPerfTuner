@@ -23,11 +23,12 @@ class Configuration:
     """Class for accesing to config file data"""
 
     def __init__(self):
-        self.logger = Logger()
+        self._logger = Logger()
         self._load_config()
+        self._config: Config | None
 
     def _load_config(self) -> None:
-        self.logger.debug("Loading settings from file")
+        self._logger.debug("Loading settings from file")
         try:
             with open(config_file, "r") as f:
                 raw_config = yaml.safe_load(f) or {}
@@ -35,7 +36,7 @@ class Configuration:
             if "boost" not in raw_config["platform"]["profiles"]:
                 raw_config["platform"]["profiles"]["boost"] = Boost.AUTO.value
 
-            self.config = Config(
+            self._config = Config(
                 settings=Settings(**raw_config.get("settings", {})),
                 platform=Platform(profiles=PlatformProfiles(**raw_config.get("platform", {}).get("profiles", {}))),
                 open_rgb=OpenRgb(
@@ -52,7 +53,7 @@ class Configuration:
             if not os.path.exists(config_folder):
                 os.makedirs(config_folder, exist_ok=True)
 
-            self.config = Config(
+            self._config = Config(
                 settings=Settings(None),
                 platform=Platform(
                     profiles=PlatformProfiles(ThermalThrottleProfile.PERFORMANCE.value, Boost.AUTO.value)
@@ -61,26 +62,28 @@ class Configuration:
             )
             self.save_config()
 
+        print("Loaded configuration")
+
     def save_config(self) -> None:
         "Persist config to file"
-        self.logger.debug("Persisting settings to file")
+        self._logger.debug("Persisting settings to file")
         with open(config_file, "w") as f:
-            yaml.dump(asdict(self.config), f, default_flow_style=False)
+            yaml.dump(asdict(self._config), f, default_flow_style=False)
 
     @property
     def settings(self) -> Settings:
         """Getter for settings"""
-        return self.config.settings
+        return self._config.settings
 
     @property
     def open_rgb(self) -> OpenRgb:
         """Getter for openrgb"""
-        return self.config.open_rgb
+        return self._config.open_rgb
 
     @property
     def platform(self) -> Platform:
         """Getter for platform"""
-        return self.config.platform
+        return self._config.platform
 
 
 configuration = Configuration()

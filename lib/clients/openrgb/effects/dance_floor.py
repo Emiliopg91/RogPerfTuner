@@ -19,8 +19,8 @@ class DanceFloor(AbstractEffect):
         return randoms
 
     def apply_effect(self):
-        while self.is_running:
-            for dev in self.devices:
+        while self._is_running:
+            for dev in self._devices:
                 self._set_colors(dev, self._get_random(len(dev.colors)))
             self._sleep(0.5)  # 500 ms
 

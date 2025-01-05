@@ -27,153 +27,153 @@ class TrayIcon:  # pylint: disable=R0902
     """Tray icon class"""
 
     def __init__(self):  # pylint: disable=R0915
-        self.logger = Logger()
+        self._logger = Logger()
 
         icon = QIcon.fromTheme(os.path.join(icons_path, "icon-45x45.png"))
 
-        self.tray = QSystemTrayIcon()
-        self.tray.setIcon(icon)
-        self.tray.setToolTip(f"{__app_name__} v{__version__}")
+        self._tray = QSystemTrayIcon()
+        self._tray.setIcon(icon)
+        self._tray.setToolTip(f"{__app_name__} v{__version__}")
 
         # Create the menu
-        self.menu = QMenu()
+        self._menu = QMenu()
 
         # Add "Battery" option (disabled)
-        self.battery_action = QAction(translator.translate("battery"))
-        self.battery_action.setEnabled(False)
-        self.menu.addAction(self.battery_action)
+        self._battery_action = QAction(translator.translate("battery"))
+        self._battery_action.setEnabled(False)
+        self._menu.addAction(self._battery_action)
 
         # Add "Umbral" submenu
-        self.umbral_menu = QMenu("    " + translator.translate("charge.threshold"))
-        self.threshold_group = QActionGroup(self.umbral_menu)
-        self.threshold_group.setExclusive(True)
+        self._umbral_menu = QMenu("    " + translator.translate("charge.threshold"))
+        self._threshold_group = QActionGroup(self._umbral_menu)
+        self._threshold_group.setExclusive(True)
         self.threshold_actions: dict[BatteryThreshold, QAction] = {}
         for threshold in BatteryThreshold:
             action = QAction(f"{threshold.value}%", checkable=True)
-            action.setActionGroup(self.threshold_group)
-            action.setChecked(threshold == platform_service.battery_charge_limit)
+            action.setActionGroup(self._threshold_group)
+            action.setChecked(threshold == platform_service._battery_charge_limit)
             action.triggered.connect(lambda _, t=threshold: self.on_threshold_selected(t))
             self.threshold_actions[threshold] = action
-            self.umbral_menu.addAction(action)
-        self.menu.addMenu(self.umbral_menu)
+            self._umbral_menu.addAction(action)
+        self._menu.addMenu(self._umbral_menu)
 
-        self.menu.addSeparator()
+        self._menu.addSeparator()
 
         # Add "AuraSync" option (disabled)
-        self.aura_section = QAction("AuraSync")
-        self.aura_section.setEnabled(False)
-        self.menu.addAction(self.aura_section)
+        self._aura_section = QAction("AuraSync")
+        self._aura_section.setEnabled(False)
+        self._menu.addAction(self._aura_section)
 
         # Add "Effect" submenu
-        self.effect_menu = QMenu("    " + translator.translate("effect"))
-        self.effect_group = QActionGroup(self.effect_menu)
-        self.effect_group.setExclusive(True)
-        self.effect_actions: dict[str, QAction] = {}
+        self._effect_menu = QMenu("    " + translator.translate("effect"))
+        self._effect_group = QActionGroup(self._effect_menu)
+        self._effect_group.setExclusive(True)
+        self._effect_actions: dict[str, QAction] = {}
         for effect in open_rgb_service.get_available_effects():
             action = QAction(effect, checkable=True)
-            action.setActionGroup(self.effect_group)
-            action.setChecked(effect == open_rgb_service.effect)
+            action.setActionGroup(self._effect_group)
+            action.setChecked(effect == open_rgb_service._effect)
             action.triggered.connect(lambda _, e=effect: self.on_effect_selected(e))
-            self.effect_actions[effect] = action
-            self.effect_menu.addAction(action)
-        self.menu.addMenu(self.effect_menu)
+            self._effect_actions[effect] = action
+            self._effect_menu.addAction(action)
+        self._menu.addMenu(self._effect_menu)
 
         # Add "Brightness" submenu
-        self.brightness_menu = QMenu("    " + translator.translate("brightness"))
-        self.brightness_group = QActionGroup(self.brightness_menu)
-        self.brightness_group.setExclusive(True)
-        self.brightness_actions: dict[str, RgbBrightness] = {}
+        self._brightness_menu = QMenu("    " + translator.translate("brightness"))
+        self._brightness_group = QActionGroup(self._brightness_menu)
+        self._brightness_group.setExclusive(True)
+        self._brightness_actions: dict[str, RgbBrightness] = {}
         for brightness in RgbBrightness:
             action = QAction(
                 translator.translate(f"label.brightness.{brightness.name}"),
                 checkable=True,
             )
-            action.setActionGroup(self.brightness_group)
-            action.setChecked(brightness == open_rgb_service.brightness)
+            action.setActionGroup(self._brightness_group)
+            action.setChecked(brightness == open_rgb_service._brightness)
             action.triggered.connect(lambda _, b=brightness: self.on_brightness_selected(b))
-            self.brightness_actions[brightness] = action
-            self.brightness_menu.addAction(action)
-        self.menu.addMenu(self.brightness_menu)
+            self._brightness_actions[brightness] = action
+            self._brightness_menu.addAction(action)
+        self._menu.addMenu(self._brightness_menu)
 
         # Add "Color" submenu
-        self.color_menu = QMenu("    " + translator.translate("color"))
+        self._color_menu = QMenu("    " + translator.translate("color"))
 
-        self.color_action = QAction(open_rgb_service.get_color())
-        self.color_action.setEnabled(False)
-        self.color_menu.addAction(self.color_action)
+        self._color_action = QAction(open_rgb_service.get_color())
+        self._color_action.setEnabled(False)
+        self._color_menu.addAction(self._color_action)
 
-        self.colorpicker_action = QAction(f"{translator.translate("select.color")}...")
-        self.colorpicker_action.triggered.connect(self.pick_color)
-        self.color_menu.addAction(self.colorpicker_action)
+        self._colorpicker_action = QAction(f"{translator.translate("select.color")}...")
+        self._colorpicker_action.triggered.connect(self.pick_color)
+        self._color_menu.addAction(self._colorpicker_action)
 
-        self.submenu_color = self.menu.addMenu(self.color_menu)
-        self.submenu_color.setVisible(open_rgb_service.supports_color())
+        self._submenu_color = self._menu.addMenu(self._color_menu)
+        self._submenu_color.setVisible(open_rgb_service.supports_color())
 
-        self.menu.addSeparator()
+        self._menu.addSeparator()
 
         # Add "Performance" option
-        self.performance_section = QAction(translator.translate("performance"))
-        self.performance_section.setEnabled(False)
-        self.menu.addAction(self.performance_section)
+        self._performance_section = QAction(translator.translate("performance"))
+        self._performance_section.setEnabled(False)
+        self._menu.addAction(self._performance_section)
 
-        self.profile_menu = QMenu("    " + translator.translate("profile"))
-        self.boost_group = QActionGroup(self.profile_menu)
-        self.boost_group.setExclusive(True)
-        self.performance_actions: dict[ThermalThrottleProfile, QAction] = {}
+        self._profile_menu = QMenu("    " + translator.translate("profile"))
+        self._boost_group = QActionGroup(self._profile_menu)
+        self._boost_group.setExclusive(True)
+        self._performance_actions: dict[ThermalThrottleProfile, QAction] = {}
         for profile in ThermalThrottleProfile:
             action = QAction(translator.translate(f"label.profile.{profile.name}"), checkable=True)
-            action.setActionGroup(self.boost_group)
-            action.setChecked(profile == platform_service.thermal_throttle_profile)
+            action.setActionGroup(self._boost_group)
+            action.setChecked(profile == platform_service._thermal_throttle_profile)
             action.triggered.connect(lambda _, p=profile: self.on_profile_selected(p))
-            self.performance_actions[profile] = action
-            self.profile_menu.addAction(action)
-        self.menu.addMenu(self.profile_menu)
+            self._performance_actions[profile] = action
+            self._profile_menu.addAction(action)
+        self._menu.addMenu(self._profile_menu)
 
         # Add "Boost" option
-        self.boost_menu = QMenu("    " + translator.translate("boost"))
-        self.boost_group = QActionGroup(self.boost_menu)
-        self.boost_group.setExclusive(True)
-        self.boost_actions: dict[Boost, QAction] = {}
+        self._boost_menu = QMenu("    " + translator.translate("boost"))
+        self._boost_group = QActionGroup(self._boost_menu)
+        self._boost_group.setExclusive(True)
+        self._boost_actions: dict[Boost, QAction] = {}
         for mode in Boost:
             action = QAction(translator.translate(f"label.boost.{mode.name}"), checkable=True)
-            action.setActionGroup(self.boost_group)
+            action.setActionGroup(self._boost_group)
             action.setChecked(mode == platform_service.get_boost_mode())
             action.triggered.connect(lambda _, m=mode: self.on_boost_selected(m))
-            self.boost_actions[mode] = action
-            self.boost_menu.addAction(action)
-        self.menu.addMenu(self.boost_menu)
+            self._boost_actions[mode] = action
+            self._boost_menu.addAction(action)
+        self._menu.addMenu(self._boost_menu)
 
-        self.menu.addSeparator()
+        self._menu.addSeparator()
 
         if dev_mode:
             # Add "Open log" option
-            self.open_logs_action = QAction(translator.translate("open.logs"))
-            self.open_logs_action.triggered.connect(self.on_open_logs)
-            self.menu.addAction(self.open_logs_action)
+            self._open_logs_action = QAction(translator.translate("open.logs"))
+            self._open_logs_action.triggered.connect(self.on_open_logs)
+            self._menu.addAction(self._open_logs_action)
 
-            self.menu.addSeparator()
+            self._menu.addSeparator()
 
         # Add "Open" option
-        self.open_action = QAction(translator.translate("open.ui"))
-        self.open_action.triggered.connect(self.on_open)
-        self.menu.addAction(self.open_action)
+        self._open_action = QAction(translator.translate("open.ui"))
+        self._open_action.triggered.connect(self.on_open)
+        self._menu.addAction(self._open_action)
 
-        self.menu.addSeparator()
+        self._menu.addSeparator()
 
         # Add "Quit" option
-        self.quit_action = QAction(translator.translate("close"))
-        self.quit_action.triggered.connect(self.on_quit)
-        self.menu.addAction(self.quit_action)
+        self._quit_action = QAction(translator.translate("close"))
+        self._quit_action.triggered.connect(self.on_quit)
+        self._menu.addAction(self._quit_action)
 
         # Set the menu on the tray icon
-        self.tray.setContextMenu(self.menu)
+        self._tray.setContextMenu(self._menu)
 
         event_bus.on("PlatformService.battery_threshold", self.set_battery_charge_limit)
         event_bus.on("PlatformService.boost", self.set_boost_mode)
         event_bus.on("PlatformService.thermal_throttle_profile", self.set_thermal_throttle_policy)
         event_bus.on("OpenRgbService.aura_changed", self.set_aura_state)
 
-        self.tray.activated.connect(self.on_tray_icon_activated)
+        self._tray.activated.connect(self.on_tray_icon_activated)
 
     def on_tray_icon_activated(self, reason):
         """Restore main window"""
@@ -186,28 +186,28 @@ class TrayIcon:  # pylint: disable=R0902
 
     def set_boost_mode(self, value: Boost):
         """Set boost mode"""
-        self.boost_actions[value].setChecked(True)
+        self._boost_actions[value].setChecked(True)
 
     def set_thermal_throttle_policy(self, value: ThermalThrottleProfile):
         """Set performance profile"""
-        self.logger.debug("Refreshing throttle policy in UI")
-        self.performance_actions[value].setChecked(True)
+        self._logger.debug("Refreshing throttle policy in UI")
+        self._performance_actions[value].setChecked(True)
 
     def set_aura_state(self, value):
         """Set aura state"""
         effect, brightness, color = value
 
-        self.effect_actions[effect].setChecked(True)
-        self.brightness_actions[brightness].setChecked(True)
+        self._effect_actions[effect].setChecked(True)
+        self._brightness_actions[brightness].setChecked(True)
         if color is None:
-            self.submenu_color.setVisible(False)
+            self._submenu_color.setVisible(False)
         else:
-            self.submenu_color.setVisible(True)
-            self.color_action.setText(color)
+            self._submenu_color.setVisible(True)
+            self._color_action.setText(color)
 
     def show(self):
         """Show tray"""
-        self.tray.setVisible(True)
+        self._tray.setVisible(True)
 
     def on_threshold_selected(self, threshold: BatteryThreshold):
         """Battery limit event handler"""
@@ -231,7 +231,7 @@ class TrayIcon:  # pylint: disable=R0902
 
     def pick_color(self):
         """Open color picker"""
-        color = QColorDialog.getColor(QColor(self.color_action.text()), None, translator.translate("color.select"))
+        color = QColorDialog.getColor(QColor(self._color_action.text()), None, translator.translate("color.select"))
         if color.isValid():
             open_rgb_service.apply_color(color.name().upper())
 
