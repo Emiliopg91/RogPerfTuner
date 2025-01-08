@@ -252,9 +252,7 @@ class PlatformService:
             self._logger.add_tab()
 
             enabled = self.THROTTLE_BOOST_ASSOC[self._thermal_throttle_profile]
-            if boost == Boost.ON:
-                enabled = True
-            elif boost == Boost.OFF:
+            if boost == Boost.OFF:
                 enabled = False
 
             if enabled != self._last_boost:

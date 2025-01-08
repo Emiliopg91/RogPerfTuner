@@ -1,11 +1,13 @@
 import datetime
 import os
+import shutil
 import subprocess
 import requests
 
 openrgb_path = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "assets", "OpenRGB.AppImage"))
+udev_path = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "assets", "60-openrgb.rules"))
 
-pip_dependencies = ["black", "openrgb-python", "psutil", "pyinstaller", "PyQt5"]
+pip_dependencies = ["black", "openrgb-python", "psutil", "pyinstaller", "PyQt5", "vdf"]
 
 
 def install_pip_deps():
@@ -13,8 +15,8 @@ def install_pip_deps():
     print("  Installing PIP packages...")
     command = ["pip", "install"]
     command.extend(pip_dependencies)
-    subprocess.run(command, check=True)
-    print("  Dependencies installed")
+    subprocess.run(command, check=True, stdout=subprocess.DEVNULL, stderr=subprocess.PIPE)
+    print("    Dependencies installed")
 
 
 def get_openrgb():
@@ -47,7 +49,19 @@ def get_openrgb():
                         f.write(chunk)
                 os.chmod(openrgb_path, 0o755)
 
-                print("    Dependency updated")
+                print("    Dependency updated, getting udev file...")
+
+                os.chdir(os.path.dirname(openrgb_path))
+                subprocess.run(
+                    [openrgb_path, "--appimage-extract"], check=True, stdout=subprocess.DEVNULL, stderr=subprocess.PIPE
+                )
+                squashfs_root = os.path.join(os.path.dirname(openrgb_path), "squashfs-root")
+
+                src_udev_path = os.path.join(squashfs_root, "usr", "lib", "udev", "rules.d", "60-openrgb.rules")
+                shutil.copy2(src_udev_path, udev_path)
+
+                shutil.rmtree(squashfs_root)
+                print("    Udev file extracted")
             else:
                 print("    Dependency up to date")
         else:

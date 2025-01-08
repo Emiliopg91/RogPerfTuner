@@ -18,11 +18,11 @@ class PowerProfilesClient(AbstractDbusClient):
     @property
     def active_profile(self) -> PowerProfile:
         """Active power profile"""
-        return PowerProfile(self.get_property("ActiveProfile"))
+        return PowerProfile(self._get_property("ActiveProfile"))
 
     @active_profile.setter
     def active_profile(self, val: PowerProfile) -> None:
-        self.set_property("ActiveProfile", val.value)
+        self._set_property("ActiveProfile", val.value)
 
 
 power_profile_client = PowerProfilesClient()

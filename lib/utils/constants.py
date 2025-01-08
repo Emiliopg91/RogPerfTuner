@@ -2,6 +2,7 @@ from datetime import datetime
 from pathlib import Path
 
 import os
+import shutil
 import sys
 
 from lib import __app_name__
@@ -9,7 +10,12 @@ from lib import __app_name__
 # pylint: disable=E1101
 dev_mode = not hasattr(sys, "frozen") or not sys.frozen
 
-user_folder = os.path.expanduser(os.path.join("~", __app_name__))
+user_folder = os.path.expanduser(os.path.join("~", ".config", __app_name__))
+
+old_user_folder = os.path.expanduser(os.path.join("~", __app_name__))
+
+if os.path.exists(old_user_folder):
+    shutil.move(old_user_folder, user_folder)
 
 if not os.path.exists(user_folder):
     os.makedirs(user_folder)
@@ -42,6 +48,8 @@ icons_path = os.path.join(base_path, "assets", "icons")
 translations_path = os.path.join(base_path, "assets", "translations.json")
 
 orgb_path = os.path.join(base_path, "assets", "OpenRGB.AppImage")
+
+udev_path = os.path.join(base_path, "assets", "60-openrgb.rules")
 
 lock_file = os.path.join(user_folder, ".lock")
 

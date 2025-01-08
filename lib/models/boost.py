@@ -5,5 +5,5 @@ class Boost(IntEnum):
     """Boost selector"""
 
     AUTO = 0
-    ON = 1
+    # ON = 1
     OFF = 2

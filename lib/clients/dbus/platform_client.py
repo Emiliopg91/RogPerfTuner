@@ -18,11 +18,11 @@ class PlatformClient(AbstractDbusClient):
     @property
     def charge_control_end_threshold(self) -> BatteryThreshold:
         """Battery charge limit"""
-        return BatteryThreshold(int.from_bytes(self.get_property("ChargeControlEndThreshold")))
+        return BatteryThreshold(int.from_bytes(self._get_property("ChargeControlEndThreshold")))
 
     @charge_control_end_threshold.setter
     def charge_control_end_threshold(self, val: BatteryThreshold) -> None:
-        self.set_property(
+        self._set_property(
             "ChargeControlEndThreshold",
             QDBusVariant(QDBusArgument(val.value, QMetaType.UChar)),
         )
@@ -30,11 +30,11 @@ class PlatformClient(AbstractDbusClient):
     @property
     def throttle_thermal_policy(self) -> ThermalThrottleProfile:
         """Thermal throttle policy"""
-        return ThermalThrottleProfile(self.get_property("ThrottleThermalPolicy"))
+        return ThermalThrottleProfile(self._get_property("ThrottleThermalPolicy"))
 
     @throttle_thermal_policy.setter
     def throttle_thermal_policy(self, val: ThermalThrottleProfile) -> None:
-        self.set_property(
+        self._set_property(
             "ThrottleThermalPolicy",
             QDBusVariant(QDBusArgument(val.value, QMetaType.UInt)),
         )
