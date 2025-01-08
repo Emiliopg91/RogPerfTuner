@@ -8,3 +8,5 @@ clients/dbus/base/__pycache__/
 assets/OpenRGB.AppImage
 
 assets/60-openrgb.rules
+
+out/
