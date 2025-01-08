@@ -1,9 +1,7 @@
-import pathlib
 import os
 import re
 import socket
 import subprocess
-import tempfile
 from typing import Optional
 import threading
 import time
@@ -15,7 +13,7 @@ from openrgb.utils import RGBColor
 
 from lib.models.rgb_brightness import RgbBrightness
 from lib.models.usb_identifier import UsbIdentifier
-from lib.utils.constants import orgb_path
+from lib.utils.constants import orgb_path, udev_path
 from lib.utils.event_bus import event_bus
 from lib.utils.logger import Logger
 from lib.utils.singleton import singleton
@@ -62,6 +60,13 @@ class OpenRgbClient:
     def start(self):
         """Initialize server and client"""
         self.logger.info("Initializing OpenRgbClient")
+        subprocess.run(
+            ["asusctl", "led-mode", "static", "-c", "000000"],
+            check=True,
+            stdout=subprocess.PIPE,
+            stderr=subprocess.PIPE,
+            encoding="utf-8",
+        )
         self.logger.add_tab()
         self._start_orgb_process()
         self._start_client()
@@ -154,35 +159,20 @@ class OpenRgbClient:
     def _find_compatible_devices(self):
         self.logger.debug("Reading udev rules")
         compatible_devices = None
-        tmp_dir = pathlib.Path(tempfile.gettempdir())
-        entries = [entry for entry in tmp_dir.iterdir() if entry.is_dir()]
 
-        matching_entries = [
-            entry.absolute()
-            for entry in entries
-            if entry.name.startswith(".mount_" + pathlib.Path(os.path.basename(orgb_path)).stem[:6])
-        ]
+        if compatible_devices is None:
+            if os.path.exists(udev_path):
+                with open(udev_path, "r") as file:
+                    content = file.read()
+                lines = content.split("\n")
 
-        for mount_dir in matching_entries:  # pylint: disable=R1702
-            try:
-                if compatible_devices is None:
-                    udev_path = os.path.join(mount_dir, "usr", "lib", "udev", "rules.d", "60-openrgb.rules")
-                    if os.path.exists(udev_path):
-                        with open(udev_path, "r") as file:
-                            content = file.read()
-                        lines = content.split("\n")
-
-                        regex = (
-                            r'SUBSYSTEMS==".*?", ATTRS{idVendor}=="([0-9a-fA-F]+)", ATTRS{idProduct}=="([0-9a-fA-F]+)"'
-                        )
-                        results = []
-                        for line in lines:
-                            match = re.search(regex, line)
-                            if match:
-                                results.append(UsbIdentifier(match.group(1), match.group(2)))
-                        compatible_devices = results
-            except Exception:
-                pass
+                regex = r'SUBSYSTEMS==".*?", ATTRS{idVendor}=="([0-9a-fA-F]+)", ATTRS{idProduct}=="([0-9a-fA-F]+)"'
+                results = []
+                for line in lines:
+                    match = re.search(regex, line)
+                    if match:
+                        results.append(UsbIdentifier(match.group(1), match.group(2)))
+                compatible_devices = results
 
         return compatible_devices
 

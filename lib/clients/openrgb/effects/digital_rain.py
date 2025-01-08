@@ -35,7 +35,7 @@ class DigitalRain(AbstractEffect):
             for c in range(zone.mat_width):
                 if r == 0:
                     if zone_status[r][c] == self._max_count:
-                        zone_status[r][c] = int(zone_status[r][c] / pow(1.4, random.random() * 5))
+                        zone_status[r][c] = math.floor(zone_status[r][c] / pow(1.4, random.random() * 6))
                     else:
                         if zone_status[r][c] > 0:
                             zone_status[r][c] = math.floor(zone_status[r][c] / self._decrement)
@@ -92,8 +92,12 @@ class DigitalRain(AbstractEffect):
                 free_cols.append(c)
 
         if len(free_cols) > 0:
-            next_col = free_cols[random.randint(0, len(free_cols) - 1)]
-            zone_status[0][next_col] = self._max_count
+            cpu = max(1, psutil.cpu_percent()) / 100
+            allowed = max(1, math.ceil(zone.mat_width * cpu))
+
+            if allowed > zone.mat_width - len(free_cols):
+                next_col = free_cols[random.randint(0, len(free_cols) - 1)]
+                zone_status[0][next_col] = self._max_count
 
     def _get_next_linear(self, zone_status: list[int], zone: Zone):
         free_cols: list[int] = []
@@ -128,20 +132,17 @@ class DigitalRain(AbstractEffect):
             while self._is_running:
                 offset = 0
                 final_colors = [RGBColor(0, 0, 0) for _ in dev.colors]
-                cpu = psutil.cpu_percent() / 100
+
                 for iz, zone in enumerate(dev.zones):
-                    can_add = iter_count % 6 == 0 or random.randint(0, 100) <= 80 * cpu
                     zone_colors = None
 
                     if zone.type == ZoneType.MATRIX:
                         self._decrement_matrix(zone_status[dev_id][iz], zone)
-                        if can_add:
-                            self._get_next_matrix(zone_status[dev_id][iz], zone)
+                        self._get_next_matrix(zone_status[dev_id][iz], zone)
                         zone_colors = self._to_color_matrix(zone_status[dev_id][iz], zone)
                     elif zone.type in (ZoneType.LINEAR, ZoneType.SINGLE):
                         self._decrement_linear(zone_status[dev_id][iz], zone)
-                        if can_add:
-                            self._get_next_linear(zone_status[dev_id][iz], zone)
+                        self._get_next_linear(zone_status[dev_id][iz], zone)
                         zone_colors = self._to_color_linear(zone_status[dev_id][iz], zone)
 
                     for i, color in enumerate(zone_colors):

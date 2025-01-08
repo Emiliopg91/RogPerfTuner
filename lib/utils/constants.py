@@ -43,6 +43,8 @@ translations_path = os.path.join(base_path, "assets", "translations.json")
 
 orgb_path = os.path.join(base_path, "assets", "OpenRGB.AppImage")
 
+udev_path = os.path.join(base_path, "assets", "60-openrgb.rules")
+
 lock_file = os.path.join(user_folder, ".lock")
 
 config_folder = os.path.join(user_folder, "config")

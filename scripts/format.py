@@ -40,8 +40,7 @@ def format_code():
             command.append(param)
 
     command.append(".")
-    print(" ".join(command))
-    subprocess.run(command, check=False)
+    subprocess.run(command, check=False, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
 
 
 if __name__ == "__main__":

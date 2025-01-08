@@ -1,6 +1,9 @@
 import os
-import signal
 import subprocess
+import sys
+import threading
+from watchdog.observers import Observer
+from watchdog.events import FileSystemEventHandler
 
 
 def run_pylint():
@@ -11,16 +14,65 @@ def run_pylint():
         "python",
         "-m",
         "pylint",
-        f"--rcfile={os.path.join(".",".pylintrc")}",
+        f"--rcfile={os.path.join('.', '.pylintrc')}",
         ".",
     ]
     result = subprocess.run(pylint_command, check=False)
 
     if result.returncode != 0:
-        print(result.stderr)
         print("Linting failed")
-        os.kill(os.getpid(), signal.SIGKILL)
+        return False
+
+    print("Linting passed!")
+    sys.exit(0)
+
+
+class FileChangeHandler(FileSystemEventHandler):
+    """Handler to detect file changes"""
+
+    def __init__(self, stop_event):
+        self.stop_event = stop_event
+
+    def on_modified(self, event):
+        """Trigger event when a Python file is modified"""
+        if event.src_path.endswith(".py"):
+            print(f"File modified: {event.src_path}")
+            self.stop_event.set()
+
+
+def wait_for_changes_and_lint():
+    """Wait for file changes and rerun pylint until successful"""
+    stop_event = threading.Event()
+
+    # Set up file system observer
+    event_handler = FileChangeHandler(stop_event)
+    observer = Observer()
+    observer.schedule(event_handler, path=".", recursive=True)
+    observer.start()
+
+    try:
+        # Run pylint initially
+        if not run_pylint():
+            print("Waiting for file changes to rerun linting...")
+
+        # Keep running pylint when there are file changes
+        while True:
+            stop_event.wait()  # Wait for a file modification event
+            stop_event.clear()  # Reset the event flag
+
+            # Rerun pylint after a file change
+            if run_pylint():
+                break  # Exit if pylint passes
+
+            # If linting fails again, keep waiting for more changes
+            print("Waiting for file changes to rerun linting...")
+
+    except KeyboardInterrupt:
+        print("Monitoring interrupted. Exiting...")
+    finally:
+        observer.stop()
+        observer.join()
 
 
 if __name__ == "__main__":
-    run_pylint()
+    wait_for_changes_and_lint()

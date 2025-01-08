@@ -16,15 +16,15 @@ class FanCurvesClient(AbstractDbusClient):
 
     def reset_profile_curves(self, profile: ThermalThrottleProfile):
         """Reset fan curves"""
-        self.invoke_method("ResetProfileCurves", QDBusArgument(profile.value, QMetaType.UInt))
+        self._invoke_method("ResetProfileCurves", QDBusArgument(profile.value, QMetaType.UInt))
 
     def set_curves_to_defaults(self, profile: ThermalThrottleProfile):
         """Restore cuves to default"""
-        self.invoke_method("SetCurvesToDefaults", QDBusArgument(profile.value, QMetaType.UInt))
+        self._invoke_method("SetCurvesToDefaults", QDBusArgument(profile.value, QMetaType.UInt))
 
     def set_fan_curves_enabled(self, profile: ThermalThrottleProfile, enabled: bool):
         """Enable fan curves"""
-        self.invoke_method("SetFanCurvesEnabled", QDBusArgument(profile.value, QMetaType.UInt), enabled)
+        self._invoke_method("SetFanCurvesEnabled", QDBusArgument(profile.value, QMetaType.UInt), enabled)
 
 
 fan_curves_client = FanCurvesClient()

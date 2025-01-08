@@ -46,20 +46,20 @@ def run_main():
 
 if __name__ == "__main__":
     paths = [os.path.join(workspace, "main.py"), os.path.join(workspace, "lib")]
-    UPPER_CASE = None
+    MAIN_PROCESS = None
 
     def restart_main():
         """Reinicia el subproceso que ejecuta main.py."""
-        global UPPER_CASE  # pylint: disable=W0603
-        if UPPER_CASE:
+        global MAIN_PROCESS  # pylint: disable=W0603
+        if MAIN_PROCESS:
             print("Changes detected, restarting main.py...")
-            UPPER_CASE.terminate()
-            UPPER_CASE.wait()
+            MAIN_PROCESS.terminate()
+            MAIN_PROCESS.wait()
             time.sleep(1)
-        UPPER_CASE = run_main()
+        MAIN_PROCESS = run_main()
 
     # Inicializar el proceso al inicio
-    UPPER_CASE = run_main()
+    MAIN_PROCESS = run_main()
 
     # Configurar Watchdog
     event_handler = ChangeHandler(restart_callback=restart_main)
@@ -78,6 +78,6 @@ if __name__ == "__main__":
             observer.stop()
         for observer in observers:
             observer.join()
-        if UPPER_CASE:
-            UPPER_CASE.terminate()
-            UPPER_CASE.wait()
+        if MAIN_PROCESS:
+            MAIN_PROCESS.terminate()
+            MAIN_PROCESS.wait()

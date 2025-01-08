@@ -44,7 +44,7 @@ class StarryNight(AbstractEffect):
         while self._is_running:
             new_colors = [None] * len(device.leds)
 
-            for i, _ in leds:
+            for i in range(len(leds)):  # pylint: disable=C0200
                 steps[i] = max(0, steps[i] - 1)
                 new_colors[i] = OpenRGBUtils.dim(leds[i], steps[i] / self._max_steps)
 
