@@ -11,10 +11,10 @@
     "editor.defaultFormatter": "ms-python.black-formatter"
   },
   "python.autoComplete.extraPaths": [
-    "${workspaceFolder}/lib"
+    "${workspaceFolder}"
   ],
   "python.analysis.extraPaths": [
-    "${workspaceFolder}/lib"
+    "${workspaceFolder}"
   ],
   "python.linting.pylintArgs": [
     "--rcfile=${workspaceFolder}/.pylintrc ${workspaceFolder}"

@@ -7,7 +7,7 @@ import requests
 openrgb_path = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "assets", "OpenRGB.AppImage"))
 udev_path = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "assets", "60-openrgb.rules"))
 
-pip_dependencies = ["black", "openrgb-python", "psutil", "pyinstaller", "PyQt5", "vdf"]
+pip_dependencies = ["black", "openrgb-python", "psutil", "pyinstaller", "PyQt5", "setproctitle", "vdf"]
 
 
 def install_pip_deps():

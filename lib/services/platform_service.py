@@ -115,9 +115,9 @@ class PlatformService:
             True,
         )
 
-        platform_client.on("ThrottleThermalPolicy", self._set_thermal_throttle_profile_async)
-        platform_client.on("ChargeControlEndThreshold", self._set_battery_threshold)
-        upower_client.on("OnBattery", self._on_ac_battery_change)
+        platform_client.on_property_change("ThrottleThermalPolicy", self._set_thermal_throttle_profile_async)
+        platform_client.on_property_change("ChargeControlEndThreshold", self._set_battery_threshold)
+        upower_client.on_property_change("OnBattery", self._on_ac_battery_change)
 
     @property
     def thermal_throttle_profile(self):

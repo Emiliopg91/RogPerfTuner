@@ -2,6 +2,11 @@
 
 # pylint: disable=C0415, C0413, C0412, C0411, E0611
 
+import setproctitle
+from lib import __app_name__, __version__
+
+setproctitle.setproctitle(__app_name__)
+
 from PyQt5.QtWidgets import QApplication
 import sys
 
@@ -21,7 +26,6 @@ def create_qt_application() -> QApplication:
 def initialize_application():
     """Application startup"""
     import os
-    from lib import __version__
     from lib.utils.constants import dev_mode
 
     from lib.utils.logger import Logger
