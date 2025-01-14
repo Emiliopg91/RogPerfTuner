@@ -57,7 +57,7 @@ class SignalListener(QObject):
         :param message: QDBusMessage containing the signal data
         """
         args = message.arguments()
-        self._logger.info(f"Received signal {message.member()} for {message.interface()}: {tuple(args)}")
+        self._logger.debug(f"Received signal {message.member()} for {message.interface()}: {tuple(args)}")
         cb_count = 0
         for signal_key, callbacks in self.watched_signals.items():
             _, path, interface, signal_name = signal_key
@@ -65,7 +65,7 @@ class SignalListener(QObject):
                 for callback in callbacks:
                     callback(message)
                     cb_count += 1
-        self._logger.info(f"Executed {cb_count} callbacks")
+        self._logger.debug(f"Executed {cb_count} callbacks")
 
     def disconnect_signal(  # pylint: disable=R0913,R0917
         self, system_bus: bool, path: str, interface: str, signal_name: str, callback

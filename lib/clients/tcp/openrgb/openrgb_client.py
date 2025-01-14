@@ -17,15 +17,15 @@ from lib.utils.constants import orgb_path, udev_path
 from lib.utils.event_bus import event_bus
 from lib.utils.logger import Logger
 from lib.utils.singleton import singleton
-from lib.clients.openrgb.effects.base.abstract_effect import AbstractEffect
-from lib.clients.openrgb.effects.breathing import breathing_effect
-from lib.clients.openrgb.effects.dance_floor import dance_floor
-from lib.clients.openrgb.effects.digital_rain import digital_rain
-from lib.clients.openrgb.effects.rain import rain
-from lib.clients.openrgb.effects.rainbow_wave import rainbow_wave
-from lib.clients.openrgb.effects.spectrum_cycle import spectrum_cycle
-from lib.clients.openrgb.effects.starry_night import starry_night
-from lib.clients.openrgb.effects.static import static_effect
+from lib.clients.tcp.openrgb.effects.base.abstract_effect import AbstractEffect
+from lib.clients.tcp.openrgb.effects.breathing import breathing_effect
+from lib.clients.tcp.openrgb.effects.dance_floor import dance_floor
+from lib.clients.tcp.openrgb.effects.digital_rain import digital_rain
+from lib.clients.tcp.openrgb.effects.rain import rain
+from lib.clients.tcp.openrgb.effects.rainbow_wave import rainbow_wave
+from lib.clients.tcp.openrgb.effects.spectrum_cycle import spectrum_cycle
+from lib.clients.tcp.openrgb.effects.starry_night import starry_night
+from lib.clients.tcp.openrgb.effects.static import static_effect
 
 
 @singleton

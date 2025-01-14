@@ -7,11 +7,12 @@ import time
 
 import pyudev
 
-from lib.clients.openrgb.openrgb_client import open_rgb_client
-from lib.clients.openrgb.effects.static import static_effect
+from lib.clients.tcp.openrgb.openrgb_client import open_rgb_client
+from lib.clients.tcp.openrgb.effects.static import static_effect
 from lib.models.rgb_brightness import RgbBrightness
+from lib.models.settings import Effect
 from lib.models.usb_identifier import UsbIdentifier
-from lib.utils.configuration import configuration, Effect
+from lib.utils.configuration import configuration
 from lib.utils.event_bus import event_bus
 from lib.utils.logger import Logger
 from lib.utils.singleton import singleton

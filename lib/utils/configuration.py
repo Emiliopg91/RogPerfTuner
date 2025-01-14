@@ -1,21 +1,19 @@
-from dataclasses import asdict
-
+import json
 import os
 import yaml
 
 from lib.models.settings import (
     Config,
+    Game,
     Settings,
     Platform,
     PlatformProfiles,
     OpenRgb,
-    Effect,
 )
 from lib.models.boost import Boost
 from lib.models.thermal_throttle_profile import ThermalThrottleProfile
 from lib.utils.singleton import singleton
 from lib.utils.constants import config_file, config_folder
-from lib.utils.logger import Logger
 
 
 @singleton
@@ -23,37 +21,38 @@ class Configuration:
     """Class for accesing to config file data"""
 
     def __init__(self):
-        self._logger = Logger()
         self._load_config()
         self._config: Config | None
 
     def _load_config(self) -> None:
-        self._logger.debug("Loading settings from file")
         try:
             with open(config_file, "r") as f:
                 raw_config = yaml.safe_load(f) or {}
 
+            update = False
             if "boost" not in raw_config["platform"]["profiles"]:
                 raw_config["platform"]["profiles"]["boost"] = Boost.AUTO.value
+                update = True
+            if "games" not in raw_config:
+                raw_config["games"] = {}
+                update = True
+            if "logger" not in raw_config:
+                raw_config["logger"] = {}
+                update = True
 
-            self._config = Config(
-                settings=Settings(**raw_config.get("settings", {})),
-                platform=Platform(profiles=PlatformProfiles(**raw_config.get("platform", {}).get("profiles", {}))),
-                open_rgb=OpenRgb(
-                    last_effect=raw_config.get("open_rgb", {}).get("last_effect", "Static"),
-                    effects={
-                        name: Effect(**effect)
-                        for name, effect in raw_config.get("open_rgb", {}).get("effects", {}).items()
-                    },
-                ),
-            )
+            json_output = json.dumps(raw_config, indent=2)
+            self._config = Config.from_json(json_output)  # pylint: disable=E1101
 
-            self.save_config()
+            if update:
+                self.save_config()
+
         except FileNotFoundError:
             if not os.path.exists(config_folder):
                 os.makedirs(config_folder, exist_ok=True)
 
             self._config = Config(
+                logger={},
+                games={},
                 settings=Settings(None),
                 platform=Platform(
                     profiles=PlatformProfiles(ThermalThrottleProfile.PERFORMANCE.value, Boost.AUTO.value)
@@ -64,9 +63,8 @@ class Configuration:
 
     def save_config(self) -> None:
         "Persist config to file"
-        self._logger.debug("Persisting settings to file")
         with open(config_file, "w") as f:
-            yaml.dump(asdict(self._config), f, default_flow_style=False)
+            yaml.dump(self._config.to_dict(), f, default_flow_style=False)
 
     @property
     def settings(self) -> Settings:
@@ -82,6 +80,16 @@ class Configuration:
     def platform(self) -> Platform:
         """Getter for platform"""
         return self._config.platform
+
+    @property
+    def games(self) -> dict[str, Game]:
+        """Getter for games"""
+        return self._config.games
+
+    @property
+    def logger(self) -> dict[str, str]:
+        """Getter for logger"""
+        return self._config.logger
 
 
 configuration = Configuration()

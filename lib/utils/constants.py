@@ -25,6 +25,11 @@ user_icon_folder = os.path.join(user_folder, "icons")
 if not os.path.exists(user_icon_folder):
     os.makedirs(user_icon_folder)
 
+user_plugin_folder = os.path.join(user_folder, "plugin")
+
+if not os.path.exists(user_plugin_folder):
+    os.makedirs(user_plugin_folder)
+
 user_update_folder = os.path.join(user_folder, "update")
 
 if not os.path.exists(user_update_folder):
@@ -48,6 +53,8 @@ icons_path = os.path.join(base_path, "assets", "icons")
 translations_path = os.path.join(base_path, "assets", "translations.json")
 
 orgb_path = os.path.join(base_path, "assets", "OpenRGB.AppImage")
+
+rccdc_asset_path = os.path.join(base_path, "assets", "RCCDeckyCompanion")
 
 udev_path = os.path.join(base_path, "assets", "60-openrgb.rules")
 

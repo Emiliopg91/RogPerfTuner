@@ -1,3 +1,5 @@
+# pylint: disable=E0611,E0401
+
 import math
 import random
 import threading
@@ -6,7 +8,7 @@ import psutil
 from openrgb.orgb import Device, Zone
 from openrgb.utils import RGBColor, ZoneType
 
-from lib.clients.openrgb.effects.base.abstract_effect import AbstractEffect
+from lib.clients.tcp.openrgb.effects.base.abstract_effect import AbstractEffect
 from lib.utils.openrgb import OpenRGBUtils
 from lib.utils.singleton import singleton
 
@@ -35,7 +37,7 @@ class DigitalRain(AbstractEffect):
             for c in range(zone.mat_width):
                 if r == 0:
                     if zone_status[r][c] == self._max_count:
-                        zone_status[r][c] = math.floor(zone_status[r][c] / pow(1.4, random.random() * 6))
+                        zone_status[r][c] = math.floor(zone_status[r][c] / pow(1.4, random.random() * 5))
                     else:
                         if zone_status[r][c] > 0:
                             zone_status[r][c] = math.floor(zone_status[r][c] / self._decrement)

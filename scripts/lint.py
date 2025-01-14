@@ -15,7 +15,8 @@ def run_pylint():
         "-m",
         "pylint",
         f"--rcfile={os.path.join('.', '.pylintrc')}",
-        ".",
+        "./main.py",
+        "./lib/*",
     ]
     result = subprocess.run(pylint_command, check=False)
 
@@ -36,7 +37,7 @@ class FileChangeHandler(FileSystemEventHandler):
     def on_modified(self, event):
         """Trigger event when a Python file is modified"""
         if event.src_path.endswith(".py"):
-            print(f"File modified: {event.src_path}")
+            print("File(s) modified")
             self.stop_event.set()
 
 

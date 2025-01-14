@@ -1,6 +1,6 @@
 import random
 
-from lib.clients.openrgb.effects.base.abstract_effect import AbstractEffect
+from lib.clients.tcp.openrgb.effects.base.abstract_effect import AbstractEffect
 from lib.utils.singleton import singleton
 from lib.utils.openrgb import OpenRGBUtils
 

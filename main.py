@@ -20,7 +20,8 @@ def get_application_lock():
 
 def create_qt_application() -> QApplication:
     """Initialize QApplication"""
-    return QApplication(sys.argv)
+    q_app = QApplication(sys.argv)
+    return q_app
 
 
 def initialize_application():
@@ -63,6 +64,11 @@ def initialize_application():
 
     if configuration.settings.password is None:
         password_dialog.show()
+
+    """Install Decky plugin"""
+    from lib.services.steam_service import steam_service
+
+    steam_service.install_rccdc()
 
     """Show tray icon"""
     from lib.gui.tray_icon import tray_icon

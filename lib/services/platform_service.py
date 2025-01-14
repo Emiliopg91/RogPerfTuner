@@ -108,12 +108,7 @@ class PlatformService:
             configuration.platform.profiles.boost = Boost.OFF
             configuration.save_config()
 
-        self.set_thermal_throttle_policy(
-            ThermalThrottleProfile(configuration._config.platform.profiles.last),
-            False,
-            True,
-            True,
-        )
+        self.restore_profile()
 
         platform_client.on_property_change("ThrottleThermalPolicy", self._set_thermal_throttle_profile_async)
         platform_client.on_property_change("ChargeControlEndThreshold", self._set_battery_threshold)
@@ -171,11 +166,7 @@ class PlatformService:
         """
 
     def set_thermal_throttle_policy(
-        self,
-        policy: ThermalThrottleProfile,
-        temporal=False,
-        notify: bool = True,
-        force=False,
+        self, policy: ThermalThrottleProfile, temporal=False, game_name: str = None, force=False
     ) -> None:
         """Establish thermal throttle policy"""
         with self._lock:
@@ -216,14 +207,24 @@ class PlatformService:
                     self._logger.info("Profile setted succesfully")
 
                     if not temporal:
-                        configuration.platform.profiles.last = policy.value
+                        configuration.platform.profiles.profile = policy.value
                         configuration.save_config()
 
-                    if notify:
+                    if game_name is None:
                         notifier.show_toast(
                             translator.translate(
                                 "profile.applied",
                                 {"profile": translator.translate(f"label.profile.{policy_name}").lower()},
+                            )
+                        )
+                    else:
+                        notifier.show_toast(
+                            translator.translate(
+                                "profile.applied.for.game",
+                                {
+                                    "profile": translator.translate(f"label.profile.{policy_name}").lower(),
+                                    "game": game_name,
+                                },
                             )
                         )
                 except Exception as error:
@@ -265,6 +266,12 @@ class PlatformService:
             self._logger.info("Boost mode setted succesfully")
 
             event_bus.emit("PlatformService.boost", self._boost_mode)
+
+    def restore_profile(self):
+        """Restore persited profile"""
+        self.set_thermal_throttle_policy(
+            ThermalThrottleProfile(configuration.platform.profiles.profile), True, None, True
+        )
 
 
 platform_service = PlatformService()

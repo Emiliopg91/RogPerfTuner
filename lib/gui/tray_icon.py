@@ -13,6 +13,7 @@ from lib.models.boost import Boost
 from lib.models.thermal_throttle_profile import ThermalThrottleProfile
 from lib.models.rgb_brightness import RgbBrightness
 from lib.models.battery_threshold import BatteryThreshold
+from lib.services.steam_service import steam_service
 from lib.services.openrgb_service import open_rgb_service
 from lib.services.platform_service import platform_service
 from lib.utils.constants import icons_path, log_file, dev_mode
@@ -142,6 +143,14 @@ class TrayIcon:  # pylint: disable=R0902
             self._boost_actions[mode] = action
             self._boost_menu.addAction(action)
         self._menu.addMenu(self._boost_menu)
+
+        if steam_service.rccdc_enabled:
+            # Add "Games" option
+            self._games_menu = QMenu("    " + translator.translate("games"))
+            self._select_profile_action = QAction(f"{translator.translate("label.game.configure")}...")
+            self._select_profile_action.triggered.connect(lambda: print("A jugar"))
+            self._games_menu.addAction(self._select_profile_action)
+            self._menu.addMenu(self._games_menu)
 
         self._menu.addSeparator()
 

@@ -15,12 +15,14 @@ class Notifier:
     def __init__(self):
         self.last_id = 0
 
-    def show_toast(self, message):
+    def show_toast(self, message, can_be_hidden=True):
         """Show notification"""
         if self.last_id > 0:
             notification_client.close_notification(self.last_id)
 
-        self.last_id = notification_client.show_notification(__app_name__, self.ICON_PATH, " ", message, 3000)
+        toast_id = notification_client.show_notification(__app_name__, self.ICON_PATH, " ", message, 3000)
+        if can_be_hidden:
+            self.last_id = toast_id
 
 
 notifier = Notifier()

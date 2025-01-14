@@ -3,7 +3,8 @@ import logging
 import os
 import shutil
 
-from lib.utils.constants import log_file, log_folder, log_old_folder
+from lib.utils.constants import dev_mode, log_file, log_folder, log_old_folder
+from lib.utils.configuration import configuration
 
 
 class Logger:
@@ -37,7 +38,7 @@ class Logger:
                 os.unlink(rf)
 
             formatter = logging.Formatter(
-                "[%(asctime)s.%(msecs)03d][%(levelname)-8s][%(name)-20s] - %(message)s",
+                "[%(asctime)s.%(msecs)03d][%(levelname)-8s][%(name)-20s]%(message)s",
                 datefmt="%Y-%m-%d %H:%M:%S",
             )
 
@@ -65,29 +66,38 @@ class Logger:
         self._class_name = class_name
 
         self._logger = logging.getLogger(self._class_name)
-        self._logger.setLevel(logging.INFO)
         self._logger.addHandler(Logger.file_handler)
         self._logger.addHandler(Logger.console_handler)
 
+        level = configuration.logger.get(self._class_name, "INFO")
+        if level == "ERROR":
+            self._logger.setLevel(logging.ERROR)
+        elif level == "WARN":
+            self._logger.setLevel(logging.WARNING)
+        elif level == "DEBUG":
+            self._logger.setLevel(logging.DEBUG)
+        else:
+            self._logger.setLevel(logging.INFO)
+
     def info(self, message: str):
         """Write info log"""
-        self._logger.info(Logger._tab_msg(message))
+        self._logger.info(Logger._format_msg(message))
 
     def debug(self, message: str):
         """Write debug log"""
-        self._logger.debug(Logger._tab_msg(message))
+        self._logger.debug(Logger._format_msg(message))
 
     def warning(self, message: str):
         """Write warning log"""
-        self._logger.warning(Logger._tab_msg(message))
+        self._logger.warning(Logger._format_msg(message))
 
     def error(self, message: str):
         """Write error log"""
-        self._logger.error(Logger._tab_msg(message))
+        self._logger.error(Logger._format_msg(message))
 
     def critical(self, message: str):
         """Write critical log"""
-        self._logger.critical(Logger._tab_msg(message))
+        self._logger.critical(Logger._format_msg(message))
 
     def add_tab(self):
         """Add tab to logger"""
@@ -98,5 +108,9 @@ class Logger:
         Logger.tabs -= 1
 
     @staticmethod
-    def _tab_msg(msg: str):
-        return ("  " * Logger.tabs) + msg
+    def _format_msg(msg: str):
+        frame = inspect.currentframe().f_back.f_back
+        if dev_mode:
+            method_name = (frame.f_code.co_name if frame else "UnknownMethod").ljust(20, " ")[:20]
+            return f"[{method_name}] - {"  " * Logger.tabs}{msg}"
+        return f"- {"  " * Logger.tabs}{msg}"

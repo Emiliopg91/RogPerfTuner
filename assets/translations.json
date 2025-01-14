@@ -146,5 +146,17 @@
   "label.boost.OFF": {
     "en": "Disabled",
     "es": "Desactivado"
+  },
+  "games": {
+    "en": "Games",
+    "es": "Juegos"
+  },
+  "label.game.configure": {
+    "en": "Setup profiles",
+    "es": "Configurar perfiles"
+  },
+  "profile.applied.for.game": {
+    "en": "Profile {profile} applied succesfully for {game}",
+    "es": "Perfil {profile} aplicado con éxito para {game}"
   }
 }

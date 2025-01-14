@@ -24,6 +24,7 @@ class Application:
     def __init__(self):
         self._logger = Logger()
         self._runner_file = os.path.join(user_bin_folder, "launch.sh")
+        self._rccdc_enabled = False
 
         self._desktop_content = f"""[Desktop Entry]
 Exec={self._runner_file}
