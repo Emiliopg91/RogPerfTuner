@@ -6,6 +6,7 @@ import subprocess
 from PyQt5.QtWidgets import QSystemTrayIcon, QMenu, QAction, QActionGroup, QColorDialog
 from PyQt5.QtGui import QIcon, QColor
 
+from lib.gui.game_list import GameList
 from lib.gui.main_window import main_window
 
 from lib import __app_name__, __version__
@@ -13,7 +14,7 @@ from lib.models.boost import Boost
 from lib.models.thermal_throttle_profile import ThermalThrottleProfile
 from lib.models.rgb_brightness import RgbBrightness
 from lib.models.battery_threshold import BatteryThreshold
-from lib.services.steam_service import steam_service
+from lib.services.games_service import games_service
 from lib.services.openrgb_service import open_rgb_service
 from lib.services.platform_service import platform_service
 from lib.utils.constants import icons_path, log_file, dev_mode
@@ -144,11 +145,11 @@ class TrayIcon:  # pylint: disable=R0902
             self._boost_menu.addAction(action)
         self._menu.addMenu(self._boost_menu)
 
-        if steam_service.rccdc_enabled:
+        if games_service.rccdc_enabled:
             # Add "Games" option
             self._games_menu = QMenu("    " + translator.translate("games"))
             self._select_profile_action = QAction(f"{translator.translate("label.game.configure")}...")
-            self._select_profile_action.triggered.connect(lambda: print("A jugar"))
+            self._select_profile_action.triggered.connect(self.on_open_game_list)
             self._games_menu.addAction(self._select_profile_action)
             self._menu.addMenu(self._games_menu)
 
@@ -181,8 +182,16 @@ class TrayIcon:  # pylint: disable=R0902
         event_bus.on("PlatformService.boost", self.set_boost_mode)
         event_bus.on("PlatformService.thermal_throttle_profile", self.set_thermal_throttle_policy)
         event_bus.on("OpenRgbService.aura_changed", self.set_aura_state)
+        event_bus.on("GamesService.gameEvent", self.on_game_event)
 
         self._tray.activated.connect(self.on_tray_icon_activated)
+
+    def on_game_event(self, running_games: int):
+        """Handler for game events"""
+        enable = running_games == 0
+        self._profile_menu.setEnabled(enable)
+        self._boost_menu.setEnabled(enable)
+        self._games_menu.setEnabled(enable)
 
     def on_tray_icon_activated(self, reason):
         """Restore main window"""
@@ -243,6 +252,10 @@ class TrayIcon:  # pylint: disable=R0902
         color = QColorDialog.getColor(QColor(self._color_action.text()), None, translator.translate("color.select"))
         if color.isValid():
             open_rgb_service.apply_color(color.name().upper())
+
+    def on_open_game_list(self):
+        """Open game list window"""
+        GameList().show()
 
     @staticmethod
     def on_open():

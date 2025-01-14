@@ -13,6 +13,7 @@ from PyQt5.QtWidgets import (
     QWidget,
 )
 
+from lib.gui.game_list import GameList
 from lib.models.battery_threshold import BatteryThreshold
 from lib.models.boost import Boost
 from lib.models.rgb_brightness import RgbBrightness
@@ -82,6 +83,10 @@ class MainWindow(QMainWindow):
         performance_group.setLayout(performance_layout)
         main_layout.addWidget(performance_group)
 
+        self._game_profile_button = QPushButton(translator.translate("label.game.configure"))
+        self._game_profile_button.clicked.connect(self.open_game_list)
+        performance_layout.addRow(QLabel(f"{translator.translate('profile.per.game')}:"), self._game_profile_button)
+
         # Grupo 2: Aura
         aura_group = QGroupBox("Aura")
         aura_layout = QFormLayout()
@@ -145,10 +150,18 @@ class MainWindow(QMainWindow):
         self.setCentralWidget(central_widget)
         GuiUtils.center_window_on_current_screen(self)
 
-        event_bus.on("PlatformService.battery_threshold", self.set_battery_charge_limit)
+        event_bus.on("PlatformService.battery_threshold", self.set_battery_charge_limit)  # pylint: disable=R0801
         event_bus.on("PlatformService.boost", self.set_boost_mode)
         event_bus.on("PlatformService.thermal_throttle_profile", self.set_thermal_throttle_policy)
         event_bus.on("OpenRgbService.aura_changed", self.set_aura_state)
+        event_bus.on("GamesService.gameEvent", self.on_game_event)
+
+    def on_game_event(self, running_games: int):
+        """Handler for game events"""
+        enable = running_games == 0
+        self._profile_dropdown.setEnabled(enable)
+        self._boost_dropdown.setEnabled(enable)
+        self._game_profile_button.setEnabled(enable)
 
     def closeEvent(self, event):  # pylint: disable=C0103
         """Override the close event to hide the window instead of closing it."""
@@ -211,6 +224,10 @@ class MainWindow(QMainWindow):
     def on_color_change(self):
         """Handler for color change"""
         open_rgb_service.apply_color(self._current_color)
+
+    def open_game_list(self):
+        """Open game list window"""
+        GameList(self).show()
 
 
 main_window = MainWindow()

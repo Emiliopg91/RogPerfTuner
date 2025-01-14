@@ -7,20 +7,27 @@ from lib.clients.file.steam_client import steam_client
 from lib.models.settings import Game
 from lib.models.thermal_throttle_profile import ThermalThrottleProfile
 from lib.services.platform_service import platform_service
+from lib.utils import event_bus
 from lib.utils.configuration import configuration
 from lib.utils.constants import rccdc_asset_path, user_plugin_folder
 from lib.utils.cryptography import cryptography
 from lib.utils.logger import Logger
 
 
-class SteamService:
+class GamesService:
     """Steam service"""
 
     def __init__(self):
         self._logger = Logger()
         self._rccdc_enabled = False
+        self.__running_games: list[str] = []
         steam_client.on("launch", self.launch_game)
         steam_client.on("stop", self.stop_game)
+
+    @property
+    def running_games(self):
+        """Get list of running games"""
+        return self.__running_games
 
     @property
     def rccdc_enabled(self):
@@ -35,11 +42,11 @@ class SteamService:
         if os.path.exists(plugins_folder):
             if not os.path.exists(rccdc_path):
                 self._logger.info("Installing plugin for first time")
-                self.__copy_plugin(rccdc_asset_path, plugins_folder, False)
+                self.__copy_plugin(rccdc_asset_path, os.path.join(plugins_folder, "RCCDeckyCompanion"), False)
             else:
                 if os.path.getmtime(rccdc_path) < os.path.getmtime(rccdc_asset_path):
                     self._logger.info("Updating plugin")
-                    self.__copy_plugin(rccdc_asset_path, plugins_folder, True)
+                    self.__copy_plugin(rccdc_asset_path, os.path.join(plugins_folder, "RCCDeckyCompanion"), True)
                 else:
                     self._logger.info("Plugin up to date")
             self._rccdc_enabled = True
@@ -50,6 +57,7 @@ class SteamService:
     def __copy_plugin(self, src: str, dst: str, is_update: bool):
         subprocess.run(
             ["cp", "-R", src, user_plugin_folder],
+            capture_output=True,
             text=True,
             check=True,
         )
@@ -57,12 +65,14 @@ class SteamService:
             subprocess.run(
                 ["sudo", "-S", "rm", "-R", dst],
                 input=cryptography.decrypt_string(configuration.settings.password) + "\n",
+                capture_output=True,
                 text=True,
                 check=True,
             )
         subprocess.run(
             ["sudo", "-S", "cp", "-R", os.path.join(user_plugin_folder, "RCCDeckyCompanion"), dst],
             input=cryptography.decrypt_string(configuration.settings.password) + "\n",
+            capture_output=True,
             text=True,
             check=True,
         )
@@ -82,6 +92,7 @@ class SteamService:
     def launch_game(self, game: str):
         """Set profile for game"""
         self._logger.info(f"Launched {game}")
+        self.__running_games.append(game)
         self._logger.add_tab()
         if game not in configuration.games:
             configuration.games[game] = Game(ThermalThrottleProfile.PERFORMANCE.value)
@@ -89,14 +100,27 @@ class SteamService:
 
         profile = ThermalThrottleProfile(configuration.games[game].profile)
         platform_service.set_thermal_throttle_policy(profile, True, game, True)
+        event_bus.event_bus.emit("GamesService.gameEvent", len(self.__running_games))
         self._logger.rem_tab()
 
     def stop_game(self, game: str):
         """Restore profile after game stop"""
         self._logger.info(f"Stopped {game}")
+        self.__running_games.remove(game)
         self._logger.add_tab()
+        event_bus.event_bus.emit("GamesService.gameEvent", len(self.__running_games))
         platform_service.restore_profile()
         self._logger.rem_tab()
 
+    def get_games(self) -> dict[str, Game]:
+        """Get games asnd setting"""
+        return configuration.games
 
-steam_service = SteamService()
+    def set_game_profile(self, game: str, profile: ThermalThrottleProfile):
+        """Set profile for game"""
+        self._logger.info(f"Setting profile {profile.name.lower()} for {game}")
+        configuration.games[game].profile = profile.value
+        configuration.save_config()
+
+
+games_service = GamesService()

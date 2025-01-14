@@ -158,5 +158,17 @@
   "profile.applied.for.game": {
     "en": "Profile {profile} applied succesfully for {game}",
     "es": "Perfil {profile} aplicado con éxito para {game}"
+  },
+  "game.title": {
+    "en": "Game title",
+    "es": "Titulo del juego"
+  },
+  "game.performance.configuration": {
+    "en": "Game performance configuration",
+    "es": "Configuracion de rendimiento de juegos"
+  },
+  "profile.per.game": {
+    "en": "Game profile",
+    "es": "Perfil por juego"
   }
 }

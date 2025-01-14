@@ -58,7 +58,7 @@ rccdc_asset_path = os.path.join(base_path, "assets", "RCCDeckyCompanion")
 
 udev_path = os.path.join(base_path, "assets", "60-openrgb.rules")
 
-lock_file = os.path.join(user_folder, ".lock")
+lock_file = os.path.join(user_folder, f"{__app_name__}.pid")
 
 config_folder = os.path.join(user_folder, "config")
 

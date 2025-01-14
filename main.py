@@ -66,9 +66,9 @@ def initialize_application():
         password_dialog.show()
 
     """Install Decky plugin"""
-    from lib.services.steam_service import steam_service
+    from lib.services.games_service import games_service
 
-    steam_service.install_rccdc()
+    games_service.install_rccdc()
 
     """Show tray icon"""
     from lib.gui.tray_icon import tray_icon

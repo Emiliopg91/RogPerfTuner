@@ -8,6 +8,7 @@ from cryptography.hazmat.backends import default_backend
 
 import keyring
 
+from lib import __app_name__
 from lib.utils.logger import Logger
 
 
@@ -15,17 +16,17 @@ class Cryptography:
     """Class for access cryptography methods"""
 
     def __init__(self):
-        self._logger = Logger()
-        self._service = "RogControlCenter"
-        self._username = os.getlogin()
+        self.__logger = Logger()
+        self.__service = __app_name__
+        self.__username = os.getlogin()
 
-        if keyring.get_password(self._service, self._username) is None:
-            keyring.set_password(self._service, self._username, urlsafe_b64encode(os.urandom(32)).decode())
-            print("Encryption key generated and stored in keyring.")
+        if keyring.get_password(self.__service, self.__username) is None:
+            keyring.set_password(self.__service, self.__username, urlsafe_b64encode(os.urandom(32)).decode())
+            self.__logger.info("Encryption key generated and stored in keyring.")
 
     def retrieve_key_from_keyring(self) -> bytes:
         """Get key from keyring"""
-        encoded_key = keyring.get_password(self._service, self._username)
+        encoded_key = keyring.get_password(self.__service, self.__username)
         if not encoded_key:
             raise ValueError("No encryption key found for the specified service and username.")
         return urlsafe_b64decode(encoded_key.encode())

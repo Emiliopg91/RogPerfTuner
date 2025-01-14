@@ -12,13 +12,14 @@ class FileCreationHandler(FileSystemEventHandler):
     """Class for file watching"""
 
     def __init__(self, callback):
-        self.callback = callback
+        self.__callback = callback
+        self.__logger = Logger()
 
     def on_created(self, event):
         # Detectar si el evento es un archivo
         if not event.is_directory:
-            print(f"Archivo creado: {event.src_path}")
-            self.callback(event.src_path)
+            self.__logger.info(f"Archivo creado: {event.src_path}")
+            self.__callback(event.src_path)
 
 
 class AbstractFileClient(ABC):
@@ -34,7 +35,7 @@ class AbstractFileClient(ABC):
         observer = Observer()
         observer.schedule(event_handler, self._path, recursive=False)
 
-        print(f"Observando el directorio: {self._path}")
+        self._logger.debug(f"Observando el directorio: {self._path}")
         observer.start()
 
     def _on_file_event(self, file_path: str):
@@ -43,7 +44,7 @@ class AbstractFileClient(ABC):
             data = json.load(file)
         event = parts[0]
 
-        self._logger.info(f"Emiting event {parts[0]} with data {data}")
+        self._logger.debug(f"Emiting event {parts[0]} with data {data}")
         if event in self.__callbacks:
             for callback in self.__callbacks[event]:
                 try:

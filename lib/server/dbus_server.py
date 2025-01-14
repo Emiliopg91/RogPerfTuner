@@ -7,6 +7,7 @@ from PyQt5.QtDBus import QDBusConnection, QDBusAbstractAdaptor
 
 from lib.models.thermal_throttle_profile import get_next_thermal_throttle_profile
 from lib.models.rgb_brightness import get_next_brightness, get_previous_brightness
+from lib.services.games_service import games_service
 from lib.services.openrgb_service import open_rgb_service
 from lib.services.platform_service import platform_service
 from lib.utils.constants import scripts_folder
@@ -26,6 +27,9 @@ class HelloService(QObject):
     # pylint: disable=C0103
     def nextProfile(self):
         """Activate next profile"""
+        if len(games_service.running_games) > 0:
+            return "Not available on game session"
+
         current = platform_service.thermal_throttle_profile
         next_t = get_next_thermal_throttle_profile(current)
         platform_service.set_thermal_throttle_policy(next_t)

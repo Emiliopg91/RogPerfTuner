@@ -29,7 +29,7 @@ class EventBus:
                 try:
                     self._callbacks[event][i](*args)
                 except Exception as e:
-                    print(e)
+                    self.__logger.error(f"Error on callback: {e}")
         except KeyError:
             """"""
 

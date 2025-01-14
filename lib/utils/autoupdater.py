@@ -88,7 +88,7 @@ class AutoUpdater:
                 if len(data) > 0:
                     return data[0]
         else:
-            print(f"Error getting latest release: {response.status_code}")
+            self._logger.error(f"Error getting latest release: {response.status_code}")
 
         return None
 

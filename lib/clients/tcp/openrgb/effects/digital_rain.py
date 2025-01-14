@@ -50,11 +50,8 @@ class DigitalRain(AbstractEffect):
 
     def _decrement_linear(self, zone_status: list[int], zone: Zone):
         for r in range(len(zone.leds) - 1, -1, -1):
-            if r == 0:
-                if zone_status[r] > 0:
-                    zone_status[r] = math.floor(zone_status[r] / self._decrement)
-            else:
-                zone_status[r] = zone_status[r - 1]
+            if zone_status[r] > 0:
+                zone_status[r] = math.floor(zone_status[r] / self._decrement)
 
     def _to_color_matrix(self, zone_status: list[list[int]], zone: Zone):
         colors = [RGBColor(0, 0, 0) for _ in range(len(zone.leds))]
@@ -108,8 +105,12 @@ class DigitalRain(AbstractEffect):
                 free_cols.append(c)
 
         if len(free_cols) > 0:
-            next_led = free_cols[random.randint(0, len(free_cols) - 1)]
-            zone_status[next_led] = self._max_count
+            cpu = max(1, psutil.cpu_percent()) / 100
+            allowed = max(1, math.ceil(len(zone.leds) * cpu))
+
+            if allowed > len(zone.leds) - len(free_cols):
+                next_led = free_cols[random.randint(0, len(free_cols) - 1)]
+                zone_status[next_led] = self._max_count
 
     def apply_effect(self):
         zone_status = []
