@@ -116,10 +116,10 @@ class MainWindow(QMainWindow):
         self._color_button.clicked.connect(self.pick_color)
         supports_color = open_rgb_service.supports_color(open_rgb_service._effect)
         self._color_button.setDisabled(not supports_color)
-        self._color_button.setHidden(not supports_color)
+        self._color_button.setDisabled(not supports_color)
 
         self._color_label = QLabel(f"{translator.translate('color')}:")
-        self._color_label.setHidden(not supports_color)
+        self._color_label.setDisabled(not supports_color)
         aura_layout.addRow(self._color_label, self._color_button)
 
         aura_group.setLayout(aura_layout)
@@ -197,8 +197,8 @@ class MainWindow(QMainWindow):
         self._current_color = color if color is not None else "#00000000"
         self._color_button.setStyleSheet(f"background-color: {self._current_color};")
         self._color_button.setDisabled(color is None)
-        self._color_button.setHidden(color is None)
-        self._color_label.setHidden(color is None)
+        self._color_button.setDisabled(color is None)
+        self._color_label.setDisabled(color is None)
 
     def on_profile_changed(self, index):
         """Handler for profile change"""

@@ -1,5 +1,6 @@
 # pylint: disable=E0611,E0401
 
+from dataclasses import dataclass
 import math
 import random
 import threading
@@ -11,6 +12,18 @@ from openrgb.utils import RGBColor, ZoneType
 from lib.clients.tcp.openrgb.effects.base.abstract_effect import AbstractEffect
 from lib.utils.openrgb import OpenRGBUtils
 from lib.utils.singleton import singleton
+
+
+@dataclass
+class LedStatus:
+    """Led status holder class"""
+
+    max_val: int = 10
+    cur_val: int = 0
+
+    def clone(self):
+        """Copy self instance into new one"""
+        return LedStatus(self.max_val, self.cur_val)
 
 
 @singleton
@@ -26,77 +39,76 @@ class DigitalRain(AbstractEffect):
         for i in range(zone.mat_height):
             zone_status.append([])
             for _ in range(zone.mat_width):
-                zone_status[i].append(0)
+                zone_status[i].append(LedStatus())
 
     def _initialize_linear(self, zone_status: list[int], zone: Zone):
         for _ in range(len(zone.leds)):
-            zone_status.append(0)
+            zone_status.append(LedStatus())
 
-    def _decrement_matrix(self, zone_status: list[list[int]], zone: Zone):
+    def _decrement_matrix(self, zone_status: list[list[LedStatus]], zone: Zone):
         for r in range(zone.mat_height - 1, -1, -1):  # pylint: disable=R1702
             for c in range(zone.mat_width):
                 if r == 0:
-                    if zone_status[r][c] == self._max_count:
-                        zone_status[r][c] = math.floor(zone_status[r][c] / pow(1.4, random.random() * 5))
-                    else:
-                        if zone_status[r][c] > 0:
-                            zone_status[r][c] = math.floor(zone_status[r][c] / self._decrement)
-                            if zone_status[r][c] == 0:
-                                zone_status[r][c] = 0
-                        elif zone_status[r][c] < 0:
-                            zone_status[r][c] += 1
+                    if zone_status[r][c].cur_val > 0:
+                        zone_status[r][c].cur_val = zone_status[r][c].cur_val - 1
+                    elif zone_status[r][c].cur_val < 0:
+                        zone_status[r][c].cur_val += 1
                 else:
-                    zone_status[r][c] = zone_status[r - 1][c]
+                    zone_status[r][c] = zone_status[r - 1][c].clone()
 
-    def _decrement_linear(self, zone_status: list[int], zone: Zone):
+    def _decrement_linear(self, zone_status: list[LedStatus], zone: Zone):
         for r in range(len(zone.leds) - 1, -1, -1):
-            if zone_status[r] > 0:
-                zone_status[r] = math.floor(zone_status[r] / self._decrement)
+            if zone_status[r].cur_val > 0:
+                zone_status[r].cur_val = zone_status[r].cur_val - 1
 
-    def _to_color_matrix(self, zone_status: list[list[int]], zone: Zone):
+    def _to_color_matrix(self, zone_status: list[list[LedStatus]], zone: Zone):
         colors = [RGBColor(0, 0, 0) for _ in range(len(zone.leds))]
         for r in range(zone.mat_height):  # pylint: disable=R1702
             for c in range(zone.mat_width):
                 if zone.matrix_map[r][c] is not None:
-                    if zone_status[r][c] >= 0:
-                        if zone_status[r][c] == self._max_count:
+                    if zone_status[r][c].cur_val >= 0:
+                        if zone_status[r][c].cur_val == zone_status[r][c].max_val:
                             colors[zone.matrix_map[r][c]] = RGBColor(255, 255, 255)
                         else:
                             colors[zone.matrix_map[r][c]] = OpenRGBUtils.dim(
-                                self._color, zone_status[r][c] / self._max_count
+                                self._color, zone_status[r][c].cur_val / zone_status[r][c].max_val
                             )
                     else:
                         colors[zone.matrix_map[r][c]] = RGBColor(0, 0, 0)
         return colors
 
-    def _to_color_linear(self, zone_status: list[int], zone: Zone):
+    def _to_color_linear(self, zone_status: list[LedStatus], zone: Zone):
         colors = [RGBColor(0, 0, 0) for _ in range(len(zone.leds))]
         for r in range(len(zone.leds)):
-            if zone_status[r] == self._max_count:
+            if zone_status[r].cur_val == zone_status[r].max_val:
                 colors[r] = RGBColor(255, 255, 255)
             else:
-                colors[r] = OpenRGBUtils.dim(self._color, zone_status[r] / self._max_count)
+                colors[r] = OpenRGBUtils.dim(self._color, zone_status[r].cur_val / zone_status[r].max_val)
         return colors
 
-    def _is_matrix_column_off(self, zone_status: list[list[int]], height: int, column: int):
+    def _is_matrix_column_available(self, zone_status: list[list[LedStatus]], height: int, column: int):
         for r in range(height):
-            if zone_status[r][column] != 0:
+            if zone_status[r][column].cur_val != 0:
                 return False
         return True
 
     def _is_matrix_column_not_last_elem_only(self, zone: Zone, height: int, column: int):
+        if zone.matrix_map[height - 1][column] is None:
+            return False
+
         for i in range(height - 1):
             if zone.matrix_map[i][column] is not None:
                 return False
+
         return True
 
-    def _get_next_matrix(self, zone_status: list[list[int]], zone: Zone):  # pylint: disable=R0912
+    def _get_next_matrix(self, zone_status: list[list[LedStatus]], zone: Zone):  # pylint: disable=R0912
         free_cols: list[int] = []
         not_only_last: list[int] = []
         for c in range(zone.mat_width):
             if not self._is_matrix_column_not_last_elem_only(zone, zone.mat_height, c):
                 not_only_last.append(c)
-                if self._is_matrix_column_off(zone_status, zone.mat_height, c):
+                if self._is_matrix_column_available(zone_status, zone.mat_height, c):
                     free_cols.append(c)
 
         if len(free_cols) > 0:
@@ -105,12 +117,13 @@ class DigitalRain(AbstractEffect):
 
             if allowed > len(not_only_last) - len(free_cols):
                 next_col = free_cols[random.randint(0, len(free_cols) - 1)]
-                zone_status[0][next_col] = self._max_count
+                zone_status[0][next_col].max_val = random.randint(5, 10)
+                zone_status[0][next_col].cur_val = zone_status[0][next_col].max_val
 
-    def _get_next_linear(self, zone_status: list[int], zone: Zone):
+    def _get_next_linear(self, zone_status: list[LedStatus], zone: Zone):
         free_cols: list[int] = []
         for c in range(len(zone.leds)):
-            if zone_status[c] == 0:
+            if zone_status[c].cur_val == 0:
                 free_cols.append(c)
 
         if len(free_cols) > 0:
@@ -119,7 +132,7 @@ class DigitalRain(AbstractEffect):
 
             if allowed > len(zone.leds) - len(free_cols):
                 next_led = free_cols[random.randint(0, len(free_cols) - 1)]
-                zone_status[next_led] = self._max_count
+                zone_status[next_led].cur_val = zone_status[next_led].max_val
 
     def apply_effect(self):
         zone_status = []
@@ -162,7 +175,7 @@ class DigitalRain(AbstractEffect):
                     offset += len(zone.leds)
 
                 self._set_colors(dev, final_colors)
-                self._sleep(0.08)
+                self._sleep(0.07)
                 iter_count = (iter_count + 1) % 100
 
         for dev_id, dev in enumerate(self._devices):

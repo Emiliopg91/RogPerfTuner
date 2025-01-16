@@ -65,6 +65,8 @@ def initialize_application():
     if configuration.settings.password is None:
         password_dialog.show()
 
+    from lib.services.openrgb_service import open_rgb_service  # pylint: disable=W0611
+
     """Install Decky plugin"""
     from lib.services.games_service import games_service
 

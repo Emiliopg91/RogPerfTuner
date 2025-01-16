@@ -109,7 +109,7 @@ class TrayIcon:  # pylint: disable=R0902
         self._color_menu.addAction(self._colorpicker_action)
 
         self._submenu_color = self._menu.addMenu(self._color_menu)
-        self._submenu_color.setVisible(open_rgb_service.supports_color())
+        self._submenu_color.setEnabled(open_rgb_service.supports_color())
 
         self._menu.addSeparator()
 
@@ -218,9 +218,9 @@ class TrayIcon:  # pylint: disable=R0902
         self._effect_actions[effect].setChecked(True)
         self._brightness_actions[brightness].setChecked(True)
         if color is None:
-            self._submenu_color.setVisible(False)
+            self._submenu_color.setEnabled(False)
         else:
-            self._submenu_color.setVisible(True)
+            self._submenu_color.setEnabled(True)
             self._color_action.setText(color)
 
     def show(self):
