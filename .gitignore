@@ -1,7 +1,14 @@
-node_modules
-dist
-out
-.DS_Store
-*.log*
+build/**/*
+dist/**/*
+
+clients/dbus/base/__pycache__/
 
 *.pyc
+
+assets/OpenRGB.AppImage
+
+assets/60-openrgb.rules
+
+out/
+
+assets/RCCDeckyCompanion/
