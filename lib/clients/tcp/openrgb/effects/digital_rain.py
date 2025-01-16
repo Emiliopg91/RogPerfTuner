@@ -84,17 +84,26 @@ class DigitalRain(AbstractEffect):
                 return False
         return True
 
+    def _is_matrix_column_not_last_elem_only(self, zone: Zone, height: int, column: int):
+        for i in range(height - 1):
+            if zone.matrix_map[i][column] is not None:
+                return False
+        return True
+
     def _get_next_matrix(self, zone_status: list[list[int]], zone: Zone):  # pylint: disable=R0912
         free_cols: list[int] = []
+        not_only_last: list[int] = []
         for c in range(zone.mat_width):
-            if self._is_matrix_column_off(zone_status, zone.mat_height, c):
-                free_cols.append(c)
+            if not self._is_matrix_column_not_last_elem_only(zone, zone.mat_height, c):
+                not_only_last.append(c)
+                if self._is_matrix_column_off(zone_status, zone.mat_height, c):
+                    free_cols.append(c)
 
         if len(free_cols) > 0:
             cpu = max(1, psutil.cpu_percent()) / 100
-            allowed = max(1, math.ceil(zone.mat_width * cpu))
+            allowed = max(1, math.ceil(len(not_only_last) * cpu))
 
-            if allowed > zone.mat_width - len(free_cols):
+            if allowed > len(not_only_last) - len(free_cols):
                 next_col = free_cols[random.randint(0, len(free_cols) - 1)]
                 zone_status[0][next_col] = self._max_count
 
@@ -153,7 +162,7 @@ class DigitalRain(AbstractEffect):
                     offset += len(zone.leds)
 
                 self._set_colors(dev, final_colors)
-                self._sleep(0.06)
+                self._sleep(0.08)
                 iter_count = (iter_count + 1) % 100
 
         for dev_id, dev in enumerate(self._devices):
