@@ -7,7 +7,7 @@ from lib import __app_name__, __version__
 
 setproctitle.setproctitle(__app_name__)
 
-from PyQt5.QtWidgets import QApplication
+from PyQt6.QtWidgets import QApplication
 import sys
 
 
@@ -94,7 +94,7 @@ def initialize_application():
 def start_qt_application(application: QApplication):
     """Launch event loop"""
     application.setQuitOnLastWindowClosed(False)
-    sys.exit(application.exec_())
+    sys.exit(application.exec())
 
 
 if __name__ == "__main__":

@@ -1,7 +1,7 @@
 # pylint: disable=E0611, E0401
-from PyQt5.QtCore import Qt
-from PyQt5.QtGui import QColor, QIcon, QPixmap
-from PyQt5.QtWidgets import (
+from PyQt6.QtCore import Qt
+from PyQt6.QtGui import QColor, QIcon, QPixmap
+from PyQt6.QtWidgets import (
     QColorDialog,
     QComboBox,
     QFormLayout,
@@ -38,8 +38,7 @@ class MainWindow(QMainWindow):
         super().__init__()
 
         self.setWindowTitle("RogControlCenter")
-        self.setGeometry(0, 0, 580, 800)
-        self.setFixedSize(580, 800)
+        self.setGeometry(0, 0, 400, 550)
         self.setWindowIcon(QIcon(f"{icons_path}/icon-45x45.png"))
 
         self._current_color = open_rgb_service.get_color(open_rgb_service._effect)
@@ -48,16 +47,18 @@ class MainWindow(QMainWindow):
         central_widget = QWidget(self)
         main_layout = QVBoxLayout(central_widget)
         main_layout.setContentsMargins(20, 20, 20, 20)
-        main_layout.setAlignment(Qt.AlignTop)  # Alinear los elementos al inicio
+        main_layout.setAlignment(Qt.AlignmentFlag.AlignTop)  # Alinear los elementos al inicio
 
         # Primera fila: Imagen centrada
         image_label = QLabel()
         pixmap = QPixmap(f"{icons_path}/rog-logo.svg")  # Ruta a tu archivo de imagen
-        scaled_pixmap = pixmap.scaled(350, 350, Qt.KeepAspectRatio, Qt.SmoothTransformation)  # Escalar la imagen
+        scaled_pixmap = pixmap.scaled(
+            200, 200, Qt.AspectRatioMode.KeepAspectRatio, Qt.TransformationMode.SmoothTransformation
+        )  # Escalar la imagen
         image_label.setPixmap(scaled_pixmap)
-        image_label.setAlignment(Qt.AlignCenter)
+        image_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
 
-        main_layout.addWidget(image_label, alignment=Qt.AlignCenter)  # Centrar la imagen
+        main_layout.addWidget(image_label, alignment=Qt.AlignmentFlag.AlignCenter)  # Centrar la imagen
 
         # Grupo 1: Rendimiento
         performance_group = QGroupBox(translator.translate("performance"))
@@ -109,7 +110,7 @@ class MainWindow(QMainWindow):
 
         # Botón de color
         self._color_button = QPushButton()
-        self._color_button.setFixedSize(50, 50)
+        self._color_button.setFixedSize(30, 20)
         self._color_button.setStyleSheet(
             f"background-color: {self._current_color if self._current_color is not None else "#00000000"};"
         )

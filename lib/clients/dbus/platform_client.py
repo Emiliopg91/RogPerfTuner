@@ -1,6 +1,6 @@
 # pylint: disable=E0611, E0401
-from PyQt5.QtCore import QMetaType
-from PyQt5.QtDBus import QDBusVariant, QDBusArgument
+from PyQt6.QtCore import QMetaType
+from PyQt6.QtDBus import QDBusVariant, QDBusArgument
 
 from lib.clients.dbus.base.abstract_dbus_client import AbstractDbusClient
 from lib.models.battery_threshold import BatteryThreshold
@@ -24,7 +24,7 @@ class PlatformClient(AbstractDbusClient):
     def charge_control_end_threshold(self, val: BatteryThreshold) -> None:
         self._set_property(
             "ChargeControlEndThreshold",
-            QDBusVariant(QDBusArgument(val.value, QMetaType.UChar)),
+            QDBusVariant(QDBusArgument(val.value, QMetaType.Type.UChar.value)),
         )
 
     @property
@@ -34,9 +34,10 @@ class PlatformClient(AbstractDbusClient):
 
     @throttle_thermal_policy.setter
     def throttle_thermal_policy(self, val: ThermalThrottleProfile) -> None:
+        val = QDBusVariant(QDBusArgument(val.value, QMetaType.Type.UInt.value))
         self._set_property(
             "ThrottleThermalPolicy",
-            QDBusVariant(QDBusArgument(val.value, QMetaType.UInt)),
+            val,
         )
 
 

@@ -2,8 +2,8 @@ import os
 import sys
 
 # pylint: disable=E0611
-from PyQt5.QtCore import QObject, pyqtSlot, Q_CLASSINFO
-from PyQt5.QtDBus import QDBusConnection, QDBusAbstractAdaptor
+from PyQt6.QtCore import QObject, pyqtSlot
+from PyQt6.QtDBus import QDBusConnection, QDBusAbstractAdaptor
 
 from lib.models.thermal_throttle_profile import get_next_thermal_throttle_profile
 from lib.models.rgb_brightness import get_next_brightness, get_previous_brightness
@@ -14,10 +14,9 @@ from lib.utils.constants import scripts_folder
 from lib.utils.logger import Logger
 from lib.utils.singleton import singleton
 
-
 SERVICE_NAME = "es.emiliopg91.RogControlCenter"
 OBJECT_PATH = "/es/emiliopg91/RogControlCenter"
-INTERFACE_NAME = "es.emiliopg91.RogControlCenter"
+INTERFACE_NAME = "local.py.main.HelloServiceAdaptor"
 
 
 @singleton
@@ -62,8 +61,6 @@ class HelloService(QObject):
 @singleton
 class HelloServiceAdaptor(QDBusAbstractAdaptor):
     """Adaptor for dbus service"""
-
-    Q_CLASSINFO("D-Bus Interface", INTERFACE_NAME)
 
     def __init__(self, service: HelloService):
         super().__init__(service)
@@ -131,11 +128,11 @@ class DBusServer:
         service = HelloService()
         adaptor = HelloServiceAdaptor(service)
 
-        if not session_bus.registerObject(OBJECT_PATH, service):
-            self._logger.error(f"Error: Couldn't register object {OBJECT_PATH}")
-            sys.exit(1)
-
-        session_bus.registerObject(OBJECT_PATH, adaptor)
+        session_bus.registerObject(
+            OBJECT_PATH,
+            adaptor,
+            QDBusConnection.RegisterOption.ExportAdaptors | QDBusConnection.RegisterOption.ExportAllSlots,
+        )
 
         self._logger.info("D-Bus service started")
 

@@ -1,6 +1,6 @@
 # pylint: disable=E0611, E0401
-from PyQt5.QtCore import QMetaType
-from PyQt5.QtDBus import QDBusArgument
+from PyQt6.QtCore import QMetaType
+from PyQt6.QtDBus import QDBusArgument
 
 from lib.clients.dbus.base.abstract_dbus_client import AbstractDbusClient
 from lib.utils.singleton import singleton
@@ -22,11 +22,11 @@ class NotificationClient(AbstractDbusClient):
         return self._invoke_method(
             "Notify",
             app_name,
-            QDBusArgument(0, QMetaType.UInt),
+            QDBusArgument(0, QMetaType.Type.UInt.value),
             app_icon,
             title,
             body,
-            QDBusArgument([], QMetaType.QStringList),
+            QDBusArgument([], QMetaType.Type.QStringList.value),
             {},
             timeout,
         )
@@ -35,7 +35,7 @@ class NotificationClient(AbstractDbusClient):
         """Close notification"""
         return self._invoke_method(
             "CloseNotification",
-            QDBusArgument(notif_id, QMetaType.UInt),
+            QDBusArgument(notif_id, QMetaType.Type.UInt.value),
         )
 
 

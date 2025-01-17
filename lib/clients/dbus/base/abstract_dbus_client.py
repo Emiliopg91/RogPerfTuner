@@ -2,7 +2,7 @@ from abc import ABC
 from typing import Any, Callable
 
 # pylint: disable=E0611
-from PyQt5.QtDBus import QDBusInterface, QDBusConnection, QDBusReply, QDBusMessage, QDBusServiceWatcher
+from PyQt6.QtDBus import QDBusInterface, QDBusConnection, QDBusReply, QDBusMessage, QDBusServiceWatcher
 
 from lib.clients.dbus.base.signal_listener import signal_listener
 from lib.utils.logger import Logger
@@ -35,7 +35,7 @@ class AbstractDbusClient(ABC):
             self.watcher = QDBusServiceWatcher(
                 service_name,
                 bus,
-                QDBusServiceWatcher.WatchForOwnerChange,
+                QDBusServiceWatcher.WatchModeFlag.WatchForOwnerChange,
             )
             self.watcher.serviceOwnerChanged.connect(self._on_service_owner_changed)
 

@@ -2,7 +2,7 @@ import subprocess
 import sys
 
 # pylint: disable=E0611, E0401
-from PyQt5.QtWidgets import (
+from PyQt6.QtWidgets import (
     QDialog,
     QVBoxLayout,
     QLabel,
@@ -37,7 +37,7 @@ class PasswordDialog(QDialog):
 
         # Campo de entrada de contraseña
         self._password_input = QLineEdit()
-        self._password_input.setEchoMode(QLineEdit.Password)
+        self._password_input.setEchoMode(QLineEdit.EchoMode.Password)
         layout.addWidget(self._password_input)
 
         # Botón de aceptar

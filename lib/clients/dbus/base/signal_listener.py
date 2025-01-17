@@ -1,8 +1,8 @@
 from typing import Callable
 
 # pylint: disable=E0611
-from PyQt5.QtCore import QObject, pyqtSlot
-from PyQt5.QtDBus import QDBusConnection, QDBusMessage
+from PyQt6.QtCore import QObject, pyqtSlot
+from PyQt6.QtDBus import QDBusConnection, QDBusMessage
 
 from lib.utils.logger import Logger
 from lib.utils.singleton import singleton

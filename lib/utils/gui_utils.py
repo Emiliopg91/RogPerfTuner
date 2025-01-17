@@ -1,10 +1,10 @@
 # pylint: disable=E0611, E0401
-from PyQt5.QtWidgets import (
+from PyQt6.QtWidgets import (
     QApplication,
     QDialog,
     QMainWindow,
 )
-from PyQt5.QtGui import QCursor
+from PyQt6.QtGui import QCursor
 
 
 class GuiUtils:

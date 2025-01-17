@@ -14,7 +14,7 @@ pip_dependencies = [
     "openrgb-python",
     "psutil",
     "pyinstaller",
-    "PyQt5",
+    "PyQt6",
     "setproctitle",
     "vdf",
 ]

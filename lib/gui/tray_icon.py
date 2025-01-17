@@ -3,8 +3,8 @@ import signal
 import subprocess
 
 # pylint: disable=E0611, E0401
-from PyQt5.QtWidgets import QSystemTrayIcon, QMenu, QAction, QActionGroup, QColorDialog
-from PyQt5.QtGui import QIcon, QColor
+from PyQt6.QtWidgets import QSystemTrayIcon, QMenu, QColorDialog
+from PyQt6.QtGui import QIcon, QColor, QAction, QActionGroup
 
 from lib.gui.game_list import GameList
 from lib.gui.main_window import main_window

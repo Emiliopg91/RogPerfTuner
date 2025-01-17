@@ -1,5 +1,5 @@
 # pylint: disable=E0611
-from PyQt5.QtWidgets import (
+from PyQt6.QtWidgets import (
     QDialog,
     QVBoxLayout,
     QTableWidget,
@@ -11,8 +11,8 @@ from PyQt5.QtWidgets import (
     QWidget,
     QAbstractItemView,
 )
-from PyQt5.QtCore import Qt
-from PyQt5.QtGui import QWheelEvent, QIcon
+from PyQt6.QtCore import Qt
+from PyQt6.QtGui import QWheelEvent, QIcon
 
 from lib.utils.constants import icons_path
 from lib.models.thermal_throttle_profile import ThermalThrottleProfile
