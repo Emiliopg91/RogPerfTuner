@@ -35,8 +35,16 @@ class DigitalRain(AbstractEffect):
         super().__init__("Digital rain", "#00FF00")
         self._max_count = 10
         self._cpu = 0
-        self._nap_time = 0.06
+        self._nap_time = 0.07
         self._lock = threading.Lock()
+
+        self.sin_array = [0] * (self._max_count)
+
+        # Rellenar el resto del array con valores basados en la función seno
+        for i in range(0, self._max_count):  # Desde la posición 1 hasta la 8
+            x = (i / (self._max_count + 2)) * math.pi / 2  # Escalar el índice entre 0 y 1
+            self.sin_array[i] = math.pow(math.sin(x), 2)
+            print(f"[{i}] {self.sin_array[i]}")
 
     def _decrement_matrix(self, zone_status: list[list[LedStatus]]):
         for r in range(len(zone_status) - 1, -1, -1):  # pylint: disable=R1702
@@ -60,13 +68,15 @@ class DigitalRain(AbstractEffect):
                         if led.cur_val == led.max_val:
                             colors[led.pos_idx] = RGBColor(255, 255, 255)
                         else:
-                            colors[led.pos_idx] = OpenRGBUtils.dim(self._color, led.cur_val / led.max_val)
+                            colors[led.pos_idx] = OpenRGBUtils.dim(
+                                self._color, self.sin_array[round(led.cur_val * (led.max_val / self._max_count))]
+                            )
                     else:
                         colors[led.pos_idx] = RGBColor(0, 0, 0)
         return colors
 
     def _is_matrix_column_available(self, zone_status: list[list[LedStatus]], height: int, column: int):
-        for r in range(height):
+        for r in range(min(3, height)):
             if zone_status[r][column].cur_val != 0:
                 return False
         return True
@@ -92,7 +102,7 @@ class DigitalRain(AbstractEffect):
 
             if allowed > len(zone_status[0]) - len(free_cols):
                 next_col = free_cols[random.randint(0, len(free_cols) - 1)]
-                zone_status[0][next_col].max_val = random.randint(int(self._max_count / 2), self._max_count)
+                zone_status[0][next_col].max_val = random.randint(round(2 * self._max_count / 3), self._max_count)
                 zone_status[0][next_col].cur_val = zone_status[0][next_col].max_val
 
     def _dev_to_mat(self, dev: Device) -> list[list[LedStatus]]:  # pylint: disable=R0912,R0914
