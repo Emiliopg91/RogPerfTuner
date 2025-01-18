@@ -118,6 +118,8 @@ def package_python():
             os.path.join(workspace_dir, "assets") + ":assets",
             os.path.join(workspace_dir, "main.py"),
         ],
+        stdout=subprocess.DEVNULL,
+        stderr=subprocess.PIPE,
         check=False,
     )
 
