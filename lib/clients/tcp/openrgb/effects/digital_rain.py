@@ -44,7 +44,6 @@ class DigitalRain(AbstractEffect):
         for i in range(0, self._max_count):  # Desde la posición 1 hasta la 8
             x = (i / (self._max_count + 2)) * math.pi / 2  # Escalar el índice entre 0 y 1
             self.sin_array[i] = math.pow(math.sin(x), 2)
-            print(f"[{i}] {self.sin_array[i]}")
 
     def _decrement_matrix(self, zone_status: list[list[LedStatus]]):
         for r in range(len(zone_status) - 1, -1, -1):  # pylint: disable=R1702
