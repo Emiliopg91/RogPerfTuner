@@ -2,7 +2,7 @@ import os
 import re
 import sys
 
-init_file_path = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "lib", "__init__.py"))
+init_file_path = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "rcc", "__init__.py"))
 
 if not os.path.exists(init_file_path):
     raise FileNotFoundError(f"File {init_file_path} not found")
