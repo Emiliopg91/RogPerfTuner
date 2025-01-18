@@ -1,3 +1,4 @@
+import json
 import os
 import subprocess
 import sys
@@ -5,6 +6,32 @@ import threading
 import time
 from watchdog.observers import Observer
 from watchdog.events import FileSystemEventHandler
+
+
+def get_pylint_args() -> list[str]:
+    """Obtiene el valor de la propiedad `python.linting.pylintArgs` del settings.json.
+
+    Returns:
+        list[str] | None: Un array de strings si existe, o None si no existe.
+    """
+    settings_path = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", ".vscode", "settings.json"))
+
+    # Verificar si el archivo existe
+    if not os.path.exists(settings_path):
+        print(f"No such file: {settings_path}")
+        return None
+
+    try:
+        # Leer el contenido del archivo
+        with open(settings_path, "r", encoding="utf-8") as file:
+            settings = json.load(file)
+
+        # Devolver el valor de la propiedad o None si no existe
+        return settings.get("python.linting.pylintArgs", [])
+
+    except json.JSONDecodeError as e:
+        print(f"Error while reading settings.json: {e}")
+        return None
 
 
 def run_pylint():
@@ -15,12 +42,11 @@ def run_pylint():
         "python",
         "-m",
         "pylint",
-        "-j",
-        "0",
-        f"--rcfile={os.path.join('.', '.pylintrc')}",
-        "./main.py",
-        "./rcc/*",
     ]
+    for _, line in enumerate(get_pylint_args()):
+        for _, param in enumerate(line.replace("${workspaceFolder}", ".").split(" ")):
+            pylint_command.append(param)
+
     result = subprocess.run(pylint_command, check=False)
 
     if result.returncode != 0:
