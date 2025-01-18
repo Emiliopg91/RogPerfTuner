@@ -14,6 +14,8 @@ def run_pylint():
         "python",
         "-m",
         "pylint",
+        "-j",
+        "8",
         f"--rcfile={os.path.join('.', '.pylintrc')}",
         "./main.py",
         "./lib/*",
