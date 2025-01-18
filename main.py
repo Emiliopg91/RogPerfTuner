@@ -6,7 +6,7 @@ import asyncio
 from qasync import QEventLoop
 
 import setproctitle
-from lib import __app_name__, __version__
+from rcc import __app_name__, __version__
 
 setproctitle.setproctitle(__app_name__)
 
@@ -16,7 +16,7 @@ import sys
 
 def get_application_lock():
     """Get the lock"""
-    from lib.utils.single_instance import single_instance
+    from rcc.utils.single_instance import single_instance
 
     single_instance.acquire()
 
@@ -32,9 +32,9 @@ def create_qt_application() -> QApplication:
 def initialize_application():
     """Application startup"""
     import os
-    from lib.utils.constants import dev_mode
+    from rcc.utils.constants import dev_mode
 
-    from lib.utils.logger import Logger
+    from rcc.utils.logger import Logger
 
     logger = Logger("Main")
 
@@ -50,45 +50,45 @@ def initialize_application():
     logger.info("Starting initialization")
     logger.add_tab()
 
-    from lib.gui.notifier import notifier
-    from lib.utils.translator import translator
+    from rcc.gui.notifier import notifier
+    from rcc.utils.translator import translator
 
     notifier.show_toast(translator.translate("initializing"))
 
     """Create application files"""
     if not dev_mode:
-        from lib.utils.application import application
+        from rcc.utils.application import application
 
         application.generate_run()
         application.create_menu_entry()
         application.enable_autostart()
 
     """Ask for sudo password"""
-    from lib.gui.password_dialog import password_dialog
-    from lib.utils.configuration import configuration
+    from rcc.gui.password_dialog import password_dialog
+    from rcc.utils.configuration import configuration
 
     if configuration.settings.password is None:
         password_dialog.show()
 
-    from lib.services.openrgb_service import open_rgb_service  # pylint: disable=W0611
+    from rcc.services.openrgb_service import open_rgb_service  # pylint: disable=W0611
 
     """Install Decky plugin"""
-    from lib.services.games_service import games_service
+    from rcc.services.games_service import games_service
 
     games_service.install_rccdc()
 
     """Show tray icon"""
-    from lib.gui.tray_icon import tray_icon
+    from rcc.gui.tray_icon import tray_icon
 
     tray_icon.show()
 
     """Start dbus server"""
-    from lib.server.dbus_server import dbus_server
+    from rcc.server.dbus_server import dbus_server
 
     dbus_server.start()
 
     """Start autoupdater"""
-    from lib.utils.autoupdater import auto_updater
+    from rcc.utils.autoupdater import auto_updater
 
     auto_updater.start()
 

@@ -45,7 +45,7 @@ def run_main():
 
 
 if __name__ == "__main__":
-    paths = [os.path.join(workspace, "main.py"), os.path.join(workspace, "lib")]
+    paths = [os.path.join(workspace, "main.py"), os.path.join(workspace, "rcc")]
     MAIN_PROCESS = None
 
     def restart_main():

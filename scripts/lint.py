@@ -19,7 +19,7 @@ def run_pylint():
         "0",
         f"--rcfile={os.path.join('.', '.pylintrc')}",
         "./main.py",
-        "./lib/*",
+        "./rcc/*",
     ]
     result = subprocess.run(pylint_command, check=False)
 
