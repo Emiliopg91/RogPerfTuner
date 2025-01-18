@@ -2,6 +2,7 @@ import os
 import subprocess
 import sys
 import threading
+import time
 from watchdog.observers import Observer
 from watchdog.events import FileSystemEventHandler
 
@@ -14,6 +15,8 @@ def run_pylint():
         "python",
         "-m",
         "pylint",
+        "-j",
+        "0",
         f"--rcfile={os.path.join('.', '.pylintrc')}",
         "./main.py",
         "./lib/*",
