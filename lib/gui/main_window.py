@@ -109,7 +109,7 @@ class MainWindow(QMainWindow):
 
         # Botón de color
         self._color_button = QPushButton()
-        self._color_button.setFixedSize(50, 50)
+        self._color_button.setFixedSize(50, 30)
         self._color_button.setStyleSheet(
             f"background-color: {self._current_color if self._current_color is not None else "#00000000"};"
         )

@@ -91,6 +91,7 @@ def generate_appimage():
                 output_dir,
                 output,
             ],
+            env={**os.environ, "ARCH": "x86_64"},
             stdout=subprocess.DEVNULL,
             stderr=subprocess.PIPE,
             check=True,
@@ -105,15 +106,18 @@ def package_python():
     subprocess.run(
         [
             "pyinstaller",
-            "-D",
+            "--collect-submodules",
+            "PyQt5",
+            "--exclude-module",
+            "PyQt6",
+            "--exclude-module",
+            "PySide6",
             "--distpath",
             os.path.join(output_dir, "usr", "bin"),
             "--add-data",
             os.path.join(workspace_dir, "assets") + ":assets",
             os.path.join(workspace_dir, "main.py"),
         ],
-        stdout=subprocess.DEVNULL,
-        stderr=subprocess.PIPE,
         check=False,
     )
 
