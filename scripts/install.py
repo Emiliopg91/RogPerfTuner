@@ -15,8 +15,8 @@ pip_dependencies = [
     "psutil",
     "pyinstaller",
     "PyQt5",
+    "qasync",
     "setproctitle",
-    "vdf",
 ]
 
 

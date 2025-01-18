@@ -5,6 +5,7 @@ import os
 import subprocess
 import threading
 
+import concurrent
 from watchdog.events import FileSystemEventHandler
 from watchdog.observers import Observer
 
@@ -182,27 +183,43 @@ class PlatformService:
                     self._logger.info(f"Setting {policy_name.lower()} profile")
                     self._logger.add_tab()
 
-                    self._logger.info(f"Throttle policy: {policy_name}")
-                    platform_client.throttle_thermal_policy = policy
-                    self._thermal_throttle_profile = policy
+                    def set_throttle_policy():
+                        self._logger.info(f"Throttle policy: {policy_name}")
+                        platform_client.throttle_thermal_policy = policy
+                        self._thermal_throttle_profile = policy
 
-                    self._logger.info(f"Fan curve: {policy_name}")
-                    fan_curves_client.set_curves_to_defaults(policy)
-                    fan_curves_client.reset_profile_curves(policy)
-                    fan_curves_client.set_fan_curves_enabled(policy, True)
+                    def set_fan_curves():
+                        self._logger.info(f"Fan curve: {policy_name}")
+                        fan_curves_client.set_curves_to_defaults(policy)
+                        fan_curves_client.reset_profile_curves(policy)
+                        fan_curves_client.set_fan_curves_enabled(policy, True)
 
-                    self._logger.info(f"Power profile: {power_profile.name}")
-                    power_profile_client.active_profile = power_profile
+                    def set_power_profile():
+                        self._logger.info(f"Power profile: {power_profile.name}")
+                        power_profile_client.active_profile = power_profile
 
-                    if no_boost_reason is not None:
-                        self._logger.info(f"Boost: omitted due to {no_boost_reason}")
-                    elif self._boost_mode == Boost.AUTO:
-                        enabled = self.THROTTLE_BOOST_ASSOC[policy]
-                        if enabled:
-                            self._logger.info("Boost: ENABLED")
-                        else:
-                            self._logger.info("Boost: DISABLED")
-                        self._apply_boost(enabled)
+                    def handle_boost():
+                        if no_boost_reason is not None:
+                            self._logger.info(f"Boost: omitted due to {no_boost_reason}")
+                        elif self._boost_mode == Boost.AUTO:
+                            enabled = self.THROTTLE_BOOST_ASSOC[policy]
+                            if enabled:
+                                self._logger.info("Boost: ENABLED")
+                            else:
+                                self._logger.info("Boost: DISABLED")
+                            self._apply_boost(enabled)
+
+                    # Ejecutar las operaciones de forma concurrente
+                    with concurrent.futures.ThreadPoolExecutor() as executor:
+                        futures = [
+                            executor.submit(handle_boost),
+                            executor.submit(set_fan_curves),
+                            executor.submit(set_throttle_policy),
+                            executor.submit(set_power_profile),
+                        ]
+                        # Esperar a que todas las operaciones terminen
+                        concurrent.futures.wait(futures)
+
                     self._logger.rem_tab()
                     self._logger.info("Profile setted succesfully")
 

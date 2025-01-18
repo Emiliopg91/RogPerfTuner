@@ -69,6 +69,7 @@ class OpenRgbClient:
         )
         self.logger.add_tab()
         self._start_orgb_process()
+        self._find_compatible_devices()
         self._start_client()
         self._get_available_devices()
         self._client.set_color(RGBColor(0, 0, 0), True)
@@ -118,7 +119,6 @@ class OpenRgbClient:
         self._orgb_thread.start()
 
         self._wait_for_server()
-        self._compatible_devices = self._find_compatible_devices()
         self.logger.info("OpenRgb server ready")
         self.logger.rem_tab()
 
@@ -157,7 +157,7 @@ class OpenRgbClient:
                 time.sleep(0.1)
 
     def _find_compatible_devices(self):
-        self.logger.debug("Reading udev rules")
+        self.logger.info("Reading udev rules")
         compatible_devices = None
 
         if compatible_devices is None:
@@ -174,7 +174,7 @@ class OpenRgbClient:
                         results.append(UsbIdentifier(match.group(1), match.group(2)))
                 compatible_devices = results
 
-        return compatible_devices
+        self._compatible_devices = compatible_devices
 
     def get_available_effects(self) -> list[AbstractEffect]:
         """Get all effects"""

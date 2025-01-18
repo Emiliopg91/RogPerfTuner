@@ -2,6 +2,9 @@
 
 # pylint: disable=C0415, C0413, C0412, C0411, E0611
 
+import asyncio
+from qasync import QEventLoop
+
 import setproctitle
 from lib import __app_name__, __version__
 
@@ -21,7 +24,9 @@ def get_application_lock():
 def create_qt_application() -> QApplication:
     """Initialize QApplication"""
     q_app = QApplication(sys.argv)
-    return q_app
+    q_loop = QEventLoop(q_app)
+    asyncio.set_event_loop(q_loop)
+    return q_app, q_loop
 
 
 def initialize_application():
@@ -94,14 +99,15 @@ def initialize_application():
 def start_qt_application(application: QApplication):
     """Launch event loop"""
     application.setQuitOnLastWindowClosed(False)
-    sys.exit(application.exec_())
+    sys.exit(application.exec())
 
 
 if __name__ == "__main__":
     get_application_lock()
 
-    app = create_qt_application()
+    app, loop = create_qt_application()
 
     initialize_application()
 
-    start_qt_application(app)
+    with loop:
+        loop.run_forever()
