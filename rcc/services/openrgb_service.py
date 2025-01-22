@@ -7,8 +7,8 @@ import time
 
 import pyudev
 
-from rcc.clients.tcp.openrgb.openrgb_client import open_rgb_client
-from rcc.clients.tcp.openrgb.effects.static import static_effect
+from rcc.clients.openrgb.openrgb_client import open_rgb_client
+from rcc.clients.openrgb.effects.static import static_effect
 from rcc.models.rgb_brightness import RgbBrightness
 from rcc.models.settings import Effect
 from rcc.models.usb_identifier import UsbIdentifier
@@ -56,6 +56,16 @@ class OpenRgbService:
     def brightness(self) -> RgbBrightness:
         """Getter for brightness"""
         return self._brightness
+
+    @property
+    def effect(self) -> str:
+        """Getter for effect"""
+        return self._effect
+
+    @property
+    def color(self) -> str:
+        """Getter for color"""
+        return self._color
 
     def bounced_reload(self) -> None:
         """Reload OpenRGB Server"""

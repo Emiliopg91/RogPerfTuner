@@ -9,7 +9,7 @@ import psutil
 from openrgb.orgb import Device, Zone
 from openrgb.utils import RGBColor, ZoneType, DeviceType
 
-from rcc.clients.tcp.openrgb.effects.base.abstract_effect import AbstractEffect
+from rcc.clients.openrgb.effects.base.abstract_effect import AbstractEffect
 from rcc.utils.openrgb import OpenRGBUtils
 from rcc.utils.singleton import singleton
 
@@ -186,7 +186,7 @@ class DigitalRain(AbstractEffect):
                 final_colors = self._to_color_matrix(zone_status, len(dev.colors))
 
                 self._set_colors(dev, final_colors)
-                self._sleep(self._nap_time)
+                self._sleep(self._nap_time - 0.2 * (self._nap_time * (self._cpu)))
                 iter_count = (iter_count + 1) % 100
 
         def cpu_thread():

@@ -3,7 +3,7 @@ import threading
 
 # pylint: disable=E0611, E0401
 from openrgb.utils import RGBColor
-from rcc.clients.tcp.openrgb.effects.base.abstract_effect import AbstractEffect
+from rcc.clients.openrgb.effects.base.abstract_effect import AbstractEffect
 from rcc.utils.singleton import singleton
 
 
@@ -61,11 +61,8 @@ class Rain(AbstractEffect):
                         "color": self._available_colors[random.randint(0, len(self._available_colors) - 1)],
                     }
                 )
-            for i in range(len(dev.leds)):
-                swap = random.randint(0, len(self._buffer[dev_index]) - 1)
-                tmp = self._buffer[dev_index][i]
-                self._buffer[dev_index][i] = self._buffer[dev_index][swap]
-                self._buffer[dev_index][swap] = tmp
+
+            random.shuffle(self._buffer[dev_index])
 
         return self._buffer[dev_index].pop(0)
 

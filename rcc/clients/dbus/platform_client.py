@@ -4,7 +4,7 @@ from PyQt5.QtDBus import QDBusVariant, QDBusArgument
 
 from rcc.clients.dbus.base.abstract_dbus_client import AbstractDbusClient
 from rcc.models.battery_threshold import BatteryThreshold
-from rcc.models.thermal_throttle_profile import ThermalThrottleProfile
+from rcc.models.platform_profile import PlatformProfile
 from rcc.utils.singleton import singleton
 
 
@@ -13,7 +13,7 @@ class PlatformClient(AbstractDbusClient):
     """DBus platform client"""
 
     def __init__(self):
-        super().__init__(True, "org.asuslinux.Daemon", "/org/asuslinux", "org.asuslinux.Platform")
+        super().__init__(True, "xyz.ljones.Asusd", "/xyz/ljones", "xyz.ljones.Platform")
 
     @property
     def charge_control_end_threshold(self) -> BatteryThreshold:
@@ -24,19 +24,43 @@ class PlatformClient(AbstractDbusClient):
     def charge_control_end_threshold(self, val: BatteryThreshold) -> None:
         self._set_property(
             "ChargeControlEndThreshold",
-            QDBusVariant(QDBusArgument(val.value, QMetaType.UChar)),
+            QDBusVariant(QDBusArgument(val.value, QMetaType.Type.UChar)),
         )
 
     @property
-    def throttle_thermal_policy(self) -> ThermalThrottleProfile:
+    def platform_profile(self) -> PlatformProfile:
         """Thermal throttle policy"""
-        return ThermalThrottleProfile(self._get_property("ThrottleThermalPolicy"))
+        return PlatformProfile(self._get_property("PlatformProfile"))
 
-    @throttle_thermal_policy.setter
-    def throttle_thermal_policy(self, val: ThermalThrottleProfile) -> None:
+    @platform_profile.setter
+    def platform_profile(self, val: bool) -> None:
         self._set_property(
-            "ThrottleThermalPolicy",
-            QDBusVariant(QDBusArgument(val.value, QMetaType.UInt)),
+            "PlatformProfile",
+            QDBusVariant(QDBusArgument(val.value, QMetaType.Type.UInt)),
+        )
+
+    @property
+    def change_platform_profile_on_battery(self) -> bool:
+        """Change Platform Profile On Battery"""
+        return PlatformProfile(self._get_property("ChangePlatformProfileOnBattery"))
+
+    @change_platform_profile_on_battery.setter
+    def change_platform_profile_on_battery(self, val: bool) -> None:
+        self._set_property(
+            "ChangePlatformProfileOnBattery",
+            QDBusVariant(QDBusArgument(val, QMetaType.Type.Bool)),
+        )
+
+    @property
+    def change_platform_profile_on_ac(self) -> bool:
+        """Change Platform Profile On AC"""
+        return PlatformProfile(self._get_property("ChangePlatformProfileOnAc"))
+
+    @change_platform_profile_on_ac.setter
+    def change_platform_profile_on_ac(self, val: bool) -> None:
+        self._set_property(
+            "ChangePlatformProfileOnAc",
+            QDBusVariant(QDBusArgument(val, QMetaType.Type.Bool)),
         )
 
 

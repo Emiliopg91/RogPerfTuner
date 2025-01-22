@@ -17,7 +17,7 @@ from rcc.gui.game_list import GameList
 from rcc.models.battery_threshold import BatteryThreshold
 from rcc.models.boost import Boost
 from rcc.models.rgb_brightness import RgbBrightness
-from rcc.models.thermal_throttle_profile import ThermalThrottleProfile
+from rcc.models.platform_profile import PlatformProfile
 from rcc.services.openrgb_service import open_rgb_service
 from rcc.services.platform_service import platform_service
 from rcc.utils.constants import icons_path
@@ -66,7 +66,7 @@ class MainWindow(QMainWindow):
 
         # Label y Dropdown para "Perfil"
         self._profile_dropdown = QComboBox()
-        for item in ThermalThrottleProfile:
+        for item in PlatformProfile:
             self._profile_dropdown.addItem(translator.translate(f"label.profile.{item.name}"), item)
         self._profile_dropdown.currentIndexChanged.connect(self.on_profile_changed)
         self.set_thermal_throttle_policy(platform_service.get_thermal_throttle_profile())
@@ -77,7 +77,7 @@ class MainWindow(QMainWindow):
         for item in Boost:
             self._boost_dropdown.addItem(translator.translate(f"label.boost.{item.name}"), item)
         self._boost_dropdown.currentIndexChanged.connect(self.on_boost_changed)
-        self.set_boost_mode(platform_service.get_boost_mode())
+        self.set_boost_mode(platform_service.boost_mode)
         performance_layout.addRow(QLabel(f"{translator.translate('boost')}:"), self._boost_dropdown)
 
         performance_group.setLayout(performance_layout)
@@ -135,7 +135,7 @@ class MainWindow(QMainWindow):
         for item in BatteryThreshold:
             self._threshold_dropdown.addItem(f"{item.value}%", item)
         self._threshold_dropdown.currentIndexChanged.connect(self.on_battery_limit_changed)
-        self.set_battery_charge_limit(platform_service.get_battery_charge_limit())
+        self.set_battery_charge_limit(platform_service.battery_charge_limit)
         settings_layout.addRow(
             QLabel(
                 f"{translator.translate("charge.threshold")}:",
@@ -176,7 +176,7 @@ class MainWindow(QMainWindow):
             self._color_button.setStyleSheet(f"background-color: {self._current_color};")
             self.on_color_change()
 
-    def set_thermal_throttle_policy(self, value: ThermalThrottleProfile):
+    def set_thermal_throttle_policy(self, value: PlatformProfile):
         """Set profile policy"""
         self._profile_dropdown.setCurrentIndex(self._profile_dropdown.findData(value))
 
@@ -202,28 +202,38 @@ class MainWindow(QMainWindow):
 
     def on_profile_changed(self, index):
         """Handler for profile change"""
-        platform_service.set_thermal_throttle_policy(self._profile_dropdown.itemData(index))
+        profile = self._profile_dropdown.itemData(index)
+        if platform_service.thermal_throttle_profile != profile:
+            platform_service.set_thermal_throttle_policy(profile)
 
     def on_boost_changed(self, index):
         """Handler for boost change"""
-        platform_service.set_boost_mode(self._boost_dropdown.itemData(index))
+        mode = self._boost_dropdown.itemData(index)
+        if platform_service.boost_mode != mode:
+            platform_service.set_boost_mode(mode)
 
     def on_battery_limit_changed(self, index):
         """Handler for battery limit change"""
-        platform_service.set_battery_threshold(self._threshold_dropdown.itemData(index))
+        threshold = self._threshold_dropdown.itemData(index)
+        if platform_service.battery_charge_limit != threshold:
+            platform_service.set_battery_threshold(threshold)
 
     def on_effect_change(self):
         """Handler for effect change"""
         effect = self._effect_labels[self._effect_dropdown.currentIndex()]
-        open_rgb_service.apply_effect(effect)
+        if open_rgb_service.effect != effect:
+            open_rgb_service.apply_effect(effect)
 
     def on_brightness_change(self, index):
         """Handler for brightness change"""
-        open_rgb_service.apply_brightness(self._brightness_dropdown.itemData(index))
+        level = self._brightness_dropdown.itemData(index)
+        if open_rgb_service.brightness != level:
+            open_rgb_service.apply_brightness(level)
 
     def on_color_change(self):
         """Handler for color change"""
-        open_rgb_service.apply_color(self._current_color)
+        if open_rgb_service.color != self._current_color:
+            open_rgb_service.apply_color(self._current_color)
 
     def open_game_list(self):
         """Open game list window"""

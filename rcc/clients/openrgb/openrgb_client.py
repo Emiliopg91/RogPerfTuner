@@ -17,15 +17,15 @@ from rcc.utils.constants import orgb_path, udev_path
 from rcc.utils.event_bus import event_bus
 from rcc.utils.logger import Logger
 from rcc.utils.singleton import singleton
-from rcc.clients.tcp.openrgb.effects.base.abstract_effect import AbstractEffect
-from rcc.clients.tcp.openrgb.effects.breathing import breathing_effect
-from rcc.clients.tcp.openrgb.effects.dance_floor import dance_floor
-from rcc.clients.tcp.openrgb.effects.digital_rain import digital_rain
-from rcc.clients.tcp.openrgb.effects.rain import rain
-from rcc.clients.tcp.openrgb.effects.rainbow_wave import rainbow_wave
-from rcc.clients.tcp.openrgb.effects.spectrum_cycle import spectrum_cycle
-from rcc.clients.tcp.openrgb.effects.starry_night import starry_night
-from rcc.clients.tcp.openrgb.effects.static import static_effect
+from rcc.clients.openrgb.effects.base.abstract_effect import AbstractEffect
+from rcc.clients.openrgb.effects.breathing import breathing_effect
+from rcc.clients.openrgb.effects.dance_floor import dance_floor
+from rcc.clients.openrgb.effects.digital_rain import digital_rain
+from rcc.clients.openrgb.effects.rain import rain
+from rcc.clients.openrgb.effects.rainbow_wave import rainbow_wave
+from rcc.clients.openrgb.effects.spectrum_cycle import spectrum_cycle
+from rcc.clients.openrgb.effects.starry_night import starry_night
+from rcc.clients.openrgb.effects.static import static_effect
 
 
 @singleton
@@ -61,7 +61,7 @@ class OpenRgbClient:
         """Initialize server and client"""
         self.logger.info("Initializing OpenRgbClient")
         subprocess.run(
-            ["asusctl", "led-mode", "static", "-c", "000000"],
+            ["asusctl", "aura", "static", "-c", "000000"],
             check=True,
             stdout=subprocess.PIPE,
             stderr=subprocess.PIPE,

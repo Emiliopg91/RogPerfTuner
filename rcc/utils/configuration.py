@@ -4,14 +4,14 @@ import yaml
 
 from rcc.models.settings import (
     Config,
-    Game,
+    GameEntry,
     Settings,
     Platform,
     PlatformProfiles,
     OpenRgb,
 )
 from rcc.models.boost import Boost
-from rcc.models.thermal_throttle_profile import ThermalThrottleProfile
+from rcc.models.platform_profile import PlatformProfile
 from rcc.utils.singleton import singleton
 from rcc.utils.constants import config_file, config_folder
 
@@ -54,9 +54,7 @@ class Configuration:
                 logger={},
                 games={},
                 settings=Settings(None),
-                platform=Platform(
-                    profiles=PlatformProfiles(ThermalThrottleProfile.PERFORMANCE.value, Boost.AUTO.value)
-                ),
+                platform=Platform(profiles=PlatformProfiles(PlatformProfile.PERFORMANCE.value, Boost.AUTO.value)),
                 open_rgb=OpenRgb(last_effect="Static", effects={}),
             )
             self.save_config()
@@ -82,7 +80,7 @@ class Configuration:
         return self._config.platform
 
     @property
-    def games(self) -> dict[str, Game]:
+    def games(self) -> dict[int, GameEntry]:
         """Getter for games"""
         return self._config.games
 

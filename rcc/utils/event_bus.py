@@ -1,3 +1,4 @@
+from concurrent.futures import ThreadPoolExecutor
 from typing import Any, Callable
 
 from rcc.utils.logger import Logger
@@ -11,6 +12,7 @@ class EventBus:
     def __init__(self):
         self.__logger = Logger()
         self._callbacks: dict[str, list[Callable[..., None]]] = {}
+        self.__executor = ThreadPoolExecutor(max_workers=4, thread_name_prefix="EventBus")
 
     def on(self, event: str, callback: Callable[..., None]) -> None:
         """Define listener for event"""
@@ -24,14 +26,18 @@ class EventBus:
     def emit(self, event: str, *args: Any) -> None:
         """Emit event"""
         self.__logger.debug(f"Emitting event {event} with args ({str(tuple(args))[1:-2]})")
-        try:
+        count = 0
+        if event in self._callbacks:
             for i in range(len(self._callbacks[event])):
-                try:
-                    self._callbacks[event][i](*args)
-                except Exception as e:
-                    self.__logger.error(f"Error on callback: {e}")
-        except KeyError:
-            """"""
+                count += 1
+                self.__executor.submit(self._safe_invoke, self._callbacks[event][i], *args)
+        self.__logger.debug(f"Invoked {count} callbacks")
+
+    def _safe_invoke(self, callback: Callable[..., None], *args: Any) -> None:
+        try:
+            callback(*args)
+        except Exception as e:
+            self.__logger.error(f"Error executing callback {callback}: {e}")
 
 
 event_bus = EventBus()

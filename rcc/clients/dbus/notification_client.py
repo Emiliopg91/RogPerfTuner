@@ -22,11 +22,11 @@ class NotificationClient(AbstractDbusClient):
         return self._invoke_method(
             "Notify",
             app_name,
-            QDBusArgument(0, QMetaType.UInt),
+            QDBusArgument(0, QMetaType.Type.UInt),
             app_icon,
             title,
             body,
-            QDBusArgument([], QMetaType.QStringList),
+            QDBusArgument([], QMetaType.Type.QStringList),
             {},
             timeout,
         )
@@ -35,7 +35,7 @@ class NotificationClient(AbstractDbusClient):
         """Close notification"""
         return self._invoke_method(
             "CloseNotification",
-            QDBusArgument(notif_id, QMetaType.UInt),
+            QDBusArgument(notif_id, QMetaType.Type.UInt),
         )
 
 

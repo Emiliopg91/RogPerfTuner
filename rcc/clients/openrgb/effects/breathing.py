@@ -1,6 +1,6 @@
 import math
 
-from rcc.clients.tcp.openrgb.effects.base.abstract_effect import AbstractEffect
+from rcc.clients.openrgb.effects.base.abstract_effect import AbstractEffect
 from rcc.utils.singleton import singleton
 from rcc.utils.openrgb import OpenRGBUtils
 

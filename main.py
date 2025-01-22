@@ -82,6 +82,11 @@ def initialize_application():
 
     tray_icon.show()
 
+    from rcc.services.platform_service import platform_service
+
+    if len(games_service.running_games) == 0:
+        platform_service.restore_profile()
+
     """Start dbus server"""
     from rcc.server.dbus_server import dbus_server
 

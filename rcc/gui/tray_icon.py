@@ -11,13 +11,13 @@ from rcc.gui.main_window import main_window
 
 from rcc import __app_name__, __version__
 from rcc.models.boost import Boost
-from rcc.models.thermal_throttle_profile import ThermalThrottleProfile
+from rcc.models.platform_profile import PlatformProfile
 from rcc.models.rgb_brightness import RgbBrightness
 from rcc.models.battery_threshold import BatteryThreshold
 from rcc.services.games_service import games_service
 from rcc.services.openrgb_service import open_rgb_service
 from rcc.services.platform_service import platform_service
-from rcc.utils.constants import icons_path, log_file, dev_mode
+from rcc.utils.constants import icons_path, dev_mode, log_file
 from rcc.utils.event_bus import event_bus
 from rcc.utils.logger import Logger
 from rcc.utils.singleton import singleton
@@ -121,8 +121,8 @@ class TrayIcon:  # pylint: disable=R0902
         self._profile_menu = QMenu("    " + translator.translate("profile"))
         self._boost_group = QActionGroup(self._profile_menu)
         self._boost_group.setExclusive(True)
-        self._performance_actions: dict[ThermalThrottleProfile, QAction] = {}
-        for profile in ThermalThrottleProfile:
+        self._performance_actions: dict[PlatformProfile, QAction] = {}
+        for profile in PlatformProfile:
             action = QAction(translator.translate(f"label.profile.{profile.name}"), checkable=True)
             action.setActionGroup(self._boost_group)
             action.setChecked(profile == platform_service._thermal_throttle_profile)
@@ -139,7 +139,7 @@ class TrayIcon:  # pylint: disable=R0902
         for mode in Boost:
             action = QAction(translator.translate(f"label.boost.{mode.name}"), checkable=True)
             action.setActionGroup(self._boost_group)
-            action.setChecked(mode == platform_service.get_boost_mode())
+            action.setChecked(mode == platform_service.boost_mode)
             action.triggered.connect(lambda _, m=mode: self.on_boost_selected(m))
             self._boost_actions[mode] = action
             self._boost_menu.addAction(action)
@@ -206,7 +206,7 @@ class TrayIcon:  # pylint: disable=R0902
         """Set boost mode"""
         self._boost_actions[value].setChecked(True)
 
-    def set_thermal_throttle_policy(self, value: ThermalThrottleProfile):
+    def set_thermal_throttle_policy(self, value: PlatformProfile):
         """Set performance profile"""
         self._logger.debug("Refreshing throttle policy in UI")
         self._performance_actions[value].setChecked(True)
@@ -229,23 +229,28 @@ class TrayIcon:  # pylint: disable=R0902
 
     def on_threshold_selected(self, threshold: BatteryThreshold):
         """Battery limit event handler"""
-        platform_service.set_battery_threshold(threshold)
+        if platform_service.battery_charge_limit != threshold:
+            platform_service.set_battery_threshold(threshold)
 
     def on_effect_selected(self, effect: str):
         """Effect event handler"""
-        open_rgb_service.apply_effect(effect)
+        if open_rgb_service.effect != effect:
+            open_rgb_service.apply_effect(effect)
 
     def on_brightness_selected(self, brightness: RgbBrightness):
         """Brightness event handler"""
-        open_rgb_service.apply_brightness(brightness)
+        if open_rgb_service.brightness != brightness:
+            open_rgb_service.apply_brightness(brightness)
 
-    def on_profile_selected(self, profile: ThermalThrottleProfile):
+    def on_profile_selected(self, profile: PlatformProfile):
         """Profile event handler"""
-        platform_service.set_thermal_throttle_policy(profile)
+        if platform_service.thermal_throttle_profile != profile:
+            platform_service.set_thermal_throttle_policy(profile)
 
     def on_boost_selected(self, boost: Boost):
         """Boost event handler"""
-        platform_service.set_boost_mode(boost)
+        if platform_service.boost_mode != boost:
+            platform_service.set_boost_mode(boost)
 
     def pick_color(self):
         """Open color picker"""

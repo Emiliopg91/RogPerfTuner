@@ -5,14 +5,6 @@ from dataclasses_json import dataclass_json
 
 @dataclass_json
 @dataclass
-class Game:
-    """Game configuration"""
-
-    profile: int
-
-
-@dataclass_json
-@dataclass
 class Effect:
     """Configuration helper class"""
 
@@ -56,6 +48,15 @@ class Settings:
 
 @dataclass_json
 @dataclass
+class GameEntry:
+    """Game configuration"""
+
+    name: str
+    profile: int
+
+
+@dataclass_json
+@dataclass
 class Config:
     """Configuration helper class"""
 
@@ -63,4 +64,4 @@ class Config:
     settings: Settings
     platform: Platform
     open_rgb: OpenRgb
-    games: dict[str, Game]
+    games: dict[int, GameEntry]

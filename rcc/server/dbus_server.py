@@ -5,7 +5,7 @@ import sys
 from PyQt5.QtCore import QObject, pyqtSlot, Q_CLASSINFO
 from PyQt5.QtDBus import QDBusConnection, QDBusAbstractAdaptor
 
-from rcc.models.thermal_throttle_profile import get_next_thermal_throttle_profile
+from rcc.models.platform_profile import get_next_thermal_throttle_profile
 from rcc.models.rgb_brightness import get_next_brightness, get_previous_brightness
 from rcc.services.games_service import games_service
 from rcc.services.openrgb_service import open_rgb_service

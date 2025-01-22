@@ -17,11 +17,11 @@ from rcc.gui.notifier import notifier
 from rcc.models.battery_threshold import BatteryThreshold
 from rcc.models.boost import Boost
 from rcc.models.power_profile import PowerProfile
-from rcc.models.thermal_throttle_profile import ThermalThrottleProfile
+from rcc.models.platform_profile import PlatformProfile
 from rcc.utils.configuration import configuration
 from rcc.utils.cryptography import cryptography
 from rcc.utils.event_bus import event_bus
-from rcc.utils.logger import Logger
+from rcc.utils.logger import Logger, logged_method
 from rcc.utils.singleton import singleton
 from rcc.utils.translator import translator
 
@@ -46,16 +46,16 @@ class BoostControlHandler(FileSystemEventHandler):
 class PlatformService:
     """Service for platform setting"""
 
-    THROTTLE_POWER_ASSOC: dict[ThermalThrottleProfile, PowerProfile] = {
-        ThermalThrottleProfile.QUIET: PowerProfile.POWER_SAVER,
-        ThermalThrottleProfile.BALANCED: PowerProfile.BALANCED,
-        ThermalThrottleProfile.PERFORMANCE: PowerProfile.PERFORMANCE,
+    THROTTLE_POWER_ASSOC: dict[PlatformProfile, PowerProfile] = {
+        PlatformProfile.QUIET: PowerProfile.POWER_SAVER,
+        PlatformProfile.BALANCED: PowerProfile.BALANCED,
+        PlatformProfile.PERFORMANCE: PowerProfile.PERFORMANCE,
     }
 
-    THROTTLE_BOOST_ASSOC: dict[ThermalThrottleProfile, bool] = {
-        ThermalThrottleProfile.QUIET: False,
-        ThermalThrottleProfile.BALANCED: False,
-        ThermalThrottleProfile.PERFORMANCE: True,
+    THROTTLE_BOOST_ASSOC: dict[PlatformProfile, bool] = {
+        PlatformProfile.QUIET: False,
+        PlatformProfile.BALANCED: False,
+        PlatformProfile.PERFORMANCE: True,
     }
 
     BOOST_CONTROLS: List[Dict[str, str]] = [
@@ -73,13 +73,15 @@ class PlatformService:
 
     def __init__(self):
         self._logger = Logger()
+        self._logger.info("Initializing PlatformService")
+        self._logger.add_tab()
         self._lock = Lock()
 
         self._boost_control: Optional[Dict[str, str]] = None
         self._last_boost: Optional[bool] = None
         self._observer = Observer()
 
-        self._thermal_throttle_profile = platform_client.throttle_thermal_policy
+        self._thermal_throttle_profile = platform_client.platform_profile
         self._battery_charge_limit = platform_client.charge_control_end_threshold
 
         for control in self.BOOST_CONTROLS:
@@ -109,11 +111,14 @@ class PlatformService:
             configuration.platform.profiles.boost = Boost.OFF
             configuration.save_config()
 
-        self.restore_profile()
+        platform_client.change_platform_profile_on_ac = False
+        platform_client.change_platform_profile_on_battery = False
 
         platform_client.on_property_change("ThrottleThermalPolicy", self._set_thermal_throttle_profile_async)
         platform_client.on_property_change("ChargeControlEndThreshold", self._set_battery_threshold)
         upower_client.on_property_change("OnBattery", self._on_ac_battery_change)
+
+        self._logger.rem_tab()
 
     @property
     def thermal_throttle_profile(self):
@@ -123,15 +128,17 @@ class PlatformService:
     def _update_boost_status(self, is_on: bool):
         self._last_boost = is_on
 
-    def get_thermal_throttle_profile(self) -> ThermalThrottleProfile:
+    def get_thermal_throttle_profile(self) -> PlatformProfile:
         """Get current profile"""
         return self._thermal_throttle_profile
 
-    def get_boost_mode(self) -> Boost:
+    @property
+    def boost_mode(self) -> Boost:
         """Get current boost mode"""
         return self._boost_mode
 
-    def get_battery_charge_limit(self) -> BatteryThreshold:
+    @property
+    def battery_charge_limit(self) -> BatteryThreshold:
         """Get current battery charge limit"""
         return self._battery_charge_limit
 
@@ -148,7 +155,7 @@ class PlatformService:
 
     def _set_thermal_throttle_profile(self, value):
         with self._lock:
-            self._thermal_throttle_profile = ThermalThrottleProfile(value)
+            self._thermal_throttle_profile = PlatformProfile(value)
             event_bus.emit(
                 "PlatformService.thermal_throttle_profile",
                 self._thermal_throttle_profile,
@@ -158,16 +165,20 @@ class PlatformService:
         self._thermal_throttle_profile = PowerProfile(value)
 
     def _on_ac_battery_change(self, on_battery):
-        """
-        policy = ThermalThrottleProfile.PERFORMANCE
+        policy = PlatformProfile.PERFORMANCE
         if on_battery:
-            policy = ThermalThrottleProfile.QUIET
+            policy = PlatformProfile.QUIET
 
+        self._logger.info(
+            f"AC cord {"dis" if on_battery else ""}connected, battery {"dis" if not on_battery else ""}engaged"
+        )
+        self._logger.add_tab()
         self.set_thermal_throttle_policy(policy, True)
-        """
+        self._logger.rem_tab()
 
+    @logged_method
     def set_thermal_throttle_policy(
-        self, policy: ThermalThrottleProfile, temporal=False, game_name: str = None, force=False
+        self, policy: PlatformProfile, temporal=False, game_name: str = None, force=False
     ) -> None:
         """Establish thermal throttle policy"""
         with self._lock:
@@ -176,45 +187,49 @@ class PlatformService:
 
             if self._thermal_throttle_profile != policy or force:
                 try:
-                    no_boost_reason = None
-                    if self._boost_control is None:
-                        no_boost_reason = "unsupported"
-
-                    self._logger.info(f"Setting {policy_name.lower()} profile")
+                    self._logger.info(
+                        f"Setting profile '{policy_name.lower()}' {f"for game {game_name}" if game_name is not None else ""}"
+                    )
                     self._logger.add_tab()
 
                     def set_throttle_policy():
-                        self._logger.info(f"Throttle policy: {policy_name}")
-                        platform_client.throttle_thermal_policy = policy
+                        self._logger.debug(f"Throttle policy: {policy_name}")
+                        platform_client.platform_profile = policy
                         self._thermal_throttle_profile = policy
 
                     def set_fan_curves():
-                        self._logger.info(f"Fan curve: {policy_name}")
+                        self._logger.debug(f"Fan curve: {policy_name}")
                         fan_curves_client.set_curves_to_defaults(policy)
                         fan_curves_client.reset_profile_curves(policy)
                         fan_curves_client.set_fan_curves_enabled(policy, True)
 
                     def set_power_profile():
-                        self._logger.info(f"Power profile: {power_profile.name}")
+                        self._logger.debug(f"Power profile: {power_profile.name}")
                         power_profile_client.active_profile = power_profile
 
                     def handle_boost():
+                        no_boost_reason = None
+                        if self._boost_control is None:
+                            no_boost_reason = "unsupported CPU"
+                        elif self._boost_mode != Boost.AUTO:
+                            no_boost_reason = f"{self._boost_mode.name} mode"
+
                         if no_boost_reason is not None:
-                            self._logger.info(f"Boost: omitted due to {no_boost_reason}")
+                            self._logger.debug(f"Boost: omitted due to {no_boost_reason}")
                         elif self._boost_mode == Boost.AUTO:
                             enabled = self.THROTTLE_BOOST_ASSOC[policy]
                             if enabled:
-                                self._logger.info("Boost: ENABLED")
+                                self._logger.debug("Boost: ENABLED")
                             else:
-                                self._logger.info("Boost: DISABLED")
+                                self._logger.debug("Boost: DISABLED")
                             self._apply_boost(enabled)
 
                     # Ejecutar las operaciones de forma concurrente
                     with concurrent.futures.ThreadPoolExecutor() as executor:
                         futures = [
                             executor.submit(handle_boost),
-                            executor.submit(set_fan_curves),
                             executor.submit(set_throttle_policy),
+                            executor.submit(set_fan_curves),
                             executor.submit(set_power_profile),
                         ]
                         # Esperar a que todas las operaciones terminen
@@ -286,9 +301,7 @@ class PlatformService:
 
     def restore_profile(self):
         """Restore persited profile"""
-        self.set_thermal_throttle_policy(
-            ThermalThrottleProfile(configuration.platform.profiles.profile), True, None, True
-        )
+        self.set_thermal_throttle_policy(PlatformProfile(configuration.platform.profiles.profile), True, None, True)
 
 
 platform_service = PlatformService()

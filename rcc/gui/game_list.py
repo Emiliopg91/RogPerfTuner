@@ -15,7 +15,7 @@ from PyQt5.QtCore import Qt
 from PyQt5.QtGui import QWheelEvent, QIcon
 
 from rcc.utils.constants import icons_path
-from rcc.models.thermal_throttle_profile import ThermalThrottleProfile
+from rcc.models.platform_profile import PlatformProfile
 from rcc.services.games_service import games_service
 from rcc.utils.translator import translator
 
@@ -85,11 +85,11 @@ class GameList(QDialog):
 
             # Segunda columna: dropdown
             combo = NoScrollComboBox()  # Usar la subclase personalizada
-            for profile in ThermalThrottleProfile:
+            for profile in PlatformProfile:
                 combo.addItem(translator.translate(f"label.profile.{profile.name}"), profile)
 
             default_index = combo.findData(
-                ThermalThrottleProfile(game_cfg[game].profile)
+                PlatformProfile(game_cfg[game].profile)
             )  # Buscar el índice basado en el dato asociado
             if default_index != -1:
                 combo.setCurrentIndex(default_index)
