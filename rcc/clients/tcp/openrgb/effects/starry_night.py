@@ -2,11 +2,10 @@ import random
 import threading
 
 # pylint: disable=E0611, E0401
-from openrgb.utils import RGBColor
+from rcc.clients.tcp.openrgb.client.utils import RGBColor
 
-from rcc.clients.openrgb.effects.base.abstract_effect import AbstractEffect
+from rcc.clients.tcp.openrgb.effects.base.abstract_effect import AbstractEffect
 from rcc.utils.singleton import singleton
-from rcc.utils.openrgb import OpenRGBUtils
 
 
 @singleton
@@ -20,7 +19,7 @@ class StarryNight(AbstractEffect):
 
     def _get_random(self):
         hue = random.randint(0, 359)
-        return OpenRGBUtils.from_hsv(hue, 1, 2)
+        return RGBColor.fromHSV(hue, 100, 100)
 
     def apply_effect(self):
         self._threads = []
@@ -46,7 +45,7 @@ class StarryNight(AbstractEffect):
 
             for i in range(len(leds)):  # pylint: disable=C0200
                 steps[i] = max(0, steps[i] - 1)
-                new_colors[i] = OpenRGBUtils.dim(leds[i], steps[i] / self._max_steps)
+                new_colors[i] = leds[i].dim(steps[i] / self._max_steps)
 
             can_turn_on = sum(1 for i in steps if i > 0) / len(steps) < 0.2
 
@@ -55,9 +54,7 @@ class StarryNight(AbstractEffect):
                 while led_on < 0 or steps[led_on] > 0:
                     led_on = random.randint(0, len(leds) - 1)
                 steps[led_on] = 20 + random.randint(0, 10)
-                new_colors[led_on] = leds[led_on] = OpenRGBUtils.dim(
-                    self._get_random(), steps[led_on] / self._max_steps
-                )
+                new_colors[led_on] = leds[led_on] = self._get_random().dim(steps[led_on] / self._max_steps)
 
             self._set_colors(device, new_colors)
             self._sleep(random.randint(0, 150) / 1000)

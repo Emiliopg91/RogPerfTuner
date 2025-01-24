@@ -1,8 +1,7 @@
 import math
 
-from rcc.clients.openrgb.effects.base.abstract_effect import AbstractEffect
+from rcc.clients.tcp.openrgb.effects.base.abstract_effect import AbstractEffect
 from rcc.utils.singleton import singleton
-from rcc.utils.openrgb import OpenRGBUtils
 
 
 @singleton
@@ -20,7 +19,7 @@ class BreathingEffect(AbstractEffect):
     def apply_effect(self):
         offset = 0
         while self._is_running:
-            new_color = OpenRGBUtils.dim(self._color, self._sin_steps[offset])
+            new_color = self._color.dim(self._sin_steps[offset])
 
             for dev in self._devices:
                 self._set_colors(dev, [new_color] * len(dev.colors))

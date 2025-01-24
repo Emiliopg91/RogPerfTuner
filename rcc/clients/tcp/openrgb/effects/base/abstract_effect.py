@@ -5,12 +5,11 @@ from threading import Lock, Thread
 from typing import List, Optional
 
 # pylint: disable=E0611, E0401
-from openrgb.orgb import Device
-from openrgb.utils import RGBColor
+from rcc.clients.tcp.openrgb.client.orgb import Device
+from rcc.clients.tcp.openrgb.client.utils import RGBColor
 
 from rcc.models.rgb_brightness import RgbBrightness
 from rcc.utils.logger import Logger
-from rcc.utils.openrgb import OpenRGBUtils
 
 
 class AbstractEffect(ABC):
@@ -45,7 +44,7 @@ class AbstractEffect(ABC):
         self._devices = devices
         self._logger.info(
             f"Starting effect with {brightness.name.lower()} brightness"
-            f"{' and ' + OpenRGBUtils.to_hex(color) + ' color' if self._supports_color else ''}"
+            f"{' and ' + color.to_hex() + ' color' if self._supports_color else ''}"
         )
 
         # Map brightness levels
@@ -79,7 +78,7 @@ class AbstractEffect(ABC):
         if self._is_running:
             with self._mutex:
                 if self._is_running:
-                    dimmed_colors = [OpenRGBUtils.dim(color, self._brightness) for color in colors]
+                    dimmed_colors = [color.dim(self._brightness) for color in colors]
                     dev.set_colors(dimmed_colors, True)
 
     @property
@@ -95,7 +94,7 @@ class AbstractEffect(ABC):
     @property
     def color(self) -> Optional[str]:
         """Get hex color or none"""
-        return OpenRGBUtils.to_hex(self._color) if self._supports_color else None
+        return self._color.to_hex() if self._supports_color else None
 
     def _thread_main(self):
         self.apply_effect()

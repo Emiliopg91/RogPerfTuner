@@ -6,11 +6,10 @@ import random
 import threading
 
 import psutil
-from openrgb.orgb import Device, Zone
-from openrgb.utils import RGBColor, ZoneType, DeviceType
+from rcc.clients.tcp.openrgb.client.orgb import Device, Zone
+from rcc.clients.tcp.openrgb.client.utils import RGBColor, ZoneType, DeviceType
 
-from rcc.clients.openrgb.effects.base.abstract_effect import AbstractEffect
-from rcc.utils.openrgb import OpenRGBUtils
+from rcc.clients.tcp.openrgb.effects.base.abstract_effect import AbstractEffect
 from rcc.utils.singleton import singleton
 
 
@@ -67,8 +66,8 @@ class DigitalRain(AbstractEffect):
                         if led.cur_val == led.max_val:
                             colors[led.pos_idx] = RGBColor(255, 255, 255)
                         else:
-                            colors[led.pos_idx] = OpenRGBUtils.dim(
-                                self._color, self.sin_array[round(led.cur_val * (led.max_val / self._max_count))]
+                            colors[led.pos_idx] = self._color.dim(
+                                self.sin_array[round(led.cur_val * (led.max_val / self._max_count))]
                             )
                     else:
                         colors[led.pos_idx] = RGBColor(0, 0, 0)

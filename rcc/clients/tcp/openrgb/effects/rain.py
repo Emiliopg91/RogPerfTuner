@@ -2,8 +2,8 @@ import random
 import threading
 
 # pylint: disable=E0611, E0401
-from openrgb.utils import RGBColor
-from rcc.clients.openrgb.effects.base.abstract_effect import AbstractEffect
+from rcc.clients.tcp.openrgb.client.utils import RGBColor
+from rcc.clients.tcp.openrgb.effects.base.abstract_effect import AbstractEffect
 from rcc.utils.singleton import singleton
 
 

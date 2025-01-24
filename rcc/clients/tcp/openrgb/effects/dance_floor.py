@@ -1,8 +1,8 @@
 import random
 
-from rcc.clients.openrgb.effects.base.abstract_effect import AbstractEffect
+from rcc.clients.tcp.openrgb.client.utils import RGBColor
+from rcc.clients.tcp.openrgb.effects.base.abstract_effect import AbstractEffect
 from rcc.utils.singleton import singleton
-from rcc.utils.openrgb import OpenRGBUtils
 
 
 @singleton
@@ -15,7 +15,7 @@ class DanceFloor(AbstractEffect):
     def _get_random(self, length):
         randoms = []
         for _ in range(length):
-            randoms.append(OpenRGBUtils.from_hsv(random.randint(0, 359), random.randint(0, 25) / 100 + 0.75, 1))
+            randoms.append(RGBColor.fromHSV(random.randint(0, 359), random.randint(0, 25) + 75, 100))
         return randoms
 
     def apply_effect(self):

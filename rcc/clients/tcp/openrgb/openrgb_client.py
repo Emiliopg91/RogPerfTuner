@@ -7,9 +7,8 @@ import threading
 import time
 
 # pylint:disable=E0611, E0401
-from openrgb import OpenRGBClient
-from openrgb.orgb import Device
-from openrgb.utils import RGBColor
+from rcc.clients.tcp.openrgb.client.orgb import Device, OpenRGBClient
+from rcc.clients.tcp.openrgb.client.utils import RGBColor
 
 from rcc.models.rgb_brightness import RgbBrightness
 from rcc.models.usb_identifier import UsbIdentifier
@@ -17,15 +16,15 @@ from rcc.utils.constants import orgb_path, udev_path
 from rcc.utils.event_bus import event_bus
 from rcc.utils.logger import Logger
 from rcc.utils.singleton import singleton
-from rcc.clients.openrgb.effects.base.abstract_effect import AbstractEffect
-from rcc.clients.openrgb.effects.breathing import breathing_effect
-from rcc.clients.openrgb.effects.dance_floor import dance_floor
-from rcc.clients.openrgb.effects.digital_rain import digital_rain
-from rcc.clients.openrgb.effects.rain import rain
-from rcc.clients.openrgb.effects.rainbow_wave import rainbow_wave
-from rcc.clients.openrgb.effects.spectrum_cycle import spectrum_cycle
-from rcc.clients.openrgb.effects.starry_night import starry_night
-from rcc.clients.openrgb.effects.static import static_effect
+from rcc.clients.tcp.openrgb.effects.base.abstract_effect import AbstractEffect
+from rcc.clients.tcp.openrgb.effects.breathing import breathing_effect
+from rcc.clients.tcp.openrgb.effects.dance_floor import dance_floor
+from rcc.clients.tcp.openrgb.effects.digital_rain import digital_rain
+from rcc.clients.tcp.openrgb.effects.rain import rain
+from rcc.clients.tcp.openrgb.effects.rainbow_wave import rainbow_wave
+from rcc.clients.tcp.openrgb.effects.spectrum_cycle import spectrum_cycle
+from rcc.clients.tcp.openrgb.effects.starry_night import starry_night
+from rcc.clients.tcp.openrgb.effects.static import static_effect
 
 
 @singleton
@@ -115,7 +114,7 @@ class OpenRgbClient:
             s.bind(("", 0))
             self._port = s.getsockname()[1]
 
-        self._orgb_thread = threading.Thread(name="ORGBServer", target=self._run_in_background)
+        self._orgb_thread = threading.Thread(name="ORGBServer", target=self._runner)
         self._orgb_thread.start()
 
         self._wait_for_server()
@@ -130,7 +129,7 @@ class OpenRgbClient:
     def _stop_orgb_process(self):
         self._orgb_process.kill()
 
-    def _run_in_background(self):
+    def _runner(self):
         self._orgb_process = subprocess.Popen(  # pylint: disable=R1732
             [orgb_path, "--server-host", "localhost", "--server-port", str(self._port)],
             stdout=subprocess.PIPE,
