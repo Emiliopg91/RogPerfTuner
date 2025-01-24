@@ -1,6 +1,7 @@
 import os
 import signal
 import subprocess
+import time
 
 # pylint: disable=E0611, E0401
 from PyQt5.QtWidgets import QSystemTrayIcon, QMenu, QAction, QActionGroup, QColorDialog
@@ -30,6 +31,7 @@ class TrayIcon:  # pylint: disable=R0902
 
     def __init__(self):  # pylint: disable=R0915
         self._logger = Logger()
+        self._last_trigger = None
 
         icon = QIcon.fromTheme(os.path.join(icons_path, "icon-45x45.png"))
 
@@ -156,8 +158,53 @@ class TrayIcon:  # pylint: disable=R0902
         self._menu.addSeparator()
 
         if dev_mode:
+            self._dev_section = QAction("Development")
+            self._dev_section.setEnabled(False)
+            self._menu.addAction(self._dev_section)
+
+            # Add "Simulation" section
+            self._simulation_menu = QMenu("    Simulation")
+
+            self._ac_connected_action = QAction("AC connected")
+            self._ac_connected_action.triggered.connect(
+                lambda: platform_service._on_ac_battery_change(False, False, False)  # pylint: disable=W0212
+            )
+            self._simulation_menu.addAction(self._ac_connected_action)
+
+            self._ac_disconnected_action = QAction("AC disconnected")
+            self._ac_disconnected_action.triggered.connect(
+                lambda: platform_service._on_ac_battery_change(True, False, False)  # pylint: disable=W0212
+            )
+            self._simulation_menu.addAction(self._ac_disconnected_action)
+
+            self._simulation_menu.addSeparator()
+
+            self._steam_connected_action = QAction("Steam connected")
+            self._steam_connected_action.triggered.connect(lambda: event_bus.emit("SteamClient.connected"))
+            self._simulation_menu.addAction(self._steam_connected_action)
+
+            self._steam_disconnected_action = QAction("Steam disconnected")
+            self._steam_disconnected_action.triggered.connect(lambda: event_bus.emit("SteamClient.disconnected"))
+            self._simulation_menu.addAction(self._steam_disconnected_action)
+
+            self._simulation_menu.addSeparator()
+
+            self._launch_game_action = QAction("Launch game")
+            self._launch_game_action.triggered.connect(
+                lambda: event_bus.emit("SteamClient.launch_game", 2891404929, "Metroid Fusion")
+            )
+            self._simulation_menu.addAction(self._launch_game_action)
+
+            self._stop_game_action = QAction("Stop game")
+            self._stop_game_action.triggered.connect(
+                lambda: event_bus.emit("SteamClient.stop_game", 2891404929, "Metroid Fusion")
+            )
+            self._simulation_menu.addAction(self._stop_game_action)
+
+            self._menu.addMenu(self._simulation_menu)
+
             # Add "Open log" option
-            self._open_logs_action = QAction(translator.translate("open.logs"))
+            self._open_logs_action = QAction("    Open logs")
             self._open_logs_action.triggered.connect(self.on_open_logs)
             self._menu.addAction(self._open_logs_action)
 
@@ -180,7 +227,7 @@ class TrayIcon:  # pylint: disable=R0902
 
         event_bus.on("PlatformService.battery_threshold", self.set_battery_charge_limit)
         event_bus.on("PlatformService.boost", self.set_boost_mode)
-        event_bus.on("PlatformService.thermal_throttle_profile", self.set_thermal_throttle_policy)
+        event_bus.on("PlatformService.platform_profile", self.set_thermal_throttle_policy)
         event_bus.on("OpenRgbService.aura_changed", self.set_aura_state)
         event_bus.on("GamesService.gameEvent", self.on_game_event)
 
@@ -191,12 +238,14 @@ class TrayIcon:  # pylint: disable=R0902
         enable = running_games == 0
         self._profile_menu.setEnabled(enable)
         self._boost_menu.setEnabled(enable)
-        self._games_menu.setEnabled(enable)
+        # self._games_menu.setEnabled(enable)
 
     def on_tray_icon_activated(self, reason):
         """Restore main window"""
-        if reason == QSystemTrayIcon.Trigger:
-            self.on_open()
+        if reason == QSystemTrayIcon.ActivationReason.Trigger:
+            if self._last_trigger is not None and time.time() - self._last_trigger < 0.5:
+                self.on_open()
+            self._last_trigger = time.time()
 
     def set_battery_charge_limit(self, value: BatteryThreshold):
         """Set battery charge limit"""
@@ -260,7 +309,7 @@ class TrayIcon:  # pylint: disable=R0902
 
     def on_open_game_list(self):
         """Open game list window"""
-        GameList().show()
+        GameList(main_window, True).show()
 
     @staticmethod
     def on_open():

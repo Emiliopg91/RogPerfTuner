@@ -14,5 +14,10 @@ class UpowerClient(AbstractDbusClient):
             "org.freedesktop.UPower",
         )
 
+    @property
+    def on_battery(self) -> bool:
+        """Battery flag"""
+        return self._get_property("OnBattery")
+
 
 upower_client = UpowerClient()

@@ -3,7 +3,6 @@ import os
 import subprocess
 from threading import Thread
 
-import psutil
 from rcc.clients.websocket.steam_client import steam_client
 from rcc.models.settings import GameEntry
 from rcc.models.platform_profile import PlatformProfile, get_greater
@@ -31,38 +30,77 @@ class GamesService:
         self._logger.info("Initializing GamesService")
         self._logger.add_tab()
         self._rccdc_enabled = False
-        self.__running_games: list[RunningGameModel] = []
+        self.__running_games: dict[int, str] = {}
 
         steam_client.on_connected(self.__on_steam_connected)
         steam_client.on_disconnected(self.__on_steam_disconnected)
-        steam_client.on_launch_game(self.launch_game)
-        steam_client.on_stop_game(self.stop_game)
+        steam_client.on_launch_game(self.__launch_game)
+        steam_client.on_stop_game(self.__stop_game)
 
         if steam_client.connected:
-            self.__on_steam_connected()
+            self.__on_steam_connected(True)
 
         self._logger.rem_tab()
 
-    def __on_steam_connected(self):
-        self.__running_games = []
+    def __on_steam_connected(self, on_boot=False):
+        self.__running_games = {}
         rg = steam_client.get_running_games()
         self._logger.info(f"SteamClient connected. Running {len(rg)} games:")
         self._logger.add_tab()
-        for g in rg:
-            game = RunningGameModel(g["id"], g["name"])
-            self._logger.info(game.name)
-            self.__running_games.append(RunningGameModel(game.id, game.name))
-
+        if len(rg) > 0:
+            for g in rg:
+                game = RunningGameModel(g["id"], g["name"])
+                self._logger.info(game.name)
+                self.__running_games[game.id] = game.name
+            self.__set_profile_for_games()
+        elif not on_boot:
+            self.__set_profile_for_games()
         self._logger.rem_tab()
-        self.__set_profile_for_games()
 
     def __on_steam_disconnected(self):
         self._logger.info("SteamClient disconnected")
         if len(self.__running_games) > 0:
             self._logger.info("Restoring platform profile")
-            self.__running_games = []
+            self.__running_games = {}
             self._logger.add_tab()
             platform_service.restore_profile()
+            self._logger.rem_tab()
+
+    def __set_profile_for_games(self):
+        if len(self.__running_games) > 0:
+            profile = PlatformProfile.QUIET
+
+            for gid in self.__running_games:
+                profile = get_greater(profile, PlatformProfile(configuration.games[gid].profile))
+
+            name = [
+                configuration.games[gid].name
+                for gid in self.__running_games
+                if PlatformProfile(configuration.games[gid].profile) == profile
+            ][0]
+            platform_service.set_thermal_throttle_policy(profile, True, name, True)
+        else:
+            platform_service.restore_profile()
+
+        event_bus.event_bus.emit("GamesService.gameEvent", len(self.__running_games))
+
+    def __launch_game(self, gid: int, name: str):
+        self._logger.info(f"Launched {name}")
+        if gid not in self.running_games:
+            self.__running_games[gid] = name
+            self._logger.add_tab()
+            if gid not in configuration.games:
+                self.set_game_profile(gid, name)
+
+            self.__set_profile_for_games()
+            self._logger.rem_tab()
+
+    def __stop_game(self, gid: int, name: str):
+        self._logger.info(f"Stopped {name}")
+        if gid in self.running_games:
+            del self.running_games[gid]
+            self._logger.add_tab()
+            self.__set_profile_for_games()
             self._logger.rem_tab()
 
     @property
@@ -117,67 +155,14 @@ class GamesService:
             text=True,
             check=True,
         )
-        with open(os.path.expanduser(os.path.join("~", ".steam", "steam.pid")), "r") as f:
-            pid = int(f.read().strip())
-
-        if psutil.pid_exists(pid):
-            Thread(
-                target=lambda: subprocess.run(
-                    ["sudo", "-S", "systemctl", "restart", "plugin_loader.service"],
-                    input=cryptography.decrypt_string(configuration.settings.password) + "\n",
-                    text=True,
-                    check=True,
-                )
-            ).start()
-
-    def __set_profile_for_games(
-        self,
-    ):
-        if len(self.__running_games) > 0:
-            profile = PlatformProfile.QUIET
-
-            for entry in self.__running_games:
-                if entry.id not in configuration.games:
-                    configuration.games[entry.id] = GameEntry(entry.name, PlatformProfile.PERFORMANCE.value)
-                profile = get_greater(profile, PlatformProfile(configuration.games[entry.id].profile))
-            configuration.save_config()
-
-            entry = [
-                game.name
-                for game in self.__running_games
-                if PlatformProfile(configuration.games[game.id].profile) == profile
-            ][0]
-            platform_service.set_thermal_throttle_policy(profile, True, entry, True)
-
-            event_bus.event_bus.emit("GamesService.gameEvent", len(self.__running_games))
-
-    def launch_game(self, gid: int, name: str):
-        """Set profile for game"""
-        self._logger.info(f"Launched {name}")
-        if not self.__is_game_running(gid):
-            self.__running_games.append(RunningGameModel(gid, name))
-            self._logger.add_tab()
-            if gid not in configuration.games:
-                self.set_game_profile(gid, name)
-
-            self.__set_profile_for_games()
-            self._logger.rem_tab()
-
-    def stop_game(self, gid: int, name: str):
-        """Restore profile after game stop"""
-        self._logger.info(f"Stopped {name}")
-        if self.__is_game_running(gid):
-            self.__running_games = [entry for entry in self.__running_games if entry.id != gid]
-            self._logger.add_tab()
-            if len(self.__running_games) > 0:
-                self.__set_profile_for_games()
-            else:
-                platform_service.restore_profile()
-                event_bus.event_bus.emit("GamesService.gameEvent", len(self.__running_games))
-            self._logger.rem_tab()
-
-    def __is_game_running(self, gid: int) -> bool:
-        return any(game.id == gid for game in self.__running_games)
+        Thread(
+            target=lambda: subprocess.run(
+                ["sudo", "-S", "systemctl", "restart", "plugin_loader.service"],
+                input=cryptography.decrypt_string(configuration.settings.password) + "\n",
+                text=True,
+                check=True,
+            )
+        ).start()
 
     def get_games(self) -> dict[str, GameEntry]:
         """Get games and setting"""

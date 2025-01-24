@@ -1,10 +1,6 @@
 # pylint: disable=E0611, E0401
-from PyQt5.QtWidgets import (
-    QApplication,
-    QDialog,
-    QMainWindow,
-)
-from PyQt5.QtGui import QCursor
+from PyQt5.QtWidgets import QApplication, QDialog, QMainWindow, QComboBox
+from PyQt5.QtGui import QCursor, QWheelEvent
 
 
 class GuiUtils:
@@ -20,3 +16,11 @@ class GuiUtils:
             x = int((screen_geometry.width() - element.width()) / 2) + screen_geometry.x()
             y = int((screen_geometry.height() - element.height()) / 2) + screen_geometry.y()
             element.move(x, y)
+
+
+class NoScrollComboBox(QComboBox):
+    """Implementation without wheel event"""
+
+    def wheelEvent(self, event: QWheelEvent):  # pylint: disable=C0103
+        """Ignore wheel event"""
+        event.ignore()

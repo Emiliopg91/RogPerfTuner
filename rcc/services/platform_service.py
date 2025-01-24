@@ -3,7 +3,6 @@ from typing import Callable, Dict, List, Optional
 
 import os
 import subprocess
-import threading
 
 import concurrent
 from watchdog.events import FileSystemEventHandler
@@ -76,6 +75,7 @@ class PlatformService:
         self._logger.info("Initializing PlatformService")
         self._logger.add_tab()
         self._lock = Lock()
+        self._ac_events_enabled = True
 
         self._boost_control: Optional[Dict[str, str]] = None
         self._last_boost: Optional[bool] = None
@@ -83,6 +83,7 @@ class PlatformService:
 
         self._thermal_throttle_profile = platform_client.platform_profile
         self._battery_charge_limit = platform_client.charge_control_end_threshold
+        self.on_bat = upower_client.on_battery
 
         for control in self.BOOST_CONTROLS:
             if os.path.exists(control["path"]):
@@ -114,9 +115,8 @@ class PlatformService:
         platform_client.change_platform_profile_on_ac = False
         platform_client.change_platform_profile_on_battery = False
 
-        platform_client.on_property_change("ThrottleThermalPolicy", self._set_thermal_throttle_profile_async)
-        platform_client.on_property_change("ChargeControlEndThreshold", self._set_battery_threshold)
         upower_client.on_property_change("OnBattery", self._on_ac_battery_change)
+        event_bus.on("GamesService.gameEvent", self._on_game_event)
 
         self._logger.rem_tab()
 
@@ -142,39 +142,27 @@ class PlatformService:
         """Get current battery charge limit"""
         return self._battery_charge_limit
 
-    def _set_battery_threshold(self, value):
-        self._battery_charge_limit = BatteryThreshold(int.from_bytes(value))
-        event_bus.emit("PlatformService.battery_threshold", self._battery_charge_limit)
-
-    def _set_thermal_throttle_profile_async(self, value):
-        threading.Thread(
-            name="PlatformService",
-            target=self._set_thermal_throttle_profile,
-            args=[value],
-        ).start()
-
-    def _set_thermal_throttle_profile(self, value):
-        with self._lock:
-            self._thermal_throttle_profile = PlatformProfile(value)
-            event_bus.emit(
-                "PlatformService.thermal_throttle_profile",
-                self._thermal_throttle_profile,
-            )
+    def _on_game_event(self, count):
+        self._ac_events_enabled = count == 0
 
     def _set_power_profile(self, value):
         self._thermal_throttle_profile = PowerProfile(value)
 
-    def _on_ac_battery_change(self, on_battery):
-        policy = PlatformProfile.PERFORMANCE
-        if on_battery:
-            policy = PlatformProfile.QUIET
+    def _on_ac_battery_change(self, on_battery: bool, muted=False, force=False):
+        if self._ac_events_enabled or force:
+            self.on_bat = on_battery
+            policy = PlatformProfile(configuration.platform.profiles.profile)
+            if on_battery:
+                policy = PlatformProfile.QUIET
 
-        self._logger.info(
-            f"AC cord {"dis" if on_battery else ""}connected, battery {"dis" if not on_battery else ""}engaged"
-        )
-        self._logger.add_tab()
-        self.set_thermal_throttle_policy(policy, True)
-        self._logger.rem_tab()
+            if not muted:
+                self._logger.info(
+                    f"AC cord {"dis" if on_battery else ""}connected, battery {"dis" if not on_battery else ""}engaged"
+                )
+                self._logger.add_tab()
+            self.set_thermal_throttle_policy(policy, True)
+            if not muted:
+                self._logger.rem_tab()
 
     @logged_method
     def set_thermal_throttle_policy(
@@ -182,10 +170,10 @@ class PlatformService:
     ) -> None:
         """Establish thermal throttle policy"""
         with self._lock:
-            policy_name = policy.name
-            power_profile = self.THROTTLE_POWER_ASSOC[policy]
-
             if self._thermal_throttle_profile != policy or force:
+                policy_name = policy.name
+                power_profile = self.THROTTLE_POWER_ASSOC[policy]
+
                 try:
                     self._logger.info(
                         f"Setting profile '{policy_name.lower()}' {f"for game {game_name}" if game_name is not None else ""}"
@@ -238,7 +226,7 @@ class PlatformService:
                     self._logger.rem_tab()
                     self._logger.info("Profile setted succesfully")
 
-                    if not temporal:
+                    if not temporal and not self.on_bat:
                         configuration.platform.profiles.profile = policy.value
                         configuration.save_config()
 
@@ -259,14 +247,22 @@ class PlatformService:
                                 },
                             )
                         )
+                    event_bus.emit(
+                        "PlatformService.platform_profile",
+                        self._thermal_throttle_profile,
+                    )
                 except Exception as error:
                     self._logger.error(f"Couldn't set profile: {error}")
                     self._logger.rem_tab()
+            else:
+                self._logger.info("Profile already setted")
 
     def set_battery_threshold(self, value: BatteryThreshold) -> None:
         """Set battery charge threshold"""
         if value != self._battery_charge_limit:
             platform_client.charge_control_end_threshold = value
+            self._battery_charge_limit = value
+            event_bus.emit("PlatformService.battery_threshold", value)
             notifier.show_toast(translator.translate("applied.battery.threshold", {"value": value.value}))
 
     def _apply_boost(self, enabled: bool):
@@ -301,7 +297,16 @@ class PlatformService:
 
     def restore_profile(self):
         """Restore persited profile"""
-        self.set_thermal_throttle_policy(PlatformProfile(configuration.platform.profiles.profile), True, None, True)
+        if upower_client.on_battery:
+            self._logger.info("Laptop running on battery")
+            self._logger.add_tab()
+            self._on_ac_battery_change(upower_client.on_battery, True, True)
+            self._logger.rem_tab()
+        else:
+            self._logger.info("Laptop running on AC")
+            self._logger.add_tab()
+            self.set_thermal_throttle_policy(PlatformProfile(configuration.platform.profiles.profile), True, None, True)
+            self._logger.rem_tab()
 
 
 platform_service = PlatformService()

@@ -20,9 +20,12 @@ class Notifier:
         if self.last_id > 0:
             notification_client.close_notification(self.last_id)
 
-        toast_id = notification_client.show_notification(__app_name__, self.ICON_PATH, " ", message, 3000)
-        if can_be_hidden:
-            self.last_id = toast_id
+        try:
+            toast_id = notification_client.show_notification(__app_name__, self.ICON_PATH, " ", message, 3000)
+            if can_be_hidden:
+                self.last_id = toast_id
+        except Exception:
+            """"""
 
 
 notifier = Notifier()

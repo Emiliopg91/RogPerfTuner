@@ -42,7 +42,7 @@ class Logger:
                 os.unlink(rf)
 
             formatter = logging.Formatter(
-                "[%(asctime)s.%(msecs)03d][%(levelname)-8s][%(name)-20s]%(message)s",
+                "[%(asctime)s.%(msecs)03d][%(levelname)-8s][%(name)-15s]%(message)s",
                 datefmt="%Y-%m-%d %H:%M:%S",
             )
 

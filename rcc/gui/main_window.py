@@ -3,7 +3,6 @@ from PyQt5.QtCore import Qt
 from PyQt5.QtGui import QColor, QIcon, QPixmap
 from PyQt5.QtWidgets import (
     QColorDialog,
-    QComboBox,
     QFormLayout,
     QGroupBox,
     QLabel,
@@ -22,7 +21,7 @@ from rcc.services.openrgb_service import open_rgb_service
 from rcc.services.platform_service import platform_service
 from rcc.utils.constants import icons_path
 from rcc.utils.event_bus import event_bus
-from rcc.utils.gui_utils import GuiUtils
+from rcc.utils.gui_utils import GuiUtils, NoScrollComboBox
 from rcc.utils.logger import Logger
 from rcc.utils.translator import translator
 
@@ -65,7 +64,7 @@ class MainWindow(QMainWindow):
         performance_layout.setContentsMargins(20, 20, 20, 20)
 
         # Label y Dropdown para "Perfil"
-        self._profile_dropdown = QComboBox()
+        self._profile_dropdown = NoScrollComboBox()
         for item in PlatformProfile:
             self._profile_dropdown.addItem(translator.translate(f"label.profile.{item.name}"), item)
         self._profile_dropdown.currentIndexChanged.connect(self.on_profile_changed)
@@ -73,7 +72,7 @@ class MainWindow(QMainWindow):
         performance_layout.addRow(QLabel(f"{translator.translate('profile')}:"), self._profile_dropdown)
 
         # Label y Dropdown para "Boost"
-        self._boost_dropdown = QComboBox()
+        self._boost_dropdown = NoScrollComboBox()
         for item in Boost:
             self._boost_dropdown.addItem(translator.translate(f"label.boost.{item.name}"), item)
         self._boost_dropdown.currentIndexChanged.connect(self.on_boost_changed)
@@ -93,14 +92,14 @@ class MainWindow(QMainWindow):
         aura_layout.setContentsMargins(20, 20, 20, 20)
 
         # Dropdown para "Efecto"
-        self._effect_dropdown = QComboBox()
+        self._effect_dropdown = NoScrollComboBox()
         self._effect_dropdown.addItems(self._effect_labels)
         self._effect_dropdown.setCurrentIndex(self._effect_labels.index(open_rgb_service._effect))
         self._effect_dropdown.currentIndexChanged.connect(self.on_effect_change)
         aura_layout.addRow(QLabel(f"{translator.translate("effect")}:"), self._effect_dropdown)
 
         # Dropdown para "Brillo"
-        self._brightness_dropdown = QComboBox()
+        self._brightness_dropdown = NoScrollComboBox()
         for brightness in RgbBrightness:
             self._brightness_dropdown.addItem(translator.translate(f"label.brightness.{brightness.name}"), brightness)
         self._brightness_dropdown.setCurrentIndex(self._brightness_dropdown.findData(open_rgb_service._brightness))
@@ -131,7 +130,7 @@ class MainWindow(QMainWindow):
         settings_layout.setContentsMargins(20, 20, 20, 20)
 
         # Dropdown para "Umbral"
-        self._threshold_dropdown = QComboBox()
+        self._threshold_dropdown = NoScrollComboBox()
         for item in BatteryThreshold:
             self._threshold_dropdown.addItem(f"{item.value}%", item)
         self._threshold_dropdown.currentIndexChanged.connect(self.on_battery_limit_changed)
@@ -152,7 +151,7 @@ class MainWindow(QMainWindow):
 
         event_bus.on("PlatformService.battery_threshold", self.set_battery_charge_limit)  # pylint: disable=R0801
         event_bus.on("PlatformService.boost", self.set_boost_mode)
-        event_bus.on("PlatformService.thermal_throttle_profile", self.set_thermal_throttle_policy)
+        event_bus.on("PlatformService.platform_profile", self.set_thermal_throttle_policy)
         event_bus.on("OpenRgbService.aura_changed", self.set_aura_state)
         event_bus.on("GamesService.gameEvent", self.on_game_event)
 

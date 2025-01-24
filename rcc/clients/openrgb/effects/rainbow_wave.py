@@ -21,7 +21,7 @@ class RainbowWave(AbstractEffect):
 
         rainbow = [0] * longest_zone
         for idx in range(len(rainbow) - 1, -1, -1):
-            rainbow[idx] = (len(rainbow) - idx) * 12
+            rainbow[idx] = (len(rainbow) - idx) * 8
 
         while self._is_running:  # pylint: disable=R1702
             for dev in self._devices:
@@ -47,7 +47,7 @@ class RainbowWave(AbstractEffect):
 
             for idx in range(len(rainbow) - 1, 0, -1):
                 rainbow[idx] = rainbow[idx - 1]
-            rainbow[0] = (rainbow[1] + 12) % 360
+            rainbow[0] = (rainbow[1] + 8) % 360
 
 
 rainbow_wave = RainbowWave()

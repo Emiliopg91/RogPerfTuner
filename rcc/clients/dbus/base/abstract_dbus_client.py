@@ -54,13 +54,11 @@ class AbstractDbusClient(ABC):
         if len(args) < 3:
             return
 
-        _, changed_properties, _ = args
-        for prop, value in changed_properties.items():
-            try:
+        iface, changed_properties, _ = args
+        if iface == self._interface_name:
+            for prop, value in changed_properties.items():
                 if prop == prop_name:
                     callback(value)
-            except Exception:
-                pass
 
     def on_property_change(self, prop_name, callback: Callable[[Any], None]):
         """Subscribe to signal"""

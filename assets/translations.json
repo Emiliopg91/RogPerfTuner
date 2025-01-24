@@ -132,8 +132,8 @@
     "es": "Inicializando aplicación"
   },
   "boost": {
-    "en": "Boost",
-    "es": "Boost"
+    "en": "CPU Boost",
+    "es": "CPU Boost"
   },
   "label.boost.AUTO": {
     "en": "Auto",

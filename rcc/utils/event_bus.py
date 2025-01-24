@@ -16,11 +16,9 @@ class EventBus:
 
     def on(self, event: str, callback: Callable[..., None]) -> None:
         """Define listener for event"""
-        try:
-            self._callbacks[event].append(callback)
-        except KeyError:
+        if event not in self._callbacks:
             self._callbacks[event] = []
-            self._callbacks[event].append(callback)
+        self._callbacks[event].append(callback)
         self.__logger.debug(f"Registered callback for {event}")
 
     def emit(self, event: str, *args: Any) -> None:
