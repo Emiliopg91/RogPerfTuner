@@ -170,5 +170,17 @@
   "profile.per.game": {
     "en": "Game profile",
     "es": "Perfil por juego"
+  },
+  "label.dgpu.auto": {
+    "en": "Automatic",
+    "es": "Automatica"
+  },
+  "label.dgpu.discrete": {
+    "en": "Discrete",
+    "es": "Dedicada"
+  },
+  "used.gpu": {
+    "en": "GPU",
+    "es": "GPU"
   }
 }

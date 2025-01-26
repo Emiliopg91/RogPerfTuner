@@ -25,12 +25,33 @@ class RunningGameModel:
 class GamesService:
     """Steam service"""
 
+    ICD_FILES: dict[str, list[str]] = {
+        "nvidia": ["/usr/share/vulkan/icd.d/nvidia_icd.i686.json", "/usr/share/vulkan/icd.d/nvidia_icd.x86_64.json"]
+    }
+
     def __init__(self):
         self._logger = Logger()
         self._logger.info("Initializing GamesService")
         self._logger.add_tab()
         self._rccdc_enabled = False
         self.__running_games: dict[int, str] = {}
+        self.__gpu: str | None = None
+
+        lspci_result = subprocess.run(["lspci"], stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True, check=False)
+        output = lspci_result.stdout
+        gpus = [line[40:] for line in output.splitlines() if "VGA" in line or "3D" in line]
+        for _, gpu in enumerate(gpus):
+            if gpu.strip().lower().startswith("nvidia"):
+                self.__gpu = gpu.strip().split(" ")[0].lower()
+                break
+
+        if self.__gpu is None:
+            self._logger.info("No discrete GPU found")
+        else:
+            self._logger.info(f"Found discrete {self.__gpu.capitalize()} GPU")
+            if not self.__exists_icd_files("nvidia"):
+                self._logger.warning(f"Missing ICD files for {self.__gpu.capitalize()} GPU, discarding")
+                self.__gpu = None
 
         steam_client.on_connected(self.__on_steam_connected)
         steam_client.on_disconnected(self.__on_steam_disconnected)
@@ -42,10 +63,29 @@ class GamesService:
 
         self._logger.rem_tab()
 
+    def __exists_icd_files(self, brand: str) -> bool:
+        for icd in self.ICD_FILES[brand]:
+            if not os.path.exists(icd):
+                return False
+
+        return True
+
+    @property
+    def gpu(self):
+        """GPU brand"""
+        return self.__gpu
+
+    @property
+    def icd_files(self) -> list[str] | None:
+        """ICD files for GPU"""
+        if self.__gpu is not None:
+            return self.ICD_FILES[self.__gpu]
+        return None
+
     def __on_steam_connected(self, on_boot=False):
         self.__running_games = {}
         rg = steam_client.get_running_games()
-        self._logger.info(f"SteamClient connected. Running {len(rg)} games:")
+        self._logger.info(f"SteamClient connected. Running {len(rg)} games")
         self._logger.add_tab()
         if len(rg) > 0:
             for g in rg:
@@ -90,7 +130,8 @@ class GamesService:
             self.__running_games[gid] = name
             self._logger.add_tab()
             if gid not in configuration.games:
-                self.set_game_profile(gid, name)
+                configuration.games[gid] = GameEntry(name, PlatformProfile.PERFORMANCE.value)
+                configuration.save_config()
 
             self.__set_profile_for_games()
             self._logger.rem_tab()

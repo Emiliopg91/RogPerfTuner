@@ -170,8 +170,8 @@ class PlatformService:
     ) -> None:
         """Establish thermal throttle policy"""
         with self._lock:
+            policy_name = policy.name
             if self._thermal_throttle_profile != policy or force:
-                policy_name = policy.name
                 power_profile = self.THROTTLE_POWER_ASSOC[policy]
 
                 try:
@@ -255,7 +255,7 @@ class PlatformService:
                     self._logger.error(f"Couldn't set profile: {error}")
                     self._logger.rem_tab()
             else:
-                self._logger.info("Profile already setted")
+                self._logger.info(f"Profile {policy_name.lower()} already setted")
 
     def set_battery_threshold(self, value: BatteryThreshold) -> None:
         """Set battery charge threshold"""
@@ -305,7 +305,9 @@ class PlatformService:
         else:
             self._logger.info("Laptop running on AC")
             self._logger.add_tab()
-            self.set_thermal_throttle_policy(PlatformProfile(configuration.platform.profiles.profile), True, None, True)
+            self.set_thermal_throttle_policy(
+                PlatformProfile(configuration.platform.profiles.profile), True, None, False
+            )
             self._logger.rem_tab()
 
 

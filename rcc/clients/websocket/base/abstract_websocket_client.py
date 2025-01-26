@@ -12,6 +12,14 @@ from rcc.utils.event_bus import event_bus
 from rcc.utils.logger import Logger
 
 
+class WebSocketInvocationError(Exception):
+    """Excepcion"""
+
+
+class WebSocketTimeoutError(Exception):
+    """Excepcion"""
+
+
 class AbstractWebsocketClient(ABC):
     """Base class for websocket clients"""
 
@@ -25,7 +33,7 @@ class AbstractWebsocketClient(ABC):
         self._current_client = None
         self._message_queue = queue.Queue()
         self.__connected = False
-        self.__responses: dict[str, list[any]] = {}
+        self.__responses: dict[str, queue.Queue] = {}
 
         # Inicia el hilo para conectar al servidor
         Thread(
@@ -112,7 +120,7 @@ class AbstractWebsocketClient(ABC):
             elif message.type == "RESPONSE":
                 if message.id in self.__responses:
                     self._logger.debug(f"Received response for {message.id}")
-                    self.__responses[message.id].put(message.data)
+                    self.__responses[message.id].put(message)
                     del self.__responses[message.id]
                 else:
                     self._logger.debug(f"No request waiting for response with id {message.id}")
@@ -134,11 +142,16 @@ class AbstractWebsocketClient(ABC):
             try:
                 response = self.__responses[msg_id].get(True, timeout)
                 self._logger.debug(f"Response received after {int(1000*(time.time()-t0))} ms: {response}")
-                return response
-            except Exception:
+                if response.error is not None:
+                    self._logger.debug(f"Error on method invocation: {response.error}")
+                    raise WebSocketInvocationError(f"Error on method invocation: {response.error}")
+                return response.data
+            except queue.Empty:
                 del self.__responses[msg_id]
-                self._logger.debug(f"No response after {self.INVOCATION_TIMEOUT} seconds")
-                raise TimeoutError(f"No response after {self.INVOCATION_TIMEOUT} seconds")  # pylint: disable=W0707
+                self._logger.debug(f"No response after {int(1000*(time.time()-t0))} ms")
+                raise WebSocketTimeoutError(  # pylint: disable=W0707
+                    f"No response after {int(1000*(time.time()-t0))} ms"
+                )
         else:
             raise ConnectionError("No connection to server")  # pylint: disable=W0707
 
