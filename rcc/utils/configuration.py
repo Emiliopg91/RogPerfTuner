@@ -10,10 +10,10 @@ from rcc.models.settings import (
     PlatformProfiles,
     OpenRgb,
 )
-from rcc.models.boost import Boost
-from rcc.models.platform_profile import PlatformProfile
-from rcc.utils.singleton import singleton
+from rcc.models.performance_profile import PerformanceProfile
 from rcc.utils.constants import config_file, config_folder
+from framework.singleton import singleton
+from framework.logger import Logger
 
 
 @singleton
@@ -29,22 +29,9 @@ class Configuration:
             with open(config_file, "r") as f:
                 raw_config = yaml.safe_load(f) or {}
 
-            update = False
-            if "boost" not in raw_config["platform"]["profiles"]:
-                raw_config["platform"]["profiles"]["boost"] = Boost.AUTO.value
-                update = True
-            if "games" not in raw_config:
-                raw_config["games"] = {}
-                update = True
-            if "logger" not in raw_config:
-                raw_config["logger"] = {}
-                update = True
-
             json_output = json.dumps(raw_config, indent=2)
             self._config = Config.from_json(json_output)  # pylint: disable=E1101
-
-            if update:
-                self.save_config()
+            Logger.set_config_map(self._config.logger)
 
         except FileNotFoundError:
             if not os.path.exists(config_folder):
@@ -54,7 +41,7 @@ class Configuration:
                 logger={},
                 games={},
                 settings=Settings(None),
-                platform=Platform(profiles=PlatformProfiles(PlatformProfile.PERFORMANCE.value, Boost.AUTO.value)),
+                platform=Platform(profiles=PlatformProfiles(PerformanceProfile.PERFORMANCE.value)),
                 open_rgb=OpenRgb(last_effect="Static", effects={}),
             )
             self.save_config()

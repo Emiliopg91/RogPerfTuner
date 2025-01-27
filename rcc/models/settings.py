@@ -27,7 +27,6 @@ class PlatformProfiles:
     """Configuration helper class"""
 
     profile: int
-    boost: int | None
 
 
 @dataclass_json

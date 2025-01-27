@@ -10,30 +10,28 @@ class RgbBrightness(IntEnum):
     LOW = 1
     OFF = 0
 
+    def get_next_brightness(self):
+        """Get the following brightness level"""
+        if self == RgbBrightness.HIGH:
+            return RgbBrightness.MAX
+        if self == RgbBrightness.MEDIUM:
+            return RgbBrightness.HIGH
+        if self == RgbBrightness.LOW:
+            return RgbBrightness.MEDIUM
+        if self == RgbBrightness.OFF:
+            return RgbBrightness.LOW
 
-def get_next_brightness(brightness: RgbBrightness) -> RgbBrightness:
-    """Get the following brightness level"""
-    if brightness == RgbBrightness.HIGH:
-        return RgbBrightness.MAX
-    if brightness == RgbBrightness.MEDIUM:
-        return RgbBrightness.HIGH
-    if brightness == RgbBrightness.LOW:
-        return RgbBrightness.MEDIUM
-    if brightness == RgbBrightness.OFF:
-        return RgbBrightness.LOW
+        return self
 
-    return brightness
+    def get_previous_brightness(self):
+        """Get the previous brightness level"""
+        if self == RgbBrightness.MAX:
+            return RgbBrightness.HIGH
+        if self == RgbBrightness.HIGH:
+            return RgbBrightness.MEDIUM
+        if self == RgbBrightness.MEDIUM:
+            return RgbBrightness.LOW
+        if self == RgbBrightness.LOW:
+            return RgbBrightness.OFF
 
-
-def get_previous_brightness(brightness: RgbBrightness) -> RgbBrightness:
-    """Get the previous brightness level"""
-    if brightness == RgbBrightness.MAX:
-        return RgbBrightness.HIGH
-    if brightness == RgbBrightness.HIGH:
-        return RgbBrightness.MEDIUM
-    if brightness == RgbBrightness.MEDIUM:
-        return RgbBrightness.LOW
-    if brightness == RgbBrightness.LOW:
-        return RgbBrightness.OFF
-
-    return brightness
+        return self

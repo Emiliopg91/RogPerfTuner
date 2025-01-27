@@ -3,15 +3,16 @@ import os
 import subprocess
 from threading import Thread
 
-from rcc.clients.websocket.steam_client import steam_client
+from rcc.communications.client.websocket.steam_client import steam_client
+from rcc.models.performance_profile import PerformanceProfile
 from rcc.models.settings import GameEntry
-from rcc.models.platform_profile import PlatformProfile, get_greater
+from rcc.models.platform_profile import PlatformProfile
 from rcc.services.platform_service import platform_service
-from rcc.utils import event_bus
 from rcc.utils.configuration import configuration
 from rcc.utils.constants import rccdc_asset_path, user_plugin_folder
-from rcc.utils.cryptography import cryptography
-from rcc.utils.logger import Logger
+from rcc.utils.beans import cryptography
+from rcc.utils.beans import event_bus
+from framework.logger import Logger
 
 
 @dataclass
@@ -24,6 +25,10 @@ class RunningGameModel:
 
 class GamesService:
     """Steam service"""
+
+    DECKY_SERVICE_PATH = os.path.expanduser(os.path.join("~", "homebrew", "services", "PluginLoader"))
+    PLUGINS_FOLDER = os.path.expanduser(os.path.join("~", "homebrew", "plugins"))
+    RCCDC_PATH = os.path.join(PLUGINS_FOLDER, "RCCDeckyCompanion")
 
     ICD_FILES: dict[str, list[str]] = {
         "nvidia": ["/usr/share/vulkan/icd.d/nvidia_icd.i686.json", "/usr/share/vulkan/icd.d/nvidia_icd.x86_64.json"]
@@ -39,10 +44,10 @@ class GamesService:
 
         lspci_result = subprocess.run(["lspci"], stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True, check=False)
         output = lspci_result.stdout
-        gpus = [line[40:] for line in output.splitlines() if "VGA" in line or "3D" in line]
-        for _, gpu in enumerate(gpus):
-            if gpu.strip().lower().startswith("nvidia"):
-                self.__gpu = gpu.strip().split(" ")[0].lower()
+        lines = [line for line in output.splitlines() if "VGA" in line or "3D" in line]
+        for _, line in enumerate(lines):
+            if line.split(": ")[1].strip().lower().startswith("nvidia"):
+                self.__gpu = "nvidia"
                 break
 
         if self.__gpu is None:
@@ -108,21 +113,21 @@ class GamesService:
 
     def __set_profile_for_games(self):
         if len(self.__running_games) > 0:
-            profile = PlatformProfile.QUIET
+            profile = PerformanceProfile.QUIET
 
             for gid in self.__running_games:
-                profile = get_greater(profile, PlatformProfile(configuration.games[gid].profile))
+                profile = profile.get_greater(PlatformProfile(configuration.games[gid].profile))
 
             name = [
                 configuration.games[gid].name
                 for gid in self.__running_games
                 if PlatformProfile(configuration.games[gid].profile) == profile
             ][0]
-            platform_service.set_thermal_throttle_policy(profile, True, name, True)
+            platform_service.set_performance_profile(profile, True, name, True)
         else:
             platform_service.restore_profile()
 
-        event_bus.event_bus.emit("GamesService.gameEvent", len(self.__running_games))
+        event_bus.emit("GamesService.gameEvent", len(self.__running_games))
 
     def __launch_game(self, gid: int, name: str):
         self._logger.info(f"Launched {name}")
@@ -156,17 +161,15 @@ class GamesService:
 
     def install_rccdc(self):
         """Install RCCDeckyCompanion plugin"""
-        plugins_folder = os.path.expanduser(os.path.join("~", "homebrew", "plugins"))
-        rccdc_path = os.path.join(plugins_folder, "RCCDeckyCompanion")
 
-        if os.path.exists(plugins_folder):
-            if not os.path.exists(rccdc_path):
+        if os.path.exists(self.DECKY_SERVICE_PATH):
+            if not os.path.exists(self.RCCDC_PATH):
                 self._logger.info("Installing plugin for first time")
-                self.__copy_plugin(rccdc_asset_path, os.path.join(plugins_folder, "RCCDeckyCompanion"), False)
+                self.__copy_plugin(rccdc_asset_path, os.path.join(self.PLUGINS_FOLDER, "RCCDeckyCompanion"), False)
             else:
-                if os.path.getmtime(rccdc_path) < os.path.getmtime(rccdc_asset_path):
+                if os.path.getmtime(self.RCCDC_PATH) < os.path.getmtime(rccdc_asset_path):
                     self._logger.info("Updating Decky plugin")
-                    self.__copy_plugin(rccdc_asset_path, os.path.join(plugins_folder, "RCCDeckyCompanion"), True)
+                    self.__copy_plugin(rccdc_asset_path, os.path.join(self.PLUGINS_FOLDER, "RCCDeckyCompanion"), True)
                 else:
                     self._logger.debug("Plugin up to date")
             self._rccdc_enabled = True
@@ -209,7 +212,7 @@ class GamesService:
         """Get games and setting"""
         return configuration.games
 
-    def set_game_profile(self, game: int, profile: PlatformProfile = PlatformProfile.PERFORMANCE):
+    def set_game_profile(self, game: int, profile: PerformanceProfile = PerformanceProfile.PERFORMANCE):
         """Set profile for game"""
         self._logger.info(f"Saving profile {profile.name.lower()} for {configuration.games[game].name}")
         configuration.games[game].profile = profile.value

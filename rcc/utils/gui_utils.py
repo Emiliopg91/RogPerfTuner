@@ -1,4 +1,3 @@
-# pylint: disable=E0611, E0401
 from PyQt5.QtWidgets import QApplication, QDialog, QMainWindow, QComboBox
 from PyQt5.QtGui import QCursor, QWheelEvent
 

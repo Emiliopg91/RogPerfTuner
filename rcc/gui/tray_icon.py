@@ -3,7 +3,6 @@ import signal
 import subprocess
 import time
 
-# pylint: disable=E0611, E0401
 from PyQt5.QtWidgets import QSystemTrayIcon, QMenu, QAction, QActionGroup, QColorDialog
 from PyQt5.QtGui import QIcon, QColor
 
@@ -11,18 +10,17 @@ from rcc.gui.game_list import GameList
 from rcc.gui.main_window import main_window
 
 from rcc import __app_name__, __version__
-from rcc.models.boost import Boost
-from rcc.models.platform_profile import PlatformProfile
+from rcc.models.performance_profile import PerformanceProfile
 from rcc.models.rgb_brightness import RgbBrightness
 from rcc.models.battery_threshold import BatteryThreshold
 from rcc.services.games_service import games_service
 from rcc.services.openrgb_service import open_rgb_service
 from rcc.services.platform_service import platform_service
 from rcc.utils.constants import icons_path, dev_mode, log_file
-from rcc.utils.event_bus import event_bus
-from rcc.utils.logger import Logger
-from rcc.utils.singleton import singleton
-from rcc.utils.translator import translator
+from rcc.utils.beans import translator
+from rcc.utils.beans import event_bus
+from framework.logger import Logger
+from framework.singleton import singleton
 
 
 @singleton
@@ -121,31 +119,17 @@ class TrayIcon:  # pylint: disable=R0902
         self._menu.addAction(self._performance_section)
 
         self._profile_menu = QMenu("    " + translator.translate("profile"))
-        self._boost_group = QActionGroup(self._profile_menu)
-        self._boost_group.setExclusive(True)
-        self._performance_actions: dict[PlatformProfile, QAction] = {}
-        for profile in PlatformProfile:
+        self._performance_group = QActionGroup(self._profile_menu)
+        self._performance_group.setExclusive(True)
+        self._performance_actions: dict[PerformanceProfile, QAction] = {}
+        for profile in reversed(PerformanceProfile):
             action = QAction(translator.translate(f"label.profile.{profile.name}"), checkable=True)
-            action.setActionGroup(self._boost_group)
-            action.setChecked(profile == platform_service._thermal_throttle_profile)
+            action.setActionGroup(self._performance_group)
+            action.setChecked(profile == platform_service.performance_profile)
             action.triggered.connect(lambda _, p=profile: self.on_profile_selected(p))
             self._performance_actions[profile] = action
             self._profile_menu.addAction(action)
         self._menu.addMenu(self._profile_menu)
-
-        # Add "Boost" option
-        self._boost_menu = QMenu("    " + translator.translate("boost"))
-        self._boost_group = QActionGroup(self._boost_menu)
-        self._boost_group.setExclusive(True)
-        self._boost_actions: dict[Boost, QAction] = {}
-        for mode in Boost:
-            action = QAction(translator.translate(f"label.boost.{mode.name}"), checkable=True)
-            action.setActionGroup(self._boost_group)
-            action.setChecked(mode == platform_service.boost_mode)
-            action.triggered.connect(lambda _, m=mode: self.on_boost_selected(m))
-            self._boost_actions[mode] = action
-            self._boost_menu.addAction(action)
-        self._menu.addMenu(self._boost_menu)
 
         if games_service.rccdc_enabled:
             # Add "Games" option
@@ -179,29 +163,30 @@ class TrayIcon:  # pylint: disable=R0902
 
             self._simulation_menu.addSeparator()
 
-            self._steam_connected_action = QAction("Steam connected")
-            self._steam_connected_action.triggered.connect(lambda: event_bus.emit("SteamClient.connected"))
-            self._simulation_menu.addAction(self._steam_connected_action)
+            if games_service.rccdc_enabled:
+                self._steam_connected_action = QAction("Steam connected")
+                self._steam_connected_action.triggered.connect(lambda: event_bus.emit("SteamClient.connected"))
+                self._simulation_menu.addAction(self._steam_connected_action)
 
-            self._steam_disconnected_action = QAction("Steam disconnected")
-            self._steam_disconnected_action.triggered.connect(lambda: event_bus.emit("SteamClient.disconnected"))
-            self._simulation_menu.addAction(self._steam_disconnected_action)
+                self._steam_disconnected_action = QAction("Steam disconnected")
+                self._steam_disconnected_action.triggered.connect(lambda: event_bus.emit("SteamClient.disconnected"))
+                self._simulation_menu.addAction(self._steam_disconnected_action)
 
-            self._simulation_menu.addSeparator()
+                self._simulation_menu.addSeparator()
 
-            self._launch_game_action = QAction("Launch game")
-            self._launch_game_action.triggered.connect(
-                lambda: event_bus.emit("SteamClient.launch_game", 2891404929, "Metroid Fusion")
-            )
-            self._simulation_menu.addAction(self._launch_game_action)
+                self._launch_game_action = QAction("Launch game")
+                self._launch_game_action.triggered.connect(
+                    lambda: event_bus.emit("SteamClient.launch_game", 2891404929, "Metroid Fusion")
+                )
+                self._simulation_menu.addAction(self._launch_game_action)
 
-            self._stop_game_action = QAction("Stop game")
-            self._stop_game_action.triggered.connect(
-                lambda: event_bus.emit("SteamClient.stop_game", 2891404929, "Metroid Fusion")
-            )
-            self._simulation_menu.addAction(self._stop_game_action)
+                self._stop_game_action = QAction("Stop game")
+                self._stop_game_action.triggered.connect(
+                    lambda: event_bus.emit("SteamClient.stop_game", 2891404929, "Metroid Fusion")
+                )
+                self._simulation_menu.addAction(self._stop_game_action)
 
-            self._menu.addMenu(self._simulation_menu)
+                self._menu.addMenu(self._simulation_menu)
 
             # Add "Open log" option
             self._open_logs_action = QAction("    Open logs")
@@ -226,8 +211,7 @@ class TrayIcon:  # pylint: disable=R0902
         self._tray.setContextMenu(self._menu)
 
         event_bus.on("PlatformService.battery_threshold", self.set_battery_charge_limit)
-        event_bus.on("PlatformService.boost", self.set_boost_mode)
-        event_bus.on("PlatformService.platform_profile", self.set_thermal_throttle_policy)
+        event_bus.on("PlatformService.performance_profile", self.set_performance_profile)
         event_bus.on("OpenRgbService.aura_changed", self.set_aura_state)
         event_bus.on("GamesService.gameEvent", self.on_game_event)
 
@@ -237,12 +221,10 @@ class TrayIcon:  # pylint: disable=R0902
         """Handler for game events"""
         enable = running_games == 0
         self._profile_menu.setEnabled(enable)
-        self._boost_menu.setEnabled(enable)
-        # self._games_menu.setEnabled(enable)
 
     def on_tray_icon_activated(self, reason):
         """Restore main window"""
-        if reason == QSystemTrayIcon.ActivationReason.Trigger:
+        if reason == QSystemTrayIcon.Trigger:
             if self._last_trigger is not None and time.time() - self._last_trigger < 0.5:
                 self.on_open()
             self._last_trigger = time.time()
@@ -251,13 +233,9 @@ class TrayIcon:  # pylint: disable=R0902
         """Set battery charge limit"""
         self.threshold_actions[value].setChecked(True)
 
-    def set_boost_mode(self, value: Boost):
-        """Set boost mode"""
-        self._boost_actions[value].setChecked(True)
-
-    def set_thermal_throttle_policy(self, value: PlatformProfile):
+    def set_performance_profile(self, value: PerformanceProfile):
         """Set performance profile"""
-        self._logger.debug("Refreshing throttle policy in UI")
+        self._logger.debug("Refreshing performance policy in UI")
         self._performance_actions[value].setChecked(True)
 
     def set_aura_state(self, value):
@@ -291,15 +269,10 @@ class TrayIcon:  # pylint: disable=R0902
         if open_rgb_service.brightness != brightness:
             open_rgb_service.apply_brightness(brightness)
 
-    def on_profile_selected(self, profile: PlatformProfile):
+    def on_profile_selected(self, profile: PerformanceProfile):
         """Profile event handler"""
-        if platform_service.thermal_throttle_profile != profile:
-            platform_service.set_thermal_throttle_policy(profile)
-
-    def on_boost_selected(self, boost: Boost):
-        """Boost event handler"""
-        if platform_service.boost_mode != boost:
-            platform_service.set_boost_mode(boost)
+        if platform_service.performance_profile != profile:
+            platform_service.set_performance_profile(profile)
 
     def pick_color(self):
         """Open color picker"""

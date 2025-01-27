@@ -1,4 +1,5 @@
 import subprocess
+import sys
 import time
 import os
 import threading
@@ -41,7 +42,10 @@ class ChangeHandler(FileSystemEventHandler):
 
 def run_main():
     """Ejecuta el archivo main.py como un subproceso."""
-    return subprocess.Popen(["python3", os.path.join(workspace, "main.py")])
+    command = ["python3", os.path.join(workspace, "main.py")]
+    for i in range(1, len(sys.argv)):
+        command.append(sys.argv[i])
+    return subprocess.Popen(command)
 
 
 if __name__ == "__main__":

@@ -7,6 +7,10 @@
     "en": "Profile",
     "es": "Perfil"
   },
+  "label.profile.TURBO": {
+    "en": "Turbo",
+    "es": "Turbo"
+  },
   "label.profile.PERFORMANCE": {
     "en": "Performance",
     "es": "Rendimiento"

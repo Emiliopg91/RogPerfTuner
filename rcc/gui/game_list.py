@@ -1,4 +1,3 @@
-# pylint: disable=E0611
 from PyQt5.QtWidgets import (
     QDialog,
     QVBoxLayout,
@@ -13,12 +12,12 @@ from PyQt5.QtWidgets import (
 from PyQt5.QtCore import Qt
 from PyQt5.QtGui import QIcon
 
-from rcc.clients.websocket.steam_client import SteamGameDetails, steam_client
+from rcc.communications.client.websocket.steam_client import SteamGameDetails, steam_client
 from rcc.utils.constants import icons_path
-from rcc.models.platform_profile import PlatformProfile
+from rcc.models.performance_profile import PerformanceProfile
 from rcc.services.games_service import games_service
 from rcc.utils.gui_utils import NoScrollComboBox
-from rcc.utils.translator import translator
+from rcc.utils.beans import translator
 
 
 class GameList(QDialog):
@@ -35,8 +34,8 @@ class GameList(QDialog):
             self.setWindowTitle(translator.translate("game.performance.configuration"))
             self.setFixedSize(850, 600)
             self.setWindowIcon(QIcon(f"{icons_path}/icon-45x45.png"))
-            self.setAttribute(Qt.WidgetAttribute.WA_DeleteOnClose)
-            self.setWindowFlags(self.windowFlags() & ~Qt.WindowType.WindowContextHelpButtonHint)
+            self.setAttribute(Qt.WA_DeleteOnClose)
+            self.setWindowFlags(self.windowFlags() & ~Qt.WindowContextHelpButtonHint)
 
             # Configurar layout principal
             layout = QVBoxLayout(self)
@@ -44,8 +43,8 @@ class GameList(QDialog):
             # Crear el área de scroll
             scroll_area = QScrollArea(self)
             scroll_area.setWidgetResizable(True)
-            scroll_area.setVerticalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAsNeeded)
-            scroll_area.setHorizontalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAsNeeded)
+            scroll_area.setVerticalScrollBarPolicy(Qt.ScrollBarAsNeeded)
+            scroll_area.setHorizontalScrollBarPolicy(Qt.ScrollBarAsNeeded)
 
             # Crear un widget contenedor
             container = QWidget()
@@ -63,23 +62,23 @@ class GameList(QDialog):
                 columns.append(translator.translate("used.gpu"))
 
             table = QTableWidget(len(appids), len(columns))
-            table.setSizeAdjustPolicy(QAbstractScrollArea.SizeAdjustPolicy.AdjustToContents)
+            table.setSizeAdjustPolicy(QAbstractScrollArea.AdjustToContents)
             table.setHorizontalHeaderLabels(columns)
             table.verticalHeader().setVisible(False)
 
             # Configurar el ancho de las columnas
             header = table.horizontalHeader()
             # Primera columna se expande
-            header.setSectionResizeMode(0, QHeaderView.ResizeMode.Stretch)
+            header.setSectionResizeMode(0, QHeaderView.Stretch)
             # Resto de columnas ajusta su tamaño al contenido
             for i in range(1, len(columns)):
-                header.setSectionResizeMode(i, QHeaderView.ResizeMode.ResizeToContents)
+                header.setSectionResizeMode(i, QHeaderView.ResizeToContents)
             header.setHighlightSections(False)  # Evitar que el encabezado se resalte
 
             # Desactivar edición y selección en la tabla
-            table.setEditTriggers(QAbstractItemView.EditTrigger.NoEditTriggers)
-            table.setSelectionMode(QAbstractItemView.SelectionMode.NoSelection)
-            table.setFocusPolicy(Qt.FocusPolicy.NoFocus)
+            table.setEditTriggers(QAbstractItemView.NoEditTriggers)
+            table.setSelectionMode(QAbstractItemView.NoSelection)
+            table.setFocusPolicy(Qt.NoFocus)
 
             # Llenar la tabla con datos
             row = 0
@@ -90,17 +89,17 @@ class GameList(QDialog):
                     col = 0
                     # Primera columna: Titulo
                     item = QTableWidgetItem(game.name)
-                    item.setFlags(Qt.ItemFlag.ItemIsEnabled)
+                    item.setFlags(Qt.ItemIsEnabled)
                     table.setItem(row, col, item)
                     col += 1
 
                     # Segunda columna: perfil
                     profile_combo = NoScrollComboBox()  # Usar la subclase personalizada
-                    for profile in PlatformProfile:
+                    for profile in PerformanceProfile:
                         profile_combo.addItem(translator.translate(f"label.profile.{profile.name}"), profile)
 
                     default_index = profile_combo.findData(
-                        PlatformProfile(game_cfg[game.appid].profile)
+                        PerformanceProfile(game_cfg[game.appid].profile)
                     )  # Buscar el índice basado en el dato asociado
                     if default_index != -1:
                         profile_combo.setCurrentIndex(default_index)

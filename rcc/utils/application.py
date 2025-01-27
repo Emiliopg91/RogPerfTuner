@@ -5,6 +5,7 @@ import subprocess
 
 from rcc import __app_name__
 from rcc.gui.notifier import notifier
+from rcc.utils.beans import translator
 from rcc.utils.constants import (
     app_draw_file,
     autostart_file,
@@ -13,9 +14,8 @@ from rcc.utils.constants import (
     user_icon_folder,
     user_update_folder,
 )
-from rcc.utils.event_bus import event_bus
-from rcc.utils.logger import Logger
-from rcc.utils.translator import translator
+from rcc.utils.beans import event_bus
+from framework.logger import Logger
 
 
 class Application:
@@ -34,6 +34,7 @@ Comment=An utility to manage Asus Rog laptop performance
 Path=
 Terminal=False
 Type=Application
+Categories=Utility;
     """
         shutil.copy2(
             os.path.join(icons_path, "rog-logo.svg"),

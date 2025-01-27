@@ -8,10 +8,13 @@ install:
 	@python3 scripts/install.py
 
 dev: install format lint
-	@python3 scripts/watch.py
+	@python3 scripts/watch.py $(ARGS)
 
 build: install format lint 
 	@python3 scripts/package.py
 
 release: build
 	@python3 scripts/version.py increment
+
+%:
+	@:

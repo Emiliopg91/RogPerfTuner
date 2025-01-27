@@ -1,6 +1,6 @@
 #!/bin/env python3
 
-# pylint: disable=C0415, C0413, C0412, C0411, E0611
+# pylint: disable=C0415, C0413, C0412, C0411
 
 import asyncio
 from qasync import QEventLoop
@@ -29,13 +29,14 @@ def create_qt_application() -> QApplication:
     return q_app, q_loop
 
 
-def initialize_application():
+def initialize_application():  # pylint:disable=R0914
     """Application startup"""
     import os
-    from rcc.utils.constants import dev_mode
+    from rcc.utils.constants import dev_mode, user_update_folder, log_file, log_folder, log_old_folder
 
-    from rcc.utils.logger import Logger
+    from framework.logger import Logger
 
+    Logger.initialize(log_file, log_folder, log_old_folder)
     logger = Logger("Main")
 
     if dev_mode:
@@ -51,7 +52,7 @@ def initialize_application():
     logger.add_tab()
 
     from rcc.gui.notifier import notifier
-    from rcc.utils.translator import translator
+    from rcc.utils.beans import translator
 
     notifier.show_toast(translator.translate("initializing"))
 
@@ -88,12 +89,23 @@ def initialize_application():
         platform_service.restore_profile()
 
     """Start dbus server"""
-    from rcc.server.dbus_server import dbus_server
+    from rcc.communications.server.dbus_server import dbus_server
 
     dbus_server.start()
 
     """Start autoupdater"""
-    from rcc.utils.autoupdater import auto_updater
+    from framework.autoupdater import AutoUpdater
+    from rcc.utils.application import application as rcc_application
+
+    auto_updater = AutoUpdater(
+        __app_name__,
+        __version__,
+        "Emiliopg91",
+        "RogControlCenter",
+        user_update_folder,
+        rcc_application.relaunch_application,
+        dev_mode,
+    )
 
     auto_updater.start()
 

@@ -4,7 +4,7 @@ import time
 import psutil
 
 from rcc.utils.constants import lock_file
-from rcc.utils.singleton import singleton
+from framework.singleton import singleton
 
 
 @singleton

@@ -1,7 +1,6 @@
 import subprocess
 import sys
 
-# pylint: disable=E0611, E0401
 from PyQt5.QtWidgets import (
     QDialog,
     QVBoxLayout,
@@ -12,10 +11,10 @@ from PyQt5.QtWidgets import (
 )
 
 from rcc.utils.configuration import configuration
-from rcc.utils.cryptography import cryptography
 from rcc.utils.gui_utils import GuiUtils
-from rcc.utils.logger import Logger
-from rcc.utils.translator import translator
+from rcc.utils.beans import translator
+from rcc.utils.beans import cryptography
+from framework.logger import Logger
 
 
 class PasswordDialog(QDialog):

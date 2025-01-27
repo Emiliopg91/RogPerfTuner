@@ -1,4 +1,3 @@
-# pylint: disable=E0611, E0401
 from PyQt5.QtCore import Qt
 from PyQt5.QtGui import QColor, QIcon, QPixmap
 from PyQt5.QtWidgets import (
@@ -14,16 +13,15 @@ from PyQt5.QtWidgets import (
 
 from rcc.gui.game_list import GameList
 from rcc.models.battery_threshold import BatteryThreshold
-from rcc.models.boost import Boost
+from rcc.models.performance_profile import PerformanceProfile
 from rcc.models.rgb_brightness import RgbBrightness
-from rcc.models.platform_profile import PlatformProfile
 from rcc.services.openrgb_service import open_rgb_service
 from rcc.services.platform_service import platform_service
 from rcc.utils.constants import icons_path
-from rcc.utils.event_bus import event_bus
+from rcc.utils.beans import translator
 from rcc.utils.gui_utils import GuiUtils, NoScrollComboBox
-from rcc.utils.logger import Logger
-from rcc.utils.translator import translator
+from rcc.utils.beans import event_bus
+from framework.logger import Logger
 
 
 class MainWindow(QMainWindow):
@@ -65,19 +63,11 @@ class MainWindow(QMainWindow):
 
         # Label y Dropdown para "Perfil"
         self._profile_dropdown = NoScrollComboBox()
-        for item in PlatformProfile:
+        for item in reversed(PerformanceProfile):
             self._profile_dropdown.addItem(translator.translate(f"label.profile.{item.name}"), item)
         self._profile_dropdown.currentIndexChanged.connect(self.on_profile_changed)
-        self.set_thermal_throttle_policy(platform_service.get_thermal_throttle_profile())
+        self.set_performance_profile(platform_service.performance_profile)
         performance_layout.addRow(QLabel(f"{translator.translate('profile')}:"), self._profile_dropdown)
-
-        # Label y Dropdown para "Boost"
-        self._boost_dropdown = NoScrollComboBox()
-        for item in Boost:
-            self._boost_dropdown.addItem(translator.translate(f"label.boost.{item.name}"), item)
-        self._boost_dropdown.currentIndexChanged.connect(self.on_boost_changed)
-        self.set_boost_mode(platform_service.boost_mode)
-        performance_layout.addRow(QLabel(f"{translator.translate('boost')}:"), self._boost_dropdown)
 
         performance_group.setLayout(performance_layout)
         main_layout.addWidget(performance_group)
@@ -150,8 +140,7 @@ class MainWindow(QMainWindow):
         GuiUtils.center_window_on_current_screen(self)
 
         event_bus.on("PlatformService.battery_threshold", self.set_battery_charge_limit)  # pylint: disable=R0801
-        event_bus.on("PlatformService.boost", self.set_boost_mode)
-        event_bus.on("PlatformService.platform_profile", self.set_thermal_throttle_policy)
+        event_bus.on("PlatformService.performance_profile", self.set_performance_profile)
         event_bus.on("OpenRgbService.aura_changed", self.set_aura_state)
         event_bus.on("GamesService.gameEvent", self.on_game_event)
 
@@ -159,7 +148,6 @@ class MainWindow(QMainWindow):
         """Handler for game events"""
         enable = running_games == 0
         self._profile_dropdown.setEnabled(enable)
-        self._boost_dropdown.setEnabled(enable)
         self._game_profile_button.setEnabled(enable)
 
     def closeEvent(self, event):  # pylint: disable=C0103
@@ -175,13 +163,9 @@ class MainWindow(QMainWindow):
             self._color_button.setStyleSheet(f"background-color: {self._current_color};")
             self.on_color_change()
 
-    def set_thermal_throttle_policy(self, value: PlatformProfile):
+    def set_performance_profile(self, value: PerformanceProfile):
         """Set profile policy"""
         self._profile_dropdown.setCurrentIndex(self._profile_dropdown.findData(value))
-
-    def set_boost_mode(self, value: Boost):
-        """Set boost mode"""
-        self._boost_dropdown.setCurrentIndex(self._boost_dropdown.findData(value))
 
     def set_battery_charge_limit(self, value: BatteryThreshold):
         """Set battery limit"""
@@ -202,14 +186,8 @@ class MainWindow(QMainWindow):
     def on_profile_changed(self, index):
         """Handler for profile change"""
         profile = self._profile_dropdown.itemData(index)
-        if platform_service.thermal_throttle_profile != profile:
-            platform_service.set_thermal_throttle_policy(profile)
-
-    def on_boost_changed(self, index):
-        """Handler for boost change"""
-        mode = self._boost_dropdown.itemData(index)
-        if platform_service.boost_mode != mode:
-            platform_service.set_boost_mode(mode)
+        if platform_service.performance_profile != profile:
+            platform_service.set_performance_profile(profile)
 
     def on_battery_limit_changed(self, index):
         """Handler for battery limit change"""

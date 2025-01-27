@@ -18,7 +18,7 @@ py-version=3.13
 recursive=no
 source-roots=
 suggestion-mode=yes
-unsafe-load-any-extension=no
+unsafe-load-any-extension=yes
 
 [BASIC]
 argument-naming-style=snake_case

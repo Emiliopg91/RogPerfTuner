@@ -1,5 +1,3 @@
-# pylint: disable=R1732
-
 from threading import Lock, Thread
 from typing import Optional
 import subprocess
@@ -7,15 +5,15 @@ import time
 
 import pyudev
 
-from rcc.clients.tcp.openrgb.openrgb_client import open_rgb_client
-from rcc.clients.tcp.openrgb.effects.static import static_effect
+from rcc.communications.client.tcp.openrgb.openrgb_client import open_rgb_client
+from rcc.communications.client.tcp.openrgb.effects.static import static_effect
 from rcc.models.rgb_brightness import RgbBrightness
 from rcc.models.settings import Effect
 from rcc.models.usb_identifier import UsbIdentifier
 from rcc.utils.configuration import configuration
-from rcc.utils.event_bus import event_bus
-from rcc.utils.logger import Logger
-from rcc.utils.singleton import singleton
+from rcc.utils.beans import event_bus
+from framework.logger import Logger
+from framework.singleton import singleton
 
 
 @singleton
@@ -69,7 +67,7 @@ class OpenRgbService:
 
     def bounced_reload(self) -> None:
         """Reload OpenRGB Server"""
-        self._usb_mutex.acquire(True)
+        self._usb_mutex.acquire(True)  # pylint: disable=R1732
         try:
             t0 = time.time()
             self._logger.info("Reloading OpenRGB server")
@@ -97,15 +95,13 @@ class OpenRgbService:
 
             usb_dev = UsbIdentifier(id_vendor, id_product, name)
 
-            if any(
-                cd.id_vendor == usb_dev.id_vendor and cd.id_product == usb_dev.id_product
-                for cd in open_rgb_client.get_compatible_devices()
-            ):
-                self._connected_usb.append(usb_dev)
+            for cd in open_rgb_client.compatible_devices:
+                if cd.id_vendor == usb_dev.id_vendor and cd.id_product == usb_dev.id_product:
+                    self._connected_usb.append(cd)
 
         for action, _ in monitor:  # pylint: disable=R1702
             if action in ["add", "remove"]:
-                self._usb_mutex.acquire(True)
+                self._usb_mutex.acquire(True)  # pylint: disable=R1732
                 try:
                     lsusb_output = subprocess.check_output(["lsusb"]).decode("utf-8").strip()
 
@@ -146,14 +142,15 @@ class OpenRgbService:
                         self._logger.info("Removed compatible device(s):")
                         self._logger.add_tab()
                         for item in removed:
-                            self._logger.info(item.name)
+                            self._logger.info(open_rgb_client.get_device_name(item.id_vendor, item.id_product))
+                            open_rgb_client.disable_device(item.name)
                         self._logger.rem_tab()
 
                     if len(added) > 0:
                         self._logger.info("Connected compatible device(s):")
                         self._logger.add_tab()
                         for item in added:
-                            self._logger.info(item.name)
+                            self._logger.info(open_rgb_client.get_device_name(item.id_vendor, item.id_product))
                         self._logger.rem_tab()
 
                         self._usb_mutex.release()
