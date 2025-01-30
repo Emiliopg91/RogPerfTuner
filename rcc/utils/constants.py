@@ -35,6 +35,11 @@ user_update_folder = os.path.join(user_folder, "update")
 if not os.path.exists(user_update_folder):
     os.makedirs(user_update_folder)
 
+user_effects_folder = os.path.join(user_folder, "effects")
+
+if not os.path.exists(user_effects_folder):
+    os.makedirs(user_effects_folder)
+
 user_bin_folder = os.path.join(user_folder, "bin")
 
 if not os.path.exists(user_bin_folder):

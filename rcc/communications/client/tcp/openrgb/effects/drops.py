@@ -1,17 +1,16 @@
 import random
 import threading
 
+from framework.singleton import singleton
 from rcc.communications.client.tcp.openrgb.client.utils import RGBColor
 from rcc.communications.client.tcp.openrgb.effects.base.abstract_effect import AbstractEffect
-from framework.singleton import singleton
-
 
 @singleton
-class Rain(AbstractEffect):
-    """Rain effect"""
+class Drops(AbstractEffect):
+    """Drops effect"""
 
     def __init__(self):
-        super().__init__("Rain")
+        super().__init__("Drops")
         self._available_colors = [
             RGBColor(0, 0, 0),
             RGBColor(0, 0, 0),
@@ -27,7 +26,7 @@ class Rain(AbstractEffect):
         for i in range(len(self._devices)):  # pylint: disable=C0200
             self._buffer[i] = []
             thread = threading.Thread(
-                name=f"Rain-dev-{i}",
+                name=f"Drops-dev-{i}",
                 target=self._effect_thread,
                 args=(i, self._devices[i]),
             )
@@ -66,4 +65,4 @@ class Rain(AbstractEffect):
         return self._buffer[dev_index].pop(0)
 
 
-rain = Rain()
+drops = Drops()

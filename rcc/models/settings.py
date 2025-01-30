@@ -8,7 +8,6 @@ from dataclasses_json import dataclass_json
 class Effect:
     """Configuration helper class"""
 
-    brightness: int
     color: str | None = None
 
 
@@ -17,6 +16,7 @@ class Effect:
 class OpenRgb:
     """Configuration helper class"""
 
+    brightness: int
     last_effect: str
     effects: dict[str, Effect]
 

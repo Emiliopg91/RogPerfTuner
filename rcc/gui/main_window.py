@@ -84,7 +84,8 @@ class MainWindow(QMainWindow):
         # Dropdown para "Efecto"
         self._effect_dropdown = NoScrollComboBox()
         self._effect_dropdown.addItems(self._effect_labels)
-        self._effect_dropdown.setCurrentIndex(self._effect_labels.index(open_rgb_service._effect))
+        if open_rgb_service._effect in self._effect_labels:
+            self._effect_dropdown.setCurrentIndex(self._effect_labels.index(open_rgb_service._effect))
         self._effect_dropdown.currentIndexChanged.connect(self.on_effect_change)
         aura_layout.addRow(QLabel(f"{translator.translate("effect")}:"), self._effect_dropdown)
 

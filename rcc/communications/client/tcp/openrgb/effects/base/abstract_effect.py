@@ -14,6 +14,14 @@ from framework.logger import Logger
 class AbstractEffect(ABC):
     """Base class for effects"""
 
+    # Map brightness levels
+    BRIGHTNESS_MAP = {
+        RgbBrightness.LOW: 0.25,
+        RgbBrightness.MEDIUM: 0.5,
+        RgbBrightness.HIGH: 0.75,
+        RgbBrightness.MAX: 1,
+    }
+
     def __init__(self, name: str, default_color: str = None):
         self._is_running = False
         self._brightness = 0
@@ -46,14 +54,7 @@ class AbstractEffect(ABC):
             f"{' and ' + color.to_hex() + ' color' if self._supports_color else ''}"
         )
 
-        # Map brightness levels
-        brightness_mapping = {
-            RgbBrightness.LOW: 0.25,
-            RgbBrightness.MEDIUM: 0.5,
-            RgbBrightness.HIGH: 0.75,
-            RgbBrightness.MAX: 1,
-        }
-        self._brightness = brightness_mapping.get(brightness, 0)
+        self._brightness = self.BRIGHTNESS_MAP.get(brightness, 0)
 
         self._is_running = True
 
@@ -77,7 +78,7 @@ class AbstractEffect(ABC):
         if self._is_running:
             with self._mutex:
                 if self._is_running:
-                    dimmed_colors = [color.dim(self._brightness) for color in colors]
+                    dimmed_colors = [color * self._brightness for color in colors]
                     dev.set_colors(dimmed_colors, True)
 
     @property

@@ -222,20 +222,19 @@ class RGBColor:
 
         return transition
 
-    def dim(self, factor: float) -> RGBColor:
-        """Get dimmed color"""
-        return RGBColor(
-            red=round(self.red * factor),
-            green=round(self.green * factor),
-            blue=round(self.blue * factor),
-        )
-
     def to_hex(self) -> str:
         """Get hex representation of color"""
         return f"#{self.red:02x}{self.green:02x}{self.blue:02x}".upper()
 
     def to_hsv(self) -> tuple[float, float, float]:
         return colorsys.rgb_to_hsv(self.red / 255, self.green / 255, self.blue / 255)
+
+    def __mul__(self, factor):
+        return RGBColor(
+            red=round(self.red * factor),
+            green=round(self.green * factor),
+            blue=round(self.blue * factor),
+        )
 
 
 @dataclass

@@ -4,11 +4,11 @@ import random
 import threading
 
 import psutil
+from framework.singleton import singleton
 from rcc.communications.client.tcp.openrgb.client.orgb import Device, Zone
 from rcc.communications.client.tcp.openrgb.client.utils import RGBColor, ZoneType, DeviceType
 
 from rcc.communications.client.tcp.openrgb.effects.base.abstract_effect import AbstractEffect
-from framework.singleton import singleton
 
 
 @dataclass
@@ -23,22 +23,21 @@ class LedStatus:
         """Copy self instance into new one"""
         return LedStatus(self.pos_idx, self.max_val, self.cur_val)
 
-
 @singleton
 class DigitalRain(AbstractEffect):
     """Digital rain effect"""
 
     def __init__(self):
         super().__init__("Digital rain", "#00FF00")
-        self._max_count = 10
+        self._max_count = 15
         self._cpu = 0
         self._nap_time = 0.07
         self._lock = threading.Lock()
 
-        self.sin_array = [0] * (self._max_count)
+        self.sin_array = [0] * int(2 * self._max_count / 3)
 
         # Rellenar el resto del array con valores basados en la función seno
-        for i in range(0, self._max_count):  # Desde la posición 1 hasta la 8
+        for i in range(int(2 * self._max_count / 3)):  # Desde la posición 1 hasta la 8
             x = (i / (self._max_count + 2)) * math.pi / 2  # Escalar el índice entre 0 y 1
             self.sin_array[i] = math.pow(math.sin(x), 2)
 
@@ -63,8 +62,10 @@ class DigitalRain(AbstractEffect):
                     if led.cur_val >= 0:
                         if led.cur_val == led.max_val:
                             colors[led.pos_idx] = RGBColor(255, 255, 255)
+                        elif led.cur_val >= int(2 * led.max_val / 3):
+                            colors[led.pos_idx] = self._color
                         else:
-                            colors[led.pos_idx] = self._color.dim(
+                            colors[led.pos_idx] = self._color * (
                                 self.sin_array[round(led.cur_val * (led.max_val / self._max_count))]
                             )
                     else:
@@ -98,7 +99,7 @@ class DigitalRain(AbstractEffect):
 
             if allowed > len(zone_status[0]) - len(free_cols):
                 next_col = free_cols[random.randint(0, len(free_cols) - 1)]
-                zone_status[0][next_col].max_val = random.randint(round(2 * self._max_count / 3), self._max_count)
+                zone_status[0][next_col].max_val = self._max_count
                 zone_status[0][next_col].cur_val = zone_status[0][next_col].max_val
 
     def _dev_to_mat(self, dev: Device) -> list[list[LedStatus]]:  # pylint: disable=R0912,R0914

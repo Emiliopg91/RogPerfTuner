@@ -17,7 +17,7 @@ from rcc.communications.client.tcp.openrgb.effects.base.abstract_effect import A
 from rcc.communications.client.tcp.openrgb.effects.breathing import breathing_effect
 from rcc.communications.client.tcp.openrgb.effects.dance_floor import dance_floor
 from rcc.communications.client.tcp.openrgb.effects.digital_rain import digital_rain
-from rcc.communications.client.tcp.openrgb.effects.rain import rain
+from rcc.communications.client.tcp.openrgb.effects.drops import drops
 from rcc.communications.client.tcp.openrgb.effects.rainbow_wave import rainbow_wave
 from rcc.communications.client.tcp.openrgb.effects.spectrum_cycle import spectrum_cycle
 from rcc.communications.client.tcp.openrgb.effects.starry_night import starry_night
@@ -44,7 +44,7 @@ class OpenRgbClient:
             breathing_effect,
             dance_floor,
             digital_rain,
-            rain,
+            drops,
             rainbow_wave,
             spectrum_cycle,
             starry_night,
@@ -195,7 +195,7 @@ class OpenRgbClient:
             return effects[0].color
         return None
 
-    def apply_effect(self, effect: str, brightness: RgbBrightness, color: Optional[str] = None) -> None:
+    def apply_effect(self, effect: str, brightness: RgbBrightness, color: Optional[str] = None) -> bool:
         """Apply effect with specified brightness and color"""
         inst = [i for i in self._available_effects if i.name == effect]
         if inst:
@@ -203,6 +203,8 @@ class OpenRgbClient:
                 mode.stop()
 
             inst[0].start(self._available_devices, brightness, RGBColor.fromHEX(color or "#000000"))
+            return inst[0].supports_color
+        return False
 
     def disable_device(self, name: str):
         """Disable certain device"""
@@ -216,6 +218,11 @@ class OpenRgbClient:
             if dev.id_vendor == vendor and dev.id_product == product:
                 return dev.name
         return None
+
+    def append_custom_effect(self, effect: AbstractEffect):
+        """Add custom effect to availability"""
+        self._available_effects.append(effect)
+        self._available_effects = sorted(self._available_effects, key=lambda e: e.name)
 
 
 open_rgb_client = OpenRgbClient()

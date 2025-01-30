@@ -1,8 +1,7 @@
 import math
 
-from rcc.communications.client.tcp.openrgb.effects.base.abstract_effect import AbstractEffect
 from framework.singleton import singleton
-
+from rcc.communications.client.tcp.openrgb.effects.base.abstract_effect import AbstractEffect
 
 @singleton
 class BreathingEffect(AbstractEffect):
@@ -19,7 +18,7 @@ class BreathingEffect(AbstractEffect):
     def apply_effect(self):
         offset = 0
         while self._is_running:
-            new_color = self._color.dim(self._sin_steps[offset])
+            new_color = self._color * (self._sin_steps[offset])
 
             for dev in self._devices:
                 if dev.enabled:

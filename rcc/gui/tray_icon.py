@@ -16,7 +16,7 @@ from rcc.models.battery_threshold import BatteryThreshold
 from rcc.services.games_service import games_service
 from rcc.services.openrgb_service import open_rgb_service
 from rcc.services.platform_service import platform_service
-from rcc.utils.constants import icons_path, dev_mode, log_file
+from rcc.utils.constants import icons_path, dev_mode, log_file, config_file
 from rcc.utils.beans import translator
 from rcc.utils.beans import event_bus
 from framework.logger import Logger
@@ -193,6 +193,11 @@ class TrayIcon:  # pylint: disable=R0902
             self._open_logs_action.triggered.connect(self.on_open_logs)
             self._menu.addAction(self._open_logs_action)
 
+            # Add "Open settings" option
+            self._open_settings_action = QAction("    Open settings")
+            self._open_settings_action.triggered.connect(self.on_open_settings)
+            self._menu.addAction(self._open_settings_action)
+
             self._menu.addSeparator()
 
         # Add "Open" option
@@ -293,6 +298,11 @@ class TrayIcon:  # pylint: disable=R0902
     def on_open_logs():
         """Open log file"""
         subprocess.run(["xdg-open", log_file], check=False)
+
+    @staticmethod
+    def on_open_settings():
+        """Open log file"""
+        subprocess.run(["xdg-open", config_file], check=False)
 
     @staticmethod
     def on_quit():

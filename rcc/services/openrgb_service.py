@@ -1,3 +1,5 @@
+import importlib
+import os
 from threading import Lock, Thread
 from typing import Optional
 import subprocess
@@ -10,6 +12,7 @@ from rcc.communications.client.tcp.openrgb.effects.static import static_effect
 from rcc.models.rgb_brightness import RgbBrightness
 from rcc.models.settings import Effect
 from rcc.models.usb_identifier import UsbIdentifier
+from rcc.utils.constants import user_effects_folder
 from rcc.utils.configuration import configuration
 from rcc.utils.beans import event_bus
 from framework.logger import Logger
@@ -29,26 +32,48 @@ class OpenRgbService:
         if configuration.open_rgb.last_effect:
             self._effect = configuration.open_rgb.last_effect
 
+        self._brightness = RgbBrightness.MAX
+        if configuration.open_rgb.brightness is not None:
+            self._brightness = RgbBrightness(configuration.open_rgb.brightness)
+
         self._color = static_effect.color
         if configuration.open_rgb.last_effect and configuration.open_rgb.last_effect in configuration.open_rgb.effects:
             self._color = configuration.open_rgb.effects[configuration.open_rgb.last_effect].color
-
-        self._brightness = RgbBrightness.MEDIUM
-        if configuration.open_rgb.last_effect and configuration.open_rgb.last_effect in configuration.open_rgb.effects:
-            self._brightness = RgbBrightness(
-                configuration.open_rgb.effects[configuration.open_rgb.last_effect].brightness
-            )
 
         self._connected_usb: list[UsbIdentifier] = []
         self._usb_mutex = Lock()
         thread = Thread(name="UsbChecker", target=self.monitor_for_usb)
         thread.start()
 
+        self.__load_custom_effects()
+
         self._logger.info("Restoring effect")
         self._logger.add_tab()
         open_rgb_client.apply_effect(self._effect, self._brightness, self._color)
         self._logger.rem_tab()
         self._logger.rem_tab()
+
+    def __load_custom_effects(self):
+        """Load user custom effect"""
+        directory = user_effects_folder
+        files = [file for file in os.listdir(directory) if file.endswith(".py") and file != "__init__.py"]
+
+        if len(files) > 0:
+            self._logger.info(f"Loading {len(files)} custom effects")
+            self._logger.add_tab()
+            for file in files:
+                module_name = file[:-3]  # Quitar ".py"
+                module_path = os.path.join(directory, file)
+                self._logger.debug(f"Loading effect file {module_path}")
+                spec = importlib.util.spec_from_file_location(module_name, module_path)
+                module = importlib.util.module_from_spec(spec)
+                spec.loader.exec_module(module)
+
+                if hasattr(module, "instance"):
+                    instance = getattr(module, "instance")
+                    self._logger.info(f"Loaded effect {instance.name}")
+                    open_rgb_client.append_custom_effect(instance)
+            self._logger.rem_tab()
 
     @property
     def brightness(self) -> RgbBrightness:
@@ -196,13 +221,7 @@ class OpenRgbService:
             else:
                 color = open_rgb_client.get_color(effect)
 
-        brightness = RgbBrightness.MEDIUM
-        if effect in configuration.open_rgb.effects:
-            brightness = RgbBrightness(configuration.open_rgb.effects[effect].brightness)
-
-        brightness = brightness if brightness != RgbBrightness.OFF else RgbBrightness.MEDIUM
-
-        self._apply_aura(effect, brightness, color)
+        self._apply_aura(effect, self.brightness, color)
 
     def apply_brightness(self, brightness: RgbBrightness) -> None:
         """Apply brightness"""
@@ -212,18 +231,19 @@ class OpenRgbService:
         """Apply color"""
         self._apply_aura(self._effect, self._brightness, color)
 
-    def _apply_aura(
+    def _apply_aura(  # pylint: disable=R0913,R0917
         self,
         effect: str,
         brightness: RgbBrightness,
         color: Optional[str] = None,
-        force=False,
+        force: bool = False,
+        temporal: bool = False,
     ) -> None:
         color = color if open_rgb_client.supports_color(effect) else None
         if (self._effect != effect or self._brightness != brightness or self._color != color) or force:
             self._logger.info("Applying effect")
             self._logger.add_tab()
-            open_rgb_client.apply_effect(effect, brightness, color)
+            supports_color = open_rgb_client.apply_effect(effect, brightness, color)
 
             self._effect = effect
             self._brightness = brightness
@@ -232,9 +252,15 @@ class OpenRgbService:
                 "OpenRgbService.aura_changed",
                 {effect: effect, brightness: brightness, color: color},
             )
-            configuration.open_rgb.last_effect = effect
-            configuration.open_rgb.effects[effect] = Effect(brightness.value, color)
-            configuration.save_config()
+
+            if not temporal:
+                configuration.open_rgb.last_effect = effect
+                configuration.open_rgb.brightness = brightness.value
+
+                if supports_color:
+                    configuration.open_rgb.effects[effect] = Effect(color)
+                configuration.save_config()
+
             self._logger.rem_tab()
 
     def get_next_effect(self) -> str:

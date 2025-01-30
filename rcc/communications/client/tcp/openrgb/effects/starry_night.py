@@ -1,10 +1,10 @@
 import random
 import threading
 
+from framework.singleton import singleton
 from rcc.communications.client.tcp.openrgb.client.utils import RGBColor
 
 from rcc.communications.client.tcp.openrgb.effects.base.abstract_effect import AbstractEffect
-from framework.singleton import singleton
 
 
 @singleton
@@ -44,7 +44,7 @@ class StarryNight(AbstractEffect):
 
             for i in range(len(leds)):  # pylint: disable=C0200
                 steps[i] = max(0, steps[i] - 1)
-                new_colors[i] = leds[i].dim(steps[i] / self._max_steps)
+                new_colors[i] = leds[i] * (steps[i] / self._max_steps)
 
             can_turn_on = sum(1 for i in steps if i > 0) / len(steps) < 0.2
 
@@ -53,7 +53,7 @@ class StarryNight(AbstractEffect):
                 while led_on < 0 or steps[led_on] > 0:
                     led_on = random.randint(0, len(leds) - 1)
                 steps[led_on] = 20 + random.randint(0, 10)
-                new_colors[led_on] = leds[led_on] = self._get_random().dim(steps[led_on] / self._max_steps)
+                new_colors[led_on] = leds[led_on] = self._get_random() * (steps[led_on] / self._max_steps)
 
             self._set_colors(device, new_colors)
             self._sleep(random.randint(0, 150) / 1000)

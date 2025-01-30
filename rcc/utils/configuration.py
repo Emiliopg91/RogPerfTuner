@@ -2,6 +2,8 @@ import json
 import os
 import yaml
 
+from rcc.communications.client.tcp.openrgb.effects.static import static_effect
+from rcc.models.rgb_brightness import RgbBrightness
 from rcc.models.settings import (
     Config,
     GameEntry,
@@ -25,15 +27,14 @@ class Configuration:
         self._config: Config | None
 
     def _load_config(self) -> None:
-        try:
+        if os.path.exists(config_file):
             with open(config_file, "r") as f:
                 raw_config = yaml.safe_load(f) or {}
 
             json_output = json.dumps(raw_config, indent=2)
             self._config = Config.from_json(json_output)  # pylint: disable=E1101
             Logger.set_config_map(self._config.logger)
-
-        except FileNotFoundError:
+        else:
             if not os.path.exists(config_folder):
                 os.makedirs(config_folder, exist_ok=True)
 
@@ -42,7 +43,7 @@ class Configuration:
                 games={},
                 settings=Settings(None),
                 platform=Platform(profiles=PlatformProfiles(PerformanceProfile.PERFORMANCE.value)),
-                open_rgb=OpenRgb(last_effect="Static", effects={}),
+                open_rgb=OpenRgb(last_effect=static_effect.name, brightness=RgbBrightness.MAX.value, effects={}),
             )
             self.save_config()
 
