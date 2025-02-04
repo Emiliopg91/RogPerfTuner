@@ -16,9 +16,9 @@ import sys
 
 def get_application_lock():
     """Get the lock"""
-    from rcc.utils.single_instance import single_instance
+    from rcc.utils.single_instance import SINGLE_INSTANCE
 
-    single_instance.acquire()
+    SINGLE_INSTANCE.acquire()
 
 
 def create_qt_application() -> QApplication:
@@ -58,11 +58,11 @@ def initialize_application():  # pylint:disable=R0914
 
     """Create application files"""
     if not DEV_MODE:
-        from rcc.utils.application import application
+        from rcc.services.application_service import APPLICATION_SERVICE
 
-        application.generate_run()
-        application.create_menu_entry()
-        application.enable_autostart()
+        APPLICATION_SERVICE.generate_run()
+        APPLICATION_SERVICE.create_menu_entry()
+        APPLICATION_SERVICE.enable_autostart()
 
     """Ask for sudo password"""
     from rcc.gui.password_dialog import PASSWORD_DIALOG
@@ -95,7 +95,7 @@ def initialize_application():  # pylint:disable=R0914
 
     """Start autoupdater"""
     from framework.autoupdater import AutoUpdater
-    from rcc.utils.application import application as rcc_application
+    from rcc.services.application_service import APPLICATION_SERVICE
 
     auto_updater = AutoUpdater(
         __app_name__,
@@ -103,7 +103,7 @@ def initialize_application():  # pylint:disable=R0914
         "Emiliopg91",
         "RogControlCenter",
         USER_UPDATE_FOLDER,
-        rcc_application.relaunch_application,
+        APPLICATION_SERVICE.relaunch_application,
         DEV_MODE,
     )
 

@@ -17,17 +17,18 @@ from rcc.utils.constants import (
 from rcc.utils.beans import event_bus
 from framework.logger import Logger
 
+from framework.singleton import singleton
 
-class Application:
+
+@singleton
+class ApplicationService:
     """Class for managing applicaion aspects"""
 
-    def __init__(self):
-        self._logger = Logger()
-        self._runner_file = os.path.join(USER_BIN_FOLDER, "launch.sh")
-        self._rccdc_enabled = False
+    RUNNER_FILE_PATH = os.path.join(USER_BIN_FOLDER, "launch.sh")
+    UPDATE_FILE_PATH = f"{os.path.join(USER_UPDATE_FOLDER, __app_name__)}.AppImage"
 
-        self._desktop_content = f"""[Desktop Entry]
-Exec={self._runner_file}
+    DESKTOP_FILE_CONTENT = f"""[Desktop Entry]
+Exec={RUNNER_FILE_PATH}
 Icon={os.path.join(USER_ICON_FOLDER, "icon.svg")}
 Name={__app_name__}
 Comment=An utility to manage Asus Rog laptop performance
@@ -36,28 +37,23 @@ Terminal=False
 Type=Application
 Categories=Utility;
     """
+
+    RUNNER_FILE_CONTENT = f"""#!/bin/bash
+if [[ -f "{UPDATE_FILE_PATH}" ]]; then
+    cp "{UPDATE_FILE_PATH}" "{os.getenv("APPIMAGE")}"
+    chmod 755 "{os.getenv("APPIMAGE")}"
+fi
+"{os.getenv("APPIMAGE")}"
+"""
+
+    def __init__(self):
+        self._logger = Logger()
+        self._rccdc_enabled = False
+
         shutil.copy2(
             os.path.join(ICONS_PATH, "rog-logo.svg"),
             os.path.join(USER_ICON_FOLDER, "icon.svg"),
         )
-
-    def generate_run(self) -> None:
-        """Generate runner file"""
-        update_file = f"{os.path.join(USER_UPDATE_FOLDER, __app_name__)}.AppImage"
-        content = f"""#!/bin/bash
-
-if [[ -f "{update_file}" ]]; then
-    cp "{update_file}" "{os.getenv("APPIMAGE")}"
-    chmod 755 "{os.getenv("APPIMAGE")}"
-fi
-
-"{os.getenv("APPIMAGE")}"
-"""
-        with open(self._runner_file, "w", encoding="utf-8") as file:
-            file.write(content)
-        os.chmod(self._runner_file, 0o755)
-
-        self._logger.debug(f"Launch file '{self._runner_file}' written successfully")
 
     def enable_autostart(self) -> None:
         """Create file to enable autostart on login"""
@@ -67,7 +63,7 @@ fi
             os.makedirs(dir_path, exist_ok=True)
 
         with open(AUTOSTART_FILE, "w", encoding="utf-8") as file:
-            file.write(self._desktop_content)
+            file.write(self.DESKTOP_FILE_CONTENT)
 
         self._logger.debug(f"Autostart file '{AUTOSTART_FILE}' written successfully")
 
@@ -79,7 +75,7 @@ fi
             os.makedirs(dir_path, exist_ok=True)
 
         with open(APP_DRAW_FILE, "w", encoding="utf-8") as file:
-            file.write(self._desktop_content)
+            file.write(self.DESKTOP_FILE_CONTENT)
 
         self._logger.debug(f"Menu entry file '{APP_DRAW_FILE}' written successfully")
 
@@ -88,11 +84,20 @@ fi
         NOTIFIER.show_toast(translator.translate("applying.update"))
         event_bus.emit("stop")
         subprocess.run(
-            f'nohup bash -c "sleep 1 && {self._runner_file}" > /dev/null 2>&1 &',
+            f'nohup bash -c "sleep 1 && {self.RUNNER_FILE_PATH}" > /dev/null 2>&1 &',
             check=False,
             shell=True,
         )
         os.kill(os.getpid(), signal.SIGKILL)
 
+    def generate_run(self) -> None:
+        """Generate runner file"""
 
-application = Application()
+        with open(self.RUNNER_FILE_PATH, "w", encoding="utf-8") as file:
+            file.write(self.RUNNER_FILE_CONTENT)
+        os.chmod(self.RUNNER_FILE_PATH, 0o755)
+
+        self._logger.debug(f"Launch file '{self.RUNNER_FILE_PATH}' written successfully")
+
+
+APPLICATION_SERVICE = ApplicationService()

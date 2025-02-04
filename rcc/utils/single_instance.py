@@ -31,4 +31,4 @@ class SingleInstance:
             f.write(str(os.getpid()))
 
 
-single_instance = SingleInstance()
+SINGLE_INSTANCE = SingleInstance()
