@@ -7,16 +7,16 @@ from PyQt5.QtWidgets import QSystemTrayIcon, QMenu, QAction, QActionGroup, QColo
 from PyQt5.QtGui import QIcon, QColor
 
 from rcc.gui.game_list import GameList
-from rcc.gui.main_window import main_window
+from rcc.gui.main_window import MAIN_WINDOW
 
 from rcc import __app_name__, __version__
 from rcc.models.performance_profile import PerformanceProfile
 from rcc.models.rgb_brightness import RgbBrightness
 from rcc.models.battery_threshold import BatteryThreshold
-from rcc.services.games_service import games_service
-from rcc.services.openrgb_service import open_rgb_service
-from rcc.services.platform_service import platform_service
-from rcc.utils.constants import icons_path, dev_mode, log_file, config_file
+from rcc.services.games_service import GAME_SERVICE
+from rcc.services.openrgb_service import OPEN_RGB_SERVICE
+from rcc.services.platform_service import PLATFORM_SERVICE
+from rcc.utils.constants import ICONS_PATH, DEV_MODE, LOG_FILE, CONFIG_FILE
 from rcc.utils.beans import translator
 from rcc.utils.beans import event_bus
 from framework.logger import Logger
@@ -31,7 +31,7 @@ class TrayIcon:  # pylint: disable=R0902
         self._logger = Logger()
         self._last_trigger = None
 
-        icon = QIcon.fromTheme(os.path.join(icons_path, "icon-45x45.png"))
+        icon = QIcon.fromTheme(os.path.join(ICONS_PATH, "icon-45x45.png"))
 
         self._tray = QSystemTrayIcon()
         self._tray.setIcon(icon)
@@ -53,7 +53,7 @@ class TrayIcon:  # pylint: disable=R0902
         for threshold in BatteryThreshold:
             action = QAction(f"{threshold.value}%", checkable=True)
             action.setActionGroup(self._threshold_group)
-            action.setChecked(threshold == platform_service._battery_charge_limit)
+            action.setChecked(threshold == PLATFORM_SERVICE._battery_charge_limit)
             action.triggered.connect(lambda _, t=threshold: self.on_threshold_selected(t))
             self.threshold_actions[threshold] = action
             self._umbral_menu.addAction(action)
@@ -71,10 +71,10 @@ class TrayIcon:  # pylint: disable=R0902
         self._effect_group = QActionGroup(self._effect_menu)
         self._effect_group.setExclusive(True)
         self._effect_actions: dict[str, QAction] = {}
-        for effect in open_rgb_service.get_available_effects():
+        for effect in OPEN_RGB_SERVICE.get_available_effects():
             action = QAction(effect, checkable=True)
             action.setActionGroup(self._effect_group)
-            action.setChecked(effect == open_rgb_service._effect)
+            action.setChecked(effect == OPEN_RGB_SERVICE._effect)
             action.triggered.connect(lambda _, e=effect: self.on_effect_selected(e))
             self._effect_actions[effect] = action
             self._effect_menu.addAction(action)
@@ -91,7 +91,7 @@ class TrayIcon:  # pylint: disable=R0902
                 checkable=True,
             )
             action.setActionGroup(self._brightness_group)
-            action.setChecked(brightness == open_rgb_service._brightness)
+            action.setChecked(brightness == OPEN_RGB_SERVICE._brightness)
             action.triggered.connect(lambda _, b=brightness: self.on_brightness_selected(b))
             self._brightness_actions[brightness] = action
             self._brightness_menu.addAction(action)
@@ -100,7 +100,7 @@ class TrayIcon:  # pylint: disable=R0902
         # Add "Color" submenu
         self._color_menu = QMenu("    " + translator.translate("color"))
 
-        self._color_action = QAction(open_rgb_service.get_color())
+        self._color_action = QAction(OPEN_RGB_SERVICE.get_color())
         self._color_action.setEnabled(False)
         self._color_menu.addAction(self._color_action)
 
@@ -109,7 +109,7 @@ class TrayIcon:  # pylint: disable=R0902
         self._color_menu.addAction(self._colorpicker_action)
 
         self._submenu_color = self._menu.addMenu(self._color_menu)
-        self._submenu_color.setEnabled(open_rgb_service.supports_color())
+        self._submenu_color.setEnabled(OPEN_RGB_SERVICE.supports_color())
 
         self._menu.addSeparator()
 
@@ -125,15 +125,16 @@ class TrayIcon:  # pylint: disable=R0902
         for profile in reversed(PerformanceProfile):
             action = QAction(translator.translate(f"label.profile.{profile.name}"), checkable=True)
             action.setActionGroup(self._performance_group)
-            action.setChecked(profile == platform_service.performance_profile)
+            action.setChecked(profile == PLATFORM_SERVICE.performance_profile)
             action.triggered.connect(lambda _, p=profile: self.on_profile_selected(p))
             self._performance_actions[profile] = action
             self._profile_menu.addAction(action)
         self._menu.addMenu(self._profile_menu)
 
-        if games_service.rccdc_enabled:
+        if GAME_SERVICE.rccdc_enabled:
             # Add "Games" option
             self._games_menu = QMenu("    " + translator.translate("games"))
+            self._games_menu.setEnabled(GAME_SERVICE.steam_connected)
             self._select_profile_action = QAction(f"{translator.translate("label.game.configure")}...")
             self._select_profile_action.triggered.connect(self.on_open_game_list)
             self._games_menu.addAction(self._select_profile_action)
@@ -141,7 +142,7 @@ class TrayIcon:  # pylint: disable=R0902
 
         self._menu.addSeparator()
 
-        if dev_mode:
+        if DEV_MODE:
             self._dev_section = QAction("Development")
             self._dev_section.setEnabled(False)
             self._menu.addAction(self._dev_section)
@@ -151,19 +152,19 @@ class TrayIcon:  # pylint: disable=R0902
 
             self._ac_connected_action = QAction("AC connected")
             self._ac_connected_action.triggered.connect(
-                lambda: platform_service._on_ac_battery_change(False, False, False)  # pylint: disable=W0212
+                lambda: PLATFORM_SERVICE._on_ac_battery_change(False, False, False)  # pylint: disable=W0212
             )
             self._simulation_menu.addAction(self._ac_connected_action)
 
             self._ac_disconnected_action = QAction("AC disconnected")
             self._ac_disconnected_action.triggered.connect(
-                lambda: platform_service._on_ac_battery_change(True, False, False)  # pylint: disable=W0212
+                lambda: PLATFORM_SERVICE._on_ac_battery_change(True, False, False)  # pylint: disable=W0212
             )
             self._simulation_menu.addAction(self._ac_disconnected_action)
 
             self._simulation_menu.addSeparator()
 
-            if games_service.rccdc_enabled:
+            if GAME_SERVICE.rccdc_enabled:
                 self._steam_connected_action = QAction("Steam connected")
                 self._steam_connected_action.triggered.connect(lambda: event_bus.emit("SteamClient.connected"))
                 self._simulation_menu.addAction(self._steam_connected_action)
@@ -219,6 +220,8 @@ class TrayIcon:  # pylint: disable=R0902
         event_bus.on("PlatformService.performance_profile", self.set_performance_profile)
         event_bus.on("OpenRgbService.aura_changed", self.set_aura_state)
         event_bus.on("GamesService.gameEvent", self.on_game_event)
+        event_bus.on("GamesService.steam_connected", lambda: self.on_steam_connected_event(True))
+        event_bus.on("GamesService.steam_disconnected", lambda: self.on_steam_connected_event(False))
 
         self._tray.activated.connect(self.on_tray_icon_activated)
 
@@ -226,6 +229,10 @@ class TrayIcon:  # pylint: disable=R0902
         """Handler for game events"""
         enable = running_games == 0
         self._profile_menu.setEnabled(enable)
+
+    def on_steam_connected_event(self, connected: bool):
+        """Handler for steam connection events"""
+        self._games_menu.setEnabled(connected)
 
     def on_tray_icon_activated(self, reason):
         """Restore main window"""
@@ -261,48 +268,48 @@ class TrayIcon:  # pylint: disable=R0902
 
     def on_threshold_selected(self, threshold: BatteryThreshold):
         """Battery limit event handler"""
-        if platform_service.battery_charge_limit != threshold:
-            platform_service.set_battery_threshold(threshold)
+        if PLATFORM_SERVICE.battery_charge_limit != threshold:
+            PLATFORM_SERVICE.set_battery_threshold(threshold)
 
     def on_effect_selected(self, effect: str):
         """Effect event handler"""
-        if open_rgb_service.effect != effect:
-            open_rgb_service.apply_effect(effect)
+        if OPEN_RGB_SERVICE.effect != effect:
+            OPEN_RGB_SERVICE.apply_effect(effect)
 
     def on_brightness_selected(self, brightness: RgbBrightness):
         """Brightness event handler"""
-        if open_rgb_service.brightness != brightness:
-            open_rgb_service.apply_brightness(brightness)
+        if OPEN_RGB_SERVICE.brightness != brightness:
+            OPEN_RGB_SERVICE.apply_brightness(brightness)
 
     def on_profile_selected(self, profile: PerformanceProfile):
         """Profile event handler"""
-        if platform_service.performance_profile != profile:
-            platform_service.set_performance_profile(profile)
+        if PLATFORM_SERVICE.performance_profile != profile:
+            PLATFORM_SERVICE.set_performance_profile(profile)
 
     def pick_color(self):
         """Open color picker"""
         color = QColorDialog.getColor(QColor(self._color_action.text()), None, translator.translate("color.select"))
         if color.isValid():
-            open_rgb_service.apply_color(color.name().upper())
+            OPEN_RGB_SERVICE.apply_color(color.name().upper())
 
     def on_open_game_list(self):
         """Open game list window"""
-        GameList(main_window, True).show()
+        GameList(MAIN_WINDOW, True).show()
 
     @staticmethod
     def on_open():
         """Open main window"""
-        main_window.show()
+        MAIN_WINDOW.show()
 
     @staticmethod
     def on_open_logs():
         """Open log file"""
-        subprocess.run(["xdg-open", log_file], check=False)
+        subprocess.run(["xdg-open", LOG_FILE], check=False)
 
     @staticmethod
     def on_open_settings():
         """Open log file"""
-        subprocess.run(["xdg-open", config_file], check=False)
+        subprocess.run(["xdg-open", CONFIG_FILE], check=False)
 
     @staticmethod
     def on_quit():
@@ -311,4 +318,4 @@ class TrayIcon:  # pylint: disable=R0902
         os.kill(os.getpid(), signal.SIGKILL)
 
 
-tray_icon = TrayIcon()
+TRAY_ICON = TrayIcon()

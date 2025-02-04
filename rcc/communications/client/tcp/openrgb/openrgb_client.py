@@ -12,16 +12,16 @@ from rcc.communications.client.tcp.openrgb.client.utils import RGBColor
 
 from rcc.models.rgb_brightness import RgbBrightness
 from rcc.models.usb_identifier import UsbIdentifier
-from rcc.utils.constants import orgb_path, udev_path
+from rcc.utils.constants import ORGB_PATH, UDEV_PATH
 from rcc.communications.client.tcp.openrgb.effects.base.abstract_effect import AbstractEffect
-from rcc.communications.client.tcp.openrgb.effects.breathing import breathing_effect
-from rcc.communications.client.tcp.openrgb.effects.dance_floor import dance_floor
-from rcc.communications.client.tcp.openrgb.effects.digital_rain import digital_rain
-from rcc.communications.client.tcp.openrgb.effects.drops import drops
-from rcc.communications.client.tcp.openrgb.effects.rainbow_wave import rainbow_wave
-from rcc.communications.client.tcp.openrgb.effects.spectrum_cycle import spectrum_cycle
-from rcc.communications.client.tcp.openrgb.effects.starry_night import starry_night
-from rcc.communications.client.tcp.openrgb.effects.static import static_effect
+from rcc.communications.client.tcp.openrgb.effects.breathing import BREATHING_EFFECT
+from rcc.communications.client.tcp.openrgb.effects.dance_floor import DANCE_FLOOR_EFFECT
+from rcc.communications.client.tcp.openrgb.effects.digital_rain import DIGITAL_RAIN_EFFECT
+from rcc.communications.client.tcp.openrgb.effects.drops import DROPS_EFFECT
+from rcc.communications.client.tcp.openrgb.effects.rainbow_wave import RAINBOW_WAVE_EFFECT
+from rcc.communications.client.tcp.openrgb.effects.spectrum_cycle import SPECTRUM_CYCLE_EFFECT
+from rcc.communications.client.tcp.openrgb.effects.starry_night import STARRY_NIGHT_EFFECT
+from rcc.communications.client.tcp.openrgb.effects.static import STATIC_EFFECT
 from rcc.utils.beans import event_bus
 from framework.logger import Logger
 from framework.singleton import singleton
@@ -41,14 +41,14 @@ class OpenRgbClient:
         self._port = 6472
         self._compatible_devices = None
         self._available_effects: list[AbstractEffect] = [
-            breathing_effect,
-            dance_floor,
-            digital_rain,
-            drops,
-            rainbow_wave,
-            spectrum_cycle,
-            starry_night,
-            static_effect,
+            BREATHING_EFFECT,
+            DANCE_FLOOR_EFFECT,
+            DIGITAL_RAIN_EFFECT,
+            DROPS_EFFECT,
+            RAINBOW_WAVE_EFFECT,
+            SPECTRUM_CYCLE_EFFECT,
+            STARRY_NIGHT_EFFECT,
+            STATIC_EFFECT,
         ]
         self.start()
 
@@ -126,7 +126,7 @@ class OpenRgbClient:
         self._orgb_process.kill()
 
     def _runner(self):
-        command = [orgb_path, "--server-host", "localhost", "--server-port", str(self._port)]
+        command = [ORGB_PATH, "--server-host", "localhost", "--server-port", str(self._port)]
         if "--orgb-gui" in sys.argv:
             command.append("--gui")
         self._orgb_process = subprocess.Popen(  # pylint: disable=R1732,
@@ -159,9 +159,9 @@ class OpenRgbClient:
         compatible_devices = None
 
         if compatible_devices is None:
-            if os.path.exists(udev_path):
+            if os.path.exists(UDEV_PATH):
                 regex = r'SUBSYSTEMS==".*?", ATTRS{idVendor}=="([0-9a-fA-F]+)", ATTRS{idProduct}=="([0-9a-fA-F]+)".*?TAG\+="([a-zA-Z0-9_]+)"'  # pylint: disable=C0301
-                with open(udev_path, "r") as file:
+                with open(UDEV_PATH, "r") as file:
                     content = file.read()
                 lines = content.split("\n")
 
@@ -225,4 +225,4 @@ class OpenRgbClient:
         self._available_effects = sorted(self._available_effects, key=lambda e: e.name)
 
 
-open_rgb_client = OpenRgbClient()
+OPEN_RGB_CLIENT = OpenRgbClient()

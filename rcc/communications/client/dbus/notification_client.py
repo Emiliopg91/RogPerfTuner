@@ -38,4 +38,4 @@ class NotificationClient(AbstractDbusClient):
         )
 
 
-notification_client = NotificationClient()
+NOTIFICATION_CLIENT = NotificationClient()

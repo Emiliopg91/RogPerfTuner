@@ -3,7 +3,7 @@ from typing import Any, Callable
 
 from PyQt5.QtDBus import QDBusInterface, QDBusConnection, QDBusReply, QDBusMessage, QDBusServiceWatcher
 
-from rcc.communications.client.dbus.base.signal_listener import signal_listener
+from rcc.communications.client.dbus.base.signal_listener import SIGNAL_LISTENER
 from framework.logger import Logger
 
 
@@ -61,7 +61,7 @@ class AbstractDbusClient(ABC):
 
     def on_property_change(self, prop_name, callback: Callable[[Any], None]):
         """Subscribe to signal"""
-        signal_listener.connect_signal(
+        SIGNAL_LISTENER.connect_signal(
             self._system_bus,
             self._service_name,
             self._object_path,
@@ -72,7 +72,7 @@ class AbstractDbusClient(ABC):
 
     def on_signal(self, signal, callback: Callable[..., None]):
         """Subscribe to signal"""
-        signal_listener.connect_signal(
+        SIGNAL_LISTENER.connect_signal(
             self._system_bus,
             self._service_name,
             self._object_path,

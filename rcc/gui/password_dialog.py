@@ -99,4 +99,4 @@ class PasswordDialog(QDialog):
             sys.exit()
 
 
-password_dialog = PasswordDialog()
+PASSWORD_DIALOG = PasswordDialog()

@@ -32,14 +32,14 @@ def create_qt_application() -> QApplication:
 def initialize_application():  # pylint:disable=R0914
     """Application startup"""
     import os
-    from rcc.utils.constants import dev_mode, user_update_folder, log_file, log_folder, log_old_folder
+    from rcc.utils.constants import DEV_MODE, USER_UPDATE_FOLDER, LOG_FILE, LOG_FOLDER, LOG_OLD_FOLDER
 
     from framework.logger import Logger
 
-    Logger.initialize(log_file, log_folder, log_old_folder)
+    Logger.initialize(LOG_FILE, LOG_FOLDER, LOG_OLD_FOLDER)
     logger = Logger("Main")
 
-    if dev_mode:
+    if DEV_MODE:
         print("Running in dev mode")
     else:
         print(f"Running bundled file from '{os.getenv("APPIMAGE")}'")
@@ -51,13 +51,13 @@ def initialize_application():  # pylint:disable=R0914
     logger.info("Starting initialization")
     logger.add_tab()
 
-    from rcc.gui.notifier import notifier
+    from rcc.gui.notifier import NOTIFIER
     from rcc.utils.beans import translator
 
-    notifier.show_toast(translator.translate("initializing"))
+    NOTIFIER.show_toast(translator.translate("initializing"))
 
     """Create application files"""
-    if not dev_mode:
+    if not DEV_MODE:
         from rcc.utils.application import application
 
         application.generate_run()
@@ -65,33 +65,33 @@ def initialize_application():  # pylint:disable=R0914
         application.enable_autostart()
 
     """Ask for sudo password"""
-    from rcc.gui.password_dialog import password_dialog
+    from rcc.gui.password_dialog import PASSWORD_DIALOG
     from rcc.utils.configuration import configuration
 
     if configuration.settings.password is None:
-        password_dialog.show()
+        PASSWORD_DIALOG.show()
 
-    from rcc.services.openrgb_service import open_rgb_service  # pylint: disable=W0611
+    from rcc.services.openrgb_service import OPEN_RGB_SERVICE  # pylint: disable=W0611
 
     """Install Decky plugin"""
-    from rcc.services.games_service import games_service
+    from rcc.services.games_service import GAME_SERVICE
 
-    games_service.install_rccdc()
+    GAME_SERVICE.install_rccdc()
 
     """Show tray icon"""
-    from rcc.gui.tray_icon import tray_icon
+    from rcc.gui.tray_icon import TRAY_ICON
 
-    tray_icon.show()
+    TRAY_ICON.show()
 
-    from rcc.services.platform_service import platform_service
+    from rcc.services.platform_service import PLATFORM_SERVICE
 
-    if len(games_service.running_games) == 0:
-        platform_service.restore_profile()
+    if len(GAME_SERVICE.running_games) == 0:
+        PLATFORM_SERVICE.restore_profile()
 
     """Start dbus server"""
-    from rcc.communications.server.dbus_server import dbus_server
+    from rcc.communications.server.dbus_server import DBUS_SERVER
 
-    dbus_server.start()
+    DBUS_SERVER.start()
 
     """Start autoupdater"""
     from framework.autoupdater import AutoUpdater
@@ -102,9 +102,9 @@ def initialize_application():  # pylint:disable=R0914
         __version__,
         "Emiliopg91",
         "RogControlCenter",
-        user_update_folder,
+        USER_UPDATE_FOLDER,
         rcc_application.relaunch_application,
-        dev_mode,
+        DEV_MODE,
     )
 
     auto_updater.start()

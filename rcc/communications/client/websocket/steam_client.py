@@ -42,4 +42,4 @@ class SteamClient(AbstractWebsocketClient):
         self._invoke("set_launch_options", appid, launch_opts)
 
 
-steam_client = SteamClient()
+STEAM_CLIENT = SteamClient()

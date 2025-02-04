@@ -2,7 +2,7 @@ import json
 import os
 import yaml
 
-from rcc.communications.client.tcp.openrgb.effects.static import static_effect
+from rcc.communications.client.tcp.openrgb.effects.static import STATIC_EFFECT
 from rcc.models.rgb_brightness import RgbBrightness
 from rcc.models.settings import (
     Config,
@@ -13,7 +13,7 @@ from rcc.models.settings import (
     OpenRgb,
 )
 from rcc.models.performance_profile import PerformanceProfile
-from rcc.utils.constants import config_file, config_folder
+from rcc.utils.constants import CONFIG_FILE, CONFIG_FOLDER
 from framework.singleton import singleton
 from framework.logger import Logger
 
@@ -27,29 +27,29 @@ class Configuration:
         self._config: Config | None
 
     def _load_config(self) -> None:
-        if os.path.exists(config_file):
-            with open(config_file, "r") as f:
+        if os.path.exists(CONFIG_FILE):
+            with open(CONFIG_FILE, "r") as f:
                 raw_config = yaml.safe_load(f) or {}
 
             json_output = json.dumps(raw_config, indent=2)
             self._config = Config.from_json(json_output)  # pylint: disable=E1101
             Logger.set_config_map(self._config.logger)
         else:
-            if not os.path.exists(config_folder):
-                os.makedirs(config_folder, exist_ok=True)
+            if not os.path.exists(CONFIG_FOLDER):
+                os.makedirs(CONFIG_FOLDER, exist_ok=True)
 
             self._config = Config(
                 logger={},
                 games={},
                 settings=Settings(None),
                 platform=Platform(profiles=PlatformProfiles(PerformanceProfile.PERFORMANCE.value)),
-                open_rgb=OpenRgb(last_effect=static_effect.name, brightness=RgbBrightness.MAX.value, effects={}),
+                open_rgb=OpenRgb(last_effect=STATIC_EFFECT.name, brightness=RgbBrightness.MAX.value, effects={}),
             )
             self.save_config()
 
     def save_config(self) -> None:
         "Persist config to file"
-        with open(config_file, "w") as f:
+        with open(CONFIG_FILE, "w") as f:
             yaml.dump(self._config.to_dict(), f, default_flow_style=False)
 
     @property

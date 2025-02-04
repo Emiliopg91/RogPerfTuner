@@ -23,6 +23,7 @@ class LedStatus:
         """Copy self instance into new one"""
         return LedStatus(self.pos_idx, self.max_val, self.cur_val)
 
+
 @singleton
 class DigitalRain(AbstractEffect):
     """Digital rain effect"""
@@ -211,4 +212,4 @@ class DigitalRain(AbstractEffect):
             thread.join()
 
 
-digital_rain = DigitalRain()
+DIGITAL_RAIN_EFFECT = DigitalRain()

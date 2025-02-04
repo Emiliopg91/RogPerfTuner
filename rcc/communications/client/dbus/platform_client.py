@@ -63,4 +63,4 @@ class PlatformClient(AbstractDbusClient):
         )
 
 
-platform_client = PlatformClient()
+PLATFORM_CLIENT = PlatformClient()

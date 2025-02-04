@@ -21,4 +21,4 @@ class SpectrumCycle(AbstractEffect):
             self._sleep(0.02)  # 20 ms
 
 
-spectrum_cycle = SpectrumCycle()
+SPECTRUM_CYCLE_EFFECT = SpectrumCycle()

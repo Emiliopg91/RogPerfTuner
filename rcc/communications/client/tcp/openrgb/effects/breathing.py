@@ -3,6 +3,7 @@ import math
 from framework.singleton import singleton
 from rcc.communications.client.tcp.openrgb.effects.base.abstract_effect import AbstractEffect
 
+
 @singleton
 class BreathingEffect(AbstractEffect):
     """Breathing effect"""
@@ -32,4 +33,4 @@ class BreathingEffect(AbstractEffect):
                 self._sleep(self._pause_time)
 
 
-breathing_effect = BreathingEffect()
+BREATHING_EFFECT = BreathingEffect()

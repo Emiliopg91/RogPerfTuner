@@ -3,7 +3,7 @@ import sys
 import time
 import psutil
 
-from rcc.utils.constants import lock_file
+from rcc.utils.constants import LOCK_FILE
 from framework.singleton import singleton
 
 
@@ -13,8 +13,8 @@ class SingleInstance:
 
     def acquire(self, retry=False) -> None:
         """Try to acquire lock file"""
-        if os.path.exists(lock_file):
-            with open(lock_file, "r") as f:
+        if os.path.exists(LOCK_FILE):
+            with open(LOCK_FILE, "r") as f:
                 pid = int(f.read().strip())
 
             if psutil.pid_exists(pid):
@@ -25,9 +25,9 @@ class SingleInstance:
                     print(f"Application already running with pid {pid}")
                     sys.exit(1)
             else:
-                os.remove(lock_file)
+                os.remove(LOCK_FILE)
 
-        with open(lock_file, "w") as f:
+        with open(LOCK_FILE, "w") as f:
             f.write(str(os.getpid()))
 
 

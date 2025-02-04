@@ -20,4 +20,4 @@ class UpowerClient(AbstractDbusClient):
         return self._get_property("OnBattery")
 
 
-upower_client = UpowerClient()
+UPOWER_CLIENT = UpowerClient()

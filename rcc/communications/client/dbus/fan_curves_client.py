@@ -26,4 +26,4 @@ class FanCurvesClient(AbstractDbusClient):
         self._invoke_method("SetFanCurvesEnabled", QDBusArgument(profile.value, QMetaType.UInt), enabled)
 
 
-fan_curves_client = FanCurvesClient()
+FAN_CURVES_CLIENT = FanCurvesClient()

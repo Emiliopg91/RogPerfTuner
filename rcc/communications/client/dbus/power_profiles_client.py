@@ -25,4 +25,4 @@ class PowerProfilesClient(AbstractDbusClient):
         self._set_property("ActiveProfile", val.value)
 
 
-power_profile_client = PowerProfilesClient()
+POWER_PROFILE_CLIENT = PowerProfilesClient()

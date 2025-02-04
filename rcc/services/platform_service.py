@@ -8,11 +8,11 @@ import concurrent
 from watchdog.events import FileSystemEventHandler
 from watchdog.observers import Observer
 
-from rcc.communications.client.dbus.fan_curves_client import fan_curves_client
-from rcc.communications.client.dbus.platform_client import platform_client
-from rcc.communications.client.dbus.power_profiles_client import power_profile_client
-from rcc.communications.client.dbus.upower_client import upower_client
-from rcc.gui.notifier import notifier
+from rcc.communications.client.dbus.fan_curves_client import FAN_CURVES_CLIENT
+from rcc.communications.client.dbus.platform_client import PLATFORM_CLIENT
+from rcc.communications.client.dbus.power_profiles_client import POWER_PROFILE_CLIENT
+from rcc.communications.client.dbus.upower_client import UPOWER_CLIENT
+from rcc.gui.notifier import NOTIFIER
 from rcc.models.battery_threshold import BatteryThreshold
 from rcc.models.performance_profile import PerformanceProfile
 from rcc.models.power_profile import PowerProfile
@@ -69,9 +69,9 @@ class PlatformService:
         self._observer = Observer()
 
         self._performance_profile = PerformanceProfile(configuration.platform.profiles.profile)
-        self._platform_profile = platform_client.platform_profile
-        self._battery_charge_limit = platform_client.charge_control_end_threshold
-        self.on_bat = upower_client.on_battery
+        self._platform_profile = PLATFORM_CLIENT.platform_profile
+        self._battery_charge_limit = PLATFORM_CLIENT.charge_control_end_threshold
+        self.on_bat = UPOWER_CLIENT.on_battery
 
         for control in self.BOOST_CONTROLS:
             if os.path.exists(control["path"]):
@@ -95,10 +95,10 @@ class PlatformService:
             )
             self._observer.start()
 
-        platform_client.change_platform_profile_on_ac = False
-        platform_client.change_platform_profile_on_battery = False
+        PLATFORM_CLIENT.change_platform_profile_on_ac = False
+        PLATFORM_CLIENT.change_platform_profile_on_battery = False
 
-        upower_client.on_property_change("OnBattery", self._on_ac_battery_change)
+        UPOWER_CLIENT.on_property_change("OnBattery", self._on_ac_battery_change)
         event_bus.on("GamesService.gameEvent", self._on_game_event)
 
         self._logger.rem_tab()
@@ -157,18 +157,18 @@ class PlatformService:
 
                     def set_throttle_policy():
                         self._logger.debug(f"Throttle policy: {platform_profile.name}")
-                        platform_client.platform_profile = platform_profile
+                        PLATFORM_CLIENT.platform_profile = platform_profile
                         self._platform_profile = platform_profile
 
                     def set_fan_curves():
                         self._logger.debug(f"Fan curve: {platform_profile.name}")
-                        fan_curves_client.set_curves_to_defaults(platform_profile)
-                        fan_curves_client.reset_profile_curves(platform_profile)
-                        fan_curves_client.set_fan_curves_enabled(platform_profile, True)
+                        FAN_CURVES_CLIENT.set_curves_to_defaults(platform_profile)
+                        FAN_CURVES_CLIENT.reset_profile_curves(platform_profile)
+                        FAN_CURVES_CLIENT.set_fan_curves_enabled(platform_profile, True)
 
                     def set_power_profile():
                         self._logger.debug(f"Power profile: {power_profile.name}")
-                        power_profile_client.active_profile = power_profile
+                        POWER_PROFILE_CLIENT.active_profile = power_profile
 
                     def handle_boost():
                         no_boost_reason = None
@@ -209,14 +209,14 @@ class PlatformService:
                         configuration.save_config()
 
                     if game_name is None:
-                        notifier.show_toast(
+                        NOTIFIER.show_toast(
                             translator.translate(
                                 "profile.applied",
                                 {"profile": translator.translate(f"label.profile.{profile_name}").lower()},
                             )
                         )
                     else:
-                        notifier.show_toast(
+                        NOTIFIER.show_toast(
                             translator.translate(
                                 "profile.applied.for.game",
                                 {
@@ -236,7 +236,7 @@ class PlatformService:
             else:
                 self._logger.info(f"Profile {profile_name.lower()} already setted")
                 if game_name is None:
-                    notifier.show_toast(
+                    NOTIFIER.show_toast(
                         translator.translate(
                             "profile.applied",
                             {"profile": translator.translate(f"label.profile.{profile_name}").lower()},
@@ -246,17 +246,17 @@ class PlatformService:
     def set_battery_threshold(self, value: BatteryThreshold) -> None:
         """Set battery charge threshold"""
         if value != self._battery_charge_limit:
-            platform_client.charge_control_end_threshold = value
+            PLATFORM_CLIENT.charge_control_end_threshold = value
             self._battery_charge_limit = value
             event_bus.emit("PlatformService.battery_threshold", value)
-            notifier.show_toast(translator.translate("applied.battery.threshold", {"value": value.value}))
+            NOTIFIER.show_toast(translator.translate("applied.battery.threshold", {"value": value.value}))
 
     def restore_profile(self):
         """Restore persited profile"""
-        if upower_client.on_battery:
+        if UPOWER_CLIENT.on_battery:
             self._logger.info("Laptop running on battery")
             self._logger.add_tab()
-            self._on_ac_battery_change(upower_client.on_battery, True, True)
+            self._on_ac_battery_change(UPOWER_CLIENT.on_battery, True, True)
             self._logger.rem_tab()
         else:
             self._logger.info("Laptop running on AC")
@@ -265,4 +265,4 @@ class PlatformService:
             self._logger.rem_tab()
 
 
-platform_service = PlatformService()
+PLATFORM_SERVICE = PlatformService()

@@ -88,4 +88,4 @@ class SignalListener(QObject):
                 del self.watched_signals[signal_key]
 
 
-signal_listener = SignalListener()
+SIGNAL_LISTENER = SignalListener()

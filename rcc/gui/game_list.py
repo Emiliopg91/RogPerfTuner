@@ -12,10 +12,10 @@ from PyQt5.QtWidgets import (
 from PyQt5.QtCore import Qt
 from PyQt5.QtGui import QIcon
 
-from rcc.communications.client.websocket.steam_client import SteamGameDetails, steam_client
-from rcc.utils.constants import icons_path
+from rcc.communications.client.websocket.steam_client import SteamGameDetails, STEAM_CLIENT
+from rcc.utils.constants import ICONS_PATH
 from rcc.models.performance_profile import PerformanceProfile
-from rcc.services.games_service import games_service
+from rcc.services.games_service import GAME_SERVICE
 from rcc.utils.gui_utils import NoScrollComboBox
 from rcc.utils.beans import translator
 
@@ -33,7 +33,7 @@ class GameList(QDialog):
             self.__manage_parent = manage_parent
             self.setWindowTitle(translator.translate("game.performance.configuration"))
             self.setFixedSize(850, 600)
-            self.setWindowIcon(QIcon(f"{icons_path}/icon-45x45.png"))
+            self.setWindowIcon(QIcon(f"{ICONS_PATH}/icon-45x45.png"))
             self.setAttribute(Qt.WA_DeleteOnClose)
             self.setWindowFlags(self.windowFlags() & ~Qt.WindowContextHelpButtonHint)
 
@@ -54,11 +54,11 @@ class GameList(QDialog):
             container_layout = QVBoxLayout(container)
 
             # Crear la tabla
-            game_cfg = games_service.get_games()
+            game_cfg = GAME_SERVICE.get_games()
             appids = list(game_cfg.keys())
 
             columns = [translator.translate("game.title"), translator.translate("profile")]
-            if games_service.gpu is not None:
+            if GAME_SERVICE.gpu is not None:
                 columns.append(translator.translate("used.gpu"))
 
             table = QTableWidget(len(appids), len(columns))
@@ -82,7 +82,7 @@ class GameList(QDialog):
 
             # Llenar la tabla con datos
             row = 0
-            game_details = steam_client.get_apps_details(*appids)  # pylint: disable=W0612
+            game_details = STEAM_CLIENT.get_apps_details(*appids)  # pylint: disable=W0612
             game_details = sorted(game_details, key=lambda item: item.name)
             for game in game_details:
                 try:
@@ -95,7 +95,7 @@ class GameList(QDialog):
 
                     # Segunda columna: perfil
                     profile_combo = NoScrollComboBox()  # Usar la subclase personalizada
-                    for profile in PerformanceProfile:
+                    for profile in reversed(PerformanceProfile):
                         profile_combo.addItem(translator.translate(f"label.profile.{profile.name}"), profile)
 
                     default_index = profile_combo.findData(
@@ -112,7 +112,7 @@ class GameList(QDialog):
                     table.setCellWidget(row, col, profile_combo)
                     col += 1
 
-                    if games_service.gpu is not None:
+                    if GAME_SERVICE.gpu is not None:
                         # Tercera columna: GPU
                         gpu_combo = NoScrollComboBox()  # Usar la subclase personalizada
                         gpu_combo.addItem(translator.translate("label.dgpu.auto"), False)
@@ -142,11 +142,11 @@ class GameList(QDialog):
 
     def __on_profile_changed(self, widget, game_id):
         selected_profile = widget.currentData()  # Obtiene el objeto asociado al elemento seleccionado
-        games_service.set_game_profile(game_id, selected_profile)
+        GAME_SERVICE.set_game_profile(game_id, selected_profile)
 
     def __on_gpu_changed(self, widget, game: SteamGameDetails):
         enabled = widget.currentData()
-        vk_opt = f"VK_ICD_FILENAMES={":".join(games_service.icd_files)} "
+        vk_opt = f"VK_ICD_FILENAMES={":".join(GAME_SERVICE.icd_files)} "
         launch_opts = game.launch_opts
         if enabled:
             if launch_opts is None:
@@ -158,7 +158,7 @@ class GameList(QDialog):
             launch_opts = launch_opts.replace(vk_opt, "").strip()
             if launch_opts == "%command%":
                 launch_opts = ""
-        steam_client.set_launch_options(game.appid, launch_opts)
+        STEAM_CLIENT.set_launch_options(game.appid, launch_opts)
         game.launch_opts = launch_opts
 
     def show(self):

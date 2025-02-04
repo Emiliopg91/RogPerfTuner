@@ -4,10 +4,10 @@ import sys
 from PyQt5.QtCore import QObject, pyqtSlot, Q_CLASSINFO
 from PyQt5.QtDBus import QDBusConnection, QDBusAbstractAdaptor
 
-from rcc.services.games_service import games_service
-from rcc.services.openrgb_service import open_rgb_service
-from rcc.services.platform_service import platform_service
-from rcc.utils.constants import scripts_folder
+from rcc.services.games_service import GAME_SERVICE
+from rcc.services.openrgb_service import OPEN_RGB_SERVICE
+from rcc.services.platform_service import PLATFORM_SERVICE
+from rcc.utils.constants import SCRIPTS_FOLDER
 from framework.logger import Logger
 from framework.singleton import singleton
 
@@ -23,29 +23,29 @@ class HelloService(QObject):
 
     def next_profile(self):
         """Activate next profile"""
-        if len(games_service.running_games) > 0:
+        if len(GAME_SERVICE.running_games) > 0:
             return "Not available on game session"
 
-        next_t = platform_service.performance_profile.get_next_performance_profile()
-        platform_service.set_performance_profile(next_t)
+        next_t = PLATFORM_SERVICE.performance_profile.get_next_performance_profile()
+        PLATFORM_SERVICE.set_performance_profile(next_t)
         return next_t.name
 
     def next_effect(self):
         """Activate next effect"""
-        next_t = open_rgb_service.get_next_effect()
-        open_rgb_service.apply_effect(next_t)
+        next_t = OPEN_RGB_SERVICE.get_next_effect()
+        OPEN_RGB_SERVICE.apply_effect(next_t)
         return next_t
 
     def increase_brightness(self):
         """Increase brightness"""
-        next_t = open_rgb_service.brightness.get_next_brightness()
-        open_rgb_service.apply_brightness(next_t)
+        next_t = OPEN_RGB_SERVICE.brightness.get_next_brightness()
+        OPEN_RGB_SERVICE.apply_brightness(next_t)
         return next_t.name
 
     def decrease_brightness(self):
         """Decrease brightness"""
-        next_t = open_rgb_service.brightness.get_previous_brightness()
-        open_rgb_service.apply_brightness(next_t)
+        next_t = OPEN_RGB_SERVICE.brightness.get_previous_brightness()
+        OPEN_RGB_SERVICE.apply_brightness(next_t)
         return next_t.name
 
 
@@ -93,10 +93,10 @@ class DBusServer:
             "nextProfile.sh": "nextProfile",
         }
 
-        os.makedirs(scripts_folder, exist_ok=True)
+        os.makedirs(SCRIPTS_FOLDER, exist_ok=True)
 
         for file, action in self._file_actions.items():
-            file_path = os.path.join(scripts_folder, file)
+            file_path = os.path.join(SCRIPTS_FOLDER, file)
             script_content = f"""#!/bin/bash
                 gdbus call --session --dest {SERVICE_NAME} --object-path {OBJECT_PATH} --method {INTERFACE_NAME}.{action}
             """
@@ -126,4 +126,4 @@ class DBusServer:
         self._logger.info("D-Bus service started")
 
 
-dbus_server = DBusServer()
+DBUS_SERVER = DBusServer()

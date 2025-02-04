@@ -8,71 +8,71 @@ import sys
 from rcc import __app_name__
 
 # pylint: disable=E1101
-dev_mode = not hasattr(sys, "frozen") or not sys.frozen
+DEV_MODE = not hasattr(sys, "frozen") or not sys.frozen
 
-user_folder = os.path.expanduser(os.path.join("~", ".config", __app_name__))
+USER_FOLDER = os.path.expanduser(os.path.join("~", ".config", __app_name__))
 
-old_user_folder = os.path.expanduser(os.path.join("~", __app_name__))
+OLD_USER_FOLDER = os.path.expanduser(os.path.join("~", __app_name__))
 
-if os.path.exists(old_user_folder):
-    shutil.move(old_user_folder, user_folder)
+if os.path.exists(OLD_USER_FOLDER):
+    shutil.move(OLD_USER_FOLDER, USER_FOLDER)
 
-if not os.path.exists(user_folder):
-    os.makedirs(user_folder)
+if not os.path.exists(USER_FOLDER):
+    os.makedirs(USER_FOLDER)
 
-user_icon_folder = os.path.join(user_folder, "icons")
+USER_ICON_FOLDER = os.path.join(USER_FOLDER, "icons")
 
-if not os.path.exists(user_icon_folder):
-    os.makedirs(user_icon_folder)
+if not os.path.exists(USER_ICON_FOLDER):
+    os.makedirs(USER_ICON_FOLDER)
 
-user_plugin_folder = os.path.join(user_folder, "plugin")
+USER_PLUGIN_FOLDER = os.path.join(USER_FOLDER, "plugin")
 
-if not os.path.exists(user_plugin_folder):
-    os.makedirs(user_plugin_folder)
+if not os.path.exists(USER_PLUGIN_FOLDER):
+    os.makedirs(USER_PLUGIN_FOLDER)
 
-user_update_folder = os.path.join(user_folder, "update")
+USER_UPDATE_FOLDER = os.path.join(USER_FOLDER, "update")
 
-if not os.path.exists(user_update_folder):
-    os.makedirs(user_update_folder)
+if not os.path.exists(USER_UPDATE_FOLDER):
+    os.makedirs(USER_UPDATE_FOLDER)
 
-user_effects_folder = os.path.join(user_folder, "effects")
+USER_EFFECTS_FOLDER = os.path.join(USER_FOLDER, "effects")
 
-if not os.path.exists(user_effects_folder):
-    os.makedirs(user_effects_folder)
+if not os.path.exists(USER_EFFECTS_FOLDER):
+    os.makedirs(USER_EFFECTS_FOLDER)
 
-user_bin_folder = os.path.join(user_folder, "bin")
+USER_BIN_FOLDER = os.path.join(USER_FOLDER, "bin")
 
-if not os.path.exists(user_bin_folder):
-    os.makedirs(user_bin_folder)
+if not os.path.exists(USER_BIN_FOLDER):
+    os.makedirs(USER_BIN_FOLDER)
 
-autostart_file = os.path.expanduser(os.path.join("~", ".config", "autostart", f"{__app_name__}.desktop"))
+AUTOSTART_FILE = os.path.expanduser(os.path.join("~", ".config", "autostart", f"{__app_name__}.desktop"))
 
-app_draw_file = os.path.expanduser(os.path.join("~", ".local", "share", "applications", f"{__app_name__}.desktop"))
+APP_DRAW_FILE = os.path.expanduser(os.path.join("~", ".local", "share", "applications", f"{__app_name__}.desktop"))
 
-base_path = Path(os.path.join(os.path.dirname(__file__), "..", "..")).resolve()
+BASE_PATH = Path(os.path.join(os.path.dirname(__file__), "..", "..")).resolve()
 
-autoupdate_path = os.path.join(base_path, "assets", "autoupdate.json")
+AUTOUPDATE_PATH = os.path.join(BASE_PATH, "assets", "autoupdate.json")
 
-icons_path = os.path.join(base_path, "assets", "icons")
+ICONS_PATH = os.path.join(BASE_PATH, "assets", "icons")
 
-translations_path = os.path.join(base_path, "assets", "translations.json")
+TRANSLATIONS_PATH = os.path.join(BASE_PATH, "assets", "translations.json")
 
-orgb_path = os.path.join(base_path, "assets", "OpenRGB.AppImage")
+ORGB_PATH = os.path.join(BASE_PATH, "assets", "OpenRGB.AppImage")
 
-rccdc_asset_path = os.path.join(base_path, "assets", "RCCDeckyCompanion")
+RCCDC_ASSET_PATH = os.path.join(BASE_PATH, "assets", "RCCDeckyCompanion")
 
-udev_path = os.path.join(base_path, "assets", "60-openrgb.rules")
+UDEV_PATH = os.path.join(BASE_PATH, "assets", "60-openrgb.rules")
 
-lock_file = os.path.join(user_folder, f"{__app_name__}.pid")
+LOCK_FILE = os.path.join(USER_FOLDER, f"{__app_name__}.pid")
 
-config_folder = os.path.join(user_folder, "config")
+CONFIG_FOLDER = os.path.join(USER_FOLDER, "config")
 
-scripts_folder = os.path.join(user_folder, "scripts")
+SCRIPTS_FOLDER = os.path.join(USER_FOLDER, "scripts")
 
-config_file = os.path.join(config_folder, "config.yml")
+CONFIG_FILE = os.path.join(CONFIG_FOLDER, "config.yml")
 
-log_folder = os.path.join(user_folder, "logs")
+LOG_FOLDER = os.path.join(USER_FOLDER, "logs")
 
-log_old_folder = os.path.join(log_folder, "old")
+LOG_OLD_FOLDER = os.path.join(LOG_FOLDER, "old")
 
-log_file = os.path.join(log_folder, f"{datetime.now().strftime("%Y-%m-%d %H:%M:%S")}.log")
+LOG_FILE = os.path.join(LOG_FOLDER, f"{datetime.now().strftime("%Y-%m-%d %H:%M:%S")}.log")

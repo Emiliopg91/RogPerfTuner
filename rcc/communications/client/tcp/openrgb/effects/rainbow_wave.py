@@ -50,4 +50,4 @@ class RainbowWave(AbstractEffect):
             rainbow[0] = (rainbow[1] + inc) % 360
 
 
-rainbow_wave = RainbowWave()
+RAINBOW_WAVE_EFFECT = RainbowWave()

@@ -7,12 +7,12 @@ import time
 
 import pyudev
 
-from rcc.communications.client.tcp.openrgb.openrgb_client import open_rgb_client
-from rcc.communications.client.tcp.openrgb.effects.static import static_effect
+from rcc.communications.client.tcp.openrgb.openrgb_client import OPEN_RGB_CLIENT
+from rcc.communications.client.tcp.openrgb.effects.static import STATIC_EFFECT
 from rcc.models.rgb_brightness import RgbBrightness
 from rcc.models.settings import Effect
 from rcc.models.usb_identifier import UsbIdentifier
-from rcc.utils.constants import user_effects_folder
+from rcc.utils.constants import USER_EFFECTS_FOLDER
 from rcc.utils.configuration import configuration
 from rcc.utils.beans import event_bus
 from framework.logger import Logger
@@ -28,7 +28,7 @@ class OpenRgbService:
         self._logger.info("Initializing OpenRgbService")
         self._logger.add_tab()
 
-        self._effect = static_effect.name
+        self._effect = STATIC_EFFECT.name
         if configuration.open_rgb.last_effect:
             self._effect = configuration.open_rgb.last_effect
 
@@ -36,7 +36,7 @@ class OpenRgbService:
         if configuration.open_rgb.brightness is not None:
             self._brightness = RgbBrightness(configuration.open_rgb.brightness)
 
-        self._color = static_effect.color
+        self._color = STATIC_EFFECT.color
         if configuration.open_rgb.last_effect and configuration.open_rgb.last_effect in configuration.open_rgb.effects:
             self._color = configuration.open_rgb.effects[configuration.open_rgb.last_effect].color
 
@@ -49,13 +49,13 @@ class OpenRgbService:
 
         self._logger.info("Restoring effect")
         self._logger.add_tab()
-        open_rgb_client.apply_effect(self._effect, self._brightness, self._color)
+        OPEN_RGB_CLIENT.apply_effect(self._effect, self._brightness, self._color)
         self._logger.rem_tab()
         self._logger.rem_tab()
 
     def __load_custom_effects(self):
         """Load user custom effect"""
-        directory = user_effects_folder
+        directory = USER_EFFECTS_FOLDER
         files = [file for file in os.listdir(directory) if file.endswith(".py") and file != "__init__.py"]
 
         if len(files) > 0:
@@ -72,7 +72,7 @@ class OpenRgbService:
                 if hasattr(module, "instance"):
                     instance = getattr(module, "instance")
                     self._logger.info(f"Loaded effect {instance.name}")
-                    open_rgb_client.append_custom_effect(instance)
+                    OPEN_RGB_CLIENT.append_custom_effect(instance)
             self._logger.rem_tab()
 
     @property
@@ -97,8 +97,8 @@ class OpenRgbService:
             t0 = time.time()
             self._logger.info("Reloading OpenRGB server")
             self._logger.add_tab()
-            open_rgb_client.stop()
-            open_rgb_client.start()
+            OPEN_RGB_CLIENT.stop()
+            OPEN_RGB_CLIENT.start()
             self._logger.rem_tab()
             self._apply_aura(self._effect, self._brightness, self._color, True)
             self._logger.info(f"Reloaded after {(time.time() - t0):.2f} seconds")
@@ -120,7 +120,7 @@ class OpenRgbService:
 
             usb_dev = UsbIdentifier(id_vendor, id_product, name)
 
-            for cd in open_rgb_client.compatible_devices:
+            for cd in OPEN_RGB_CLIENT.compatible_devices:
                 if cd.id_vendor == usb_dev.id_vendor and cd.id_product == usb_dev.id_product:
                     self._connected_usb.append(cd)
 
@@ -141,7 +141,7 @@ class OpenRgbService:
 
                         if any(
                             cd.id_vendor == usb_dev.id_vendor and cd.id_product == usb_dev.id_product
-                            for cd in open_rgb_client.compatible_devices
+                            for cd in OPEN_RGB_CLIENT.compatible_devices
                         ):
                             current_usb.append(usb_dev)
 
@@ -167,15 +167,15 @@ class OpenRgbService:
                         self._logger.info("Removed compatible device(s):")
                         self._logger.add_tab()
                         for item in removed:
-                            self._logger.info(open_rgb_client.get_device_name(item.id_vendor, item.id_product))
-                            open_rgb_client.disable_device(item.name)
+                            self._logger.info(OPEN_RGB_CLIENT.get_device_name(item.id_vendor, item.id_product))
+                            OPEN_RGB_CLIENT.disable_device(item.name)
                         self._logger.rem_tab()
 
                     if len(added) > 0:
                         self._logger.info("Connected compatible device(s):")
                         self._logger.add_tab()
                         for item in added:
-                            self._logger.info(open_rgb_client.get_device_name(item.id_vendor, item.id_product))
+                            self._logger.info(OPEN_RGB_CLIENT.get_device_name(item.id_vendor, item.id_product))
                         self._logger.rem_tab()
 
                         self._usb_mutex.release()
@@ -189,13 +189,13 @@ class OpenRgbService:
 
     def get_available_effects(self) -> list[str]:
         """Get all available effects"""
-        return open_rgb_client.get_available_effects()
+        return OPEN_RGB_CLIENT.get_available_effects()
 
     def supports_color(self, effect=None) -> bool:
         """Check if effect supports color"""
         if effect is None:
             effect = self._effect
-        return open_rgb_client.supports_color(effect)
+        return OPEN_RGB_CLIENT.supports_color(effect)
 
     def get_color(self, effect=None) -> str | None:
         """Get color for effect"""
@@ -205,7 +205,7 @@ class OpenRgbService:
         if effect in configuration.open_rgb.effects:
             return configuration.open_rgb.effects[effect].color
 
-        from_cli = open_rgb_client.get_color(effect)
+        from_cli = OPEN_RGB_CLIENT.get_color(effect)
 
         if from_cli is not None:
             return from_cli
@@ -215,11 +215,11 @@ class OpenRgbService:
     def apply_effect(self, effect: str) -> None:
         """Apply effect"""
         color = None
-        if open_rgb_client.supports_color(effect):
+        if OPEN_RGB_CLIENT.supports_color(effect):
             if effect in configuration.open_rgb.effects:
                 color = configuration.open_rgb.effects[effect].color
             else:
-                color = open_rgb_client.get_color(effect)
+                color = OPEN_RGB_CLIENT.get_color(effect)
 
         self._apply_aura(effect, self.brightness, color)
 
@@ -239,11 +239,11 @@ class OpenRgbService:
         force: bool = False,
         temporal: bool = False,
     ) -> None:
-        color = color if open_rgb_client.supports_color(effect) else None
+        color = color if OPEN_RGB_CLIENT.supports_color(effect) else None
         if (self._effect != effect or self._brightness != brightness or self._color != color) or force:
             self._logger.info("Applying effect")
             self._logger.add_tab()
-            supports_color = open_rgb_client.apply_effect(effect, brightness, color)
+            supports_color = OPEN_RGB_CLIENT.apply_effect(effect, brightness, color)
 
             self._effect = effect
             self._brightness = brightness
@@ -270,4 +270,4 @@ class OpenRgbService:
         return effects[index]
 
 
-open_rgb_service = OpenRgbService()
+OPEN_RGB_SERVICE = OpenRgbService()

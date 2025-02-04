@@ -5,6 +5,7 @@ from framework.singleton import singleton
 from rcc.communications.client.tcp.openrgb.client.utils import RGBColor
 from rcc.communications.client.tcp.openrgb.effects.base.abstract_effect import AbstractEffect
 
+
 @singleton
 class Drops(AbstractEffect):
     """Drops effect"""
@@ -65,4 +66,4 @@ class Drops(AbstractEffect):
         return self._buffer[dev_index].pop(0)
 
 
-drops = Drops()
+DROPS_EFFECT = Drops()

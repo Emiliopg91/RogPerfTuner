@@ -14,4 +14,4 @@ class StaticEffect(AbstractEffect):
             self._set_colors(dev, [self._color] * len(dev.leds))
 
 
-static_effect = StaticEffect()
+STATIC_EFFECT = StaticEffect()

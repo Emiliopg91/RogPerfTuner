@@ -4,6 +4,7 @@ from framework.singleton import singleton
 from rcc.communications.client.tcp.openrgb.client.utils import RGBColor
 from rcc.communications.client.tcp.openrgb.effects.base.abstract_effect import AbstractEffect
 
+
 @singleton
 class DanceFloor(AbstractEffect):
     """Dance floor effect"""
@@ -25,4 +26,4 @@ class DanceFloor(AbstractEffect):
             self._sleep(0.5)  # 500 ms
 
 
-dance_floor = DanceFloor()
+DANCE_FLOOR_EFFECT = DanceFloor()

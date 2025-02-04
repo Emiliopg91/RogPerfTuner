@@ -6,4 +6,4 @@ from rcc.utils import constants
 
 cryptography = Cryptography(__app_name__)
 event_bus = EventBus()
-translator = Translator(constants.translations_path)
+translator = Translator(constants.TRANSLATIONS_PATH)

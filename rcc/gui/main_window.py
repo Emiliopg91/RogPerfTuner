@@ -15,9 +15,9 @@ from rcc.gui.game_list import GameList
 from rcc.models.battery_threshold import BatteryThreshold
 from rcc.models.performance_profile import PerformanceProfile
 from rcc.models.rgb_brightness import RgbBrightness
-from rcc.services.openrgb_service import open_rgb_service
-from rcc.services.platform_service import platform_service
-from rcc.utils.constants import icons_path
+from rcc.services.openrgb_service import OPEN_RGB_SERVICE
+from rcc.services.platform_service import PLATFORM_SERVICE
+from rcc.utils.constants import ICONS_PATH
 from rcc.utils.beans import translator
 from rcc.utils.gui_utils import GuiUtils, NoScrollComboBox
 from rcc.utils.beans import event_bus
@@ -30,16 +30,16 @@ class MainWindow(QMainWindow):
     def __init__(self):
         self._logger = Logger()
 
-        self._effect_labels = open_rgb_service.get_available_effects()
+        self._effect_labels = OPEN_RGB_SERVICE.get_available_effects()
 
         super().__init__()
 
         self.setWindowTitle("RogControlCenter")
         self.setGeometry(0, 0, 580, 800)
         self.setFixedSize(580, 800)
-        self.setWindowIcon(QIcon(f"{icons_path}/icon-45x45.png"))
+        self.setWindowIcon(QIcon(f"{ICONS_PATH}/icon-45x45.png"))
 
-        self._current_color = open_rgb_service.get_color(open_rgb_service._effect)
+        self._current_color = OPEN_RGB_SERVICE.get_color(OPEN_RGB_SERVICE._effect)
 
         # Widget central
         central_widget = QWidget(self)
@@ -49,7 +49,7 @@ class MainWindow(QMainWindow):
 
         # Primera fila: Imagen centrada
         image_label = QLabel()
-        pixmap = QPixmap(f"{icons_path}/rog-logo.svg")  # Ruta a tu archivo de imagen
+        pixmap = QPixmap(f"{ICONS_PATH}/rog-logo.svg")  # Ruta a tu archivo de imagen
         scaled_pixmap = pixmap.scaled(350, 350, Qt.KeepAspectRatio, Qt.SmoothTransformation)  # Escalar la imagen
         image_label.setPixmap(scaled_pixmap)
         image_label.setAlignment(Qt.AlignCenter)
@@ -66,7 +66,7 @@ class MainWindow(QMainWindow):
         for item in reversed(PerformanceProfile):
             self._profile_dropdown.addItem(translator.translate(f"label.profile.{item.name}"), item)
         self._profile_dropdown.currentIndexChanged.connect(self.on_profile_changed)
-        self.set_performance_profile(platform_service.performance_profile)
+        self.set_performance_profile(PLATFORM_SERVICE.performance_profile)
         performance_layout.addRow(QLabel(f"{translator.translate('profile')}:"), self._profile_dropdown)
 
         performance_group.setLayout(performance_layout)
@@ -84,8 +84,8 @@ class MainWindow(QMainWindow):
         # Dropdown para "Efecto"
         self._effect_dropdown = NoScrollComboBox()
         self._effect_dropdown.addItems(self._effect_labels)
-        if open_rgb_service._effect in self._effect_labels:
-            self._effect_dropdown.setCurrentIndex(self._effect_labels.index(open_rgb_service._effect))
+        if OPEN_RGB_SERVICE._effect in self._effect_labels:
+            self._effect_dropdown.setCurrentIndex(self._effect_labels.index(OPEN_RGB_SERVICE._effect))
         self._effect_dropdown.currentIndexChanged.connect(self.on_effect_change)
         aura_layout.addRow(QLabel(f"{translator.translate("effect")}:"), self._effect_dropdown)
 
@@ -93,7 +93,7 @@ class MainWindow(QMainWindow):
         self._brightness_dropdown = NoScrollComboBox()
         for brightness in RgbBrightness:
             self._brightness_dropdown.addItem(translator.translate(f"label.brightness.{brightness.name}"), brightness)
-        self._brightness_dropdown.setCurrentIndex(self._brightness_dropdown.findData(open_rgb_service._brightness))
+        self._brightness_dropdown.setCurrentIndex(self._brightness_dropdown.findData(OPEN_RGB_SERVICE._brightness))
         self._brightness_dropdown.currentIndexChanged.connect(self.on_brightness_change)
         aura_layout.addRow(QLabel(f"{translator.translate("brightness")}:"), self._brightness_dropdown)
 
@@ -104,7 +104,7 @@ class MainWindow(QMainWindow):
             f"background-color: {self._current_color if self._current_color is not None else "#00000000"};"
         )
         self._color_button.clicked.connect(self.pick_color)
-        supports_color = open_rgb_service.supports_color(open_rgb_service._effect)
+        supports_color = OPEN_RGB_SERVICE.supports_color(OPEN_RGB_SERVICE._effect)
         self._color_button.setDisabled(not supports_color)
         self._color_button.setDisabled(not supports_color)
 
@@ -125,7 +125,7 @@ class MainWindow(QMainWindow):
         for item in BatteryThreshold:
             self._threshold_dropdown.addItem(f"{item.value}%", item)
         self._threshold_dropdown.currentIndexChanged.connect(self.on_battery_limit_changed)
-        self.set_battery_charge_limit(platform_service.battery_charge_limit)
+        self.set_battery_charge_limit(PLATFORM_SERVICE.battery_charge_limit)
         settings_layout.addRow(
             QLabel(
                 f"{translator.translate("charge.threshold")}:",
@@ -187,35 +187,35 @@ class MainWindow(QMainWindow):
     def on_profile_changed(self, index):
         """Handler for profile change"""
         profile = self._profile_dropdown.itemData(index)
-        if platform_service.performance_profile != profile:
-            platform_service.set_performance_profile(profile)
+        if PLATFORM_SERVICE.performance_profile != profile:
+            PLATFORM_SERVICE.set_performance_profile(profile)
 
     def on_battery_limit_changed(self, index):
         """Handler for battery limit change"""
         threshold = self._threshold_dropdown.itemData(index)
-        if platform_service.battery_charge_limit != threshold:
-            platform_service.set_battery_threshold(threshold)
+        if PLATFORM_SERVICE.battery_charge_limit != threshold:
+            PLATFORM_SERVICE.set_battery_threshold(threshold)
 
     def on_effect_change(self):
         """Handler for effect change"""
         effect = self._effect_labels[self._effect_dropdown.currentIndex()]
-        if open_rgb_service.effect != effect:
-            open_rgb_service.apply_effect(effect)
+        if OPEN_RGB_SERVICE.effect != effect:
+            OPEN_RGB_SERVICE.apply_effect(effect)
 
     def on_brightness_change(self, index):
         """Handler for brightness change"""
         level = self._brightness_dropdown.itemData(index)
-        if open_rgb_service.brightness != level:
-            open_rgb_service.apply_brightness(level)
+        if OPEN_RGB_SERVICE.brightness != level:
+            OPEN_RGB_SERVICE.apply_brightness(level)
 
     def on_color_change(self):
         """Handler for color change"""
-        if open_rgb_service.color != self._current_color:
-            open_rgb_service.apply_color(self._current_color)
+        if OPEN_RGB_SERVICE.color != self._current_color:
+            OPEN_RGB_SERVICE.apply_color(self._current_color)
 
     def open_game_list(self):
         """Open game list window"""
         GameList(self).show()
 
 
-main_window = MainWindow()
+MAIN_WINDOW = MainWindow()

@@ -59,4 +59,4 @@ class StarryNight(AbstractEffect):
             self._sleep(random.randint(0, 150) / 1000)
 
 
-starry_night = StarryNight()
+STARRY_NIGHT_EFFECT = StarryNight()
