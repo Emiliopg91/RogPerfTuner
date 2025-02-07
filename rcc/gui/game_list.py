@@ -12,7 +12,7 @@ from PyQt5.QtWidgets import (
 from PyQt5.QtCore import Qt
 from PyQt5.QtGui import QIcon
 
-from rcc.communications.client.websocket.steam_client import SteamGameDetails, STEAM_CLIENT
+from rcc.communications.client.websocket.steam.steam_client import SteamGameDetails, STEAM_CLIENT
 from rcc.utils.constants import ICONS_PATH
 from rcc.models.performance_profile import PerformanceProfile
 from rcc.services.games_service import GAME_SERVICE

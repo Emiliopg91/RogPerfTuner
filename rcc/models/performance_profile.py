@@ -1,8 +1,8 @@
 from enum import IntEnum
 
-from rcc.communications.client.dbus.nv_boost_client import NV_BOOST_CLIENT
-from rcc.communications.client.dbus.pl1_spl_client import PL1_SPL_CLIENT
-from rcc.communications.client.dbus.pl2_sppt_client import PL2_SPPT_CLIENT
+from rcc.communications.client.dbus.asus.armoury.nvidia.nv_boost_client import NV_BOOST_CLIENT
+from rcc.communications.client.dbus.asus.armoury.intel.pl1_spl_client import PL1_SPL_CLIENT
+from rcc.communications.client.dbus.asus.armoury.intel.pl2_sppt_client import PL2_SPPT_CLIENT
 from rcc.models.platform_profile import PlatformProfile
 from rcc.models.power_profile import PowerProfile
 
@@ -58,11 +58,6 @@ class PerformanceProfile(IntEnum):
             return NV_BOOST_CLIENT.min_value
 
         return NV_BOOST_CLIENT.current_value
-
-    @property
-    def boost_enabled(self) -> bool:
-        """Get if profile enables boost"""
-        return True
 
     @property
     def platform_profile(self) -> PlatformProfile:

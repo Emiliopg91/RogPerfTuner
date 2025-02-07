@@ -3,7 +3,7 @@ from typing import Any, Callable
 
 from PyQt5.QtDBus import QDBusInterface, QDBusConnection, QDBusReply, QDBusMessage, QDBusServiceWatcher
 
-from rcc.communications.client.dbus.base.signal_listener import SIGNAL_LISTENER
+from rcc.communications.client.dbus.signal_listener import SIGNAL_LISTENER
 from framework.logger import Logger
 
 

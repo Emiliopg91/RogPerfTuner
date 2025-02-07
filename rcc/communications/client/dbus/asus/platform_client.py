@@ -1,7 +1,7 @@
 from PyQt5.QtCore import QMetaType
 from PyQt5.QtDBus import QDBusVariant, QDBusArgument
 
-from rcc.communications.client.dbus.base.abstract_dbus_client import AbstractDbusClient
+from rcc.communications.client.dbus.abstract_dbus_client import AbstractDbusClient
 from rcc.models.battery_threshold import BatteryThreshold
 from rcc.models.platform_profile import PlatformProfile
 from framework.singleton import singleton

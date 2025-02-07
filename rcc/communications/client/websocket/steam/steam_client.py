@@ -1,6 +1,6 @@
 from typing import Callable
 from rcc.models.steam_game_client import SteamGameDetails
-from rcc.communications.client.websocket.base.abstract_websocket_client import AbstractWebsocketClient
+from rcc.communications.client.websocket.abstract_websocket_client import AbstractWebsocketClient
 from framework.singleton import singleton
 
 

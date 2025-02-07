@@ -1,31 +1,28 @@
-from threading import Lock
-import time
-from typing import Callable, Dict, List, Optional
-
+import concurrent
 import os
 import subprocess
+import time
+from threading import Lock
+from typing import Callable, Dict, List, Optional
 
-import concurrent
 from watchdog.events import FileSystemEventHandler
 from watchdog.observers import Observer
 
-from rcc.communications.client.dbus.nv_boost_client import NV_BOOST_CLIENT
-from rcc.communications.client.dbus.pl1_spl_client import PL1_SPL_CLIENT
-from rcc.communications.client.dbus.pl2_sppt_client import PL2_SPPT_CLIENT
-from rcc.communications.client.dbus.fan_curves_client import FAN_CURVES_CLIENT
-from rcc.communications.client.dbus.platform_client import PLATFORM_CLIENT
-from rcc.communications.client.dbus.power_profiles_client import POWER_PROFILE_CLIENT
-from rcc.communications.client.dbus.upower_client import UPOWER_CLIENT
+from framework.logger import Logger, logged_method
+from framework.singleton import singleton
+from rcc.communications.client.dbus.asus.fan_curves_client import FAN_CURVES_CLIENT
+from rcc.communications.client.dbus.asus.armoury.nvidia.nv_boost_client import NV_BOOST_CLIENT
+from rcc.communications.client.dbus.asus.armoury.intel.pl1_spl_client import PL1_SPL_CLIENT
+from rcc.communications.client.dbus.asus.armoury.intel.pl2_sppt_client import PL2_SPPT_CLIENT
+from rcc.communications.client.dbus.asus.platform_client import PLATFORM_CLIENT
+from rcc.communications.client.dbus.linux.power_profiles_client import POWER_PROFILE_CLIENT
+from rcc.communications.client.dbus.linux.upower_client import UPOWER_CLIENT
 from rcc.gui.notifier import NOTIFIER
 from rcc.models.battery_threshold import BatteryThreshold
 from rcc.models.performance_profile import PerformanceProfile
 from rcc.models.power_profile import PowerProfile
+from rcc.utils.beans import CRYPTOGRAPHY, EVENT_BUS, TRANSLATOR
 from rcc.utils.configuration import CONFIGURATION
-from rcc.utils.beans import TRANSLATOR
-from rcc.utils.beans import CRYPTOGRAPHY
-from rcc.utils.beans import EVENT_BUS
-from framework.logger import Logger, logged_method
-from framework.singleton import singleton
 
 
 class BoostControlHandler(FileSystemEventHandler):
@@ -152,7 +149,7 @@ class PlatformService:
             if self._performance_profile != profile or force:
                 platform_profile = profile.platform_profile
                 power_profile = profile.power_profile
-                boost_enabled = profile.boost_enabled
+                boost_enabled = not self.on_bat
                 pl1 = profile.pl1_spl
                 pl2 = profile.pl2_sppt
                 nv = profile.nv_boost

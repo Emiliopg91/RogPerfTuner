@@ -1,4 +1,4 @@
-from rcc.communications.client.dbus.base.abstract_dbus_client import AbstractDbusClient
+from rcc.communications.client.dbus.abstract_dbus_client import AbstractDbusClient
 from framework.singleton import singleton
 
 

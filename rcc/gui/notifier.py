@@ -1,7 +1,7 @@
 import os
 
 from rcc import __app_name__
-from rcc.communications.client.dbus.notification_client import NOTIFICATION_CLIENT
+from rcc.communications.client.dbus.linux.notification_client import NOTIFICATION_CLIENT
 from rcc.utils.constants import ICONS_PATH
 from framework.singleton import singleton
 

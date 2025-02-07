@@ -3,7 +3,7 @@ import os
 import subprocess
 from threading import Thread
 
-from rcc.communications.client.websocket.steam_client import STEAM_CLIENT
+from rcc.communications.client.websocket.steam.steam_client import STEAM_CLIENT
 from rcc.models.performance_profile import PerformanceProfile
 from rcc.models.settings import GameEntry
 from rcc.models.platform_profile import PlatformProfile
