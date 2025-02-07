@@ -3,11 +3,11 @@ from rcc.communications.client.dbus.asus.armoury.armoury_base_client import Armo
 
 
 @singleton
-class NvBoostClient(ArmouryBaseClient):
+class NvTempClient(ArmouryBaseClient):
     """DBus platform client"""
 
     def __init__(self):
-        super().__init__("nv_dynamic_boost", False)
+        super().__init__("nv_temp_target", False)
 
 
-NV_BOOST_CLIENT = NvBoostClient()
+NV_TEMP_CLIENT = NvTempClient()

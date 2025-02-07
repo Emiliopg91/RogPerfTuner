@@ -1,17 +1,17 @@
 from PyQt5.QtCore import QMetaType
 from PyQt5.QtDBus import QDBusArgument
 
-from rcc.communications.client.dbus.abstract_dbus_client import AbstractDbusClient
+from rcc.communications.client.dbus.asus.asus_base_client import AsusBaseClient
 from rcc.models.platform_profile import PlatformProfile
 from framework.singleton import singleton
 
 
 @singleton
-class FanCurvesClient(AbstractDbusClient):
+class FanCurvesClient(AsusBaseClient):
     """Fan curves client"""
 
     def __init__(self):
-        super().__init__(True, "xyz.ljones.Asusd", "/xyz/ljones", "xyz.ljones.FanCurves")
+        super().__init__("FanCurves")
 
     def reset_profile_curves(self, profile: PlatformProfile):
         """Reset fan curves"""

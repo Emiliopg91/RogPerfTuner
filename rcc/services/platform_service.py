@@ -10,11 +10,12 @@ from watchdog.observers import Observer
 
 from framework.logger import Logger, logged_method
 from framework.singleton import singleton
-from rcc.communications.client.dbus.asus.fan_curves_client import FAN_CURVES_CLIENT
+from rcc.communications.client.dbus.asus.armoury.nvidia.nv_temp_client import NV_TEMP_CLIENT
+from rcc.communications.client.dbus.asus.core.fan_curves_client import FAN_CURVES_CLIENT
 from rcc.communications.client.dbus.asus.armoury.nvidia.nv_boost_client import NV_BOOST_CLIENT
 from rcc.communications.client.dbus.asus.armoury.intel.pl1_spl_client import PL1_SPL_CLIENT
 from rcc.communications.client.dbus.asus.armoury.intel.pl2_sppt_client import PL2_SPPT_CLIENT
-from rcc.communications.client.dbus.asus.platform_client import PLATFORM_CLIENT
+from rcc.communications.client.dbus.asus.core.platform_client import PLATFORM_CLIENT
 from rcc.communications.client.dbus.linux.power_profiles_client import POWER_PROFILE_CLIENT
 from rcc.communications.client.dbus.linux.upower_client import UPOWER_CLIENT
 from rcc.gui.notifier import NOTIFIER
@@ -45,6 +46,8 @@ class BoostControlHandler(FileSystemEventHandler):
 class PlatformService:
     """Service for platform setting"""
 
+    TDP_BAT_FACTOR = 0.6
+
     BOOST_CONTROLS: List[Dict[str, str]] = [
         {
             "path": "/sys/devices/system/cpu/intel_pstate/no_turbo",
@@ -64,6 +67,12 @@ class PlatformService:
         self._logger.add_tab()
         self._lock = Lock()
         self._ac_events_enabled = True
+
+        if PL1_SPL_CLIENT.available:
+            self._logger.info("Detected Intel CPU")
+
+        if NV_BOOST_CLIENT.available:
+            self._logger.info("Detected Nvidia GPU")
 
         self._boost_control: Optional[Dict[str, str]] = None
         self._last_boost: Optional[bool] = None
@@ -135,7 +144,7 @@ class PlatformService:
                     f"AC cord {"dis" if on_battery else ""}connected, battery {"dis" if not on_battery else ""}engaged"
                 )
                 self._logger.add_tab()
-            self.set_performance_profile(policy, True)
+            self.set_performance_profile(policy, True, force=True)
             if not muted:
                 self._logger.rem_tab()
 
@@ -150,57 +159,69 @@ class PlatformService:
                 platform_profile = profile.platform_profile
                 power_profile = profile.power_profile
                 boost_enabled = not self.on_bat
-                pl1 = profile.pl1_spl
-                pl2 = profile.pl2_sppt
-                nv = profile.nv_boost
 
                 try:
                     self._logger.info(
-                        f"Setting profile '{profile_name.lower()}' {f"for game {game_name}" if game_name is not None else ""}"  # pylint: disable=C0301
+                        f"Setting {profile_name} profile {f"for game {game_name}" if game_name is not None else ""}"  # pylint: disable=C0301
                     )
                     self._logger.add_tab()
 
                     def set_throttle_policy():
-                        self._logger.debug(f"Throttle policy: {platform_profile.name}")
+                        self._logger.info(f"Throttle policy: {platform_profile.name}")
+                        self._logger.add_tab()
                         PLATFORM_CLIENT.platform_profile = platform_profile
                         self._platform_profile = platform_profile
 
-                        if (pl1 is not None and pl2 is not None) or nv is not None:
-                            self._logger.debug(f"Power limits:{platform_profile.name}")
-                            PLATFORM_CLIENT.enable_ppt_group = True
+                        PLATFORM_CLIENT.enable_ppt_group = True
+                        time.sleep(0.05)
+
+                        pl1 = profile.pl1_spl
+                        pl2 = profile.pl2_sppt
+                        if pl1 is not None and pl2 is not None:
+                            self._logger.info("CPU power")
+                            pl1 = max(int(pl1 * (self.TDP_BAT_FACTOR if self.on_bat else 1)), PL1_SPL_CLIENT.min_value)
+                            pl2 = max(int(pl2 * (self.TDP_BAT_FACTOR if self.on_bat else 1)), PL2_SPPT_CLIENT.min_value)
+
+                            self._logger.info(f"  PL1: {pl1}W")
+                            self._logger.info(f"  PL2: {pl2}W")
+
+                            PL1_SPL_CLIENT.current_value = PL1_SPL_CLIENT.default_value
+                            time.sleep(0.05)
+                            PL2_SPPT_CLIENT.current_value = PL2_SPPT_CLIENT.default_value
                             time.sleep(0.05)
 
-                            if pl1 is not None and pl2 is not None:
-                                self._logger.debug(f"  PL1: {pl1}")
-                                self._logger.debug(f"  PL2: {pl2}")
+                            PL1_SPL_CLIENT.current_value = pl1
+                            time.sleep(0.05)
+                            PL2_SPPT_CLIENT.current_value = pl2
 
-                                PL1_SPL_CLIENT.current_value = PL1_SPL_CLIENT.default_value
-                                time.sleep(0.05)
-                                PL2_SPPT_CLIENT.current_value = PL2_SPPT_CLIENT.default_value
-                                time.sleep(0.05)
+                        nv = profile.nv_boost
+                        if nv is not None:
+                            self._logger.info("GPU power")
+                            nv = max(int(nv * (self.TDP_BAT_FACTOR if self.on_bat else 1)), NV_BOOST_CLIENT.min_value)
+                            nt = max(
+                                int(NV_TEMP_CLIENT.max_value * (self.TDP_BAT_FACTOR if self.on_bat else 1)),
+                                NV_TEMP_CLIENT.min_value,
+                            )
 
-                                PL1_SPL_CLIENT.current_value = pl1
-                                time.sleep(0.05)
-                                PL2_SPPT_CLIENT.current_value = pl2
-                                time.sleep(0.05)
+                            self._logger.info(f"  BST: {nv}W")
+                            self._logger.info(f"  TEM: {nt}ºC")
 
-                            if nv is not None:
-                                self._logger.debug(f"  NVB: {nv}")
+                            NV_BOOST_CLIENT.current_value = NV_BOOST_CLIENT.default_value
+                            time.sleep(0.05)
 
-                                NV_BOOST_CLIENT.current_value = NV_BOOST_CLIENT.default_value
-                                time.sleep(0.05)
-
-                                NV_BOOST_CLIENT.current_value = nv
-                                time.sleep(0.05)
+                            NV_BOOST_CLIENT.current_value = nv
+                            time.sleep(0.05)
+                            NV_TEMP_CLIENT.current_value = nt
+                        self._logger.rem_tab()
 
                     def set_fan_curves():
-                        self._logger.debug(f"Fan curve: {platform_profile.name}")
+                        self._logger.info(f"Fan curve: {platform_profile.name}")
                         FAN_CURVES_CLIENT.set_curves_to_defaults(platform_profile)
                         FAN_CURVES_CLIENT.reset_profile_curves(platform_profile)
                         FAN_CURVES_CLIENT.set_fan_curves_enabled(platform_profile, True)
 
                     def set_power_profile():
-                        self._logger.debug(f"Power profile: {power_profile.name}")
+                        self._logger.info(f"Power profile: {power_profile.name}")
                         POWER_PROFILE_CLIENT.active_profile = power_profile
 
                     def handle_boost():
@@ -212,9 +233,9 @@ class PlatformService:
                             self._logger.debug(f"Boost: omitted due to {no_boost_reason}")
                         else:
                             if boost_enabled:
-                                self._logger.debug("Boost: ENABLED")
+                                self._logger.info("Boost: ENABLED")
                             else:
-                                self._logger.debug("Boost: DISABLED")
+                                self._logger.info("Boost: DISABLED")
 
                             target = "on" if boost_enabled else "off"
                             value = self._boost_control[target]
@@ -227,9 +248,9 @@ class PlatformService:
                     with concurrent.futures.ThreadPoolExecutor() as executor:
                         futures = [
                             executor.submit(handle_boost),
-                            executor.submit(set_throttle_policy),
-                            executor.submit(set_fan_curves),
                             executor.submit(set_power_profile),
+                            executor.submit(set_fan_curves),
+                            executor.submit(set_throttle_policy),
                         ]
                         # Esperar a que todas las operaciones terminen
                         concurrent.futures.wait(futures)
@@ -294,7 +315,7 @@ class PlatformService:
         else:
             self._logger.info("Laptop running on AC")
             self._logger.add_tab()
-            self.set_performance_profile(PerformanceProfile(CONFIGURATION.platform.profiles.profile), True, None, False)
+            self.set_performance_profile(PerformanceProfile(CONFIGURATION.platform.profiles.profile), True, None, True)
             self._logger.rem_tab()
 
 

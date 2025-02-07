@@ -13,6 +13,7 @@ class PerformanceProfile(IntEnum):
     QUIET = 0
     BALANCED = 1
     PERFORMANCE = 2
+    TURBO = 3
 
     @property
     def pl1_spl(self):
@@ -20,12 +21,14 @@ class PerformanceProfile(IntEnum):
         if not PL1_SPL_CLIENT.available:
             return None
 
+        if self == PerformanceProfile.TURBO:
+            return int(PL1_SPL_CLIENT.max_value * 1)
         if self == PerformanceProfile.PERFORMANCE:
-            return int(PL1_SPL_CLIENT.max_value * 0.7)
+            return int(PL1_SPL_CLIENT.max_value * 0.8)
         if self == PerformanceProfile.BALANCED:
-            return int(PL1_SPL_CLIENT.max_value * 0.5)
+            return int(PL1_SPL_CLIENT.max_value * 0.6)
         if self == PerformanceProfile.QUIET:
-            return int(PL1_SPL_CLIENT.max_value * 0.3)
+            return int(PL1_SPL_CLIENT.max_value * 0.4)
 
         return PL1_SPL_CLIENT.current_value
 
@@ -35,12 +38,12 @@ class PerformanceProfile(IntEnum):
         if not PL2_SPPT_CLIENT.available:
             return None
 
-        if self == PerformanceProfile.PERFORMANCE:
-            return int(PL2_SPPT_CLIENT.max_value * 0.9)
+        if self in (PerformanceProfile.PERFORMANCE, self == PerformanceProfile.TURBO):
+            return int(PL2_SPPT_CLIENT.max_value * 1)
         if self == PerformanceProfile.BALANCED:
             return int(PL2_SPPT_CLIENT.max_value * 0.75)
         if self == PerformanceProfile.QUIET:
-            return int(PL2_SPPT_CLIENT.max_value * 0.45)
+            return int(PL2_SPPT_CLIENT.max_value * 0.5)
 
         return PL1_SPL_CLIENT.current_value
 
@@ -50,7 +53,7 @@ class PerformanceProfile(IntEnum):
         if not PL2_SPPT_CLIENT.available:
             return None
 
-        if self == PerformanceProfile.PERFORMANCE:
+        if self in (PerformanceProfile.PERFORMANCE, self == PerformanceProfile.TURBO):
             return NV_BOOST_CLIENT.max_value
         if self == PerformanceProfile.BALANCED:
             return int((NV_BOOST_CLIENT.max_value + NV_BOOST_CLIENT.min_value) / 2)
@@ -74,14 +77,17 @@ class PerformanceProfile(IntEnum):
         """Get associated power profile"""
         if self == PerformanceProfile.QUIET:
             return PowerProfile.POWER_SAVER
-
+        if self == PerformanceProfile.BALANCED:
+            return PowerProfile.BALANCED
         return PowerProfile.PERFORMANCE
 
     @property
     def next_performance_profile(self):
         """Get next profile"""
-        if self == PerformanceProfile.PERFORMANCE:
+        if self == PerformanceProfile.TURBO:
             return PerformanceProfile.QUIET
+        if self == PerformanceProfile.PERFORMANCE:
+            return PerformanceProfile.TURBO
         if self == PerformanceProfile.BALANCED:
             return PerformanceProfile.PERFORMANCE
         if self == PerformanceProfile.QUIET:
@@ -91,6 +97,9 @@ class PerformanceProfile(IntEnum):
 
     def get_greater(self, other):
         """Get the profile with higher performance"""
+        if PerformanceProfile.TURBO in (self, other):
+            return PerformanceProfile.TURBO
+
         if PerformanceProfile.PERFORMANCE in (self, other):
             return PerformanceProfile.PERFORMANCE
 

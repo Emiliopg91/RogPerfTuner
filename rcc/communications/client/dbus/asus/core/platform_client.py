@@ -1,18 +1,18 @@
 from PyQt5.QtCore import QMetaType
 from PyQt5.QtDBus import QDBusVariant, QDBusArgument
 
-from rcc.communications.client.dbus.abstract_dbus_client import AbstractDbusClient
+from rcc.communications.client.dbus.asus.asus_base_client import AsusBaseClient
 from rcc.models.battery_threshold import BatteryThreshold
 from rcc.models.platform_profile import PlatformProfile
 from framework.singleton import singleton
 
 
 @singleton
-class PlatformClient(AbstractDbusClient):
+class PlatformClient(AsusBaseClient):
     """DBus platform client"""
 
     def __init__(self):
-        super().__init__(True, "xyz.ljones.Asusd", "/xyz/ljones", "xyz.ljones.Platform")
+        super().__init__("Platform")
 
     @property
     def charge_control_end_threshold(self) -> BatteryThreshold:
