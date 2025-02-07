@@ -85,6 +85,11 @@ class AbstractDbusClient(ABC):
         if not self._available:
             raise Exception(f"Service {self._service_name} is not available")
 
+    @property
+    def available(self):
+        """Availability flag"""
+        return self._available
+
     def _get_property(self, property_name: str):
         """Get dbus property"""
         self._check_availability()

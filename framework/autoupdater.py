@@ -25,6 +25,8 @@ class Asset:
 class AutoUpdater:
     """Class to manage application updates"""
 
+    CHECK_INTERVAL = 24 * 60 * 60
+
     def __init__(  # pylint: disable=R0913,R0917
         self,
         app_name: str,
@@ -66,7 +68,7 @@ class AutoUpdater:
             data = self.get_update_url()
             if data is None:
                 self._logger.info("No update found")
-                time.sleep(3600)
+                time.sleep(self.CHECK_INTERVAL)
             else:
                 self.download_update(data._url)  # pylint: disable=W0212
                 if not self.dev_mode:

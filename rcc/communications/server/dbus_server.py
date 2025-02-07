@@ -26,7 +26,7 @@ class HelloService(QObject):
         if len(GAME_SERVICE.running_games) > 0:
             return "Not available on game session"
 
-        next_t = PLATFORM_SERVICE.performance_profile.get_next_performance_profile()
+        next_t = PLATFORM_SERVICE.performance_profile.next_performance_profile
         PLATFORM_SERVICE.set_performance_profile(next_t)
         return next_t.name
 

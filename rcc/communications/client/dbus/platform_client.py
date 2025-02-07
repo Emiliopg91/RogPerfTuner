@@ -39,6 +39,18 @@ class PlatformClient(AbstractDbusClient):
         )
 
     @property
+    def enable_ppt_group(self) -> PlatformProfile:
+        """Enable PPT group"""
+        return PlatformProfile(self._get_property("EnablePptGroup"))
+
+    @enable_ppt_group.setter
+    def enable_ppt_group(self, val: bool) -> None:
+        self._set_property(
+            "EnablePptGroup",
+            QDBusVariant(QDBusArgument(val, QMetaType.Bool)),
+        )
+
+    @property
     def change_platform_profile_on_battery(self) -> bool:
         """Change Platform Profile On Battery"""
         return PlatformProfile(self._get_property("ChangePlatformProfileOnBattery"))

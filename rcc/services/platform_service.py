@@ -1,4 +1,5 @@
 from threading import Lock
+import time
 from typing import Callable, Dict, List, Optional
 
 import os
@@ -8,6 +9,10 @@ import concurrent
 from watchdog.events import FileSystemEventHandler
 from watchdog.observers import Observer
 
+from rcc.communications.client.dbus import platform_client
+from rcc.communications.client.dbus.nv_boost_client import NV_BOOST_CLIENT
+from rcc.communications.client.dbus.pl1_spl_client import PL1_SPL_CLIENT
+from rcc.communications.client.dbus.pl2_sppt_client import PL2_SPPT_CLIENT
 from rcc.communications.client.dbus.fan_curves_client import FAN_CURVES_CLIENT
 from rcc.communications.client.dbus.platform_client import PLATFORM_CLIENT
 from rcc.communications.client.dbus.power_profiles_client import POWER_PROFILE_CLIENT
@@ -146,9 +151,13 @@ class PlatformService:
         with self._lock:
             profile_name = profile.name
             if self._performance_profile != profile or force:
-                platform_profile = profile.get_platform_profile()
-                power_profile = profile.get_power_profile()
-                boost_enabled = profile.get_boost_enabled()
+                platform_profile = profile.platform_profile
+                power_profile = profile.power_profile
+                boost_enabled = profile.boost_enabled
+                pl1 = profile.pl1_spl
+                pl2 = profile.pl2_sppt
+                nv = profile.nv_boost
+
                 try:
                     self._logger.info(
                         f"Setting profile '{profile_name.lower()}' {f"for game {game_name}" if game_name is not None else ""}"  # pylint: disable=C0301
@@ -159,6 +168,34 @@ class PlatformService:
                         self._logger.debug(f"Throttle policy: {platform_profile.name}")
                         PLATFORM_CLIENT.platform_profile = platform_profile
                         self._platform_profile = platform_profile
+
+                        if (pl1 is not None and pl2 is not None) or nv is not None:
+                            self._logger.debug(f"Power limits:{platform_profile.name}")
+                            PLATFORM_CLIENT.enable_ppt_group = True
+                            time.sleep(0.05)
+
+                            if pl1 is not None and pl2 is not None:
+                                self._logger.debug(f"  PL1: {pl1}")
+                                self._logger.debug(f"  PL2: {pl2}")
+
+                                PL1_SPL_CLIENT.current_value = PL1_SPL_CLIENT.default_value
+                                time.sleep(0.05)
+                                PL2_SPPT_CLIENT.current_value = PL2_SPPT_CLIENT.default_value
+                                time.sleep(0.05)
+
+                                PL1_SPL_CLIENT.current_value = pl1
+                                time.sleep(0.05)
+                                PL2_SPPT_CLIENT.current_value = pl2
+                                time.sleep(0.05)
+
+                            if nv is not None:
+                                self._logger.debug(f"  NVB: {nv}")
+
+                                NV_BOOST_CLIENT.current_value = NV_BOOST_CLIENT.default_value
+                                time.sleep(0.05)
+
+                                NV_BOOST_CLIENT.current_value = nv
+                                time.sleep(0.05)
 
                     def set_fan_curves():
                         self._logger.debug(f"Fan curve: {platform_profile.name}")

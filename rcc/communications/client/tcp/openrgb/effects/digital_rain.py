@@ -100,7 +100,9 @@ class DigitalRain(AbstractEffect):
 
             if allowed > len(zone_status[0]) - len(free_cols):
                 next_col = free_cols[random.randint(0, len(free_cols) - 1)]
-                zone_status[0][next_col].max_val = self._max_count
+                zone_status[0][next_col].max_val = random.randint(
+                    round(self._max_count * (1 - (0.5 * (self._cpu)))), self._max_count
+                )
                 zone_status[0][next_col].cur_val = zone_status[0][next_col].max_val
 
     def _dev_to_mat(self, dev: Device) -> list[list[LedStatus]]:  # pylint: disable=R0912,R0914
@@ -185,7 +187,7 @@ class DigitalRain(AbstractEffect):
                 final_colors = self._to_color_matrix(zone_status, len(dev.colors))
 
                 self._set_colors(dev, final_colors)
-                self._sleep(self._nap_time - 0.2 * (self._nap_time * (self._cpu)))
+                self._sleep(self._nap_time - 0.4 * (self._nap_time * (self._cpu)))
                 iter_count = (iter_count + 1) % 100
 
         def cpu_thread():
