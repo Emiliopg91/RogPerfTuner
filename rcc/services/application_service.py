@@ -5,7 +5,7 @@ import subprocess
 
 from rcc import __app_name__
 from rcc.gui.notifier import NOTIFIER
-from rcc.utils.beans import translator
+from rcc.utils.beans import TRANSLATOR
 from rcc.utils.constants import (
     APP_DRAW_FILE,
     AUTOSTART_FILE,
@@ -14,7 +14,7 @@ from rcc.utils.constants import (
     USER_ICON_FOLDER,
     USER_UPDATE_FOLDER,
 )
-from rcc.utils.beans import event_bus
+from rcc.utils.beans import EVENT_BUS
 from framework.logger import Logger
 
 from framework.singleton import singleton
@@ -81,8 +81,8 @@ fi
 
     def relaunch_application(self) -> None:
         """Relaunch the application after 1 second"""
-        NOTIFIER.show_toast(translator.translate("applying.update"))
-        event_bus.emit("stop")
+        NOTIFIER.show_toast(TRANSLATOR.translate("applying.update"))
+        EVENT_BUS.emit("stop")
         subprocess.run(
             f'nohup bash -c "sleep 1 && {self.RUNNER_FILE_PATH}" > /dev/null 2>&1 &',
             check=False,

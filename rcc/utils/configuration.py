@@ -78,4 +78,4 @@ class Configuration:
         return self._config.logger
 
 
-configuration = Configuration()
+CONFIGURATION = Configuration()

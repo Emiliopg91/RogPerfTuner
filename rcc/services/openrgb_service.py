@@ -13,8 +13,8 @@ from rcc.models.rgb_brightness import RgbBrightness
 from rcc.models.settings import Effect
 from rcc.models.usb_identifier import UsbIdentifier
 from rcc.utils.constants import USER_EFFECTS_FOLDER
-from rcc.utils.configuration import configuration
-from rcc.utils.beans import event_bus
+from rcc.utils.configuration import CONFIGURATION
+from rcc.utils.beans import EVENT_BUS
 from framework.logger import Logger
 from framework.singleton import singleton
 
@@ -29,16 +29,16 @@ class OpenRgbService:
         self._logger.add_tab()
 
         self._effect = STATIC_EFFECT.name
-        if configuration.open_rgb.last_effect:
-            self._effect = configuration.open_rgb.last_effect
+        if CONFIGURATION.open_rgb.last_effect:
+            self._effect = CONFIGURATION.open_rgb.last_effect
 
         self._brightness = RgbBrightness.MAX
-        if configuration.open_rgb.brightness is not None:
-            self._brightness = RgbBrightness(configuration.open_rgb.brightness)
+        if CONFIGURATION.open_rgb.brightness is not None:
+            self._brightness = RgbBrightness(CONFIGURATION.open_rgb.brightness)
 
         self._color = STATIC_EFFECT.color
-        if configuration.open_rgb.last_effect and configuration.open_rgb.last_effect in configuration.open_rgb.effects:
-            self._color = configuration.open_rgb.effects[configuration.open_rgb.last_effect].color
+        if CONFIGURATION.open_rgb.last_effect and CONFIGURATION.open_rgb.last_effect in CONFIGURATION.open_rgb.effects:
+            self._color = CONFIGURATION.open_rgb.effects[CONFIGURATION.open_rgb.last_effect].color
 
         self._connected_usb: list[UsbIdentifier] = []
         self._usb_mutex = Lock()
@@ -202,8 +202,8 @@ class OpenRgbService:
         if effect is None:
             effect = self._effect
 
-        if effect in configuration.open_rgb.effects:
-            return configuration.open_rgb.effects[effect].color
+        if effect in CONFIGURATION.open_rgb.effects:
+            return CONFIGURATION.open_rgb.effects[effect].color
 
         from_cli = OPEN_RGB_CLIENT.get_color(effect)
 
@@ -216,8 +216,8 @@ class OpenRgbService:
         """Apply effect"""
         color = None
         if OPEN_RGB_CLIENT.supports_color(effect):
-            if effect in configuration.open_rgb.effects:
-                color = configuration.open_rgb.effects[effect].color
+            if effect in CONFIGURATION.open_rgb.effects:
+                color = CONFIGURATION.open_rgb.effects[effect].color
             else:
                 color = OPEN_RGB_CLIENT.get_color(effect)
 
@@ -248,18 +248,18 @@ class OpenRgbService:
             self._effect = effect
             self._brightness = brightness
             self._color = color
-            event_bus.emit(
+            EVENT_BUS.emit(
                 "OpenRgbService.aura_changed",
                 {effect: effect, brightness: brightness, color: color},
             )
 
             if not temporal:
-                configuration.open_rgb.last_effect = effect
-                configuration.open_rgb.brightness = brightness.value
+                CONFIGURATION.open_rgb.last_effect = effect
+                CONFIGURATION.open_rgb.brightness = brightness.value
 
                 if supports_color:
-                    configuration.open_rgb.effects[effect] = Effect(color)
-                configuration.save_config()
+                    CONFIGURATION.open_rgb.effects[effect] = Effect(color)
+                CONFIGURATION.save_config()
 
             self._logger.rem_tab()
 

@@ -18,9 +18,9 @@ from rcc.models.rgb_brightness import RgbBrightness
 from rcc.services.openrgb_service import OPEN_RGB_SERVICE
 from rcc.services.platform_service import PLATFORM_SERVICE
 from rcc.utils.constants import ICONS_PATH
-from rcc.utils.beans import translator
+from rcc.utils.beans import TRANSLATOR
 from rcc.utils.gui_utils import GuiUtils, NoScrollComboBox
-from rcc.utils.beans import event_bus
+from rcc.utils.beans import EVENT_BUS
 from framework.logger import Logger
 
 
@@ -57,24 +57,24 @@ class MainWindow(QMainWindow):
         main_layout.addWidget(image_label, alignment=Qt.AlignCenter)  # Centrar la imagen
 
         # Grupo 1: Rendimiento
-        performance_group = QGroupBox(translator.translate("performance"))
+        performance_group = QGroupBox(TRANSLATOR.translate("performance"))
         performance_layout = QFormLayout()
         performance_layout.setContentsMargins(20, 20, 20, 20)
 
         # Label y Dropdown para "Perfil"
         self._profile_dropdown = NoScrollComboBox()
         for item in reversed(PerformanceProfile):
-            self._profile_dropdown.addItem(translator.translate(f"label.profile.{item.name}"), item)
+            self._profile_dropdown.addItem(TRANSLATOR.translate(f"label.profile.{item.name}"), item)
         self._profile_dropdown.currentIndexChanged.connect(self.on_profile_changed)
         self.set_performance_profile(PLATFORM_SERVICE.performance_profile)
-        performance_layout.addRow(QLabel(f"{translator.translate('profile')}:"), self._profile_dropdown)
+        performance_layout.addRow(QLabel(f"{TRANSLATOR.translate('profile')}:"), self._profile_dropdown)
 
         performance_group.setLayout(performance_layout)
         main_layout.addWidget(performance_group)
 
-        self._game_profile_button = QPushButton(translator.translate("label.game.configure"))
+        self._game_profile_button = QPushButton(TRANSLATOR.translate("label.game.configure"))
         self._game_profile_button.clicked.connect(self.open_game_list)
-        performance_layout.addRow(QLabel(f"{translator.translate('profile.per.game')}:"), self._game_profile_button)
+        performance_layout.addRow(QLabel(f"{TRANSLATOR.translate('profile.per.game')}:"), self._game_profile_button)
 
         # Grupo 2: Aura
         aura_group = QGroupBox("Aura")
@@ -87,15 +87,15 @@ class MainWindow(QMainWindow):
         if OPEN_RGB_SERVICE._effect in self._effect_labels:
             self._effect_dropdown.setCurrentIndex(self._effect_labels.index(OPEN_RGB_SERVICE._effect))
         self._effect_dropdown.currentIndexChanged.connect(self.on_effect_change)
-        aura_layout.addRow(QLabel(f"{translator.translate("effect")}:"), self._effect_dropdown)
+        aura_layout.addRow(QLabel(f"{TRANSLATOR.translate("effect")}:"), self._effect_dropdown)
 
         # Dropdown para "Brillo"
         self._brightness_dropdown = NoScrollComboBox()
         for brightness in RgbBrightness:
-            self._brightness_dropdown.addItem(translator.translate(f"label.brightness.{brightness.name}"), brightness)
+            self._brightness_dropdown.addItem(TRANSLATOR.translate(f"label.brightness.{brightness.name}"), brightness)
         self._brightness_dropdown.setCurrentIndex(self._brightness_dropdown.findData(OPEN_RGB_SERVICE._brightness))
         self._brightness_dropdown.currentIndexChanged.connect(self.on_brightness_change)
-        aura_layout.addRow(QLabel(f"{translator.translate("brightness")}:"), self._brightness_dropdown)
+        aura_layout.addRow(QLabel(f"{TRANSLATOR.translate("brightness")}:"), self._brightness_dropdown)
 
         # Botón de color
         self._color_button = QPushButton()
@@ -108,7 +108,7 @@ class MainWindow(QMainWindow):
         self._color_button.setDisabled(not supports_color)
         self._color_button.setDisabled(not supports_color)
 
-        self._color_label = QLabel(f"{translator.translate('color')}:")
+        self._color_label = QLabel(f"{TRANSLATOR.translate('color')}:")
         self._color_label.setDisabled(not supports_color)
         aura_layout.addRow(self._color_label, self._color_button)
 
@@ -116,7 +116,7 @@ class MainWindow(QMainWindow):
         main_layout.addWidget(aura_group)
 
         # Grupo 3: Configuración
-        settings_group = QGroupBox(translator.translate("battery"))
+        settings_group = QGroupBox(TRANSLATOR.translate("battery"))
         settings_layout = QFormLayout()
         settings_layout.setContentsMargins(20, 20, 20, 20)
 
@@ -128,7 +128,7 @@ class MainWindow(QMainWindow):
         self.set_battery_charge_limit(PLATFORM_SERVICE.battery_charge_limit)
         settings_layout.addRow(
             QLabel(
-                f"{translator.translate("charge.threshold")}:",
+                f"{TRANSLATOR.translate("charge.threshold")}:",
             ),
             self._threshold_dropdown,
         )
@@ -140,10 +140,10 @@ class MainWindow(QMainWindow):
         self.setCentralWidget(central_widget)
         GuiUtils.center_window_on_current_screen(self)
 
-        event_bus.on("PlatformService.battery_threshold", self.set_battery_charge_limit)  # pylint: disable=R0801
-        event_bus.on("PlatformService.performance_profile", self.set_performance_profile)
-        event_bus.on("OpenRgbService.aura_changed", self.set_aura_state)
-        event_bus.on("GamesService.gameEvent", self.on_game_event)
+        EVENT_BUS.on("PlatformService.battery_threshold", self.set_battery_charge_limit)  # pylint: disable=R0801
+        EVENT_BUS.on("PlatformService.performance_profile", self.set_performance_profile)
+        EVENT_BUS.on("OpenRgbService.aura_changed", self.set_aura_state)
+        EVENT_BUS.on("GamesService.gameEvent", self.on_game_event)
 
     def on_game_event(self, running_games: int):
         """Handler for game events"""
@@ -158,7 +158,7 @@ class MainWindow(QMainWindow):
 
     def pick_color(self):
         """Open color picker"""
-        color = QColorDialog.getColor(QColor(self._current_color), self, translator.translate("color.select"))
+        color = QColorDialog.getColor(QColor(self._current_color), self, TRANSLATOR.translate("color.select"))
         if color.isValid():
             self._current_color = color.name().upper()
             self._color_button.setStyleSheet(f"background-color: {self._current_color};")

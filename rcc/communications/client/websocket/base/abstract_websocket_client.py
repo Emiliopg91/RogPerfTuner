@@ -8,7 +8,7 @@ import websockets
 from websockets.exceptions import ConnectionClosedError
 
 from rcc.models.message_type import MessageType
-from rcc.utils.beans import event_bus
+from rcc.utils.beans import EVENT_BUS
 from framework.logger import Logger
 
 
@@ -60,13 +60,13 @@ class AbstractWebsocketClient(ABC):
                 async with websockets.connect(uri) as websocket:
                     self._current_client = websocket
                     self._logger.debug(f"Connected to WebSocket server at {uri}")
-                    event_bus.emit(f"{self.__class__.__name__}.connected")
+                    EVENT_BUS.emit(f"{self.__class__.__name__}.connected")
                     self.__connected = True
                     await self._handler(websocket)
             except Exception as e:
                 self._current_client = None
                 if self.__connected:
-                    event_bus.emit(f"{self.__class__.__name__}.disconnected")
+                    EVENT_BUS.emit(f"{self.__class__.__name__}.disconnected")
                 self.__connected = False
                 self._logger.debug(f"Error connecting to WebSocket server: {e.__class__} - {e}")
                 self._logger.debug("Reconnecting in 5 seconds...")
@@ -116,7 +116,7 @@ class AbstractWebsocketClient(ABC):
 
         if message is not None:
             if message.type == "EVENT":
-                event_bus.emit(f"{self.__class__.__name__}.{message.name}", *message.data)
+                EVENT_BUS.emit(f"{self.__class__.__name__}.{message.name}", *message.data)
             elif message.type == "RESPONSE":
                 if message.id in self.__responses:
                     self._logger.debug(f"Received response for {message.id}")
@@ -157,12 +157,12 @@ class AbstractWebsocketClient(ABC):
 
     def on(self, event: str, callback: Callable[..., None]):
         """Defines handler for event"""
-        event_bus.on(f"{self.__class__.__name__}.{event}", callback)
+        EVENT_BUS.on(f"{self.__class__.__name__}.{event}", callback)
 
     def on_connected(self, callback: Callable[..., None]):
         """Defines handler for event"""
-        event_bus.on(f"{self.__class__.__name__}.connected", callback)
+        EVENT_BUS.on(f"{self.__class__.__name__}.connected", callback)
 
     def on_disconnected(self, callback: Callable[..., None]):
         """Defines handler for event"""
-        event_bus.on(f"{self.__class__.__name__}.disconnected", callback)
+        EVENT_BUS.on(f"{self.__class__.__name__}.disconnected", callback)

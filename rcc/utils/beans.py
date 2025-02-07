@@ -4,6 +4,6 @@ from framework.translator import Translator
 from rcc import __app_name__
 from rcc.utils import constants
 
-cryptography = Cryptography(__app_name__)
-event_bus = EventBus()
-translator = Translator(constants.TRANSLATIONS_PATH)
+CRYPTOGRAPHY = Cryptography(__app_name__)
+EVENT_BUS = EventBus()
+TRANSLATOR = Translator(constants.TRANSLATIONS_PATH)

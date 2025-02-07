@@ -9,7 +9,6 @@ import concurrent
 from watchdog.events import FileSystemEventHandler
 from watchdog.observers import Observer
 
-from rcc.communications.client.dbus import platform_client
 from rcc.communications.client.dbus.nv_boost_client import NV_BOOST_CLIENT
 from rcc.communications.client.dbus.pl1_spl_client import PL1_SPL_CLIENT
 from rcc.communications.client.dbus.pl2_sppt_client import PL2_SPPT_CLIENT
@@ -21,10 +20,10 @@ from rcc.gui.notifier import NOTIFIER
 from rcc.models.battery_threshold import BatteryThreshold
 from rcc.models.performance_profile import PerformanceProfile
 from rcc.models.power_profile import PowerProfile
-from rcc.utils.configuration import configuration
-from rcc.utils.beans import translator
-from rcc.utils.beans import cryptography
-from rcc.utils.beans import event_bus
+from rcc.utils.configuration import CONFIGURATION
+from rcc.utils.beans import TRANSLATOR
+from rcc.utils.beans import CRYPTOGRAPHY
+from rcc.utils.beans import EVENT_BUS
 from framework.logger import Logger, logged_method
 from framework.singleton import singleton
 
@@ -73,7 +72,7 @@ class PlatformService:
         self._last_boost: Optional[bool] = None
         self._observer = Observer()
 
-        self._performance_profile = PerformanceProfile(configuration.platform.profiles.profile)
+        self._performance_profile = PerformanceProfile(CONFIGURATION.platform.profiles.profile)
         self._platform_profile = PLATFORM_CLIENT.platform_profile
         self._battery_charge_limit = PLATFORM_CLIENT.charge_control_end_threshold
         self.on_bat = UPOWER_CLIENT.on_battery
@@ -104,7 +103,7 @@ class PlatformService:
         PLATFORM_CLIENT.change_platform_profile_on_battery = False
 
         UPOWER_CLIENT.on_property_change("OnBattery", self._on_ac_battery_change)
-        event_bus.on("GamesService.gameEvent", self._on_game_event)
+        EVENT_BUS.on("GamesService.gameEvent", self._on_game_event)
 
         self._logger.rem_tab()
 
@@ -130,7 +129,7 @@ class PlatformService:
     def _on_ac_battery_change(self, on_battery: bool, muted=False, force=False):
         if self._ac_events_enabled or force:
             self.on_bat = on_battery
-            policy = PerformanceProfile(configuration.platform.profiles.profile)
+            policy = PerformanceProfile(CONFIGURATION.platform.profiles.profile)
             if on_battery:
                 policy = PerformanceProfile.QUIET
 
@@ -224,7 +223,7 @@ class PlatformService:
                             value = self._boost_control[target]
                             path = self._boost_control["path"]
 
-                            command = f'echo "{cryptography.decrypt_string(configuration.settings.password)}" | sudo -S bash -c "echo \'{value}\' | tee {path}" &>> /dev/null'  # pylint: disable=C0301
+                            command = f'echo "{CRYPTOGRAPHY.decrypt_string(CONFIGURATION.settings.password)}" | sudo -S bash -c "echo \'{value}\' | tee {path}" &>> /dev/null'  # pylint: disable=C0301
                             subprocess.run(command, shell=True, check=True)
 
                     # Ejecutar las operaciones de forma concurrente
@@ -242,28 +241,28 @@ class PlatformService:
                     self._logger.info("Profile setted succesfully")
 
                     if not temporal and not self.on_bat:
-                        configuration.platform.profiles.profile = profile.value
-                        configuration.save_config()
+                        CONFIGURATION.platform.profiles.profile = profile.value
+                        CONFIGURATION.save_config()
 
                     if game_name is None:
                         NOTIFIER.show_toast(
-                            translator.translate(
+                            TRANSLATOR.translate(
                                 "profile.applied",
-                                {"profile": translator.translate(f"label.profile.{profile_name}").lower()},
+                                {"profile": TRANSLATOR.translate(f"label.profile.{profile_name}").lower()},
                             )
                         )
                     else:
                         NOTIFIER.show_toast(
-                            translator.translate(
+                            TRANSLATOR.translate(
                                 "profile.applied.for.game",
                                 {
-                                    "profile": translator.translate(f"label.profile.{profile_name}").lower(),
+                                    "profile": TRANSLATOR.translate(f"label.profile.{profile_name}").lower(),
                                     "game": game_name,
                                 },
                             )
                         )
                     self._performance_profile = profile
-                    event_bus.emit(
+                    EVENT_BUS.emit(
                         "PlatformService.performance_profile",
                         self._performance_profile,
                     )
@@ -274,9 +273,9 @@ class PlatformService:
                 self._logger.info(f"Profile {profile_name.lower()} already setted")
                 if game_name is None:
                     NOTIFIER.show_toast(
-                        translator.translate(
+                        TRANSLATOR.translate(
                             "profile.applied",
-                            {"profile": translator.translate(f"label.profile.{profile_name}").lower()},
+                            {"profile": TRANSLATOR.translate(f"label.profile.{profile_name}").lower()},
                         )
                     )
 
@@ -285,8 +284,8 @@ class PlatformService:
         if value != self._battery_charge_limit:
             PLATFORM_CLIENT.charge_control_end_threshold = value
             self._battery_charge_limit = value
-            event_bus.emit("PlatformService.battery_threshold", value)
-            NOTIFIER.show_toast(translator.translate("applied.battery.threshold", {"value": value.value}))
+            EVENT_BUS.emit("PlatformService.battery_threshold", value)
+            NOTIFIER.show_toast(TRANSLATOR.translate("applied.battery.threshold", {"value": value.value}))
 
     def restore_profile(self):
         """Restore persited profile"""
@@ -298,7 +297,7 @@ class PlatformService:
         else:
             self._logger.info("Laptop running on AC")
             self._logger.add_tab()
-            self.set_performance_profile(PerformanceProfile(configuration.platform.profiles.profile), True, None, False)
+            self.set_performance_profile(PerformanceProfile(CONFIGURATION.platform.profiles.profile), True, None, False)
             self._logger.rem_tab()
 
 

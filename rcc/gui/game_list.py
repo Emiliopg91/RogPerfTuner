@@ -17,7 +17,7 @@ from rcc.utils.constants import ICONS_PATH
 from rcc.models.performance_profile import PerformanceProfile
 from rcc.services.games_service import GAME_SERVICE
 from rcc.utils.gui_utils import NoScrollComboBox
-from rcc.utils.beans import translator
+from rcc.utils.beans import TRANSLATOR
 
 
 class GameList(QDialog):
@@ -31,7 +31,7 @@ class GameList(QDialog):
             GameList.INSTANCE = self
             self.__parent = parent
             self.__manage_parent = manage_parent
-            self.setWindowTitle(translator.translate("game.performance.configuration"))
+            self.setWindowTitle(TRANSLATOR.translate("game.performance.configuration"))
             self.setFixedSize(850, 600)
             self.setWindowIcon(QIcon(f"{ICONS_PATH}/icon-45x45.png"))
             self.setAttribute(Qt.WA_DeleteOnClose)
@@ -57,9 +57,9 @@ class GameList(QDialog):
             game_cfg = GAME_SERVICE.get_games()
             appids = list(game_cfg.keys())
 
-            columns = [translator.translate("game.title"), translator.translate("profile")]
+            columns = [TRANSLATOR.translate("game.title"), TRANSLATOR.translate("profile")]
             if GAME_SERVICE.gpu is not None:
-                columns.append(translator.translate("used.gpu"))
+                columns.append(TRANSLATOR.translate("used.gpu"))
 
             table = QTableWidget(len(appids), len(columns))
             table.setSizeAdjustPolicy(QAbstractScrollArea.AdjustToContents)
@@ -96,7 +96,7 @@ class GameList(QDialog):
                     # Segunda columna: perfil
                     profile_combo = NoScrollComboBox()  # Usar la subclase personalizada
                     for profile in reversed(PerformanceProfile):
-                        profile_combo.addItem(translator.translate(f"label.profile.{profile.name}"), profile)
+                        profile_combo.addItem(TRANSLATOR.translate(f"label.profile.{profile.name}"), profile)
 
                     default_index = profile_combo.findData(
                         PerformanceProfile(game_cfg[game.appid].profile)
@@ -115,8 +115,8 @@ class GameList(QDialog):
                     if GAME_SERVICE.gpu is not None:
                         # Tercera columna: GPU
                         gpu_combo = NoScrollComboBox()  # Usar la subclase personalizada
-                        gpu_combo.addItem(translator.translate("label.dgpu.auto"), False)
-                        gpu_combo.addItem(translator.translate("label.dgpu.discrete"), True)
+                        gpu_combo.addItem(TRANSLATOR.translate("label.dgpu.auto"), False)
+                        gpu_combo.addItem(TRANSLATOR.translate("label.dgpu.discrete"), True)
 
                         gpu_combo.setCurrentIndex(1 if game.gpu else 0)
 

@@ -8,10 +8,10 @@ from rcc.models.performance_profile import PerformanceProfile
 from rcc.models.settings import GameEntry
 from rcc.models.platform_profile import PlatformProfile
 from rcc.services.platform_service import PLATFORM_SERVICE
-from rcc.utils.configuration import configuration
+from rcc.utils.configuration import CONFIGURATION
 from rcc.utils.constants import RCCDC_ASSET_PATH, USER_PLUGIN_FOLDER
-from rcc.utils.beans import cryptography
-from rcc.utils.beans import event_bus
+from rcc.utils.beans import CRYPTOGRAPHY
+from rcc.utils.beans import EVENT_BUS
 from framework.logger import Logger
 
 
@@ -103,12 +103,12 @@ class GamesService:
             self.__set_profile_for_games()
         self._logger.rem_tab()
         self.__steam_connnected = True
-        event_bus.emit("GamesService.steam_connected")
+        EVENT_BUS.emit("GamesService.steam_connected")
 
     def __on_steam_disconnected(self):
         self._logger.info("SteamClient disconnected")
         self.__steam_connnected = False
-        event_bus.emit("GamesService.steam_disconnected")
+        EVENT_BUS.emit("GamesService.steam_disconnected")
         if len(self.__running_games) > 0:
             self._logger.info("Restoring platform profile")
             self.__running_games = {}
@@ -126,27 +126,27 @@ class GamesService:
             profile = PerformanceProfile.QUIET
 
             for gid in self.__running_games:
-                profile = profile.get_greater(PlatformProfile(configuration.games[gid].profile))
+                profile = profile.get_greater(PlatformProfile(CONFIGURATION.games[gid].profile))
 
             name = [
-                configuration.games[gid].name
+                CONFIGURATION.games[gid].name
                 for gid in self.__running_games
-                if PlatformProfile(configuration.games[gid].profile) == profile
+                if PlatformProfile(CONFIGURATION.games[gid].profile) == profile
             ][0]
             PLATFORM_SERVICE.set_performance_profile(profile, True, name, True)
         else:
             PLATFORM_SERVICE.restore_profile()
 
-        event_bus.emit("GamesService.gameEvent", len(self.__running_games))
+        EVENT_BUS.emit("GamesService.gameEvent", len(self.__running_games))
 
     def __launch_game(self, gid: int, name: str):
         self._logger.info(f"Launched {name}")
         if gid not in self.running_games:
             self.__running_games[gid] = name
             self._logger.add_tab()
-            if gid not in configuration.games:
-                configuration.games[gid] = GameEntry(name, PlatformProfile.PERFORMANCE.value)
-                configuration.save_config()
+            if gid not in CONFIGURATION.games:
+                CONFIGURATION.games[gid] = GameEntry(name, PlatformProfile.PERFORMANCE.value)
+                CONFIGURATION.save_config()
 
             self.__set_profile_for_games()
             self._logger.rem_tab()
@@ -197,14 +197,14 @@ class GamesService:
         if is_update:
             subprocess.run(
                 ["sudo", "-S", "rm", "-R", dst],
-                input=cryptography.decrypt_string(configuration.settings.password) + "\n",
+                input=CRYPTOGRAPHY.decrypt_string(CONFIGURATION.settings.password) + "\n",
                 capture_output=True,
                 text=True,
                 check=True,
             )
         subprocess.run(
             ["sudo", "-S", "cp", "-R", os.path.join(USER_PLUGIN_FOLDER, "RCCDeckyCompanion"), dst],
-            input=cryptography.decrypt_string(configuration.settings.password) + "\n",
+            input=CRYPTOGRAPHY.decrypt_string(CONFIGURATION.settings.password) + "\n",
             capture_output=True,
             text=True,
             check=True,
@@ -212,7 +212,7 @@ class GamesService:
         Thread(
             target=lambda: subprocess.run(
                 ["sudo", "-S", "systemctl", "restart", "plugin_loader.service"],
-                input=cryptography.decrypt_string(configuration.settings.password) + "\n",
+                input=CRYPTOGRAPHY.decrypt_string(CONFIGURATION.settings.password) + "\n",
                 text=True,
                 check=True,
             )
@@ -220,13 +220,13 @@ class GamesService:
 
     def get_games(self) -> dict[str, GameEntry]:
         """Get games and setting"""
-        return configuration.games
+        return CONFIGURATION.games
 
     def set_game_profile(self, game: int, profile: PerformanceProfile = PerformanceProfile.PERFORMANCE):
         """Set profile for game"""
-        self._logger.info(f"Saving profile {profile.name.lower()} for {configuration.games[game].name}")
-        configuration.games[game].profile = profile.value
-        configuration.save_config()
+        self._logger.info(f"Saving profile {profile.name.lower()} for {CONFIGURATION.games[game].name}")
+        CONFIGURATION.games[game].profile = profile.value
+        CONFIGURATION.save_config()
 
 
 GAME_SERVICE = GamesService()

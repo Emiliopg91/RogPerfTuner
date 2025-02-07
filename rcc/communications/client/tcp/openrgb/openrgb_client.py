@@ -22,7 +22,7 @@ from rcc.communications.client.tcp.openrgb.effects.rainbow_wave import RAINBOW_W
 from rcc.communications.client.tcp.openrgb.effects.spectrum_cycle import SPECTRUM_CYCLE_EFFECT
 from rcc.communications.client.tcp.openrgb.effects.starry_night import STARRY_NIGHT_EFFECT
 from rcc.communications.client.tcp.openrgb.effects.static import STATIC_EFFECT
-from rcc.utils.beans import event_bus
+from rcc.utils.beans import EVENT_BUS
 from framework.logger import Logger
 from framework.singleton import singleton
 
@@ -33,7 +33,7 @@ class OpenRgbClient:
 
     def __init__(self):
         self.logger = Logger()
-        event_bus.on("stop", self.stop)
+        EVENT_BUS.on("stop", self.stop)
         self._available_devices: list[Device] = []
         self._client = None
         self._orgb_thread = None

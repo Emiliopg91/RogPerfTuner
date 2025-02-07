@@ -52,9 +52,9 @@ def initialize_application():  # pylint:disable=R0914
     logger.add_tab()
 
     from rcc.gui.notifier import NOTIFIER
-    from rcc.utils.beans import translator
+    from rcc.utils.beans import TRANSLATOR
 
-    NOTIFIER.show_toast(translator.translate("initializing"))
+    NOTIFIER.show_toast(TRANSLATOR.translate("initializing"))
 
     """Create application files"""
     if not DEV_MODE:
@@ -66,9 +66,9 @@ def initialize_application():  # pylint:disable=R0914
 
     """Ask for sudo password"""
     from rcc.gui.password_dialog import PASSWORD_DIALOG
-    from rcc.utils.configuration import configuration
+    from rcc.utils.configuration import CONFIGURATION
 
-    if configuration.settings.password is None:
+    if CONFIGURATION.settings.password is None:
         PASSWORD_DIALOG.show()
 
     from rcc.services.openrgb_service import OPEN_RGB_SERVICE  # pylint: disable=W0611
