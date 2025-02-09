@@ -17,7 +17,7 @@ from rcc.utils.constants import ICONS_PATH
 from rcc.models.performance_profile import PerformanceProfile
 from rcc.services.games_service import GAME_SERVICE
 from rcc.utils.gui_utils import NoScrollComboBox
-from rcc.utils.beans import TRANSLATOR
+from rcc.utils.beans import EVENT_BUS, TRANSLATOR
 
 
 class GameList(QDialog):
@@ -139,6 +139,8 @@ class GameList(QDialog):
 
             # Añadir el área de scroll al layout principal
             layout.addWidget(scroll_area)
+
+            EVENT_BUS.on("GamesService.steam_disconnected", self.close)
 
     def __on_profile_changed(self, widget, game_id):
         selected_profile = widget.currentData()  # Obtiene el objeto asociado al elemento seleccionado

@@ -180,7 +180,6 @@ class DigitalRain(AbstractEffect):
             self._set_colors(dev, [RGBColor(0, 0, 0) for _ in dev.colors])
             self._sleep(random.randint(0, 500) / 1000)
 
-            iter_count = 0
             while self._is_running and dev.enabled:
                 self._decrement_matrix(zone_status)
                 self._get_next_matrix(zone_status)
@@ -188,7 +187,6 @@ class DigitalRain(AbstractEffect):
 
                 self._set_colors(dev, final_colors)
                 self._sleep(self._nap_time - 0.4 * (self._nap_time * (self._cpu)))
-                iter_count = (iter_count + 1) % 100
 
         def cpu_thread():
             while True:

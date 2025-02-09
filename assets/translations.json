@@ -171,10 +171,6 @@
     "en": "Game performance configuration",
     "es": "Configuracion de rendimiento de juegos"
   },
-  "profile.per.game": {
-    "en": "Game profile",
-    "es": "Perfil por juego"
-  },
   "label.dgpu.auto": {
     "en": "Automatic",
     "es": "Automatica"

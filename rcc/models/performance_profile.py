@@ -13,7 +13,6 @@ class PerformanceProfile(IntEnum):
     QUIET = 0
     BALANCED = 1
     PERFORMANCE = 2
-    TURBO = 3
 
     @property
     def pl1_spl(self):
@@ -21,8 +20,6 @@ class PerformanceProfile(IntEnum):
         if not PL1_SPL_CLIENT.available:
             return None
 
-        if self == PerformanceProfile.TURBO:
-            return int(PL1_SPL_CLIENT.max_value * 1)
         if self == PerformanceProfile.PERFORMANCE:
             return int(PL1_SPL_CLIENT.max_value * 0.8)
         if self == PerformanceProfile.BALANCED:
@@ -38,7 +35,7 @@ class PerformanceProfile(IntEnum):
         if not PL2_SPPT_CLIENT.available:
             return None
 
-        if self in (PerformanceProfile.PERFORMANCE, self == PerformanceProfile.TURBO):
+        if self == PerformanceProfile.PERFORMANCE:
             return int(PL2_SPPT_CLIENT.max_value * 1)
         if self == PerformanceProfile.BALANCED:
             return int(PL2_SPPT_CLIENT.max_value * 0.75)
@@ -50,10 +47,10 @@ class PerformanceProfile(IntEnum):
     @property
     def nv_boost(self):
         """Get NV dynamic boost Watts value"""
-        if not PL2_SPPT_CLIENT.available:
+        if not NV_BOOST_CLIENT.available:
             return None
 
-        if self in (PerformanceProfile.PERFORMANCE, self == PerformanceProfile.TURBO):
+        if self == PerformanceProfile.PERFORMANCE:
             return NV_BOOST_CLIENT.max_value
         if self == PerformanceProfile.BALANCED:
             return int((NV_BOOST_CLIENT.max_value + NV_BOOST_CLIENT.min_value) / 2)
@@ -84,10 +81,8 @@ class PerformanceProfile(IntEnum):
     @property
     def next_performance_profile(self):
         """Get next profile"""
-        if self == PerformanceProfile.TURBO:
-            return PerformanceProfile.QUIET
         if self == PerformanceProfile.PERFORMANCE:
-            return PerformanceProfile.TURBO
+            return PerformanceProfile.QUIET
         if self == PerformanceProfile.BALANCED:
             return PerformanceProfile.PERFORMANCE
         if self == PerformanceProfile.QUIET:
@@ -97,9 +92,6 @@ class PerformanceProfile(IntEnum):
 
     def get_greater(self, other):
         """Get the profile with higher performance"""
-        if PerformanceProfile.TURBO in (self, other):
-            return PerformanceProfile.TURBO
-
         if PerformanceProfile.PERFORMANCE in (self, other):
             return PerformanceProfile.PERFORMANCE
 

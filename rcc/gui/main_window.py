@@ -1,3 +1,5 @@
+# pylint: disable=R0801
+
 from PyQt5.QtCore import Qt
 from PyQt5.QtGui import QColor, QIcon, QPixmap
 from PyQt5.QtWidgets import (
@@ -15,6 +17,7 @@ from rcc.gui.game_list import GameList
 from rcc.models.battery_threshold import BatteryThreshold
 from rcc.models.performance_profile import PerformanceProfile
 from rcc.models.rgb_brightness import RgbBrightness
+from rcc.services.games_service import GAME_SERVICE
 from rcc.services.openrgb_service import OPEN_RGB_SERVICE
 from rcc.services.platform_service import PLATFORM_SERVICE
 from rcc.utils.constants import ICONS_PATH
@@ -35,8 +38,8 @@ class MainWindow(QMainWindow):
         super().__init__()
 
         self.setWindowTitle("RogControlCenter")
-        self.setGeometry(0, 0, 580, 800)
-        self.setFixedSize(580, 800)
+        self.setGeometry(0, 0, 400, 650)
+        self.setFixedSize(400, 650)
         self.setWindowIcon(QIcon(f"{ICONS_PATH}/icon-45x45.png"))
 
         self._current_color = OPEN_RGB_SERVICE.get_color(OPEN_RGB_SERVICE._effect)
@@ -50,7 +53,7 @@ class MainWindow(QMainWindow):
         # Primera fila: Imagen centrada
         image_label = QLabel()
         pixmap = QPixmap(f"{ICONS_PATH}/rog-logo.svg")  # Ruta a tu archivo de imagen
-        scaled_pixmap = pixmap.scaled(350, 350, Qt.KeepAspectRatio, Qt.SmoothTransformation)  # Escalar la imagen
+        scaled_pixmap = pixmap.scaled(200, 200, Qt.KeepAspectRatio, Qt.SmoothTransformation)  # Escalar la imagen
         image_label.setPixmap(scaled_pixmap)
         image_label.setAlignment(Qt.AlignCenter)
 
@@ -74,7 +77,8 @@ class MainWindow(QMainWindow):
 
         self._game_profile_button = QPushButton(TRANSLATOR.translate("label.game.configure"))
         self._game_profile_button.clicked.connect(self.open_game_list)
-        performance_layout.addRow(QLabel(f"{TRANSLATOR.translate('profile.per.game')}:"), self._game_profile_button)
+        self._game_profile_button.setEnabled(GAME_SERVICE.steam_connected)
+        performance_layout.addRow(QLabel(f"{TRANSLATOR.translate('games')}:"), self._game_profile_button)
 
         # Grupo 2: Aura
         aura_group = QGroupBox("Aura")
@@ -99,7 +103,7 @@ class MainWindow(QMainWindow):
 
         # Botón de color
         self._color_button = QPushButton()
-        self._color_button.setFixedSize(50, 30)
+        self._color_button.setFixedSize(25, 25)
         self._color_button.setStyleSheet(
             f"background-color: {self._current_color if self._current_color is not None else "#00000000"};"
         )
@@ -144,6 +148,12 @@ class MainWindow(QMainWindow):
         EVENT_BUS.on("PlatformService.performance_profile", self.set_performance_profile)
         EVENT_BUS.on("OpenRgbService.aura_changed", self.set_aura_state)
         EVENT_BUS.on("GamesService.gameEvent", self.on_game_event)
+        EVENT_BUS.on("GamesService.steam_connected", lambda: self.on_steam_connected_event(True))
+        EVENT_BUS.on("GamesService.steam_disconnected", lambda: self.on_steam_connected_event(False))
+
+    def on_steam_connected_event(self, connected: bool):
+        """Handler for steam connection events"""
+        self._game_profile_button.setEnabled(connected)
 
     def on_game_event(self, running_games: int):
         """Handler for game events"""
