@@ -89,7 +89,7 @@ class DigitalRain(AbstractEffect):
 
         return True
 
-    def _get_next_matrix(self, zone_status: list[list[LedStatus]]):  # pylint: disable=R0912
+    def _get_next_matrix(self, zone_status: list[list[LedStatus]], hue: int):  # pylint: disable=R0912
         free_cols: list[int] = []
         for c in range(len(zone_status[0])):
             if self._is_matrix_column_available(zone_status, len(zone_status), c):
@@ -100,10 +100,10 @@ class DigitalRain(AbstractEffect):
 
             if allowed > len(zone_status[0]) - len(free_cols):
                 next_col = free_cols[random.randint(0, len(free_cols) - 1)]
-                zone_status[0][next_col].max_val = random.randint(
-                    round(self._max_count * (1 - (0.5 * (self._cpu)))), self._max_count
-                )
+                zone_status[0][next_col].max_val = round(self._max_count * (1 - (0.25 * (self._cpu))))
                 zone_status[0][next_col].cur_val = zone_status[0][next_col].max_val
+
+        return (hue + 51) % 360
 
     def _dev_to_mat(self, dev: Device) -> list[list[LedStatus]]:  # pylint: disable=R0912,R0914
         mat_def: list[list[LedStatus]] = []
@@ -146,20 +146,10 @@ class DigitalRain(AbstractEffect):
                         )
 
                     mat_def = new_mat
-
-                for r, row in enumerate(mat_def):  # Enumerar las filas directamente
-                    line = ""
-                    for c, cell in enumerate(row):  # Enumerar las columnas de la fila actual
-                        if cell is not None:
-                            line += f"{str(cell.pos_idx).rjust(3, '0')} "
-                        else:
-                            line += "--- "
             else:
                 row = []
-                line = ""
                 for l in range(len(zone.leds)):
                     row.append(LedStatus(pos_idx=offset + l))
-                    line += f"{str(offset + l).rjust(3, '0')} "
 
                 mat_def.append(row)
 
@@ -180,13 +170,15 @@ class DigitalRain(AbstractEffect):
             self._set_colors(dev, [RGBColor(0, 0, 0) for _ in dev.colors])
             self._sleep(random.randint(0, 500) / 1000)
 
+            hue = random.randint(0, 359)
+
             while self._is_running and dev.enabled:
                 self._decrement_matrix(zone_status)
-                self._get_next_matrix(zone_status)
+                hue = self._get_next_matrix(zone_status, hue)
                 final_colors = self._to_color_matrix(zone_status, len(dev.colors))
 
                 self._set_colors(dev, final_colors)
-                self._sleep(self._nap_time - 0.4 * (self._nap_time * (self._cpu)))
+                self._sleep(self._nap_time * (1 - 0.4 * self._cpu))
 
         def cpu_thread():
             while True:

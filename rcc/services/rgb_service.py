@@ -1,17 +1,15 @@
 import importlib
 import os
-from threading import Lock, Thread
 from typing import Optional
-import subprocess
 import time
 
-import pyudev
 
+from rcc.communications.client.dbus.linux.upower_client import UPOWER_CLIENT
 from rcc.communications.client.tcp.openrgb.openrgb_client import OPEN_RGB_CLIENT
 from rcc.communications.client.tcp.openrgb.effects.static import STATIC_EFFECT
 from rcc.models.rgb_brightness import RgbBrightness
 from rcc.models.settings import Effect
-from rcc.models.usb_identifier import UsbIdentifier
+from rcc.utils.events import HARDWARE_SERVICE_ON_BATTERY, HARDWARE_SERVICE_ON_USB_CHANGED
 from rcc.utils.constants import USER_EFFECTS_FOLDER
 from rcc.utils.configuration import CONFIGURATION
 from rcc.utils.beans import EVENT_BUS
@@ -20,7 +18,7 @@ from framework.singleton import singleton
 
 
 @singleton
-class OpenRgbService:
+class RgbService:
     """Service for mangeing RGB lightning"""
 
     def __init__(self):
@@ -40,18 +38,23 @@ class OpenRgbService:
         if CONFIGURATION.open_rgb.last_effect and CONFIGURATION.open_rgb.last_effect in CONFIGURATION.open_rgb.effects:
             self._color = CONFIGURATION.open_rgb.effects[CONFIGURATION.open_rgb.last_effect].color
 
-        self._connected_usb: list[UsbIdentifier] = []
-        self._usb_mutex = Lock()
-        thread = Thread(name="UsbChecker", target=self.monitor_for_usb)
-        thread.start()
-
         self.__load_custom_effects()
 
         self._logger.info("Restoring effect")
         self._logger.add_tab()
-        OPEN_RGB_CLIENT.apply_effect(self._effect, self._brightness, self._color)
+        OPEN_RGB_CLIENT.apply_effect(
+            self._effect, RgbBrightness.OFF if UPOWER_CLIENT.on_battery else self._brightness, self._color
+        )
         self._logger.rem_tab()
         self._logger.rem_tab()
+
+        EVENT_BUS.on(HARDWARE_SERVICE_ON_USB_CHANGED, self.reload)
+        EVENT_BUS.on(
+            HARDWARE_SERVICE_ON_BATTERY,
+            lambda on_bat: OPEN_RGB_CLIENT.apply_effect(
+                self._effect, RgbBrightness.OFF if on_bat else self._brightness, self._color
+            ),
+        )
 
     def __load_custom_effects(self):
         """Load user custom effect"""
@@ -90,102 +93,16 @@ class OpenRgbService:
         """Getter for color"""
         return self._color
 
-    def bounced_reload(self) -> None:
+    def reload(self) -> None:
         """Reload OpenRGB Server"""
-        self._usb_mutex.acquire(True)  # pylint: disable=R1732
-        try:
-            t0 = time.time()
-            self._logger.info("Reloading OpenRGB server")
-            self._logger.add_tab()
-            OPEN_RGB_CLIENT.stop()
-            OPEN_RGB_CLIENT.start()
-            self._logger.rem_tab()
-            self._apply_aura(self._effect, self._brightness, self._color, True)
-            self._logger.info(f"Reloaded after {(time.time() - t0):.2f} seconds")
-        finally:
-            self._usb_mutex.release()
-
-    def monitor_for_usb(self) -> None:  # pylint: disable=R0914, R0912
-        """Monitor for usb devices changes"""
-        monitor = pyudev.Monitor.from_netlink(pyudev.Context())
-        monitor.filter_by("usb")
-
-        lsusb_output = subprocess.check_output(["lsusb"]).decode("utf-8").strip()
-        current_usb = []
-        for line in lsusb_output.split("\n"):
-            columns = line.strip().split(" ")
-
-            id_vendor, id_product = columns[5].split(":")
-            name = " ".join(columns[6:])
-
-            usb_dev = UsbIdentifier(id_vendor, id_product, name)
-
-            for cd in OPEN_RGB_CLIENT.compatible_devices:
-                if cd.id_vendor == usb_dev.id_vendor and cd.id_product == usb_dev.id_product:
-                    self._connected_usb.append(cd)
-
-        for action, _ in monitor:  # pylint: disable=R1702
-            if action in ["add", "remove"]:
-                self._usb_mutex.acquire(True)  # pylint: disable=R1732
-                try:
-                    lsusb_output = subprocess.check_output(["lsusb"]).decode("utf-8").strip()
-
-                    current_usb = []
-                    for line in lsusb_output.split("\n"):
-                        columns = line.strip().split(" ")
-
-                        id_vendor, id_product = columns[5].split(":")
-                        name = " ".join(columns[6:])
-
-                        usb_dev = UsbIdentifier(id_vendor, id_product, name)
-
-                        if any(
-                            cd.id_vendor == usb_dev.id_vendor and cd.id_product == usb_dev.id_product
-                            for cd in OPEN_RGB_CLIENT.compatible_devices
-                        ):
-                            current_usb.append(usb_dev)
-
-                    added = []
-                    for dev1 in current_usb:
-                        found = False
-                        for dev2 in self._connected_usb:
-                            if not found and dev1.id_vendor == dev2.id_vendor and dev1.id_product == dev2.id_product:
-                                found = True
-                        if not found:
-                            added.append(dev1)
-
-                    removed = []
-                    for dev1 in self._connected_usb:
-                        found = False
-                        for dev2 in current_usb:
-                            if not found and dev1.id_vendor == dev2.id_vendor and dev1.id_product == dev2.id_product:
-                                found = True
-                        if not found:
-                            removed.append(dev1)
-
-                    if len(removed) > 0:
-                        self._logger.info("Removed compatible device(s):")
-                        self._logger.add_tab()
-                        for item in removed:
-                            self._logger.info(OPEN_RGB_CLIENT.get_device_name(item.id_vendor, item.id_product))
-                            OPEN_RGB_CLIENT.disable_device(item.name)
-                        self._logger.rem_tab()
-
-                    if len(added) > 0:
-                        self._logger.info("Connected compatible device(s):")
-                        self._logger.add_tab()
-                        for item in added:
-                            self._logger.info(OPEN_RGB_CLIENT.get_device_name(item.id_vendor, item.id_product))
-                        self._logger.rem_tab()
-
-                        self._usb_mutex.release()
-                        self.bounced_reload()
-                    else:
-                        self._usb_mutex.release()
-
-                    self._connected_usb = current_usb
-                except Exception:
-                    self._usb_mutex.release()
+        t0 = time.time()
+        self._logger.info("Reloading OpenRGB server")
+        self._logger.add_tab()
+        OPEN_RGB_CLIENT.stop()
+        OPEN_RGB_CLIENT.start()
+        self._logger.rem_tab()
+        self._apply_aura(self._effect, self._brightness, self._color, True)
+        self._logger.info(f"Reloaded after {(time.time() - t0):.2f} seconds")
 
     def get_available_effects(self) -> list[str]:
         """Get all available effects"""
@@ -270,4 +187,4 @@ class OpenRgbService:
         return effects[index]
 
 
-OPEN_RGB_SERVICE = OpenRgbService()
+RGB_SERVICE = RgbService()

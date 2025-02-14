@@ -31,6 +31,19 @@ class EventBus:
                 self.__executor.submit(self._safe_invoke, self._callbacks[event][i], *args)
         self.__logger.debug(f"Invoked {count} callbacks")
 
+    def emit_sequencial(self, event: str, *args: Any) -> None:
+        """Emit event sequencially"""
+        self.__logger.debug(f"Emitting event {event} with args ({str(tuple(args))[1:-2]})")
+        count = 0
+        if event in self._callbacks:
+            for i in range(len(self._callbacks[event])):
+                try:
+                    self._callbacks[event][i](*args)
+                except Exception as e:
+                    self.__logger.error(f"Error executing callback {self._callbacks[event][i]}: {e}")
+                count += 1
+        self.__logger.debug(f"Invoked {count} callbacks")
+
     def _safe_invoke(self, callback: Callable[..., None], *args: Any) -> None:
         try:
             callback(*args)

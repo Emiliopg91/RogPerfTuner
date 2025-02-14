@@ -71,22 +71,22 @@ def initialize_application():  # pylint:disable=R0914
     if CONFIGURATION.settings.password is None:
         PASSWORD_DIALOG.show()
 
-    from rcc.services.openrgb_service import OPEN_RGB_SERVICE  # pylint: disable=W0611
+    from rcc.services.rgb_service import RGB_SERVICE  # pylint: disable=W0611
 
     """Install Decky plugin"""
-    from rcc.services.games_service import GAME_SERVICE
+    from rcc.services.steam_service import STEAM_SERVICE
 
-    GAME_SERVICE.install_rccdc()
+    STEAM_SERVICE.install_rccdc()
 
     """Show tray icon"""
     from rcc.gui.tray_icon import TRAY_ICON
 
     TRAY_ICON.show()
 
-    from rcc.services.platform_service import PLATFORM_SERVICE
+    from rcc.services.performance_service import PERFORMANCE_SERVICE
 
-    if len(GAME_SERVICE.running_games) == 0:
-        PLATFORM_SERVICE.restore_profile()
+    if len(STEAM_SERVICE.running_games) == 0:
+        PERFORMANCE_SERVICE.restore_profile()
 
     """Start dbus server"""
     from rcc.communications.server.dbus_server import DBUS_SERVER

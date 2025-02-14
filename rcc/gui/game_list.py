@@ -15,7 +15,8 @@ from PyQt5.QtGui import QIcon
 from rcc.communications.client.websocket.steam.steam_client import SteamGameDetails, STEAM_CLIENT
 from rcc.utils.constants import ICONS_PATH
 from rcc.models.performance_profile import PerformanceProfile
-from rcc.services.games_service import GAME_SERVICE
+from rcc.services.steam_service import STEAM_SERVICE
+from rcc.utils.events import STEAM_SERVICE_CONNECTED
 from rcc.utils.gui_utils import NoScrollComboBox
 from rcc.utils.beans import EVENT_BUS, TRANSLATOR
 
@@ -54,11 +55,11 @@ class GameList(QDialog):
             container_layout = QVBoxLayout(container)
 
             # Crear la tabla
-            game_cfg = GAME_SERVICE.get_games()
+            game_cfg = STEAM_SERVICE.get_games()
             appids = list(game_cfg.keys())
 
             columns = [TRANSLATOR.translate("game.title"), TRANSLATOR.translate("profile")]
-            if GAME_SERVICE.gpu is not None:
+            if STEAM_SERVICE.gpu is not None:
                 columns.append(TRANSLATOR.translate("used.gpu"))
 
             table = QTableWidget(len(appids), len(columns))
@@ -112,7 +113,7 @@ class GameList(QDialog):
                     table.setCellWidget(row, col, profile_combo)
                     col += 1
 
-                    if GAME_SERVICE.gpu is not None:
+                    if STEAM_SERVICE.gpu is not None:
                         # Tercera columna: GPU
                         gpu_combo = NoScrollComboBox()  # Usar la subclase personalizada
                         gpu_combo.addItem(TRANSLATOR.translate("label.dgpu.auto"), False)
@@ -140,15 +141,15 @@ class GameList(QDialog):
             # Añadir el área de scroll al layout principal
             layout.addWidget(scroll_area)
 
-            EVENT_BUS.on("GamesService.steam_disconnected", self.close)
+            EVENT_BUS.on(STEAM_SERVICE_CONNECTED, self.close)
 
     def __on_profile_changed(self, widget, game_id):
         selected_profile = widget.currentData()  # Obtiene el objeto asociado al elemento seleccionado
-        GAME_SERVICE.set_game_profile(game_id, selected_profile)
+        STEAM_SERVICE.set_game_profile(game_id, selected_profile)
 
     def __on_gpu_changed(self, widget, game: SteamGameDetails):
         enabled = widget.currentData()
-        vk_opt = f"VK_ICD_FILENAMES={":".join(GAME_SERVICE.icd_files)} "
+        vk_opt = f"VK_ICD_FILENAMES={":".join(STEAM_SERVICE.icd_files)} "
         launch_opts = game.launch_opts
         if enabled:
             if launch_opts is None:

@@ -17,7 +17,7 @@
     "${workspaceFolder}"
   ],
   "python.linting.pylintArgs": [
-    "-j 0 --rcfile=${workspaceFolder}/.pylintrc ${workspaceFolder}/main.py ${workspaceFolder}/framework/* ${workspaceFolder}/rcc/*"
+    "-j 0 --rcfile=${workspaceFolder}/.pylintrc ${workspaceFolder}/main.py ${workspaceFolder}/framework/* ${workspaceFolder}/rcc/* ${workspaceFolder}/framework/* ${workspaceFolder}/framework/*"
   ],
   "black-formatter.args": [
     "--line-length=120"

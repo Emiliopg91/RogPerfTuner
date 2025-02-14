@@ -4,9 +4,9 @@ import sys
 from PyQt5.QtCore import QObject, pyqtSlot, Q_CLASSINFO
 from PyQt5.QtDBus import QDBusConnection, QDBusAbstractAdaptor
 
-from rcc.services.games_service import GAME_SERVICE
-from rcc.services.openrgb_service import OPEN_RGB_SERVICE
-from rcc.services.platform_service import PLATFORM_SERVICE
+from rcc.services.steam_service import STEAM_SERVICE
+from rcc.services.rgb_service import RGB_SERVICE
+from rcc.services.performance_service import PERFORMANCE_SERVICE
 from rcc.utils.constants import SCRIPTS_FOLDER
 from framework.logger import Logger
 from framework.singleton import singleton
@@ -23,29 +23,29 @@ class HelloService(QObject):
 
     def next_profile(self):
         """Activate next profile"""
-        if len(GAME_SERVICE.running_games) > 0:
+        if len(STEAM_SERVICE.running_games) > 0:
             return "Not available on game session"
 
-        next_t = PLATFORM_SERVICE.performance_profile.next_performance_profile
-        PLATFORM_SERVICE.set_performance_profile(next_t)
+        next_t = PERFORMANCE_SERVICE.performance_profile.next_performance_profile
+        PERFORMANCE_SERVICE.set_performance_profile(next_t)
         return next_t.name
 
     def next_effect(self):
         """Activate next effect"""
-        next_t = OPEN_RGB_SERVICE.get_next_effect()
-        OPEN_RGB_SERVICE.apply_effect(next_t)
+        next_t = RGB_SERVICE.get_next_effect()
+        RGB_SERVICE.apply_effect(next_t)
         return next_t
 
     def increase_brightness(self):
         """Increase brightness"""
-        next_t = OPEN_RGB_SERVICE.brightness.get_next_brightness()
-        OPEN_RGB_SERVICE.apply_brightness(next_t)
+        next_t = RGB_SERVICE.brightness.get_next_brightness()
+        RGB_SERVICE.apply_brightness(next_t)
         return next_t.name
 
     def decrease_brightness(self):
         """Decrease brightness"""
-        next_t = OPEN_RGB_SERVICE.brightness.get_previous_brightness()
-        OPEN_RGB_SERVICE.apply_brightness(next_t)
+        next_t = RGB_SERVICE.brightness.get_previous_brightness()
+        RGB_SERVICE.apply_brightness(next_t)
         return next_t.name
 
 

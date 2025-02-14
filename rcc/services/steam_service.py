@@ -7,11 +7,12 @@ from rcc.communications.client.websocket.steam.steam_client import STEAM_CLIENT
 from rcc.models.performance_profile import PerformanceProfile
 from rcc.models.settings import GameEntry
 from rcc.models.platform_profile import PlatformProfile
-from rcc.services.platform_service import PLATFORM_SERVICE
+from rcc.services.performance_service import PERFORMANCE_SERVICE
 from rcc.utils.configuration import CONFIGURATION
 from rcc.utils.constants import RCCDC_ASSET_PATH, USER_PLUGIN_FOLDER
 from rcc.utils.beans import CRYPTOGRAPHY
 from rcc.utils.beans import EVENT_BUS
+from rcc.utils.events import STEAM_SERVICE_CONNECTED, STEAM_SERVICE_DISCONNECTED, STEAM_SERVICE_GAME_EVENT
 from framework.logger import Logger
 
 
@@ -23,7 +24,7 @@ class RunningGameModel:
     name: str
 
 
-class GamesService:
+class SteamService:
     """Steam service"""
 
     DECKY_SERVICE_PATH = os.path.expanduser(os.path.join("~", "homebrew", "services", "PluginLoader"))
@@ -103,17 +104,17 @@ class GamesService:
             self.__set_profile_for_games()
         self._logger.rem_tab()
         self.__steam_connnected = True
-        EVENT_BUS.emit("GamesService.steam_connected")
+        EVENT_BUS.emit(STEAM_SERVICE_CONNECTED)
 
     def __on_steam_disconnected(self):
         self._logger.info("SteamClient disconnected")
         self.__steam_connnected = False
-        EVENT_BUS.emit("GamesService.steam_disconnected")
+        EVENT_BUS.emit(STEAM_SERVICE_DISCONNECTED)
         if len(self.__running_games) > 0:
             self._logger.info("Restoring platform profile")
             self.__running_games = {}
             self._logger.add_tab()
-            PLATFORM_SERVICE.restore_profile()
+            PERFORMANCE_SERVICE.restore_profile()
             self._logger.rem_tab()
 
     @property
@@ -133,11 +134,11 @@ class GamesService:
                 for gid in self.__running_games
                 if PlatformProfile(CONFIGURATION.games[gid].profile) == profile
             ][0]
-            PLATFORM_SERVICE.set_performance_profile(profile, True, name, True)
+            PERFORMANCE_SERVICE.set_performance_profile(profile, True, name, True)
         else:
-            PLATFORM_SERVICE.restore_profile()
+            PERFORMANCE_SERVICE.restore_profile()
 
-        EVENT_BUS.emit("GamesService.gameEvent", len(self.__running_games))
+        EVENT_BUS.emit(STEAM_SERVICE_GAME_EVENT, len(self.__running_games))
 
     def __launch_game(self, gid: int, name: str):
         self._logger.info(f"Launched {name}")
@@ -189,31 +190,35 @@ class GamesService:
 
     def __copy_plugin(self, src: str, dst: str, is_update: bool):
         subprocess.run(
-            ["cp", "-R", src, USER_PLUGIN_FOLDER],
+            f"cp -R {src} {USER_PLUGIN_FOLDER}",
             capture_output=True,
             text=True,
+            shell=True,
             check=True,
         )
         if is_update:
             subprocess.run(
-                ["sudo", "-S", "rm", "-R", dst],
+                f"sudo -S rm -R {dst}",
                 input=CRYPTOGRAPHY.decrypt_string(CONFIGURATION.settings.password) + "\n",
                 capture_output=True,
                 text=True,
+                shell=True,
                 check=True,
             )
         subprocess.run(
-            ["sudo", "-S", "cp", "-R", os.path.join(USER_PLUGIN_FOLDER, "RCCDeckyCompanion"), dst],
+            f"sudo -S cp -R {os.path.join(USER_PLUGIN_FOLDER, 'RCCDeckyCompanion')} dst",
             input=CRYPTOGRAPHY.decrypt_string(CONFIGURATION.settings.password) + "\n",
             capture_output=True,
             text=True,
+            shell=True,
             check=True,
         )
         Thread(
             target=lambda: subprocess.run(
-                ["sudo", "-S", "systemctl", "restart", "plugin_loader.service"],
+                "sudo -S systemctl restart plugin_loader.service",
                 input=CRYPTOGRAPHY.decrypt_string(CONFIGURATION.settings.password) + "\n",
                 text=True,
+                shell=True,
                 check=True,
             )
         ).start()
@@ -228,5 +233,15 @@ class GamesService:
         CONFIGURATION.games[game].profile = profile.value
         CONFIGURATION.save_config()
 
+    def set_profile_for_running_game(self, profile: PerformanceProfile):
+        """If only one game is running store the profile"""
+        if len(self.__running_games) == 1:
+            game = next(iter(self.__running_games))
+            self.set_game_profile(game, profile)
+            if PERFORMANCE_SERVICE.performance_profile != profile:
+                PERFORMANCE_SERVICE.set_performance_profile(
+                    profile, temporal=True, game_name=CONFIGURATION.games[game].name
+                )
 
-GAME_SERVICE = GamesService()
+
+STEAM_SERVICE = SteamService()

@@ -43,7 +43,7 @@ class BoostControlHandler(FileSystemEventHandler):
 
 
 @singleton
-class PlatformService:
+class PerformanceService:
     """Service for platform setting"""
 
     TDP_BAT_FACTOR = 0.6
@@ -319,4 +319,4 @@ class PlatformService:
             self._logger.rem_tab()
 
 
-PLATFORM_SERVICE = PlatformService()
+PERFORMANCE_SERVICE = PerformanceService()

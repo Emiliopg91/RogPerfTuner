@@ -17,11 +17,20 @@ from rcc.gui.game_list import GameList
 from rcc.models.battery_threshold import BatteryThreshold
 from rcc.models.performance_profile import PerformanceProfile
 from rcc.models.rgb_brightness import RgbBrightness
-from rcc.services.games_service import GAME_SERVICE
-from rcc.services.openrgb_service import OPEN_RGB_SERVICE
-from rcc.services.platform_service import PLATFORM_SERVICE
+from rcc.services.hardware_service import HARDWARE_SERVICE
+from rcc.services.steam_service import STEAM_SERVICE
+from rcc.services.rgb_service import RGB_SERVICE
+from rcc.services.performance_service import PERFORMANCE_SERVICE
 from rcc.utils.constants import ICONS_PATH
 from rcc.utils.beans import TRANSLATOR
+from rcc.utils.events import (
+    OPENRGB_SERVICE_AURA_CHANGED,
+    HARDWARE_SERVICE_BATTERY_THRESHOLD_CHANGED,
+    PLATFORM_SERVICE_PROFILE_CHANGED,
+    STEAM_SERVICE_CONNECTED,
+    STEAM_SERVICE_DISCONNECTED,
+    STEAM_SERVICE_GAME_EVENT,
+)
 from rcc.utils.gui_utils import GuiUtils, NoScrollComboBox
 from rcc.utils.beans import EVENT_BUS
 from framework.logger import Logger
@@ -33,7 +42,7 @@ class MainWindow(QMainWindow):
     def __init__(self):
         self._logger = Logger()
 
-        self._effect_labels = OPEN_RGB_SERVICE.get_available_effects()
+        self._effect_labels = RGB_SERVICE.get_available_effects()
 
         super().__init__()
 
@@ -42,7 +51,7 @@ class MainWindow(QMainWindow):
         self.setFixedSize(400, 650)
         self.setWindowIcon(QIcon(f"{ICONS_PATH}/icon-45x45.png"))
 
-        self._current_color = OPEN_RGB_SERVICE.get_color(OPEN_RGB_SERVICE._effect)
+        self._current_color = RGB_SERVICE.get_color(RGB_SERVICE._effect)
 
         # Widget central
         central_widget = QWidget(self)
@@ -69,7 +78,7 @@ class MainWindow(QMainWindow):
         for item in reversed(PerformanceProfile):
             self._profile_dropdown.addItem(TRANSLATOR.translate(f"label.profile.{item.name}"), item)
         self._profile_dropdown.currentIndexChanged.connect(self.on_profile_changed)
-        self.set_performance_profile(PLATFORM_SERVICE.performance_profile)
+        self.set_performance_profile(PERFORMANCE_SERVICE.performance_profile)
         performance_layout.addRow(QLabel(f"{TRANSLATOR.translate('profile')}:"), self._profile_dropdown)
 
         performance_group.setLayout(performance_layout)
@@ -77,7 +86,7 @@ class MainWindow(QMainWindow):
 
         self._game_profile_button = QPushButton(TRANSLATOR.translate("label.game.configure"))
         self._game_profile_button.clicked.connect(self.open_game_list)
-        self._game_profile_button.setEnabled(GAME_SERVICE.steam_connected)
+        self._game_profile_button.setEnabled(STEAM_SERVICE.steam_connected)
         performance_layout.addRow(QLabel(f"{TRANSLATOR.translate('games')}:"), self._game_profile_button)
 
         # Grupo 2: Aura
@@ -88,8 +97,8 @@ class MainWindow(QMainWindow):
         # Dropdown para "Efecto"
         self._effect_dropdown = NoScrollComboBox()
         self._effect_dropdown.addItems(self._effect_labels)
-        if OPEN_RGB_SERVICE._effect in self._effect_labels:
-            self._effect_dropdown.setCurrentIndex(self._effect_labels.index(OPEN_RGB_SERVICE._effect))
+        if RGB_SERVICE._effect in self._effect_labels:
+            self._effect_dropdown.setCurrentIndex(self._effect_labels.index(RGB_SERVICE._effect))
         self._effect_dropdown.currentIndexChanged.connect(self.on_effect_change)
         aura_layout.addRow(QLabel(f"{TRANSLATOR.translate("effect")}:"), self._effect_dropdown)
 
@@ -97,7 +106,7 @@ class MainWindow(QMainWindow):
         self._brightness_dropdown = NoScrollComboBox()
         for brightness in RgbBrightness:
             self._brightness_dropdown.addItem(TRANSLATOR.translate(f"label.brightness.{brightness.name}"), brightness)
-        self._brightness_dropdown.setCurrentIndex(self._brightness_dropdown.findData(OPEN_RGB_SERVICE._brightness))
+        self._brightness_dropdown.setCurrentIndex(self._brightness_dropdown.findData(RGB_SERVICE._brightness))
         self._brightness_dropdown.currentIndexChanged.connect(self.on_brightness_change)
         aura_layout.addRow(QLabel(f"{TRANSLATOR.translate("brightness")}:"), self._brightness_dropdown)
 
@@ -108,7 +117,7 @@ class MainWindow(QMainWindow):
             f"background-color: {self._current_color if self._current_color is not None else "#00000000"};"
         )
         self._color_button.clicked.connect(self.pick_color)
-        supports_color = OPEN_RGB_SERVICE.supports_color(OPEN_RGB_SERVICE._effect)
+        supports_color = RGB_SERVICE.supports_color(RGB_SERVICE._effect)
         self._color_button.setDisabled(not supports_color)
         self._color_button.setDisabled(not supports_color)
 
@@ -129,7 +138,7 @@ class MainWindow(QMainWindow):
         for item in BatteryThreshold:
             self._threshold_dropdown.addItem(f"{item.value}%", item)
         self._threshold_dropdown.currentIndexChanged.connect(self.on_battery_limit_changed)
-        self.set_battery_charge_limit(PLATFORM_SERVICE.battery_charge_limit)
+        self.set_battery_charge_limit(HARDWARE_SERVICE.battery_charge_limit)
         settings_layout.addRow(
             QLabel(
                 f"{TRANSLATOR.translate("charge.threshold")}:",
@@ -144,12 +153,12 @@ class MainWindow(QMainWindow):
         self.setCentralWidget(central_widget)
         GuiUtils.center_window_on_current_screen(self)
 
-        EVENT_BUS.on("PlatformService.battery_threshold", self.set_battery_charge_limit)  # pylint: disable=R0801
-        EVENT_BUS.on("PlatformService.performance_profile", self.set_performance_profile)
-        EVENT_BUS.on("OpenRgbService.aura_changed", self.set_aura_state)
-        EVENT_BUS.on("GamesService.gameEvent", self.on_game_event)
-        EVENT_BUS.on("GamesService.steam_connected", lambda: self.on_steam_connected_event(True))
-        EVENT_BUS.on("GamesService.steam_disconnected", lambda: self.on_steam_connected_event(False))
+        EVENT_BUS.on(HARDWARE_SERVICE_BATTERY_THRESHOLD_CHANGED, self.set_battery_charge_limit)  # pylint: disable=R0801
+        EVENT_BUS.on(PLATFORM_SERVICE_PROFILE_CHANGED, self.set_performance_profile)
+        EVENT_BUS.on(OPENRGB_SERVICE_AURA_CHANGED, self.set_aura_state)
+        EVENT_BUS.on(STEAM_SERVICE_GAME_EVENT, self.on_game_event)
+        EVENT_BUS.on(STEAM_SERVICE_CONNECTED, lambda: self.on_steam_connected_event(True))
+        EVENT_BUS.on(STEAM_SERVICE_DISCONNECTED, lambda: self.on_steam_connected_event(False))
 
     def on_steam_connected_event(self, connected: bool):
         """Handler for steam connection events"""
@@ -158,7 +167,6 @@ class MainWindow(QMainWindow):
     def on_game_event(self, running_games: int):
         """Handler for game events"""
         enable = running_games == 0
-        self._profile_dropdown.setEnabled(enable)
         self._game_profile_button.setEnabled(enable)
 
     def closeEvent(self, event):  # pylint: disable=C0103
@@ -197,31 +205,34 @@ class MainWindow(QMainWindow):
     def on_profile_changed(self, index):
         """Handler for profile change"""
         profile = self._profile_dropdown.itemData(index)
-        if PLATFORM_SERVICE.performance_profile != profile:
-            PLATFORM_SERVICE.set_performance_profile(profile)
+        if len(STEAM_SERVICE.running_games.keys()) == 0:
+            if PERFORMANCE_SERVICE.performance_profile != profile:
+                PERFORMANCE_SERVICE.set_performance_profile(profile)
+        else:
+            STEAM_SERVICE.set_profile_for_running_game(profile)
 
     def on_battery_limit_changed(self, index):
         """Handler for battery limit change"""
         threshold = self._threshold_dropdown.itemData(index)
-        if PLATFORM_SERVICE.battery_charge_limit != threshold:
-            PLATFORM_SERVICE.set_battery_threshold(threshold)
+        if HARDWARE_SERVICE.battery_charge_limit != threshold:
+            HARDWARE_SERVICE.set_battery_threshold(threshold)
 
     def on_effect_change(self):
         """Handler for effect change"""
         effect = self._effect_labels[self._effect_dropdown.currentIndex()]
-        if OPEN_RGB_SERVICE.effect != effect:
-            OPEN_RGB_SERVICE.apply_effect(effect)
+        if RGB_SERVICE.effect != effect:
+            RGB_SERVICE.apply_effect(effect)
 
     def on_brightness_change(self, index):
         """Handler for brightness change"""
         level = self._brightness_dropdown.itemData(index)
-        if OPEN_RGB_SERVICE.brightness != level:
-            OPEN_RGB_SERVICE.apply_brightness(level)
+        if RGB_SERVICE.brightness != level:
+            RGB_SERVICE.apply_brightness(level)
 
     def on_color_change(self):
         """Handler for color change"""
-        if OPEN_RGB_SERVICE.color != self._current_color:
-            OPEN_RGB_SERVICE.apply_color(self._current_color)
+        if RGB_SERVICE.color != self._current_color:
+            RGB_SERVICE.apply_color(self._current_color)
 
     def open_game_list(self):
         """Open game list window"""

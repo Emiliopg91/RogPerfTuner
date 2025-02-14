@@ -64,7 +64,7 @@ class Logger:
                 frame = frame.f_back
             else:
                 class_name = "Unknown"
-        self._class_name = class_name
+        self._class_name = class_name.ljust(15)[:15]
 
         self._logger = logging.getLogger(self._class_name)
         self._logger.addHandler(Logger.file_handler)

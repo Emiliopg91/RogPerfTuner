@@ -13,12 +13,21 @@ from rcc import __app_name__, __version__
 from rcc.models.performance_profile import PerformanceProfile
 from rcc.models.rgb_brightness import RgbBrightness
 from rcc.models.battery_threshold import BatteryThreshold
-from rcc.services.games_service import GAME_SERVICE
-from rcc.services.openrgb_service import OPEN_RGB_SERVICE
-from rcc.services.platform_service import PLATFORM_SERVICE
+from rcc.services.hardware_service import HARDWARE_SERVICE
+from rcc.services.steam_service import STEAM_SERVICE
+from rcc.services.rgb_service import RGB_SERVICE
+from rcc.services.performance_service import PERFORMANCE_SERVICE
 from rcc.utils.constants import ICONS_PATH, DEV_MODE, LOG_FILE, CONFIG_FILE
 from rcc.utils.beans import TRANSLATOR
 from rcc.utils.beans import EVENT_BUS
+from rcc.utils.events import (
+    OPENRGB_SERVICE_AURA_CHANGED,
+    HARDWARE_SERVICE_BATTERY_THRESHOLD_CHANGED,
+    PLATFORM_SERVICE_PROFILE_CHANGED,
+    STEAM_SERVICE_CONNECTED,
+    STEAM_SERVICE_DISCONNECTED,
+    STEAM_SERVICE_GAME_EVENT,
+)
 from framework.logger import Logger
 from framework.singleton import singleton
 
@@ -53,7 +62,7 @@ class TrayIcon:  # pylint: disable=R0902
         for threshold in BatteryThreshold:
             action = QAction(f"{threshold.value}%", checkable=True)
             action.setActionGroup(self._threshold_group)
-            action.setChecked(threshold == PLATFORM_SERVICE._battery_charge_limit)
+            action.setChecked(threshold == HARDWARE_SERVICE.battery_charge_limit)
             action.triggered.connect(lambda _, t=threshold: self.on_threshold_selected(t))
             self.threshold_actions[threshold] = action
             self._umbral_menu.addAction(action)
@@ -71,10 +80,10 @@ class TrayIcon:  # pylint: disable=R0902
         self._effect_group = QActionGroup(self._effect_menu)
         self._effect_group.setExclusive(True)
         self._effect_actions: dict[str, QAction] = {}
-        for effect in OPEN_RGB_SERVICE.get_available_effects():
+        for effect in RGB_SERVICE.get_available_effects():
             action = QAction(effect, checkable=True)
             action.setActionGroup(self._effect_group)
-            action.setChecked(effect == OPEN_RGB_SERVICE._effect)
+            action.setChecked(effect == RGB_SERVICE._effect)
             action.triggered.connect(lambda _, e=effect: self.on_effect_selected(e))
             self._effect_actions[effect] = action
             self._effect_menu.addAction(action)
@@ -91,7 +100,7 @@ class TrayIcon:  # pylint: disable=R0902
                 checkable=True,
             )
             action.setActionGroup(self._brightness_group)
-            action.setChecked(brightness == OPEN_RGB_SERVICE._brightness)
+            action.setChecked(brightness == RGB_SERVICE._brightness)
             action.triggered.connect(lambda _, b=brightness: self.on_brightness_selected(b))
             self._brightness_actions[brightness] = action
             self._brightness_menu.addAction(action)
@@ -100,7 +109,7 @@ class TrayIcon:  # pylint: disable=R0902
         # Add "Color" submenu
         self._color_menu = QMenu("    " + TRANSLATOR.translate("color"))
 
-        self._color_action = QAction(OPEN_RGB_SERVICE.get_color())
+        self._color_action = QAction(RGB_SERVICE.get_color())
         self._color_action.setEnabled(False)
         self._color_menu.addAction(self._color_action)
 
@@ -109,7 +118,7 @@ class TrayIcon:  # pylint: disable=R0902
         self._color_menu.addAction(self._colorpicker_action)
 
         self._submenu_color = self._menu.addMenu(self._color_menu)
-        self._submenu_color.setEnabled(OPEN_RGB_SERVICE.supports_color())
+        self._submenu_color.setEnabled(RGB_SERVICE.supports_color())
 
         self._menu.addSeparator()
 
@@ -125,16 +134,16 @@ class TrayIcon:  # pylint: disable=R0902
         for profile in reversed(PerformanceProfile):
             action = QAction(TRANSLATOR.translate(f"label.profile.{profile.name}"), checkable=True)
             action.setActionGroup(self._performance_group)
-            action.setChecked(profile == PLATFORM_SERVICE.performance_profile)
+            action.setChecked(profile == PERFORMANCE_SERVICE.performance_profile)
             action.triggered.connect(lambda _, p=profile: self.on_profile_selected(p))
             self._performance_actions[profile] = action
             self._profile_menu.addAction(action)
         self._menu.addMenu(self._profile_menu)
 
-        if GAME_SERVICE.rccdc_enabled:
+        if STEAM_SERVICE.rccdc_enabled:
             # Add "Games" option
             self._games_menu = QMenu("    " + TRANSLATOR.translate("games"))
-            self._games_menu.setEnabled(GAME_SERVICE.steam_connected)
+            self._games_menu.setEnabled(STEAM_SERVICE.steam_connected)
             self._select_profile_action = QAction(f"{TRANSLATOR.translate("label.game.configure")}...")
             self._select_profile_action.triggered.connect(self.on_open_game_list)
             self._games_menu.addAction(self._select_profile_action)
@@ -152,19 +161,19 @@ class TrayIcon:  # pylint: disable=R0902
 
             self._ac_connected_action = QAction("AC connected")
             self._ac_connected_action.triggered.connect(
-                lambda: PLATFORM_SERVICE._on_ac_battery_change(False, False, False)  # pylint: disable=W0212
+                lambda: PERFORMANCE_SERVICE._on_ac_battery_change(False, False)  # pylint: disable=W0212
             )
             self._simulation_menu.addAction(self._ac_connected_action)
 
             self._ac_disconnected_action = QAction("AC disconnected")
             self._ac_disconnected_action.triggered.connect(
-                lambda: PLATFORM_SERVICE._on_ac_battery_change(True, False, False)  # pylint: disable=W0212
+                lambda: PERFORMANCE_SERVICE._on_ac_battery_change(True, False)  # pylint: disable=W0212
             )
             self._simulation_menu.addAction(self._ac_disconnected_action)
 
             self._simulation_menu.addSeparator()
 
-            if GAME_SERVICE.rccdc_enabled:
+            if STEAM_SERVICE.rccdc_enabled:
                 self._steam_connected_action = QAction("Steam connected")
                 self._steam_connected_action.triggered.connect(lambda: EVENT_BUS.emit("SteamClient.connected"))
                 self._simulation_menu.addAction(self._steam_connected_action)
@@ -216,19 +225,19 @@ class TrayIcon:  # pylint: disable=R0902
         # Set the menu on the tray icon
         self._tray.setContextMenu(self._menu)
 
-        EVENT_BUS.on("PlatformService.battery_threshold", self.set_battery_charge_limit)
-        EVENT_BUS.on("PlatformService.performance_profile", self.set_performance_profile)
-        EVENT_BUS.on("OpenRgbService.aura_changed", self.set_aura_state)
-        EVENT_BUS.on("GamesService.gameEvent", self.on_game_event)
-        EVENT_BUS.on("GamesService.steam_connected", lambda: self.on_steam_connected_event(True))
-        EVENT_BUS.on("GamesService.steam_disconnected", lambda: self.on_steam_connected_event(False))
+        EVENT_BUS.on(HARDWARE_SERVICE_BATTERY_THRESHOLD_CHANGED, self.set_battery_charge_limit)
+        EVENT_BUS.on(PLATFORM_SERVICE_PROFILE_CHANGED, self.set_performance_profile)
+        EVENT_BUS.on(OPENRGB_SERVICE_AURA_CHANGED, self.set_aura_state)
+        EVENT_BUS.on(STEAM_SERVICE_GAME_EVENT, self.on_game_event)
+        EVENT_BUS.on(STEAM_SERVICE_CONNECTED, lambda: self.on_steam_connected_event(True))
+        EVENT_BUS.on(STEAM_SERVICE_DISCONNECTED, lambda: self.on_steam_connected_event(False))
 
         self._tray.activated.connect(self.on_tray_icon_activated)
 
     def on_game_event(self, running_games: int):
         """Handler for game events"""
         enable = running_games == 0
-        self._profile_menu.setEnabled(enable)
+        self._games_menu.setEnabled(enable)
 
     def on_steam_connected_event(self, connected: bool):
         """Handler for steam connection events"""
@@ -268,29 +277,32 @@ class TrayIcon:  # pylint: disable=R0902
 
     def on_threshold_selected(self, threshold: BatteryThreshold):
         """Battery limit event handler"""
-        if PLATFORM_SERVICE.battery_charge_limit != threshold:
-            PLATFORM_SERVICE.set_battery_threshold(threshold)
+        if HARDWARE_SERVICE.battery_charge_limit != threshold:
+            HARDWARE_SERVICE.set_battery_threshold(threshold)
 
     def on_effect_selected(self, effect: str):
         """Effect event handler"""
-        if OPEN_RGB_SERVICE.effect != effect:
-            OPEN_RGB_SERVICE.apply_effect(effect)
+        if RGB_SERVICE.effect != effect:
+            RGB_SERVICE.apply_effect(effect)
 
     def on_brightness_selected(self, brightness: RgbBrightness):
         """Brightness event handler"""
-        if OPEN_RGB_SERVICE.brightness != brightness:
-            OPEN_RGB_SERVICE.apply_brightness(brightness)
+        if RGB_SERVICE.brightness != brightness:
+            RGB_SERVICE.apply_brightness(brightness)
 
     def on_profile_selected(self, profile: PerformanceProfile):
         """Profile event handler"""
-        if PLATFORM_SERVICE.performance_profile != profile:
-            PLATFORM_SERVICE.set_performance_profile(profile)
+        if len(STEAM_SERVICE.running_games.keys()) == 0:
+            if PERFORMANCE_SERVICE.performance_profile != profile:
+                PERFORMANCE_SERVICE.set_performance_profile(profile)
+        else:
+            STEAM_SERVICE.set_profile_for_running_game(profile)
 
     def pick_color(self):
         """Open color picker"""
         color = QColorDialog.getColor(QColor(self._color_action.text()), None, TRANSLATOR.translate("color.select"))
         if color.isValid():
-            OPEN_RGB_SERVICE.apply_color(color.name().upper())
+            RGB_SERVICE.apply_color(color.name().upper())
 
     def on_open_game_list(self):
         """Open game list window"""
