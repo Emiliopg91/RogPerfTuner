@@ -22,6 +22,7 @@ from rcc.communications.client.tcp.openrgb.effects.rainbow_wave import RAINBOW_W
 from rcc.communications.client.tcp.openrgb.effects.spectrum_cycle import SPECTRUM_CYCLE_EFFECT
 from rcc.communications.client.tcp.openrgb.effects.starry_night import STARRY_NIGHT_EFFECT
 from rcc.communications.client.tcp.openrgb.effects.static import STATIC_EFFECT
+from rcc.utils.shell import SHELL
 from rcc.utils.beans import EVENT_BUS
 from framework.logger import Logger
 from framework.singleton import singleton
@@ -55,13 +56,7 @@ class OpenRgbClient:
     def start(self):
         """Initialize server and client"""
         self.logger.info("Initializing OpenRgbClient")
-        subprocess.run(
-            ["asusctl", "aura", "static", "-c", "000000"],
-            check=True,
-            stdout=subprocess.PIPE,
-            stderr=subprocess.PIPE,
-            encoding="utf-8",
-        )
+        SHELL.run_command("asusctl aura static -c 000000")
         self.logger.add_tab()
         self._start_orgb_process()
         self._find_compatible_devices()

@@ -1,6 +1,5 @@
 import os
 import signal
-import subprocess
 import time
 
 from PyQt5.QtWidgets import QSystemTrayIcon, QMenu, QAction, QActionGroup, QColorDialog
@@ -16,10 +15,11 @@ from rcc.models.battery_threshold import BatteryThreshold
 from rcc.services.hardware_service import HARDWARE_SERVICE
 from rcc.services.steam_service import STEAM_SERVICE
 from rcc.services.rgb_service import RGB_SERVICE
-from rcc.services.performance_service import PERFORMANCE_SERVICE
+from rcc.services.profile_service import PROFILE_SERVICE
 from rcc.utils.constants import ICONS_PATH, DEV_MODE, LOG_FILE, CONFIG_FILE
 from rcc.utils.beans import TRANSLATOR
 from rcc.utils.beans import EVENT_BUS
+from rcc.utils.shell import SHELL
 from rcc.utils.events import (
     OPENRGB_SERVICE_AURA_CHANGED,
     HARDWARE_SERVICE_BATTERY_THRESHOLD_CHANGED,
@@ -134,7 +134,7 @@ class TrayIcon:  # pylint: disable=R0902
         for profile in reversed(PerformanceProfile):
             action = QAction(TRANSLATOR.translate(f"label.profile.{profile.name}"), checkable=True)
             action.setActionGroup(self._performance_group)
-            action.setChecked(profile == PERFORMANCE_SERVICE.performance_profile)
+            action.setChecked(profile == PROFILE_SERVICE.performance_profile)
             action.triggered.connect(lambda _, p=profile: self.on_profile_selected(p))
             self._performance_actions[profile] = action
             self._profile_menu.addAction(action)
@@ -161,13 +161,13 @@ class TrayIcon:  # pylint: disable=R0902
 
             self._ac_connected_action = QAction("AC connected")
             self._ac_connected_action.triggered.connect(
-                lambda: PERFORMANCE_SERVICE._on_ac_battery_change(False, False)  # pylint: disable=W0212
+                lambda: PROFILE_SERVICE._on_ac_battery_change(False, False)  # pylint: disable=W0212
             )
             self._simulation_menu.addAction(self._ac_connected_action)
 
             self._ac_disconnected_action = QAction("AC disconnected")
             self._ac_disconnected_action.triggered.connect(
-                lambda: PERFORMANCE_SERVICE._on_ac_battery_change(True, False)  # pylint: disable=W0212
+                lambda: PROFILE_SERVICE._on_ac_battery_change(True, False)  # pylint: disable=W0212
             )
             self._simulation_menu.addAction(self._ac_disconnected_action)
 
@@ -293,8 +293,8 @@ class TrayIcon:  # pylint: disable=R0902
     def on_profile_selected(self, profile: PerformanceProfile):
         """Profile event handler"""
         if len(STEAM_SERVICE.running_games.keys()) == 0:
-            if PERFORMANCE_SERVICE.performance_profile != profile:
-                PERFORMANCE_SERVICE.set_performance_profile(profile)
+            if PROFILE_SERVICE.performance_profile != profile:
+                PROFILE_SERVICE.set_performance_profile(profile)
         else:
             STEAM_SERVICE.set_profile_for_running_game(profile)
 
@@ -316,12 +316,12 @@ class TrayIcon:  # pylint: disable=R0902
     @staticmethod
     def on_open_logs():
         """Open log file"""
-        subprocess.run(["xdg-open", LOG_FILE], check=False)
+        SHELL.run_command(f"xdg-open '{LOG_FILE}'", check=False)
 
     @staticmethod
     def on_open_settings():
         """Open log file"""
-        subprocess.run(["xdg-open", CONFIG_FILE], check=False)
+        SHELL.run_command(f"xdg-open '{CONFIG_FILE}'", check=False)
 
     @staticmethod
     def on_quit():

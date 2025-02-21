@@ -83,6 +83,7 @@ class AbstractDbusClient(ABC):
 
     def _check_availability(self):
         if not self._available:
+            self._logger.error(f"Service {self._service_name} is not available")
             raise Exception(f"Service {self._service_name} is not available")
 
     @property
@@ -97,6 +98,7 @@ class AbstractDbusClient(ABC):
         if reply.isValid():
             return reply.value()
 
+        self._logger.error(f"Error getting property {property_name}: {reply.error().message()}")
         raise Exception(f"Error getting property {property_name}: {reply.error().message()}")
 
     def _set_property(self, property_name: str, value):
@@ -104,6 +106,7 @@ class AbstractDbusClient(ABC):
         self._check_availability()
         reply = QDBusReply(self._props_interface.call("Set", self._interface_name, property_name, value))
         if not reply.isValid():
+            self._logger.error(f"Error setting property {property_name}: {reply.error().message()}")
             raise Exception(f"Error setting property {property_name}: {reply.error().message()}")
 
     def _invoke_method(self, method_name: str, *args):
@@ -113,4 +116,5 @@ class AbstractDbusClient(ABC):
         if reply.isValid():
             return reply.value()
 
+        self._logger.error(f"Error invoking method {method_name}: {reply.error().message()}")
         raise Exception(f"Error invoking method {method_name}: {reply.error().message()}")

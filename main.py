@@ -83,10 +83,14 @@ def initialize_application():  # pylint:disable=R0914
 
     TRAY_ICON.show()
 
-    from rcc.services.performance_service import PERFORMANCE_SERVICE
+    from rcc.services.hardware_service import HARDWARE_SERVICE
+
+    HARDWARE_SERVICE.set_panel_overdrive(False)
+
+    from rcc.services.profile_service import PROFILE_SERVICE
 
     if len(STEAM_SERVICE.running_games) == 0:
-        PERFORMANCE_SERVICE.restore_profile()
+        PROFILE_SERVICE.restore_profile()
 
     """Start dbus server"""
     from rcc.communications.server.dbus_server import DBUS_SERVER

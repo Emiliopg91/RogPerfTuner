@@ -23,7 +23,7 @@ class RgbService:
 
     def __init__(self):
         self._logger = Logger()
-        self._logger.info("Initializing OpenRgbService")
+        self._logger.info("Initializing RgbService")
         self._logger.add_tab()
 
         self._effect = STATIC_EFFECT.name

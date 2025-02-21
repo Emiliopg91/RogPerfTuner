@@ -26,11 +26,11 @@ class PerformanceProfile(IntEnum):
             return None
 
         if self == PerformanceProfile.PERFORMANCE:
-            return int(PL1_SPL_CLIENT.max_value * 0.85)
+            return int(PL1_SPL_CLIENT.max_value * 0.8)
         if self == PerformanceProfile.BALANCED:
             return int(PL1_SPL_CLIENT.max_value * 0.6)
         if self == PerformanceProfile.QUIET:
-            return int(PL1_SPL_CLIENT.max_value * 0.35)
+            return int(PL1_SPL_CLIENT.max_value * 0.4)
 
         return PL1_SPL_CLIENT.current_value
 
@@ -53,9 +53,9 @@ class PerformanceProfile(IntEnum):
         if self == PerformanceProfile.PERFORMANCE:
             return int(PL2_SPPT_CLIENT.max_value * 1)
         if self == PerformanceProfile.BALANCED:
-            return int(PL2_SPPT_CLIENT.max_value * 0.75)
+            return int(PL2_SPPT_CLIENT.max_value * 0.8)
         if self == PerformanceProfile.QUIET:
-            return int(PL2_SPPT_CLIENT.max_value * 0.5)
+            return int(PL2_SPPT_CLIENT.max_value * 0.6)
 
         return PL2_SPPT_CLIENT.current_value
 
@@ -149,7 +149,7 @@ class PerformanceProfile(IntEnum):
     @property
     def ac_boost(self):
         """Boost on battery"""
-        return self != PerformanceProfile.QUIET
+        return True
 
     @property
     def battery_boost(self):
@@ -159,12 +159,12 @@ class PerformanceProfile(IntEnum):
     @property
     def ac_governor(self):
         """AC Governor"""
-        return CpuGovernor.PERFORMANCE
+        return CpuGovernor.PERFORMANCE if self == PerformanceProfile.PERFORMANCE else CpuGovernor.POWERSAVE
 
     @property
     def battery_governor(self):
         """Battery Governor"""
-        return CpuGovernor.POWERSAVER
+        return CpuGovernor.POWERSAVE
 
     def get_greater(self, other):
         """Get the profile with higher performance"""

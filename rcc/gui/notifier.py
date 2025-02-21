@@ -21,7 +21,7 @@ class Notifier:
             NOTIFICATION_CLIENT.close_notification(self.last_id)
 
         try:
-            toast_id = NOTIFICATION_CLIENT.show_notification(__app_name__, icon, " ", message, 3000)
+            toast_id = NOTIFICATION_CLIENT.show_notification(" ", icon, __app_name__, message + "\n\t", 3000)
             if can_be_hidden:
                 self.last_id = toast_id
         except Exception:

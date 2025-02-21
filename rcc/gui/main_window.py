@@ -20,7 +20,7 @@ from rcc.models.rgb_brightness import RgbBrightness
 from rcc.services.hardware_service import HARDWARE_SERVICE
 from rcc.services.steam_service import STEAM_SERVICE
 from rcc.services.rgb_service import RGB_SERVICE
-from rcc.services.performance_service import PERFORMANCE_SERVICE
+from rcc.services.profile_service import PROFILE_SERVICE
 from rcc.utils.constants import ICONS_PATH
 from rcc.utils.beans import TRANSLATOR
 from rcc.utils.events import (
@@ -78,7 +78,7 @@ class MainWindow(QMainWindow):
         for item in reversed(PerformanceProfile):
             self._profile_dropdown.addItem(TRANSLATOR.translate(f"label.profile.{item.name}"), item)
         self._profile_dropdown.currentIndexChanged.connect(self.on_profile_changed)
-        self.set_performance_profile(PERFORMANCE_SERVICE.performance_profile)
+        self.set_performance_profile(PROFILE_SERVICE.performance_profile)
         performance_layout.addRow(QLabel(f"{TRANSLATOR.translate('profile')}:"), self._profile_dropdown)
 
         performance_group.setLayout(performance_layout)
@@ -206,8 +206,8 @@ class MainWindow(QMainWindow):
         """Handler for profile change"""
         profile = self._profile_dropdown.itemData(index)
         if len(STEAM_SERVICE.running_games.keys()) == 0:
-            if PERFORMANCE_SERVICE.performance_profile != profile:
-                PERFORMANCE_SERVICE.set_performance_profile(profile)
+            if PROFILE_SERVICE.performance_profile != profile:
+                PROFILE_SERVICE.set_performance_profile(profile)
         else:
             STEAM_SERVICE.set_profile_for_running_game(profile)
 

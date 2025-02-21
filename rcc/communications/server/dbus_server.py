@@ -6,7 +6,7 @@ from PyQt5.QtDBus import QDBusConnection, QDBusAbstractAdaptor
 
 from rcc.services.steam_service import STEAM_SERVICE
 from rcc.services.rgb_service import RGB_SERVICE
-from rcc.services.performance_service import PERFORMANCE_SERVICE
+from rcc.services.profile_service import PROFILE_SERVICE
 from rcc.utils.constants import SCRIPTS_FOLDER
 from framework.logger import Logger
 from framework.singleton import singleton
@@ -26,8 +26,8 @@ class HelloService(QObject):
         if len(STEAM_SERVICE.running_games) > 0:
             return "Not available on game session"
 
-        next_t = PERFORMANCE_SERVICE.performance_profile.next_performance_profile
-        PERFORMANCE_SERVICE.set_performance_profile(next_t)
+        next_t = PROFILE_SERVICE.performance_profile.next_performance_profile
+        PROFILE_SERVICE.set_performance_profile(next_t)
         return next_t.name
 
     def next_effect(self):
@@ -108,6 +108,8 @@ class DBusServer:
 
     def start(self):
         """Start dbus server"""
+
+        self._logger.info("Initializing DBusServer")
         session_bus = QDBusConnection.sessionBus()
 
         if not session_bus.registerService(SERVICE_NAME):
@@ -122,8 +124,6 @@ class DBusServer:
             sys.exit(1)
 
         session_bus.registerObject(OBJECT_PATH, adaptor)
-
-        self._logger.info("D-Bus service started")
 
 
 DBUS_SERVER = DBusServer()

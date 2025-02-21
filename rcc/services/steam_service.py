@@ -1,17 +1,19 @@
 from dataclasses import dataclass
 import os
-import subprocess
 from threading import Thread
+
+import time
 
 from rcc.communications.client.websocket.steam.steam_client import STEAM_CLIENT
 from rcc.models.performance_profile import PerformanceProfile
 from rcc.models.settings import GameEntry
 from rcc.models.platform_profile import PlatformProfile
-from rcc.services.performance_service import PERFORMANCE_SERVICE
+from rcc.services.hardware_service import HARDWARE_SERVICE
+from rcc.services.profile_service import PROFILE_SERVICE
 from rcc.utils.configuration import CONFIGURATION
 from rcc.utils.constants import RCCDC_ASSET_PATH, USER_PLUGIN_FOLDER
-from rcc.utils.beans import CRYPTOGRAPHY
 from rcc.utils.beans import EVENT_BUS
+from rcc.utils.shell import SHELL
 from rcc.utils.events import STEAM_SERVICE_CONNECTED, STEAM_SERVICE_DISCONNECTED, STEAM_SERVICE_GAME_EVENT
 from framework.logger import Logger
 
@@ -37,25 +39,16 @@ class SteamService:
 
     def __init__(self):
         self._logger = Logger()
-        self._logger.info("Initializing GamesService")
+        self._logger.info("Initializing SteamService")
         self._logger.add_tab()
         self._rccdc_enabled = False
         self.__running_games: dict[int, str] = {}
-        self.__gpu: str | None = None
+        self.__gpu: str | None = HARDWARE_SERVICE.gpu
         self.__steam_connnected = STEAM_CLIENT.connected
-
-        lspci_result = subprocess.run(["lspci"], stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True, check=False)
-        output = lspci_result.stdout
-        lines = [line for line in output.splitlines() if "VGA" in line or "3D" in line]
-        for _, line in enumerate(lines):
-            if line.split(": ")[1].strip().lower().startswith("nvidia"):
-                self.__gpu = "nvidia"
-                break
 
         if self.__gpu is None:
             self._logger.info("No discrete GPU found")
         else:
-            self._logger.info(f"Found discrete {self.__gpu.capitalize()} GPU")
             if not self.__exists_icd_files("nvidia"):
                 self._logger.warning(f"Missing ICD files for {self.__gpu.capitalize()} GPU, discarding")
                 self.__gpu = None
@@ -91,16 +84,9 @@ class SteamService:
 
     def __on_steam_connected(self, on_boot=False):
         self.__running_games = {}
-        rg = STEAM_CLIENT.get_running_games()
-        self._logger.info(f"SteamClient connected. Running {len(rg)} games")
+        self._logger.info("SteamClient connected")
         self._logger.add_tab()
-        if len(rg) > 0:
-            for g in rg:
-                game = RunningGameModel(g["id"], g["name"])
-                self._logger.info(game.name)
-                self.__running_games[game.id] = game.name
-            self.__set_profile_for_games()
-        elif not on_boot:
+        if not on_boot:
             self.__set_profile_for_games()
         self._logger.rem_tab()
         self.__steam_connnected = True
@@ -109,13 +95,8 @@ class SteamService:
     def __on_steam_disconnected(self):
         self._logger.info("SteamClient disconnected")
         self.__steam_connnected = False
+        PROFILE_SERVICE.restore_profile()
         EVENT_BUS.emit(STEAM_SERVICE_DISCONNECTED)
-        if len(self.__running_games) > 0:
-            self._logger.info("Restoring platform profile")
-            self.__running_games = {}
-            self._logger.add_tab()
-            PERFORMANCE_SERVICE.restore_profile()
-            self._logger.rem_tab()
 
     @property
     def steam_connected(self):
@@ -134,21 +115,40 @@ class SteamService:
                 for gid in self.__running_games
                 if PlatformProfile(CONFIGURATION.games[gid].profile) == profile
             ][0]
-            PERFORMANCE_SERVICE.set_performance_profile(profile, True, name, True)
+            PROFILE_SERVICE.set_performance_profile(profile, True, name, True)
         else:
-            PERFORMANCE_SERVICE.restore_profile()
+            PROFILE_SERVICE.restore_profile()
 
         EVENT_BUS.emit(STEAM_SERVICE_GAME_EVENT, len(self.__running_games))
 
-    def __launch_game(self, gid: int, name: str):
-        self._logger.info(f"Launched {name}")
+    def __get_pids(self, parent_pid):
+        pids = []
+
+        output = SHELL.run_command(
+            "pstree -p " + str(parent_pid) + " | awk -F'[()]' '{for(i=2;i<=NF;i+=2) print $i}'", False, True, True
+        )[1]
+        for _ in range(0, 3):
+            for line in output.splitlines():
+                pid = int(line.strip())
+                if pid not in pids:
+                    pids.append(pid)
+            time.sleep(0.05)
+
+        return pids
+
+    def __launch_game(self, gid: int, name: str, pid: int):
+        self._logger.info(f"Launched {name} with PID {pid}")
         if gid not in self.running_games:
             self.__running_games[gid] = name
             self._logger.add_tab()
-            if gid not in CONFIGURATION.games:
+
+            pids = self.__get_pids(pid)
+            HARDWARE_SERVICE.apply_process_optimizations(pids)
+
+            HARDWARE_SERVICE.set_panel_overdrive(True)
+            if CONFIGURATION.games.get(gid) is None:
                 CONFIGURATION.games[gid] = GameEntry(name, PlatformProfile.PERFORMANCE.value)
                 CONFIGURATION.save_config()
-
             self.__set_profile_for_games()
             self._logger.rem_tab()
 
@@ -156,9 +156,10 @@ class SteamService:
         self._logger.info(f"Stopped {name}")
         if gid in self.running_games:
             del self.running_games[gid]
-            self._logger.add_tab()
-            self.__set_profile_for_games()
-            self._logger.rem_tab()
+        self._logger.add_tab()
+        HARDWARE_SERVICE.set_panel_overdrive(len(self.running_games) > 0)
+        self.__set_profile_for_games()
+        self._logger.rem_tab()
 
     @property
     def running_games(self):
@@ -189,57 +190,30 @@ class SteamService:
             self._rccdc_enabled = False
 
     def __copy_plugin(self, src: str, dst: str, is_update: bool):
-        subprocess.run(
-            f"cp -R {src} {USER_PLUGIN_FOLDER}",
-            capture_output=True,
-            text=True,
-            shell=True,
-            check=True,
-        )
+        SHELL.run_command(f"cp -R {src} {USER_PLUGIN_FOLDER}", False)
         if is_update:
-            subprocess.run(
-                f"sudo -S rm -R {dst}",
-                input=CRYPTOGRAPHY.decrypt_string(CONFIGURATION.settings.password) + "\n",
-                capture_output=True,
-                text=True,
-                shell=True,
-                check=True,
-            )
-        subprocess.run(
-            f"sudo -S cp -R {os.path.join(USER_PLUGIN_FOLDER, 'RCCDeckyCompanion')} dst",
-            input=CRYPTOGRAPHY.decrypt_string(CONFIGURATION.settings.password) + "\n",
-            capture_output=True,
-            text=True,
-            shell=True,
-            check=True,
-        )
-        Thread(
-            target=lambda: subprocess.run(
-                "sudo -S systemctl restart plugin_loader.service",
-                input=CRYPTOGRAPHY.decrypt_string(CONFIGURATION.settings.password) + "\n",
-                text=True,
-                shell=True,
-                check=True,
-            )
-        ).start()
+            SHELL.run_command(f"rm -R {dst}", True)
+        SHELL.run_command(f"cp -R {os.path.join(USER_PLUGIN_FOLDER, 'RCCDeckyCompanion')} {dst}", True)
+        Thread(target=lambda: SHELL.run_command("systemctl restart plugin_loader.service", True)).start()
 
     def get_games(self) -> dict[str, GameEntry]:
         """Get games and setting"""
         return CONFIGURATION.games
 
-    def set_game_profile(self, game: int, profile: PerformanceProfile = PerformanceProfile.PERFORMANCE):
+    def set_game_profile(self, game: int, profile: PerformanceProfile = PerformanceProfile.BALANCED):
         """Set profile for game"""
-        self._logger.info(f"Saving profile {profile.name.lower()} for {CONFIGURATION.games[game].name}")
-        CONFIGURATION.games[game].profile = profile.value
-        CONFIGURATION.save_config()
+        if CONFIGURATION.games.get(game) is None or CONFIGURATION.games.get(game).profile != profile.value:
+            self._logger.info(f"Saving profile {profile.name.lower()} for {CONFIGURATION.games[game].name}")
+            CONFIGURATION.games[game].profile = profile.value
+            CONFIGURATION.save_config()
 
     def set_profile_for_running_game(self, profile: PerformanceProfile):
         """If only one game is running store the profile"""
         if len(self.__running_games) == 1:
             game = next(iter(self.__running_games))
             self.set_game_profile(game, profile)
-            if PERFORMANCE_SERVICE.performance_profile != profile:
-                PERFORMANCE_SERVICE.set_performance_profile(
+            if PROFILE_SERVICE.performance_profile != profile:
+                PROFILE_SERVICE.set_performance_profile(
                     profile, temporal=True, game_name=CONFIGURATION.games[game].name
                 )
 
