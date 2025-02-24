@@ -20,7 +20,7 @@ class PerformanceProfile(IntEnum):
         return max(min_tdp, round(tdp * 0.6))
 
     @property
-    def ac_pl1_spl(self):
+    def ac_intel_pl1_spl(self):
         """Get AC PL1 SPL Watts value"""
         if not PL1_SPL_CLIENT.available:
             return None
@@ -35,20 +35,20 @@ class PerformanceProfile(IntEnum):
         return PL1_SPL_CLIENT.current_value
 
     @property
-    def battery_pl1_spl(self):
+    def battery_intel_pl1_spl(self):
         """Get battery PL1 SPL Watts value"""
         if not PL1_SPL_CLIENT.available:
             return None
-        return self.__ac_tdp_to_bat_tdp(self.ac_pl1_spl, PL1_SPL_CLIENT.min_value)
+        return self.__ac_tdp_to_bat_tdp(self.ac_intel_pl1_spl, PL1_SPL_CLIENT.min_value)
 
     @property
-    def ac_pl2_sppt(self):
+    def ac_intel_pl2_sppt(self):
         """Get AC PL2 SPPT Watts value"""
         if not PL2_SPPT_CLIENT.available:
             return None
 
         if not self.ac_boost:
-            return self.ac_pl1_spl
+            return self.ac_intel_pl1_spl
 
         if self == PerformanceProfile.PERFORMANCE:
             return int(PL2_SPPT_CLIENT.max_value * 1)
@@ -60,15 +60,15 @@ class PerformanceProfile(IntEnum):
         return PL2_SPPT_CLIENT.current_value
 
     @property
-    def battery_pl2_sppt(self):
+    def battery_intel_pl2_sppt(self):
         """Get battery PL2 SPPT Watts value"""
         if not PL2_SPPT_CLIENT.available:
             return None
 
         if not self.battery_boost:
-            return self.battery_pl1_spl
+            return self.battery_intel_pl1_spl
 
-        return self.__ac_tdp_to_bat_tdp(self.ac_pl2_sppt, PL2_SPPT_CLIENT.min_value)
+        return self.__ac_tdp_to_bat_tdp(self.ac_intel_pl2_sppt, PL2_SPPT_CLIENT.min_value)
 
     @property
     def ac_nv_boost(self):

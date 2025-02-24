@@ -1,9 +1,18 @@
 import concurrent
+import os
 from threading import Lock, Thread
+import time
+from typing import Callable, Optional, Dict, List
 
 import pyudev
+from watchdog.events import FileSystemEventHandler
+from watchdog.observers import Observer
 
 from framework.logger import Logger
+from rcc.communications.client.dbus.asus.armoury.intel.pl1_spl_client import PL1_SPL_CLIENT
+from rcc.communications.client.dbus.asus.armoury.intel.pl2_sppt_client import PL2_SPPT_CLIENT
+from rcc.communications.client.dbus.asus.armoury.nvidia.nv_boost_client import NV_BOOST_CLIENT
+from rcc.communications.client.dbus.asus.armoury.nvidia.nv_temp_client import NV_TEMP_CLIENT
 from rcc.communications.client.dbus.asus.armoury.panel_overdrive_client import PANEL_OVERDRIVE_CLIENT
 from rcc.communications.client.dbus.asus.core.platform_client import PLATFORM_CLIENT
 from rcc.communications.client.dbus.linux.switcheroo_client import SWITCHEROO_CLIENT
@@ -13,6 +22,7 @@ from rcc.gui.notifier import NOTIFIER
 from rcc.models.battery_threshold import BatteryThreshold
 from rcc.models.cpu_brand import CpuBrand
 from rcc.models.gpu_brand import GpuBrand
+from rcc.models.performance_profile import PerformanceProfile
 from rcc.models.usb_identifier import UsbIdentifier
 from rcc.utils.beans import EVENT_BUS, TRANSLATOR
 from rcc.utils.events import (
@@ -24,17 +34,48 @@ from rcc.utils.events import (
 from rcc.utils.shell import SHELL
 
 
+class BoostControlHandler(FileSystemEventHandler):
+    """Watcher for boost file changes"""
+
+    def __init__(self, path: str, on_value: str, callback: Callable[[bool], None]):
+        super().__init__()
+        self._path = path
+        self._on_value = on_value
+        self._callback = callback
+
+    def on_modified(self, event):
+        if event.src_path == self._path:
+            with open(self._path, "r") as f:
+                content = f.read().strip()
+            self._callback(content == self._on_value)
+
+
 class HardwareService:
     """Hardware service"""
 
     CPU_PRIORITY = -10
     IO_PRIORITY = int((CPU_PRIORITY + 20) / 5)
     IO_CLASS = 2
+    BOOST_CONTROLS: List[Dict[str, str]] = [
+        {
+            "path": "/sys/devices/system/cpu/intel_pstate/no_turbo",
+            "on": "0",
+            "off": "1",
+        },
+        {
+            "path": "/sys/devices/system/cpu/cpufreq/boost",
+            "on": "1",
+            "off": "0",
+        },
+    ]
 
     def __init__(self):
         self._logger = Logger()
         self._logger.info("Initializing HardwareService")
         self._logger.add_tab()
+
+        self._boost_control: Optional[Dict[str, str]] = None
+        self._last_boost: Optional[bool] = None
 
         self.__cpu = None
         resultado = SHELL.run_command("cat /proc/cpuinfo", output=True)[1]
@@ -46,6 +87,31 @@ class HardwareService:
                 self._logger.info(f"Hybrid CPU, performance cores: {self.__hp_cores}")
             self._logger.rem_tab()
             self.__cpu = CpuBrand.INTEL
+
+        for control in self.BOOST_CONTROLS:
+            if os.path.exists(control["path"]):
+                self._logger.info("CPU with available boost")
+
+                self._boost_control = control
+
+                with open(self._boost_control["path"], "r") as f:
+                    content = f.read().strip()
+                self._last_boost = self._boost_control["on"] == content
+
+                handler = BoostControlHandler(
+                    path=self._boost_control["path"],
+                    on_value=self._boost_control["on"],
+                    callback=self._update_boost_status,
+                )
+                self._observer = Observer()
+                self._observer.schedule(
+                    handler,
+                    path=os.path.dirname(self._boost_control["path"]),
+                    recursive=False,
+                )
+                self._observer.start()
+
+                break
 
         self.__gpu = None
         if SWITCHEROO_CLIENT.available:
@@ -70,6 +136,9 @@ class HardwareService:
         EVENT_BUS.on(STEAM_SERVICE_GAME_EVENT, self.__on_game_event)
 
         self._logger.rem_tab()
+
+    def _update_boost_status(self, is_on: bool):
+        self._last_boost = is_on
 
     def __determine_cpu_architecture(self):
         output = SHELL.run_command("lscpu -e", output=True)[1]
@@ -144,6 +213,11 @@ class HardwareService:
         self.__running_games = count
 
     @property
+    def boost_allowed(self) -> None:
+        """Boost flag"""
+        return self._boost_control is not None
+
+    @property
     def on_battery(self):
         """On battery flag"""
         return self.__on_bat
@@ -160,6 +234,16 @@ class HardwareService:
             self.__battery_charge_limit = value
             EVENT_BUS.emit(HARDWARE_SERVICE_BATTERY_THRESHOLD_CHANGED, value)
             NOTIFIER.show_toast(TRANSLATOR.translate("applied.battery.threshold", {"value": value.value}))
+
+    def set_boost_status(self, enabled: bool):
+        """Enable/disable cpu boost"""
+        if self.boost_allowed:
+            self._logger.info(f"CPU boost: {"ENABLED" if enabled else "DISABLED"}")
+            target = "on" if enabled else "off"
+            value = self._boost_control[target]
+            path = self._boost_control["path"]
+
+            SHELL.run_command(f"echo '{value}' | tee {path}", True)
 
     def __monitor_for_usb(self) -> None:  # pylint: disable=R0914, R0912
         """Monitor for usb devices changes"""
@@ -286,6 +370,49 @@ class HardwareService:
             )
         except Exception as e:
             self._logger.error(f"Could not set affinity of process {pid}: {e}")
+
+    def set_cpu_tdp(self, profile: PerformanceProfile):
+        """Set CPU TDP configuration"""
+        if HARDWARE_SERVICE.cpu == CpuBrand.INTEL:
+            pl1 = profile.ac_intel_pl1_spl
+            pl2 = profile.ac_intel_pl2_sppt
+            if pl1 is not None:
+                time.sleep(0.05)
+                self._logger.info("CPU power")
+
+                if UPOWER_CLIENT.on_battery:
+                    pl1 = profile.battery_intel_pl1_spl
+                    pl2 = profile.battery_intel_pl2_sppt
+
+                self._logger.info(f"  PL1: {pl1}W")
+                PL1_SPL_CLIENT.current_value = PL1_SPL_CLIENT.default_value
+                time.sleep(0.05)
+                PL1_SPL_CLIENT.current_value = pl1
+
+                if pl2 is not None:
+                    self._logger.info(f"  PL2: {pl2}W")
+                    PL2_SPPT_CLIENT.current_value = PL2_SPPT_CLIENT.default_value
+                    time.sleep(0.05)
+                    PL2_SPPT_CLIENT.current_value = pl2
+
+    def set_gpu_tgp(self, profile: PerformanceProfile):
+        """Set GPU TGP parameters"""
+        if self.__gpu == GpuBrand.NVIDIA:
+            nv = profile.ac_nv_boost
+            nt = profile.ac_nv_temp
+            if nv is not None or nt is not None:
+                self._logger.info("GPU power")
+                if UPOWER_CLIENT.on_battery:
+                    nv = profile.battery_nv_boost
+                    nt = profile.battery_nv_temp
+
+                if nv is not None:
+                    self._logger.info(f"  BST: {nv}W")
+                    NV_BOOST_CLIENT.current_value = nv
+
+                if nt is not None:
+                    self._logger.info(f"  TEM: {nt}ºC")
+                    NV_TEMP_CLIENT.current_value = nt
 
 
 HARDWARE_SERVICE = HardwareService()
