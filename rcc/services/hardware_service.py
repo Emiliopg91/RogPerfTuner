@@ -1,9 +1,9 @@
+import concurrent
 from threading import Lock, Thread
 
-import concurrent
 import pyudev
+
 from framework.logger import Logger
-from rcc.communications.client.dbus.asus.armoury.nvidia.nv_boost_client import NV_BOOST_CLIENT
 from rcc.communications.client.dbus.asus.armoury.panel_overdrive_client import PANEL_OVERDRIVE_CLIENT
 from rcc.communications.client.dbus.asus.core.platform_client import PLATFORM_CLIENT
 from rcc.communications.client.dbus.linux.switcheroo_client import SWITCHEROO_CLIENT
@@ -11,11 +11,13 @@ from rcc.communications.client.dbus.linux.upower_client import UPOWER_CLIENT
 from rcc.communications.client.tcp.openrgb.openrgb_client import OPEN_RGB_CLIENT
 from rcc.gui.notifier import NOTIFIER
 from rcc.models.battery_threshold import BatteryThreshold
+from rcc.models.cpu_brand import CpuBrand
+from rcc.models.gpu_brand import GpuBrand
 from rcc.models.usb_identifier import UsbIdentifier
 from rcc.utils.beans import EVENT_BUS, TRANSLATOR
 from rcc.utils.events import (
-    HARDWARE_SERVICE_ON_BATTERY,
     HARDWARE_SERVICE_BATTERY_THRESHOLD_CHANGED,
+    HARDWARE_SERVICE_ON_BATTERY,
     HARDWARE_SERVICE_ON_USB_CHANGED,
     STEAM_SERVICE_GAME_EVENT,
 )
@@ -34,6 +36,7 @@ class HardwareService:
         self._logger.info("Initializing HardwareService")
         self._logger.add_tab()
 
+        self.__cpu = None
         resultado = SHELL.run_command("cat /proc/cpuinfo", output=True)[1]
         if "GenuineIntel" in resultado:
             self._logger.info("Detected Intel CPU")
@@ -42,12 +45,16 @@ class HardwareService:
             if self.hp_cores is not None:
                 self._logger.info(f"Hybrid CPU, performance cores: {self.__hp_cores}")
             self._logger.rem_tab()
+            self.__cpu = CpuBrand.INTEL
 
+        self.__gpu = None
         if SWITCHEROO_CLIENT.available:
             self._logger.info("Detected GPUS: ")
             self._logger.add_tab()
             for gpu in sorted(SWITCHEROO_CLIENT.gpus, key=lambda x: (not x["Default"], x["Name"])):
                 self._logger.info(f"{"Discrete" if gpu["Discrete"] else "Integrated"} - {gpu["Name"]}")
+                if gpu["Discrete"]:
+                    self.__gpu = GpuBrand(gpu["Name"].split(" ")[0].lower())
             self._logger.rem_tab()
 
         self.__on_bat = UPOWER_CLIENT.on_battery
@@ -86,30 +93,32 @@ class HardwareService:
                 e_cores.append(cores_list[0])
 
         if len(p_cores) > 0 and len(e_cores) > 0:
-            numeros = sorted(set(p_cores))  # Asegura orden y elimina duplicados
-            grupos = []
-            inicio = numeros[0]
-            fin = numeros[0]
+            cores = sorted(set(p_cores))
+            groups = []
+            beg = cores[0]
+            end = cores[0]
 
-            for num in numeros[1:]:
-                if num == fin + 1:
-                    fin = num
+            for num in cores[1:]:
+                if num == end + 1:
+                    end = num
                 else:
-                    grupos.append(f"{inicio}-{fin}" if inicio != fin else str(inicio))
-                    inicio = fin = num
+                    groups.append(f"{beg}-{end}" if beg != end else str(beg))
+                    beg = end = num
 
-            grupos.append(f"{inicio}-{fin}" if inicio != fin else str(inicio))
-            return ",".join(grupos)
+            groups.append(f"{beg}-{end}" if beg != end else str(beg))
+            return ",".join(groups)
 
         return None
 
     @property
-    def gpu(self):
-        """dGPU brand"""
-        if NV_BOOST_CLIENT.available:
-            return "nvidia"
+    def gpu(self) -> GpuBrand | None:
+        """GPU brand"""
+        return self.__gpu
 
-        return None
+    @property
+    def cpu(self) -> CpuBrand | None:
+        """CPU brand"""
+        return self.__cpu
 
     @property
     def hp_cores(self):

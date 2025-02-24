@@ -1,21 +1,21 @@
-from dataclasses import dataclass
 import os
+import time
+from dataclasses import dataclass
 from threading import Thread
 
-import time
-
+from framework.logger import Logger
 from rcc.communications.client.websocket.steam.steam_client import STEAM_CLIENT
+from rcc.models.gpu_brand import GpuBrand
 from rcc.models.performance_profile import PerformanceProfile
-from rcc.models.settings import GameEntry
 from rcc.models.platform_profile import PlatformProfile
+from rcc.models.settings import GameEntry
 from rcc.services.hardware_service import HARDWARE_SERVICE
 from rcc.services.profile_service import PROFILE_SERVICE
+from rcc.utils.beans import EVENT_BUS
 from rcc.utils.configuration import CONFIGURATION
 from rcc.utils.constants import RCCDC_ASSET_PATH, USER_PLUGIN_FOLDER
-from rcc.utils.beans import EVENT_BUS
-from rcc.utils.shell import SHELL
 from rcc.utils.events import STEAM_SERVICE_CONNECTED, STEAM_SERVICE_DISCONNECTED, STEAM_SERVICE_GAME_EVENT
-from framework.logger import Logger
+from rcc.utils.shell import SHELL
 
 
 @dataclass
@@ -33,8 +33,11 @@ class SteamService:
     PLUGINS_FOLDER = os.path.expanduser(os.path.join("~", "homebrew", "plugins"))
     RCCDC_PATH = os.path.join(PLUGINS_FOLDER, "RCCDeckyCompanion")
 
-    ICD_FILES: dict[str, list[str]] = {
-        "nvidia": ["/usr/share/vulkan/icd.d/nvidia_icd.i686.json", "/usr/share/vulkan/icd.d/nvidia_icd.x86_64.json"]
+    ICD_FILES: dict[GpuBrand, list[str]] = {
+        GpuBrand.NVIDIA: [
+            "/usr/share/vulkan/icd.d/nvidia_icd.i686.json",
+            "/usr/share/vulkan/icd.d/nvidia_icd.x86_64.json",
+        ]
     }
 
     def __init__(self):
@@ -43,14 +46,14 @@ class SteamService:
         self._logger.add_tab()
         self._rccdc_enabled = False
         self.__running_games: dict[int, str] = {}
-        self.__gpu: str | None = HARDWARE_SERVICE.gpu
+        self.__gpu: GpuBrand | None = HARDWARE_SERVICE.gpu
         self.__steam_connnected = STEAM_CLIENT.connected
 
         if self.__gpu is None:
             self._logger.info("No discrete GPU found")
         else:
-            if not self.__exists_icd_files("nvidia"):
-                self._logger.warning(f"Missing ICD files for {self.__gpu.capitalize()} GPU, discarding")
+            if not self.__exists_icd_files(self.__gpu):
+                self._logger.warning(f"Missing ICD files for {self.__gpu.value.capitalize()} GPU, discarding")
                 self.__gpu = None
 
         STEAM_CLIENT.on_connected(self.__on_steam_connected)
@@ -63,7 +66,7 @@ class SteamService:
 
         self._logger.rem_tab()
 
-    def __exists_icd_files(self, brand: str) -> bool:
+    def __exists_icd_files(self, brand: GpuBrand) -> bool:
         for icd in self.ICD_FILES[brand]:
             if not os.path.exists(icd):
                 return False
@@ -71,7 +74,7 @@ class SteamService:
         return True
 
     @property
-    def gpu(self):
+    def gpu(self) -> GpuBrand:
         """GPU brand"""
         return self.__gpu
 
