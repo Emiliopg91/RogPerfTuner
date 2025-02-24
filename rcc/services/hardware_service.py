@@ -3,10 +3,10 @@ from threading import Lock, Thread
 import concurrent
 import pyudev
 from framework.logger import Logger
-from rcc.communications.client.dbus.asus.armoury.intel.pl1_spl_client import PL1_SPL_CLIENT
 from rcc.communications.client.dbus.asus.armoury.nvidia.nv_boost_client import NV_BOOST_CLIENT
 from rcc.communications.client.dbus.asus.armoury.panel_overdrive_client import PANEL_OVERDRIVE_CLIENT
 from rcc.communications.client.dbus.asus.core.platform_client import PLATFORM_CLIENT
+from rcc.communications.client.dbus.linux.switcheroo_client import SWITCHEROO_CLIENT
 from rcc.communications.client.dbus.linux.upower_client import UPOWER_CLIENT
 from rcc.communications.client.tcp.openrgb.openrgb_client import OPEN_RGB_CLIENT
 from rcc.gui.notifier import NOTIFIER
@@ -34,13 +34,21 @@ class HardwareService:
         self._logger.info("Initializing HardwareService")
         self._logger.add_tab()
 
-        if PL1_SPL_CLIENT.available:
+        resultado = SHELL.run_command("cat /proc/cpuinfo", output=True)[1]
+        if "GenuineIntel" in resultado:
             self._logger.info("Detected Intel CPU")
-            self.__hp_cores = None
-            self.__determine_cpu_architecture()
+            self._logger.add_tab()
+            self.__hp_cores = self.__determine_cpu_architecture()
+            if self.hp_cores is not None:
+                self._logger.info(f"Hybrid CPU, performance cores: {self.__hp_cores}")
+            self._logger.rem_tab()
 
-        if NV_BOOST_CLIENT.available:
-            self._logger.info("Detected Nvidia GPU")
+        if SWITCHEROO_CLIENT.available:
+            self._logger.info("Detected GPUS: ")
+            self._logger.add_tab()
+            for gpu in sorted(SWITCHEROO_CLIENT.gpus, key=lambda x: (not x["Default"], x["Name"])):
+                self._logger.info(f"{"Discrete" if gpu["Discrete"] else "Integrated"} - {gpu["Name"]}")
+            self._logger.rem_tab()
 
         self.__on_bat = UPOWER_CLIENT.on_battery
         self.__battery_charge_limit = PLATFORM_CLIENT.charge_control_end_threshold
@@ -78,8 +86,22 @@ class HardwareService:
                 e_cores.append(cores_list[0])
 
         if len(p_cores) > 0 and len(e_cores) > 0:
-            self.__hp_cores = p_cores
-            self._logger.info(f"Hybrid CPU found. High performance cores: {self.__hp_cores[0]}-{self.__hp_cores[-1]}")
+            numeros = sorted(set(p_cores))  # Asegura orden y elimina duplicados
+            grupos = []
+            inicio = numeros[0]
+            fin = numeros[0]
+
+            for num in numeros[1:]:
+                if num == fin + 1:
+                    fin = num
+                else:
+                    grupos.append(f"{inicio}-{fin}" if inicio != fin else str(inicio))
+                    inicio = fin = num
+
+            grupos.append(f"{inicio}-{fin}" if inicio != fin else str(inicio))
+            return ",".join(grupos)
+
+        return None
 
     @property
     def gpu(self):
@@ -223,7 +245,7 @@ class HardwareService:
     def apply_process_optimizations(self, pids):
         """Change CPU and IO nice value"""
         self._logger.info(
-            f"Setting CPU affinity to cores {self.__hp_cores[0]}-{self.__hp_cores[-1]}, "
+            f"Setting CPU affinity to cores {self.__hp_cores}, "
             + f"priority to {self.CPU_PRIORITY} and "
             + f"IO priority to {self.IO_PRIORITY}"
         )
@@ -238,7 +260,7 @@ class HardwareService:
     def __apply_affinity(self, pid):
         try:
             SHELL.run_command(
-                f"taskset -cp {self.__hp_cores[0]}-{self.__hp_cores[-1]} {pid}",
+                f"taskset -cp {self.__hp_cores} {pid}",
                 sudo=True,
                 check=True,
             )

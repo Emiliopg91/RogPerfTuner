@@ -144,10 +144,9 @@ class SteamService:
 
             pids = self.__get_pids(pid)
             HARDWARE_SERVICE.apply_process_optimizations(pids)
-
             HARDWARE_SERVICE.set_panel_overdrive(True)
             if CONFIGURATION.games.get(gid) is None:
-                CONFIGURATION.games[gid] = GameEntry(name, PlatformProfile.PERFORMANCE.value)
+                CONFIGURATION.games[gid] = GameEntry(name, PerformanceProfile.PERFORMANCE.value)
                 CONFIGURATION.save_config()
             self.__set_profile_for_games()
             self._logger.rem_tab()
@@ -200,7 +199,7 @@ class SteamService:
         """Get games and setting"""
         return CONFIGURATION.games
 
-    def set_game_profile(self, game: int, profile: PerformanceProfile = PerformanceProfile.BALANCED):
+    def set_game_profile(self, game: int, profile: PerformanceProfile = PerformanceProfile.PERFORMANCE):
         """Set profile for game"""
         if CONFIGURATION.games.get(game) is None or CONFIGURATION.games.get(game).profile != profile.value:
             self._logger.info(f"Saving profile {profile.name.lower()} for {CONFIGURATION.games[game].name}")
