@@ -5,7 +5,6 @@ from threading import Thread
 
 from framework.logger import Logger
 from rcc.communications.client.websocket.steam.steam_client import STEAM_CLIENT
-from rcc.models.gpu_brand import GpuBrand
 from rcc.models.performance_profile import PerformanceProfile
 from rcc.models.platform_profile import PlatformProfile
 from rcc.models.settings import GameEntry
@@ -33,28 +32,13 @@ class SteamService:
     PLUGINS_FOLDER = os.path.expanduser(os.path.join("~", "homebrew", "plugins"))
     RCCDC_PATH = os.path.join(PLUGINS_FOLDER, "RCCDeckyCompanion")
 
-    ICD_FILES: dict[GpuBrand, list[str]] = {
-        GpuBrand.NVIDIA: [
-            "/usr/share/vulkan/icd.d/nvidia_icd.i686.json",
-            "/usr/share/vulkan/icd.d/nvidia_icd.x86_64.json",
-        ]
-    }
-
     def __init__(self):
         self._logger = Logger()
         self._logger.info("Initializing SteamService")
         self._logger.add_tab()
         self._rccdc_enabled = False
         self.__running_games: dict[int, str] = {}
-        self.__gpu: GpuBrand | None = HARDWARE_SERVICE.gpu
         self.__steam_connnected = STEAM_CLIENT.connected
-
-        if self.__gpu is None:
-            self._logger.info("No discrete GPU found")
-        else:
-            if not self.__exists_icd_files(self.__gpu):
-                self._logger.warning(f"Missing ICD files for {self.__gpu.value.capitalize()} GPU, discarding")
-                self.__gpu = None
 
         STEAM_CLIENT.on_connected(self.__on_steam_connected)
         STEAM_CLIENT.on_disconnected(self.__on_steam_disconnected)
@@ -65,25 +49,6 @@ class SteamService:
             self.__on_steam_connected(True)
 
         self._logger.rem_tab()
-
-    def __exists_icd_files(self, brand: GpuBrand) -> bool:
-        for icd in self.ICD_FILES[brand]:
-            if not os.path.exists(icd):
-                return False
-
-        return True
-
-    @property
-    def gpu(self) -> GpuBrand:
-        """GPU brand"""
-        return self.__gpu
-
-    @property
-    def icd_files(self) -> list[str] | None:
-        """ICD files for GPU"""
-        if self.__gpu is not None:
-            return self.ICD_FILES[self.__gpu]
-        return None
 
     def __on_steam_connected(self, on_boot=False):
         self.__running_games = {}

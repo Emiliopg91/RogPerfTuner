@@ -68,8 +68,14 @@ class HardwareService:
             "off": "0",
         },
     ]
+    ICD_FILES: dict[GpuBrand, list[str]] = {
+        GpuBrand.NVIDIA: [
+            "/usr/share/vulkan/icd.d/nvidia_icd.i686.json",
+            "/usr/share/vulkan/icd.d/nvidia_icd.x86_64.json",
+        ]
+    }
 
-    def __init__(self):
+    def __init__(self):  # pylint: disable=R0912
         self._logger = Logger()
         self._logger.info("Initializing HardwareService")
         self._logger.add_tab()
@@ -77,20 +83,28 @@ class HardwareService:
         self._boost_control: Optional[Dict[str, str]] = None
         self._last_boost: Optional[bool] = None
 
+        self._logger.info("Detecting CPU")
+        self._logger.add_tab()
         self.__cpu = None
-        resultado = SHELL.run_command("cat /proc/cpuinfo", output=True)[1]
-        if "GenuineIntel" in resultado:
-            self._logger.info("Detected Intel CPU")
-            self._logger.add_tab()
-            self.__hp_cores = self.__determine_cpu_architecture()
-            if self.hp_cores is not None:
-                self._logger.info(f"Hybrid CPU, performance cores: {self.__hp_cores}")
-            self._logger.rem_tab()
+        output = SHELL.run_command("cat /proc/cpuinfo | head -n5", output=True)[1]
+        if "GenuineIntel" in output:
             self.__cpu = CpuBrand.INTEL
+            line = output.splitlines()[-1]
+            line = line[line.index(":") + 1 :].strip()
+            self._logger.info(line)
+        self._logger.add_tab()
+
+        self.__hp_cores = self.__determine_cpu_architecture()
+        if self.hp_cores is not None:
+            self._logger.info(f"Performance cores: {self.__hp_cores}")
+
+        if self.__cpu == CpuBrand.INTEL:
+            if PL1_SPL_CLIENT.available:
+                self._logger.info("TDP control available")
 
         for control in self.BOOST_CONTROLS:
             if os.path.exists(control["path"]):
-                self._logger.info("CPU with available boost")
+                self._logger.info("Boost control available")
 
                 self._boost_control = control
 
@@ -112,16 +126,34 @@ class HardwareService:
                 self._observer.start()
 
                 break
+        self._logger.rem_tab()
+        self._logger.rem_tab()
 
         self.__gpu = None
         if SWITCHEROO_CLIENT.available:
-            self._logger.info("Detected GPUS: ")
+            self._logger.info("Detecting GPU")
             self._logger.add_tab()
-            for gpu in sorted(SWITCHEROO_CLIENT.gpus, key=lambda x: (not x["Default"], x["Name"])):
-                self._logger.info(f"{"Discrete" if gpu["Discrete"] else "Integrated"} - {gpu["Name"]}")
-                if gpu["Discrete"]:
-                    self.__gpu = GpuBrand(gpu["Name"].split(" ")[0].lower())
-            self._logger.rem_tab()
+            gpus = [gpu for gpu in SWITCHEROO_CLIENT.gpus if gpu["Discrete"]]
+            for gpu in sorted(gpus, key=lambda x: (x["Name"])):
+                self._logger.info(f"{gpu["Name"]}")
+                self.__gpu = GpuBrand(gpu["Name"].split(" ")[0].lower())
+            self._logger.add_tab()
+
+        if self.__gpu == GpuBrand.NVIDIA:
+            if NV_BOOST_CLIENT.available:
+                self._logger.info("Dynamic boost control available")
+            if NV_TEMP_CLIENT.available:
+                self._logger.info("Throttle temperature control available")
+
+        self.__icd_files = None
+        if self.__gpu is not None:
+            if any(not os.path.exists(icd) for icd in self.ICD_FILES[self.__gpu]):
+                self._logger.error("Missing ICD files for Vulkan")
+            else:
+                self.__icd_files = self.ICD_FILES[self.__gpu]
+
+        self._logger.rem_tab()
+        self._logger.rem_tab()
 
         self.__on_bat = UPOWER_CLIENT.on_battery
         self.__battery_charge_limit = PLATFORM_CLIENT.charge_control_end_threshold
@@ -178,6 +210,11 @@ class HardwareService:
             return ",".join(groups)
 
         return None
+
+    @property
+    def icd_files(self) -> list[str] | None:
+        """ICD files for GPU"""
+        return self.__icd_files
 
     @property
     def gpu(self) -> GpuBrand | None:
@@ -378,7 +415,7 @@ class HardwareService:
             pl2 = profile.ac_intel_pl2_sppt
             if pl1 is not None:
                 time.sleep(0.05)
-                self._logger.info("CPU power")
+                self._logger.info(f"{self.cpu.capitalize()} CPU")
 
                 if UPOWER_CLIENT.on_battery:
                     pl1 = profile.battery_intel_pl1_spl
@@ -401,17 +438,17 @@ class HardwareService:
             nv = profile.ac_nv_boost
             nt = profile.ac_nv_temp
             if nv is not None or nt is not None:
-                self._logger.info("GPU power")
+                self._logger.info(f"{self.gpu.capitalize()} GPU")
                 if UPOWER_CLIENT.on_battery:
                     nv = profile.battery_nv_boost
                     nt = profile.battery_nv_temp
 
                 if nv is not None:
-                    self._logger.info(f"  BST: {nv}W")
+                    self._logger.info(f"  Dynamic Boost: {nv}W")
                     NV_BOOST_CLIENT.current_value = nv
 
                 if nt is not None:
-                    self._logger.info(f"  TEM: {nt}ºC")
+                    self._logger.info(f"  Throttle temp: {nt}ºC")
                     NV_TEMP_CLIENT.current_value = nt
 
 

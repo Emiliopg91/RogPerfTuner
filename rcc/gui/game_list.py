@@ -13,6 +13,7 @@ from PyQt5.QtCore import Qt
 from PyQt5.QtGui import QIcon
 
 from rcc.communications.client.websocket.steam.steam_client import SteamGameDetails, STEAM_CLIENT
+from rcc.services.hardware_service import HARDWARE_SERVICE
 from rcc.utils.constants import ICONS_PATH
 from rcc.models.performance_profile import PerformanceProfile
 from rcc.services.steam_service import STEAM_SERVICE
@@ -58,8 +59,11 @@ class GameList(QDialog):
             game_cfg = STEAM_SERVICE.get_games()
             appids = list(game_cfg.keys())
 
-            columns = [TRANSLATOR.translate("game.title"), TRANSLATOR.translate("profile")]
-            if STEAM_SERVICE.gpu is not None:
+            columns = [
+                TRANSLATOR.translate("game.title"),
+                TRANSLATOR.translate("profile"),
+            ]
+            if HARDWARE_SERVICE.icd_files is not None:
                 columns.append(TRANSLATOR.translate("used.gpu"))
 
             table = QTableWidget(len(appids), len(columns))
@@ -91,6 +95,7 @@ class GameList(QDialog):
                     # Primera columna: Titulo
                     item = QTableWidgetItem(game.name)
                     item.setFlags(Qt.ItemIsEnabled)
+                    item.setToolTip(f"{game.appid}")
                     table.setItem(row, col, item)
                     col += 1
 
@@ -113,7 +118,7 @@ class GameList(QDialog):
                     table.setCellWidget(row, col, profile_combo)
                     col += 1
 
-                    if STEAM_SERVICE.gpu is not None:
+                    if HARDWARE_SERVICE.icd_files is not None:
                         # Tercera columna: GPU
                         gpu_combo = NoScrollComboBox()  # Usar la subclase personalizada
                         gpu_combo.addItem(TRANSLATOR.translate("label.dgpu.auto"), False)
@@ -126,7 +131,7 @@ class GameList(QDialog):
                                 widget, game
                             )
                         )
-                        gpu_combo.setEnabled(game.is_steam_app)
+                        # gpu_combo.setEnabled(game.is_steam_app)
 
                         table.setCellWidget(row, col, gpu_combo)
                         col += 1
@@ -149,7 +154,7 @@ class GameList(QDialog):
 
     def __on_gpu_changed(self, widget, game: SteamGameDetails):
         enabled = widget.currentData()
-        vk_opt = f"VK_ICD_FILENAMES={":".join(STEAM_SERVICE.icd_files)} "
+        vk_opt = f"VK_ICD_FILENAMES={":".join(HARDWARE_SERVICE.icd_files)} "
         launch_opts = game.launch_opts
         if enabled:
             if launch_opts is None:

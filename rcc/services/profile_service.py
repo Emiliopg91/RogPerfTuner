@@ -162,8 +162,11 @@ class ProfileService:
             PLATFORM_CLIENT.enable_ppt_group = True
             time.sleep(0.05)
 
+            self._logger.info("Advanced parameters")
+            self._logger.add_tab()
             HARDWARE_SERVICE.set_cpu_tdp(profile)
             HARDWARE_SERVICE.set_gpu_tgp(profile)
+            self._logger.rem_tab()
 
             self._logger.rem_tab()
         except Exception as e:
