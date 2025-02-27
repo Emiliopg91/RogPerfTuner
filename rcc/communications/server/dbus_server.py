@@ -7,7 +7,7 @@ from PyQt5.QtDBus import QDBusConnection, QDBusAbstractAdaptor
 from rcc.services.steam_service import STEAM_SERVICE
 from rcc.services.rgb_service import RGB_SERVICE
 from rcc.services.profile_service import PROFILE_SERVICE
-from rcc.utils.constants import SCRIPTS_FOLDER
+from rcc.utils.constants import USER_SCRIPTS_FOLDER
 from framework.logger import Logger
 from framework.singleton import singleton
 
@@ -93,10 +93,10 @@ class DBusServer:
             "nextProfile.sh": "nextProfile",
         }
 
-        os.makedirs(SCRIPTS_FOLDER, exist_ok=True)
+        os.makedirs(USER_SCRIPTS_FOLDER, exist_ok=True)
 
         for file, action in self._file_actions.items():
-            file_path = os.path.join(SCRIPTS_FOLDER, file)
+            file_path = os.path.join(USER_SCRIPTS_FOLDER, file)
             script_content = f"""#!/bin/bash
                 gdbus call --session --dest {SERVICE_NAME} --object-path {OBJECT_PATH} --method {INTERFACE_NAME}.{action}
             """

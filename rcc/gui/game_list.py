@@ -13,10 +13,11 @@ from PyQt5.QtCore import Qt
 from PyQt5.QtGui import QIcon
 
 from rcc.communications.client.websocket.steam.steam_client import SteamGameDetails, STEAM_CLIENT
+from rcc.models.mangohud_level import MangoHudLevel
 from rcc.services.hardware_service import HARDWARE_SERVICE
-from rcc.utils.constants import ICONS_PATH
 from rcc.models.performance_profile import PerformanceProfile
 from rcc.services.steam_service import STEAM_SERVICE
+from rcc.utils.constants import ICONS_PATH
 from rcc.utils.events import STEAM_SERVICE_CONNECTED
 from rcc.utils.gui_utils import NoScrollComboBox
 from rcc.utils.beans import EVENT_BUS, TRANSLATOR
@@ -29,7 +30,7 @@ class GameList(QDialog):
 
     def __init__(self, parent: QWidget, manage_parent=False):  # pylint: disable=R0914
         super().__init__(parent)
-        if GameList.INSTANCE is None:
+        if GameList.INSTANCE is None:  # pylint: disable=R1702
             GameList.INSTANCE = self
             self.__parent = parent
             self.__manage_parent = manage_parent
@@ -62,9 +63,10 @@ class GameList(QDialog):
             columns = [
                 TRANSLATOR.translate("game.title"),
                 TRANSLATOR.translate("profile"),
+                TRANSLATOR.translate("used.gpu"),
             ]
-            if HARDWARE_SERVICE.icd_files is not None:
-                columns.append(TRANSLATOR.translate("used.gpu"))
+            if STEAM_SERVICE.metrics_enabled:
+                columns.append(TRANSLATOR.translate("metrics"))
 
             table = QTableWidget(len(appids), len(columns))
             table.setSizeAdjustPolicy(QAbstractScrollArea.AdjustToContents)
@@ -92,14 +94,14 @@ class GameList(QDialog):
             for game in game_details:
                 try:
                     col = 0
-                    # Primera columna: Titulo
+                    # Title
                     item = QTableWidgetItem(game.name)
                     item.setFlags(Qt.ItemIsEnabled)
                     item.setToolTip(f"{game.appid}")
                     table.setItem(row, col, item)
                     col += 1
 
-                    # Segunda columna: perfil
+                    # Profile
                     profile_combo = NoScrollComboBox()  # Usar la subclase personalizada
                     for profile in reversed(PerformanceProfile):
                         profile_combo.addItem(TRANSLATOR.translate(f"label.profile.{profile.name}"), profile)
@@ -118,22 +120,37 @@ class GameList(QDialog):
                     table.setCellWidget(row, col, profile_combo)
                     col += 1
 
-                    if HARDWARE_SERVICE.icd_files is not None:
-                        # Tercera columna: GPU
-                        gpu_combo = NoScrollComboBox()  # Usar la subclase personalizada
-                        gpu_combo.addItem(TRANSLATOR.translate("label.dgpu.auto"), False)
-                        gpu_combo.addItem(TRANSLATOR.translate("label.dgpu.discrete"), True)
+                    # GPU
+                    gpu_combo = NoScrollComboBox()  # Usar la subclase personalizada
+                    gpu_combo.addItem(TRANSLATOR.translate("label.dgpu.auto"), None)
+                    gpu_combo.setCurrentIndex(0)
+                    for i, gpu in enumerate(HARDWARE_SERVICE.gpus):
+                        gpu_combo.addItem(f"{gpu.value.capitalize()}", gpu)
+                        if gpu == STEAM_SERVICE.get_prefered_gpu(game.launch_opts):
+                            gpu_combo.setCurrentIndex(i + 1)
 
-                        gpu_combo.setCurrentIndex(1 if game.gpu else 0)
+                    gpu_combo.currentIndexChanged.connect(
+                        lambda _, widget=gpu_combo, game=game: self.__on_gpu_changed(  # pylint: disable=C0301
+                            widget, game
+                        )
+                    )
+                    table.setCellWidget(row, col, gpu_combo)
+                    col += 1
 
-                        gpu_combo.currentIndexChanged.connect(
-                            lambda _, widget=gpu_combo, game=game: self.__on_gpu_changed(  # pylint: disable=C0301
+                    # Metrics
+                    if STEAM_SERVICE.metrics_enabled:
+                        metrics_combo = NoScrollComboBox()  # Usar la subclase personalizada
+                        for level in MangoHudLevel:
+                            metrics_combo.addItem(TRANSLATOR.translate(f"label.level.{level}"), level)
+                            if level == STEAM_SERVICE.get_metrics_level(game.launch_opts):
+                                metrics_combo.setCurrentIndex(level.value)
+
+                        metrics_combo.currentIndexChanged.connect(
+                            lambda _, widget=metrics_combo, game=game: self.__on_metrics_changed(  # pylint: disable=C0301
                                 widget, game
                             )
                         )
-                        # gpu_combo.setEnabled(game.is_steam_app)
-
-                        table.setCellWidget(row, col, gpu_combo)
+                        table.setCellWidget(row, col, metrics_combo)
                         col += 1
 
                     row += 1
@@ -152,22 +169,13 @@ class GameList(QDialog):
         selected_profile = widget.currentData()  # Obtiene el objeto asociado al elemento seleccionado
         STEAM_SERVICE.set_game_profile(game_id, selected_profile)
 
+    def __on_metrics_changed(self, widget, game: SteamGameDetails):
+        level = widget.currentData()
+        game.launch_opts = STEAM_SERVICE.set_metrics_level(level, game.appid, game.launch_opts)
+
     def __on_gpu_changed(self, widget, game: SteamGameDetails):
-        enabled = widget.currentData()
-        vk_opt = f"VK_ICD_FILENAMES={":".join(HARDWARE_SERVICE.icd_files)} "
-        launch_opts = game.launch_opts
-        if enabled:
-            if launch_opts is None:
-                launch_opts = ""
-            if "%command%" not in launch_opts:
-                launch_opts = f"{launch_opts.strip()} %command%"
-            launch_opts = f"{vk_opt} {launch_opts.strip()}"
-        else:
-            launch_opts = launch_opts.replace(vk_opt, "").strip()
-            if launch_opts == "%command%":
-                launch_opts = ""
-        STEAM_CLIENT.set_launch_options(game.appid, launch_opts)
-        game.launch_opts = launch_opts
+        gpu_brand = widget.currentData()
+        game.launch_opts = STEAM_SERVICE.set_prefered_gpu(gpu_brand, game.appid, game.launch_opts)
 
     def show(self):
         """Override default show behaviour"""

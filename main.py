@@ -32,11 +32,11 @@ def create_qt_application() -> QApplication:
 def initialize_application():  # pylint:disable=R0914
     """Application startup"""
     import os
-    from rcc.utils.constants import DEV_MODE, USER_UPDATE_FOLDER, LOG_FILE, LOG_FOLDER, LOG_OLD_FOLDER
+    from rcc.utils.constants import DEV_MODE, USER_UPDATE_FOLDER, LOG_FILE, USER_LOG_FOLDER, LOG_OLD_FOLDER
 
     from framework.logger import Logger
 
-    Logger.initialize(LOG_FILE, LOG_FOLDER, LOG_OLD_FOLDER)
+    Logger.initialize(LOG_FILE, USER_LOG_FOLDER, LOG_OLD_FOLDER)
     logger = Logger("Main")
 
     if DEV_MODE:

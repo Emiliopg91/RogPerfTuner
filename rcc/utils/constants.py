@@ -45,6 +45,23 @@ USER_BIN_FOLDER = os.path.join(USER_FOLDER, "bin")
 if not os.path.exists(USER_BIN_FOLDER):
     os.makedirs(USER_BIN_FOLDER)
 
+USER_CONFIG_FOLDER = os.path.join(USER_FOLDER, "config")
+
+if not os.path.exists(USER_CONFIG_FOLDER):
+    os.makedirs(USER_CONFIG_FOLDER)
+
+USER_SCRIPTS_FOLDER = os.path.join(USER_FOLDER, "scripts")
+
+if not os.path.exists(USER_SCRIPTS_FOLDER):
+    os.makedirs(USER_SCRIPTS_FOLDER)
+
+USER_LOG_FOLDER = os.path.join(USER_FOLDER, "logs")
+
+if not os.path.exists(USER_LOG_FOLDER):
+    os.makedirs(USER_LOG_FOLDER)
+
+LOCK_FILE = os.path.join(USER_FOLDER, f"{__app_name__}.pid")
+
 AUTOSTART_FILE = os.path.expanduser(os.path.join("~", ".config", "autostart", f"{__app_name__}.desktop"))
 
 APP_DRAW_FILE = os.path.expanduser(os.path.join("~", ".local", "share", "applications", f"{__app_name__}.desktop"))
@@ -63,16 +80,8 @@ RCCDC_ASSET_PATH = os.path.join(BASE_PATH, "assets", "RCCDeckyCompanion")
 
 UDEV_PATH = os.path.join(BASE_PATH, "assets", "60-openrgb.rules")
 
-LOCK_FILE = os.path.join(USER_FOLDER, f"{__app_name__}.pid")
+CONFIG_FILE = os.path.join(USER_CONFIG_FOLDER, "config.yml")
 
-CONFIG_FOLDER = os.path.join(USER_FOLDER, "config")
+LOG_OLD_FOLDER = os.path.join(USER_LOG_FOLDER, "old")
 
-SCRIPTS_FOLDER = os.path.join(USER_FOLDER, "scripts")
-
-CONFIG_FILE = os.path.join(CONFIG_FOLDER, "config.yml")
-
-LOG_FOLDER = os.path.join(USER_FOLDER, "logs")
-
-LOG_OLD_FOLDER = os.path.join(LOG_FOLDER, "old")
-
-LOG_FILE = os.path.join(LOG_FOLDER, f"{datetime.now().strftime("%Y-%m-%d %H:%M:%S")}.log")
+LOG_FILE = os.path.join(USER_LOG_FOLDER, f"{datetime.now().strftime("%Y-%m-%d %H:%M:%S")}.log")

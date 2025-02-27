@@ -182,5 +182,33 @@
   "used.gpu": {
     "en": "GPU",
     "es": "GPU"
+  },
+  "metrics": {
+    "en": "Metrics",
+    "es": "Métricas"
+  }, 
+  "label.level":{
+    "en":"Level",
+    "es": "Nivel"
+  },
+  "label.level.0":{
+    "en":"Disabled",
+    "es": "Desactivado"
+  },
+  "label.level.1":{
+    "en":"Only FPS",
+    "es": "Solo FPS"
+  },
+  "label.level.2":{
+    "en":"Horizontal",
+    "es": "Horizontal"
+  },
+  "label.level.3":{
+    "en":"Extended",
+    "es": "Extendido"
+  },
+  "label.level.4":{
+    "en":"Detailed",
+    "es": "Detallado"
   }
 }

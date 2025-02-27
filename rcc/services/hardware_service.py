@@ -4,6 +4,7 @@ from threading import Lock, Thread
 import time
 from typing import Callable, Optional, Dict, List
 
+from psutil import Process
 import pyudev
 from watchdog.events import FileSystemEventHandler
 from watchdog.observers import Observer
@@ -68,12 +69,6 @@ class HardwareService:
             "off": "0",
         },
     ]
-    ICD_FILES: dict[GpuBrand, list[str]] = {
-        GpuBrand.NVIDIA: [
-            "/usr/share/vulkan/icd.d/nvidia_icd.i686.json",
-            "/usr/share/vulkan/icd.d/nvidia_icd.x86_64.json",
-        ]
-    }
 
     def __init__(self):  # pylint: disable=R0912
         self._logger = Logger()
@@ -129,30 +124,31 @@ class HardwareService:
         self._logger.rem_tab()
         self._logger.rem_tab()
 
-        self.__gpu = None
+        self.__gpus = []
+        self.__icd_files = {}
         if SWITCHEROO_CLIENT.available:
             self._logger.info("Detecting GPU")
             self._logger.add_tab()
-            gpus = [gpu for gpu in SWITCHEROO_CLIENT.gpus if gpu["Discrete"]]
+            gpus = list(SWITCHEROO_CLIENT.gpus)
             for gpu in sorted(gpus, key=lambda x: (x["Name"])):
                 self._logger.info(f"{gpu["Name"]}")
-                self.__gpu = GpuBrand(gpu["Name"].split(" ")[0].lower())
-            self._logger.add_tab()
+                brand = GpuBrand(gpu["Name"].split(" ")[0].lower())
 
-        if self.__gpu == GpuBrand.NVIDIA:
-            if NV_BOOST_CLIENT.available:
-                self._logger.info("Dynamic boost control available")
-            if NV_TEMP_CLIENT.available:
-                self._logger.info("Throttle temperature control available")
+                self._logger.add_tab()
+                if any(not os.path.exists(icd) for icd in self.get_icd_files(brand)):
+                    self._logger.error("Missing ICD files for Vulkan")
+                else:
+                    self._logger.error("ICD files found")
+                    self.__gpus.append(brand)
 
-        self.__icd_files = None
-        if self.__gpu is not None:
-            if any(not os.path.exists(icd) for icd in self.ICD_FILES[self.__gpu]):
-                self._logger.error("Missing ICD files for Vulkan")
-            else:
-                self.__icd_files = self.ICD_FILES[self.__gpu]
+                    if brand == GpuBrand.NVIDIA:
+                        if NV_BOOST_CLIENT.available:
+                            self._logger.info("Dynamic boost control available")
+                        if NV_TEMP_CLIENT.available:
+                            self._logger.info("Throttle temperature control available")
 
-        self._logger.rem_tab()
+                self._logger.rem_tab()
+
         self._logger.rem_tab()
 
         self.__on_bat = UPOWER_CLIENT.on_battery
@@ -168,6 +164,13 @@ class HardwareService:
         EVENT_BUS.on(STEAM_SERVICE_GAME_EVENT, self.__on_game_event)
 
         self._logger.rem_tab()
+
+    def get_icd_files(self, gpu: GpuBrand):
+        """Get path to ICD files"""
+        return [
+            f"/usr/share/vulkan/icd.d/{gpu.value}_icd.i686.json",
+            f"/usr/share/vulkan/icd.d/{gpu.value}_icd.x86_64.json",
+        ]
 
     def _update_boost_status(self, is_on: bool):
         self._last_boost = is_on
@@ -217,9 +220,9 @@ class HardwareService:
         return self.__icd_files
 
     @property
-    def gpu(self) -> GpuBrand | None:
+    def gpus(self) -> list[GpuBrand]:
         """GPU brand"""
-        return self.__gpu
+        return self.__gpus
 
     @property
     def cpu(self) -> CpuBrand | None:
@@ -372,20 +375,70 @@ class HardwareService:
         if PANEL_OVERDRIVE_CLIENT.available:
             PANEL_OVERDRIVE_CLIENT.current_value = 1 if enabled else 0
 
-    def apply_process_optimizations(self, pids):
-        """Change CPU and IO nice value"""
-        self._logger.info(
-            f"Setting CPU affinity to cores {self.__hp_cores}, "
-            + f"priority to {self.CPU_PRIORITY} and "
-            + f"IO priority to {self.IO_PRIORITY}"
-        )
+    def apply_proccess_optimizations(self, pid: int, first_run=True):
+        """Apply optimizations to the process tree"""
+        if first_run:
+            self._logger.info(
+                f"Setting CPU affinity to cores {self.__hp_cores}, "
+                + f"priority to {self.CPU_PRIORITY} and "
+                + f"IO priority to {self.IO_PRIORITY}"
+            )
+
+        pending = [pid]
+        processed = []
+        futures = []
 
         with concurrent.futures.ThreadPoolExecutor() as executor:
-            futures = []
-            for pid in pids:
-                futures.append(executor.submit(lambda pid=pid: self.__apply_affinity(pid)))
-                futures.append(executor.submit(lambda pid=pid: self.__apply_priority(pid)))
+            while True:
+                new_pids_found = False
+
+                while pending:
+                    pid = pending.pop(0)
+                    if pid not in processed:
+                        futures.append(executor.submit(self.__apply_process_optimizations, pid))
+                        processed.append(pid)
+
+                    try:
+                        for child in Process(pid).children():
+                            if child.pid not in pending and child.pid not in processed:
+                                pending.append(child.pid)
+                                new_pids_found = True
+                    except Exception:
+                        pass
+
+                concurrent.futures.wait(futures)
+
+                if not new_pids_found:
+                    break
+
+                pending = processed
+                processed = []
+
+                time.sleep(0.05)
+
             concurrent.futures.wait(futures)
+
+        if first_run:
+            self._logger.info(f"Optimized {len(processed)} processes")
+            secs = 60
+            Thread(target=lambda: self.__keep_optimizing(pid, secs, processed)).start()
+            self._logger.info(f"Optimizations will keep running in background for {secs} seconds")
+
+        return len(processed)
+
+    def __keep_optimizing(self, pid, time_len, processed):
+        t0 = time.time()
+        beg = len(processed)
+        last = beg
+        while time.time() - t0 < time_len:
+            time.sleep(0.5)
+            last = max(last, self.apply_proccess_optimizations(pid, False))
+
+        self._logger.info(f"Optimization finished for {last-beg} additional processes")
+
+    def __apply_process_optimizations(self, pid):
+        self.__apply_affinity(pid)
+        self.__apply_priority(pid)
 
     def __apply_affinity(self, pid):
         try:
@@ -395,7 +448,7 @@ class HardwareService:
                 check=True,
             )
         except Exception as e:
-            self._logger.error(f"Could not set affinity of process {pid}: {e}")
+            self._logger.debug(f"Could not set affinity of process {pid}: {e}")
 
     def __apply_priority(self, pid):
         try:
@@ -406,7 +459,7 @@ class HardwareService:
                 check=True,
             )
         except Exception as e:
-            self._logger.error(f"Could not set affinity of process {pid}: {e}")
+            self._logger.debug(f"Could not set affinity of process {pid}: {e}")
 
     def set_cpu_tdp(self, profile: PerformanceProfile):
         """Set CPU TDP configuration"""
@@ -434,11 +487,11 @@ class HardwareService:
 
     def set_gpu_tgp(self, profile: PerformanceProfile):
         """Set GPU TGP parameters"""
-        if self.__gpu == GpuBrand.NVIDIA:
+        if GpuBrand.NVIDIA in self.__gpus:
             nv = profile.ac_nv_boost
             nt = profile.ac_nv_temp
             if nv is not None or nt is not None:
-                self._logger.info(f"{self.gpu.capitalize()} GPU")
+                self._logger.info("Nvidia GPU")
                 if UPOWER_CLIENT.on_battery:
                     nv = profile.battery_nv_boost
                     nt = profile.battery_nv_temp

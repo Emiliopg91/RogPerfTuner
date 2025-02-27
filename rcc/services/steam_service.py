@@ -1,10 +1,12 @@
 import os
-import time
+import re
 from dataclasses import dataclass
 from threading import Thread
 
 from framework.logger import Logger
 from rcc.communications.client.websocket.steam.steam_client import STEAM_CLIENT
+from rcc.models.gpu_brand import GpuBrand
+from rcc.models.mangohud_level import MangoHudLevel
 from rcc.models.performance_profile import PerformanceProfile
 from rcc.models.platform_profile import PlatformProfile
 from rcc.models.settings import GameEntry
@@ -40,6 +42,8 @@ class SteamService:
         self.__running_games: dict[int, str] = {}
         self.__steam_connnected = STEAM_CLIENT.connected
 
+        self.__metrics_available = SHELL.run_command("which mangohud", check=False) == 0
+
         STEAM_CLIENT.on_connected(self.__on_steam_connected)
         STEAM_CLIENT.on_disconnected(self.__on_steam_disconnected)
         STEAM_CLIENT.on_launch_game(self.__launch_game)
@@ -71,6 +75,11 @@ class SteamService:
         """Flag for steam connection"""
         return self.__steam_connnected
 
+    @property
+    def metrics_enabled(self):
+        """Flag metrics availability"""
+        return self.__metrics_available
+
     def __set_profile_for_games(self):
         if len(self.__running_games) > 0:
             profile = PerformanceProfile.QUIET
@@ -89,29 +98,13 @@ class SteamService:
 
         EVENT_BUS.emit(STEAM_SERVICE_GAME_EVENT, len(self.__running_games))
 
-    def __get_pids(self, parent_pid):
-        pids = []
-
-        output = SHELL.run_command(
-            "pstree -p " + str(parent_pid) + " | awk -F'[()]' '{for(i=2;i<=NF;i+=2) print $i}'", False, True, True
-        )[1]
-        for _ in range(0, 3):
-            for line in output.splitlines():
-                pid = int(line.strip())
-                if pid not in pids:
-                    pids.append(pid)
-            time.sleep(0.05)
-
-        return pids
-
     def __launch_game(self, gid: int, name: str, pid: int):
         self._logger.info(f"Launched {name} with PID {pid}")
         if gid not in self.running_games:
             self.__running_games[gid] = name
             self._logger.add_tab()
 
-            pids = self.__get_pids(pid)
-            HARDWARE_SERVICE.apply_process_optimizations(pids)
+            HARDWARE_SERVICE.apply_proccess_optimizations(pid)
             HARDWARE_SERVICE.set_panel_overdrive(True)
             if CONFIGURATION.games.get(gid) is None:
                 CONFIGURATION.games[gid] = GameEntry(name, PerformanceProfile.PERFORMANCE.value)
@@ -183,6 +176,58 @@ class SteamService:
                 PROFILE_SERVICE.set_performance_profile(
                     profile, temporal=True, game_name=CONFIGURATION.games[game].name
                 )
+
+    def get_metrics_level(self, launch_options) -> MangoHudLevel:
+        """Get level from game launch option"""
+        if "mangohud %command%" in launch_options:
+            if "MANGOHUD_CONFIG=preset=" in launch_options:
+                match = re.search(r"(?<=preset=)(-?\d+)", launch_options)
+                if match:
+                    return MangoHudLevel(int(match.group(0)))
+
+        return MangoHudLevel.NO_DISPLAY
+
+    def set_metrics_level(self, level: MangoHudLevel, app_id, launch_options) -> MangoHudLevel:
+        """Set level for game launch option"""
+        launch_opts = re.sub(r"MANGOHUD=[^ ]+ MANGOHUD_CONFIG=[^ ]+ mangohud", "", launch_options).strip()
+        if level > 0:
+            ml_opt = f"MANGOHUD=1 MANGOHUD_CONFIG=preset={level.value} mangohud"
+            if launch_opts is None:
+                launch_opts = ""
+            if "%command%" not in launch_opts:
+                launch_opts = f"%command% {launch_opts.strip()}"
+            launch_opts = launch_opts.replace("%command%", f"{ml_opt} %command%")
+        else:
+            if launch_opts == "%command%":
+                launch_opts = ""
+        STEAM_CLIENT.set_launch_options(app_id, launch_opts)
+
+        return launch_opts
+
+    def get_prefered_gpu(self, launch_options) -> GpuBrand | None:
+        """Get GPU from game launch option"""
+        for gpu in HARDWARE_SERVICE.gpus:
+            if f"VK_ICD_FILENAMES={":".join(HARDWARE_SERVICE.get_icd_files(gpu))} " in launch_options:
+                return gpu
+
+        return None
+
+    def set_prefered_gpu(self, gpu_brand: GpuBrand, app_id, launch_options) -> MangoHudLevel:
+        """Set gpu for game launch option"""
+        launch_opts = re.sub(r"VK_ICD_FILENAMES=[^ ]+", "", launch_options).strip()
+        if gpu_brand is not None:
+            vk_opt = f"VK_ICD_FILENAMES={":".join(HARDWARE_SERVICE.get_icd_files(gpu_brand))} "
+            if launch_opts is None:
+                launch_opts = ""
+            if "%command%" not in launch_opts:
+                launch_opts = f"%command% {launch_opts.strip()}"
+            launch_opts = f"{vk_opt} {launch_opts.strip()}"
+        else:
+            if launch_opts == "%command%":
+                launch_opts = ""
+        STEAM_CLIENT.set_launch_options(app_id, launch_opts)
+
+        return launch_opts
 
 
 STEAM_SERVICE = SteamService()

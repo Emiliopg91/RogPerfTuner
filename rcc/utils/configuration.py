@@ -13,7 +13,7 @@ from rcc.models.settings import (
     OpenRgb,
 )
 from rcc.models.performance_profile import PerformanceProfile
-from rcc.utils.constants import CONFIG_FILE, CONFIG_FOLDER
+from rcc.utils.constants import CONFIG_FILE, USER_CONFIG_FOLDER
 from framework.singleton import singleton
 from framework.logger import Logger
 
@@ -35,8 +35,8 @@ class Configuration:
             self._config = Config.from_json(json_output)  # pylint: disable=E1101
             Logger.set_config_map(self._config.logger)
         else:
-            if not os.path.exists(CONFIG_FOLDER):
-                os.makedirs(CONFIG_FOLDER, exist_ok=True)
+            if not os.path.exists(USER_CONFIG_FOLDER):
+                os.makedirs(USER_CONFIG_FOLDER, exist_ok=True)
 
             self._config = Config(
                 logger={},

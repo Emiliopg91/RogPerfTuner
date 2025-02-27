@@ -10,6 +10,7 @@ class Shell:
 
     def __init__(self):
         self.__logger = Logger()
+        self.__pwd = CRYPTOGRAPHY.decrypt_string(CONFIGURATION.settings.password) + "\n"
 
     def run_command(self, command, sudo=False, check=True, output=False):
         """Run command on shell"""
@@ -17,7 +18,7 @@ class Shell:
         input_txt = None
         if sudo:
             final_cmd = f'sudo -S bash -c "{final_cmd}"'
-            input_txt = CRYPTOGRAPHY.decrypt_string(CONFIGURATION.settings.password) + "\n"
+            input_txt = self.__pwd
 
         self.__logger.debug(f"Running command '{final_cmd}'")
         t0 = time.time()
