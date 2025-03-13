@@ -1,4 +1,3 @@
-from math import floor
 import re
 from framework.singleton import singleton
 from rcc.communications.client.tcp.openrgb.client.utils import DeviceType, RGBColor
