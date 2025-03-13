@@ -33,10 +33,10 @@ from framework.singleton import singleton
 
 
 @singleton
-class TrayIcon:  # pylint: disable=R0902
+class TrayIcon:  # pylint: disable=too-many-instance-attributes
     """Tray icon class"""
 
-    def __init__(self):  # pylint: disable=R0915
+    def __init__(self):  # pylint: disable=too-many-statements
         self._logger = Logger()
         self._last_trigger = None
 
@@ -161,13 +161,13 @@ class TrayIcon:  # pylint: disable=R0902
 
             self._ac_connected_action = QAction("AC connected")
             self._ac_connected_action.triggered.connect(
-                lambda: PROFILE_SERVICE._on_ac_battery_change(False, False)  # pylint: disable=W0212
+                lambda: PROFILE_SERVICE._on_ac_battery_change(False, False)  # pylint: disable=protected-access
             )
             self._simulation_menu.addAction(self._ac_connected_action)
 
             self._ac_disconnected_action = QAction("AC disconnected")
             self._ac_disconnected_action.triggered.connect(
-                lambda: PROFILE_SERVICE._on_ac_battery_change(True, False)  # pylint: disable=W0212
+                lambda: PROFILE_SERVICE._on_ac_battery_change(True, False)  # pylint: disable=protected-access
             )
             self._simulation_menu.addAction(self._ac_disconnected_action)
 
@@ -186,7 +186,7 @@ class TrayIcon:  # pylint: disable=R0902
 
                 self._launch_game_action = QAction("Launch game")
                 self._launch_game_action.triggered.connect(
-                    lambda: EVENT_BUS.emit("SteamClient.launch_game", 2891404929, "Metroid Fusion")
+                    lambda: EVENT_BUS.emit("SteamClient.launch_game", 2891404929, "Metroid Fusion", os.getpid())
                 )
                 self._simulation_menu.addAction(self._launch_game_action)
 

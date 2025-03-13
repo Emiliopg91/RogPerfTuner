@@ -24,7 +24,7 @@ class Drops(AbstractEffect):
     def apply_effect(self):
         self._buffer = [None] * len(self._devices)
         threads = []
-        for i in range(len(self._devices)):  # pylint: disable=C0200
+        for i in range(len(self._devices)):  # pylint: disable=consider-using-enumerate
             self._buffer[i] = []
             thread = threading.Thread(
                 name=f"Drops-dev-{i}",

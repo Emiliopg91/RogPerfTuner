@@ -7,8 +7,7 @@ import sys
 
 from rcc import __app_name__
 
-# pylint: disable=E1101
-DEV_MODE = not hasattr(sys, "frozen") or not sys.frozen
+DEV_MODE = not hasattr(sys, "frozen") or not sys.frozen  # pylint: disable=no-member
 
 USER_FOLDER = os.path.expanduser(os.path.join("~", ".config", __app_name__))
 

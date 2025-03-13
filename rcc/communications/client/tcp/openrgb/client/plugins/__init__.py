@@ -1,4 +1,4 @@
-# pylint: disable=C0116
+# pylint: disable=missing-function-docstring
 from __future__ import annotations
 from rcc.communications.client.tcp.openrgb.client.utils import Plugin
 from rcc.communications.client.tcp.openrgb.client.network import NetworkClient

@@ -54,7 +54,7 @@ if __name__ == "__main__":
 
     def restart_main():
         """Reinicia el subproceso que ejecuta main.py."""
-        global MAIN_PROCESS  # pylint: disable=W0603
+        global MAIN_PROCESS  # pylint: disable=
         if MAIN_PROCESS:
             print("Changes detected, restarting main.py...")
             MAIN_PROCESS.terminate()

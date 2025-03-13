@@ -1,4 +1,4 @@
-# pylint: disable=C0415
+# pylint: disable=import-outside-toplevel
 import datetime
 import os
 import shutil

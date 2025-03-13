@@ -174,7 +174,7 @@ contextmanager-decorators=contextlib.contextmanager
 generated-members=
 ignore-none=yes
 ignore-on-opaque-inference=yes
-ignored-checks-for-mixins=no-member,
+ignored-checks-for-mixins=,
                           not-async-context-manager,
                           not-context-manager,
                           attribute-defined-outside-init

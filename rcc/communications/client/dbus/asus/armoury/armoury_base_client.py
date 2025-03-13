@@ -1,4 +1,4 @@
-# pylint: disable=R0801
+# pylint: disable=duplicate-code
 
 from PyQt5.QtCore import QMetaType
 from PyQt5.QtDBus import QDBusVariant, QDBusArgument
@@ -9,7 +9,9 @@ from rcc.communications.client.dbus.asus.asus_base_client import AsusBaseClient
 class ArmouryBaseClient(AsusBaseClient):
     """DBus platform client"""
 
-    def __init__(self, object_path_sufix: str, required=True):  # pylint: disable=R0913,R0917
+    def __init__(
+        self, object_path_sufix: str, required=True
+    ):  # pylint: disable=too-many-arguments,too-many-positional-arguments
         super().__init__("AsusArmoury", "asus_armoury/" + object_path_sufix, required)
         if self.available:
             self.__min_value = self._get_property("MinValue")

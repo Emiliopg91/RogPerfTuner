@@ -10,6 +10,7 @@ import time
 from rcc.communications.client.tcp.openrgb.client.orgb import Device, OpenRGBClient
 from rcc.communications.client.tcp.openrgb.client.utils import RGBColor
 
+from rcc.communications.client.tcp.openrgb.effects.gaming import GAMING_EFFECT
 from rcc.models.rgb_brightness import RgbBrightness
 from rcc.models.usb_identifier import UsbIdentifier
 from rcc.utils.constants import ORGB_PATH, UDEV_PATH
@@ -46,6 +47,7 @@ class OpenRgbClient:
             DANCE_FLOOR_EFFECT,
             DIGITAL_RAIN_EFFECT,
             DROPS_EFFECT,
+            GAMING_EFFECT,
             RAINBOW_WAVE_EFFECT,
             SPECTRUM_CYCLE_EFFECT,
             STARRY_NIGHT_EFFECT,
@@ -118,24 +120,19 @@ class OpenRgbClient:
         return self._compatible_devices
 
     def _stop_orgb_process(self):
-        self._orgb_process.kill()
+        if self._orgb_process is not None:
+            self._orgb_process.kill()
 
     def _runner(self):
         command = [ORGB_PATH, "--server-host", "localhost", "--server-port", str(self._port)]
         if "--orgb-gui" in sys.argv:
             command.append("--gui")
-        self._orgb_process = subprocess.Popen(  # pylint: disable=R1732,
+        self._orgb_process = subprocess.Popen(  # pylint: disable=consider-using-with
             command,
             stdout=subprocess.PIPE,
             stderr=subprocess.PIPE,
             text=True,
         )
-
-        for _ in self._orgb_process.stdout:
-            pass
-
-        for _ in self._orgb_process.stderr:
-            pass
 
         self._orgb_process.wait()
         self.logger.info(f"OpenRgb finished with code {self._orgb_process.returncode}")
@@ -155,7 +152,7 @@ class OpenRgbClient:
 
         if compatible_devices is None:
             if os.path.exists(UDEV_PATH):
-                regex = r'SUBSYSTEMS==".*?", ATTRS{idVendor}=="([0-9a-fA-F]+)", ATTRS{idProduct}=="([0-9a-fA-F]+)".*?TAG\+="([a-zA-Z0-9_]+)"'  # pylint: disable=C0301
+                regex = r'SUBSYSTEMS==".*?", ATTRS{idVendor}=="([0-9a-fA-F]+)", ATTRS{idProduct}=="([0-9a-fA-F]+)".*?TAG\+="([a-zA-Z0-9_]+)"'  # pylint: disable=line-too-long
                 with open(UDEV_PATH, "r") as file:
                     content = file.read()
                 lines = content.split("\n")

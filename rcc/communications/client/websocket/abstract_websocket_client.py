@@ -109,7 +109,7 @@ class AbstractWebsocketClient(ABC):
         self._logger.debug(f"Received message: '{input_msg}'")
         message: MessageType = None
         try:
-            message = MessageType.from_json(input_msg)  # pylint: disable=E1101
+            message = MessageType.from_json(input_msg)  # pylint: disable=no-member
         except Exception as e:
             message = None
             self._logger.debug(f"Error on message parsing: {e}")
@@ -134,7 +134,7 @@ class AbstractWebsocketClient(ABC):
             self.__responses[msg_id] = queue.Queue()
 
             self._logger.debug("Sending request")
-            self.send_message(message.to_json())  # pylint: disable=E1101
+            self.send_message(message.to_json())  # pylint: disable=raise-missing-from,no-member
             self._logger.debug(f"Waiting {int(timeout*1000)} ms for response")
 
             response = None
@@ -149,11 +149,11 @@ class AbstractWebsocketClient(ABC):
             except queue.Empty:
                 del self.__responses[msg_id]
                 self._logger.debug(f"No response after {int(1000*(time.time()-t0))} ms")
-                raise WebSocketTimeoutError(  # pylint: disable=W0707
+                raise WebSocketTimeoutError(  # pylint: disable=raise-missing-from
                     f"No response after {int(1000*(time.time()-t0))} ms"
                 )
         else:
-            raise ConnectionError("No connection to server")  # pylint: disable=W0707
+            raise ConnectionError("No connection to server")  # pylint: disable=
 
     def on(self, event: str, callback: Callable[..., None]):
         """Defines handler for event"""

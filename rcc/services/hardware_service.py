@@ -1,4 +1,4 @@
-import concurrent
+from math import floor
 import os
 from threading import Lock, Thread
 import time
@@ -54,8 +54,8 @@ class BoostControlHandler(FileSystemEventHandler):
 class HardwareService:
     """Hardware service"""
 
-    CPU_PRIORITY = -10
-    IO_PRIORITY = int((CPU_PRIORITY + 20) / 5)
+    CPU_PRIORITY = -15
+    IO_PRIORITY = floor((CPU_PRIORITY + 20) / 5)
     IO_CLASS = 2
     BOOST_CONTROLS: List[Dict[str, str]] = [
         {
@@ -70,7 +70,7 @@ class HardwareService:
         },
     ]
 
-    def __init__(self):  # pylint: disable=R0912
+    def __init__(self):  # pylint: disable=too-many-branches
         self._logger = Logger()
         self._logger.info("Initializing HardwareService")
         self._logger.add_tab()
@@ -126,28 +126,28 @@ class HardwareService:
 
         self.__gpus = []
         self.__icd_files = {}
-        if SWITCHEROO_CLIENT.available:
+        if SWITCHEROO_CLIENT.available:  # pylint: disable=too-many-nested-blocks
             self._logger.info("Detecting GPU")
             self._logger.add_tab()
             gpus = list(SWITCHEROO_CLIENT.gpus)
             for gpu in sorted(gpus, key=lambda x: (x["Name"])):
                 self._logger.info(f"{gpu["Name"]}")
-                brand = GpuBrand(gpu["Name"].split(" ")[0].lower())
+                if gpu["Discrete"]:
+                    brand = GpuBrand(gpu["Name"].split(" ")[0].lower())
+                    self._logger.add_tab()
+                    if any(not os.path.exists(icd) for icd in self.get_icd_files(brand)):
+                        self._logger.error("Missing ICD files for Vulkan")
+                    else:
+                        self._logger.error("ICD files found")
+                        self.__gpus.append(brand)
 
-                self._logger.add_tab()
-                if any(not os.path.exists(icd) for icd in self.get_icd_files(brand)):
-                    self._logger.error("Missing ICD files for Vulkan")
-                else:
-                    self._logger.error("ICD files found")
-                    self.__gpus.append(brand)
+                        if brand == GpuBrand.NVIDIA:
+                            if NV_BOOST_CLIENT.available:
+                                self._logger.info("Dynamic boost control available")
+                            if NV_TEMP_CLIENT.available:
+                                self._logger.info("Throttle temperature control available")
 
-                    if brand == GpuBrand.NVIDIA:
-                        if NV_BOOST_CLIENT.available:
-                            self._logger.info("Dynamic boost control available")
-                        if NV_TEMP_CLIENT.available:
-                            self._logger.info("Throttle temperature control available")
-
-                self._logger.rem_tab()
+                    self._logger.rem_tab()
 
         self._logger.rem_tab()
 
@@ -285,7 +285,7 @@ class HardwareService:
 
             SHELL.run_command(f"echo '{value}' | tee {path}", True)
 
-    def __monitor_for_usb(self) -> None:  # pylint: disable=R0914, R0912
+    def __monitor_for_usb(self) -> None:  # pylint: disable=too-many-locals, too-many-branches
         """Monitor for usb devices changes"""
         monitor = pyudev.Monitor.from_netlink(pyudev.Context())
         monitor.filter_by("usb")
@@ -304,9 +304,9 @@ class HardwareService:
                 if cd.id_vendor == usb_dev.id_vendor and cd.id_product == usb_dev.id_product:
                     self._connected_usb.append(cd)
 
-        for action, _ in monitor:  # pylint: disable=R1702
+        for action, _ in monitor:  # pylint: disable=too-many-nested-blocks
             if action in ["add", "remove"]:
-                self._usb_mutex.acquire(True)  # pylint: disable=R1732
+                self._usb_mutex.acquire(True)  # pylint: disable=consider-using-with
                 try:
                     lsusb_output = SHELL.run_command("lsusb", output=True)[1].strip()
 
@@ -386,46 +386,51 @@ class HardwareService:
 
         pending = [pid]
         processed = []
-        futures = []
 
-        with concurrent.futures.ThreadPoolExecutor() as executor:
-            while True:
-                new_pids_found = False
+        while True:
+            new_pids_found = False
 
-                while pending:
-                    pid = pending.pop(0)
-                    if pid not in processed:
-                        futures.append(executor.submit(self.__apply_process_optimizations, pid))
-                        processed.append(pid)
-
+            while pending:
+                pid = pending.pop(0)
+                if pid not in processed:
                     try:
-                        for child in Process(pid).children():
-                            if child.pid not in pending and child.pid not in processed:
-                                pending.append(child.pid)
-                                new_pids_found = True
-                    except Exception:
-                        pass
+                        SHELL.run_command(
+                            f"renice -n {self.CPU_PRIORITY} -p {pid} && "
+                            + f"ionice -c {self.IO_CLASS} -n {self.IO_PRIORITY} -p {pid}",
+                            # + f"ionice -c {self.IO_CLASS} -n {self.IO_PRIORITY} -p {pid} && "
+                            # + f"taskset -cp {self.__hp_cores} {pid}",
+                            sudo=True,
+                            check=True,
+                        )
+                    except Exception as e:
+                        self._logger.debug(f"Could not apply optimizations for process {pid}: {e}")
+                    processed.append(pid)
 
-                concurrent.futures.wait(futures)
+                try:
+                    for child in Process(pid).children():
+                        if child.pid not in pending and child.pid not in processed:
+                            pending.append(child.pid)
+                            new_pids_found = True
+                except Exception:
+                    pass
 
-                if not new_pids_found:
-                    break
+            if not new_pids_found:
+                break
 
-                pending = processed
-                processed = []
+            pending = processed
+            processed = []
 
-                time.sleep(0.05)
-
-            concurrent.futures.wait(futures)
+            time.sleep(0.05)
 
         if first_run:
             self._logger.info(f"Optimized {len(processed)} processes")
-            secs = 60
-            Thread(target=lambda: self.__keep_optimizing(pid, secs, processed)).start()
-            self._logger.info(f"Optimizations will keep running in background for {secs} seconds")
+            # secs = 60
+            # Thread(target=lambda: self.__keep_optimizing(pid, secs, processed)).start()
+            # self._logger.info(f"Optimizations will keep running in background for {secs} seconds")
 
         return len(processed)
 
+    """
     def __keep_optimizing(self, pid, time_len, processed):
         t0 = time.time()
         beg = len(processed)
@@ -434,32 +439,9 @@ class HardwareService:
             time.sleep(0.5)
             last = max(last, self.apply_proccess_optimizations(pid, False))
 
-        self._logger.info(f"Optimization finished for {last-beg} additional processes")
-
-    def __apply_process_optimizations(self, pid):
-        self.__apply_affinity(pid)
-        self.__apply_priority(pid)
-
-    def __apply_affinity(self, pid):
-        try:
-            SHELL.run_command(
-                f"taskset -cp {self.__hp_cores} {pid}",
-                sudo=True,
-                check=True,
-            )
-        except Exception as e:
-            self._logger.debug(f"Could not set affinity of process {pid}: {e}")
-
-    def __apply_priority(self, pid):
-        try:
-            SHELL.run_command(
-                f"renice -n {self.CPU_PRIORITY} -p {pid} && "
-                + f"ionice -c {self.IO_CLASS} -n {self.IO_PRIORITY} -p {pid}",
-                sudo=True,
-                check=True,
-            )
-        except Exception as e:
-            self._logger.debug(f"Could not set affinity of process {pid}: {e}")
+        if last - beg > 0:
+            self._logger.info(f"Optimization finished for {last-beg} additional processes")
+    """
 
     def set_cpu_tdp(self, profile: PerformanceProfile):
         """Set CPU TDP configuration"""

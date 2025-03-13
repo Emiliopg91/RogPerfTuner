@@ -1,4 +1,4 @@
-# pylint: disable=R0801
+# pylint: disable=duplicate-code
 
 from PyQt5.QtCore import Qt
 from PyQt5.QtGui import QColor, QIcon, QPixmap
@@ -153,7 +153,9 @@ class MainWindow(QMainWindow):
         self.setCentralWidget(central_widget)
         GuiUtils.center_window_on_current_screen(self)
 
-        EVENT_BUS.on(HARDWARE_SERVICE_BATTERY_THRESHOLD_CHANGED, self.set_battery_charge_limit)  # pylint: disable=R0801
+        EVENT_BUS.on(
+            HARDWARE_SERVICE_BATTERY_THRESHOLD_CHANGED, self.set_battery_charge_limit
+        )  # pylint: disable=duplicate-code
         EVENT_BUS.on(PLATFORM_SERVICE_PROFILE_CHANGED, self.set_performance_profile)
         EVENT_BUS.on(OPENRGB_SERVICE_AURA_CHANGED, self.set_aura_state)
         EVENT_BUS.on(STEAM_SERVICE_GAME_EVENT, self.on_game_event)
@@ -169,7 +171,7 @@ class MainWindow(QMainWindow):
         enable = running_games == 0
         self._game_profile_button.setEnabled(enable)
 
-    def closeEvent(self, event):  # pylint: disable=C0103
+    def closeEvent(self, event):  # pylint: disable=invalid-name
         """Override the close event to hide the window instead of closing it."""
         event.ignore()
         self.hide()

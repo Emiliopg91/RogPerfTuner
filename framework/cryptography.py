@@ -2,7 +2,7 @@ from base64 import urlsafe_b64encode, urlsafe_b64decode
 
 import os
 
-# pylint: disable=E0611,E0401
+# pylint: disable=no-name-in-module, import-error
 from cryptography.hazmat.primitives.ciphers import Cipher, algorithms, modes
 from cryptography.hazmat.backends import default_backend
 

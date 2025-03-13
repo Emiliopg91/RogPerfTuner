@@ -79,6 +79,13 @@ class HelloServiceAdaptor(QDBusAbstractAdaptor):
         """Decrease brightness"""
         return self.service.decrease_brightness()
 
+    @pyqtSlot(int, str, result=str, name="launchGame")
+    def launch_game(self, app_id: int, command: str):
+        """Decrease brightness"""
+        print("Request game launch:")
+        print(f"  AppId: {app_id}")
+        print(f"  Command: {command}")
+
 
 @singleton
 class DBusServer:

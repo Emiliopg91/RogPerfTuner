@@ -1,4 +1,4 @@
-# pylint: disable=C0115,C0116,W0613,C0123,C0301,R0913,R0917,W0622,C0116,R1720,W0107,C0112,W0612,R0914,R1710,W0212,C0103
+# pylint: disable=missing-class-docstring,missing-function-docstring,unused-argument,unidiomatic-typecheck,line-too-long,too-many-arguments,too-many-positional-arguments,redefined-builtin,missing-function-docstring,no-else-raise,empty-docstring,unused-variable,too-many-locals,inconsistent-return-statements,protected-access,invalid-name,no-member,W0107
 from __future__ import annotations
 import colorsys
 from enum import IntEnum, IntFlag
@@ -704,7 +704,7 @@ class RGBObject:
     """
 
     def __repr__(self):
-        return f"{type(self).__name__}(name={self.name}, id={self.id})"  # pylint: disable=E1101
+        return f"{type(self).__name__}(name={self.name}, id={self.id})"
 
     def set_color(self, color: RGBColor, fast: bool = False):
         """
@@ -725,7 +725,7 @@ class RGBObject:
         Gets the current status from the SDK server, ensuring a correct
         internal state.
         """
-        self.comms.requestDeviceData(self.device_id)  # pylint: disable=E1101
+        self.comms.requestDeviceData(self.device_id)  # pylint: disable=
 
 
 class RGBContainer(RGBObject):

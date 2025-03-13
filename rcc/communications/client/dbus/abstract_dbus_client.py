@@ -10,7 +10,7 @@ from framework.logger import Logger
 class AbstractDbusClient(ABC):
     """Base class for dbus clients"""
 
-    def __init__(  # pylint: disable=R0913,R0917
+    def __init__(  # pylint: disable=too-many-arguments,too-many-positional-arguments
         self, system_bus: bool, service_name: str, object_path: str, interface_name: str, required=True
     ):
         self._logger = Logger(self.__class__.__name__)
@@ -27,7 +27,7 @@ class AbstractDbusClient(ABC):
         if not self._available:
             if required:
                 raise Exception(
-                    f"Not found {"system" if system_bus else "session"} DBus service {service_name} with path {object_path} and interface {interface_name}"  # pylint: disable=C0301
+                    f"Not found {"system" if system_bus else "session"} DBus service {service_name} with path {object_path} and interface {interface_name}"  # pylint: disable=line-too-long
                 )
             self._logger.warning("DBus service not available")
         else:

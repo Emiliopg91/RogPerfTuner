@@ -15,11 +15,11 @@ class Asset:
     """Class for hold asset data"""
 
     def __init__(self, url, size):
-        self._url = url
-        self._size = size
+        self.url = url
+        self.size = size
 
     def __repr__(self):
-        return f"Asset(url={self._url}, size={self._size})"
+        return f"Asset(url={self.url}, size={self.size})"
 
 
 class AutoUpdater:
@@ -27,7 +27,7 @@ class AutoUpdater:
 
     CHECK_INTERVAL = 24 * 60 * 60
 
-    def __init__(  # pylint: disable=R0913,R0917
+    def __init__(  # pylint: disable=too-many-arguments,too-many-positional-arguments
         self,
         app_name: str,
         version: str,
@@ -70,7 +70,7 @@ class AutoUpdater:
                 self._logger.info("No update found")
                 time.sleep(self.CHECK_INTERVAL)
             else:
-                self.download_update(data._url)  # pylint: disable=W0212
+                self.download_update(data.url)
                 if not self.dev_mode:
                     self.copy_file(self._update_path)
                     self.restart_method()

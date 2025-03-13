@@ -7,7 +7,7 @@ from framework.logger import Logger
 class Translator:
     """Class for locale translation"""
 
-    LANGUAGE = locale.getdefaultlocale()[0].split("_")[0]  # pylint: disable=W4902
+    LANGUAGE = locale.getlocale()[0].split("_")[0]
 
     def __init__(self, translation_file: str):
         self._logger = Logger()

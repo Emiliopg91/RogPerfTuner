@@ -1,6 +1,6 @@
 #!/bin/env python3
 
-# pylint: disable=C0415, C0413, C0412, C0411
+# pylint: disable=import-outside-toplevel, wrong-import-position, ungrouped-imports, wrong-import-order
 
 import asyncio
 from qasync import QEventLoop
@@ -29,7 +29,7 @@ def create_qt_application() -> QApplication:
     return q_app, q_loop
 
 
-def initialize_application():  # pylint:disable=R0914
+def initialize_application():  # pylint:disable=too-many-locals
     """Application startup"""
     import os
     from rcc.utils.constants import DEV_MODE, USER_UPDATE_FOLDER, LOG_FILE, USER_LOG_FOLDER, LOG_OLD_FOLDER
@@ -71,7 +71,7 @@ def initialize_application():  # pylint:disable=R0914
     if CONFIGURATION.settings.password is None:
         PASSWORD_DIALOG.show()
 
-    from rcc.services.rgb_service import RGB_SERVICE  # pylint: disable=W0611
+    from rcc.services.rgb_service import RGB_SERVICE  # pylint: disable=unused-import
 
     """Install Decky plugin"""
     from rcc.services.steam_service import STEAM_SERVICE

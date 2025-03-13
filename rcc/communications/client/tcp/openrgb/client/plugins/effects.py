@@ -1,4 +1,4 @@
-# pylint: disable=C0115,C0116,W0613,C0123
+# pylint: disable=missing-class-docstring,missing-function-docstring,unused-argument,unidiomatic-typecheck
 
 from __future__ import annotations
 from dataclasses import dataclass

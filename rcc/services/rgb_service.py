@@ -129,7 +129,7 @@ class RgbService:
 
         return "#000000"
 
-    def apply_effect(self, effect: str) -> None:
+    def apply_effect(self, effect: str, temporal=False) -> None:
         """Apply effect"""
         color = None
         if OPEN_RGB_CLIENT.supports_color(effect):
@@ -138,7 +138,7 @@ class RgbService:
             else:
                 color = OPEN_RGB_CLIENT.get_color(effect)
 
-        self._apply_aura(effect, self.brightness, color)
+        self._apply_aura(effect, self.brightness, color, temporal=temporal)
 
     def apply_brightness(self, brightness: RgbBrightness) -> None:
         """Apply brightness"""
@@ -148,7 +148,11 @@ class RgbService:
         """Apply color"""
         self._apply_aura(self._effect, self._brightness, color)
 
-    def _apply_aura(  # pylint: disable=R0913,R0917
+    def restore_effect(self):
+        """Restore last not temporal effect"""
+        self.apply_effect(CONFIGURATION.open_rgb.last_effect)
+
+    def _apply_aura(  # pylint: disable=too-many-arguments,too-many-positional-arguments
         self,
         effect: str,
         brightness: RgbBrightness,

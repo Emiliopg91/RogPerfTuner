@@ -28,9 +28,9 @@ class GameList(QDialog):
 
     INSTANCE: QDialog = None
 
-    def __init__(self, parent: QWidget, manage_parent=False):  # pylint: disable=R0914
+    def __init__(self, parent: QWidget, manage_parent=False):  # pylint: disable=too-many-locals
         super().__init__(parent)
-        if GameList.INSTANCE is None:  # pylint: disable=R1702
+        if GameList.INSTANCE is None:  # pylint: disable=too-many-nested-blocks
             GameList.INSTANCE = self
             self.__parent = parent
             self.__manage_parent = manage_parent
@@ -89,7 +89,7 @@ class GameList(QDialog):
 
             # Llenar la tabla con datos
             row = 0
-            game_details = STEAM_CLIENT.get_apps_details(*appids)  # pylint: disable=W0612
+            game_details = STEAM_CLIENT.get_apps_details(*appids)  # pylint: disable=unused-variable
             game_details = sorted(game_details, key=lambda item: item.name)
             for game in game_details:
                 try:
@@ -130,7 +130,7 @@ class GameList(QDialog):
                             gpu_combo.setCurrentIndex(i + 1)
 
                     gpu_combo.currentIndexChanged.connect(
-                        lambda _, widget=gpu_combo, game=game: self.__on_gpu_changed(  # pylint: disable=C0301
+                        lambda _, widget=gpu_combo, game=game: self.__on_gpu_changed(  # pylint: disable=line-too-long
                             widget, game
                         )
                     )
@@ -146,7 +146,7 @@ class GameList(QDialog):
                                 metrics_combo.setCurrentIndex(level.value)
 
                         metrics_combo.currentIndexChanged.connect(
-                            lambda _, widget=metrics_combo, game=game: self.__on_metrics_changed(  # pylint: disable=C0301
+                            lambda _, widget=metrics_combo, game=game: self.__on_metrics_changed(  # pylint: disable=line-too-long
                                 widget, game
                             )
                         )
@@ -186,7 +186,7 @@ class GameList(QDialog):
             if self.__manage_parent:
                 self.__parent.hide()
 
-    def closeEvent(self, event):  # pylint: disable=C0103
+    def closeEvent(self, event):  # pylint: disable=invalid-name
         """Override default closeEvent behaviour"""
         if GameList.INSTANCE == self:
             if self.__manage_parent:

@@ -42,7 +42,7 @@ class StarryNight(AbstractEffect):
         while self._is_running and device.enabled:
             new_colors = [None] * len(device.leds)
 
-            for i in range(len(leds)):  # pylint: disable=C0200
+            for i in range(len(leds)):  # pylint: disable=consider-using-enumerate
                 steps[i] = max(0, steps[i] - 1)
                 new_colors[i] = leds[i] * (steps[i] / self._max_steps)
 

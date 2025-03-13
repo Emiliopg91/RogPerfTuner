@@ -4,7 +4,9 @@ from rcc.communications.client.dbus.abstract_dbus_client import AbstractDbusClie
 class AsusBaseClient(AbstractDbusClient):
     """DBus platform client"""
 
-    def __init__(self, interface_sufix: str, object_path_sufix: str = "", required=True):  # pylint: disable=R0913,R0917
+    def __init__(
+        self, interface_sufix: str, object_path_sufix: str = "", required=True
+    ):  # pylint: disable=too-many-arguments,too-many-positional-arguments
         object_sufix = object_path_sufix
         if object_sufix != "":
             object_sufix = "/" + object_sufix

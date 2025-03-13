@@ -1,4 +1,4 @@
-# pylint: disable=C0115,C0116,W0613,C0123,C0301,R0913,R0917,W0622,C0116,R1720,W0107,C0112,W0612,R0914,R1710,W0212,C0103,R0912,C0200,W0401,W0231,W0614
+# pylint: disable=missing-class-docstring,missing-function-docstring,unused-argument,unidiomatic-typecheck,line-too-long,too-many-arguments,too-many-positional-arguments,redefined-builtin,missing-function-docstring,no-else-raise,W0107,empty-docstring,unused-variable,too-many-locals,inconsistent-return-statements,protected-access,invalid-name,too-many-branches,consider-using-enumerate,wildcard-import,super-init-not-called,unused-wildcard-import
 from __future__ import annotations
 from typing import Union, Any, Optional
 from os import environ

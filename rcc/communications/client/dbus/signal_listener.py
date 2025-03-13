@@ -18,7 +18,7 @@ class SignalListener(QObject):
         self.sys_bus = QDBusConnection.systemBus()
         self.ses_bus = QDBusConnection.sessionBus()
 
-    def connect_signal(  # pylint: disable=R0913,R0917
+    def connect_signal(  # pylint: disable=too-many-arguments,too-many-positional-arguments
         self,
         system_bus: bool,
         service: str,
@@ -66,7 +66,7 @@ class SignalListener(QObject):
                     cb_count += 1
         self._logger.debug(f"Executed {cb_count} callbacks")
 
-    def disconnect_signal(  # pylint: disable=R0913,R0917
+    def disconnect_signal(  # pylint: disable=too-many-arguments,too-many-positional-arguments
         self, system_bus: bool, path: str, interface: str, signal_name: str, callback
     ):
         """

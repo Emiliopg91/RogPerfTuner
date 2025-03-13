@@ -22,7 +22,7 @@ class RainbowWave(AbstractEffect):
         for idx in range(len(rainbow) - 1, -1, -1):
             rainbow[idx] = (len(rainbow) - idx) * inc
 
-        while self._is_running:  # pylint: disable=R1702
+        while self._is_running:  # pylint: disable=too-many-nested-blocks
             for dev in self._devices:
                 if dev.enabled:
                     colors = [RGBColor(0, 0, 0)] * len(dev.leds)

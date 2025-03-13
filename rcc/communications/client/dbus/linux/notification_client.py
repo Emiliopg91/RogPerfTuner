@@ -14,7 +14,7 @@ class NotificationClient(AbstractDbusClient):
             False, "org.freedesktop.Notifications", "/org/freedesktop/Notifications", "org.freedesktop.Notifications"
         )
 
-    def show_notification(  # pylint: disable=R0913,R0917
+    def show_notification(  # pylint: disable=too-many-arguments,too-many-positional-arguments
         self, app_name: str, app_icon: str, title: str, body: str, timeout: int
     ) -> int:
         """Show notification"""

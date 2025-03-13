@@ -20,6 +20,6 @@ class GuiUtils:
 class NoScrollComboBox(QComboBox):
     """Implementation without wheel event"""
 
-    def wheelEvent(self, event: QWheelEvent):  # pylint: disable=C0103
+    def wheelEvent(self, event: QWheelEvent):  # pylint: disable=invalid-name
         """Ignore wheel event"""
         event.ignore()

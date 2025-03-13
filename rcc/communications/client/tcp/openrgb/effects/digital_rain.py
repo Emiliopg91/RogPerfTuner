@@ -43,7 +43,7 @@ class DigitalRain(AbstractEffect):
             self.sin_array[i] = math.pow(math.sin(x), 2)
 
     def _decrement_matrix(self, zone_status: list[list[LedStatus]]):
-        for r in range(len(zone_status) - 1, -1, -1):  # pylint: disable=R1702
+        for r in range(len(zone_status) - 1, -1, -1):  # pylint: disable=
             for c in range(len(zone_status[0])):
                 if r == 0:
                     if zone_status[r][c].cur_val > 0:
@@ -89,7 +89,7 @@ class DigitalRain(AbstractEffect):
 
         return True
 
-    def _get_next_matrix(self, zone_status: list[list[LedStatus]], hue: int):  # pylint: disable=R0912
+    def _get_next_matrix(self, zone_status: list[list[LedStatus]], hue: int):  # pylint: disable=too-many-branches
         free_cols: list[int] = []
         for c in range(len(zone_status[0])):
             if self._is_matrix_column_available(zone_status, len(zone_status), c):
@@ -105,15 +105,15 @@ class DigitalRain(AbstractEffect):
 
         return (hue + 51) % 360
 
-    def _dev_to_mat(self, dev: Device) -> list[list[LedStatus]]:  # pylint: disable=R0912,R0914
+    def _dev_to_mat(self, dev: Device) -> list[list[LedStatus]]:  # pylint: disable=too-many-branches,too-many-locals
         mat_def: list[list[LedStatus]] = []
 
         offset = 0
         last_leds = 0
-        for zone in dev.zones:  # pylint: disable=R1702
+        for zone in dev.zones:  # pylint: disable=too-many-nested-blocks
             if zone.type == ZoneType.MATRIX:
                 has_only_last = False
-                for r in range(zone.mat_height):  # pylint: disable=R1702
+                for r in range(zone.mat_height):
                     row = []
                     for c in range(zone.mat_width):
                         if zone.matrix_map[r][c] is not None:

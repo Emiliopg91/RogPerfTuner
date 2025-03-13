@@ -66,7 +66,7 @@ class ProfileService:
             self.set_performance_profile(policy, True, force=True)
 
     @logged_method
-    def set_performance_profile(  # pylint: disable=R0914
+    def set_performance_profile(  # pylint: disable=too-many-locals
         self, profile: PerformanceProfile, temporal=False, game_name: str = None, force=False
     ) -> None:
         """Establish performance profile"""
@@ -79,7 +79,7 @@ class ProfileService:
                 boost_enabled = profile.battery_boost if self.on_bat else profile.ac_boost
                 try:
                     self._logger.info(
-                        f"Setting {profile_name} profile {f"for game {game_name}" if game_name is not None else ""}"  # pylint: disable=C0301
+                        f"Setting {profile_name} profile {f"for game {game_name}" if game_name is not None else ""}"  # pylint: disable=line-too-long
                     )
                     self._logger.add_tab()
 

@@ -1,4 +1,4 @@
-# pylint: disable=C0115,C0116
+# pylint: disable=missing-class-docstring,missing-function-docstring,not-callable
 from __future__ import annotations
 from typing import Iterator, Optional, Type
 from enum import IntEnum
@@ -31,7 +31,7 @@ class ORGBPlugin:
         self.comms.send_data(data, not request)
 
     def _recv(self, data: Iterator[int]):
-        pkt_id = self.pkt_type_enum(utils.parse_var("I", data))  # pylint: disable=E1102
+        pkt_id = self.pkt_type_enum(utils.parse_var("I", data))
         self.recv(pkt_id, data)
 
     def recv(self, pkt_id: Type[IntEnum], data: Iterator[int]):
