@@ -181,6 +181,8 @@ class SteamService:
                 PROFILE_SERVICE.set_performance_profile(
                     profile, temporal=True, game_name=CONFIGURATION.games[game].name
                 )
+            CONFIGURATION.games[game].profile = profile.value
+            CONFIGURATION.save_config()
 
     def get_metrics_level(self, launch_options) -> MangoHudLevel:
         """Get level from game launch option"""

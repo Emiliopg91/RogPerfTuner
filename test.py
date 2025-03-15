@@ -1,28 +1,35 @@
-def agrupar_consecutivos(lista):
-    grupos = []
-    inicio = lista[0]
+import os
+import re
+import subprocess
 
-    for i in range(1, len(lista)):
-        if lista[i] != lista[i - 1] + 1:
-            if inicio == lista[i - 1]:
-                grupos.append(f"{inicio}")
-            else:
-                grupos.append(f"{inicio}-{lista[i - 1]}")
-            inicio = lista[i]
 
-    # Añadir el último grupo
-    if inicio == lista[-1]:
-        grupos.append(f"{inicio}")
+cmd_line = "ujust benchmark"
+
+pattern = re.compile(r'([A-Za-z_][A-Za-z0-9_]*)=(?:"([^"]*)"|\'([^\']*)\'|(\S+))')
+
+
+env_vars = {}
+pos = 0
+while pos < len(cmd_line):
+    match = pattern.match(cmd_line, pos)
+    if match:
+        key = match.group(1)
+        value = match.group(2) or match.group(3) or match.group(4)
+        env_vars[key] = value
+        pos = match.end()
+        # Avanza ignorando espacios después de cada variable
+        while pos < len(cmd_line) and cmd_line[pos].isspace():
+            pos += 1
     else:
-        grupos.append(f"{inicio}-{lista[-1]}")
+        # El resto es el comando y sus argumentos
+        user = os.getenv("USER")
+        cmd_line = f"sudo nice -n -10 setpriv --reuid={user} --regid={user} --init-groups --reset-env {cmd_line[pos:]}"
+        break
 
-    return grupos
+print(f"{env_vars}")
+print(cmd_line)
 
+current_env = os.environ.copy()
+current_env.update(env_vars)
 
-# Ejemplo de uso
-lista = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15]
-resultado = agrupar_consecutivos(lista)
-print(resultado)
-lista = [0, 1, 2, 4, 5, 6, 8, 9, 10]
-resultado = agrupar_consecutivos(lista)
-print(resultado)
+process = subprocess.run(cmd_line, env=current_env, text=True, capture_output=True, shell=True)

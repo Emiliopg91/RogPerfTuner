@@ -23,12 +23,17 @@ class HelloService(QObject):
 
     def next_profile(self):
         """Activate next profile"""
-        if len(STEAM_SERVICE.running_games) > 0:
-            return "Not available on game session"
+        if len(STEAM_SERVICE.running_games) == 0:
+            next_t = PROFILE_SERVICE.performance_profile.next_performance_profile
+            PROFILE_SERVICE.set_performance_profile(next_t)
+            return next_t.name
 
-        next_t = PROFILE_SERVICE.performance_profile.next_performance_profile
-        PROFILE_SERVICE.set_performance_profile(next_t)
-        return next_t.name
+        if len(STEAM_SERVICE.running_games) == 1:
+            next_t = PROFILE_SERVICE.performance_profile.next_performance_profile
+            STEAM_SERVICE.set_profile_for_running_game(next_t)
+            return next_t.name
+
+        return "Not available on multi-game session"
 
     def next_effect(self):
         """Activate next effect"""

@@ -141,7 +141,7 @@ class OpenRgbClient:
     def _wait_for_server(self) -> bool:
         while True:
             try:
-                with socket.create_connection(("localhost", self._port), timeout=1):
+                with socket.create_connection(("localhost", self._port), timeout=0.1):
                     break
             except Exception:
                 time.sleep(0.1)
