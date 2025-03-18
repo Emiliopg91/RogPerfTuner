@@ -182,45 +182,6 @@ class HardwareService:
     def _update_boost_status(self, is_on: bool):
         self._last_boost = is_on
 
-    def __determine_cpu_architecture(self):
-        output = SHELL.run_command("lscpu -e", output=True)[1]
-        lines = output.splitlines()[1:]
-
-        found_cores: dict[int, list[int]] = {}
-
-        for line in lines:
-            cpu = int(line[0:3].strip())
-            core = int(line[15:20].strip())
-            if core not in found_cores:
-                found_cores[core] = []
-            found_cores[core].append(cpu)
-
-        p_cores = []
-        e_cores = []
-        for core, cores_list in found_cores.items():
-            if len(cores_list) > 1:
-                p_cores.extend(cores_list)
-            else:
-                e_cores.append(cores_list[0])
-
-        if len(p_cores) > 0 and len(e_cores) > 0:
-            cores = sorted(set(p_cores))
-            groups = []
-            beg = cores[0]
-            end = cores[0]
-
-            for num in cores[1:]:
-                if num == end + 1:
-                    end = num
-                else:
-                    groups.append(f"{beg}-{end}" if beg != end else str(beg))
-                    beg = end = num
-
-            groups.append(f"{beg}-{end}" if beg != end else str(beg))
-            return ",".join(groups)
-
-        return None
-
     @property
     def icd_files(self) -> list[str] | None:
         """ICD files for GPU"""
