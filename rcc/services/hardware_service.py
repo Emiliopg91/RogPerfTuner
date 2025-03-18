@@ -24,6 +24,7 @@ from rcc.models.battery_threshold import BatteryThreshold
 from rcc.models.cpu_brand import CpuBrand
 from rcc.models.gpu_brand import GpuBrand
 from rcc.models.performance_profile import PerformanceProfile
+from rcc.models.ssd_queue_sched import SsdQueueScheduler
 from rcc.models.usb_identifier import UsbIdentifier
 from rcc.utils.beans import EVENT_BUS, TRANSLATOR
 from rcc.utils.events import (
@@ -89,10 +90,6 @@ class HardwareService:
             self._logger.info(line)
         self._logger.add_tab()
 
-        self.__hp_cores = self.__determine_cpu_architecture()
-        if self.hp_cores is not None:
-            self._logger.info(f"Performance cores: {self.__hp_cores}")
-
         if self.__cpu == CpuBrand.INTEL:
             if PL1_SPL_CLIENT.available:
                 self._logger.info("TDP control available")
@@ -149,6 +146,16 @@ class HardwareService:
 
                     self._logger.rem_tab()
 
+        self._logger.rem_tab()
+
+        self._logger.info("Getting available SSD schedulers")
+        self._logger.add_tab()
+        self.__available_ssd_sched = []
+        output = SHELL.run_command("cat /sys/block/nvme*/queue/scheduler", False, False, True)[1]
+        for sched in SsdQueueScheduler:
+            if all(sched.value in l for l in output.splitlines()):
+                self.__available_ssd_sched.append(sched)
+                self._logger.info(f"{sched.name} - {sched.value}")
         self._logger.rem_tab()
 
         self.__on_bat = UPOWER_CLIENT.on_battery
@@ -229,11 +236,6 @@ class HardwareService:
         """CPU brand"""
         return self.__cpu
 
-    @property
-    def hp_cores(self):
-        """High performance cores"""
-        return self.__hp_cores
-
     def _on_ac_battery_change(self, on_battery: bool, muted=False):
         self.__on_bat = on_battery
         if self.__running_games == 0:
@@ -274,6 +276,12 @@ class HardwareService:
             self.__battery_charge_limit = value
             EVENT_BUS.emit(HARDWARE_SERVICE_BATTERY_THRESHOLD_CHANGED, value)
             NOTIFIER.show_toast(TRANSLATOR.translate("applied.battery.threshold", {"value": value.value}))
+
+    def set_ssd_scheduler(self, scheduler: SsdQueueScheduler):
+        """Set SSD queue scheduler"""
+        if scheduler in self.__available_ssd_sched:
+            self._logger.info(f"SSD scheduler: {scheduler.name}")
+            SHELL.run_command(f"echo '{scheduler.value}' | tee /sys/block/nvme*/queue/scheduler", True)
 
     def set_boost_status(self, enabled: bool):
         """Enable/disable cpu boost"""
@@ -379,9 +387,7 @@ class HardwareService:
         """Apply optimizations to the process tree"""
         if first_run:
             self._logger.info(
-                f"Setting CPU affinity to cores {self.__hp_cores}, "
-                + f"priority to {self.CPU_PRIORITY} and "
-                + f"IO priority to {self.IO_PRIORITY}"
+                f"Setting CPU priority to {self.CPU_PRIORITY} and " + f"IO priority to {self.IO_PRIORITY}"
             )
 
         pending = [pid]
@@ -397,8 +403,6 @@ class HardwareService:
                         SHELL.run_command(
                             f"renice -n {self.CPU_PRIORITY} -p {pid} && "
                             + f"ionice -c {self.IO_CLASS} -n {self.IO_PRIORITY} -p {pid}",
-                            # + f"ionice -c {self.IO_CLASS} -n {self.IO_PRIORITY} -p {pid} && "
-                            # + f"taskset -cp {self.__hp_cores} {pid}",
                             sudo=True,
                             check=True,
                         )

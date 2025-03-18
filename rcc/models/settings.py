@@ -51,7 +51,6 @@ class GameEntry:
     """Game configuration"""
 
     name: str
-    profile: int
 
 
 @dataclass_json

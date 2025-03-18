@@ -169,6 +169,7 @@ class MainWindow(QMainWindow):
     def on_game_event(self, running_games: int):
         """Handler for game events"""
         enable = running_games == 0
+        self._profile_dropdown.setEnabled(enable)
         self._game_profile_button.setEnabled(enable)
 
     def closeEvent(self, event):  # pylint: disable=invalid-name
@@ -210,8 +211,6 @@ class MainWindow(QMainWindow):
         if len(STEAM_SERVICE.running_games.keys()) == 0:
             if PROFILE_SERVICE.performance_profile != profile:
                 PROFILE_SERVICE.set_performance_profile(profile)
-        else:
-            STEAM_SERVICE.set_profile_for_running_game(profile)
 
     def on_battery_limit_changed(self, index):
         """Handler for battery limit change"""

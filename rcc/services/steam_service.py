@@ -9,7 +9,6 @@ from rcc.communications.client.websocket.steam.steam_client import STEAM_CLIENT
 from rcc.models.gpu_brand import GpuBrand
 from rcc.models.mangohud_level import MangoHudLevel
 from rcc.models.performance_profile import PerformanceProfile
-from rcc.models.platform_profile import PlatformProfile
 from rcc.models.settings import GameEntry
 from rcc.services.hardware_service import HARDWARE_SERVICE
 from rcc.services.profile_service import PROFILE_SERVICE
@@ -83,19 +82,13 @@ class SteamService:
         """Flag metrics availability"""
         return self.__metrics_available
 
+    def get_games(self) -> dict[int, str]:
+        """Get games and setting"""
+        return CONFIGURATION.games
+
     def __set_profile_for_games(self, on_connect=False):
         if len(self.__running_games) > 0:
-            profile = PerformanceProfile.QUIET
-
-            for gid in self.__running_games:
-                profile = profile.get_greater(PlatformProfile(CONFIGURATION.games[gid].profile))
-
-            name = [
-                CONFIGURATION.games[gid].name
-                for gid in self.__running_games
-                if PlatformProfile(CONFIGURATION.games[gid].profile) == profile
-            ][0]
-            PROFILE_SERVICE.set_performance_profile(profile, True, name, True)
+            PROFILE_SERVICE.set_performance_profile(PerformanceProfile.PERFORMANCE, True, True)
         elif not on_connect:
             PROFILE_SERVICE.restore_profile()
 
@@ -109,12 +102,13 @@ class SteamService:
 
             HARDWARE_SERVICE.apply_proccess_optimizations(pid)
             HARDWARE_SERVICE.set_panel_overdrive(True)
-            if CONFIGURATION.games.get(gid) is None:
-                CONFIGURATION.games[gid] = GameEntry(name, PerformanceProfile.PERFORMANCE.value)
-                CONFIGURATION.save_config()
             self.__set_profile_for_games()
             RGB_SERVICE.apply_effect(GAMING_EFFECT.name, True)
             self._logger.rem_tab()
+
+            if CONFIGURATION.games.get(gid) is None:
+                CONFIGURATION.games[gid] = GameEntry(name)
+                CONFIGURATION.save_config()
 
     def __stop_game(self, gid: int, name: str):
         self._logger.info(f"Stopped {name}")
@@ -161,28 +155,6 @@ class SteamService:
             SHELL.run_command(f"rm -R {dst}", True)
         SHELL.run_command(f"cp -R {os.path.join(USER_PLUGIN_FOLDER, 'RCCDeckyCompanion')} {dst}", True)
         Thread(target=lambda: SHELL.run_command("systemctl restart plugin_loader.service", True)).start()
-
-    def get_games(self) -> dict[str, GameEntry]:
-        """Get games and setting"""
-        return CONFIGURATION.games
-
-    def set_game_profile(self, game: int, profile: PerformanceProfile = PerformanceProfile.PERFORMANCE):
-        """Set profile for game"""
-        if CONFIGURATION.games.get(game) is None or CONFIGURATION.games.get(game).profile != profile.value:
-            CONFIGURATION.games[game].profile = profile.value
-            CONFIGURATION.save_config()
-
-    def set_profile_for_running_game(self, profile: PerformanceProfile):
-        """If only one game is running store the profile"""
-        if len(self.__running_games) == 1:
-            game = next(iter(self.__running_games))
-            self.set_game_profile(game, profile)
-            if PROFILE_SERVICE.performance_profile != profile:
-                PROFILE_SERVICE.set_performance_profile(
-                    profile, temporal=True, game_name=CONFIGURATION.games[game].name
-                )
-            CONFIGURATION.games[game].profile = profile.value
-            CONFIGURATION.save_config()
 
     def get_metrics_level(self, launch_options) -> MangoHudLevel:
         """Get level from game launch option"""

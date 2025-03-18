@@ -15,7 +15,6 @@ from PyQt5.QtGui import QIcon
 from rcc.communications.client.websocket.steam.steam_client import SteamGameDetails, STEAM_CLIENT
 from rcc.models.mangohud_level import MangoHudLevel
 from rcc.services.hardware_service import HARDWARE_SERVICE
-from rcc.models.performance_profile import PerformanceProfile
 from rcc.services.steam_service import STEAM_SERVICE
 from rcc.utils.constants import ICONS_PATH
 from rcc.utils.events import STEAM_SERVICE_CONNECTED
@@ -35,7 +34,7 @@ class GameList(QDialog):
             self.__parent = parent
             self.__manage_parent = manage_parent
             self.setWindowTitle(TRANSLATOR.translate("game.performance.configuration"))
-            self.setFixedSize(850, 600)
+            self.setFixedSize(600, 600)
             self.setWindowIcon(QIcon(f"{ICONS_PATH}/icon-45x45.png"))
             self.setAttribute(Qt.WA_DeleteOnClose)
             self.setWindowFlags(self.windowFlags() & ~Qt.WindowContextHelpButtonHint)
@@ -62,7 +61,6 @@ class GameList(QDialog):
 
             columns = [
                 TRANSLATOR.translate("game.title"),
-                TRANSLATOR.translate("profile"),
                 TRANSLATOR.translate("used.gpu"),
             ]
             if STEAM_SERVICE.metrics_enabled:
@@ -99,25 +97,6 @@ class GameList(QDialog):
                     item.setFlags(Qt.ItemIsEnabled)
                     item.setToolTip(f"{game.appid}")
                     table.setItem(row, col, item)
-                    col += 1
-
-                    # Profile
-                    profile_combo = NoScrollComboBox()  # Usar la subclase personalizada
-                    for profile in reversed(PerformanceProfile):
-                        profile_combo.addItem(TRANSLATOR.translate(f"label.profile.{profile.name}"), profile)
-
-                    default_index = profile_combo.findData(
-                        PerformanceProfile(game_cfg[game.appid].profile)
-                    )  # Buscar el índice basado en el dato asociado
-                    if default_index != -1:
-                        profile_combo.setCurrentIndex(default_index)
-
-                    # Conectar el evento currentIndexChanged al manejador
-                    profile_combo.currentIndexChanged.connect(
-                        lambda _, widget=profile_combo, game_id=game.appid: self.__on_profile_changed(widget, game_id)
-                    )
-
-                    table.setCellWidget(row, col, profile_combo)
                     col += 1
 
                     # GPU
@@ -164,10 +143,6 @@ class GameList(QDialog):
             layout.addWidget(scroll_area)
 
             EVENT_BUS.on(STEAM_SERVICE_CONNECTED, self.close)
-
-    def __on_profile_changed(self, widget, game_id):
-        selected_profile = widget.currentData()  # Obtiene el objeto asociado al elemento seleccionado
-        STEAM_SERVICE.set_game_profile(game_id, selected_profile)
 
     def __on_metrics_changed(self, widget, game: SteamGameDetails):
         level = widget.currentData()

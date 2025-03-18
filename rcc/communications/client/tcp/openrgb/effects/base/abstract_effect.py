@@ -70,9 +70,15 @@ class AbstractEffect(ABC):
             if self._thread is not None:
                 self._thread.join()
 
-    def _sleep(self, ms: int):
-        if self._is_running:
-            time.sleep(ms)
+    def _sleep(self, ms: float):
+        naps = []
+        while ms > 0:
+            nap = min(0.1, ms)
+            ms -= nap
+            naps.append(nap)
+        for nap in naps:
+            if self._is_running:
+                time.sleep(nap)
 
     def _set_colors(self, dev: Device, colors: List[RGBColor]):
         if self._is_running:

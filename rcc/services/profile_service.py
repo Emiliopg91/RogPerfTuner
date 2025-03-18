@@ -14,6 +14,7 @@ from rcc.models.cpu_governor import CpuGovernor
 from rcc.models.performance_profile import PerformanceProfile
 from rcc.models.platform_profile import PlatformProfile
 from rcc.models.power_profile import PowerProfile
+from rcc.models.ssd_queue_sched import SsdQueueScheduler
 from rcc.services.hardware_service import HARDWARE_SERVICE
 from rcc.utils.beans import EVENT_BUS, TRANSLATOR
 from rcc.utils.configuration import CONFIGURATION
@@ -63,11 +64,11 @@ class ProfileService:
             if on_battery:
                 policy = PerformanceProfile.QUIET
 
-            self.set_performance_profile(policy, True, force=True)
+            self.set_performance_profile(policy, True, True)
 
     @logged_method
     def set_performance_profile(  # pylint: disable=too-many-locals
-        self, profile: PerformanceProfile, temporal=False, game_name: str = None, force=False
+        self, profile: PerformanceProfile, temporal=False, force=False
     ) -> None:
         """Establish performance profile"""
         with self._lock:
@@ -77,15 +78,15 @@ class ProfileService:
                 power_profile = profile.power_profile
                 cpu_governor = profile.battery_governor if self.on_bat else profile.ac_governor
                 boost_enabled = profile.battery_boost if self.on_bat else profile.ac_boost
+                ssd_sched = profile.ssd_queue_scheduler
                 try:
-                    self._logger.info(
-                        f"Setting {profile_name} profile {f"for game {game_name}" if game_name is not None else ""}"  # pylint: disable=line-too-long
-                    )
+                    self._logger.info(f"Setting {profile_name} profile")  # pylint: disable=line-too-long
                     self._logger.add_tab()
 
                     # Ejecutar las operaciones de forma concurrente
                     with concurrent.futures.ThreadPoolExecutor() as executor:
                         futures = [
+                            executor.submit(lambda: self.__set_ssd_scheduler(ssd_sched)),
                             executor.submit(lambda: self.__set_boost(boost_enabled)),
                             executor.submit(lambda: self.__set_cpu_governor(cpu_governor)),
                             executor.submit(lambda: self.__set_power_profile(power_profile)),
@@ -102,23 +103,13 @@ class ProfileService:
                         CONFIGURATION.platform.profiles.profile = profile.value
                         CONFIGURATION.save_config()
 
-                    if game_name is None:
-                        NOTIFIER.show_toast(
-                            TRANSLATOR.translate(
-                                "profile.applied",
-                                {"profile": TRANSLATOR.translate(f"label.profile.{profile_name}").lower()},
-                            )
+                    NOTIFIER.show_toast(
+                        TRANSLATOR.translate(
+                            "profile.applied",
+                            {"profile": TRANSLATOR.translate(f"label.profile.{profile_name}").lower()},
                         )
-                    else:
-                        NOTIFIER.show_toast(
-                            TRANSLATOR.translate(
-                                "profile.applied.for.game",
-                                {
-                                    "profile": TRANSLATOR.translate(f"label.profile.{profile_name}").lower(),
-                                    "game": game_name,
-                                },
-                            )
-                        )
+                    )
+
                     self._performance_profile = profile
                     EVENT_BUS.emit(
                         PLATFORM_SERVICE_PROFILE_CHANGED,
@@ -129,13 +120,6 @@ class ProfileService:
                     self._logger.rem_tab()
             else:
                 self._logger.info(f"Profile {profile_name.lower()} already setted")
-                if game_name is None:
-                    NOTIFIER.show_toast(
-                        TRANSLATOR.translate(
-                            "profile.applied",
-                            {"profile": TRANSLATOR.translate(f"label.profile.{profile_name}").lower()},
-                        )
-                    )
 
     def restore_profile(self):
         """Restore persited profile"""
@@ -147,7 +131,7 @@ class ProfileService:
         else:
             self._logger.info("Laptop running on AC")
             self._logger.add_tab()
-            self.set_performance_profile(PerformanceProfile(CONFIGURATION.platform.profiles.profile), True, None, True)
+            self.set_performance_profile(PerformanceProfile(CONFIGURATION.platform.profiles.profile), True, True)
             self._logger.rem_tab()
 
     def __set_throttle_policy(self, profile: PerformanceProfile, platform_profile: PlatformProfile):
@@ -200,6 +184,12 @@ class ProfileService:
             HARDWARE_SERVICE.set_boost_status(boost_enabled)
         except Exception as e:
             self._logger.error(f"Error while setting boost mode: {e}")
+
+    def __set_ssd_scheduler(self, scheduler: SsdQueueScheduler):
+        try:
+            HARDWARE_SERVICE.set_ssd_scheduler(scheduler)
+        except Exception as e:
+            self._logger.error(f"Error while setting SSD scheduler: {e}")
 
 
 PROFILE_SERVICE = ProfileService()

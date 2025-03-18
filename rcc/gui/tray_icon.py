@@ -236,7 +236,8 @@ class TrayIcon:  # pylint: disable=too-many-instance-attributes
 
     def on_game_event(self, running_games: int):
         """Handler for game events"""
-        enable = running_games < 2
+        enable = running_games == 0
+        self._profile_menu.setEnabled(enable)
         self._games_menu.setEnabled(enable)
 
     def on_steam_connected_event(self, connected: bool):
@@ -295,8 +296,6 @@ class TrayIcon:  # pylint: disable=too-many-instance-attributes
         if len(STEAM_SERVICE.running_games.keys()) == 0:
             if PROFILE_SERVICE.performance_profile != profile:
                 PROFILE_SERVICE.set_performance_profile(profile)
-        else:
-            STEAM_SERVICE.set_game_profile(profile)
 
     def pick_color(self):
         """Open color picker"""
