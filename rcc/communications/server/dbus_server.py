@@ -84,13 +84,6 @@ class HelloServiceAdaptor(QDBusAbstractAdaptor):
         """Decrease brightness"""
         return self.service.decrease_brightness()
 
-    @pyqtSlot(int, str, result=str, name="launchGame")
-    def launch_game(self, app_id: int, command: str):
-        """Decrease brightness"""
-        print("Request game launch:")
-        print(f"  AppId: {app_id}")
-        print(f"  Command: {command}")
-
 
 @singleton
 class DBusServer:
@@ -110,7 +103,7 @@ class DBusServer:
         for file, action in self._file_actions.items():
             file_path = os.path.join(USER_SCRIPTS_FOLDER, file)
             script_content = f"""#!/bin/bash
-                gdbus call --session --dest {SERVICE_NAME} --object-path {OBJECT_PATH} --method {INTERFACE_NAME}.{action}
+gdbus call --session --dest {SERVICE_NAME} --object-path {OBJECT_PATH} --method {INTERFACE_NAME}.{action}
             """
 
             with open(file_path, "w") as f:

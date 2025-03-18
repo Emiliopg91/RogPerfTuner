@@ -215,6 +215,8 @@ class SteamService:
 
         if launch_opts is None or launch_opts == "":
             launch_opts = "%command%"
+        elif "%command%" not in launch_opts:
+            launch_opts = "%command% " + launch_opts
 
         launch_opts = re.sub(r"MANGOHUD=.* MANGOHUD_CONFIG=preset=[^ ]+ mangohud ", "", launch_opts).strip()
         launch_opts = re.sub(r"VK_ICD_FILENAMES=[^ ]+ ", "", launch_opts).strip()

@@ -8,7 +8,7 @@ from rcc.communications.client.tcp.openrgb.effects.base.abstract_effect import A
 class GamingEffect(AbstractEffect):
     """Gaming effect"""
 
-    MAIN_COLOR = RGBColor.fromHEX("#0000FF")
+    MAIN_COLOR = RGBColor.fromHEX("#000040")
     COLOR_MATCHING: list[re.Pattern, RGBColor] = {
         re.compile(r"Key: [1|2|3|4]"): RGBColor.fromHEX("#FFFF00"),
         re.compile(r"Key: [W|A|S|D]"): RGBColor.fromHEX("#FF0000"),

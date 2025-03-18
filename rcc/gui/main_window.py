@@ -47,8 +47,8 @@ class MainWindow(QMainWindow):
         super().__init__()
 
         self.setWindowTitle("RogControlCenter")
-        self.setGeometry(0, 0, 400, 650)
-        self.setFixedSize(400, 650)
+        self.setGeometry(0, 0, 400, 600)
+        self.setFixedSize(400, 600)
         self.setWindowIcon(QIcon(f"{ICONS_PATH}/icon-45x45.png"))
 
         self._current_color = RGB_SERVICE.get_color(RGB_SERVICE._effect)

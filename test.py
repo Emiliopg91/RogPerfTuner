@@ -1,9 +1,14 @@
+#!/bin/env python3
+
 import os
 import re
 import subprocess
 
 
-cmd_line = "ujust benchmark"
+cmd_line = (
+    "vblank_mode=0 /var/mnt/Datos/Emulation/tools/launchers/yuzu.sh -f -g "
+    "\"'/var/mnt/Datos/Emulation/roms/switch/Pokemon Violet.nsp'\""
+)
 
 pattern = re.compile(r'([A-Za-z_][A-Za-z0-9_]*)=(?:"([^"]*)"|\'([^\']*)\'|(\S+))')
 
@@ -22,7 +27,7 @@ while pos < len(cmd_line):
             pos += 1
     else:
         # El resto es el comando y sus argumentos
-        user = os.getenv("USER")
+        user = os.os.getenv("USER")
         cmd_line = f"sudo nice -n -10 setpriv --reuid={user} --regid={user} --init-groups --reset-env {cmd_line[pos:]}"
         break
 
