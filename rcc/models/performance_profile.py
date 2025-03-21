@@ -7,7 +7,7 @@ from rcc.communications.client.dbus.asus.armoury.nvidia.nv_temp_client import NV
 from rcc.models.cpu_governor import CpuGovernor
 from rcc.models.platform_profile import PlatformProfile
 from rcc.models.power_profile import PowerProfile
-from rcc.models.ssd_queue_sched import SsdQueueScheduler
+from rcc.models.ssd_scheduler import SsdScheduler
 
 
 class PerformanceProfile(IntEnum):
@@ -136,11 +136,11 @@ class PerformanceProfile(IntEnum):
         return PowerProfile.PERFORMANCE
 
     @property
-    def ssd_queue_scheduler(self) -> SsdQueueScheduler:
+    def ssd_queue_scheduler(self) -> SsdScheduler:
         """Get associated power profile"""
         if self == PerformanceProfile.QUIET:
-            return SsdQueueScheduler.NOOP
-        return SsdQueueScheduler.MQ_DEADLINE
+            return SsdScheduler.NOOP
+        return SsdScheduler.MQ_DEADLINE
 
     @property
     def next_performance_profile(self):

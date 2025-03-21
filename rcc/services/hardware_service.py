@@ -24,7 +24,7 @@ from rcc.models.battery_threshold import BatteryThreshold
 from rcc.models.cpu_brand import CpuBrand
 from rcc.models.gpu_brand import GpuBrand
 from rcc.models.performance_profile import PerformanceProfile
-from rcc.models.ssd_queue_sched import SsdQueueScheduler
+from rcc.models.ssd_scheduler import SsdScheduler
 from rcc.models.usb_identifier import UsbIdentifier
 from rcc.utils.beans import EVENT_BUS, TRANSLATOR
 from rcc.utils.events import (
@@ -152,7 +152,7 @@ class HardwareService:
         self._logger.add_tab()
         self.__available_ssd_sched = []
         output = SHELL.run_command("cat /sys/block/nvme*/queue/scheduler", False, False, True)[1]
-        for sched in SsdQueueScheduler:
+        for sched in SsdScheduler:
             if all(sched.value in l for l in output.splitlines()):
                 self.__available_ssd_sched.append(sched)
                 self._logger.info(f"{sched.name} - {sched.value}")
@@ -238,7 +238,7 @@ class HardwareService:
             EVENT_BUS.emit(HARDWARE_SERVICE_BATTERY_THRESHOLD_CHANGED, value)
             NOTIFIER.show_toast(TRANSLATOR.translate("applied.battery.threshold", {"value": value.value}))
 
-    def set_ssd_scheduler(self, scheduler: SsdQueueScheduler):
+    def set_ssd_scheduler(self, scheduler: SsdScheduler):
         """Set SSD queue scheduler"""
         if scheduler in self.__available_ssd_sched:
             self._logger.info(f"SSD scheduler: {scheduler.name}")

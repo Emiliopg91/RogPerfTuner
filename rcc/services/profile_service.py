@@ -14,7 +14,7 @@ from rcc.models.cpu_governor import CpuGovernor
 from rcc.models.performance_profile import PerformanceProfile
 from rcc.models.platform_profile import PlatformProfile
 from rcc.models.power_profile import PowerProfile
-from rcc.models.ssd_queue_sched import SsdQueueScheduler
+from rcc.models.ssd_scheduler import SsdScheduler
 from rcc.services.hardware_service import HARDWARE_SERVICE
 from rcc.utils.beans import EVENT_BUS, TRANSLATOR
 from rcc.utils.configuration import CONFIGURATION
@@ -185,7 +185,7 @@ class ProfileService:
         except Exception as e:
             self._logger.error(f"Error while setting boost mode: {e}")
 
-    def __set_ssd_scheduler(self, scheduler: SsdQueueScheduler):
+    def __set_ssd_scheduler(self, scheduler: SsdScheduler):
         try:
             HARDWARE_SERVICE.set_ssd_scheduler(scheduler)
         except Exception as e:

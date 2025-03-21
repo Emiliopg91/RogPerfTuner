@@ -1,7 +1,7 @@
 from enum import StrEnum
 
 
-class SsdQueueScheduler(StrEnum):
+class SsdScheduler(StrEnum):
     """Enum for ssd queue scheduler"""
 
     NOOP = "none"
