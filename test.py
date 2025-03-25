@@ -1,40 +1,18 @@
-#!/bin/env python3
-
-import os
-import re
-import subprocess
-
-
-cmd_line = (
-    "vblank_mode=0 /var/mnt/Datos/Emulation/tools/launchers/yuzu.sh -f -g "
-    "\"'/var/mnt/Datos/Emulation/roms/switch/Pokemon Violet.nsp'\""
+import asyncio
+import time
+from rcc.communications.client.dbus.linux.power_management_keyboard_brightness_control import (
+    KEYBOARD_BRIGHTNESS_CONTROL,
 )
 
-pattern = re.compile(r'([A-Za-z_][A-Za-z0-9_]*)=(?:"([^"]*)"|\'([^\']*)\'|(\S+))')
+
+async def keep_running():
+    while True:
+        await asyncio.sleep(3600)
 
 
-env_vars = {}
-pos = 0
-while pos < len(cmd_line):
-    match = pattern.match(cmd_line, pos)
-    if match:
-        key = match.group(1)
-        value = match.group(2) or match.group(3) or match.group(4)
-        env_vars[key] = value
-        pos = match.end()
-        # Avanza ignorando espacios después de cada variable
-        while pos < len(cmd_line) and cmd_line[pos].isspace():
-            pos += 1
-    else:
-        # El resto es el comando y sus argumentos
-        user = os.os.getenv("USER")
-        cmd_line = f"sudo nice -n -10 setpriv --reuid={user} --regid={user} --init-groups --reset-env {cmd_line[pos:]}"
-        break
+async def main():
+    KEYBOARD_BRIGHTNESS_CONTROL.on_brightness_change(lambda v: print(f"{v}!!!"))
+    await keep_running()
 
-print(f"{env_vars}")
-print(cmd_line)
 
-current_env = os.environ.copy()
-current_env.update(env_vars)
-
-process = subprocess.run(cmd_line, env=current_env, text=True, capture_output=True, shell=True)
+asyncio.run(main())

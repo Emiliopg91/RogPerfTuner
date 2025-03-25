@@ -4,6 +4,9 @@ from typing import Optional
 import time
 
 
+from rcc.communications.client.dbus.linux.power_management_keyboard_brightness_control import (
+    KEYBOARD_BRIGHTNESS_CONTROL,
+)
 from rcc.communications.client.dbus.linux.upower_client import UPOWER_CLIENT
 from rcc.communications.client.tcp.openrgb.openrgb_client import OPEN_RGB_CLIENT
 from rcc.communications.client.tcp.openrgb.effects.static import STATIC_EFFECT
@@ -55,6 +58,13 @@ class RgbService:
                 self._effect, RgbBrightness.OFF if on_bat else self._brightness, self._color
             ),
         )
+        KEYBOARD_BRIGHTNESS_CONTROL.on_brightness_change(self.__on_keyboard_brightness_change)
+
+    def __on_keyboard_brightness_change(self, value: int):
+        if value == 0:
+            self._apply_aura(self._effect, RgbBrightness.OFF, self._color, True, True)
+        else:
+            self.restore_brightness()
 
     def __load_custom_effects(self):
         """Load user custom effect"""
@@ -151,6 +161,10 @@ class RgbService:
     def restore_effect(self):
         """Restore last not temporal effect"""
         self.apply_effect(CONFIGURATION.open_rgb.last_effect)
+
+    def restore_brightness(self):
+        """Restore last not temporal effect"""
+        self.apply_brightness(RgbBrightness(CONFIGURATION.open_rgb.brightness))
 
     def _apply_aura(  # pylint: disable=too-many-arguments,too-many-positional-arguments
         self,
