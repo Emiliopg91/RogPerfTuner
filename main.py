@@ -6,9 +6,9 @@ import asyncio
 from qasync import QEventLoop
 
 import setproctitle
-from rcc import __app_name__, __version__
+from rcc.utils.constants import APP_NAME, VERSION
 
-setproctitle.setproctitle(__app_name__)
+setproctitle.setproctitle(APP_NAME)
 
 from PyQt5.QtWidgets import QApplication
 import sys
@@ -47,7 +47,7 @@ def initialize_application():  # pylint:disable=too-many-locals
     logger.info("###################################################")
     logger.info("#            Starting RogControlCenter            #")
     logger.info("###################################################")
-    logger.info(f"Version {__version__}")
+    logger.info(f"Version {VERSION}")
     logger.info("Starting initialization")
     logger.add_tab()
 
@@ -102,8 +102,8 @@ def initialize_application():  # pylint:disable=too-many-locals
     from rcc.services.application_service import APPLICATION_SERVICE
 
     auto_updater = AutoUpdater(
-        __app_name__,
-        __version__,
+        APP_NAME,
+        VERSION,
         "Emiliopg91",
         "RogControlCenter",
         USER_UPDATE_FOLDER,

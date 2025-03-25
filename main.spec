@@ -1,20 +1,16 @@
 # -*- mode: python ; coding: utf-8 -*-
-from PyInstaller.utils.hooks import collect_submodules
-
-hiddenimports = []
-hiddenimports += collect_submodules('PyQt5')
 
 
 a = Analysis(
     ['/var/mnt/Datos/Desarrollo/Workspace/VSCode/RogControlCenter/main.py'],
     pathex=[],
     binaries=[],
-    datas=[('/var/mnt/Datos/Desarrollo/Workspace/VSCode/RogControlCenter/assets', 'assets')],
-    hiddenimports=hiddenimports,
+    datas=[('/var/mnt/Datos/Desarrollo/Workspace/VSCode/RogControlCenter/assets', 'assets'), ('/var/mnt/Datos/Desarrollo/Workspace/VSCode/RogControlCenter/pyproject.toml', 'assets')],
+    hiddenimports=[],
     hookspath=[],
     hooksconfig={},
     runtime_hooks=[],
-    excludes=['PyQt6', 'PySide6'],
+    excludes=[],
     noarchive=False,
     optimize=0,
 )

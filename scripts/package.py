@@ -106,16 +106,12 @@ def package_python():
     subprocess.run(
         [
             "pyinstaller",
-            "--collect-submodules",
-            "PyQt5",
-            "--exclude-module",
-            "PyQt6",
-            "--exclude-module",
-            "PySide6",
             "--distpath",
             os.path.join(output_dir, "usr", "bin"),
             "--add-data",
             os.path.join(workspace_dir, "assets") + ":assets",
+            "--add-data",
+            os.path.join(workspace_dir, "pyproject.toml") + ":assets",
             os.path.join(workspace_dir, "main.py"),
         ],
         stdout=subprocess.DEVNULL,

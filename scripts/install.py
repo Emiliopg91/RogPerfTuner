@@ -8,37 +8,6 @@ RCCDC_PATH = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "asse
 OPENRGB_PATH = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "assets", "OpenRGB.AppImage"))
 UDEV_PATH = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "assets", "60-openrgb.rules"))
 
-DEVELOP_DEPENDENCIES = [
-    "black",
-    "pyinstaller",
-    "pylint",
-    "requests",
-    "watchdog",
-]
-
-RUNTIME_DEPENDENCIES = [
-    "cryptography",
-    "keyring",
-    "dataclasses-json",
-    "psutil",
-    "pyyaml",
-    "pyudev",
-    "PyQt5",
-    "qasync",
-    "setproctitle",
-    "websockets",
-]
-
-
-def install_pip_deps():
-    """Install dependencies from PIP"""
-    print("  Installing PIP packages...")
-    command = ["python", "-m", "pip", "install"]
-    command.extend(DEVELOP_DEPENDENCIES)
-    command.extend(RUNTIME_DEPENDENCIES)
-    subprocess.run(command, check=True, stdout=subprocess.DEVNULL, stderr=subprocess.PIPE)
-    print("    Dependencies installed")
-
 
 def get_openrgb():
     """Download latest OpenRGB"""
@@ -142,6 +111,5 @@ def get_rccdc():
 
 
 print("Installing dependencies...")
-install_pip_deps()
 get_openrgb()
 get_rccdc()

@@ -8,7 +8,6 @@ from PyQt5.QtGui import QIcon, QColor
 from rcc.gui.game_list import GameList
 from rcc.gui.main_window import MAIN_WINDOW
 
-from rcc import __app_name__, __version__
 from rcc.models.performance_profile import PerformanceProfile
 from rcc.models.rgb_brightness import RgbBrightness
 from rcc.models.battery_threshold import BatteryThreshold
@@ -16,7 +15,7 @@ from rcc.services.hardware_service import HARDWARE_SERVICE
 from rcc.services.steam_service import STEAM_SERVICE
 from rcc.services.rgb_service import RGB_SERVICE
 from rcc.services.profile_service import PROFILE_SERVICE
-from rcc.utils.constants import ICONS_PATH, DEV_MODE, LOG_FILE, CONFIG_FILE
+from rcc.utils.constants import APP_NAME, VERSION, ICONS_PATH, DEV_MODE, LOG_FILE, CONFIG_FILE
 from rcc.utils.beans import TRANSLATOR
 from rcc.utils.beans import EVENT_BUS
 from rcc.utils.shell import SHELL
@@ -44,7 +43,7 @@ class TrayIcon:  # pylint: disable=too-many-instance-attributes
 
         self._tray = QSystemTrayIcon()
         self._tray.setIcon(icon)
-        self._tray.setToolTip(f"{__app_name__} v{__version__}")
+        self._tray.setToolTip(f"{APP_NAME} v{VERSION}")
 
         # Create the menu
         self._menu = QMenu()

@@ -1,8 +1,7 @@
 import os
 
-from rcc import __app_name__
 from rcc.communications.client.dbus.linux.notification_client import NOTIFICATION_CLIENT
-from rcc.utils.constants import ICONS_PATH
+from rcc.utils.constants import APP_NAME, ICONS_PATH
 from framework.singleton import singleton
 
 
@@ -21,7 +20,7 @@ class Notifier:
             NOTIFICATION_CLIENT.close_notification(self.last_id)
 
         try:
-            toast_id = NOTIFICATION_CLIENT.show_notification(" ", icon, __app_name__, message + "\n\t", 3000)
+            toast_id = NOTIFICATION_CLIENT.show_notification(" ", icon, APP_NAME, message + "\n\t", 3000)
             if can_be_hidden:
                 self.last_id = toast_id
         except Exception:

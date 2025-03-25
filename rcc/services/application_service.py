@@ -2,10 +2,10 @@ import os
 import shutil
 import signal
 
-from rcc import __app_name__
 from rcc.gui.notifier import NOTIFIER
 from rcc.utils.beans import TRANSLATOR
 from rcc.utils.constants import (
+    APP_NAME,
     APP_DRAW_FILE,
     AUTOSTART_FILE,
     ICONS_PATH,
@@ -25,12 +25,12 @@ class ApplicationService:
     """Class for managing applicaion aspects"""
 
     RUNNER_FILE_PATH = os.path.join(USER_BIN_FOLDER, "launch.sh")
-    UPDATE_FILE_PATH = f"{os.path.join(USER_UPDATE_FOLDER, __app_name__)}.AppImage"
+    UPDATE_FILE_PATH = f"{os.path.join(USER_UPDATE_FOLDER, APP_NAME)}.AppImage"
 
     DESKTOP_FILE_CONTENT = f"""[Desktop Entry]
 Exec={RUNNER_FILE_PATH}
 Icon={os.path.join(USER_ICON_FOLDER, "icon.svg")}
-Name={__app_name__}
+Name={APP_NAME}
 Comment=An utility to manage Asus Rog laptop performance
 Path=
 Terminal=False
