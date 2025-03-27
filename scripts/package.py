@@ -1,5 +1,6 @@
 import os
 import shutil
+
 import subprocess
 
 workspace_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
@@ -85,12 +86,16 @@ def generate_appimage():
     try:
         os.chmod(appimagetool_path, 0o755)
         os.chdir(output_dir)
-        subprocess.run(
+        command = " ".join(
             [
                 appimagetool_path,
                 output_dir,
                 output,
-            ],
+            ]
+        )
+        subprocess.run(
+            command,
+            shell=True,
             env={**os.environ, "ARCH": "x86_64"},
             stdout=subprocess.DEVNULL,
             stderr=subprocess.PIPE,
@@ -103,7 +108,7 @@ def generate_appimage():
 def package_python():
     """Package Python application"""
     print("Packaging Python code...")
-    subprocess.run(
+    command = " ".join(
         [
             "pyinstaller",
             "--distpath",
@@ -113,7 +118,11 @@ def package_python():
             "--add-data",
             os.path.join(workspace_dir, "pyproject.toml") + ":assets",
             os.path.join(workspace_dir, "main.py"),
-        ],
+        ]
+    )
+    subprocess.run(
+        command,
+        shell=True,
         stdout=subprocess.DEVNULL,
         stderr=subprocess.PIPE,
         check=False,

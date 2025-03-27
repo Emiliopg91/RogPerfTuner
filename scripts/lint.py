@@ -3,7 +3,6 @@ import os
 import subprocess
 import sys
 import threading
-import time
 from watchdog.observers import Observer
 from watchdog.events import FileSystemEventHandler
 
@@ -47,7 +46,9 @@ def run_pylint():
         for _, param in enumerate(line.replace("${workspaceFolder}", ".").split(" ")):
             pylint_command.append(param)
 
-    result = subprocess.run(pylint_command, check=False)
+    command = " ".join(pylint_command)
+
+    result = subprocess.run(command, shell=True, check=False)
 
     if result.returncode != 0:
         print("Linting failed")

@@ -16,6 +16,7 @@ class AbstractEffect(ABC):
 
     # Map brightness levels
     BRIGHTNESS_MAP = {
+        RgbBrightness.OFF: 0,
         RgbBrightness.LOW: 0.25,
         RgbBrightness.MEDIUM: 0.5,
         RgbBrightness.HIGH: 0.75,
@@ -40,12 +41,6 @@ class AbstractEffect(ABC):
 
         self._thread = None
         self._is_running = True
-
-        if brightness == RgbBrightness.OFF:
-            self._logger.info("Turning off RGB")
-            for dev in devices:
-                dev.set_colors([RGBColor.fromHEX("#000000")] * len(dev.leds), True)
-            return
 
         self._color = color
         self._devices = devices

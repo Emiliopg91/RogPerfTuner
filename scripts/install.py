@@ -3,10 +3,18 @@ import datetime
 import os
 import shutil
 import subprocess
+import time
 
 RCCDC_PATH = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "assets", "RCCDeckyCompanion"))
 OPENRGB_PATH = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "assets", "OpenRGB.AppImage"))
 UDEV_PATH = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "assets", "60-openrgb.rules"))
+
+
+def install_uv_deps():
+    """Install uv dependencies"""
+    print("  Installing project dependencies...")
+    command = " ".join(["uv", "sync", "--reinstall"])
+    subprocess.run(command, shell=True, check=True, stdout=subprocess.DEVNULL, stderr=subprocess.PIPE)
 
 
 def get_openrgb():
@@ -43,9 +51,8 @@ def get_openrgb():
                 print("    Dependency updated, getting udev file...")
 
                 os.chdir(os.path.dirname(OPENRGB_PATH))
-                subprocess.run(
-                    [OPENRGB_PATH, "--appimage-extract"], check=True, stdout=subprocess.DEVNULL, stderr=subprocess.PIPE
-                )
+                command = " ".join([OPENRGB_PATH, "--appimage-extract"])
+                subprocess.run(command, shell=True, check=True, stdout=subprocess.DEVNULL, stderr=subprocess.PIPE)
                 squashfs_root = os.path.join(os.path.dirname(OPENRGB_PATH), "squashfs-root")
 
                 src_udev_path = os.path.join(squashfs_root, "usr", "lib", "udev", "rules.d", "60-openrgb.rules")
@@ -94,8 +101,9 @@ def get_rccdc():
                 print("    Dependency updated, extracting...")
 
                 os.chdir(os.path.dirname(RCCDC_PATH))
+                command = " ".join(["tar", "-xvzf", (RCCDC_PATH + ".tar.gz"), "-C", os.path.dirname(RCCDC_PATH)])
                 subprocess.run(
-                    ["tar", "-xvzf", (RCCDC_PATH + ".tar.gz"), "-C", os.path.dirname(RCCDC_PATH)],
+                    command,
                     check=True,
                     stdout=subprocess.DEVNULL,
                     stderr=subprocess.PIPE,
@@ -111,5 +119,7 @@ def get_rccdc():
 
 
 print("Installing dependencies...")
+time.sleep(0.1)
+install_uv_deps()
 get_openrgb()
 get_rccdc()
