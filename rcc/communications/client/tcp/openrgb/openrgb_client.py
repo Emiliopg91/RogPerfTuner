@@ -198,6 +198,14 @@ class OpenRgbClient:
             return inst[0].supports_color
         return False
 
+    def apply_brightness(self, effect: str, brightness: RgbBrightness) -> bool:
+        """Apply effect with specified brightness and color"""
+        inst = [i for i in self._available_effects if i.name == effect]
+        if inst:
+            inst[0].brightness = brightness
+            return inst[0].supports_color
+        return False
+
     def disable_device(self, name: str):
         """Disable certain device"""
         dev = next((d for d in self._available_devices if d.name == name), None)

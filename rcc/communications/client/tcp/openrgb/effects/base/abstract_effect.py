@@ -33,6 +33,7 @@ class AbstractEffect(ABC):
         self._mutex = Lock()
         self._devices: List[Device] = []
         self._thread = None
+        self._brightness_changed = False
 
     def start(self, devices: List[Device], brightness: RgbBrightness, color: RGBColor):
         """Start effect"""
@@ -72,6 +73,9 @@ class AbstractEffect(ABC):
             ms -= nap
             naps.append(nap)
         for nap in naps:
+            if self._brightness_changed:
+                self._brightness_changed = False
+                break
             if self._is_running:
                 time.sleep(nap)
 
@@ -96,6 +100,20 @@ class AbstractEffect(ABC):
     def color(self) -> Optional[str]:
         """Get hex color or none"""
         return self._color.to_hex() if self._supports_color else None
+
+    @property
+    def brightness(self) -> RgbBrightness:
+        """Brightness of effect"""
+        for k, v in self.BRIGHTNESS_MAP.items():
+            if v == self._brightness:
+                return k
+        return RgbBrightness.MAX
+
+    @brightness.setter
+    def brightness(self, brightness: RgbBrightness):
+        self._brightness = self.BRIGHTNESS_MAP.get(brightness, 0)
+        self._logger.info(f"Updating effect with {brightness.name.lower()} brightness")
+        self._brightness_changed = True
 
     def _thread_main(self):
         self.apply_effect()

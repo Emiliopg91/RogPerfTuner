@@ -188,7 +188,11 @@ class RgbService:
         if (self._effect != effect or self._brightness != brightness or self._color != color) or force:
             self._logger.info("Applying effect")
             self._logger.add_tab()
-            supports_color = OPEN_RGB_CLIENT.apply_effect(effect, brightness, color)
+            supports_color = False
+            if self._effect == effect and self._color == color and self._brightness != brightness:
+                OPEN_RGB_CLIENT.apply_brightness(effect, brightness)
+            else:
+                supports_color = OPEN_RGB_CLIENT.apply_effect(effect, brightness, color)
 
             self._effect = effect
             self._brightness = brightness
