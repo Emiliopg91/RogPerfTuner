@@ -1,3 +1,6 @@
 [submodule "submodules/OpenRGB"]
 	path = submodules/OpenRGB
 	url = https://github.com/Emiliopg91/OpenRGB
+[submodule "submodules/RCCDeckyCompanion"]
+	path = submodules/RCCDeckyCompanion
+	url = git@github.com:Emiliopg91/RCCDeckyCompanion.git
