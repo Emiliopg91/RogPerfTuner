@@ -1,4 +1,3 @@
-import concurrent
 import time
 from threading import Lock
 
@@ -11,6 +10,7 @@ from rcc.communications.client.dbus.linux.power_profiles_client import POWER_PRO
 from rcc.communications.client.dbus.linux.upower_client import UPOWER_CLIENT
 from rcc.gui.notifier import NOTIFIER
 from rcc.models.cpu_governor import CpuGovernor
+from rcc.models.fan_curve import FanCurve
 from rcc.models.performance_profile import PerformanceProfile
 from rcc.models.platform_profile import PlatformProfile
 from rcc.models.power_profile import PowerProfile
@@ -40,6 +40,21 @@ class ProfileService:
 
         PLATFORM_CLIENT.change_platform_profile_on_ac = False
         PLATFORM_CLIENT.change_platform_profile_on_battery = False
+        PLATFORM_CLIENT.platfom_profile_linked_epp = True
+
+        self.__curves: dict[PlatformProfile, list[FanCurve]] = {}
+        self._logger.info("Configuring improved fan curves")
+        for p in PlatformProfile:
+            FAN_CURVES_CLIENT.set_curves_to_defaults(p)
+            FAN_CURVES_CLIENT.reset_profile_curves(p)
+            time.sleep(0.2)
+
+            curves = FAN_CURVES_CLIENT.fan_curve_data(p)
+            for curve in curves:
+                curve.enabled = True
+                for i in range(len(curve.points)):  # pylint: disable=consider-using-enumerate
+                    curve.points[i] = (curve.points[i][0], min(100, round(curve.points[i][1] * 1.15)))
+            self.__curves[p] = curves
 
         EVENT_BUS.on(HARDWARE_SERVICE_ON_BATTERY, self._on_ac_battery_change)
         EVENT_BUS.on(STEAM_SERVICE_GAME_EVENT, self._on_game_event)
@@ -83,18 +98,11 @@ class ProfileService:
                     self._logger.info(f"Setting {profile_name} profile")  # pylint: disable=line-too-long
                     self._logger.add_tab()
 
-                    # Ejecutar las operaciones de forma concurrente
-                    with concurrent.futures.ThreadPoolExecutor() as executor:
-                        futures = [
-                            executor.submit(lambda: self.__set_ssd_scheduler(ssd_sched)),
-                            executor.submit(lambda: self.__set_boost(boost_enabled)),
-                            executor.submit(lambda: self.__set_cpu_governor(cpu_governor)),
-                            executor.submit(lambda: self.__set_power_profile(power_profile)),
-                            executor.submit(lambda: self.__set_fan_curves(platform_profile)),
-                            executor.submit(lambda: self.__set_throttle_policy(profile, platform_profile)),
-                        ]
-                        # Esperar a que todas las operaciones terminen
-                        concurrent.futures.wait(futures)
+                    self.__set_throttle_policy(profile, platform_profile)
+                    self.__set_boost(boost_enabled)
+                    self.__set_fan_curves(platform_profile)
+                    self.__set_cpu_governor(cpu_governor, power_profile)
+                    self.__set_ssd_scheduler(ssd_sched)
 
                     self._logger.rem_tab()
                     self._logger.info("Profile setted succesfully")
@@ -159,23 +167,18 @@ class ProfileService:
     def __set_fan_curves(self, platform_profile: PlatformProfile):
         try:
             self._logger.info(f"Fan curve: {platform_profile.name}")
-            FAN_CURVES_CLIENT.set_curves_to_defaults(platform_profile)
-            FAN_CURVES_CLIENT.reset_profile_curves(platform_profile)
-            FAN_CURVES_CLIENT.set_fan_curves_enabled(platform_profile, True)
+            for curve in self.__curves[platform_profile]:
+                FAN_CURVES_CLIENT.set_fan_curve(platform_profile, curve)
         except Exception as e:
             self._logger.error(f"Error while setting fan curve: {e}")
 
-    def __set_power_profile(self, power_profile: PowerProfile):
-        try:
-            self._logger.info(f"Power profile: {power_profile.name}")
-            POWER_PROFILE_CLIENT.active_profile = power_profile
-        except Exception as e:
-            self._logger.error(f"Error while setting power profile: {e}")
-
-    def __set_cpu_governor(self, governor: CpuGovernor):
+    def __set_cpu_governor(self, governor: CpuGovernor, power_profile: PowerProfile):
         try:
             self._logger.info(f"CPU governor: {governor.name}")
             SHELL.run_command(f"cpupower frequency-set -g {governor.value}", True)
+            time.sleep(0.25)
+            self._logger.info(f"Power profile: {power_profile.name}")
+            POWER_PROFILE_CLIENT.active_profile = power_profile
         except Exception as e:
             self._logger.error(f"Error while setting CPU governor: {e}")
 

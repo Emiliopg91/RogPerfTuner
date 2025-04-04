@@ -108,6 +108,7 @@ def generate_appimage():
 def package_python():
     """Package Python application"""
     print("Packaging Python code...")
+    shutil.copy2(os.path.join(workspace_dir, "pyproject.toml"), os.path.join(workspace_dir, "assets", "pyproject.toml"))
     command = " ".join(
         [
             "pyinstaller",
@@ -115,8 +116,6 @@ def package_python():
             os.path.join(output_dir, "usr", "bin"),
             "--add-data",
             os.path.join(workspace_dir, "assets") + ":assets",
-            "--add-data",
-            os.path.join(workspace_dir, "pyproject.toml") + ":assets",
             os.path.join(workspace_dir, "main.py"),
         ]
     )

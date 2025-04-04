@@ -1,0 +1,3 @@
+[submodule "OpenRGB"]
+	path = OpenRGB
+	url = https://github.com/Emiliopg91/OpenRGB
