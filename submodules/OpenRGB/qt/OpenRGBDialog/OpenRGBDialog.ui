@@ -1,0 +1,163 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>OpenRGBDialogUi</class>
+ <widget class="QMainWindow" name="OpenRGBDialogUi">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>500</width>
+    <height>160</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>OpenRGB</string>
+  </property>
+  <widget class="QWidget" name="centralWidget">
+   <layout class="QGridLayout" name="gridLayout">
+    <item row="0" column="0">
+     <widget class="QPushButton" name="ButtonRed">
+      <property name="text">
+       <string/>
+      </property>
+     </widget>
+    </item>
+    <item row="0" column="1">
+     <widget class="QPushButton" name="ButtonYellow">
+      <property name="text">
+       <string/>
+      </property>
+     </widget>
+    </item>
+    <item row="0" column="2">
+     <widget class="QPushButton" name="ButtonGreen">
+      <property name="text">
+       <string/>
+      </property>
+     </widget>
+    </item>
+    <item row="0" column="3">
+     <widget class="QPushButton" name="ButtonCyan">
+      <property name="text">
+       <string/>
+      </property>
+     </widget>
+    </item>
+    <item row="0" column="4">
+     <widget class="QPushButton" name="ButtonBlue">
+      <property name="text">
+       <string/>
+      </property>
+     </widget>
+    </item>
+    <item row="0" column="5">
+     <widget class="QPushButton" name="ButtonMagenta">
+      <property name="text">
+       <string/>
+      </property>
+     </widget>
+    </item>
+    <item row="0" column="6">
+     <widget class="QLabel" name="LabelAuraDevice">
+      <property name="text">
+       <string>Device</string>
+      </property>
+     </widget>
+    </item>
+    <item row="0" column="7">
+     <widget class="QComboBox" name="ComboDevices"/>
+    </item>
+    <item row="1" column="0" colspan="2">
+     <widget class="QLabel" name="LabelRed">
+      <property name="text">
+       <string>Red</string>
+      </property>
+     </widget>
+    </item>
+    <item row="1" column="2" colspan="2">
+     <widget class="QLabel" name="LabelGreen">
+      <property name="text">
+       <string>Green</string>
+      </property>
+     </widget>
+    </item>
+    <item row="1" column="4" colspan="2">
+     <widget class="QLabel" name="LabelBlue">
+      <property name="text">
+       <string>Blue</string>
+      </property>
+     </widget>
+    </item>
+    <item row="1" column="6" rowspan="2">
+     <widget class="QLabel" name="LabelMode">
+      <property name="text">
+       <string>Mode</string>
+      </property>
+     </widget>
+    </item>
+    <item row="1" column="7" rowspan="2">
+     <widget class="QComboBox" name="ComboModes"/>
+    </item>
+    <item row="2" column="0" colspan="2">
+     <widget class="QLineEdit" name="EditLED0R"/>
+    </item>
+    <item row="2" column="2" colspan="2">
+     <widget class="QLineEdit" name="EditLED0G"/>
+    </item>
+    <item row="2" column="4" colspan="2">
+     <widget class="QLineEdit" name="EditLED0B"/>
+    </item>
+    <item row="3" column="0" colspan="3">
+     <widget class="QPushButton" name="ButtonSetAll">
+      <property name="text">
+       <string>Set All</string>
+      </property>
+     </widget>
+    </item>
+    <item row="3" column="3" colspan="3">
+     <widget class="QPushButton" name="ButtonSetDevice">
+      <property name="text">
+       <string>Set Device</string>
+      </property>
+     </widget>
+    </item>
+    <item row="3" column="6">
+     <widget class="QLabel" name="LabelZone">
+      <property name="text">
+       <string>Zone</string>
+      </property>
+     </widget>
+    </item>
+    <item row="3" column="7">
+     <widget class="QComboBox" name="ComboZones"/>
+    </item>
+    <item row="4" column="0" colspan="3">
+     <widget class="QPushButton" name="ButtonSetZone">
+      <property name="text">
+       <string>Set Zone</string>
+      </property>
+     </widget>
+    </item>
+    <item row="4" column="3" colspan="3">
+     <widget class="QPushButton" name="ButtonSetLED">
+      <property name="text">
+       <string>Set LED</string>
+      </property>
+     </widget>
+    </item>
+    <item row="4" column="6">
+     <widget class="QLabel" name="LabelLED">
+      <property name="text">
+       <string>LED</string>
+      </property>
+     </widget>
+    </item>
+    <item row="4" column="7">
+     <widget class="QComboBox" name="ComboLEDs"/>
+    </item>
+   </layout>
+  </widget>
+ </widget>
+ <resources/>
+ <connections/>
+</ui>

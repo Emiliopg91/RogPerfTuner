@@ -16,6 +16,9 @@ from rcc.communications.client.dbus.asus.armoury.nvidia.nv_boost_client import N
 from rcc.communications.client.dbus.asus.armoury.nvidia.nv_temp_client import NV_TEMP_CLIENT
 from rcc.communications.client.dbus.asus.armoury.panel_overdrive_client import PANEL_OVERDRIVE_CLIENT
 from rcc.communications.client.dbus.asus.core.platform_client import PLATFORM_CLIENT
+from rcc.communications.client.dbus.linux.power_management_keyboard_brightness_control import (
+    KEYBOARD_BRIGHTNESS_CONTROL,
+)
 from rcc.communications.client.dbus.linux.switcheroo_client import SWITCHEROO_CLIENT
 from rcc.communications.client.dbus.linux.upower_client import UPOWER_CLIENT
 from rcc.communications.client.tcp.openrgb.openrgb_client import OPEN_RGB_CLIENT
@@ -168,9 +171,14 @@ class HardwareService:
         thread.start()
 
         UPOWER_CLIENT.on_battery_change(self._on_ac_battery_change)
+        KEYBOARD_BRIGHTNESS_CONTROL.on_brightness_change(self._on_kb_brightness_change)
         EVENT_BUS.on(STEAM_SERVICE_GAME_EVENT, self.__on_game_event)
 
         self._logger.rem_tab()
+
+    def _on_kb_brightness_change(self, value: int):
+        if value == 0:
+            KEYBOARD_BRIGHTNESS_CONTROL.keyboard_brightness = 2
 
     def get_icd_files(self, gpu: GpuBrand):
         """Get path to ICD files"""

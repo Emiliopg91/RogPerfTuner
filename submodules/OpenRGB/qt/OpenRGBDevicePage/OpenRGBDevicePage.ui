@@ -1,0 +1,439 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>OpenRGBDevicePageUi</class>
+ <widget class="QFrame" name="OpenRGBDevicePageUi">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>843</width>
+    <height>374</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>Device page</string>
+  </property>
+  <layout class="QGridLayout" name="OpenRGBDevicePageUiGridLayout" rowstretch="0,0" columnstretch="3,1">
+   <item row="1" column="1">
+    <widget class="QFrame" name="ColorFrame">
+     <property name="sizePolicy">
+      <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+       <horstretch>0</horstretch>
+       <verstretch>0</verstretch>
+      </sizepolicy>
+     </property>
+     <property name="autoFillBackground">
+      <bool>true</bool>
+     </property>
+     <property name="frameShape">
+      <enum>QFrame::Shape::StyledPanel</enum>
+     </property>
+     <property name="frameShadow">
+      <enum>QFrame::Shadow::Sunken</enum>
+     </property>
+     <layout class="QGridLayout" name="ColorGridLayout" rowstretch="10,0,0,0" columnstretch="0">
+      <item row="2" column="0">
+       <widget class="QFrame" name="ColorEntryFrame">
+        <property name="frameShape">
+         <enum>QFrame::Shape::NoFrame</enum>
+        </property>
+        <property name="frameShadow">
+         <enum>QFrame::Shadow::Raised</enum>
+        </property>
+        <layout class="QGridLayout" name="ColorEntryGridLayout" columnstretch="0,1,0,1">
+         <property name="leftMargin">
+          <number>0</number>
+         </property>
+         <property name="topMargin">
+          <number>0</number>
+         </property>
+         <property name="rightMargin">
+          <number>0</number>
+         </property>
+         <property name="bottomMargin">
+          <number>0</number>
+         </property>
+         <item row="0" column="0">
+          <widget class="QLabel" name="RedLabel">
+           <property name="text">
+            <string>R:</string>
+           </property>
+          </widget>
+         </item>
+         <item row="0" column="1">
+          <widget class="QSpinBox" name="RedSpinBox">
+           <property name="maximum">
+            <number>255</number>
+           </property>
+          </widget>
+         </item>
+         <item row="0" column="2">
+          <widget class="QLabel" name="HueLabel">
+           <property name="text">
+            <string>H:</string>
+           </property>
+          </widget>
+         </item>
+         <item row="0" column="3">
+          <widget class="QSpinBox" name="HueSpinBox">
+           <property name="maximum">
+            <number>359</number>
+           </property>
+          </widget>
+         </item>
+         <item row="1" column="0">
+          <widget class="QLabel" name="GreenLabel">
+           <property name="text">
+            <string>G:</string>
+           </property>
+          </widget>
+         </item>
+         <item row="1" column="1">
+          <widget class="QSpinBox" name="GreenSpinBox">
+           <property name="maximum">
+            <number>255</number>
+           </property>
+          </widget>
+         </item>
+         <item row="1" column="2">
+          <widget class="QLabel" name="SatLabel">
+           <property name="text">
+            <string>S:</string>
+           </property>
+          </widget>
+         </item>
+         <item row="1" column="3">
+          <widget class="QSpinBox" name="SatSpinBox">
+           <property name="maximum">
+            <number>255</number>
+           </property>
+          </widget>
+         </item>
+         <item row="2" column="0">
+          <widget class="QLabel" name="BlueLabel">
+           <property name="text">
+            <string>B:</string>
+           </property>
+          </widget>
+         </item>
+         <item row="2" column="1">
+          <widget class="QSpinBox" name="BlueSpinBox">
+           <property name="maximum">
+            <number>255</number>
+           </property>
+          </widget>
+         </item>
+         <item row="2" column="2">
+          <widget class="QLabel" name="ValLabel">
+           <property name="text">
+            <string>V:</string>
+           </property>
+          </widget>
+         </item>
+         <item row="2" column="3">
+          <widget class="QSpinBox" name="ValSpinBox">
+           <property name="maximum">
+            <number>255</number>
+           </property>
+          </widget>
+         </item>
+         <item row="3" column="0">
+          <widget class="QLabel" name="HexLabel">
+           <property name="text">
+            <string>Hex:</string>
+           </property>
+          </widget>
+         </item>
+         <item row="3" column="1" colspan="3">
+          <widget class="QLineEdit" name="HexLineEdit">
+           <property name="maxLength">
+            <number>8</number>
+           </property>
+          </widget>
+         </item>
+        </layout>
+       </widget>
+      </item>
+      <item row="0" column="0">
+       <widget class="ColorWheel" name="ColorWheelBox" native="true">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
+       </widget>
+      </item>
+      <item row="1" column="0">
+       <widget class="Swatches" name="SwatchBox" native="true">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
+        <property name="styleSheet">
+         <string notr="true"/>
+        </property>
+       </widget>
+      </item>
+      <item row="3" column="0">
+       <widget class="QPushButton" name="DeviceSaveButton">
+        <property name="text">
+         <string>Save To Device</string>
+        </property>
+       </widget>
+      </item>
+     </layout>
+    </widget>
+   </item>
+   <item row="1" column="0">
+    <widget class="QFrame" name="ControlsFrame">
+     <property name="sizePolicy">
+      <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+       <horstretch>0</horstretch>
+       <verstretch>0</verstretch>
+      </sizepolicy>
+     </property>
+     <property name="autoFillBackground">
+      <bool>true</bool>
+     </property>
+     <property name="frameShape">
+      <enum>QFrame::Shape::StyledPanel</enum>
+     </property>
+     <property name="frameShadow">
+      <enum>QFrame::Shadow::Sunken</enum>
+     </property>
+     <layout class="QGridLayout" name="ControlsGridLayout" columnstretch="0,1,1,1">
+      <item row="5" column="0">
+       <widget class="QLabel" name="SpeedLabel">
+        <property name="text">
+         <string>Speed:</string>
+        </property>
+       </widget>
+      </item>
+      <item row="1" column="1" colspan="2">
+       <widget class="QComboBox" name="LEDBox"/>
+      </item>
+      <item row="0" column="1" colspan="2">
+       <widget class="QComboBox" name="ZoneBox"/>
+      </item>
+      <item row="4" column="3">
+       <widget class="QRadioButton" name="RandomCheck">
+        <property name="text">
+         <string>Random</string>
+        </property>
+       </widget>
+      </item>
+      <item row="3" column="0">
+       <widget class="QLabel" name="ModeLabel">
+        <property name="text">
+         <string>Mode:</string>
+        </property>
+       </widget>
+      </item>
+      <item row="6" column="0">
+       <widget class="QLabel" name="DirectionLabel">
+        <property name="text">
+         <string>Dir:</string>
+        </property>
+       </widget>
+      </item>
+      <item row="5" column="1" colspan="3">
+       <widget class="QTooltipedSlider" name="SpeedSlider">
+        <property name="orientation">
+         <enum>Qt::Orientation::Horizontal</enum>
+        </property>
+       </widget>
+      </item>
+      <item row="4" column="0">
+       <widget class="QLabel" name="ColorLabel">
+        <property name="text">
+         <string>Colors:</string>
+        </property>
+       </widget>
+      </item>
+      <item row="4" column="1">
+       <widget class="QRadioButton" name="PerLEDCheck">
+        <property name="text">
+         <string>Per-LED</string>
+        </property>
+       </widget>
+      </item>
+      <item row="0" column="0">
+       <widget class="QLabel" name="ZoneLabel">
+        <property name="text">
+         <string>Zone:</string>
+        </property>
+       </widget>
+      </item>
+      <item row="3" column="1" colspan="3">
+       <widget class="QComboBox" name="ModeBox"/>
+      </item>
+      <item row="2" column="3">
+       <widget class="QPushButton" name="SetAllButton">
+        <property name="toolTip">
+         <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p align=&quot;justify&quot;&gt;Sets all devices to&lt;br/&gt;&lt;b&gt;Static&lt;/b&gt; mode and&lt;br/&gt;applies the selected color.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+        </property>
+        <property name="text">
+         <string>Apply All Devices</string>
+        </property>
+       </widget>
+      </item>
+      <item row="1" column="0">
+       <widget class="QLabel" name="LEDLabel">
+        <property name="text">
+         <string>LED:</string>
+        </property>
+       </widget>
+      </item>
+      <item row="0" column="3">
+       <widget class="QPushButton" name="EditZoneButton">
+        <property name="text">
+         <string>Edit</string>
+        </property>
+       </widget>
+      </item>
+      <item row="4" column="2">
+       <widget class="QRadioButton" name="ModeSpecificCheck">
+        <property name="text">
+         <string>Mode-Specific</string>
+        </property>
+       </widget>
+      </item>
+      <item row="2" column="1" colspan="2">
+       <widget class="QPushButton" name="ApplyColorsButton">
+        <property name="text">
+         <string>Apply Colors To Selection</string>
+        </property>
+       </widget>
+      </item>
+      <item row="1" column="3">
+       <widget class="QPushButton" name="SelectAllLEDsButton">
+        <property name="text">
+         <string>Select All</string>
+        </property>
+       </widget>
+      </item>
+      <item row="7" column="1" colspan="3">
+       <widget class="QTooltipedSlider" name="BrightnessSlider">
+        <property name="orientation">
+         <enum>Qt::Orientation::Horizontal</enum>
+        </property>
+       </widget>
+      </item>
+      <item row="6" column="1" colspan="3">
+       <widget class="QComboBox" name="DirectionBox"/>
+      </item>
+      <item row="7" column="0">
+       <widget class="QLabel" name="BrightnessLabel">
+        <property name="text">
+         <string>Brightness:</string>
+        </property>
+       </widget>
+      </item>
+     </layout>
+    </widget>
+   </item>
+   <item row="0" column="0" colspan="2">
+    <widget class="QFrame" name="DeviceViewBoxFrame">
+     <property name="sizePolicy">
+      <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+       <horstretch>0</horstretch>
+       <verstretch>0</verstretch>
+      </sizepolicy>
+     </property>
+     <property name="minimumSize">
+      <size>
+       <width>0</width>
+       <height>0</height>
+      </size>
+     </property>
+     <property name="autoFillBackground">
+      <bool>true</bool>
+     </property>
+     <property name="frameShape">
+      <enum>QFrame::Shape::StyledPanel</enum>
+     </property>
+     <property name="frameShadow">
+      <enum>QFrame::Shadow::Sunken</enum>
+     </property>
+     <layout class="QGridLayout" name="DeviceViewBoxGridLayout">
+      <item row="0" column="0">
+       <widget class="DeviceView" name="DeviceViewBox" native="true">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
+        <property name="minimumSize">
+         <size>
+          <width>0</width>
+          <height>0</height>
+         </size>
+        </property>
+       </widget>
+      </item>
+     </layout>
+    </widget>
+   </item>
+  </layout>
+ </widget>
+ <customwidgets>
+  <customwidget>
+   <class>ColorWheel</class>
+   <extends>QWidget</extends>
+   <header location="global">ColorWheel.h</header>
+   <container>1</container>
+   <slots>
+    <signal>colorChanged(QColor)</signal>
+   </slots>
+  </customwidget>
+  <customwidget>
+   <class>DeviceView</class>
+   <extends>QWidget</extends>
+   <header location="global">DeviceView.h</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>Swatches</class>
+   <extends>QWidget</extends>
+   <header location="global">swatches.h</header>
+   <container>1</container>
+   <slots>
+    <signal>swatchChanged(QColor)</signal>
+    <slot>currentColorInput(QColor)</slot>
+   </slots>
+  </customwidget>
+  <customwidget>
+   <class>QTooltipedSlider</class>
+   <extends>QSlider</extends>
+   <header location="global">QTooltipedSlider.h</header>
+  </customwidget>
+ </customwidgets>
+ <tabstops>
+  <tabstop>ZoneBox</tabstop>
+  <tabstop>EditZoneButton</tabstop>
+  <tabstop>LEDBox</tabstop>
+  <tabstop>SelectAllLEDsButton</tabstop>
+  <tabstop>ApplyColorsButton</tabstop>
+  <tabstop>SetAllButton</tabstop>
+  <tabstop>ModeBox</tabstop>
+  <tabstop>PerLEDCheck</tabstop>
+  <tabstop>ModeSpecificCheck</tabstop>
+  <tabstop>RandomCheck</tabstop>
+  <tabstop>SpeedSlider</tabstop>
+  <tabstop>DirectionBox</tabstop>
+  <tabstop>BrightnessSlider</tabstop>
+  <tabstop>RedSpinBox</tabstop>
+  <tabstop>GreenSpinBox</tabstop>
+  <tabstop>BlueSpinBox</tabstop>
+  <tabstop>HueSpinBox</tabstop>
+  <tabstop>SatSpinBox</tabstop>
+  <tabstop>ValSpinBox</tabstop>
+  <tabstop>DeviceSaveButton</tabstop>
+ </tabstops>
+ <resources/>
+ <connections/>
+</ui>

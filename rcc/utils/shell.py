@@ -10,10 +10,13 @@ class Shell:
 
     def __init__(self):
         self.__logger = Logger()
-        self.__pwd = CRYPTOGRAPHY.decrypt_string(CONFIGURATION.settings.password) + "\n"
+        self.__pwd = None
 
     def run_command(self, command, sudo=False, check=True, output=False):
         """Run command on shell"""
+        if sudo and self.__pwd is None:
+            self.__pwd = CRYPTOGRAPHY.decrypt_string(CONFIGURATION.settings.password) + "\n"
+
         final_cmd = command
         input_txt = None
         if sudo:

@@ -17,9 +17,13 @@ class PowerManagementKeyboardBrightnessControl(AbstractDbusClient):
         )
 
     @property
-    def keyboard_brightness(self) -> bool:
+    def keyboard_brightness(self) -> int:
         """keyboardBrightness"""
         return self._invoke_method("keyboardBrightness")
+
+    @keyboard_brightness.setter
+    def keyboard_brightness(self, value: int):
+        return self._invoke_method("setKeyboardBrightnessSilent", value)
 
     def on_brightness_change(self, callback: Callable[[int], None]):
         """Subscribe keyboard brightness change"""

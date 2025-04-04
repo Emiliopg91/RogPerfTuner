@@ -5,7 +5,7 @@ a = Analysis(
     ['/var/mnt/Datos/Desarrollo/Workspace/VSCode/RogControlCenter/main.py'],
     pathex=[],
     binaries=[],
-    datas=[('/var/mnt/Datos/Desarrollo/Workspace/VSCode/RogControlCenter/assets', 'assets'), ('/var/mnt/Datos/Desarrollo/Workspace/VSCode/RogControlCenter/pyproject.toml', 'assets')],
+    datas=[('/var/mnt/Datos/Desarrollo/Workspace/VSCode/RogControlCenter/assets', 'assets')],
     hiddenimports=[],
     hookspath=[],
     hooksconfig={},

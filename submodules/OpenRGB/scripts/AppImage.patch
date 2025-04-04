@@ -1,0 +1,23 @@
+--- a/OpenRGB.pro
++++ b/OpenRGB.pro
+@@ -443,8 +443,6 @@ contains(QMAKE_PLATFORM, linux) {
+     PKGCONFIG +=                                                                                \
+     libusb-1.0
+
+-    TARGET = $$lower($$TARGET)
+-
+     HEADERS += $$CONTROLLER_H_LINUX
+
+     HEADERS +=                                                                                  \
+--- a/qt/org.openrgb.OpenRGB.desktop
++++ b/qt/org.openrgb.OpenRGB.desktop
+@@ -4,7 +4,7 @@ Version=1.5
+ Name=OpenRGB
+ Comment=Control RGB lighting
+ Icon=org.openrgb.OpenRGB
+-TryExec=openrgb
+-Exec=openrgb
++TryExec=OpenRGB
++Exec=OpenRGB
+ Terminal=false
+ Categories=Utility;

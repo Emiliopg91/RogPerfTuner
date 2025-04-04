@@ -4,9 +4,6 @@ from typing import Optional
 import time
 
 
-from rcc.communications.client.dbus.linux.power_management_keyboard_brightness_control import (
-    KEYBOARD_BRIGHTNESS_CONTROL,
-)
 from rcc.communications.client.dbus.linux.upower_client import UPOWER_CLIENT
 from rcc.communications.client.tcp.openrgb.openrgb_client import OPEN_RGB_CLIENT
 from rcc.communications.client.tcp.openrgb.effects.static import STATIC_EFFECT
@@ -52,29 +49,12 @@ class RgbService:
         self._logger.rem_tab()
 
         EVENT_BUS.on(HARDWARE_SERVICE_ON_USB_CHANGED, self.reload)
-        EVENT_BUS.on(HARDWARE_SERVICE_ON_BATTERY, self.__on_battery_handler)
-        if KEYBOARD_BRIGHTNESS_CONTROL.available:
-            KEYBOARD_BRIGHTNESS_CONTROL.on_brightness_change(self.__on_keyboard_brightness_change)
-
-    def __on_battery_handler(self, on_bat: bool, keyboard_value: int = None):
-        if KEYBOARD_BRIGHTNESS_CONTROL.available:
-            if keyboard_value is None:
-                keyboard_value = KEYBOARD_BRIGHTNESS_CONTROL.keyboard_brightness
-
-            if keyboard_value == 0:
-                self._apply_aura(self._effect, RgbBrightness.OFF, self._color, True, True)
-            elif on_bat:
-                OPEN_RGB_CLIENT.apply_effect(self._effect, RgbBrightness.OFF)
-            else:
-                self.restore_brightness()
-        else:
-            OPEN_RGB_CLIENT.apply_effect(self._effect, RgbBrightness.OFF if on_bat else self._brightness, self._color)
-
-    def __on_keyboard_brightness_change(self, value: int):
-        if value == 0:
-            self._apply_aura(self._effect, RgbBrightness.OFF, self._color, True, True)
-        else:
-            self.__on_battery_handler(UPOWER_CLIENT.on_battery, value)
+        EVENT_BUS.on(
+            HARDWARE_SERVICE_ON_BATTERY,
+            lambda on_bat: OPEN_RGB_CLIENT.apply_effect(
+                self._effect, RgbBrightness.OFF if on_bat else self._brightness, self._color
+            ),
+        )
 
     def __load_custom_effects(self):
         """Load user custom effect"""
@@ -85,7 +65,7 @@ class RgbService:
             self._logger.info(f"Loading {len(files)} custom effects")
             self._logger.add_tab()
             for file in files:
-                module_name = file[:-3]
+                module_name = file[:-3]  # Quitar ".py"
                 module_path = os.path.join(directory, file)
                 self._logger.debug(f"Loading effect file {module_path}")
                 spec = importlib.util.spec_from_file_location(module_name, module_path)
@@ -188,11 +168,7 @@ class RgbService:
         if (self._effect != effect or self._brightness != brightness or self._color != color) or force:
             self._logger.info("Applying effect")
             self._logger.add_tab()
-            supports_color = False
-            if self._effect == effect and self._color == color and self._brightness != brightness:
-                OPEN_RGB_CLIENT.apply_brightness(effect, brightness)
-            else:
-                supports_color = OPEN_RGB_CLIENT.apply_effect(effect, brightness, color)
+            supports_color = OPEN_RGB_CLIENT.apply_effect(effect, brightness, color)
 
             self._effect = effect
             self._brightness = brightness

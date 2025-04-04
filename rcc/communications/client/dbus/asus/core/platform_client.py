@@ -51,6 +51,18 @@ class PlatformClient(AsusBaseClient):
         )
 
     @property
+    def platfom_profile_linked_epp(self) -> PlatformProfile:
+        """Enable EPP linking to profile"""
+        return PlatformProfile(self._get_property("PlatformProfileLinkedEpp"))
+
+    @platfom_profile_linked_epp.setter
+    def platfom_profile_linked_epp(self, val: bool) -> None:
+        self._set_property(
+            "PlatformProfileLinkedEpp",
+            QDBusVariant(QDBusArgument(val, QMetaType.Bool)),
+        )
+
+    @property
     def change_platform_profile_on_battery(self) -> bool:
         """Change Platform Profile On Battery"""
         return PlatformProfile(self._get_property("ChangePlatformProfileOnBattery"))
