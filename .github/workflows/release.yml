@@ -11,6 +11,8 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
+          submodules: recursive
+          fetch-depth: 0
 
       - name: Install Python and uv
         uses: actions/setup-python@v5
