@@ -17,11 +17,11 @@ ICONS_PATH = os.path.join(BASE_PATH, "assets", "icons")
 
 TRANSLATIONS_PATH = os.path.join(BASE_PATH, "assets", "translations.json")
 
-ORGB_PATH = os.path.join(BASE_PATH, "assets", "OpenRGB.AppImage")
+ORGB_PATH = os.path.join(BASE_PATH, "assets", "OpenRGB", "AppRun")
 
 RCCDC_ASSET_PATH = os.path.join(BASE_PATH, "assets", "RCCDeckyCompanion")
 
-UDEV_PATH = os.path.join(BASE_PATH, "assets", "60-openrgb.rules")
+UDEV_PATH = os.path.join(BASE_PATH, "assets", "OpenRGB", "usr", "lib", "udev", "rules.d", "60-openrgb.rules")
 
 PYPROJECT_TOML_PATH = (
     os.path.join(BASE_PATH, "pyproject.toml") if DEV_MODE else os.path.join(BASE_PATH, "assets", "pyproject.toml")

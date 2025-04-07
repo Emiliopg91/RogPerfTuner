@@ -6,7 +6,7 @@ import subprocess
 import time
 
 RCCDC_PATH = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "assets", "RCCDeckyCompanion"))
-OPENRGB_PATH = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "assets", "OpenRGB.AppImage"))
+OPENRGB_PATH = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "assets", "OpenRGB"))
 UDEV_PATH = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "assets", "60-openrgb.rules"))
 
 
@@ -36,11 +36,11 @@ def get_openrgb():
     """Download latest OpenRGB"""
     print("  Building OpenRGB...")
 
-    if not os.path.exists(OPENRGB_PATH) or os.path.getmtime(OPENRGB_PATH) < get_last_mod_time(
+    if not os.path.exists(OPENRGB_PATH) or get_last_mod_time(OPENRGB_PATH) < get_last_mod_time(
         os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "submodules", "OpenRGB"))
     ):
         if os.path.exists(OPENRGB_PATH):
-            os.unlink(OPENRGB_PATH)
+            shutil.rmtree(OPENRGB_PATH)
         subprocess.run(
             "./build.sh",
             cwd=os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "submodules", "OpenRGB")),
@@ -49,21 +49,16 @@ def get_openrgb():
             stdout=subprocess.DEVNULL,
             stderr=subprocess.PIPE,
         )
-        shutil.copy2("./submodules/OpenRGB/OpenRGB-Exp.AppImage", OPENRGB_PATH)
-        os.chmod(OPENRGB_PATH, 0o755)
-
-        print("    Built, getting udev file...")
+        shutil.copy2("./submodules/OpenRGB/OpenRGB-Exp.AppImage", OPENRGB_PATH + ".AppImage")
+        os.chmod(OPENRGB_PATH + ".AppImage", 0o755)
 
         os.chdir(os.path.dirname(OPENRGB_PATH))
-        command = " ".join([OPENRGB_PATH, "--appimage-extract"])
+        command = " ".join([OPENRGB_PATH + ".AppImage", "--appimage-extract"])
         subprocess.run(command, shell=True, check=True, stdout=subprocess.DEVNULL, stderr=subprocess.PIPE)
         squashfs_root = os.path.join(os.path.dirname(OPENRGB_PATH), "squashfs-root")
-
-        src_udev_path = os.path.join(squashfs_root, "usr", "lib", "udev", "rules.d", "60-openrgb.rules")
-        shutil.copy2(src_udev_path, UDEV_PATH)
-
-        shutil.rmtree(squashfs_root)
-        print("    Udev file extracted")
+        shutil.move(squashfs_root, OPENRGB_PATH)
+        os.unlink(OPENRGB_PATH + ".AppImage")
+        os.unlink(os.path.join(OPENRGB_PATH, "usr", "bin", "OpenRGB.exe"))
 
 
 def get_rccdc():
@@ -92,6 +87,7 @@ def get_rccdc():
             ),
             RCCDC_PATH,
         )
+        subprocess.run(f"touch {RCCDC_PATH}", shell=True, check=True)
 
 
 print("Installing dependencies...")

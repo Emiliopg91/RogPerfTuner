@@ -7,9 +7,7 @@ clients/dbus/base/__pycache__/
 
 *.pyc
 
-assets/OpenRGB.AppImage
-
-assets/60-openrgb.rules
+assets/OpenRGB/
 
 out/
 

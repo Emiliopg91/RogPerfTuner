@@ -99,8 +99,8 @@ class ProfileService:
                     self._logger.add_tab()
 
                     self.__set_throttle_policy(profile, platform_profile)
-                    self.__set_boost(boost_enabled)
                     self.__set_fan_curves(platform_profile)
+                    self.__set_boost(boost_enabled)
                     self.__set_cpu_governor(cpu_governor, power_profile)
                     self.__set_ssd_scheduler(ssd_sched)
 
