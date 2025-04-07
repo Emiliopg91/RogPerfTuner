@@ -8,25 +8,30 @@ on:
 jobs:
   release:
     runs-on: ubuntu-latest
-    steps:
+    steps:          
       - name: Checkout repository
         uses: actions/checkout@v4
         with:
           submodules: recursive
           fetch-depth: 0
 
-      - name: Install Python and uv
+      - name: Configure Git user
+        run: |
+          git config user.name "GitHub Actions"
+          git config user.email "actions@github.com"
+
+      - name: Install Python
         uses: actions/setup-python@v5
         with:
-          python-version: '3.11'
+          python-version: '3.13'
 
-      - name: Install uv
+      - name: Install dependencies
         run: |
+          sudo apt-get update
+          sudo apt-get install -y libfuse2
+          npm i -g pnpm@8.5.1 shx@0.3.4
           curl -LsSf https://astral.sh/uv/install.sh | sh
-          echo "$HOME/.cargo/bin" >> $GITHUB_PATH  # uv se instala aquí
-
-      - name: Run make release
-        run: make release
+          echo "$HOME/.cargo/bin" >> $GITHUB_PATH
 
       - name: Extract version from pyproject.toml
         id: get_version
@@ -35,12 +40,8 @@ jobs:
           echo "VERSION=$VERSION" >> $GITHUB_ENV
           echo "::set-output name=version::$VERSION"
 
-      - name: Create Git tag
-        run: |
-          git config user.name "GitHub Actions"
-          git config user.email "actions@github.com"
-          git tag ${{ env.VERSION }}
-          git push origin ${{ env.VERSION }}
+      - name: Run make release
+        run: make release
 
       - name: Create GitHub release
         uses: softprops/action-gh-release@v2
@@ -50,18 +51,13 @@ jobs:
           files: dist/RogControlCenter.AppImage
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          
+      - name: Reset submodules
+        run: |
+          git submodule foreach --recursive "git reset --hard"
+          git submodule foreach --recursive "git clean -fd"
 
       - name: Push changes to main and force push to develop
         run: |
-          git config user.name "GitHub Actions"
-          git config user.email "actions@github.com"
-
-          git add .
-          git commit -m "[ci skip] Prepare next develop iteration"
-          
-          git checkout main
-          git pull origin main
-
-          git push origin main
-
+          git push origin 
           git push origin main:develop --force

@@ -22,7 +22,7 @@ release: build
 	git tag $$VERSION && \
 	uv run scripts/version.py increment > /dev/null && \
 	git add . > /dev/null && \
-	git commit -m "Ready for next development iteration" > /dev/null && \
+	git commit -m "[ci skip] Ready for next development iteration" > /dev/null && \
 	echo "Succesful released version $$VERSION, please push changes to repository"
 
 %:

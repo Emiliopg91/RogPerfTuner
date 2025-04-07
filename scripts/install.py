@@ -49,12 +49,18 @@ def get_openrgb():
             stdout=subprocess.DEVNULL,
             stderr=subprocess.PIPE,
         )
-        shutil.copy2("./submodules/OpenRGB/OpenRGB-Exp.AppImage", OPENRGB_PATH + ".AppImage")
+        shutil.copy2("./submodules/OpenRGB/OpenRGB.AppImage", OPENRGB_PATH + ".AppImage")
         os.chmod(OPENRGB_PATH + ".AppImage", 0o755)
 
         os.chdir(os.path.dirname(OPENRGB_PATH))
         command = " ".join([OPENRGB_PATH + ".AppImage", "--appimage-extract"])
-        subprocess.run(command, shell=True, check=True, stdout=subprocess.DEVNULL, stderr=subprocess.PIPE)
+        subprocess.run(
+            command,
+            shell=True,
+            check=True,
+            stdout=subprocess.DEVNULL,
+            stderr=subprocess.PIPE,
+        )
         squashfs_root = os.path.join(os.path.dirname(OPENRGB_PATH), "squashfs-root")
         shutil.move(squashfs_root, OPENRGB_PATH)
         os.unlink(OPENRGB_PATH + ".AppImage")
@@ -75,8 +81,6 @@ def get_rccdc():
             cwd=os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "submodules", "RCCDeckyCompanion")),
             check=True,
             shell=True,
-            stdout=subprocess.DEVNULL,
-            stderr=subprocess.PIPE,
         )
 
         shutil.copytree(

@@ -27,7 +27,7 @@ class PerformanceProfile(IntEnum):
             return None
 
         if self == PerformanceProfile.PERFORMANCE:
-            return int(PL1_SPL_CLIENT.max_value * 0.8)
+            return int(PL1_SPL_CLIENT.max_value * 1)
         if self == PerformanceProfile.BALANCED:
             return int(PL1_SPL_CLIENT.max_value * 0.6)
         if self == PerformanceProfile.QUIET:
