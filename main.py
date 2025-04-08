@@ -109,7 +109,7 @@ def initialize_application():  # pylint:disable=too-many-locals
         USER_UPDATE_FOLDER,
         APPLICATION_SERVICE.relaunch_application,
         DEV_MODE,
-        lambda: STEAM_SERVICE.running_games == 0,
+        lambda: len(STEAM_SERVICE.running_games.keys()) == 0,
     )
 
     auto_updater.start()

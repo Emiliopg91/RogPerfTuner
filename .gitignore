@@ -16,3 +16,5 @@ assets/RCCDeckyCompanion/
 dst/
 
 main.spec
+
+uv.lock
