@@ -1,6 +1,6 @@
 import re
+from openrgb.utils import DeviceType, RGBColor
 from framework.singleton import singleton
-from rcc.communications.client.tcp.openrgb.client.utils import DeviceType, RGBColor
 from rcc.communications.client.tcp.openrgb.effects.base.abstract_effect import AbstractEffect
 
 

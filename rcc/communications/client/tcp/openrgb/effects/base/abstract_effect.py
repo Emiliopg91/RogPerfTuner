@@ -4,8 +4,8 @@ from abc import ABC, abstractmethod
 from threading import Lock, Thread
 from typing import List, Optional
 
-from rcc.communications.client.tcp.openrgb.client.orgb import Device
-from rcc.communications.client.tcp.openrgb.client.utils import RGBColor
+from openrgb.orgb import Device
+from openrgb.utils import RGBColor
 
 from rcc.models.rgb_brightness import RgbBrightness
 from framework.logger import Logger
@@ -51,7 +51,7 @@ class AbstractEffect(ABC):
         self._devices = devices
         self._logger.info(
             f"Starting effect with {brightness.name.lower()} brightness"
-            f"{' and ' + color.to_hex() + ' color' if self._supports_color else ''}"
+            f"{' and ' + color.toHex() + ' color' if self._supports_color else ''}"
         )
 
         self._brightness = self.BRIGHTNESS_MAP.get(brightness, 0)
@@ -100,7 +100,7 @@ class AbstractEffect(ABC):
     @property
     def color(self) -> Optional[str]:
         """Get hex color or none"""
-        return self._color.to_hex() if self._supports_color else None
+        return self._color.toHex() if self._supports_color else None
 
     def _thread_main(self):
         self.apply_effect()

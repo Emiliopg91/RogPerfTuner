@@ -1,7 +1,7 @@
 import random
+from openrgb.utils import RGBColor
 
 from framework.singleton import singleton
-from rcc.communications.client.tcp.openrgb.client.utils import RGBColor
 from rcc.communications.client.tcp.openrgb.effects.base.abstract_effect import AbstractEffect
 
 

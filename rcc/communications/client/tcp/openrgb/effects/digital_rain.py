@@ -3,10 +3,11 @@ import math
 import random
 import threading
 
+from openrgb.orgb import Device, Zone
+from openrgb.utils import RGBColor, ZoneType, DeviceType
+
 import psutil
 from framework.singleton import singleton
-from rcc.communications.client.tcp.openrgb.client.orgb import Device, Zone
-from rcc.communications.client.tcp.openrgb.client.utils import RGBColor, ZoneType, DeviceType
 
 from rcc.communications.client.tcp.openrgb.effects.base.abstract_effect import AbstractEffect
 

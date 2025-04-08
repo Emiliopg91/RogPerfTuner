@@ -36,6 +36,7 @@ class AutoUpdater:
         user_update_folder: str,
         restart_method: Callable[[], None],
         dev_mode=False,
+        perform_update_check: Callable[[], bool] = None,
     ):
         self._logger = Logger()
         self._app_image = os.getenv("APPIMAGE")
@@ -45,6 +46,7 @@ class AutoUpdater:
         self.dev_mode = dev_mode
         self.user_update_folder = user_update_folder
         self.restart_method = restart_method
+        self.perform_update_check = perform_update_check
 
         if self._app_image is not None:
             self._logger.debug(f"AppImage location: {self._app_image}")
@@ -70,6 +72,10 @@ class AutoUpdater:
                 self._logger.info("No update found")
                 time.sleep(self.CHECK_INTERVAL)
             else:
+                while self.perform_update_check is not None and not self.perform_update_check():
+                    self._logger.info("Update blocked by application, retry in 10 minutes")
+                    time.sleep(600)
+
                 self.download_update(data.url)
                 if not self.dev_mode:
                     self.copy_file(self._update_path)
