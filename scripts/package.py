@@ -97,8 +97,6 @@ def generate_appimage():
             command,
             shell=True,
             env={**os.environ, "ARCH": "x86_64"},
-            stdout=subprocess.DEVNULL,
-            stderr=subprocess.PIPE,
             check=True,
         )
     finally:
@@ -122,8 +120,6 @@ def package_python():
     subprocess.run(
         command,
         shell=True,
-        stdout=subprocess.DEVNULL,
-        stderr=subprocess.PIPE,
         check=False,
     )
 
