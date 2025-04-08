@@ -7,8 +7,8 @@ from typing import Optional
 import threading
 import time
 
-from rcc.communications.client.tcp.openrgb.client.orgb import Device, OpenRGBClient
-from rcc.communications.client.tcp.openrgb.client.utils import RGBColor
+from openrgb.orgb import Device, OpenRGBClient
+from openrgb.utils import RGBColor
 
 from rcc.communications.client.tcp.openrgb.effects.gaming import GAMING_EFFECT
 from rcc.models.rgb_brightness import RgbBrightness

@@ -300,6 +300,15 @@ wheels = [
 ]
 
 [[package]]
+name = "openrgb-python-ng"
+version = "0.3.3"
+source = { registry = "https://pypi.org/simple" }
+sdist = { url = "https://files.pythonhosted.org/packages/cf/55/a2166bb8ca6f27793707c7088d7ebafd157d007cc7e2cbef2760eb73aee6/openrgb-python-ng-0.3.3.tar.gz", hash = "sha256:fcd3683a5553d2f15f4a54a63f8bb393bde088c3464932d41bfeb529cba89c9d", size = 28521 }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/97/89/6fc1a3ec7d6a95c8614e826ec2e45bc9745d12d360a8b46b5a4b7af53c98/openrgb_python_ng-0.3.3-py3-none-any.whl", hash = "sha256:a7dd841e9ffd6df15cc2eec74276209b9351f431d5c808ec48d127fbb8f595a1", size = 30066 },
+]
+
+[[package]]
 name = "packaging"
 version = "24.2"
 source = { registry = "https://pypi.org/simple" }
@@ -519,12 +528,13 @@ wheels = [
 
 [[package]]
 name = "rogcontrolcenter"
-version = "3.2.1"
+version = "3.2.2"
 source = { virtual = "." }
 dependencies = [
     { name = "cryptography" },
     { name = "dataclasses-json" },
     { name = "keyring" },
+    { name = "openrgb-python-ng" },
     { name = "psutil" },
     { name = "pyqt5" },
     { name = "pyudev" },
@@ -549,23 +559,24 @@ requires-dist = [
     { name = "cryptography", specifier = "==44.0.2" },
     { name = "dataclasses-json", specifier = "==0.6.7" },
     { name = "keyring", specifier = "==25.6.0" },
+    { name = "openrgb-python-ng", specifier = ">=0.3.3" },
     { name = "psutil", specifier = "==7.0.0" },
     { name = "pyqt5", specifier = "==5.15.11" },
     { name = "pyudev", specifier = "==0.24.3" },
     { name = "pyyaml", specifier = "==6.0.2" },
     { name = "qasync", specifier = "==0.27.1" },
     { name = "setproctitle", specifier = "==1.3.5" },
-    { name = "toml", specifier = ">=0.10.2" },
+    { name = "toml", specifier = "==0.10.2" },
     { name = "websockets", specifier = "==15.0.1" },
 ]
 
 [package.metadata.requires-dev]
 dev = [
-    { name = "black", specifier = ">=25.1.0" },
-    { name = "pyinstaller", specifier = ">=6.12.0" },
-    { name = "pylint", specifier = ">=3.3.6" },
-    { name = "requests", specifier = ">=2.32.3" },
-    { name = "watchdog", specifier = ">=6.0.0" },
+    { name = "black", specifier = "==25.1.0" },
+    { name = "pyinstaller", specifier = "==6.12.0" },
+    { name = "pylint", specifier = "==3.3.6" },
+    { name = "requests", specifier = "==2.32.3" },
+    { name = "watchdog", specifier = "==6.0.0" },
 ]
 
 [[package]]
