@@ -1,7 +1,7 @@
 .venv/**/*
 
 build/**/*
-dist/**/*
+dist/
 
 clients/dbus/base/__pycache__/
 
@@ -13,8 +13,8 @@ out/
 
 assets/RCCDeckyCompanion/
 
-dst/
-
 main.spec
 
 uv.lock
+
+.python-version
