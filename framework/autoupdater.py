@@ -78,7 +78,7 @@ class AutoUpdater:
                 while self.perform_update_check is not None and not self.perform_update_check():
                     self._logger.info("Update blocked by application, retry in 10 minutes")
                     time.sleep(600)
-                if not os.getenv("APPIMAGE").startswith("/usr/"):
+                if not self._app_image.startswith("/usr/"):
                     self.download_update(data.url)
                     if not self.dev_mode:
                         self.copy_file(self._update_path)
