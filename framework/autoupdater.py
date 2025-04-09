@@ -37,6 +37,7 @@ class AutoUpdater:
         restart_method: Callable[[], None],
         dev_mode=False,
         perform_update_check: Callable[[], bool] = None,
+        notify_method: Callable[[], None] = None,
     ):
         self._logger = Logger()
         self._app_image = os.getenv("APPIMAGE")
@@ -47,6 +48,7 @@ class AutoUpdater:
         self.user_update_folder = user_update_folder
         self.restart_method = restart_method
         self.perform_update_check = perform_update_check
+        self.notify_method = notify_method
 
         if self._app_image is not None:
             self._logger.debug(f"AppImage location: {self._app_image}")
@@ -72,14 +74,18 @@ class AutoUpdater:
                 self._logger.info("No update found")
                 time.sleep(self.CHECK_INTERVAL)
             else:
+                self._logger.info("Update found")
                 while self.perform_update_check is not None and not self.perform_update_check():
                     self._logger.info("Update blocked by application, retry in 10 minutes")
                     time.sleep(600)
-
-                self.download_update(data.url)
-                if not self.dev_mode:
-                    self.copy_file(self._update_path)
-                    self.restart_method()
+                if not os.getenv("APPIMAGE").startswith("/usr/"):
+                    self.download_update(data.url)
+                    if not self.dev_mode:
+                        self.copy_file(self._update_path)
+                        self.restart_method()
+                elif self.notify_method is not None:
+                    self.notify_method()
+                    break
 
     def copy_file(self, tmp_file: str) -> None:
         """Copy temporal file to pending update path"""
