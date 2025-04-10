@@ -32,16 +32,34 @@ jobs:
           npm i -g pnpm@8.5.1 shx@0.3.4
           curl -LsSf https://astral.sh/uv/install.sh | sh
           echo "$HOME/.cargo/bin" >> $GITHUB_PATH
+          uv run scripts/install.py
 
       - name: Extract version from pyproject.toml
         id: get_version
         run: |
-          VERSION=$(grep '^version *= *' pyproject.toml | sed 's/version *= *"\(.*\)"/\1/')
-          echo "VERSION=$VERSION" >> $GITHUB_ENV
-          echo "::set-output name=version::$VERSION"
+          echo "VERSION=$(uv run scripts/version.py)" >> $GITHUB_ENV
+
+      - name: Format and lint
+        run: |
+          uv run scripts/format.py
+          uv run scripts/lint.py
+
+          if [ -n "$(git status --porcelain)" ]; then
+            git add .
+            git commit -m "[ci skip] Commit formated code" > /dev/null
+          fi
+
+      - name: Generate AppImage
+        run: | 
+          uv run scripts/package.py
 
       - name: Run make release
-        run: make release
+        run: |
+          git tag "$VERSION"
+
+          uv run scripts/version.py increment > /dev/null
+          git add . > /dev/null
+          git commit -m "[ci skip] Ready for next development iteration" > /dev/null
 
       - name: Create GitHub release
         uses: softprops/action-gh-release@v2

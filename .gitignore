@@ -1,5 +1,7 @@
 .venv/
 
+assets/pyproject.toml
+
 assets/OpenRGB/
 
 assets/RCCDeckyCompanion/
