@@ -41,8 +41,8 @@ jobs:
 
       - name: Format and lint
         run: |
-          uv run scripts/format.py
-          uv run scripts/lint.py
+          PYTHONUNBUFFERED=1 uv run scripts/format.py
+          PYTHONUNBUFFERED=1 uv run scripts/lint.py
 
           if [ -n "$(git status --porcelain)" ]; then
             git add .
@@ -51,13 +51,13 @@ jobs:
 
       - name: Generate AppImage
         run: | 
-          uv run scripts/package.py
+          PYTHONUNBUFFERED=1 uv run scripts/package.py
 
       - name: Run make release
         run: |
           git tag "$VERSION"
 
-          uv run scripts/version.py increment > /dev/null
+          PYTHONUNBUFFERED=1 uv run scripts/version.py increment > /dev/null
           git add . > /dev/null
           git commit -m "[ci skip] Ready for next development iteration" > /dev/null
 
