@@ -20,7 +20,7 @@ def copy_icon():
 
 def generate_desktop():
     """Generate .desktop file"""
-    src_file_path = os.path.join(workspace_dir, "RogControlCenter.desktop")
+    src_file_path = os.path.join(workspace_dir, "build", "RogControlCenter.desktop")
     dst_file_path = os.path.join(output_dir, "RogControlCenter.desktop")
 
     print(f"Copying .desktop file to {dst_file_path}...")

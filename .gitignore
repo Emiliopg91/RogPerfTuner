@@ -1,20 +1,17 @@
-.venv/**/*
-
-build/**/*
-dist/
-
-clients/dbus/base/__pycache__/
-
-*.pyc
+.venv/
 
 assets/OpenRGB/
 
-out/
-
 assets/RCCDeckyCompanion/
+
+dist/
+
+.python-version
+
+out/
 
 main.spec
 
 uv.lock
 
-.python-version
+*.pyc
