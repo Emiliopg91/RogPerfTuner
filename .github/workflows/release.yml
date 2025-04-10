@@ -41,13 +41,7 @@ jobs:
 
       - name: Format and lint
         run: |
-          PYTHONUNBUFFERED=1 uv run scripts/format.py
           PYTHONUNBUFFERED=1 uv run scripts/lint.py
-
-          if [ -n "$(git status --porcelain)" ]; then
-            git add .
-            git commit -m "[ci skip] Commit formated code" > /dev/null
-          fi
 
       - name: Generate AppImage
         run: | 

@@ -52,7 +52,10 @@ def run_pylint():
 
     if result.returncode != 0:
         print("Linting failed")
-        return False
+        if os.getenv("GITHUB_ACTIONS") == "true":
+            sys.exit(1)
+        else:
+            return False
 
     print("Linting passed!")
     sys.exit(0)
