@@ -97,7 +97,7 @@ jobs:
       - name: Setup and Install
         run: |
           sudo apt-get update
-          sudo apt-get install -y rpm build-essential
+          sudo apt-get install -y libfuse2 rpm build-essential
           npm i -g pnpm@8.5.1 shx@0.3.4
           curl -LsSf https://astral.sh/uv/install.sh | sh
           echo "$HOME/.cargo/bin" >> $GITHUB_PATH
