@@ -3,6 +3,7 @@ import datetime
 import os
 import shutil
 import subprocess
+import sys
 import time
 
 RCCDC_PATH = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "assets", "RCCDeckyCompanion"))
@@ -95,7 +96,7 @@ def get_rccdc():
 
 
 print("Installing dependencies...")
-time.sleep(0.1)
 install_uv_deps()
-get_openrgb()
-get_rccdc()
+if not "skipSubmodules" in sys.argv:
+    get_openrgb()
+    get_rccdc()

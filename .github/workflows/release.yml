@@ -34,7 +34,7 @@ jobs:
           npm i -g pnpm@8.5.1 shx@0.3.4
           curl -LsSf https://astral.sh/uv/install.sh | sh
           echo "$HOME/.cargo/bin" >> $GITHUB_PATH
-          PYTHONUNBUFFERED=1 uv run scripts/install.py
+          PYTHONUNBUFFERED=1 uv run scripts/install.py skipSubmodules
 
       - name: Extract version from pyproject.toml
         id: get_version
