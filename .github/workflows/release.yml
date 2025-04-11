@@ -205,8 +205,8 @@ jobs:
           tag_name: ${{ needs.prepare_and_install.outputs.version }}
           name: ${{ needs.prepare_and_install.outputs.version }}
           files: |
-            RogControlCenter.AppImage
-            rogcontrolcenter.x86_64.rpm
+            dist/RogControlCenter.AppImage
+            dist/rogcontrolcenter.x86_64.rpm
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
