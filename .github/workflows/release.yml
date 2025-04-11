@@ -179,7 +179,7 @@ jobs:
           
       - name: Create tag
         run: |
-          git tag "${{ needs.prepare.outputs.version }}"
+          git tag "${{ needs.prepare_and_install.outputs.version }}"
 
           PYTHONUNBUFFERED=1 uv run scripts/version.py increment > /dev/null
           git add . > /dev/null
@@ -188,8 +188,8 @@ jobs:
       - name: Create GitHub release
         uses: softprops/action-gh-release@v2
         with:
-          tag_name: ${{ needs.prepare.outputs.version }}
-          name: ${{ needs.prepare.outputs.version }}
+          tag_name: ${{ needs.prepare_and_install.outputs.version }}
+          name: ${{ needs.prepare_and_install.outputs.version }}
           files: |
             RogControlCenter.AppImage
             rogcontrolcenter.x86_64.rpm
