@@ -6,9 +6,11 @@ on:
       - main
 
 jobs:
-  release:
+  prepare:
     runs-on: ubuntu-latest
-    steps:          
+    outputs:
+      version: ${{ steps.get_version.outputs.version }}
+    steps:
       - name: Checkout repository
         uses: actions/checkout@v4
         with:
@@ -37,19 +39,110 @@ jobs:
       - name: Extract version from pyproject.toml
         id: get_version
         run: |
-          echo "VERSION=$(uv run scripts/version.py)" >> $GITHUB_ENV
+          echo "version=$(uv run scripts/version.py)" >> $GITHUB_OUTPUT
 
       - name: Format and lint
         run: |
           PYTHONUNBUFFERED=1 uv run scripts/lint.py
 
-      - name: Generate AppImage
-        run: | 
-          PYTHONUNBUFFERED=1 uv run scripts/package.py
+  generate_appimage:
+    needs: prepare
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          submodules: recursive
+          fetch-depth: 0
 
-      - name: Run make release
+      - name: Install Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.13'
+
+      - name: Setup and Install
         run: |
-          git tag "$VERSION"
+          sudo apt-get update
+          sudo apt-get install -y libfuse2
+          npm i -g pnpm@8.5.1 shx@0.3.4
+          curl -LsSf https://astral.sh/uv/install.sh | sh
+          echo "$HOME/.cargo/bin" >> $GITHUB_PATH
+          PYTHONUNBUFFERED=1 uv run scripts/install.py
+
+      - name: Generate AppImage
+        run: |
+          PYTHONUNBUFFERED=1 uv run scripts/appimage.py
+
+      - name: Upload AppImage artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: appimage
+          path: dist/RogControlCenter.AppImage
+
+  generate_rpm:
+    needs: prepare
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          submodules: recursive
+          fetch-depth: 0
+
+      - name: Install Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.13'
+
+      - name: Setup and Install
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y rpm build-essential
+          npm i -g pnpm@8.5.1 shx@0.3.4
+          curl -LsSf https://astral.sh/uv/install.sh | sh
+          echo "$HOME/.cargo/bin" >> $GITHUB_PATH
+          PYTHONUNBUFFERED=1 uv run scripts/install.py
+
+      - name: Generate RPM
+        run: |
+          PYTHONUNBUFFERED=1 uv run scripts/rpm.py
+
+      - name: Upload RPM artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: rpm
+          path: rpm/rpmbuild/RPMS/*.rpm
+
+  release:
+    needs: [generate_appimage, generate_rpm, prepare]
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          submodules: recursive
+          fetch-depth: 0
+
+      - name: Download AppImage artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: appimage
+          path: .
+
+      - name: Download RPM artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: rpm
+          path: .
+
+      - name: Rename artifacts
+        run: |
+          mv appimage RogControlCenter.AppImage
+          mv rpm "dist/rogcontrolcenter-${{ needs.prepare.outputs.version }}-1.x86_64.rpm"
+          
+      - name: Create tag
+        run: |
+          git tag "${{ needs.prepare.outputs.version }}"
 
           PYTHONUNBUFFERED=1 uv run scripts/version.py increment > /dev/null
           git add . > /dev/null
@@ -58,12 +151,14 @@ jobs:
       - name: Create GitHub release
         uses: softprops/action-gh-release@v2
         with:
-          tag_name: ${{ env.VERSION }}
-          name: ${{ env.VERSION }}
-          files: dist/RogControlCenter.AppImage
+          tag_name: ${{ needs.prepare.outputs.version }}
+          name: ${{ needs.prepare.outputs.version }}
+          files: |
+            RogControlCenter.AppImage
+            rogcontrolcenter-${{ needs.prepare.outputs.version }}-1.x86_64.rpm
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          
+
       - name: Reset submodules
         run: |
           git submodule foreach --recursive "git reset --hard"
@@ -71,5 +166,5 @@ jobs:
 
       - name: Push changes to main and force push to develop
         run: |
-          git push origin 
+          git push origin
           git push origin main:develop --force

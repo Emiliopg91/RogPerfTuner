@@ -10,6 +10,8 @@ dist/
 
 .python-version
 
+rpm/
+
 out/
 
 main.spec

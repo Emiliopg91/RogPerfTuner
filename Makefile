@@ -9,9 +9,12 @@ lint:
 
 dev: install format lint
 	@uv run scripts/watch.py $(ARGS)
-
-build: install format lint 
-	@uv run scripts/package.py
+	
+appimage: install format lint
+	@uv run scripts/appimage.py
+	
+rpm: install format lint
+	@uv run scripts/rpm.py
 
 %:
 	@:

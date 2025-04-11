@@ -20,17 +20,33 @@ def copy_icon():
 
 def generate_desktop():
     """Generate .desktop file"""
-    src_file_path = os.path.join(workspace_dir, "RogControlCenter.desktop")
     dst_file_path = os.path.join(output_dir, "RogControlCenter.desktop")
 
-    print(f"Copying .desktop file to {dst_file_path}...")
-    shutil.copy2(src_file_path, dst_file_path)
+    print(f"Creating .desktop file in {dst_file_path}...")
+    with open(dst_file_path, "w", encoding="utf-8") as file:
+        file.write(
+            """[Desktop Entry]
+Name=RogControlCenter
+Comment=An utility to manage Asus Rog laptop performance
+Exec=main/main
+Icon=icon
+Terminal=false
+Type=Application
+Categories=Utility;
+"""
+        )
     os.chmod(dst_file_path, 0o755)
 
 
 def generate_apprun():
     """Generate AppRun file"""
-    content = """#!/bin/bash
+    apprun_file_path = os.path.join(output_dir, "AppRun")
+
+    print(f"Generating AppRun file {apprun_file_path}...")
+
+    with open(apprun_file_path, "w") as f:
+        f.write(
+            """#!/bin/bash
 set -e
 
 if [ ! -z "$DEBUG" ] ; then
@@ -65,12 +81,7 @@ else
     exec "$BIN" "${args[@]}"
 fi
 """
-    apprun_file_path = os.path.join(output_dir, "AppRun")
-
-    print(f"Generating AppRun file {apprun_file_path}...")
-
-    with open(apprun_file_path, "w") as f:
-        f.write(content)
+        )
 
     # Dar permisos de ejecución al archivo
     os.chmod(apprun_file_path, 0o755)
@@ -98,6 +109,8 @@ def generate_appimage():
             shell=True,
             env={**os.environ, "ARCH": "x86_64"},
             check=True,
+            stdout=subprocess.DEVNULL,
+            stderr=subprocess.PIPE,
         )
     finally:
         os.chdir(cwd)
@@ -117,11 +130,7 @@ def package_python():
             os.path.join(workspace_dir, "main.py"),
         ]
     )
-    subprocess.run(
-        command,
-        shell=True,
-        check=False,
-    )
+    subprocess.run(command, shell=True, check=False, stdout=subprocess.DEVNULL, stderr=subprocess.PIPE)
 
 
 def prepare_workspace():
