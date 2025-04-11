@@ -153,10 +153,10 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: rpm
-          path: dist/RogControlCenter.x86_64.rpm
+          path: dist/rogcontrolcenter.x86_64.rpm
 
   release:
-    needs: [generate_appimage, generate_rpm, prepare]
+    needs: [generate_appimage, generate_rpm, prepare_and_install]
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
@@ -169,19 +169,13 @@ jobs:
         uses: actions/download-artifact@v4
         with:
           name: appimage
-          path: .
+          path: dist
 
       - name: Download RPM artifact
         uses: actions/download-artifact@v4
         with:
           name: rpm
-          path: .
-
-      - name: Rename artifacts
-        run: |
-          ls
-          mv appimage RogControlCenter.AppImage
-          mv rpm rogcontrolcenter.x86_64.rpm"
+          path: dist
           
       - name: Create tag
         run: |
