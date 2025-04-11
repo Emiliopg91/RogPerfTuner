@@ -106,6 +106,7 @@ jobs:
       - name: Generate RPM
         run: |
           PYTHONUNBUFFERED=1 uv run scripts/rpm.py
+          tree
 
       - name: Upload RPM artifact
         uses: actions/upload-artifact@v4
