@@ -106,7 +106,6 @@ jobs:
       - name: Generate RPM
         run: |
           PYTHONUNBUFFERED=1 uv run scripts/rpm.py
-          tree
 
       - name: Upload RPM artifact
         uses: actions/upload-artifact@v4
@@ -138,6 +137,7 @@ jobs:
 
       - name: Rename artifacts
         run: |
+          ls
           mv appimage RogControlCenter.AppImage
           mv rpm rogcontrolcenter.x86_64.rpm"
           
