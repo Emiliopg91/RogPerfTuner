@@ -137,8 +137,8 @@ jobs:
 
       - name: Rename artifacts
         run: |
-          mv appimage "RogControlCenter-${{ needs.prepare.outputs.version }}.AppImage"
-          mv rpm "rogcontrolcenter-${{ needs.prepare.outputs.version }}-1.x86_64.rpm"
+          mv appimage RogControlCenter.AppImage
+          mv rpm rogcontrolcenter.x86_64.rpm"
           
       - name: Create tag
         run: |
@@ -155,7 +155,7 @@ jobs:
           name: ${{ needs.prepare.outputs.version }}
           files: |
             RogControlCenter.AppImage
-            rogcontrolcenter-${{ needs.prepare.outputs.version }}-1.x86_64.rpm
+            rogcontrolcenter.x86_64.rpm
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
