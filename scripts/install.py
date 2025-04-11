@@ -82,6 +82,8 @@ def get_rccdc():
             cwd=os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "submodules", "RCCDeckyCompanion")),
             check=True,
             shell=True,
+            stdout=subprocess.DEVNULL,
+            stderr=subprocess.PIPE,
         )
 
         shutil.copytree(

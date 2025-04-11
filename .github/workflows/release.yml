@@ -112,7 +112,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: rpm
-          path: rpm/rpmbuild/RPMS/*.rpm
+          path: dist/*.rpm
 
   release:
     needs: [generate_appimage, generate_rpm, prepare]
