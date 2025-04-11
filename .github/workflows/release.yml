@@ -75,13 +75,13 @@ jobs:
         uses: actions/download-artifact@v4
         with:
           name: OpenRGB
-          path: assets
+          path: assets/OpenRGB
 
       - name: Download RCCDeckyCompanion artifact
         uses: actions/download-artifact@v4
         with:
           name: RCCDeckyCompanion
-          path: assets
+          path: assets/RCCDeckyCompanion
 
       - name: Install Python
         uses: actions/setup-python@v5
@@ -122,13 +122,13 @@ jobs:
         uses: actions/download-artifact@v4
         with:
           name: OpenRGB
-          path: assets
+          path: assets/OpenRGB
 
       - name: Download RCCDeckyCompanion artifact
         uses: actions/download-artifact@v4
         with:
           name: RCCDeckyCompanion
-          path: assets
+          path: assets/RCCDeckyCompanion
 
       - name: Install Python
         uses: actions/setup-python@v5
