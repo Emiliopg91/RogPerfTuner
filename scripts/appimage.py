@@ -91,6 +91,7 @@ def generate_appimage():
     """Generate AppImage file for application"""
     output = os.path.join(dist_dir, "RogControlCenter.AppImage")
     print(f"Generating AppImage file to {output}...")
+    subprocess.run("chmod 777 -R .", shell=True, check=True)
     appimagetool_path = os.path.join(workspace_dir, "resources", "appimagetool")
     cwd = os.getcwd()
     os.makedirs(dist_dir)

@@ -66,7 +66,6 @@ def get_openrgb():
         shutil.move(squashfs_root, OPENRGB_PATH)
         os.unlink(OPENRGB_PATH + ".AppImage")
         os.unlink(os.path.join(OPENRGB_PATH, "usr", "bin", "OpenRGB.exe"))
-        subprocess.run(f"chmod 777 -R {OPENRGB_PATH}", shell=True, check=True)
 
 
 def get_rccdc():

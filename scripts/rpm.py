@@ -126,6 +126,7 @@ install -m 755 """
 def generate_rpm():
     """Generate RPM package"""
     print("Generating RPM package...")
+    subprocess.run("chmod 777 -R .", shell=True, check=True)
     subprocess.run(
         f'rpmbuild --define "_topdir {rpm_dir}/rpmbuild" -ba {rpm_spec_file}', cwd=rpm_dir, shell=True, check=True
     )
