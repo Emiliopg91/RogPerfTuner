@@ -52,13 +52,13 @@ jobs:
       - name: Upload OpenRGB
         uses: actions/upload-artifact@v4
         with:
-          name: rpm
+          name: OpenRGB
           path: assets/OpenRGB
 
       - name: Upload RCCDeckyCompanion
         uses: actions/upload-artifact@v4
         with:
-          name: rpm
+          name: RCCDeckyCompanion
           path: assets/RCCDeckyCompanion
 
   generate_appimage:
@@ -122,13 +122,13 @@ jobs:
         uses: actions/download-artifact@v4
         with:
           name: OpenRGB
-          path: assets/OpenRGB
+          path: assets
 
       - name: Download RCCDeckyCompanion artifact
         uses: actions/download-artifact@v4
         with:
           name: RCCDeckyCompanion
-          path: assets/RCCDeckyCompanion
+          path: assets
 
       - name: Install Python
         uses: actions/setup-python@v5
