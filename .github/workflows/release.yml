@@ -6,7 +6,7 @@ on:
       - main
 
 jobs:
-  prepare:
+  prepare_and_install:
     runs-on: ubuntu-latest
     outputs:
       version: ${{ steps.get_version.outputs.version }}
@@ -41,12 +41,28 @@ jobs:
         run: |
           echo "version=$(uv run scripts/version.py)" >> $GITHUB_OUTPUT
 
-      - name: Format and lint
+      - name: Lint Python code
         run: |
           PYTHONUNBUFFERED=1 uv run scripts/lint.py
 
+      - name: Build submodules
+        run: |
+          PYTHONUNBUFFERED=1 uv run scripts/install.py
+
+      - name: Upload OpenRGB
+        uses: actions/upload-artifact@v4
+        with:
+          name: rpm
+          path: assets/OpenRGB
+
+      - name: Upload RCCDeckyCompanion
+        uses: actions/upload-artifact@v4
+        with:
+          name: rpm
+          path: assets/RCCDeckyCompanion
+
   generate_appimage:
-    needs: prepare
+    needs: prepare_and_install
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
@@ -55,6 +71,18 @@ jobs:
           submodules: recursive
           fetch-depth: 0
 
+      - name: Download OpenRGB artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: OpenRGB
+          path: assets
+
+      - name: Download RCCDeckyCompanion artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: RCCDeckyCompanion
+          path: assets
+
       - name: Install Python
         uses: actions/setup-python@v5
         with:
@@ -62,12 +90,13 @@ jobs:
 
       - name: Setup and Install
         run: |
+          ls assets
           sudo apt-get update
           sudo apt-get install -y libfuse2
           npm i -g pnpm@8.5.1 shx@0.3.4
           curl -LsSf https://astral.sh/uv/install.sh | sh
           echo "$HOME/.cargo/bin" >> $GITHUB_PATH
-          PYTHONUNBUFFERED=1 uv run scripts/install.py
+          PYTHONUNBUFFERED=1 uv run scripts/install.py skipSubmodules
 
       - name: Generate AppImage
         run: |
@@ -80,7 +109,7 @@ jobs:
           path: dist/RogControlCenter.AppImage
 
   generate_rpm:
-    needs: prepare
+    needs: prepare_and_install
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
@@ -89,6 +118,18 @@ jobs:
           submodules: recursive
           fetch-depth: 0
 
+      - name: Download OpenRGB artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: OpenRGB
+          path: assets
+
+      - name: Download RCCDeckyCompanion artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: RCCDeckyCompanion
+          path: assets
+
       - name: Install Python
         uses: actions/setup-python@v5
         with:
@@ -96,12 +137,13 @@ jobs:
 
       - name: Setup and Install
         run: |
+          ls assets
           sudo apt-get update
           sudo apt-get install -y libfuse2 rpm build-essential
           npm i -g pnpm@8.5.1 shx@0.3.4
           curl -LsSf https://astral.sh/uv/install.sh | sh
           echo "$HOME/.cargo/bin" >> $GITHUB_PATH
-          PYTHONUNBUFFERED=1 uv run scripts/install.py
+          PYTHONUNBUFFERED=1 uv run scripts/install.py skipSubmodules
 
       - name: Generate RPM
         run: |
@@ -111,7 +153,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: rpm
-          path: dist/*.rpm
+          path: dist/RogControlCenter.x86_64.rpm
 
   release:
     needs: [generate_appimage, generate_rpm, prepare]

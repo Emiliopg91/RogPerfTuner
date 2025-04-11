@@ -138,9 +138,7 @@ def generate_rpm():
             "x86_64",
             py_project["project"]["name"] + "-" + py_project["project"]["version"] + "-1.x86_64.rpm",
         ),
-        os.path.join(
-            dist_dir, py_project["project"]["name"] + "-" + py_project["project"]["version"] + "-1.x86_64.rpm"
-        ),
+        os.path.join(dist_dir, py_project["project"]["name"] + ".x86_64.rpm"),
     )
 
 
