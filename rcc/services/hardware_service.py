@@ -138,7 +138,7 @@ class HardwareService:
                     if any(not os.path.exists(icd) for icd in self.get_icd_files(brand)):
                         self._logger.error("Missing ICD files for Vulkan")
                     else:
-                        self._logger.error("ICD files found")
+                        self._logger.info("ICD files found")
                         self.__gpus.append(brand)
 
                         if brand == GpuBrand.NVIDIA:
