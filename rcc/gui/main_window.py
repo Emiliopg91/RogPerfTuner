@@ -119,7 +119,6 @@ class MainWindow(QMainWindow):
         self._color_button.clicked.connect(self.pick_color)
         supports_color = RGB_SERVICE.supports_color(RGB_SERVICE._effect)
         self._color_button.setDisabled(not supports_color)
-        self._color_button.setDisabled(not supports_color)
 
         self._color_label = QLabel(f"{TRANSLATOR.translate('color')}:")
         self._color_label.setDisabled(not supports_color)
@@ -201,7 +200,6 @@ class MainWindow(QMainWindow):
         self._brightness_dropdown.setCurrentIndex(self._brightness_dropdown.findData(brightness))
         self._current_color = color if color is not None else "#00000000"
         self._color_button.setStyleSheet(f"background-color: {self._current_color};")
-        self._color_button.setDisabled(color is None)
         self._color_button.setDisabled(color is None)
         self._color_label.setDisabled(color is None)
 

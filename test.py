@@ -1,50 +1,44 @@
-#!/bin/env python3
-
-# pylint: disable=import-outside-toplevel, wrong-import-position, ungrouped-imports, wrong-import-order
-
-from rcc.utils.constants import DEV_MODE, USER_UPDATE_FOLDER, LOG_FILE, USER_LOG_FOLDER, LOG_OLD_FOLDER
-
-from framework.logger import Logger
-
-Logger.initialize(LOG_FILE, USER_LOG_FOLDER, LOG_OLD_FOLDER)
-logger = Logger("Main")
-
 import asyncio
 import os
-from qasync import QEventLoop
+from threading import Thread
 
-import setproctitle
-from rcc.communications.client.dbus.asus.core.fan_curves_client import FAN_CURVES_CLIENT
-from rcc.models.platform_profile import PlatformProfile
-from rcc.utils.constants import APP_NAME, VERSION
+from rcc.models.message_type import MessageType
 
-setproctitle.setproctitle(APP_NAME)
-
-from PyQt5.QtWidgets import QApplication
-import sys
+SOCKET_PATH = os.path.expanduser(os.path.join("~", "homebrew", "data", "RCCDeckyCompanion", "socket.sock"))
 
 
-def create_qt_application() -> QApplication:
-    """Initialize QApplication"""
-    q_app = QApplication(sys.argv)
-    q_loop = QEventLoop(q_app)
-    asyncio.set_event_loop(q_loop)
-    return q_app, q_loop
+async def handle_client(reader, writer):
+    addr = writer.get_extra_info("peername")
+    print(f"Cliente conectado: {addr}")
+    try:
+        writer.write(MessageType(type="R", name="test", data=[]).to_json().encode())
+        while True:
+            data = await reader.readline()
+            if not data:
+                break
+            message = data.decode().strip()
+            print(f"-> {message}")
+            response = MessageType.from_json(message)
+            response.type = "RESPONSE"
+            print(f"<- {response.to_json()}")
+            writer.write(response.to_json().encode())
+            await writer.drain()
+    except Exception as e:
+        print(f"Error: {e}")
+    finally:
+        print("Cliente desconectado")
+        writer.close()
+        await writer.wait_closed()
 
 
-def initialize_application():  # pylint:disable=too-many-locals
-    curves = FAN_CURVES_CLIENT.fan_curve_data(PlatformProfile.PERFORMANCE)
-    print(curves)
-    for curve in curves:
-        for i in range(len(curve.points)):  # pylint: disable=consider-using-enumerate
-            curve.points[i] = (curve.points[i][0], min(100, round(curve.points[i][1] * 1.15)))
-        print(f"{curve}")
-        FAN_CURVES_CLIENT.set_fan_curve(PlatformProfile.PERFORMANCE, curve)
+async def main():
+    if os.path.exists(SOCKET_PATH):
+        os.remove(SOCKET_PATH)
+    server = await asyncio.start_unix_server(handle_client, path=SOCKET_PATH)
+    async with server:
+        print(f"Servidor escuchando en {SOCKET_PATH}")
+        await server.serve_forever()
 
 
 if __name__ == "__main__":
-    print(os.getpid())
-
-    app, loop = create_qt_application()
-
-    initialize_application()
+    asyncio.run(main())
