@@ -27,8 +27,8 @@ Do you want something similar for Asus Rog Ally/Ally X? Check [AllyDeckyCompanio
   - CPU TDP
   - CPU Boost
   - CPU Governor
-  - CPU and GPU Thermal throttling policy
   - GPU TGP
+  - GPU Thermal throttling policy
   - Fan curves
   - Power profile
   - SSD IO scheduler
@@ -36,15 +36,17 @@ Do you want something similar for Asus Rog Ally/Ally X? Check [AllyDeckyCompanio
 - [x] RGB control for Asus ROG laptops and peripherics and support for custom AuraSync
 
 - [x] Available RGB effects:
-  - Breathing
-  - Dance floor
-  - Digital rain
-  - Drops
-  - Gaming
-  - Rainbow wave
-  - Spectrum cycle
-  - Starry night
-  - Static
+  - Breathing: Feel every breath
+  - Dance floor: Every led dancing at rithm
+  - Digital rain: Matrix like animation that speeds up as your CPU is more demanded
+  - Drops: Feel every drop of rain fallin over you
+  - Gaming: Highlights most used in game keyboard keys
+  - Rainbow wave: A rainbow sliding on your leds
+  - Spectrum cycle: A cycle of every color of RGB spectrum
+  - Starry night: Stars blinking on your devices 
+  - Static: A classic solid color effect
+
+- [x] Select color for the effect (only available on Breathing, Digital Rain and Static effect)
 
 - [x] Allow changing RGB brightness
   - Off
@@ -52,10 +54,10 @@ Do you want something similar for Asus Rog Ally/Ally X? Check [AllyDeckyCompanio
   - Medium
   - High 
 
-- [x] Limit battery charge threshold to improve its life-span
-  - 50%
-  - 75%
-  - 100%
+- [x] Limit battery charge threshold to maintain its life-span
+  - 100%: If you requires full battery without bothering about its health
+  - 75%: If you want big battery cappacity saving its health
+  - 50%: for laptops that are always connected to AC
 
 - [x] Steam integration through Decky plugin
   - Force use of dGPU or letting Linux select for you
