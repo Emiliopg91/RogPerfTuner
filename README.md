@@ -1,7 +1,10 @@
-
 [![Release](https://github.com/Emiliopg91/RogControlCenter/actions/workflows/release.yml/badge.svg)](https://github.com/Emiliopg91/RogControlCenter/actions/workflows/release.yml)
 [![Downloads](https://img.shields.io/github/downloads/Emiliopg91/RogControlCenter/total.svg)](https://github.com/Emiliopg91/RogControlCenter/releases)
 
+# RogControlCenter
+- [Features](#features)
+
+- [Requirements](#requirements)
 
 ## Features
 
@@ -38,7 +41,7 @@
   - Force use of dGPU or letting S.O. select for you
   - Show performance metrics 
 
-## Supported systems
+## Requirements
 - Tested on Bazzite based on Fedora 41/42 with KDE environment
 - Only tested on Laptops with Intel+Nvidia settings
 
