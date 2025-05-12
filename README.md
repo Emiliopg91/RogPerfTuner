@@ -37,4 +37,8 @@
 - [x] Steam integration through Decky plugin
   - Force use of dGPU or letting S.O. select for you
   - Show performance metrics 
-  
+
+## Supported systems
+- Tested on Bazzite based on Fedora 41/42 with KDE environment
+- Only tested on Laptops with Intel+Nvidia settings
+
