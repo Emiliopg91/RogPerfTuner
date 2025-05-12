@@ -56,7 +56,9 @@
 
 Thanks to the following for making this plugin possible:
 
-- [Asusctl](https://gitlab.com/asus-linux/asusctl/): for giving the base for performance profiles.
+- [Bazzite](https://github.com/ublue-os/bazzite/) thank you because you made Linux gaming beautiful for me
+
+- [Asusctl](https://gitlab.com/asus-linux/asusctl/) for giving the base for performance profiles.
 
 - [OpenRGB](https://gitlab.com/CalcProgrammer1/OpenRGB/) base of the custom version for this project. 
 
