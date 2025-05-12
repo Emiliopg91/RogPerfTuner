@@ -56,12 +56,12 @@ RogControlCenter is here to simplify your life and help you enjoy gaming on your
   - 100%
 
 - [x] Steam integration through Decky plugin
-  - Force use of dGPU or letting S.O. select for you
+  - Force use of dGPU or letting Linux select for you
   - Show performance metrics
   - Process CPU and IO priority
 
 ## Requirements
-- asusctl 6.12.0 or later
+- asusctl 6.1.12 or later
 
 ## Compatibility
 - Tested on Bazzite based on Fedora 41/42 with KDE environment
