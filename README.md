@@ -35,7 +35,6 @@
   - 100%
 
 - [x] Steam integration through Decky plugin
-  - Define performance profile per-game
-  - Apply profile automatically when game starts and restore SO profile when quits
+  - Force use of dGPU or letting S.O. select for you
   - Show performance metrics 
   
