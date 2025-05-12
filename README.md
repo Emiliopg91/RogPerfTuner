@@ -6,6 +6,8 @@
 
 - [Requirements](#requirements)
 
+- [Compatibility](#compatibility)
+
 - [Attribution](#attribution)
 
 ## Features
@@ -15,7 +17,7 @@
   - Balanced
   - Performance
 
-- [x] RGB control for Asus ROG laptops and peripherics
+- [x] RGB control for Asus ROG laptops and peripherics and support for custom AuraSync
 
 - [x] Available RGB effects:
   - Breathing
@@ -44,6 +46,9 @@
   - Show performance metrics 
 
 ## Requirements
+- asusctl 6.12.0 or later
+
+## Compatibility
 - Tested on Bazzite based on Fedora 41/42 with KDE environment
 - Only tested on Laptops with Intel+Nvidia settings
 
@@ -51,8 +56,8 @@
 
 Thanks to the following for making this plugin possible:
 
-- [asusctl](https://gitlab.com/asus-linux/asusctl/)
+- [Asusctl](https://gitlab.com/asus-linux/asusctl/): for giving the base for performance profiles.
 
-- [OpenRGB](https://gitlab.com/CalcProgrammer1/OpenRGB/)
+- [OpenRGB](https://gitlab.com/CalcProgrammer1/OpenRGB/) base of the custom version for this project. 
 
-- [decky loader](https://github.com/SteamDeckHomebrew/decky-loader/)
+- [Decky loader](https://github.com/SteamDeckHomebrew/decky-loader/) for allowing Steam integration.
