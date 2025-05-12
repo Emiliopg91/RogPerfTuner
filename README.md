@@ -38,15 +38,15 @@ Do you want something similar for Asus Rog Ally/Ally X? Check [AllyDeckyCompanio
 - [x] RGB control for Asus ROG laptops and peripherics and support for custom AuraSync
 
 - [x] Available RGB effects:
-  - Breathing: Feel every breath
-  - Dance floor: Every led dancing at rithm
-  - Digital rain: Matrix like animation that speeds up as your CPU is more demanded
-  - Drops: Feel every drop of rain fallin over you
-  - Gaming: Highlights most used in game keyboard keys
-  - Rainbow wave: A rainbow sliding on your leds
-  - Spectrum cycle: A cycle of every color of RGB spectrum
-  - Starry night: Stars blinking on your devices 
-  - Static: A classic solid color effect
+  - **Breathing**: Feel every breath
+  - **Dance floor**: Every led dancing at rithm
+  - **Digital rain**: Matrix like animation that speeds up as your CPU is more demanded
+  - **Drops**: Feel every drop of rain fallin over you
+  - **Gaming**: Highlights most used in game keyboard keys
+  - **Rainbow wave**: A rainbow sliding on your leds
+  - **Spectrum cycle**: A cycle of every color of RGB spectrum
+  - **Starry night**: Stars blinking on your devices 
+  - **Static**: A classic solid color effect
 
 - [x] Select color for the effect (only available on Breathing, Digital Rain and Static effect)
 
