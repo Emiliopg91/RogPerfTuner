@@ -62,6 +62,12 @@ Do you want something similar for Asus Rog Ally/Ally X? Check [AllyDeckyCompanio
   - Show performance metrics
   - Process CPU and IO priority
 
+- [x] Start on boot
+
+- [x] Autoupdates
+
+- [x] Portable AppImage or RPM package  
+
 ## Requirements
 - asusctl 6.1.12 or later
 
