@@ -2,6 +2,8 @@
 [![Downloads](https://img.shields.io/github/downloads/Emiliopg91/RogControlCenter/total.svg)](https://github.com/Emiliopg91/RogControlCenter/releases)
 
 # RogControlCenter
+- [Description](#description)
+  
 - [Features](#features)
 
 - [Requirements](#requirements)
@@ -83,12 +85,12 @@ Thanks to the following for making this plugin possible:
 
 - [Bazzite](https://github.com/ublue-os/bazzite/) thank you because you made Linux gaming beautiful for me
 
-- [Asusctl](https://gitlab.com/asus-linux/asusctl/) for giving the base for performance profiles.
+- [Asusctl](https://gitlab.com/asus-linux/asusctl/) for giving the base for performance profiles
 
-- [OpenRGB](https://gitlab.com/CalcProgrammer1/OpenRGB/) base of the custom version for this project.
+- [OpenRGB](https://gitlab.com/CalcProgrammer1/OpenRGB/) base of the custom version for this project
 
-- [MangoHUD](https://github.com/flightlessmango/MangoHud/) used for showing performance metrics in-game.
+- [MangoHUD](https://github.com/flightlessmango/MangoHud/) used for showing performance metrics in-game
 
-- [Gamemode](https://github.com/FeralInteractive/gamemode/) to give inspiration about game processes optimizations.
+- [Gamemode](https://github.com/FeralInteractive/gamemode/) to give inspiration about game processes optimizations
 
-- [Decky loader](https://github.com/SteamDeckHomebrew/decky-loader/) for allowing Steam integration.
+- [Decky loader](https://github.com/SteamDeckHomebrew/decky-loader/) for allowing Steam integration
