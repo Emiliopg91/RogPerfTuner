@@ -53,6 +53,6 @@ Thanks to the following for making this plugin possible:
 
 - [asusctl](https://gitlab.com/asus-linux/asusctl/)
 
-- [OpenRGB]([https://github.com/hhd-dev/adjustor/](https://gitlab.com/CalcProgrammer1/OpenRGB/))
+- [OpenRGB](https://gitlab.com/CalcProgrammer1/OpenRGB/)
 
 - [decky loader](https://github.com/SteamDeckHomebrew/decky-loader/)
