@@ -1,7 +1,8 @@
+# RogControlCenter
+
 [![Release](https://github.com/Emiliopg91/RogControlCenter/actions/workflows/release.yml/badge.svg)](https://github.com/Emiliopg91/RogControlCenter/actions/workflows/release.yml)
 [![Downloads](https://img.shields.io/github/downloads/Emiliopg91/RogControlCenter/total.svg)](https://github.com/Emiliopg91/RogControlCenter/releases)
 
-# RogControlCenter
 - [Description](#description)
   
 - [Features](#features)
