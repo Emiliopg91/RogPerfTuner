@@ -190,6 +190,7 @@ class SteamService:
         elif "%command%" not in launch_opts:
             launch_opts = "%command% " + launch_opts
 
+        launch_opts = re.sub(r"SteamDeck=0 ", "", launch_opts).strip()
         launch_opts = re.sub(r"MANGOHUD=.* MANGOHUD_CONFIG=preset=[^ ]+ mangohud ", "", launch_opts).strip()
         launch_opts = re.sub(r"VK_ICD_FILENAMES=[^ ]+ ", "", launch_opts).strip()
 
@@ -201,10 +202,7 @@ class SteamService:
         if gpu_brand is not None:
             launch_opts = f"VK_ICD_FILENAMES={":".join(HARDWARE_SERVICE.get_icd_files(gpu_brand))} " + launch_opts
 
-        if launch_opts.startswith("%command%"):
-            launch_opts = launch_opts[len("%command%") :]
-
-        launch_opts = launch_opts.strip()
+        launch_opts = "SteamDeck=0 " + launch_opts.strip()
 
         STEAM_CLIENT.set_launch_options(app_id, launch_opts)
 
