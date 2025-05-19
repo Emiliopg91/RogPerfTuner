@@ -161,8 +161,13 @@ class HardwareService:
                 self._logger.info(f"{sched.name} - {sched.value}")
         self._logger.rem_tab()
 
-        self.__on_bat = UPOWER_CLIENT.on_battery
-        self.__battery_charge_limit = PLATFORM_CLIENT.charge_control_end_threshold
+        if UPOWER_CLIENT.available:
+            self.__on_bat = UPOWER_CLIENT.on_battery
+            UPOWER_CLIENT.on_battery_change(self._on_ac_battery_change)
+
+        if PLATFORM_CLIENT.available:
+            self.__battery_charge_limit = PLATFORM_CLIENT.charge_control_end_threshold
+
         self.__running_games = 0
 
         self._connected_usb: list[UsbIdentifier] = []
@@ -170,14 +175,15 @@ class HardwareService:
         thread = Thread(name="UsbChecker", target=self.__monitor_for_usb)
         thread.start()
 
-        UPOWER_CLIENT.on_battery_change(self._on_ac_battery_change)
-        KEYBOARD_BRIGHTNESS_CONTROL.on_brightness_change(self._on_kb_brightness_change)
+        if KEYBOARD_BRIGHTNESS_CONTROL.available:
+            KEYBOARD_BRIGHTNESS_CONTROL.on_brightness_change(self._on_kb_brightness_change)
+
         EVENT_BUS.on(STEAM_SERVICE_GAME_EVENT, self.__on_game_event)
 
         self._logger.rem_tab()
 
     def _on_kb_brightness_change(self, value: int):
-        if value == 0:
+        if value == 0 and KEYBOARD_BRIGHTNESS_CONTROL.available:
             KEYBOARD_BRIGHTNESS_CONTROL.keyboard_brightness = 2
 
     def get_icd_files(self, gpu: GpuBrand):
@@ -240,11 +246,12 @@ class HardwareService:
 
     def set_battery_threshold(self, value: BatteryThreshold) -> None:
         """Set battery charge threshold"""
-        if value != self.__battery_charge_limit:
-            PLATFORM_CLIENT.charge_control_end_threshold = value
-            self.__battery_charge_limit = value
-            EVENT_BUS.emit(HARDWARE_SERVICE_BATTERY_THRESHOLD_CHANGED, value)
-            NOTIFIER.show_toast(TRANSLATOR.translate("applied.battery.threshold", {"value": value.value}))
+        if PLATFORM_CLIENT.available:
+            if value != self.__battery_charge_limit:
+                PLATFORM_CLIENT.charge_control_end_threshold = value
+                self.__battery_charge_limit = value
+                EVENT_BUS.emit(HARDWARE_SERVICE_BATTERY_THRESHOLD_CHANGED, value)
+                NOTIFIER.show_toast(TRANSLATOR.translate("applied.battery.threshold", {"value": value.value}))
 
     def set_ssd_scheduler(self, scheduler: SsdScheduler):
         """Set SSD queue scheduler"""
@@ -348,8 +355,8 @@ class HardwareService:
 
     def set_panel_overdrive(self, enabled):
         """Enable or disable panel overdrive"""
-        self._logger.info(f"Setting panel overdrive {"disabled" if not enabled else "enabled"}")
         if PANEL_OVERDRIVE_CLIENT.available:
+            self._logger.info(f"Setting panel overdrive {"disabled" if not enabled else "enabled"}")
             PANEL_OVERDRIVE_CLIENT.current_value = 1 if enabled else 0
 
     def apply_proccess_optimizations(self, pid: int, first_run=True):
@@ -425,7 +432,7 @@ class HardwareService:
                 time.sleep(0.05)
                 self._logger.info(f"{self.cpu.capitalize()} CPU")
 
-                if UPOWER_CLIENT.on_battery:
+                if UPOWER_CLIENT.available and UPOWER_CLIENT.on_battery:
                     pl1 = profile.battery_intel_pl1_spl
                     pl2 = profile.battery_intel_pl2_sppt
 
@@ -447,7 +454,7 @@ class HardwareService:
             nt = profile.ac_nv_temp
             if nv is not None or nt is not None:
                 self._logger.info("Nvidia GPU")
-                if UPOWER_CLIENT.on_battery:
+                if UPOWER_CLIENT.available and UPOWER_CLIENT.on_battery:
                     nv = profile.battery_nv_boost
                     nt = profile.battery_nv_temp
 
@@ -458,6 +465,13 @@ class HardwareService:
                 if nt is not None:
                     self._logger.info(f"  Throttle temp: {nt}ºC")
                     NV_TEMP_CLIENT.current_value = nt
+
+    @property
+    def tdp_available(self):
+        """Flag for TDP support"""
+        return (GpuBrand.NVIDIA in self.__gpus and (NV_BOOST_CLIENT.available or NV_TEMP_CLIENT.available)) or (
+            HARDWARE_SERVICE.cpu == CpuBrand.INTEL and PL1_SPL_CLIENT.available
+        )
 
 
 HARDWARE_SERVICE = HardwareService()

@@ -8,7 +8,7 @@ from qasync import QEventLoop
 import setproctitle
 from rcc.utils.constants import APP_NAME, VERSION
 
-setproctitle.setproctitle(APP_NAME)
+setproctitle.setproctitle(f"{APP_NAME} v{VERSION}")
 
 from PyQt5.QtWidgets import QApplication
 import sys
@@ -62,7 +62,6 @@ def initialize_application():  # pylint:disable=too-many-locals
 
         APPLICATION_SERVICE.generate_run()
         APPLICATION_SERVICE.create_menu_entry()
-        APPLICATION_SERVICE.enable_autostart()
 
     """Ask for sudo password"""
     from rcc.gui.password_dialog import PASSWORD_DIALOG
