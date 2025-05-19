@@ -11,12 +11,14 @@ from PyQt5.QtWidgets import (
     QPushButton,
     QVBoxLayout,
     QWidget,
+    QCheckBox,
 )
 
 from rcc.gui.game_list import GameList
 from rcc.models.battery_threshold import BatteryThreshold
 from rcc.models.performance_profile import PerformanceProfile
 from rcc.models.rgb_brightness import RgbBrightness
+from rcc.services.application_service import APPLICATION_SERVICE
 from rcc.services.hardware_service import HARDWARE_SERVICE
 from rcc.services.steam_service import STEAM_SERVICE
 from rcc.services.rgb_service import RGB_SERVICE
@@ -39,7 +41,7 @@ from framework.logger import Logger
 class MainWindow(QMainWindow):
     """Aplication main window"""
 
-    def __init__(self):
+    def __init__(self):  # pylint: disable=too-many-locals
         self._logger = Logger()
 
         self._effect_labels = RGB_SERVICE.get_available_effects()
@@ -47,8 +49,8 @@ class MainWindow(QMainWindow):
         super().__init__()
 
         self.setWindowTitle("RogControlCenter")
-        self.setGeometry(0, 0, 350, 600)
-        self.setFixedSize(350, 600)
+        self.setGeometry(0, 0, 350, 680)
+        self.setFixedSize(350, 680)
         self.setWindowIcon(QIcon(f"{ICONS_PATH}/icon-45x45.png"))
 
         self._current_color = RGB_SERVICE.get_color(RGB_SERVICE._effect)
@@ -127,7 +129,7 @@ class MainWindow(QMainWindow):
         aura_group.setLayout(aura_layout)
         main_layout.addWidget(aura_group)
 
-        # Grupo 3: Configuración
+        # Grupo 3: Battery
         settings_group = QGroupBox(TRANSLATOR.translate("battery"))
         settings_layout = QFormLayout()
         settings_layout.setContentsMargins(20, 20, 20, 20)
@@ -148,6 +150,18 @@ class MainWindow(QMainWindow):
         settings_group.setLayout(settings_layout)
         main_layout.addWidget(settings_group)
 
+        application_group = QGroupBox(TRANSLATOR.translate("application"))
+        application_layout = QFormLayout()
+        application_layout.setContentsMargins(20, 20, 20, 20)
+
+        autostart_checkbox = QCheckBox()
+        autostart_checkbox.setChecked(APPLICATION_SERVICE.is_autostart)
+        autostart_checkbox.toggled.connect(self.on_autostart_changed)
+        application_layout.addRow(TRANSLATOR.translate("autostart"), autostart_checkbox)
+
+        application_group.setLayout(application_layout)
+        main_layout.addWidget(application_group)
+
         # Configurar el widget central
         self.setCentralWidget(central_widget)
         GuiUtils.center_window_on_current_screen(self)
@@ -160,6 +174,10 @@ class MainWindow(QMainWindow):
         EVENT_BUS.on(STEAM_SERVICE_GAME_EVENT, self.on_game_event)
         EVENT_BUS.on(STEAM_SERVICE_CONNECTED, lambda: self.on_steam_connected_event(True))
         EVENT_BUS.on(STEAM_SERVICE_DISCONNECTED, lambda: self.on_steam_connected_event(False))
+
+    def on_autostart_changed(self, state):
+        """Hanndler for autostart state change"""
+        APPLICATION_SERVICE.enable_autostart(state)
 
     def on_steam_connected_event(self, connected: bool):
         """Handler for steam connection events"""

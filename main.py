@@ -62,7 +62,6 @@ def initialize_application():  # pylint:disable=too-many-locals
 
         APPLICATION_SERVICE.generate_run()
         APPLICATION_SERVICE.create_menu_entry()
-        APPLICATION_SERVICE.enable_autostart()
 
     """Ask for sudo password"""
     from rcc.gui.password_dialog import PASSWORD_DIALOG

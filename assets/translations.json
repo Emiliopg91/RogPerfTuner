@@ -210,5 +210,13 @@
   "label.level.4":{
     "en":"Detailed",
     "es": "Detallado"
+  },
+  "application": {
+    "en":"Application",
+    "es":"Aplicación"
+  },
+  "autostart": {
+    "en": "Start on boot",
+    "es": "Iniciar automaticamente"
   }
 }

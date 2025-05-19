@@ -56,17 +56,32 @@ fi
             os.path.join(USER_ICON_FOLDER, "icon.svg"),
         )
 
-    def enable_autostart(self) -> None:
+    @property
+    def is_autostart(self):
+        """Flag for autostart state"""
+        return os.path.exists(AUTOSTART_FILE)
+
+    def enable_autostart(self, enable) -> None:
         """Create file to enable autostart on login"""
-        self._logger.debug("Creating autostart file")
-        dir_path = os.path.dirname(AUTOSTART_FILE)
-        if not os.path.exists(dir_path):
-            os.makedirs(dir_path, exist_ok=True)
+        self._logger.info("Setting autostart")
+        self._logger.add_tab()
 
-        with open(AUTOSTART_FILE, "w", encoding="utf-8") as file:
-            file.write(self.DESKTOP_FILE_CONTENT)
+        if (enable and self.is_autostart) or (not enable and not self.is_autostart):
+            self._logger.info("Autostart state not changed")
+            return
 
-        self._logger.debug(f"Autostart file '{AUTOSTART_FILE}' written successfully")
+        if enable:
+            dir_path = os.path.dirname(AUTOSTART_FILE)
+            if not os.path.exists(dir_path):
+                os.makedirs(dir_path, exist_ok=True)
+            with open(AUTOSTART_FILE, "w", encoding="utf-8") as file:
+                file.write(self.DESKTOP_FILE_CONTENT)
+            self._logger.info(f"Autostart file '{AUTOSTART_FILE}' written successfully")
+        else:
+            os.unlink(AUTOSTART_FILE)
+            self._logger.info(f"Autostart file '{AUTOSTART_FILE}' deleted successfully")
+
+        self._logger.rem_tab()
 
     def create_menu_entry(self) -> None:
         """Create file to add application to menu"""
