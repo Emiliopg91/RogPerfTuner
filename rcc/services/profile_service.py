@@ -34,27 +34,32 @@ class ProfileService:
         self._ac_events_enabled = True
 
         self._performance_profile = PerformanceProfile(CONFIGURATION.platform.profiles.profile)
-        self._platform_profile = PLATFORM_CLIENT.platform_profile
-        self._battery_charge_limit = PLATFORM_CLIENT.charge_control_end_threshold
-        self.on_bat = UPOWER_CLIENT.on_battery
 
-        PLATFORM_CLIENT.change_platform_profile_on_ac = False
-        PLATFORM_CLIENT.change_platform_profile_on_battery = False
-        PLATFORM_CLIENT.platfom_profile_linked_epp = True
+        if UPOWER_CLIENT.available:
+            self.on_bat = UPOWER_CLIENT.on_battery
+
+        if PLATFORM_CLIENT.available:
+            self._platform_profile = PLATFORM_CLIENT.platform_profile
+            self._battery_charge_limit = PLATFORM_CLIENT.charge_control_end_threshold
+
+            PLATFORM_CLIENT.change_platform_profile_on_ac = False
+            PLATFORM_CLIENT.change_platform_profile_on_battery = False
+            PLATFORM_CLIENT.platfom_profile_linked_epp = True
 
         self.__curves: dict[PlatformProfile, list[FanCurve]] = {}
-        self._logger.info("Configuring improved fan curves")
-        for p in PlatformProfile:
-            FAN_CURVES_CLIENT.set_curves_to_defaults(p)
-            FAN_CURVES_CLIENT.reset_profile_curves(p)
-            time.sleep(0.2)
+        if FAN_CURVES_CLIENT.available:
+            self._logger.info("Configuring improved fan curves")
+            for p in PlatformProfile:
+                FAN_CURVES_CLIENT.set_curves_to_defaults(p)
+                FAN_CURVES_CLIENT.reset_profile_curves(p)
+                time.sleep(0.2)
 
-            curves = FAN_CURVES_CLIENT.fan_curve_data(p)
-            for curve in curves:
-                curve.enabled = True
-                for i in range(len(curve.points)):  # pylint: disable=consider-using-enumerate
-                    curve.points[i] = (curve.points[i][0], min(100, round(curve.points[i][1] * 1.15)))
-            self.__curves[p] = curves
+                curves = FAN_CURVES_CLIENT.fan_curve_data(p)
+                for curve in curves:
+                    curve.enabled = True
+                    for i in range(len(curve.points)):  # pylint: disable=consider-using-enumerate
+                        curve.points[i] = (curve.points[i][0], min(100, round(curve.points[i][1] * 1.15)))
+                self.__curves[p] = curves
 
         EVENT_BUS.on(HARDWARE_SERVICE_ON_BATTERY, self._on_ac_battery_change)
         EVENT_BUS.on(STEAM_SERVICE_GAME_EVENT, self._on_game_event)
@@ -99,6 +104,7 @@ class ProfileService:
                     self._logger.add_tab()
 
                     self.__set_throttle_policy(profile, platform_profile)
+                    self.__set_tdp_values(profile)
                     self.__set_fan_curves(platform_profile)
                     self.__set_boost(boost_enabled)
                     self.__set_cpu_governor(cpu_governor, power_profile)
@@ -144,41 +150,47 @@ class ProfileService:
 
     def __set_throttle_policy(self, profile: PerformanceProfile, platform_profile: PlatformProfile):
         try:
-            time.sleep(0.05)
             platform_profile = profile.platform_profile
             self._logger.info(f"Throttle policy: {platform_profile.name}")
             self._logger.add_tab()
-            self._platform_profile = platform_profile
-            PLATFORM_CLIENT.platform_profile = platform_profile
 
-            PLATFORM_CLIENT.enable_ppt_group = True
-            time.sleep(0.05)
-
-            self._logger.info("Advanced parameters")
-            self._logger.add_tab()
-            HARDWARE_SERVICE.set_cpu_tdp(profile)
-            HARDWARE_SERVICE.set_gpu_tgp(profile)
-            self._logger.rem_tab()
+            if PLATFORM_CLIENT.available:
+                self._platform_profile = platform_profile
+                PLATFORM_CLIENT.platform_profile = platform_profile
+                PLATFORM_CLIENT.enable_ppt_group = True
 
             self._logger.rem_tab()
         except Exception as e:
             self._logger.error(f"Error while setting platform policy: {e}")
 
+    def __set_tdp_values(self, profile: PerformanceProfile):
+        if HARDWARE_SERVICE.tdp_available:
+            try:
+                self._logger.info("TDP values")
+                self._logger.add_tab()
+                HARDWARE_SERVICE.set_cpu_tdp(profile)
+                HARDWARE_SERVICE.set_gpu_tgp(profile)
+                self._logger.rem_tab()
+            except Exception as e:
+                self._logger.error(f"Error while setting TDP values: {e}")
+
     def __set_fan_curves(self, platform_profile: PlatformProfile):
-        try:
-            self._logger.info(f"Fan curve: {platform_profile.name}")
-            for curve in self.__curves[platform_profile]:
-                FAN_CURVES_CLIENT.set_fan_curve(platform_profile, curve)
-        except Exception as e:
-            self._logger.error(f"Error while setting fan curve: {e}")
+        if FAN_CURVES_CLIENT.available:
+            try:
+                self._logger.info(f"Fan curve: {platform_profile.name}")
+                for curve in self.__curves[platform_profile]:
+                    FAN_CURVES_CLIENT.set_fan_curve(platform_profile, curve)
+            except Exception as e:
+                self._logger.error(f"Error while setting fan curve: {e}")
 
     def __set_cpu_governor(self, governor: CpuGovernor, power_profile: PowerProfile):
         try:
             self._logger.info(f"CPU governor: {governor.name}")
             SHELL.run_command(f"cpupower frequency-set -g {governor.value}", True)
             time.sleep(0.25)
-            self._logger.info(f"Power profile: {power_profile.name}")
-            POWER_PROFILE_CLIENT.active_profile = power_profile
+            if POWER_PROFILE_CLIENT.available:
+                self._logger.info(f"Power profile: {power_profile.name}")
+                POWER_PROFILE_CLIENT.active_profile = power_profile
         except Exception as e:
             self._logger.error(f"Error while setting CPU governor: {e}")
 

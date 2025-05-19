@@ -43,7 +43,9 @@ class RgbService:
         self._logger.info("Restoring effect")
         self._logger.add_tab()
         OPEN_RGB_CLIENT.apply_effect(
-            self._effect, RgbBrightness.OFF if UPOWER_CLIENT.on_battery else self._brightness, self._color
+            self._effect,
+            RgbBrightness.OFF if UPOWER_CLIENT.available and UPOWER_CLIENT.on_battery else self._brightness,
+            self._color,
         )
         self._logger.rem_tab()
         self._logger.rem_tab()
