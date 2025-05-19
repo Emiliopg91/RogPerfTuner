@@ -8,7 +8,7 @@ from qasync import QEventLoop
 import setproctitle
 from rcc.utils.constants import APP_NAME, VERSION
 
-setproctitle.setproctitle(APP_NAME)
+setproctitle.setproctitle(f"{APP_NAME} v{VERSION}")
 
 from PyQt5.QtWidgets import QApplication
 import sys
