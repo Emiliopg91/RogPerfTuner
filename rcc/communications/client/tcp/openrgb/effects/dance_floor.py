@@ -15,7 +15,7 @@ class DanceFloor(AbstractEffect):
     def _get_random(self, length):
         randoms = []
         for _ in range(length):
-            randoms.append(RGBColor.fromHSV(random.randint(0, 359), random.randint(0, 25) + 75, 100))
+            randoms.append(RGBColor.fromHSV(random.randint(0, 359), random.randint(0, 20) + 80, 100))
         return randoms
 
     def apply_effect(self):

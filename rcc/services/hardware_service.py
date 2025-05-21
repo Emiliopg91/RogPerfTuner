@@ -193,6 +193,12 @@ class HardwareService:
             f"/usr/share/vulkan/icd.d/{gpu.value}_icd.x86_64.json",
         ]
 
+    def get_ocl_files(self, gpu: GpuBrand):
+        """Get path to OCL files"""
+        return [
+            f"/etc/OpenCL/vendors/{gpu.value}",
+        ]
+
     def _update_boost_status(self, is_on: bool):
         self._last_boost = is_on
 

@@ -193,6 +193,7 @@ class SteamService:
         launch_opts = re.sub(r"SteamDeck=0 ", "", launch_opts).strip()
         launch_opts = re.sub(r"MANGOHUD=.* MANGOHUD_CONFIG=preset=[^ ]+ mangohud ", "", launch_opts).strip()
         launch_opts = re.sub(r"VK_ICD_FILENAMES=[^ ]+ ", "", launch_opts).strip()
+        launch_opts = re.sub(r"OCL_ICD_FILENAMES=[^ ]+ ", "", launch_opts).strip()
 
         if metric_level > 0:
             launch_opts = launch_opts.replace(
@@ -201,6 +202,7 @@ class SteamService:
 
         if gpu_brand is not None:
             launch_opts = f"VK_ICD_FILENAMES={":".join(HARDWARE_SERVICE.get_icd_files(gpu_brand))} " + launch_opts
+            launch_opts = f"OCL_ICD_FILENAMES={":".join(HARDWARE_SERVICE.get_ocl_files(gpu_brand))} " + launch_opts
 
         launch_opts = "SteamDeck=0 " + launch_opts.strip()
 

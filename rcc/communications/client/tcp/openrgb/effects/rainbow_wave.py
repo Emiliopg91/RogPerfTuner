@@ -17,9 +17,9 @@ class RainbowWave(AbstractEffect):
 
     def apply_effect(self):
         longest_zone = max(set(max(set(zone.mat_width or len(zone.leds) for zone in el.zones)) for el in self._devices))
-        inc = 12
 
-        rainbow = [0] * longest_zone
+        rainbow = [0] * (3 * longest_zone)
+        inc = 360 / len(rainbow)
         for idx in range(len(rainbow) - 1, -1, -1):
             rainbow[idx] = (len(rainbow) - idx) * inc
 
@@ -33,22 +33,21 @@ class RainbowWave(AbstractEffect):
                             for r in range(zone.mat_height):
                                 for c in range(zone.mat_width):
                                     if zone.matrix_map[r][c] is not None:
-                                        rainbow_index = round(len(rainbow) * (c / zone.mat_width))
+                                        rainbow_index = round((0.85 * len(rainbow)) * (c / zone.mat_width))
                                         colors[offset + zone.matrix_map[r][c]] = RGBColor.fromHSV(
                                             rainbow[rainbow_index], 100, 100
                                         )
                         else:
                             for l in range(len(zone.leds)):
-                                rainbow_index = math.floor(len(rainbow) * (l / len(zone.leds)))
+                                rainbow_index = math.floor((0.85 * len(rainbow)) * (l / len(zone.leds)))
                                 colors[offset + l] = RGBColor.fromHSV(rainbow[rainbow_index], 100, 100)
                         offset += len(zone.leds)
                     self._set_colors(dev, colors)
 
-            self._sleep(3 / longest_zone)
+            self._sleep(4 / len(rainbow))
 
-            for idx in range(len(rainbow) - 1, 0, -1):
-                rainbow[idx] = rainbow[idx - 1]
-            rainbow[0] = (rainbow[1] + inc) % 360
+            rainbow.insert(0, (rainbow[0] + inc) % 360)
+            rainbow.pop()
 
 
 RAINBOW_WAVE_EFFECT = RainbowWave()
