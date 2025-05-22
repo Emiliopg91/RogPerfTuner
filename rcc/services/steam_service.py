@@ -10,7 +10,6 @@ from rcc.models.gpu_brand import GpuBrand
 from rcc.models.mangohud_level import MangoHudLevel
 from rcc.models.performance_profile import PerformanceProfile
 from rcc.models.settings import GameEntry
-from rcc.services import hardware_service
 from rcc.services.hardware_service import HARDWARE_SERVICE
 from rcc.services.profile_service import PROFILE_SERVICE
 from rcc.services.rgb_service import RGB_SERVICE

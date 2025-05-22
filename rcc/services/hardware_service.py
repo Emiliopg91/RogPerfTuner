@@ -189,6 +189,7 @@ class HardwareService:
             KEYBOARD_BRIGHTNESS_CONTROL.keyboard_brightness = 2
 
     def get_gpu_selector_env(self, gpu: GpuBrand):
+        """Get ENV configuration for GPU selection"""
         env = f"RCC_GPU={gpu.value} "
 
         icds = [
