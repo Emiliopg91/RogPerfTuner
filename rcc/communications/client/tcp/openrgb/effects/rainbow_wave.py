@@ -33,13 +33,13 @@ class RainbowWave(AbstractEffect):
                             for r in range(zone.mat_height):
                                 for c in range(zone.mat_width):
                                     if zone.matrix_map[r][c] is not None:
-                                        rainbow_index = round((0.85 * len(rainbow)) * (c / zone.mat_width))
+                                        rainbow_index = round(len(rainbow) * (c / zone.mat_width))
                                         colors[offset + zone.matrix_map[r][c]] = RGBColor.fromHSV(
                                             rainbow[rainbow_index], 100, 100
                                         )
                         else:
                             for l in range(len(zone.leds)):
-                                rainbow_index = math.floor((0.85 * len(rainbow)) * (l / len(zone.leds)))
+                                rainbow_index = math.floor(len(rainbow) * (l / len(zone.leds)))
                                 colors[offset + l] = RGBColor.fromHSV(rainbow[rainbow_index], 100, 100)
                         offset += len(zone.leds)
                     self._set_colors(dev, colors)
