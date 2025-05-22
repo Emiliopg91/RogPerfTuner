@@ -124,8 +124,7 @@ class HardwareService:
         self._logger.rem_tab()
         self._logger.rem_tab()
 
-        self.__gpus = []
-        self.__icd_files = {}
+        self.__gpus = {}
         if SWITCHEROO_CLIENT.available:  # pylint: disable=too-many-nested-blocks
             self._logger.info("Detecting GPU")
             self._logger.add_tab()
@@ -134,18 +133,21 @@ class HardwareService:
                 self._logger.info(f"{gpu["Name"]}")
                 if gpu["Discrete"]:
                     brand = GpuBrand(gpu["Name"].split(" ")[0].lower())
-                    self._logger.add_tab()
-                    if any(not os.path.exists(icd) for icd in self.get_icd_files(brand)):
-                        self._logger.error("Missing ICD files for Vulkan")
-                    else:
-                        self._logger.info("ICD files found")
-                        self.__gpus.append(brand)
+                    env = None
+                    if len(gpu["Environment"]) > 1:
+                        env = ""
+                        for i in range(0, len(gpu["Environment"]), 2):
+                            env += gpu["Environment"][i] + "=" + gpu["Environment"][i + 1] + " "
+                        env = env.strip()
 
-                        if brand == GpuBrand.NVIDIA:
-                            if NV_BOOST_CLIENT.available:
-                                self._logger.info("Dynamic boost control available")
-                            if NV_TEMP_CLIENT.available:
-                                self._logger.info("Throttle temperature control available")
+                    self.__gpus[brand] = env
+                    self._logger.add_tab()
+
+                    if brand == GpuBrand.NVIDIA:
+                        if NV_BOOST_CLIENT.available:
+                            self._logger.info("Dynamic boost control available")
+                        if NV_TEMP_CLIENT.available:
+                            self._logger.info("Throttle temperature control available")
 
                     self._logger.rem_tab()
 
@@ -186,31 +188,36 @@ class HardwareService:
         if value == 0 and KEYBOARD_BRIGHTNESS_CONTROL.available:
             KEYBOARD_BRIGHTNESS_CONTROL.keyboard_brightness = 2
 
-    def get_icd_files(self, gpu: GpuBrand):
-        """Get path to ICD files"""
-        return [
-            f"/usr/share/vulkan/icd.d/{gpu.value}_icd.i686.json",
-            f"/usr/share/vulkan/icd.d/{gpu.value}_icd.x86_64.json",
-        ]
+    def get_gpu_selector_env(self, gpu: GpuBrand):
+        env = f"RCC_GPU={gpu.value} "
 
-    def get_ocl_files(self, gpu: GpuBrand):
-        """Get path to OCL files"""
-        return [
-            f"/etc/OpenCL/vendors/{gpu.value}",
+        icds = [
+            icd
+            for icd in [
+                f"/usr/share/vulkan/icd.d/{gpu.value}_icd.i686.json",
+                f"/usr/share/vulkan/icd.d/{gpu.value}_icd.x86_64.json",
+            ]
+            if os.path.exists(icd)
         ]
+        if len(icds) > 0:
+            env += f"VK_ICD_FILENAMES={":".join(icds)} "
+
+        ocds = [ocd for ocd in [f"/etc/OpenCL/vendors/{gpu.value}.icd"] if os.path.exists(ocd)]
+        if len(ocds) > 0:
+            env += f"OCL_ICD_FILENAMES={":".join(ocds)} "
+
+        if gpu in self.__gpus and self.__gpus[gpu] is not None:
+            env += self.__gpus[gpu]
+
+        return env.strip()
 
     def _update_boost_status(self, is_on: bool):
         self._last_boost = is_on
 
     @property
-    def icd_files(self) -> list[str] | None:
-        """ICD files for GPU"""
-        return self.__icd_files
-
-    @property
     def gpus(self) -> list[GpuBrand]:
         """GPU brand"""
-        return self.__gpus
+        return self.__gpus.keys()
 
     @property
     def cpu(self) -> CpuBrand | None:
