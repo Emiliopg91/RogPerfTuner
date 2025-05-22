@@ -101,6 +101,7 @@ class ProfileService:
                 ssd_sched = profile.ssd_queue_scheduler
                 try:
                     self._logger.info(f"Setting {profile_name} profile")  # pylint: disable=line-too-long
+                    t0 = time.time()
                     self._logger.add_tab()
 
                     self.__set_throttle_policy(profile, platform_profile)
@@ -111,7 +112,7 @@ class ProfileService:
                     self.__set_ssd_scheduler(ssd_sched)
 
                     self._logger.rem_tab()
-                    self._logger.info("Profile setted succesfully")
+                    self._logger.info(f"Profile setted succesfully after {round(1000*(time.time()-t0))/1000} ms")
 
                     if not temporal and not self.on_bat:
                         CONFIGURATION.platform.profiles.profile = profile.value

@@ -10,6 +10,7 @@ from rcc.models.gpu_brand import GpuBrand
 from rcc.models.mangohud_level import MangoHudLevel
 from rcc.models.performance_profile import PerformanceProfile
 from rcc.models.settings import GameEntry
+from rcc.services import hardware_service
 from rcc.services.hardware_service import HARDWARE_SERVICE
 from rcc.services.profile_service import PROFILE_SERVICE
 from rcc.services.rgb_service import RGB_SERVICE
@@ -172,7 +173,7 @@ class SteamService:
     def get_prefered_gpu(self, launch_options) -> GpuBrand | None:
         """Get GPU from game launch option"""
         for gpu in HARDWARE_SERVICE.gpus:
-            if f"VK_ICD_FILENAMES={":".join(HARDWARE_SERVICE.get_icd_files(gpu))} " in launch_options:
+            if f"RCC_GPU={gpu.value} " in launch_options:
                 return gpu
 
         return None
@@ -192,7 +193,10 @@ class SteamService:
 
         launch_opts = re.sub(r"SteamDeck=0 ", "", launch_opts).strip()
         launch_opts = re.sub(r"MANGOHUD=.* MANGOHUD_CONFIG=preset=[^ ]+ mangohud ", "", launch_opts).strip()
-        launch_opts = re.sub(r"VK_ICD_FILENAMES=[^ ]+ ", "", launch_opts).strip()
+        prev_gpu = self.get_prefered_gpu(launch_options)
+        if prev_gpu is not None:
+            for part in HARDWARE_SERVICE.get_gpu_selector_env(prev_gpu).split(" "):
+                launch_opts = re.sub(rf"{part} ", "", launch_opts).strip()
 
         if metric_level > 0:
             launch_opts = launch_opts.replace(
@@ -200,7 +204,7 @@ class SteamService:
             )
 
         if gpu_brand is not None:
-            launch_opts = f"VK_ICD_FILENAMES={":".join(HARDWARE_SERVICE.get_icd_files(gpu_brand))} " + launch_opts
+            launch_opts = HARDWARE_SERVICE.get_gpu_selector_env(gpu_brand) + " " + launch_opts
 
         launch_opts = "SteamDeck=0 " + launch_opts.strip()
 

@@ -17,9 +17,9 @@ class RainbowWave(AbstractEffect):
 
     def apply_effect(self):
         longest_zone = max(set(max(set(zone.mat_width or len(zone.leds) for zone in el.zones)) for el in self._devices))
-        inc = 12
 
-        rainbow = [0] * longest_zone
+        rainbow = [0] * (3 * longest_zone)
+        inc = 360 / len(rainbow)
         for idx in range(len(rainbow) - 1, -1, -1):
             rainbow[idx] = (len(rainbow) - idx) * inc
 
@@ -44,11 +44,10 @@ class RainbowWave(AbstractEffect):
                         offset += len(zone.leds)
                     self._set_colors(dev, colors)
 
-            self._sleep(3 / longest_zone)
+            self._sleep(4 / len(rainbow))
 
-            for idx in range(len(rainbow) - 1, 0, -1):
-                rainbow[idx] = rainbow[idx - 1]
-            rainbow[0] = (rainbow[1] + inc) % 360
+            rainbow.insert(0, (rainbow[0] + inc) % 360)
+            rainbow.pop()
 
 
 RAINBOW_WAVE_EFFECT = RainbowWave()
