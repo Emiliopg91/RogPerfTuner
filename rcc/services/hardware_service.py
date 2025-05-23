@@ -2,14 +2,12 @@ from math import floor
 import os
 from threading import Lock, Thread
 import time
-from typing import Callable, Optional, Dict, List
 
 from psutil import Process
 import pyudev
-from watchdog.events import FileSystemEventHandler
-from watchdog.observers import Observer
 
 from framework.logger import Logger
+from rcc.communications.client.cmd.linux.lsusb_client import LS_USB_CLIENT
 from rcc.communications.client.dbus.asus.armoury.intel.pl1_spl_client import PL1_SPL_CLIENT
 from rcc.communications.client.dbus.asus.armoury.intel.pl2_sppt_client import PL2_SPPT_CLIENT
 from rcc.communications.client.dbus.asus.armoury.nvidia.nv_boost_client import NV_BOOST_CLIENT
@@ -21,6 +19,7 @@ from rcc.communications.client.dbus.linux.power_management_keyboard_brightness_c
 )
 from rcc.communications.client.dbus.linux.switcheroo_client import SWITCHEROO_CLIENT
 from rcc.communications.client.dbus.linux.upower_client import UPOWER_CLIENT
+from rcc.communications.client.file.linux.boost_client import BOOST_CLIENT
 from rcc.communications.client.file.linux.cpuinfo_client import CPU_INFO_CLIENT
 from rcc.communications.client.file.linux.scheduler_client import SSD_SCHEDULER_CLIENT
 from rcc.communications.client.tcp.openrgb.openrgb_client import OPEN_RGB_CLIENT
@@ -41,48 +40,17 @@ from rcc.utils.events import (
 from rcc.utils.shell import SHELL
 
 
-class BoostControlHandler(FileSystemEventHandler):
-    """Watcher for boost file changes"""
-
-    def __init__(self, path: str, on_value: str, callback: Callable[[bool], None]):
-        super().__init__()
-        self._path = path
-        self._on_value = on_value
-        self._callback = callback
-
-    def on_modified(self, event):
-        if event.src_path == self._path:
-            with open(self._path, "r") as f:
-                content = f.read().strip()
-            self._callback(content == self._on_value)
-
-
 class HardwareService:
     """Hardware service"""
 
     CPU_PRIORITY = -15
     IO_PRIORITY = floor((CPU_PRIORITY + 20) / 5)
     IO_CLASS = 2
-    BOOST_CONTROLS: List[Dict[str, str]] = [
-        {
-            "path": "/sys/devices/system/cpu/intel_pstate/no_turbo",
-            "on": "0",
-            "off": "1",
-        },
-        {
-            "path": "/sys/devices/system/cpu/cpufreq/boost",
-            "on": "1",
-            "off": "0",
-        },
-    ]
 
     def __init__(self):  # pylint: disable=too-many-branches
         self._logger = Logger()
         self._logger.info("Initializing HardwareService")
         self._logger.add_tab()
-
-        self._boost_control: Optional[Dict[str, str]] = None
-        self._last_boost: Optional[bool] = None
 
         self._logger.info("Detecting CPU")
         self._logger.add_tab()
@@ -99,30 +67,9 @@ class HardwareService:
             if PL1_SPL_CLIENT.available:
                 self._logger.info("TDP control available")
 
-        for control in self.BOOST_CONTROLS:
-            if os.path.exists(control["path"]):
+            if BOOST_CLIENT.available:
                 self._logger.info("Boost control available")
 
-                self._boost_control = control
-
-                with open(self._boost_control["path"], "r") as f:
-                    content = f.read().strip()
-                self._last_boost = self._boost_control["on"] == content
-
-                handler = BoostControlHandler(
-                    path=self._boost_control["path"],
-                    on_value=self._boost_control["on"],
-                    callback=self._update_boost_status,
-                )
-                self._observer = Observer()
-                self._observer.schedule(
-                    handler,
-                    path=os.path.dirname(self._boost_control["path"]),
-                    recursive=False,
-                )
-                self._observer.start()
-
-                break
         self._logger.rem_tab()
         self._logger.rem_tab()
 
@@ -212,9 +159,6 @@ class HardwareService:
 
         return env.strip()
 
-    def _update_boost_status(self, is_on: bool):
-        self._last_boost = is_on
-
     @property
     def gpus(self) -> list[GpuBrand]:
         """GPU brand"""
@@ -244,11 +188,6 @@ class HardwareService:
         self.__running_games = count
 
     @property
-    def boost_allowed(self) -> None:
-        """Boost flag"""
-        return self._boost_control is not None
-
-    @property
     def on_battery(self):
         """On battery flag"""
         return self.__on_bat
@@ -275,20 +214,16 @@ class HardwareService:
 
     def set_boost_status(self, enabled: bool):
         """Enable/disable cpu boost"""
-        if self.boost_allowed:
+        if BOOST_CLIENT.available:
             self._logger.info(f"CPU boost: {"ENABLED" if enabled else "DISABLED"}")
-            target = "on" if enabled else "off"
-            value = self._boost_control[target]
-            path = self._boost_control["path"]
-
-            SHELL.run_command(f"echo '{value}' | tee {path}", True)
+            BOOST_CLIENT.boost = enabled
 
     def __monitor_for_usb(self) -> None:  # pylint: disable=too-many-locals, too-many-branches
         """Monitor for usb devices changes"""
         monitor = pyudev.Monitor.from_netlink(pyudev.Context())
         monitor.filter_by("usb")
 
-        lsusb_output = SHELL.run_command("lsusb", output=True)[1].strip()
+        lsusb_output = LS_USB_CLIENT.get_usb_dev()
         current_usb = []
         for line in lsusb_output.split("\n"):
             columns = line.strip().split(" ")
@@ -306,7 +241,7 @@ class HardwareService:
             if action in ["add", "remove"]:
                 self._usb_mutex.acquire(True)  # pylint: disable=consider-using-with
                 try:
-                    lsusb_output = SHELL.run_command("lsusb", output=True)[1].strip()
+                    lsusb_output = LS_USB_CLIENT.get_usb_dev()
 
                     current_usb = []
                     for line in lsusb_output.split("\n"):
@@ -418,24 +353,8 @@ class HardwareService:
 
         if first_run:
             self._logger.info(f"Optimized {len(processed)} processes")
-            # secs = 60
-            # Thread(target=lambda: self.__keep_optimizing(pid, secs, processed)).start()
-            # self._logger.info(f"Optimizations will keep running in background for {secs} seconds")
 
         return len(processed)
-
-    """
-    def __keep_optimizing(self, pid, time_len, processed):
-        t0 = time.time()
-        beg = len(processed)
-        last = beg
-        while time.time() - t0 < time_len:
-            time.sleep(0.5)
-            last = max(last, self.apply_proccess_optimizations(pid, False))
-
-        if last - beg > 0:
-            self._logger.info(f"Optimization finished for {last-beg} additional processes")
-    """
 
     def set_cpu_tdp(self, profile: PerformanceProfile):
         """Set CPU TDP configuration"""

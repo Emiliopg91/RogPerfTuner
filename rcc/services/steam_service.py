@@ -4,6 +4,7 @@ from dataclasses import dataclass
 from threading import Thread
 
 from framework.logger import Logger
+from rcc.communications.client.cmd.linux.mangohud_client import MANGO_HUD_CLIENT
 from rcc.communications.client.cmd.linux.systemctl_client import SYSTEM_CTL_CLIENT
 from rcc.communications.client.tcp.openrgb.effects.gaming import GAMING_EFFECT
 from rcc.communications.client.websocket.steam.steam_client import STEAM_CLIENT
@@ -44,8 +45,6 @@ class SteamService:
         self.__running_games: dict[int, str] = {}
         self.__steam_connnected = STEAM_CLIENT.connected
 
-        self.__metrics_available = SHELL.run_command("which mangohud", check=False) == 0
-
         STEAM_CLIENT.on_connected(self.__on_steam_connected)
         STEAM_CLIENT.on_disconnected(self.__on_steam_disconnected)
         STEAM_CLIENT.on_launch_game(self.__launch_game)
@@ -81,7 +80,7 @@ class SteamService:
     @property
     def metrics_enabled(self):
         """Flag metrics availability"""
-        return self.__metrics_available
+        return MANGO_HUD_CLIENT.available
 
     def get_games(self) -> dict[int, str]:
         """Get games and setting"""

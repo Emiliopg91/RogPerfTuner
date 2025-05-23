@@ -16,5 +16,5 @@ class AbstractCmdClient(ABC):
         """Availability flag"""
         return self._available
 
-    def _run_command(self, args: str, sudo=False):
-        return SHELL.run_command(command=f"{self.__command} {args}", output=True, sudo=sudo, check=True)
+    def _run_command(self, args="", sudo=False):
+        return SHELL.run_command(command=f"{self.__command} {args}".strip(), output=True, sudo=sudo, check=True)
