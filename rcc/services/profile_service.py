@@ -4,6 +4,7 @@ from threading import Lock
 
 from framework.logger import Logger, logged_method
 from framework.singleton import singleton
+from rcc.communications.client.cmd.linux.cpupower_client import CPU_POWER_CLIENT
 from rcc.communications.client.dbus.asus.core.fan_curves_client import FAN_CURVES_CLIENT
 from rcc.communications.client.dbus.asus.core.platform_client import PLATFORM_CLIENT
 from rcc.communications.client.dbus.linux.power_profiles_client import POWER_PROFILE_CLIENT
@@ -19,7 +20,6 @@ from rcc.services.hardware_service import HARDWARE_SERVICE
 from rcc.utils.beans import EVENT_BUS, TRANSLATOR
 from rcc.utils.configuration import CONFIGURATION
 from rcc.utils.events import HARDWARE_SERVICE_ON_BATTERY, PLATFORM_SERVICE_PROFILE_CHANGED, STEAM_SERVICE_GAME_EVENT
-from rcc.utils.shell import SHELL
 
 
 @singleton
@@ -185,15 +185,16 @@ class ProfileService:
                 self._logger.error(f"Error while setting fan curve: {e}")
 
     def __set_cpu_governor(self, governor: CpuGovernor, power_profile: PowerProfile):
-        try:
-            self._logger.info(f"CPU governor: {governor.name}")
-            SHELL.run_command(f"cpupower frequency-set -g {governor.value}", True)
-            time.sleep(0.25)
-            if POWER_PROFILE_CLIENT.available:
-                self._logger.info(f"Power profile: {power_profile.name}")
-                POWER_PROFILE_CLIENT.active_profile = power_profile
-        except Exception as e:
-            self._logger.error(f"Error while setting CPU governor: {e}")
+        if CPU_POWER_CLIENT.available:
+            try:
+                self._logger.info(f"CPU governor: {governor.name}")
+                CPU_POWER_CLIENT.set_governor(governor)
+                time.sleep(0.25)
+                if POWER_PROFILE_CLIENT.available:
+                    self._logger.info(f"Power profile: {power_profile.name}")
+                    POWER_PROFILE_CLIENT.active_profile = power_profile
+            except Exception as e:
+                self._logger.error(f"Error while setting CPU governor: {e}")
 
     def __set_boost(self, boost_enabled: bool):
         try:

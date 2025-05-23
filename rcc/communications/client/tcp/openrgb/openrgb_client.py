@@ -10,6 +10,7 @@ import time
 from openrgb.orgb import Device, OpenRGBClient
 from openrgb.utils import RGBColor
 
+from rcc.communications.client.cmd.asus.asusctl_client import ASUS_CTL_CLIENT
 from rcc.communications.client.tcp.openrgb.effects.gaming import GAMING_EFFECT
 from rcc.models.rgb_brightness import RgbBrightness
 from rcc.models.usb_identifier import UsbIdentifier
@@ -23,7 +24,6 @@ from rcc.communications.client.tcp.openrgb.effects.rainbow_wave import RAINBOW_W
 from rcc.communications.client.tcp.openrgb.effects.spectrum_cycle import SPECTRUM_CYCLE_EFFECT
 from rcc.communications.client.tcp.openrgb.effects.starry_night import STARRY_NIGHT_EFFECT
 from rcc.communications.client.tcp.openrgb.effects.static import STATIC_EFFECT
-from rcc.utils.shell import SHELL
 from rcc.utils.beans import EVENT_BUS
 from framework.logger import Logger
 from framework.singleton import singleton
@@ -58,7 +58,8 @@ class OpenRgbClient:
     def start(self):
         """Initialize server and client"""
         self.logger.info("Initializing OpenRgbClient")
-        SHELL.run_command("asusctl aura static -c 000000")
+        if ASUS_CTL_CLIENT.available:
+            ASUS_CTL_CLIENT.set_aura("static", "000000")
         self.logger.add_tab()
         self._start_orgb_process()
         self._find_compatible_devices()

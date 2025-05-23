@@ -21,6 +21,8 @@ from rcc.communications.client.dbus.linux.power_management_keyboard_brightness_c
 )
 from rcc.communications.client.dbus.linux.switcheroo_client import SWITCHEROO_CLIENT
 from rcc.communications.client.dbus.linux.upower_client import UPOWER_CLIENT
+from rcc.communications.client.file.linux.cpuinfo_client import CPU_INFO_CLIENT
+from rcc.communications.client.file.linux.scheduler_client import SSD_SCHEDULER_CLIENT
 from rcc.communications.client.tcp.openrgb.openrgb_client import OPEN_RGB_CLIENT
 from rcc.gui.notifier import NOTIFIER
 from rcc.models.battery_threshold import BatteryThreshold
@@ -85,7 +87,7 @@ class HardwareService:
         self._logger.info("Detecting CPU")
         self._logger.add_tab()
         self.__cpu = None
-        output = SHELL.run_command("cat /proc/cpuinfo | head -n5", output=True)[1]
+        output = CPU_INFO_CLIENT.read(5)
         if "GenuineIntel" in output:
             self.__cpu = CpuBrand.INTEL
             line = output.splitlines()[-1]
@@ -153,15 +155,13 @@ class HardwareService:
 
         self._logger.rem_tab()
 
-        self._logger.info("Getting available SSD schedulers")
-        self._logger.add_tab()
-        self.__available_ssd_sched = []
-        output = SHELL.run_command("cat /sys/block/nvme*/queue/scheduler", False, False, True)[1]
-        for sched in SsdScheduler:
-            if all(sched.value in l for l in output.splitlines()):
-                self.__available_ssd_sched.append(sched)
+        if SSD_SCHEDULER_CLIENT.available:
+            self._logger.info("Getting available SSD schedulers")
+            self._logger.add_tab()
+            self.__available_ssd_sched = SSD_SCHEDULER_CLIENT.get_schedulers()
+            for sched in self.__available_ssd_sched:
                 self._logger.info(f"{sched.name} - {sched.value}")
-        self._logger.rem_tab()
+            self._logger.rem_tab()
 
         if UPOWER_CLIENT.available:
             self.__on_bat = UPOWER_CLIENT.on_battery
@@ -269,9 +269,9 @@ class HardwareService:
 
     def set_ssd_scheduler(self, scheduler: SsdScheduler):
         """Set SSD queue scheduler"""
-        if scheduler in self.__available_ssd_sched:
+        if SSD_SCHEDULER_CLIENT.available and scheduler in self.__available_ssd_sched:
             self._logger.info(f"SSD scheduler: {scheduler.name}")
-            SHELL.run_command(f"echo '{scheduler.value}' | tee /sys/block/nvme*/queue/scheduler", True)
+            SSD_SCHEDULER_CLIENT.set_scheduler(scheduler)
 
     def set_boost_status(self, enabled: bool):
         """Enable/disable cpu boost"""

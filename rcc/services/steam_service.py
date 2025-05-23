@@ -4,6 +4,7 @@ from dataclasses import dataclass
 from threading import Thread
 
 from framework.logger import Logger
+from rcc.communications.client.cmd.linux.systemctl_client import SYSTEM_CTL_CLIENT
 from rcc.communications.client.tcp.openrgb.effects.gaming import GAMING_EFFECT
 from rcc.communications.client.websocket.steam.steam_client import STEAM_CLIENT
 from rcc.models.gpu_brand import GpuBrand
@@ -154,7 +155,7 @@ class SteamService:
         if is_update:
             SHELL.run_command(f"rm -R {dst}", True)
         SHELL.run_command(f"cp -R {os.path.join(USER_PLUGIN_FOLDER, 'RCCDeckyCompanion')} {dst}", True)
-        Thread(target=lambda: SHELL.run_command("systemctl restart plugin_loader.service", True)).start()
+        Thread(target=lambda: SYSTEM_CTL_CLIENT.restart_service("plugin_loader")).start()
 
     def get_metrics_level(self, launch_options) -> MangoHudLevel:
         """Get level from game launch option"""
