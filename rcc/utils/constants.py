@@ -33,6 +33,11 @@ with open(PYPROJECT_TOML_PATH, "r") as f:
     VERSION = data["project"]["version"]
 
 USER_FOLDER = os.path.expanduser(os.path.join("~", ".config", APP_NAME))
+for arg in sys.argv:
+    if arg.startswith("--cfg-dir="):
+        USER_FOLDER = arg.replace("--cfg-dir=", "")
+        print(f"Using user config folder '{USER_FOLDER}'")
+        break
 
 OLD_USER_FOLDER = os.path.expanduser(os.path.join("~", APP_NAME))
 
