@@ -225,5 +225,12 @@ class OpenRgbClient:
         self._available_effects.append(effect)
         self._available_effects = sorted(self._available_effects, key=lambda e: e.name)
 
+    def is_suppored_device(self, usb_dev: UsbIdentifier):
+        """Check if USB device is supported"""
+        for cd in self.compatible_devices:
+            if cd.id_vendor == usb_dev.id_vendor and cd.id_product == usb_dev.id_product:
+                return True
+        return False
+
 
 OPEN_RGB_CLIENT = OpenRgbClient()

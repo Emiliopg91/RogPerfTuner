@@ -223,71 +223,28 @@ class HardwareService:
         monitor = pyudev.Monitor.from_netlink(pyudev.Context())
         monitor.filter_by("usb")
 
-        lsusb_output = LS_USB_CLIENT.get_usb_dev()
-        current_usb = []
-        for line in lsusb_output.split("\n"):
-            columns = line.strip().split(" ")
-
-            id_vendor, id_product = columns[5].split(":")
-            name = " ".join(columns[6:])
-
-            usb_dev = UsbIdentifier(id_vendor, id_product, name)
-
-            for cd in OPEN_RGB_CLIENT.compatible_devices:
-                if cd.id_vendor == usb_dev.id_vendor and cd.id_product == usb_dev.id_product:
-                    self._connected_usb.append(cd)
+        self._connected_usb = LS_USB_CLIENT.compare_connected_devs([], OPEN_RGB_CLIENT.is_suppored_device)[0]
 
         for action, _ in monitor:  # pylint: disable=too-many-nested-blocks
             if action in ["add", "remove"]:
                 self._usb_mutex.acquire(True)  # pylint: disable=consider-using-with
                 try:
-                    lsusb_output = LS_USB_CLIENT.get_usb_dev()
+                    lsusb_out = LS_USB_CLIENT.compare_connected_devs(
+                        self._connected_usb, OPEN_RGB_CLIENT.is_suppored_device
+                    )
 
-                    current_usb = []
-                    for line in lsusb_output.split("\n"):
-                        columns = line.strip().split(" ")
-
-                        id_vendor, id_product = columns[5].split(":")
-                        name = " ".join(columns[6:])
-
-                        usb_dev = UsbIdentifier(id_vendor, id_product, name)
-
-                        if any(
-                            cd.id_vendor == usb_dev.id_vendor and cd.id_product == usb_dev.id_product
-                            for cd in OPEN_RGB_CLIENT.compatible_devices
-                        ):
-                            current_usb.append(usb_dev)
-
-                    added = []
-                    for dev1 in current_usb:
-                        found = False
-                        for dev2 in self._connected_usb:
-                            if not found and dev1.id_vendor == dev2.id_vendor and dev1.id_product == dev2.id_product:
-                                found = True
-                        if not found:
-                            added.append(dev1)
-
-                    removed = []
-                    for dev1 in self._connected_usb:
-                        found = False
-                        for dev2 in current_usb:
-                            if not found and dev1.id_vendor == dev2.id_vendor and dev1.id_product == dev2.id_product:
-                                found = True
-                        if not found:
-                            removed.append(dev1)
-
-                    if len(removed) > 0:
+                    if len(lsusb_out[2]) > 0:
                         self._logger.info("Removed compatible device(s):")
                         self._logger.add_tab()
-                        for item in removed:
+                        for item in lsusb_out[2]:
                             self._logger.info(OPEN_RGB_CLIENT.get_device_name(item.id_vendor, item.id_product))
                             OPEN_RGB_CLIENT.disable_device(item.name)
                         self._logger.rem_tab()
 
-                    if len(added) > 0:
+                    if len(lsusb_out[1]) > 0:
                         self._logger.info("Connected compatible device(s):")
                         self._logger.add_tab()
-                        for item in added:
+                        for item in lsusb_out[1]:
                             self._logger.info(OPEN_RGB_CLIENT.get_device_name(item.id_vendor, item.id_product))
                         self._logger.rem_tab()
 
@@ -298,7 +255,7 @@ class HardwareService:
                     else:
                         self._usb_mutex.release()
 
-                    self._connected_usb = current_usb
+                    self._connected_usb = lsusb_out[0]
                 except Exception:
                     self._usb_mutex.release()
 
