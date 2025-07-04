@@ -105,7 +105,7 @@ class GameList(QDialog):
                     gpu_combo.setCurrentIndex(0)
                     for i, gpu in enumerate(HARDWARE_SERVICE.gpus):
                         gpu_combo.addItem(f"{gpu.value.capitalize()}", gpu)
-                        if gpu == STEAM_SERVICE.get_prefered_gpu(game.launch_opts):
+                        if gpu == STEAM_SERVICE.get_prefered_gpu(game.appid):
                             gpu_combo.setCurrentIndex(i + 1)
 
                     gpu_combo.currentIndexChanged.connect(
@@ -121,7 +121,7 @@ class GameList(QDialog):
                         metrics_combo = NoScrollComboBox()  # Usar la subclase personalizada
                         for level in MangoHudLevel:
                             metrics_combo.addItem(TRANSLATOR.translate(f"label.level.{level}"), level)
-                            if level == STEAM_SERVICE.get_metrics_level(game.launch_opts):
+                            if level == STEAM_SERVICE.get_metrics_level(game.appid):
                                 metrics_combo.setCurrentIndex(level.value)
 
                         metrics_combo.currentIndexChanged.connect(

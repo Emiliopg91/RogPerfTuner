@@ -91,10 +91,10 @@ def initialize_application():  # pylint:disable=too-many-locals
     if len(STEAM_SERVICE.running_games) == 0:
         PROFILE_SERVICE.restore_profile()
 
-    """Start dbus server"""
-    from rcc.communications.server.dbus_server import DBUS_SERVER
+    """Start rest server"""
+    from rcc.communications.server.rest_server import REST_SERVER
 
-    DBUS_SERVER.start()
+    REST_SERVER.start()
 
     """Start autoupdater"""
     from framework.autoupdater import AutoUpdater

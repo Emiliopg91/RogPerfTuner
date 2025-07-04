@@ -6,6 +6,7 @@ from rcc.communications.client.tcp.openrgb.effects.static import STATIC_EFFECT
 from rcc.models.rgb_brightness import RgbBrightness
 from rcc.models.settings import (
     Config,
+    GameEntry,
     Settings,
     Platform,
     PlatformProfiles,
@@ -67,7 +68,7 @@ class Configuration:
         return self._config.platform
 
     @property
-    def games(self) -> dict[int, str]:
+    def games(self) -> dict[int, GameEntry]:
         """Getter for games"""
         return self._config.games
 

@@ -3,7 +3,6 @@ import os
 from threading import Lock, Thread
 import time
 
-from psutil import Process
 import pyudev
 
 from framework.logger import Logger
@@ -137,7 +136,7 @@ class HardwareService:
 
     def get_gpu_selector_env(self, gpu: GpuBrand):
         """Get ENV configuration for GPU selection"""
-        env = f"RCC_GPU={gpu.value} "
+        env = []
 
         icds = [
             icd
@@ -148,16 +147,17 @@ class HardwareService:
             if os.path.exists(icd)
         ]
         if len(icds) > 0:
-            env += f"VK_ICD_FILENAMES={":".join(icds)} "
+            env.append(f"VK_ICD_FILENAMES={":".join(icds)}")
 
         ocds = [ocd for ocd in [f"/etc/OpenCL/vendors/{gpu.value}.icd"] if os.path.exists(ocd)]
         if len(ocds) > 0:
-            env += f"OCL_ICD_FILENAMES={":".join(ocds)} "
+            env.append(f"OCL_ICD_FILENAMES={":".join(ocds)}")
 
         if gpu in self.__gpus and self.__gpus[gpu] is not None:
-            env += self.__gpus[gpu]
+            for part in self.__gpus[gpu].split(" "):
+                env.append(part)
 
-        return env.strip()
+        return env
 
     @property
     def gpus(self) -> list[GpuBrand]:
@@ -265,54 +265,6 @@ class HardwareService:
             self._logger.info(f"Setting panel overdrive {"disabled" if not enabled else "enabled"}")
             PANEL_OVERDRIVE_CLIENT.current_value = 1 if enabled else 0
 
-    def apply_proccess_optimizations(self, pid: int, first_run=True):
-        """Apply optimizations to the process tree"""
-        if first_run:
-            self._logger.info(
-                f"Setting CPU priority to {self.CPU_PRIORITY} and " + f"IO priority to {self.IO_PRIORITY}"
-            )
-
-        pending = [pid]
-        processed = []
-
-        while True:
-            new_pids_found = False
-
-            while pending:
-                pid = pending.pop(0)
-                if pid not in processed:
-                    try:
-                        SHELL.run_command(
-                            f"renice -n {self.CPU_PRIORITY} -p {pid} && "
-                            + f"ionice -c {self.IO_CLASS} -n {self.IO_PRIORITY} -p {pid}",
-                            sudo=True,
-                            check=True,
-                        )
-                    except Exception as e:
-                        self._logger.debug(f"Could not apply optimizations for process {pid}: {e}")
-                    processed.append(pid)
-
-                try:
-                    for child in Process(pid).children():
-                        if child.pid not in pending and child.pid not in processed:
-                            pending.append(child.pid)
-                            new_pids_found = True
-                except Exception:
-                    pass
-
-            if not new_pids_found:
-                break
-
-            pending = processed
-            processed = []
-
-            time.sleep(0.05)
-
-        if first_run:
-            self._logger.info(f"Optimized {len(processed)} processes")
-
-        return len(processed)
-
     def set_cpu_tdp(self, profile: PerformanceProfile):
         """Set CPU TDP configuration"""
         if HARDWARE_SERVICE.cpu == CpuBrand.INTEL:
@@ -361,6 +313,18 @@ class HardwareService:
         """Flag for TDP support"""
         return (GpuBrand.NVIDIA in self.__gpus and (NV_BOOST_CLIENT.available or NV_TEMP_CLIENT.available)) or (
             HARDWARE_SERVICE.cpu == CpuBrand.INTEL and PL1_SPL_CLIENT.available
+        )
+
+    def renice(self, pid: int):
+        """Apply optimizations to the process tree"""
+        self._logger.info(
+            f"Setting CPU priority to {self.CPU_PRIORITY} and " + f"IO priority to {self.IO_PRIORITY} for PID {pid}"
+        )
+
+        SHELL.run_command(
+            f"renice -n {self.CPU_PRIORITY} -p {pid} && " + f"ionice -c {self.IO_CLASS} -n {self.IO_PRIORITY} -p {pid}",
+            sudo=True,
+            check=True,
         )
 
 

@@ -77,6 +77,8 @@ USER_CONFIG_FOLDER = os.path.join(USER_FOLDER, "config")
 if not os.path.exists(USER_CONFIG_FOLDER):
     os.makedirs(USER_CONFIG_FOLDER)
 
+ASSET_SCRIPTS_FOLDER = os.path.join(BASE_PATH, "assets", "scripts")
+
 USER_SCRIPTS_FOLDER = os.path.join(USER_FOLDER, "scripts")
 
 if not os.path.exists(USER_SCRIPTS_FOLDER):

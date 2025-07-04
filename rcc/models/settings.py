@@ -1,6 +1,8 @@
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 
 from dataclasses_json import dataclass_json
+
+from rcc.models.mangohud_level import MangoHudLevel
 
 
 @dataclass_json
@@ -51,6 +53,8 @@ class GameEntry:
     """Game configuration"""
 
     name: str
+    gpu: str | None = field(default=None)
+    metrics_level: int = field(default=MangoHudLevel.NO_DISPLAY.value)
 
 
 @dataclass_json

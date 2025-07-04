@@ -101,7 +101,7 @@ class DigitalRain(AbstractEffect):
 
             if allowed > len(zone_status[0]) - len(free_cols):
                 next_col = free_cols[random.randint(0, len(free_cols) - 1)]
-                zone_status[0][next_col].max_val = round(self._max_count * (1 - (0.25 * (self._cpu))))
+                zone_status[0][next_col].max_val = round(self._max_count * (1 - (0.25 * self._cpu)))
                 zone_status[0][next_col].cur_val = zone_status[0][next_col].max_val
 
         return (hue + 51) % 360
