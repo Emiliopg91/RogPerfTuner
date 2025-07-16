@@ -39,7 +39,6 @@ console_handler.setFormatter(log_formatter)
 logger.addHandler(console_handler)
 
 # === Inicio del script ===
-start_time = datetime.now()
 
 if len(sys.argv) < 2:
     logger.error("Error: no command provided")
@@ -113,8 +112,8 @@ except (URLError, HTTPError) as e:
 except Exception as e:
     logger.warning("Unexpected error during renice: %s", e)
 
-logger.info(">>> Comando final ejecutado: %s", " ".join(command))
-logger.info(">>> Comenzó: %s", start_time)
+logger.info(">>> Running command: %s", " ".join(command))
+start_time = time.time()
 try:
     result = subprocess.run(command, env=child_env, check=False)
     exit_code = result.returncode
@@ -125,9 +124,9 @@ except Exception as e:
     exit_code = 1
     logger.error("Error running command: %s", e)
 
-end_time = datetime.now()
+end_time = time.time()
 
-logger.info(">>> Terminó: %s", end_time)
-logger.info(">>> Código de salida: %d", exit_code)
+logger.info(">>> Finished after %f", (end_time - start_time))
+logger.info(">>> Exit code: %d", exit_code)
 
 sys.exit(exit_code)
