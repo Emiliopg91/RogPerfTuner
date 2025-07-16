@@ -1,6 +1,6 @@
 import os
-import re
 from dataclasses import dataclass
+import subprocess
 from threading import Thread
 
 from framework.logger import Logger
@@ -10,6 +10,7 @@ from rcc.communications.client.tcp.openrgb.effects.gaming import GAMING_EFFECT
 from rcc.communications.client.websocket.steam.steam_client import STEAM_CLIENT
 from rcc.models.gpu_brand import GpuBrand
 from rcc.models.mangohud_level import MangoHudLevel
+from rcc.models.ntsync_option import NtSyncOption
 from rcc.models.performance_profile import PerformanceProfile
 from rcc.models.settings import GameEntry
 from rcc.services.hardware_service import HARDWARE_SERVICE
@@ -17,7 +18,7 @@ from rcc.services.profile_service import PROFILE_SERVICE
 from rcc.services.rgb_service import RGB_SERVICE
 from rcc.utils.beans import EVENT_BUS
 from rcc.utils.configuration import CONFIGURATION
-from rcc.utils.constants import RCCDC_ASSET_PATH, USER_PLUGIN_FOLDER
+from rcc.utils.constants import RCCDC_ASSET_PATH, USER_PLUGIN_FOLDER, USER_SCRIPTS_FOLDER
 from rcc.utils.events import STEAM_SERVICE_CONNECTED, STEAM_SERVICE_DISCONNECTED, STEAM_SERVICE_GAME_EVENT
 from rcc.utils.shell import SHELL
 
@@ -32,6 +33,8 @@ class RunningGameModel:
 
 class SteamService:
     """Steam service"""
+
+    WRAPER_PATH = os.path.join(USER_SCRIPTS_FOLDER, "runGame.py")
 
     DECKY_SERVICE_PATH = os.path.expanduser(os.path.join("~", "homebrew", "services", "PluginLoader"))
     PLUGINS_FOLDER = os.path.expanduser(os.path.join("~", "homebrew", "plugins"))
@@ -100,14 +103,13 @@ class SteamService:
             self.__running_games[gid] = name
             self._logger.add_tab()
 
-            HARDWARE_SERVICE.apply_proccess_optimizations(pid)
             HARDWARE_SERVICE.set_panel_overdrive(True)
             self.__set_profile_for_games()
             RGB_SERVICE.apply_effect(GAMING_EFFECT.name, True)
             self._logger.rem_tab()
 
             if CONFIGURATION.games.get(gid) is None:
-                CONFIGURATION.games[gid] = GameEntry(name)
+                CONFIGURATION.games[gid] = GameEntry(name, None, MangoHudLevel.NO_DISPLAY)
                 CONFIGURATION.save_config()
 
     def __stop_game(self, gid: int, name: str):
@@ -156,60 +158,135 @@ class SteamService:
         SHELL.run_command(f"cp -R {os.path.join(USER_PLUGIN_FOLDER, 'RCCDeckyCompanion')} {dst}", True)
         Thread(target=lambda: SYSTEM_CTL_CLIENT.restart_service("plugin_loader")).start()
 
-    def get_metrics_level(self, launch_options) -> MangoHudLevel:
-        """Get level from game launch option"""
-        match = re.search(r"(?<=preset=)(-?\d+)", launch_options)
-        if match:
-            return MangoHudLevel(int(match.group(0)))
-
-        return MangoHudLevel.NO_DISPLAY
+    def get_metrics_level(self, app_id) -> MangoHudLevel:
+        """Get level for game"""
+        game = CONFIGURATION.games.get(app_id)
+        return (
+            MangoHudLevel(game.metrics_level) if game and game.metrics_level is not None else MangoHudLevel.NO_DISPLAY
+        )
 
     def set_metrics_level(self, metric_level: MangoHudLevel, app_id, launch_options) -> MangoHudLevel:
         """Set level for game launch option"""
-        gpu_brand = self.get_prefered_gpu(launch_options)
-        return self.__set_launch_options(app_id, launch_options, gpu_brand, metric_level)
+        gpu_brand = self.get_prefered_gpu(app_id)
+        ntsync_level = self.get_ntsync_level(app_id)
+        return self.__set_launch_options(app_id, launch_options, gpu_brand, metric_level, ntsync_level)
 
-    def get_prefered_gpu(self, launch_options) -> GpuBrand | None:
+    def get_ntsync_level(self, app_id) -> NtSyncOption:
+        """Get level for game"""
+        game = CONFIGURATION.games.get(app_id)
+        return NtSyncOption(game.ntsync) if game and game.ntsync is not None else NtSyncOption.OFF
+
+    def set_ntsync_level(self, ntsync_level: NtSyncOption, app_id, launch_options) -> MangoHudLevel:
+        """Set level for game launch option"""
+        gpu_brand = self.get_prefered_gpu(app_id)
+        metric_level = self.get_metrics_level(app_id)
+        return self.__set_launch_options(app_id, launch_options, gpu_brand, metric_level, ntsync_level)
+
+    def get_prefered_gpu(self, app_id) -> GpuBrand | None:
         """Get GPU from game launch option"""
-        for gpu in HARDWARE_SERVICE.gpus:
-            if f"RCC_GPU={gpu.value} " in launch_options:
-                return gpu
-
-        return None
+        game = CONFIGURATION.games.get(app_id)
+        return GpuBrand(game.gpu) if game and game.gpu is not None else None
 
     def set_prefered_gpu(self, gpu_brand: GpuBrand, app_id, launch_options) -> MangoHudLevel:
         """Set gpu for game launch option"""
-        metric_level = self.get_metrics_level(launch_options)
-        return self.__set_launch_options(app_id, launch_options, gpu_brand, metric_level)
+        metric_level = self.get_metrics_level(app_id)
+        ntsync_level = self.get_ntsync_level(app_id)
+        return self.__set_launch_options(app_id, launch_options, gpu_brand, metric_level, ntsync_level)
 
-    def __set_launch_options(self, app_id: int, launch_options: str, gpu_brand: GpuBrand, metric_level: MangoHudLevel):
+    def __set_launch_options(  # pylint: disable=too-many-arguments,too-many-positional-arguments
+        self,
+        app_id: int,
+        launch_options: str,
+        gpu_brand: GpuBrand,
+        metric_level: MangoHudLevel,
+        ntsync_level: NtSyncOption,
+    ):
         launch_opts = launch_options
 
-        if launch_opts is None or launch_opts == "":
-            launch_opts = "%command%"
-        elif "%command%" not in launch_opts:
-            launch_opts = "%command% " + launch_opts
+        if gpu_brand is None and metric_level == MangoHudLevel.NO_DISPLAY and ntsync_level == NtSyncOption.OFF:
+            if self.WRAPER_PATH in launch_opts:
+                launch_opts = launch_opts.replace(self.WRAPER_PATH, "").strip()
 
-        launch_opts = re.sub(r"SteamDeck=0 ", "", launch_opts).strip()
-        launch_opts = re.sub(r"MANGOHUD=.* MANGOHUD_CONFIG=preset=[^ ]+ mangohud ", "", launch_opts).strip()
-        prev_gpu = self.get_prefered_gpu(launch_options)
-        if prev_gpu is not None:
-            for part in HARDWARE_SERVICE.get_gpu_selector_env(prev_gpu).split(" "):
-                launch_opts = re.sub(rf"{part} ", "", launch_opts).strip()
+            if launch_opts.startswith("%command%"):
+                launch_opts = launch_opts.replace("%command%", "").strip()
 
-        if metric_level > 0:
-            launch_opts = launch_opts.replace(
-                "%command%", f"MANGOHUD=1 MANGOHUD_CONFIG=preset={metric_level.value} mangohud %command%"
-            )
+        else:
+            if self.WRAPER_PATH not in launch_opts:
+                if launch_opts is None or launch_opts == "":
+                    launch_opts = "%command%"
+                elif "%command%" not in launch_opts:
+                    launch_opts = "%command% " + launch_opts
 
-        if gpu_brand is not None:
-            launch_opts = HARDWARE_SERVICE.get_gpu_selector_env(gpu_brand) + " " + launch_opts
+                launch_opts = launch_opts.replace("%command%", f"{self.WRAPER_PATH} %command%")
 
-        launch_opts = "SteamDeck=0 " + launch_opts.strip()
+        """
+                launch_opts = re.sub(r"SteamDeck=0 ", "", launch_opts).strip()
+                launch_opts = re.sub(r"MANGOHUD=.* MANGOHUD_CONFIG=preset=[^ ]+ mangohud ", "", launch_opts).strip()
+                prev_gpu = self.get_prefered_gpu(launch_options)
+                if prev_gpu is not None:
+                    for part in HARDWARE_SERVICE.get_gpu_selector_env(prev_gpu).split(" "):
+                        launch_opts = re.sub(rf"{part} ", "", launch_opts).strip()
+
+                if metric_level > 0:
+                    launch_opts = launch_opts.replace(
+                        "%command%", f"MANGOHUD=1 MANGOHUD_CONFIG=preset={metric_level.value} mangohud %command%"
+                    )
+
+                if gpu_brand is not None:
+                    launch_opts = HARDWARE_SERVICE.get_gpu_selector_env(gpu_brand) + " " + launch_opts
+
+                launch_opts = "SteamDeck=0 " + launch_opts.strip()
+        """
+
+        game = CONFIGURATION.games.get(app_id)
+        game.gpu = gpu_brand.value if gpu_brand is not None else None
+        game.metrics_level = metric_level.value if metric_level is not None else MangoHudLevel.NO_DISPLAY.value
+        game.ntsync = ntsync_level.value if ntsync_level is not None else NtSyncOption.OFF.value
+        CONFIGURATION.save_config()
 
         STEAM_CLIENT.set_launch_options(app_id, launch_opts)
 
         return launch_opts
+
+    def run_app(self, env: dict, cmd: list[str]):
+        """Run command"""
+        child_env = {}
+        command = []
+
+        for c in cmd:
+            if c.startswith("AppId="):
+                app_id = int(c.split("=")[1])
+                game = CONFIGURATION.games.get(app_id)
+                if game is not None:
+                    child_env["SteamDeck"] = "0"
+                    if game.gpu is not None:
+                        for part in HARDWARE_SERVICE.get_gpu_selector_env(GpuBrand(game.gpu)):
+                            part1 = part.split("=")
+                            child_env[part1[0]] = "=".join(part1[1:])
+                    if NtSyncOption(game.ntsync) in [NtSyncOption.DEFAULT_WOW, NtSyncOption.WOW64]:
+                        child_env["PROTON_USE_NTSYNC"] = "1"
+                        if NtSyncOption(game.ntsync) == NtSyncOption.WOW64:
+                            child_env["PROTON_USE_WOW64"] = "1"
+
+                    child_env["MANGOHUD"] = "1"
+                    child_env["MANGOHUD_CONFIG"] = f"preset={game.metrics_level}"
+
+                    command.append("mangohud")
+                break
+
+        child_env = {**child_env, **env}
+
+        for c in cmd:
+            command.append(c)
+
+        try:
+            process = subprocess.Popen(command, env=child_env)  # pylint: disable=consider-using-with
+            self._logger.info(f"Launched process with PID: {process.pid}")
+            process.wait()
+        except FileNotFoundError:
+            self._logger.error(f"Command not found: {command[0]}")
+        except Exception as e:
+            self._logger.error(f"Error running command: {e}")
 
 
 STEAM_SERVICE = SteamService()

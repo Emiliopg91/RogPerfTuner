@@ -80,11 +80,7 @@ class ProfileService:
     def _on_ac_battery_change(self, on_battery: bool, force=False):
         if self._ac_events_enabled or force:
             self.on_bat = on_battery
-            policy = PerformanceProfile(CONFIGURATION.platform.profiles.profile)
-            if on_battery:
-                policy = PerformanceProfile.QUIET
-
-            self.set_performance_profile(policy, True, True)
+            self.set_performance_profile(PerformanceProfile.QUIET, True, True)
 
     @logged_method
     def set_performance_profile(  # pylint: disable=too-many-locals

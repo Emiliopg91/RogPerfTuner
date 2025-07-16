@@ -218,5 +218,17 @@
   "autostart": {
     "en": "Start on boot",
     "es": "Iniciar automaticamente"
+  },
+  "label.ntsync.0":{
+    "en":"No",
+    "es":"No"
+  },
+  "label.ntsync.1":{
+    "en":"Yes",
+    "es":"Sí"
+  },
+  "label.ntsync.2":{
+    "en":"With WOW64",
+    "es":"Con WOW64"
   }
 }

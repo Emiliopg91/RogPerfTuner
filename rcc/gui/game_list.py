@@ -14,6 +14,7 @@ from PyQt5.QtGui import QIcon
 
 from rcc.communications.client.websocket.steam.steam_client import SteamGameDetails, STEAM_CLIENT
 from rcc.models.mangohud_level import MangoHudLevel
+from rcc.models.ntsync_option import NtSyncOption
 from rcc.services.hardware_service import HARDWARE_SERVICE
 from rcc.services.steam_service import STEAM_SERVICE
 from rcc.utils.constants import ICONS_PATH
@@ -27,7 +28,7 @@ class GameList(QDialog):
 
     INSTANCE: QDialog = None
 
-    def __init__(self, parent: QWidget, manage_parent=False):  # pylint: disable=too-many-locals
+    def __init__(self, parent: QWidget, manage_parent=False):  # pylint: disable=too-many-locals, too-many-branches
         super().__init__(parent)
         if GameList.INSTANCE is None:  # pylint: disable=too-many-nested-blocks
             GameList.INSTANCE = self
@@ -65,6 +66,8 @@ class GameList(QDialog):
             ]
             if STEAM_SERVICE.metrics_enabled:
                 columns.append(TRANSLATOR.translate("metrics"))
+            if HARDWARE_SERVICE.is_ntsync_ready:
+                columns.append(TRANSLATOR.translate("ntsync"))
 
             table = QTableWidget(len(appids), len(columns))
             table.setSizeAdjustPolicy(QAbstractScrollArea.AdjustToContents)
@@ -105,7 +108,7 @@ class GameList(QDialog):
                     gpu_combo.setCurrentIndex(0)
                     for i, gpu in enumerate(HARDWARE_SERVICE.gpus):
                         gpu_combo.addItem(f"{gpu.value.capitalize()}", gpu)
-                        if gpu == STEAM_SERVICE.get_prefered_gpu(game.launch_opts):
+                        if gpu == STEAM_SERVICE.get_prefered_gpu(game.appid):
                             gpu_combo.setCurrentIndex(i + 1)
 
                     gpu_combo.currentIndexChanged.connect(
@@ -121,7 +124,7 @@ class GameList(QDialog):
                         metrics_combo = NoScrollComboBox()  # Usar la subclase personalizada
                         for level in MangoHudLevel:
                             metrics_combo.addItem(TRANSLATOR.translate(f"label.level.{level}"), level)
-                            if level == STEAM_SERVICE.get_metrics_level(game.launch_opts):
+                            if level == STEAM_SERVICE.get_metrics_level(game.appid):
                                 metrics_combo.setCurrentIndex(level.value)
 
                         metrics_combo.currentIndexChanged.connect(
@@ -130,6 +133,21 @@ class GameList(QDialog):
                             )
                         )
                         table.setCellWidget(row, col, metrics_combo)
+                        col += 1
+
+                    if HARDWARE_SERVICE.is_ntsync_ready:
+                        ntsync_combo = NoScrollComboBox()  # Usar la subclase personalizada
+                        for option in NtSyncOption:
+                            ntsync_combo.addItem(TRANSLATOR.translate(f"label.ntsync.{option}"), option)
+                            if option == STEAM_SERVICE.get_ntsync_level(game.appid):
+                                ntsync_combo.setCurrentIndex(option.value)
+
+                        ntsync_combo.currentIndexChanged.connect(
+                            lambda _, widget=ntsync_combo, game=game: self.__on_ntsync_changed(  # pylint: disable=line-too-long
+                                widget, game
+                            )
+                        )
+                        table.setCellWidget(row, col, ntsync_combo)
                         col += 1
 
                     row += 1
@@ -147,6 +165,10 @@ class GameList(QDialog):
     def __on_metrics_changed(self, widget, game: SteamGameDetails):
         level = widget.currentData()
         game.launch_opts = STEAM_SERVICE.set_metrics_level(level, game.appid, game.launch_opts)
+
+    def __on_ntsync_changed(self, widget, game: SteamGameDetails):
+        level = widget.currentData()
+        game.launch_opts = STEAM_SERVICE.set_ntsync_level(level, game.appid, game.launch_opts)
 
     def __on_gpu_changed(self, widget, game: SteamGameDetails):
         gpu_brand = widget.currentData()

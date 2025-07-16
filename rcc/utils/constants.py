@@ -33,6 +33,11 @@ with open(PYPROJECT_TOML_PATH, "r") as f:
     VERSION = data["project"]["version"]
 
 USER_FOLDER = os.path.expanduser(os.path.join("~", ".config", APP_NAME))
+for arg in sys.argv:
+    if arg.startswith("--cfg-dir="):
+        USER_FOLDER = arg.replace("--cfg-dir=", "")
+        print(f"Using user config folder '{USER_FOLDER}'")
+        break
 
 OLD_USER_FOLDER = os.path.expanduser(os.path.join("~", APP_NAME))
 
@@ -71,6 +76,8 @@ USER_CONFIG_FOLDER = os.path.join(USER_FOLDER, "config")
 
 if not os.path.exists(USER_CONFIG_FOLDER):
     os.makedirs(USER_CONFIG_FOLDER)
+
+ASSET_SCRIPTS_FOLDER = os.path.join(BASE_PATH, "assets", "scripts")
 
 USER_SCRIPTS_FOLDER = os.path.join(USER_FOLDER, "scripts")
 
