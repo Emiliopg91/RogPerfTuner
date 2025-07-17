@@ -219,6 +219,10 @@
     "en": "Start on boot",
     "es": "Iniciar automaticamente"
   },
+  "ntsync":  {
+    "en":"NTSync",
+    "es":"NTSync"
+  },
   "label.ntsync.0":{
     "en":"No",
     "es":"No"
@@ -228,7 +232,7 @@
     "es":"Sí"
   },
   "label.ntsync.2":{
-    "en":"With WOW64",
-    "es":"Con WOW64"
+    "en":"WOW64",
+    "es":"WOW64"
   }
 }

@@ -28,7 +28,9 @@ class GameList(QDialog):
 
     INSTANCE: QDialog = None
 
-    def __init__(self, parent: QWidget, manage_parent=False):  # pylint: disable=too-many-locals, too-many-branches
+    def __init__(
+        self, parent: QWidget, manage_parent=False, app_id: int = None
+    ):  # pylint: disable=too-many-locals, too-many-branches
         super().__init__(parent)
         if GameList.INSTANCE is None:  # pylint: disable=too-many-nested-blocks
             GameList.INSTANCE = self
@@ -103,7 +105,8 @@ class GameList(QDialog):
                     col += 1
 
                     # GPU
-                    gpu_combo = NoScrollComboBox()  # Usar la subclase personalizada
+                    gpu_combo = NoScrollComboBox()
+                    gpu_combo.setEnabled(app_id is None or app_id == game.appid)  # Usar la subclase personalizada
                     gpu_combo.addItem(TRANSLATOR.translate("label.dgpu.auto"), None)
                     gpu_combo.setCurrentIndex(0)
                     for i, gpu in enumerate(HARDWARE_SERVICE.gpus):
@@ -122,6 +125,7 @@ class GameList(QDialog):
                     # Metrics
                     if STEAM_SERVICE.metrics_enabled:
                         metrics_combo = NoScrollComboBox()  # Usar la subclase personalizada
+                        metrics_combo.setEnabled(app_id is None or app_id == game.appid)
                         for level in MangoHudLevel:
                             metrics_combo.addItem(TRANSLATOR.translate(f"label.level.{level}"), level)
                             if level == STEAM_SERVICE.get_metrics_level(game.appid):
@@ -137,6 +141,7 @@ class GameList(QDialog):
 
                     if HARDWARE_SERVICE.is_ntsync_ready:
                         ntsync_combo = NoScrollComboBox()  # Usar la subclase personalizada
+                        ntsync_combo.setEnabled(app_id is None or app_id == game.appid)
                         for option in NtSyncOption:
                             ntsync_combo.addItem(TRANSLATOR.translate(f"label.ntsync.{option}"), option)
                             if option == STEAM_SERVICE.get_ntsync_level(game.appid):

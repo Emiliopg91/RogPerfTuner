@@ -1,6 +1,5 @@
 import os
 from dataclasses import dataclass
-import subprocess
 from threading import Thread
 
 from framework.logger import Logger
@@ -248,45 +247,33 @@ class SteamService:
 
         return launch_opts
 
-    def run_app(self, env: dict, cmd: list[str]):
-        """Run command"""
-        child_env = {}
-        command = []
+    def get_environment_and_wrappers(self, app_id):
+        "Get environment and wrappers for app_id"
+        environment = []
+        wrappers = []
 
-        for c in cmd:
-            if c.startswith("AppId="):
-                app_id = int(c.split("=")[1])
-                game = CONFIGURATION.games.get(app_id)
-                if game is not None:
-                    child_env["SteamDeck"] = "0"
-                    if game.gpu is not None:
-                        for part in HARDWARE_SERVICE.get_gpu_selector_env(GpuBrand(game.gpu)):
-                            part1 = part.split("=")
-                            child_env[part1[0]] = "=".join(part1[1:])
-                    if NtSyncOption(game.ntsync) in [NtSyncOption.DEFAULT_WOW, NtSyncOption.WOW64]:
-                        child_env["PROTON_USE_NTSYNC"] = "1"
-                        if NtSyncOption(game.ntsync) == NtSyncOption.WOW64:
-                            child_env["PROTON_USE_WOW64"] = "1"
+        game = CONFIGURATION.games.get(app_id)
+        if game is not None:
+            environment.append("SteamDeck=0")
+            ntsync = NtSyncOption(game.ntsync)
+            if ntsync != NtSyncOption.OFF:
+                environment.append("PROTON_USE_NTSYNC=1")
+                if ntsync == NtSyncOption.WOW64:
+                    environment.append("PROTON_USE_WOW64=1")
+            if game.gpu is not None:
+                for part in HARDWARE_SERVICE.get_gpu_selector_env(GpuBrand(game.gpu)):
+                    environment.append(part)
 
-                    child_env["MANGOHUD"] = "1"
-                    child_env["MANGOHUD_CONFIG"] = f"preset={game.metrics_level}"
+            if game.metrics_level != MangoHudLevel.NO_DISPLAY:
+                environment.append("MANGOHUD=1")
+                environment.append(f"MANGOHUD_CONFIG=preset={game.metrics_level}")
+                wrappers.append("mangohud")
 
-                    command.append("mangohud")
-                break
+        self._logger.info(f"Config for {game.name}:")
+        self._logger.info(f"  Environment: {environment}")
+        self._logger.info(f"  Wrappers: {wrappers}")
 
-        child_env = {**child_env, **env}
-
-        for c in cmd:
-            command.append(c)
-
-        try:
-            process = subprocess.Popen(command, env=child_env)  # pylint: disable=consider-using-with
-            self._logger.info(f"Launched process with PID: {process.pid}")
-            process.wait()
-        except FileNotFoundError:
-            self._logger.error(f"Command not found: {command[0]}")
-        except Exception as e:
-            self._logger.error(f"Error running command: {e}")
+        return environment, wrappers
 
 
 STEAM_SERVICE = SteamService()

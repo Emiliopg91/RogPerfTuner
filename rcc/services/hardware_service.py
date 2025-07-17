@@ -3,8 +3,6 @@ import os
 from threading import Lock, Thread
 import time
 
-import concurrent
-from psutil import Process
 import pyudev
 
 from framework.logger import Logger
@@ -333,28 +331,6 @@ class HardwareService:
             sudo=True,
             check=True,
         )
-
-    def apply_proccess_optimizations(self, ppid: int):
-        """Apply optimizations to the process tree"""
-        self._logger.info(f"Setting CPU priority to {self.CPU_PRIORITY} and " + f"IO priority to {self.IO_PRIORITY}")
-        already_applied = set()
-        parent = Process(ppid)
-
-        with concurrent.futures.ThreadPoolExecutor() as executor:
-            while True:
-                pids = {p.pid for p in parent.children(recursive=True)}
-                pids.add(ppid)
-                new_pids = pids - already_applied
-                if not new_pids:
-                    break
-
-                futures = []
-                for pp in new_pids:
-                    futures.append(executor.submit(self.renice, pp))
-
-                concurrent.futures.wait(futures)
-                already_applied.update(new_pids)
-                time.sleep(0.05)
 
 
 HARDWARE_SERVICE = HardwareService()
