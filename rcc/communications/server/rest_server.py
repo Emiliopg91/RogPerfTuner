@@ -9,7 +9,7 @@ from rcc.services.hardware_service import HARDWARE_SERVICE
 from rcc.services.steam_service import STEAM_SERVICE
 from rcc.services.rgb_service import RGB_SERVICE
 from rcc.services.profile_service import PROFILE_SERVICE
-from rcc.utils.constants import ASSET_SCRIPTS_FOLDER, USER_SCRIPTS_FOLDER
+from rcc.utils.constants import ASSET_SCRIPTS_FOLDER, USER_LOG_FOLDER, USER_SCRIPTS_FOLDER
 from framework.logger import Logger
 from framework.singleton import singleton
 
@@ -109,6 +109,7 @@ class RESTServer:
                 content = f.read()
 
             content = content.replace("{{port}}", str(self._port))
+            content = content.replace("{{logger_path}}", USER_LOG_FOLDER)
 
             with open(dst_path, "w") as f:
                 f.write(content)

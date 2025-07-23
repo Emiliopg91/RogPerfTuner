@@ -18,7 +18,7 @@ def get_application_lock():
     """Get the lock"""
     from rcc.utils.single_instance import SINGLE_INSTANCE
 
-    SINGLE_INSTANCE.acquire()
+    SINGLE_INSTANCE.acquire(APP_NAME)
 
 
 def create_qt_application() -> QApplication:

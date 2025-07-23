@@ -30,7 +30,7 @@ class Logger:
         if not os.path.exists(log_old_folder):
             os.makedirs(log_old_folder, exist_ok=True)
 
-        for lf in [file for file in os.listdir(log_folder) if file.endswith(".log")]:
+        for lf in [file for file in os.listdir(log_folder) if file != "runner.log" and file.endswith(".log")]:
             shutil.move(os.path.join(log_folder, lf), log_old_folder)
 
         old_files = [

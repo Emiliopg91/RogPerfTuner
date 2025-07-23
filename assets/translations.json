@@ -164,8 +164,8 @@
     "es": "Perfil {profile} aplicado con éxito para {game}"
   },
   "game.title": {
-    "en": "Game title",
-    "es": "Titulo del juego"
+    "en": "Game",
+    "es": "Juego"
   },
   "game.performance.configuration": {
     "en": "Game performance configuration",

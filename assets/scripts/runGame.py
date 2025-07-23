@@ -9,9 +9,14 @@ import time
 from urllib.request import urlopen, Request
 from urllib.error import URLError, HTTPError
 
-"""
-LOGFILE = "{{log_file}}"
-"""
+LOGGER_FILE = os.path.join("{{logger_path}}", "runner.log")
+
+
+def format_time(segundos) -> str:
+    segundos = round(segundos)
+    horas, resto = divmod(segundos, 3600)
+    minutos, segundos = divmod(resto, 60)
+    return f"{horas:02}:{minutos:02}:{segundos:02}"
 
 
 # === Configuración del logger ===
@@ -26,12 +31,10 @@ log_formatter = CustomFormatter("[%(asctime)s] %(message)s")
 logger = logging.getLogger("launcher")
 logger.setLevel(logging.INFO)
 
-"""
 # Handler a archivo
-file_handler = logging.FileHandler(LOGFILE, encoding="utf-8", mode="w")
+file_handler = logging.FileHandler(LOGGER_FILE, encoding="utf-8", mode="w")
 file_handler.setFormatter(log_formatter)
 logger.addHandler(file_handler)
-"""
 
 # Handler a consola
 console_handler = logging.StreamHandler()
@@ -45,21 +48,22 @@ if len(sys.argv) < 2:
     sys.exit(1)
 
 logger.info("===== Lanzamiento iniciado =====")
-logger.info(">>> Entorno inicial:")
-for key, value in os.environ.items():
-    logger.info("\t%s=%s", key, value)
+logger.info(">>> Entorno:")
+logger.info("\t%d entries", len(os.environ))
 
 app_id = None
 
-logger.info(">>> Argumentos originales:")
-for arg in sys.argv[1:]:
-    logger.info("\t%s", arg)
-    if arg.startswith("AppId="):
-        app_id = arg.split("=")[1]
+logger.info(">>> Command:")
+logger.info("\t%s", " ".join(sys.argv[1:]))
 
 
 child_env = os.environ.copy()
 command = sys.argv[1:]
+
+for p in command[1:]:
+    if p.startswith("AppId="):
+        app_id = p.split("=")[1]
+        break
 
 if app_id is not None:
     try:
@@ -74,21 +78,18 @@ if app_id is not None:
         )
         with urlopen(req) as response:
             config = json.load(response)
-        env_vars = config.get("environment", [])
+        env_vars = config.get("environment", {})
         wrappers = config.get("wrappers", [])
 
         logger.info(">>> Configuración descargada:")
         logger.info("\tEnvironment:")
+        logger.info("\t\t%s", env_vars)
 
-        for pair in env_vars:
-            if "=" in pair:
-                key, value = pair.split("=", 1)
-                logger.info("\t\t%s=%s", key, value)
-                child_env[key] = value
+        for key in env_vars:
+            child_env[key] = env_vars[key]
 
         logger.info("\tWrappers:")
-        for wrapper in wrappers:
-            logger.info("\t\t%s", wrapper)
+        logger.info("\t\t%s", " ".join(wrappers))
         command = wrappers + sys.argv[1:]
     except (URLError, HTTPError) as e:
         logger.warning("Error fetching config from %s: %s", API_URL, e)
@@ -112,11 +113,13 @@ except (URLError, HTTPError) as e:
 except Exception as e:
     logger.warning("Unexpected error during renice: %s", e)
 
-logger.info(">>> Running command: %s", " ".join(command))
+logger.info(">>> Running command: ")
+logger.info("\t%s", " ".join(command))
 start_time = time.time()
 try:
-    result = subprocess.run(command, env=child_env, check=False)
-    exit_code = result.returncode
+    with open(LOGGER_FILE, "a") as log_file:
+        result = subprocess.run(command, env=child_env, check=False, stdout=log_file, stderr=subprocess.STDOUT)
+        exit_code = result.returncode
 except FileNotFoundError:
     exit_code = 127
     logger.error("Command not found: %s", command[0])
@@ -126,7 +129,7 @@ except Exception as e:
 
 end_time = time.time()
 
-logger.info(">>> Finished after %f", (end_time - start_time))
+logger.info(">>> Finished after %s", format_time(end_time - start_time))
 logger.info(">>> Exit code: %d", exit_code)
 
 sys.exit(exit_code)

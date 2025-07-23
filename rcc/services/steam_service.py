@@ -173,7 +173,7 @@ class SteamService:
     def get_ntsync_level(self, app_id) -> NtSyncOption:
         """Get level for game"""
         game = CONFIGURATION.games.get(app_id)
-        return NtSyncOption(game.ntsync) if game and game.ntsync is not None else NtSyncOption.OFF
+        return NtSyncOption(game.ntsync) if game and game.ntsync is not None else NtSyncOption.ON
 
     def set_ntsync_level(self, ntsync_level: NtSyncOption, app_id, launch_options) -> MangoHudLevel:
         """Set level for game launch option"""
@@ -218,29 +218,10 @@ class SteamService:
 
                 launch_opts = launch_opts.replace("%command%", f"{self.WRAPER_PATH} %command%")
 
-        """
-                launch_opts = re.sub(r"SteamDeck=0 ", "", launch_opts).strip()
-                launch_opts = re.sub(r"MANGOHUD=.* MANGOHUD_CONFIG=preset=[^ ]+ mangohud ", "", launch_opts).strip()
-                prev_gpu = self.get_prefered_gpu(launch_options)
-                if prev_gpu is not None:
-                    for part in HARDWARE_SERVICE.get_gpu_selector_env(prev_gpu).split(" "):
-                        launch_opts = re.sub(rf"{part} ", "", launch_opts).strip()
-
-                if metric_level > 0:
-                    launch_opts = launch_opts.replace(
-                        "%command%", f"MANGOHUD=1 MANGOHUD_CONFIG=preset={metric_level.value} mangohud %command%"
-                    )
-
-                if gpu_brand is not None:
-                    launch_opts = HARDWARE_SERVICE.get_gpu_selector_env(gpu_brand) + " " + launch_opts
-
-                launch_opts = "SteamDeck=0 " + launch_opts.strip()
-        """
-
         game = CONFIGURATION.games.get(app_id)
         game.gpu = gpu_brand.value if gpu_brand is not None else None
         game.metrics_level = metric_level.value if metric_level is not None else MangoHudLevel.NO_DISPLAY.value
-        game.ntsync = ntsync_level.value if ntsync_level is not None else NtSyncOption.OFF.value
+        game.ntsync = ntsync_level.value if ntsync_level is not None else NtSyncOption.ON.value
         CONFIGURATION.save_config()
 
         STEAM_CLIENT.set_launch_options(app_id, launch_opts)
@@ -249,24 +230,22 @@ class SteamService:
 
     def get_environment_and_wrappers(self, app_id):
         "Get environment and wrappers for app_id"
-        environment = []
+        environment = {}
         wrappers = []
 
         game = CONFIGURATION.games.get(app_id)
         if game is not None:
-            environment.append("SteamDeck=0")
-            ntsync = NtSyncOption(game.ntsync)
-            if ntsync != NtSyncOption.OFF:
-                environment.append("PROTON_USE_NTSYNC=1")
-                if ntsync == NtSyncOption.WOW64:
-                    environment.append("PROTON_USE_WOW64=1")
+            environment["SteamDeck"] = "0"
+
+            if game.ntsync == NtSyncOption.OFF.value:
+                environment["PROTON_USE_NTSYNC"] = "0"
+
             if game.gpu is not None:
-                for part in HARDWARE_SERVICE.get_gpu_selector_env(GpuBrand(game.gpu)):
-                    environment.append(part)
+                environment.update(HARDWARE_SERVICE.get_gpu_selector_env(GpuBrand(game.gpu)))
 
             if game.metrics_level != MangoHudLevel.NO_DISPLAY:
-                environment.append("MANGOHUD=1")
-                environment.append(f"MANGOHUD_CONFIG=preset={game.metrics_level}")
+                environment["MANGOHUD"] = "1"
+                environment["MANGOHUD_CONFIG"] = f"preset={game.metrics_level}"
                 wrappers.append("mangohud")
 
         self._logger.info(f"Config for {game.name}:")

@@ -42,7 +42,7 @@ from rcc.utils.shell import SHELL
 class HardwareService:
     """Hardware service"""
 
-    CPU_PRIORITY = -15
+    CPU_PRIORITY = -17
     IO_PRIORITY = floor((CPU_PRIORITY + 20) / 5)
     IO_CLASS = 2
 
@@ -136,7 +136,7 @@ class HardwareService:
 
     def get_gpu_selector_env(self, gpu: GpuBrand):
         """Get ENV configuration for GPU selection"""
-        env = []
+        env = {}
 
         icds = [
             icd
@@ -147,15 +147,16 @@ class HardwareService:
             if os.path.exists(icd)
         ]
         if len(icds) > 0:
-            env.append(f"VK_ICD_FILENAMES={":".join(icds)}")
+            env["VK_ICD_FILENAMES"] = ":".join(icds)
 
         ocds = [ocd for ocd in [f"/etc/OpenCL/vendors/{gpu.value}.icd"] if os.path.exists(ocd)]
         if len(ocds) > 0:
-            env.append(f"OCL_ICD_FILENAMES={":".join(ocds)}")
+            env["OCL_ICD_FILENAMES"] = ":".join(ocds)
 
         if gpu in self.__gpus and self.__gpus[gpu] is not None:
-            for part in self.__gpus[gpu].split(" "):
-                env.append(part)
+            for part in self.__gpus[gpu].strip().split(" "):
+                parts = str(part).split("=")
+                env[parts[0]] = "=".join(parts[1:])
 
         return env
 

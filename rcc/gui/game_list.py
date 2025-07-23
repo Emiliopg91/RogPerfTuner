@@ -142,10 +142,10 @@ class GameList(QDialog):
                     if HARDWARE_SERVICE.is_ntsync_ready:
                         ntsync_combo = NoScrollComboBox()  # Usar la subclase personalizada
                         ntsync_combo.setEnabled(app_id is None or app_id == game.appid)
-                        for option in NtSyncOption:
+                        for i, option in enumerate(reversed(NtSyncOption)):
                             ntsync_combo.addItem(TRANSLATOR.translate(f"label.ntsync.{option}"), option)
                             if option == STEAM_SERVICE.get_ntsync_level(game.appid):
-                                ntsync_combo.setCurrentIndex(option.value)
+                                ntsync_combo.setCurrentIndex(i)
 
                         ntsync_combo.currentIndexChanged.connect(
                             lambda _, widget=ntsync_combo, game=game: self.__on_ntsync_changed(  # pylint: disable=line-too-long
