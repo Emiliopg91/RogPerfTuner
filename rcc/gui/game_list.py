@@ -8,6 +8,7 @@ from PyQt5.QtWidgets import (
     QHeaderView,
     QWidget,
     QAbstractItemView,
+    QLineEdit,
 )
 from PyQt5.QtCore import Qt
 from PyQt5.QtGui import QIcon
@@ -37,7 +38,7 @@ class GameList(QDialog):
             self.__parent = parent
             self.__manage_parent = manage_parent
             self.setWindowTitle(TRANSLATOR.translate("game.performance.configuration"))
-            self.setFixedSize(600, 600)
+            self.setFixedSize(800, 600)
             self.setWindowIcon(QIcon(f"{ICONS_PATH}/icon-45x45.png"))
             self.setAttribute(Qt.WA_DeleteOnClose)
             self.setWindowFlags(self.windowFlags() & ~Qt.WindowContextHelpButtonHint)
@@ -70,6 +71,9 @@ class GameList(QDialog):
                 columns.append(TRANSLATOR.translate("metrics"))
             if HARDWARE_SERVICE.is_ntsync_ready:
                 columns.append(TRANSLATOR.translate("ntsync"))
+
+            columns.append(TRANSLATOR.translate("environment"))
+            columns.append(TRANSLATOR.translate("params"))
 
             table = QTableWidget(len(appids), len(columns))
             table.setSizeAdjustPolicy(QAbstractScrollArea.AdjustToContents)
@@ -155,6 +159,20 @@ class GameList(QDialog):
                         table.setCellWidget(row, col, ntsync_combo)
                         col += 1
 
+                    env_input = QLineEdit()
+                    env_input.setText(STEAM_SERVICE.get_environment(game.appid))
+                    env_input.setEnabled(app_id is None or app_id == game.appid)
+                    env_input.textChanged.connect(lambda text, game=game: self.__on_environment_changed(text, game))
+                    table.setCellWidget(row, col, env_input)
+                    col += 1
+
+                    args_input = QLineEdit()
+                    args_input.setText(STEAM_SERVICE.get_parameters(game.appid))
+                    args_input.setEnabled(app_id is None or app_id == game.appid)
+                    args_input.textChanged.connect(lambda text, game=game: self.__on_params_changed(text, game))
+                    table.setCellWidget(row, col, args_input)
+                    col += 1
+
                     row += 1
                 except Exception as e:
                     print(f"{e}")
@@ -166,6 +184,12 @@ class GameList(QDialog):
             layout.addWidget(scroll_area)
 
             EVENT_BUS.on(STEAM_SERVICE_CONNECTED, self.close)
+
+    def __on_params_changed(self, text, game: SteamGameDetails):
+        game.launch_opts = STEAM_SERVICE.set_parameters(text, game.appid, game.launch_opts)
+
+    def __on_environment_changed(self, text, game: SteamGameDetails):
+        game.launch_opts = STEAM_SERVICE.set_environment(text, game.appid, game.launch_opts)
 
     def __on_metrics_changed(self, widget, game: SteamGameDetails):
         level = widget.currentData()

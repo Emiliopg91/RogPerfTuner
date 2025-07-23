@@ -234,5 +234,13 @@
   "label.ntsync.2":{
     "en":"WOW64",
     "es":"WOW64"
+  },
+  "environment":{
+    "en":"Environment",
+    "es":"Entorno"
+  },
+  "params":{
+    "en": "Parameters",
+    "es": "Parámetros"
   }
 }

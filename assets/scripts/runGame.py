@@ -80,6 +80,7 @@ if app_id is not None:
             config = json.load(response)
         env_vars = config.get("environment", {})
         wrappers = config.get("wrappers", [])
+        params = config.get("parameters", "")
 
         logger.info(">>> Configuración descargada:")
         logger.info("\tEnvironment:")
@@ -90,7 +91,12 @@ if app_id is not None:
 
         logger.info("\tWrappers:")
         logger.info("\t\t%s", " ".join(wrappers))
+
+        logger.info("\tParameters:")
+        logger.info("\t\t%s", params)
+
         command = wrappers + sys.argv[1:]
+        command.append(params)
     except (URLError, HTTPError) as e:
         logger.warning("Error fetching config from %s: %s", API_URL, e)
     except Exception as e:

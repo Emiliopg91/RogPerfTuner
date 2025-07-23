@@ -168,7 +168,11 @@ class SteamService:
         """Set level for game launch option"""
         gpu_brand = self.get_prefered_gpu(app_id)
         ntsync_level = self.get_ntsync_level(app_id)
-        return self.__set_launch_options(app_id, launch_options, gpu_brand, metric_level, ntsync_level)
+        environment = self.get_environment(app_id)
+        params = self.get_parameters(app_id)
+        return self.__set_launch_options(
+            app_id, launch_options, gpu_brand, metric_level, ntsync_level, environment, params
+        )
 
     def get_ntsync_level(self, app_id) -> NtSyncOption:
         """Get level for game"""
@@ -179,7 +183,11 @@ class SteamService:
         """Set level for game launch option"""
         gpu_brand = self.get_prefered_gpu(app_id)
         metric_level = self.get_metrics_level(app_id)
-        return self.__set_launch_options(app_id, launch_options, gpu_brand, metric_level, ntsync_level)
+        environment = self.get_environment(app_id)
+        params = self.get_parameters(app_id)
+        return self.__set_launch_options(
+            app_id, launch_options, gpu_brand, metric_level, ntsync_level, environment, params
+        )
 
     def get_prefered_gpu(self, app_id) -> GpuBrand | None:
         """Get GPU from game launch option"""
@@ -190,7 +198,41 @@ class SteamService:
         """Set gpu for game launch option"""
         metric_level = self.get_metrics_level(app_id)
         ntsync_level = self.get_ntsync_level(app_id)
-        return self.__set_launch_options(app_id, launch_options, gpu_brand, metric_level, ntsync_level)
+        environment = self.get_environment(app_id)
+        params = self.get_parameters(app_id)
+        return self.__set_launch_options(
+            app_id, launch_options, gpu_brand, metric_level, ntsync_level, environment, params
+        )
+
+    def get_environment(self, app_id) -> str:
+        """Get defined env for game"""
+        game = CONFIGURATION.games.get(app_id)
+        return game.env if game.env is not None else ""
+
+    def set_environment(self, env: str, app_id, launch_options) -> MangoHudLevel:
+        """Set gpu for game launch option"""
+        metric_level = self.get_metrics_level(app_id)
+        ntsync_level = self.get_ntsync_level(app_id)
+        gpu_brand = self.get_prefered_gpu(app_id)
+        params = self.get_parameters(app_id)
+        return self.__set_launch_options(
+            app_id, launch_options, gpu_brand, metric_level, ntsync_level, env.strip(), params
+        )
+
+    def get_parameters(self, app_id) -> str:
+        """Get defined params for game"""
+        game = CONFIGURATION.games.get(app_id)
+        return game.args if game.args is not None else ""
+
+    def set_parameters(self, param: str, app_id, launch_options) -> MangoHudLevel:
+        """Set gpu for game launch option"""
+        metric_level = self.get_metrics_level(app_id)
+        ntsync_level = self.get_ntsync_level(app_id)
+        gpu_brand = self.get_prefered_gpu(app_id)
+        environment = self.get_environment(app_id)
+        return self.__set_launch_options(
+            app_id, launch_options, gpu_brand, metric_level, ntsync_level, environment, param.strip()
+        )
 
     def __set_launch_options(  # pylint: disable=too-many-arguments,too-many-positional-arguments
         self,
@@ -199,6 +241,8 @@ class SteamService:
         gpu_brand: GpuBrand,
         metric_level: MangoHudLevel,
         ntsync_level: NtSyncOption,
+        environment: str,
+        params: str,
     ):
         launch_opts = launch_options
 
@@ -222,16 +266,19 @@ class SteamService:
         game.gpu = gpu_brand.value if gpu_brand is not None else None
         game.metrics_level = metric_level.value if metric_level is not None else MangoHudLevel.NO_DISPLAY.value
         game.ntsync = ntsync_level.value if ntsync_level is not None else NtSyncOption.ON.value
+        game.env = environment
+        game.args = params
         CONFIGURATION.save_config()
 
         STEAM_CLIENT.set_launch_options(app_id, launch_opts)
 
         return launch_opts
 
-    def get_environment_and_wrappers(self, app_id):
+    def get_run_configuration(self, app_id):
         "Get environment and wrappers for app_id"
         environment = {}
         wrappers = []
+        params = ""
 
         game = CONFIGURATION.games.get(app_id)
         if game is not None:
@@ -248,11 +295,21 @@ class SteamService:
                 environment["MANGOHUD_CONFIG"] = f"preset={game.metrics_level}"
                 wrappers.append("mangohud")
 
+            if game.env is not None and len(game.env.strip()):
+                env = game.env.strip()
+                parts = env.split(" ")
+                for part in parts:
+                    env_parts = part.split("=")
+                    environment[env_parts[0]] = env_parts[1]
+
+            if game.args is not None:
+                params = game.args.strip()
+
         self._logger.info(f"Config for {game.name}:")
         self._logger.info(f"  Environment: {environment}")
         self._logger.info(f"  Wrappers: {wrappers}")
 
-        return environment, wrappers
+        return environment, wrappers, params
 
 
 STEAM_SERVICE = SteamService()

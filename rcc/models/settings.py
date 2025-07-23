@@ -57,6 +57,8 @@ class GameEntry:
     gpu: str | None = field(default=None)
     metrics_level: int = field(default=MangoHudLevel.NO_DISPLAY.value)
     ntsync: int = field(default=NtSyncOption.ON.value)
+    env: str = field(default=None)
+    args: str = field(default=None)
 
 
 @dataclass_json

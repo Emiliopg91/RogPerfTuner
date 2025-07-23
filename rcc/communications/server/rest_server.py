@@ -44,8 +44,8 @@ class HelloService:
         return {"result": next_t.name}
 
     def get_param_running_app(self, app_id):
-        env, wrap = STEAM_SERVICE.get_environment_and_wrappers(app_id)
-        return {"environment": env, "wrappers": wrap}
+        env, wrap, params = STEAM_SERVICE.get_run_configuration(app_id)
+        return {"environment": env, "wrappers": wrap, "parameters": params}
 
     def renice(self, app_id):
         HARDWARE_SERVICE.renice(app_id)
