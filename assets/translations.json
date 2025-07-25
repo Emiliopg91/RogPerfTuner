@@ -219,21 +219,29 @@
     "en": "Start on boot",
     "es": "Iniciar automaticamente"
   },
-  "ntsync":  {
+  "winesync":  {
+    "en":"Synchronization",
+    "es":"Sincronización"
+  },
+  "label.winesync.auto":{
+    "en":"Auto",
+    "es":"Auto"
+  },
+  "label.winesync.ntsync":{
     "en":"NTSync",
     "es":"NTSync"
   },
-  "label.ntsync.0":{
-    "en":"No",
+  "label.winesync.esync":{
+    "en":"ESync",
+    "es":"ESync"
+  },
+  "label.winesync.fsync":{
+    "en":"FSync",
+    "es":"FSync"
+  },
+  "label.winesync.none":{
+    "en":"None",
     "es":"No"
-  },
-  "label.ntsync.1":{
-    "en":"Yes",
-    "es":"Sí"
-  },
-  "label.ntsync.2":{
-    "en":"WOW64",
-    "es":"WOW64"
   },
   "environment":{
     "en":"Environment",

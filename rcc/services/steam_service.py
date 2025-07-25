@@ -9,7 +9,7 @@ from rcc.communications.client.tcp.openrgb.effects.gaming import GAMING_EFFECT
 from rcc.communications.client.websocket.steam.steam_client import STEAM_CLIENT
 from rcc.models.gpu_brand import GpuBrand
 from rcc.models.mangohud_level import MangoHudLevel
-from rcc.models.ntsync_option import NtSyncOption
+from rcc.models.wine_sync_option import WineSyncOption
 from rcc.models.performance_profile import PerformanceProfile
 from rcc.models.settings import GameEntry
 from rcc.services.hardware_service import HARDWARE_SERVICE
@@ -167,26 +167,26 @@ class SteamService:
     def set_metrics_level(self, metric_level: MangoHudLevel, app_id, launch_options) -> MangoHudLevel:
         """Set level for game launch option"""
         gpu_brand = self.get_prefered_gpu(app_id)
-        ntsync_level = self.get_ntsync_level(app_id)
+        wine_sync = self.get_wine_sync(app_id)
         environment = self.get_environment(app_id)
         params = self.get_parameters(app_id)
         return self.__set_launch_options(
-            app_id, launch_options, gpu_brand, metric_level, ntsync_level, environment, params
+            app_id, launch_options, gpu_brand, metric_level, wine_sync, environment, params
         )
 
-    def get_ntsync_level(self, app_id) -> NtSyncOption:
+    def get_wine_sync(self, app_id) -> WineSyncOption:
         """Get level for game"""
         game = CONFIGURATION.games.get(app_id)
-        return NtSyncOption(game.ntsync) if game and game.ntsync is not None else NtSyncOption.ON
+        return WineSyncOption(game.sync) if game and game.sync is not None else WineSyncOption.AUTO
 
-    def set_ntsync_level(self, ntsync_level: NtSyncOption, app_id, launch_options) -> MangoHudLevel:
+    def set_wine_sync(self, wine_sync: WineSyncOption, app_id, launch_options) -> MangoHudLevel:
         """Set level for game launch option"""
         gpu_brand = self.get_prefered_gpu(app_id)
         metric_level = self.get_metrics_level(app_id)
         environment = self.get_environment(app_id)
         params = self.get_parameters(app_id)
         return self.__set_launch_options(
-            app_id, launch_options, gpu_brand, metric_level, ntsync_level, environment, params
+            app_id, launch_options, gpu_brand, metric_level, wine_sync, environment, params
         )
 
     def get_prefered_gpu(self, app_id) -> GpuBrand | None:
@@ -197,11 +197,11 @@ class SteamService:
     def set_prefered_gpu(self, gpu_brand: GpuBrand, app_id, launch_options) -> MangoHudLevel:
         """Set gpu for game launch option"""
         metric_level = self.get_metrics_level(app_id)
-        ntsync_level = self.get_ntsync_level(app_id)
+        wine_sync = self.get_wine_sync(app_id)
         environment = self.get_environment(app_id)
         params = self.get_parameters(app_id)
         return self.__set_launch_options(
-            app_id, launch_options, gpu_brand, metric_level, ntsync_level, environment, params
+            app_id, launch_options, gpu_brand, metric_level, wine_sync, environment, params
         )
 
     def get_environment(self, app_id) -> str:
@@ -212,11 +212,11 @@ class SteamService:
     def set_environment(self, env: str, app_id, launch_options) -> MangoHudLevel:
         """Set gpu for game launch option"""
         metric_level = self.get_metrics_level(app_id)
-        ntsync_level = self.get_ntsync_level(app_id)
+        wine_sync = self.get_wine_sync(app_id)
         gpu_brand = self.get_prefered_gpu(app_id)
         params = self.get_parameters(app_id)
         return self.__set_launch_options(
-            app_id, launch_options, gpu_brand, metric_level, ntsync_level, env.strip(), params
+            app_id, launch_options, gpu_brand, metric_level, wine_sync, env.strip(), params
         )
 
     def get_parameters(self, app_id) -> str:
@@ -227,11 +227,11 @@ class SteamService:
     def set_parameters(self, param: str, app_id, launch_options) -> MangoHudLevel:
         """Set gpu for game launch option"""
         metric_level = self.get_metrics_level(app_id)
-        ntsync_level = self.get_ntsync_level(app_id)
+        wine_sync = self.get_wine_sync(app_id)
         gpu_brand = self.get_prefered_gpu(app_id)
         environment = self.get_environment(app_id)
         return self.__set_launch_options(
-            app_id, launch_options, gpu_brand, metric_level, ntsync_level, environment, param.strip()
+            app_id, launch_options, gpu_brand, metric_level, wine_sync, environment, param.strip()
         )
 
     def __set_launch_options(  # pylint: disable=too-many-arguments,too-many-positional-arguments
@@ -240,32 +240,30 @@ class SteamService:
         launch_options: str,
         gpu_brand: GpuBrand,
         metric_level: MangoHudLevel,
-        ntsync_level: NtSyncOption,
+        wine_sync: WineSyncOption,
         environment: str,
         params: str,
     ):
         launch_opts = launch_options
 
-        if gpu_brand is None and metric_level == MangoHudLevel.NO_DISPLAY and ntsync_level == NtSyncOption.OFF:
-            if self.WRAPER_PATH in launch_opts:
-                launch_opts = launch_opts.replace(self.WRAPER_PATH, "").strip()
+        if environment is not None and len(environment.strip()) == 0:
+            environment = None
 
-            if launch_opts.startswith("%command%"):
-                launch_opts = launch_opts.replace("%command%", "").strip()
+        if params is not None and len(params.strip()) == 0:
+            params = None
 
-        else:
-            if self.WRAPER_PATH not in launch_opts:
-                if launch_opts is None or launch_opts == "":
-                    launch_opts = "%command%"
-                elif "%command%" not in launch_opts:
-                    launch_opts = "%command% " + launch_opts
+        if self.WRAPER_PATH not in launch_opts:
+            if launch_opts is None or launch_opts == "":
+                launch_opts = "%command%"
+            elif "%command%" not in launch_opts:
+                launch_opts = "%command% " + launch_opts
 
-                launch_opts = launch_opts.replace("%command%", f"{self.WRAPER_PATH} %command%")
+            launch_opts = launch_opts.replace("%command%", f"{self.WRAPER_PATH} %command%")
 
         game = CONFIGURATION.games.get(app_id)
         game.gpu = gpu_brand.value if gpu_brand is not None else None
         game.metrics_level = metric_level.value if metric_level is not None else MangoHudLevel.NO_DISPLAY.value
-        game.ntsync = ntsync_level.value if ntsync_level is not None else NtSyncOption.ON.value
+        game.sync = wine_sync.value if wine_sync is not None else WineSyncOption.AUTO.value
         game.env = environment
         game.args = params
         CONFIGURATION.save_config()
@@ -273,6 +271,16 @@ class SteamService:
         STEAM_CLIENT.set_launch_options(app_id, launch_opts)
 
         return launch_opts
+
+    def __get_actual_winesync(self, mode: WineSyncOption):
+        if mode == WineSyncOption.AUTO.value:
+            return self.__get_actual_winesync(WineSyncOption.NTSYNC)
+
+        if mode == WineSyncOption.NTSYNC:
+            if not HARDWARE_SERVICE.is_ntsync_ready:
+                return WineSyncOption.FSYNC
+
+        return mode
 
     def get_run_configuration(self, app_id):
         "Get environment and wrappers for app_id"
@@ -284,8 +292,23 @@ class SteamService:
         if game is not None:
             environment["SteamDeck"] = "0"
 
-            if game.ntsync == NtSyncOption.OFF.value:
-                environment["PROTON_USE_NTSYNC"] = "0"
+            mode = self.__get_actual_winesync(WineSyncOption(game.sync))
+            if mode == WineSyncOption.NTSYNC:
+                environment["PROTON_NO_NTSYNC"] = "0"
+                environment["PROTON_NO_FSYNC"] = "1"
+                environment["PROTON_NO_ESYNC"] = "1"
+            elif mode == WineSyncOption.FSYNC:
+                environment["PROTON_NO_NTSYNC"] = "1"
+                environment["PROTON_NO_FSYNC"] = "0"
+                environment["PROTON_NO_ESYNC"] = "1"
+            elif mode == WineSyncOption.ESYNC:
+                environment["PROTON_NO_NTSYNC"] = "1"
+                environment["PROTON_NO_FSYNC"] = "1"
+                environment["PROTON_NO_ESYNC"] = "0"
+            elif mode == WineSyncOption.NONE:
+                environment["PROTON_NO_NTSYNC"] = "1"
+                environment["PROTON_NO_FSYNC"] = "1"
+                environment["PROTON_NO_ESYNC"] = "1"
 
             if game.gpu is not None:
                 environment.update(HARDWARE_SERVICE.get_gpu_selector_env(GpuBrand(game.gpu)))

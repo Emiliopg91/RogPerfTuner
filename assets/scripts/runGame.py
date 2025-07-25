@@ -49,7 +49,8 @@ if len(sys.argv) < 2:
 
 logger.info("===== Lanzamiento iniciado =====")
 logger.info(">>> Entorno:")
-logger.info("\t%d entries", len(os.environ))
+for key in os.environ:
+    logger.info("\t%s=%s", key, os.environ[key])
 
 app_id = None
 
@@ -84,13 +85,14 @@ if app_id is not None:
 
         logger.info(">>> Configuración descargada:")
         logger.info("\tEnvironment:")
-        logger.info("\t\t%s", env_vars)
 
         for key in env_vars:
+            logger.info("\t\t%s=%s", key, env_vars[key])
             child_env[key] = env_vars[key]
 
         logger.info("\tWrappers:")
-        logger.info("\t\t%s", " ".join(wrappers))
+        for wrapper in wrappers:
+            logger.info("\t\t%s", wrapper)
 
         logger.info("\tParameters:")
         logger.info("\t\t%s", params)

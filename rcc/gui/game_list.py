@@ -15,7 +15,7 @@ from PyQt5.QtGui import QIcon
 
 from rcc.communications.client.websocket.steam.steam_client import SteamGameDetails, STEAM_CLIENT
 from rcc.models.mangohud_level import MangoHudLevel
-from rcc.models.ntsync_option import NtSyncOption
+from rcc.models.wine_sync_option import WineSyncOption
 from rcc.services.hardware_service import HARDWARE_SERVICE
 from rcc.services.steam_service import STEAM_SERVICE
 from rcc.utils.constants import ICONS_PATH
@@ -67,11 +67,11 @@ class GameList(QDialog):
                 TRANSLATOR.translate("game.title"),
                 TRANSLATOR.translate("used.gpu"),
             ]
+
             if STEAM_SERVICE.metrics_enabled:
                 columns.append(TRANSLATOR.translate("metrics"))
-            if HARDWARE_SERVICE.is_ntsync_ready:
-                columns.append(TRANSLATOR.translate("ntsync"))
 
+            columns.append(TRANSLATOR.translate("winesync"))
             columns.append(TRANSLATOR.translate("environment"))
             columns.append(TRANSLATOR.translate("params"))
 
@@ -143,21 +143,20 @@ class GameList(QDialog):
                         table.setCellWidget(row, col, metrics_combo)
                         col += 1
 
-                    if HARDWARE_SERVICE.is_ntsync_ready:
-                        ntsync_combo = NoScrollComboBox()  # Usar la subclase personalizada
-                        ntsync_combo.setEnabled(app_id is None or app_id == game.appid)
-                        for i, option in enumerate(reversed(NtSyncOption)):
-                            ntsync_combo.addItem(TRANSLATOR.translate(f"label.ntsync.{option}"), option)
-                            if option == STEAM_SERVICE.get_ntsync_level(game.appid):
-                                ntsync_combo.setCurrentIndex(i)
+                    sync_combo = NoScrollComboBox()  # Usar la subclase personalizada
+                    sync_combo.setEnabled(app_id is None or app_id == game.appid)
+                    for i, option in enumerate(WineSyncOption):
+                        sync_combo.addItem(TRANSLATOR.translate(f"label.winesync.{option}"), option)
+                        if option == STEAM_SERVICE.get_wine_sync(game.appid):
+                            sync_combo.setCurrentIndex(i)
 
-                        ntsync_combo.currentIndexChanged.connect(
-                            lambda _, widget=ntsync_combo, game=game: self.__on_ntsync_changed(  # pylint: disable=line-too-long
-                                widget, game
-                            )
+                    sync_combo.currentIndexChanged.connect(
+                        lambda _, widget=sync_combo, game=game: self.__on_winesync_changed(  # pylint: disable=line-too-long
+                            widget, game
                         )
-                        table.setCellWidget(row, col, ntsync_combo)
-                        col += 1
+                    )
+                    table.setCellWidget(row, col, sync_combo)
+                    col += 1
 
                     env_input = QLineEdit()
                     env_input.setText(STEAM_SERVICE.get_environment(game.appid))
@@ -195,9 +194,9 @@ class GameList(QDialog):
         level = widget.currentData()
         game.launch_opts = STEAM_SERVICE.set_metrics_level(level, game.appid, game.launch_opts)
 
-    def __on_ntsync_changed(self, widget, game: SteamGameDetails):
+    def __on_winesync_changed(self, widget, game: SteamGameDetails):
         level = widget.currentData()
-        game.launch_opts = STEAM_SERVICE.set_ntsync_level(level, game.appid, game.launch_opts)
+        game.launch_opts = STEAM_SERVICE.set_wine_sync(level, game.appid, game.launch_opts)
 
     def __on_gpu_changed(self, widget, game: SteamGameDetails):
         gpu_brand = widget.currentData()

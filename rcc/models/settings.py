@@ -3,7 +3,7 @@ from dataclasses import dataclass, field
 from dataclasses_json import dataclass_json
 
 from rcc.models.mangohud_level import MangoHudLevel
-from rcc.models.ntsync_option import NtSyncOption
+from rcc.models.wine_sync_option import WineSyncOption
 
 
 @dataclass_json
@@ -56,7 +56,7 @@ class GameEntry:
     name: str
     gpu: str | None = field(default=None)
     metrics_level: int = field(default=MangoHudLevel.NO_DISPLAY.value)
-    ntsync: int = field(default=NtSyncOption.ON.value)
+    sync: str = field(default=WineSyncOption.AUTO.value)
     env: str = field(default=None)
     args: str = field(default=None)
 
