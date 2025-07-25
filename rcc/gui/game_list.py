@@ -62,6 +62,8 @@ class GameList(QDialog):
             # Crear la tabla
             game_cfg = STEAM_SERVICE.get_games()
             appids = list(game_cfg.keys())
+            if app_id is not None:
+                appids.append(app_id)
 
             columns = [
                 TRANSLATOR.translate("game.title"),

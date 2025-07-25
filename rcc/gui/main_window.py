@@ -257,3 +257,4 @@ class MainWindow(QMainWindow):
 
 
 MAIN_WINDOW = MainWindow()
+EVENT_BUS.on("open.game.list", lambda id: GameList(MAIN_WINDOW, True, id))

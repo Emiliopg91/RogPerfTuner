@@ -1,23 +1,27 @@
 import os
 from dataclasses import dataclass
+from signal import Signals
 from threading import Thread
+
+from psutil import NoSuchProcess, Process
 
 from framework.logger import Logger
 from rcc.communications.client.cmd.linux.mangohud_client import MANGO_HUD_CLIENT
 from rcc.communications.client.cmd.linux.systemctl_client import SYSTEM_CTL_CLIENT
 from rcc.communications.client.tcp.openrgb.effects.gaming import GAMING_EFFECT
 from rcc.communications.client.websocket.steam.steam_client import STEAM_CLIENT
+from rcc.gui.notifier import NOTIFIER
 from rcc.models.gpu_brand import GpuBrand
 from rcc.models.mangohud_level import MangoHudLevel
+from rcc.models.settings import GameEntry
 from rcc.models.wine_sync_option import WineSyncOption
 from rcc.models.performance_profile import PerformanceProfile
-from rcc.models.settings import GameEntry
 from rcc.services.hardware_service import HARDWARE_SERVICE
 from rcc.services.profile_service import PROFILE_SERVICE
 from rcc.services.rgb_service import RGB_SERVICE
 from rcc.utils.beans import EVENT_BUS
 from rcc.utils.configuration import CONFIGURATION
-from rcc.utils.constants import RCCDC_ASSET_PATH, USER_PLUGIN_FOLDER, USER_SCRIPTS_FOLDER
+from rcc.utils.constants import DEV_MODE, RCCDC_ASSET_PATH, USER_PLUGIN_FOLDER, USER_SCRIPTS_FOLDER
 from rcc.utils.events import STEAM_SERVICE_CONNECTED, STEAM_SERVICE_DISCONNECTED, STEAM_SERVICE_GAME_EVENT
 from rcc.utils.shell import SHELL
 
@@ -98,29 +102,70 @@ class SteamService:
 
     def __launch_game(self, gid: int, name: str, pid: int):
         self._logger.info(f"Launched {name} with PID {pid}")
-        if gid not in self.running_games:
+        self._logger.add_tab()
+
+        if CONFIGURATION.games.get(gid) is None:
+            self._logger.info("Game not configured, stopping...")
+            process = Process(pid)
+            processes = process.children(recursive=True)
+            processes.append(process)
+
+            for child in reversed(processes):
+                try:
+                    child.send_signal(Signals.SIGKILL)
+                except NoSuchProcess:
+                    pass
+
+            Thread(target=lambda: self.__first_game_run(gid, name)).start()
+        elif gid not in self.running_games:
             self.__running_games[gid] = name
-            self._logger.add_tab()
 
             HARDWARE_SERVICE.set_panel_overdrive(True)
             self.__set_profile_for_games()
             RGB_SERVICE.apply_effect(GAMING_EFFECT.name, True)
-            self._logger.rem_tab()
 
-            if CONFIGURATION.games.get(gid) is None:
-                CONFIGURATION.games[gid] = GameEntry(name, None, MangoHudLevel.NO_DISPLAY)
-                CONFIGURATION.save_config()
+        self._logger.rem_tab()
 
     def __stop_game(self, gid: int, name: str):
         self._logger.info(f"Stopped {name}")
+        pref_running_games = len(self.running_games)
         if gid in self.running_games:
             del self.running_games[gid]
-        if len(self.running_games.keys()) == 0:
-            RGB_SERVICE.restore_effect()
-        self._logger.add_tab()
-        HARDWARE_SERVICE.set_panel_overdrive(len(self.running_games) > 0)
-        self.__set_profile_for_games()
-        self._logger.rem_tab()
+        if pref_running_games != len(self.running_games):
+            if len(self.running_games.keys()) == 0:
+                RGB_SERVICE.restore_effect()
+            self._logger.add_tab()
+            HARDWARE_SERVICE.set_panel_overdrive(len(self.running_games) > 0)
+            self.__set_profile_for_games()
+            self._logger.rem_tab()
+
+    def __first_game_run(self, gid, name):
+        self._logger.info("Retrieving game details...")
+
+        gpu = None
+        if len(HARDWARE_SERVICE.gpus) > 0:
+            for gpu_brand in GpuBrand:
+                if gpu_brand in HARDWARE_SERVICE.gpus:
+                    gpu = gpu_brand.value
+                    break
+
+        entry = GameEntry(name, gpu=gpu)
+        launch_opts = STEAM_CLIENT.get_apps_details(gid)[0].launch_opts
+
+        if "%command" in launch_opts:
+            entry.env = launch_opts[0 : launch_opts.index("%command%")].strip()
+            launch_opts = launch_opts[launch_opts.index("%command%") + 9 :].strip()
+
+        if len(launch_opts) > 0:
+            entry.args = launch_opts
+
+        CONFIGURATION.games[gid] = entry
+        CONFIGURATION.save_config()
+
+        self._logger.info("Updating launch options...")
+        STEAM_CLIENT.set_launch_options(gid, f"{self.WRAPER_PATH} %command%")
+        self._logger.info("Game ready for user relaunch")
+        NOTIFIER.show_toast("relaunch.configured.game")
 
     @property
     def running_games(self):
@@ -291,6 +336,9 @@ class SteamService:
         game = CONFIGURATION.games.get(app_id)
         if game is not None:
             environment["SteamDeck"] = "0"
+
+            if DEV_MODE:
+                environment["PROTON_LOG"] = "1"
 
             mode = self.__get_actual_winesync(WineSyncOption(game.sync))
             if mode == WineSyncOption.NTSYNC:
