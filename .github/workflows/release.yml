@@ -156,52 +156,52 @@ jobs:
           name: appimage
           path: dist/RogControlCenter.AppImage
 
-  generate_rpm:
-    needs: 
-      - build_openrgb
-      - build_rccdc
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
-        with:
-          submodules: recursive
-          fetch-depth: 0
-
-      - name: Download OpenRGB artifact
-        uses: actions/download-artifact@v4
-        with:
-          name: OpenRGB
-          path: assets/OpenRGB
-
-      - name: Download RCCDeckyCompanion artifact
-        uses: actions/download-artifact@v4
-        with:
-          name: RCCDeckyCompanion
-          path: assets/RCCDeckyCompanion
-
-      - name: Install Python
-        uses: actions/setup-python@v5
-        with:
-          python-version: '3.13'
-
-      - name: Setup and Install
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y libfuse2 rpm build-essential
-          curl -LsSf https://astral.sh/uv/install.sh | sh
-          echo "$HOME/.cargo/bin" >> $GITHUB_PATH
-          PYTHONUNBUFFERED=1 uv run scripts/install.py skipSubmodules
-
-      - name: Generate RPM
-        run: |
-          PYTHONUNBUFFERED=1 uv run scripts/rpm.py
-
-      - name: Upload RPM artifact
-        uses: actions/upload-artifact@v4
-        with:
-          name: rpm
-          path: dist/rogcontrolcenter.x86_64.rpm
+#  generate_rpm:
+#    needs: 
+#      - build_openrgb
+#      - build_rccdc
+#    runs-on: ubuntu-latest
+#    steps:
+#      - name: Checkout repository
+#        uses: actions/checkout@v4
+#        with:
+#          submodules: recursive
+#          fetch-depth: 0
+#
+#      - name: Download OpenRGB artifact
+#        uses: actions/download-artifact@v4
+#        with:
+#          name: OpenRGB
+#          path: assets/OpenRGB
+#
+#      - name: Download RCCDeckyCompanion artifact
+#        uses: actions/download-artifact@v4
+#        with:
+#          name: RCCDeckyCompanion
+#          path: assets/RCCDeckyCompanion
+#
+#      - name: Install Python
+#        uses: actions/setup-python@v5
+#        with:
+#          python-version: '3.13'
+#
+#      - name: Setup and Install
+#        run: |
+#          sudo apt-get update
+#          sudo apt-get install -y libfuse2 rpm build-essential
+#          curl -LsSf https://astral.sh/uv/install.sh | sh
+#          echo "$HOME/.cargo/bin" >> $GITHUB_PATH
+#          PYTHONUNBUFFERED=1 uv run scripts/install.py skipSubmodules
+#
+#      - name: Generate RPM
+#        run: |
+#          PYTHONUNBUFFERED=1 uv run scripts/rpm.py
+#
+#      - name: Upload RPM artifact
+#        uses: actions/upload-artifact@v4
+#        with:
+#          name: rpm
+#          path: dist/rogcontrolcenter.x86_64.rpm
 
   release:
     needs: 
