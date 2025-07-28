@@ -206,7 +206,7 @@ jobs:
   release:
     needs: 
       - generate_appimage
-      - generate_rpm
+      #- generate_rpm
     runs-on: ubuntu-latest
     steps:
       - name: Install Python
