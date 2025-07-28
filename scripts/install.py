@@ -100,5 +100,11 @@ def get_rccdc():
 print("Installing dependencies...")
 install_uv_deps()
 if not "skipSubmodules" in sys.argv:
-    get_openrgb()
-    get_rccdc()
+    if "openrgb" not in sys.argv and "rccdc" not in sys.argv:
+        get_openrgb()
+        get_rccdc()
+    else:
+        if "openrgb" in sys.argv:
+            get_openrgb()
+        if "rccdc" in sys.argv:
+            get_rccdc()

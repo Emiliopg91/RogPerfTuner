@@ -45,9 +45,33 @@ jobs:
         run: |
           PYTHONUNBUFFERED=1 uv run scripts/lint.py
 
-      - name: Build submodules
+  build_openrgb:
+    needs: prepare_and_install
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          submodules: recursive
+          fetch-depth: 0
+
+      - name: Install Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.13'
+
+      - name: Install dependencies
         run: |
-          PYTHONUNBUFFERED=1 uv run scripts/install.py
+          sudo apt-get update
+          sudo apt-get install -y libfuse2
+          npm i -g pnpm@8.5.1 shx@0.3.4
+          curl -LsSf https://astral.sh/uv/install.sh | sh
+          echo "$HOME/.cargo/bin" >> $GITHUB_PATH
+          PYTHONUNBUFFERED=1 uv run scripts/install.py skipSubmodules
+
+      - name: Build
+        run: |
+          PYTHONUNBUFFERED=1 uv run scripts/install.py openrgb
 
       - name: Upload OpenRGB
         uses: actions/upload-artifact@v4
@@ -55,14 +79,45 @@ jobs:
           name: OpenRGB
           path: assets/OpenRGB
 
+  build_rccdc:
+    needs: prepare_and_install
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          submodules: recursive
+          fetch-depth: 0
+
+      - name: Install Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.13'
+
+      - name: Install dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y libfuse2
+          npm i -g pnpm@8.5.1 shx@0.3.4
+          curl -LsSf https://astral.sh/uv/install.sh | sh
+          echo "$HOME/.cargo/bin" >> $GITHUB_PATH
+          PYTHONUNBUFFERED=1 uv run scripts/install.py skipSubmodules
+
+      - name: Build
+        run: |
+          PYTHONUNBUFFERED=1 uv run scripts/install.py rccdc
+
       - name: Upload RCCDeckyCompanion
         uses: actions/upload-artifact@v4
         with:
           name: RCCDeckyCompanion
           path: assets/RCCDeckyCompanion
 
+
   generate_appimage:
-    needs: prepare_and_install
+    needs: 
+      - build_openrgb
+      - build_rccdc
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
@@ -109,7 +164,9 @@ jobs:
           path: dist/RogControlCenter.AppImage
 
   generate_rpm:
-    needs: prepare_and_install
+    needs: 
+      - build_openrgb
+      - build_rccdc
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
@@ -155,7 +212,9 @@ jobs:
           path: dist/rogcontrolcenter.x86_64.rpm
 
   release:
-    needs: [generate_appimage, generate_rpm, prepare_and_install]
+    needs: 
+      - generate_appimage
+      - generate_rpm
     runs-on: ubuntu-latest
     steps:
       - name: Install Python
