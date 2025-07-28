@@ -205,6 +205,7 @@ jobs:
 
   release:
     needs: 
+      - prepare_and_install
       - generate_appimage
       #- generate_rpm
     runs-on: ubuntu-latest
