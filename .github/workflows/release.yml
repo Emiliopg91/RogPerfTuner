@@ -29,9 +29,6 @@ jobs:
 
       - name: Install dependencies
         run: |
-          sudo apt-get update
-          sudo apt-get install -y libfuse2
-          npm i -g pnpm@8.5.1 shx@0.3.4
           curl -LsSf https://astral.sh/uv/install.sh | sh
           echo "$HOME/.cargo/bin" >> $GITHUB_PATH
           PYTHONUNBUFFERED=1 uv run scripts/install.py skipSubmodules
@@ -64,7 +61,6 @@ jobs:
         run: |
           sudo apt-get update
           sudo apt-get install -y libfuse2
-          npm i -g pnpm@8.5.1 shx@0.3.4
           curl -LsSf https://astral.sh/uv/install.sh | sh
           echo "$HOME/.cargo/bin" >> $GITHUB_PATH
           PYTHONUNBUFFERED=1 uv run scripts/install.py skipSubmodules
@@ -96,8 +92,6 @@ jobs:
 
       - name: Install dependencies
         run: |
-          sudo apt-get update
-          sudo apt-get install -y libfuse2
           npm i -g pnpm@8.5.1 shx@0.3.4
           curl -LsSf https://astral.sh/uv/install.sh | sh
           echo "$HOME/.cargo/bin" >> $GITHUB_PATH
@@ -148,7 +142,6 @@ jobs:
           ls assets
           sudo apt-get update
           sudo apt-get install -y libfuse2
-          npm i -g pnpm@8.5.1 shx@0.3.4
           curl -LsSf https://astral.sh/uv/install.sh | sh
           echo "$HOME/.cargo/bin" >> $GITHUB_PATH
           PYTHONUNBUFFERED=1 uv run scripts/install.py skipSubmodules
@@ -196,7 +189,6 @@ jobs:
         run: |
           sudo apt-get update
           sudo apt-get install -y libfuse2 rpm build-essential
-          npm i -g pnpm@8.5.1 shx@0.3.4
           curl -LsSf https://astral.sh/uv/install.sh | sh
           echo "$HOME/.cargo/bin" >> $GITHUB_PATH
           PYTHONUNBUFFERED=1 uv run scripts/install.py skipSubmodules
