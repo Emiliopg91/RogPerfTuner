@@ -231,11 +231,11 @@ jobs:
           name: appimage
           path: dist
 
-      - name: Download RPM artifact
-        uses: actions/download-artifact@v4
-        with:
-          name: rpm
-          path: dist
+#      - name: Download RPM artifact
+#        uses: actions/download-artifact@v4
+#        with:
+#          name: rpm
+#          path: dist
 
       - name: Configure git client
         run: | 
@@ -257,7 +257,7 @@ jobs:
           name: ${{ needs.prepare_and_install.outputs.version }}
           files: |
             dist/RogControlCenter.AppImage
-            dist/rogcontrolcenter.x86_64.rpm
+#            dist/rogcontrolcenter.x86_64.rpm
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
