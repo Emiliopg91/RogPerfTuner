@@ -2,6 +2,7 @@ import os
 from dataclasses import dataclass
 from signal import Signals
 from threading import Thread
+import time
 
 from psutil import NoSuchProcess, Process
 
@@ -10,7 +11,6 @@ from rcc.communications.client.cmd.linux.mangohud_client import MANGO_HUD_CLIENT
 from rcc.communications.client.cmd.linux.systemctl_client import SYSTEM_CTL_CLIENT
 from rcc.communications.client.tcp.openrgb.effects.gaming import GAMING_EFFECT
 from rcc.communications.client.websocket.steam.steam_client import STEAM_CLIENT
-from rcc.gui.notifier import NOTIFIER
 from rcc.models.gpu_brand import GpuBrand
 from rcc.models.mangohud_level import MangoHudLevel
 from rcc.models.settings import GameEntry
@@ -107,6 +107,7 @@ class SteamService:
         if CONFIGURATION.games.get(gid) is None:
             self._logger.info("Game not configured, stopping...")
             process = Process(pid)
+            env = process.environ()
             processes = process.children(recursive=True)
             processes.append(process)
 
@@ -116,10 +117,9 @@ class SteamService:
                 except NoSuchProcess:
                     pass
 
-            Thread(target=lambda: self.__first_game_run(gid, name)).start()
+            Thread(target=lambda: self.__first_game_run(gid, name, env)).start()
         elif gid not in self.running_games:
             self.__running_games[gid] = name
-
             HARDWARE_SERVICE.set_panel_overdrive(True)
             self.__set_profile_for_games()
             RGB_SERVICE.apply_effect(GAMING_EFFECT.name, True)
@@ -139,7 +139,7 @@ class SteamService:
             self.__set_profile_for_games()
             self._logger.rem_tab()
 
-    def __first_game_run(self, gid, name):
+    def __first_game_run(self, gid: int, name: str, env: dict[str, str]):
         self._logger.info("Retrieving game details...")
 
         gpu = None
@@ -150,7 +150,8 @@ class SteamService:
                     break
 
         entry = GameEntry(name, gpu=gpu)
-        launch_opts = STEAM_CLIENT.get_apps_details(gid)[0].launch_opts
+        details = STEAM_CLIENT.get_apps_details(gid)[0]
+        launch_opts = details.launch_opts
 
         if "%command" in launch_opts:
             entry.env = launch_opts[0 : launch_opts.index("%command%")].strip()
@@ -164,8 +165,12 @@ class SteamService:
 
         self._logger.info("Updating launch options...")
         STEAM_CLIENT.set_launch_options(gid, f"{self.WRAPER_PATH} %command%")
-        self._logger.info("Game ready for user relaunch")
-        NOTIFIER.show_toast("relaunch.configured.game")
+
+        overlay_id = env["SteamOverlayGameId"]
+        self._logger.info(f"Relaunching with Overlay GameId {overlay_id}...")
+        time.sleep(1)
+        SHELL.run_command(f"{env["STEAMSCRIPT"]} steam://rungameid/{overlay_id}")
+        self._logger.info("Relauched")
 
     @property
     def running_games(self):

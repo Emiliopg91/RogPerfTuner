@@ -33,7 +33,12 @@ class SteamClient(AbstractWebsocketClient):
         ret: list[SteamGameDetails] = []
         for entry in resp.items():
             ret.append(
-                SteamGameDetails(int(entry[0]), entry[1]["name"], entry[1]["is_steam_app"], entry[1]["launch_opts"])
+                SteamGameDetails(
+                    int(entry[0]),
+                    entry[1]["name"],
+                    entry[1]["is_steam_app"],
+                    entry[1]["launch_opts"],
+                )
             )
         return ret
 
