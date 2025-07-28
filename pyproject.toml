@@ -1,6 +1,6 @@
 [project]
 name = "RogControlCenter"
-version = "3.5.0"
+version = "3.5.1"
 description = "An utility to manage Asus Rog laptop performance"
 readme = "README.md"
 requires-python = ">=3.13"
