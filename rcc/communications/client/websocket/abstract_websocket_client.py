@@ -109,7 +109,7 @@ class AbstractWebsocketClient(ABC):
         self._logger.debug(f"Received message: '{input_msg}'")
         message: MessageType = None
         try:
-            message = MessageType.from_json(input_msg)  # pylint: disable=no-member
+            message = MessageType.from_json(input_msg)
         except Exception as e:
             message = None
             self._logger.debug(f"Error on message parsing: {e}")

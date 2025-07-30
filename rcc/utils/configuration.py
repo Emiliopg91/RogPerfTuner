@@ -32,7 +32,7 @@ class Configuration:
                 raw_config = yaml.safe_load(f) or {}
 
             json_output = json.dumps(raw_config, indent=2)
-            self._config = Config.from_json(json_output)  # pylint: disable=no-member
+            self._config = Config.from_json(json_output)
             Logger.set_config_map(self._config.logger)
         else:
             if not os.path.exists(USER_CONFIG_FOLDER):

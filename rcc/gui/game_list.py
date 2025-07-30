@@ -157,6 +157,7 @@ class GameList(QDialog):
                             widget, game
                         )
                     )
+                    sync_combo.setEnabled(STEAM_SERVICE.is_proton(game.appid))
                     table.setCellWidget(row, col, sync_combo)
                     col += 1
 

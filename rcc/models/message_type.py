@@ -1,11 +1,10 @@
 from dataclasses import dataclass, field
 import uuid
-from dataclasses_json import dataclass_json
+from dataclasses_json import DataClassJsonMixin
 
 
-@dataclass_json
 @dataclass
-class MessageType:
+class MessageType(DataClassJsonMixin):
     """Data class for message"""
 
     type: str

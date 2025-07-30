@@ -1,22 +1,20 @@
 from dataclasses import dataclass, field
 
-from dataclasses_json import dataclass_json
+from dataclasses_json import DataClassJsonMixin
 
 from rcc.models.mangohud_level import MangoHudLevel
 from rcc.models.wine_sync_option import WineSyncOption
 
 
-@dataclass_json
 @dataclass
-class Effect:
+class Effect(DataClassJsonMixin):
     """Configuration helper class"""
 
     color: str | None = None
 
 
-@dataclass_json
 @dataclass
-class OpenRgb:
+class OpenRgb(DataClassJsonMixin):
     """Configuration helper class"""
 
     brightness: int
@@ -24,33 +22,29 @@ class OpenRgb:
     effects: dict[str, Effect]
 
 
-@dataclass_json
 @dataclass
-class PlatformProfiles:
+class PlatformProfiles(DataClassJsonMixin):
     """Configuration helper class"""
 
     profile: int
 
 
-@dataclass_json
 @dataclass
-class Platform:
+class Platform(DataClassJsonMixin):
     """Configuration helper class"""
 
     profiles: PlatformProfiles
 
 
-@dataclass_json
 @dataclass
-class Settings:
+class Settings(DataClassJsonMixin):
     """Configuration helper class"""
 
     password: str
 
 
-@dataclass_json
 @dataclass
-class GameEntry:
+class GameEntry(DataClassJsonMixin):
     """Game configuration"""
 
     name: str
@@ -59,11 +53,11 @@ class GameEntry:
     sync: str = field(default=WineSyncOption.AUTO.value)
     env: str = field(default=None)
     args: str = field(default=None)
+    proton: bool = field(default=True)
 
 
-@dataclass_json
 @dataclass
-class Config:
+class Config(DataClassJsonMixin):
     """Configuration helper class"""
 
     logger: dict[str, str]

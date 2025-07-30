@@ -37,7 +37,7 @@ class RunningGameModel:
 class SteamService:
     """Steam service"""
 
-    WRAPER_PATH = os.path.join(USER_SCRIPTS_FOLDER, "runGame.py")
+    WRAPPER_PATH = os.path.join(USER_SCRIPTS_FOLDER, "runGame")
 
     DECKY_SERVICE_PATH = os.path.expanduser(os.path.join("~", "homebrew", "services", "PluginLoader"))
     PLUGINS_FOLDER = os.path.expanduser(os.path.join("~", "homebrew", "plugins"))
@@ -149,7 +149,7 @@ class SteamService:
                     gpu = gpu_brand.value
                     break
 
-        entry = GameEntry(name, gpu=gpu)
+        entry = GameEntry(name, gpu=gpu, proton="STEAM_COMPAT_PROTON" in env)
         details = STEAM_CLIENT.get_apps_details(gid)[0]
         launch_opts = details.launch_opts
 
@@ -164,7 +164,7 @@ class SteamService:
         CONFIGURATION.save_config()
 
         self._logger.info("Updating launch options...")
-        STEAM_CLIENT.set_launch_options(gid, f"{self.WRAPER_PATH} %command%")
+        STEAM_CLIENT.set_launch_options(gid, f"{self.WRAPPER_PATH} %command%")
 
         overlay_id = env["SteamOverlayGameId"]
         self._logger.info(f"Relaunching with Overlay GameId {overlay_id}...")
@@ -274,6 +274,10 @@ class SteamService:
         game = CONFIGURATION.games.get(app_id)
         return game.args if game.args is not None else ""
 
+    def is_proton(self, app_id) -> bool:
+        """Check if app_id requires proton"""
+        return CONFIGURATION.games.get(app_id).proton
+
     def set_parameters(self, param: str, app_id, launch_options) -> MangoHudLevel:
         """Set gpu for game launch option"""
         metric_level = self.get_metrics_level(app_id)
@@ -302,13 +306,13 @@ class SteamService:
         if params is not None and len(params.strip()) == 0:
             params = None
 
-        if self.WRAPER_PATH not in launch_opts:
+        if self.WRAPPER_PATH not in launch_opts:
             if launch_opts is None or launch_opts == "":
                 launch_opts = "%command%"
             elif "%command%" not in launch_opts:
                 launch_opts = "%command% " + launch_opts
 
-            launch_opts = launch_opts.replace("%command%", f"{self.WRAPER_PATH} %command%")
+            launch_opts = launch_opts.replace("%command%", f"{self.WRAPPER_PATH} %command%")
 
         game = CONFIGURATION.games.get(app_id)
         game.gpu = gpu_brand.value if gpu_brand is not None else None
@@ -322,16 +326,6 @@ class SteamService:
 
         return launch_opts
 
-    def __get_actual_winesync(self, mode: WineSyncOption):
-        if mode == WineSyncOption.AUTO.value:
-            return self.__get_actual_winesync(WineSyncOption.NTSYNC)
-
-        if mode == WineSyncOption.NTSYNC:
-            if not HARDWARE_SERVICE.is_ntsync_ready:
-                return WineSyncOption.FSYNC
-
-        return mode
-
     def get_run_configuration(self, app_id):
         "Get environment and wrappers for app_id"
         environment = {}
@@ -342,33 +336,35 @@ class SteamService:
         if game is not None:
             environment["SteamDeck"] = "0"
 
-            if DEV_MODE:
-                environment["PROTON_LOG"] = "1"
+            if game.proton:
+                if DEV_MODE:
+                    environment["PROTON_LOG"] = "1"
 
-            mode = self.__get_actual_winesync(WineSyncOption(game.sync))
-            if mode == WineSyncOption.NTSYNC:
-                environment["PROTON_NO_NTSYNC"] = "0"
-                environment["PROTON_NO_FSYNC"] = "1"
-                environment["PROTON_NO_ESYNC"] = "1"
-            elif mode == WineSyncOption.FSYNC:
-                environment["PROTON_NO_NTSYNC"] = "1"
-                environment["PROTON_NO_FSYNC"] = "0"
-                environment["PROTON_NO_ESYNC"] = "1"
-            elif mode == WineSyncOption.ESYNC:
-                environment["PROTON_NO_NTSYNC"] = "1"
-                environment["PROTON_NO_FSYNC"] = "1"
-                environment["PROTON_NO_ESYNC"] = "0"
-            elif mode == WineSyncOption.NONE:
-                environment["PROTON_NO_NTSYNC"] = "1"
-                environment["PROTON_NO_FSYNC"] = "1"
-                environment["PROTON_NO_ESYNC"] = "1"
+                mode = WineSyncOption(game.sync)
+                if mode == WineSyncOption.NTSYNC:
+                    environment["PROTON_NO_NTSYNC"] = "0"
+                    environment["PROTON_NO_FSYNC"] = "1"
+                    environment["PROTON_NO_ESYNC"] = "1"
+                elif mode == WineSyncOption.FSYNC:
+                    environment["PROTON_NO_NTSYNC"] = "1"
+                    environment["PROTON_NO_FSYNC"] = "0"
+                    environment["PROTON_NO_ESYNC"] = "1"
+                elif mode == WineSyncOption.ESYNC:
+                    environment["PROTON_NO_NTSYNC"] = "1"
+                    environment["PROTON_NO_FSYNC"] = "1"
+                    environment["PROTON_NO_ESYNC"] = "0"
+                elif mode == WineSyncOption.NONE:
+                    environment["PROTON_NO_NTSYNC"] = "1"
+                    environment["PROTON_NO_FSYNC"] = "1"
+                    environment["PROTON_NO_ESYNC"] = "1"
 
             if game.gpu is not None:
                 environment.update(HARDWARE_SERVICE.get_gpu_selector_env(GpuBrand(game.gpu)))
 
-            if game.metrics_level != MangoHudLevel.NO_DISPLAY:
-                environment["MANGOHUD"] = "1"
+            if self.metrics_enabled:
                 environment["MANGOHUD_CONFIG"] = f"preset={game.metrics_level}"
+                environment["MANGOHUD"] = "1"
+                environment["MANGOHUD_DLSYM"] = "1"
                 wrappers.append("mangohud")
 
             if game.env is not None and len(game.env.strip()):
