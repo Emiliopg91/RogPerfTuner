@@ -60,12 +60,15 @@ Do you want something similar for Asus Rog Ally/Ally X? Check [AllyDeckyCompanio
 
 - [x] Limit battery charge threshold to maintain its life-span
   - 100%: If you requires full battery without bothering about its health
-  - 75%: If you want big battery cappacity saving its health
+  - 75%: If you want big battery capacity saving its health
   - 50%: for laptops that are always connected to AC
 
+- [x] Wrapper to apply optimization to applications (standard and flatpak)
+
 - [x] Steam integration through Decky plugin
+  - Interception of game first run to change it's launch option to use our custom wrapper
   - Force use of dGPU or letting Linux select for you
-  - Show performance metrics
+  - Show performance metrics (may not work with flatpak applications)
   - Process CPU and IO priority
 
 - [x] Start on boot
