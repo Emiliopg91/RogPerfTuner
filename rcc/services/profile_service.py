@@ -58,7 +58,7 @@ class ProfileService:
                 for curve in curves:
                     curve.enabled = True
                     for i in range(len(curve.points)):  # pylint: disable=consider-using-enumerate
-                        curve.points[i] = (curve.points[i][0], min(100, round(curve.points[i][1] * 1.15)))
+                        curve.points[i] = (curve.points[i][0], min(100, round(curve.points[i][1] * 1.25)))
                 self.__curves[p] = curves
 
         EVENT_BUS.on(HARDWARE_SERVICE_ON_BATTERY, self._on_ac_battery_change)
