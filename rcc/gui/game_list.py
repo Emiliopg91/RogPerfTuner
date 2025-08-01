@@ -11,7 +11,7 @@ from PyQt5.QtWidgets import (
     QLineEdit,
 )
 from PyQt5.QtCore import Qt
-from PyQt5.QtGui import QIcon
+from PyQt5.QtGui import QIcon, QPixmap
 
 from rcc.models.mangohud_level import MangoHudLevel
 from rcc.models.wine_sync_option import WineSyncOption
@@ -96,13 +96,19 @@ class GameList(QDialog):
             table.setSelectionMode(QAbstractItemView.NoSelection)
             table.setFocusPolicy(Qt.NoFocus)
 
-            # Llenar la tabla con datos
             row = 0
-            for appid in appids:
+            for appid in sorted(appids, key=lambda e: game_cfg[e].name):
                 try:
                     col = 0
                     # Title
+
                     item = QTableWidgetItem(game_cfg[appid].name)
+                    if STEAM_SERVICE.get_icon_path(appid):
+                        pixmap = QPixmap(STEAM_SERVICE.get_icon_path(appid)).scaled(
+                            32, 32, Qt.KeepAspectRatio, Qt.SmoothTransformation
+                        )
+                        icon = QIcon(pixmap)
+                        item.setIcon(icon)
                     item.setFlags(Qt.ItemIsEnabled)
                     item.setToolTip(f"{appid}")
                     table.setItem(row, col, item)
