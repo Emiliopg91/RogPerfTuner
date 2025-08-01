@@ -1,10 +1,12 @@
 import os
 from dataclasses import dataclass
+import re
 from signal import Signals
 from threading import Thread
 import time
 
 from psutil import NoSuchProcess, Process
+import requests
 
 from framework.logger import Logger
 from rcc.communications.client.cmd.linux.mangohud_client import MANGO_HUD_CLIENT
@@ -34,7 +36,7 @@ class RunningGameModel:
     name: str
 
 
-class SteamService:
+class SteamService:  # pylint: disable=too-many-public-methods
     """Steam service"""
 
     WRAPPER_PATH = os.path.join(USER_SCRIPTS_FOLDER, "wrapper")
@@ -139,6 +141,21 @@ class SteamService:
             self.__set_profile_for_games()
             self._logger.rem_tab()
 
+    OFFSET = 76561197960265728
+
+    def __get_steamid32_from_custom_url(self, custom_url: str) -> int | None:
+        url = f"https://steamcommunity.com/id/{custom_url}?xml=1"
+        r = requests.get(url)
+        if r.status_code != 200 or "<steamID64>" not in r.text:
+            return None
+
+        match = re.search(r"<steamID64>(\d+)</steamID64>", r.text)
+        if not match:
+            return None
+
+        steamid64 = int(match.group(1))
+        return steamid64 - self.OFFSET
+
     def __first_game_run(self, gid: int, name: str, env: dict[str, str]):
         self._logger.info("Retrieving game details...")
 
@@ -159,6 +176,24 @@ class SteamService:
 
         if len(launch_opts) > 0:
             entry.args = launch_opts
+
+        icon_url = STEAM_CLIENT.get_icon(gid)
+        icon_path = os.path.expanduser(
+            f"~/.steam/steam/userdata/{self.__get_steamid32_from_custom_url(env["SteamAppUser"])}/config/grid/{gid}_icon.png"
+        )
+        if icon_url and icon_url != "null":
+            try:
+                respuesta = requests.get(icon_url)
+                respuesta.raise_for_status()
+
+                with open(icon_path, "wb") as archivo:
+                    archivo.write(respuesta.content)
+                entry.icon_path = icon_path
+            except Exception as e:
+                self._logger.error(f"Error downloading image: {e}")
+        else:
+            if os.path.exists(icon_path):
+                entry.icon_path = icon_path
 
         CONFIGURATION.games[gid] = entry
         CONFIGURATION.save_config()
@@ -261,6 +296,10 @@ class SteamService:
     def is_proton(self, app_id) -> bool:
         """Check if app_id requires proton"""
         return CONFIGURATION.games.get(app_id).proton
+
+    def get_icon_path(self, app_id) -> bool:
+        """Get icon file path"""
+        return CONFIGURATION.games.get(app_id).icon_path
 
     def set_parameters(self, params: str, app_id) -> MangoHudLevel:
         """Set gpu for game launch option"""

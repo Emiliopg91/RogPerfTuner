@@ -55,6 +55,7 @@ class GameEntry(DataClassJsonMixin):
     args: str | None = field(default=None)
     proton: bool = field(default=True)
     steamdeck: bool = field(default=False)
+    icon_path: str | None = field(default=None)
 
 
 @dataclass

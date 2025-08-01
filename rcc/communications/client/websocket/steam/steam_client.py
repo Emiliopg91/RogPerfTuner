@@ -46,5 +46,9 @@ class SteamClient(AbstractWebsocketClient):
         """Set launch option for game"""
         self._invoke("set_launch_options", appid, launch_opts)
 
+    def get_icon(self, appid: int):
+        """Get icon url"""
+        return self._invoke("get_icon", appid)[0]
+
 
 STEAM_CLIENT = SteamClient()
