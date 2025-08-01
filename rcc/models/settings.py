@@ -51,9 +51,10 @@ class GameEntry(DataClassJsonMixin):
     gpu: str | None = field(default=None)
     metrics_level: int = field(default=MangoHudLevel.NO_DISPLAY.value)
     sync: str = field(default=WineSyncOption.AUTO.value)
-    env: str = field(default=None)
-    args: str = field(default=None)
+    env: str | None = field(default=None)
+    args: str | None = field(default=None)
     proton: bool = field(default=True)
+    steamdeck: bool = field(default=False)
 
 
 @dataclass

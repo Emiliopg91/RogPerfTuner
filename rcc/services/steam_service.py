@@ -37,7 +37,7 @@ class RunningGameModel:
 class SteamService:
     """Steam service"""
 
-    WRAPPER_PATH = os.path.join(USER_SCRIPTS_FOLDER, "runGame")
+    WRAPPER_PATH = os.path.join(USER_SCRIPTS_FOLDER, "wrapper")
 
     DECKY_SERVICE_PATH = os.path.expanduser(os.path.join("~", "homebrew", "services", "PluginLoader"))
     PLUGINS_FOLDER = os.path.expanduser(os.path.join("~", "homebrew", "plugins"))
@@ -88,7 +88,7 @@ class SteamService:
         """Flag metrics availability"""
         return MANGO_HUD_CLIENT.available
 
-    def get_games(self) -> dict[int, str]:
+    def get_games(self) -> dict[int, GameEntry]:
         """Get games and setting"""
         return CONFIGURATION.games
 
@@ -214,60 +214,44 @@ class SteamService:
             MangoHudLevel(game.metrics_level) if game and game.metrics_level is not None else MangoHudLevel.NO_DISPLAY
         )
 
-    def set_metrics_level(self, metric_level: MangoHudLevel, app_id, launch_options) -> MangoHudLevel:
+    def set_metrics_level(self, metric_level: MangoHudLevel, app_id) -> MangoHudLevel:
         """Set level for game launch option"""
-        gpu_brand = self.get_prefered_gpu(app_id)
-        wine_sync = self.get_wine_sync(app_id)
-        environment = self.get_environment(app_id)
-        params = self.get_parameters(app_id)
-        return self.__set_launch_options(
-            app_id, launch_options, gpu_brand, metric_level, wine_sync, environment, params
-        )
+        game = CONFIGURATION.games.get(app_id)
+        game.metrics_level = metric_level.value if metric_level is not None else MangoHudLevel.NO_DISPLAY.value
+        CONFIGURATION.save_config()
 
     def get_wine_sync(self, app_id) -> WineSyncOption:
         """Get level for game"""
         game = CONFIGURATION.games.get(app_id)
         return WineSyncOption(game.sync) if game and game.sync is not None else WineSyncOption.AUTO
 
-    def set_wine_sync(self, wine_sync: WineSyncOption, app_id, launch_options) -> MangoHudLevel:
+    def set_wine_sync(self, wine_sync: WineSyncOption, app_id) -> MangoHudLevel:
         """Set level for game launch option"""
-        gpu_brand = self.get_prefered_gpu(app_id)
-        metric_level = self.get_metrics_level(app_id)
-        environment = self.get_environment(app_id)
-        params = self.get_parameters(app_id)
-        return self.__set_launch_options(
-            app_id, launch_options, gpu_brand, metric_level, wine_sync, environment, params
-        )
+        game = CONFIGURATION.games.get(app_id)
+        game.sync = wine_sync.value if wine_sync is not None else WineSyncOption.AUTO.value
+        CONFIGURATION.save_config()
 
     def get_prefered_gpu(self, app_id) -> GpuBrand | None:
         """Get GPU from game launch option"""
         game = CONFIGURATION.games.get(app_id)
         return GpuBrand(game.gpu) if game and game.gpu is not None else None
 
-    def set_prefered_gpu(self, gpu_brand: GpuBrand, app_id, launch_options) -> MangoHudLevel:
+    def set_prefered_gpu(self, gpu_brand: GpuBrand, app_id) -> MangoHudLevel:
         """Set gpu for game launch option"""
-        metric_level = self.get_metrics_level(app_id)
-        wine_sync = self.get_wine_sync(app_id)
-        environment = self.get_environment(app_id)
-        params = self.get_parameters(app_id)
-        return self.__set_launch_options(
-            app_id, launch_options, gpu_brand, metric_level, wine_sync, environment, params
-        )
+        game = CONFIGURATION.games.get(app_id)
+        game.gpu = gpu_brand.value if gpu_brand is not None else None
+        CONFIGURATION.save_config()
 
     def get_environment(self, app_id) -> str:
         """Get defined env for game"""
         game = CONFIGURATION.games.get(app_id)
         return game.env if game.env is not None else ""
 
-    def set_environment(self, env: str, app_id, launch_options) -> MangoHudLevel:
+    def set_environment(self, env: str, app_id) -> MangoHudLevel:
         """Set gpu for game launch option"""
-        metric_level = self.get_metrics_level(app_id)
-        wine_sync = self.get_wine_sync(app_id)
-        gpu_brand = self.get_prefered_gpu(app_id)
-        params = self.get_parameters(app_id)
-        return self.__set_launch_options(
-            app_id, launch_options, gpu_brand, metric_level, wine_sync, env.strip(), params
-        )
+        game = CONFIGURATION.games.get(app_id)
+        game.env = env
+        CONFIGURATION.save_config()
 
     def get_parameters(self, app_id) -> str:
         """Get defined params for game"""
@@ -278,53 +262,21 @@ class SteamService:
         """Check if app_id requires proton"""
         return CONFIGURATION.games.get(app_id).proton
 
-    def set_parameters(self, param: str, app_id, launch_options) -> MangoHudLevel:
+    def set_parameters(self, params: str, app_id) -> MangoHudLevel:
         """Set gpu for game launch option"""
-        metric_level = self.get_metrics_level(app_id)
-        wine_sync = self.get_wine_sync(app_id)
-        gpu_brand = self.get_prefered_gpu(app_id)
-        environment = self.get_environment(app_id)
-        return self.__set_launch_options(
-            app_id, launch_options, gpu_brand, metric_level, wine_sync, environment, param.strip()
-        )
-
-    def __set_launch_options(  # pylint: disable=too-many-arguments,too-many-positional-arguments
-        self,
-        app_id: int,
-        launch_options: str,
-        gpu_brand: GpuBrand,
-        metric_level: MangoHudLevel,
-        wine_sync: WineSyncOption,
-        environment: str,
-        params: str,
-    ):
-        launch_opts = launch_options
-
-        if environment is not None and len(environment.strip()) == 0:
-            environment = None
-
-        if params is not None and len(params.strip()) == 0:
-            params = None
-
-        if self.WRAPPER_PATH not in launch_opts:
-            if launch_opts is None or launch_opts == "":
-                launch_opts = "%command%"
-            elif "%command%" not in launch_opts:
-                launch_opts = "%command% " + launch_opts
-
-            launch_opts = launch_opts.replace("%command%", f"{self.WRAPPER_PATH} %command%")
-
         game = CONFIGURATION.games.get(app_id)
-        game.gpu = gpu_brand.value if gpu_brand is not None else None
-        game.metrics_level = metric_level.value if metric_level is not None else MangoHudLevel.NO_DISPLAY.value
-        game.sync = wine_sync.value if wine_sync is not None else WineSyncOption.AUTO.value
-        game.env = environment
         game.args = params
         CONFIGURATION.save_config()
 
-        STEAM_CLIENT.set_launch_options(app_id, launch_opts)
+    def is_steamdeck(self, app_id):
+        """Check if app_id simulates steamdeck"""
+        return CONFIGURATION.games.get(app_id).steamdeck
 
-        return launch_opts
+    def set_steamdeck(self, steamdeck: bool, app_id) -> MangoHudLevel:
+        """Set gpu for game launch option"""
+        game = CONFIGURATION.games.get(app_id)
+        game.steamdeck = steamdeck
+        CONFIGURATION.save_config()
 
     def get_run_configuration(self, app_id):
         "Get environment and wrappers for app_id"
@@ -334,7 +286,7 @@ class SteamService:
 
         game = CONFIGURATION.games.get(app_id)
         if game is not None:
-            environment["SteamDeck"] = "0"
+            environment["SteamDeck"] = "1" if game.steamdeck else "0"
 
             if game.proton:
                 if DEV_MODE:
@@ -363,8 +315,8 @@ class SteamService:
 
             if self.metrics_enabled:
                 environment["MANGOHUD_CONFIG"] = f"preset={game.metrics_level}"
-                environment["MANGOHUD"] = "1"
                 environment["MANGOHUD_DLSYM"] = "1"
+                environment["MANGOHUD"] = "1"
                 wrappers.append("mangohud")
 
             if game.env is not None and len(game.env.strip()):

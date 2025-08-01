@@ -29,8 +29,6 @@ from rcc.utils.events import (
     OPENRGB_SERVICE_AURA_CHANGED,
     HARDWARE_SERVICE_BATTERY_THRESHOLD_CHANGED,
     PLATFORM_SERVICE_PROFILE_CHANGED,
-    STEAM_SERVICE_CONNECTED,
-    STEAM_SERVICE_DISCONNECTED,
     STEAM_SERVICE_GAME_EVENT,
 )
 from rcc.utils.gui_utils import GuiUtils, NoScrollComboBox
@@ -88,7 +86,6 @@ class MainWindow(QMainWindow):
 
         self._game_profile_button = QPushButton(TRANSLATOR.translate("label.game.configure"))
         self._game_profile_button.clicked.connect(self.open_game_list)
-        self._game_profile_button.setEnabled(STEAM_SERVICE.steam_connected)
         performance_layout.addRow(QLabel(f"{TRANSLATOR.translate('games')}:"), self._game_profile_button)
 
         # Grupo 2: Aura
@@ -172,22 +169,15 @@ class MainWindow(QMainWindow):
         EVENT_BUS.on(PLATFORM_SERVICE_PROFILE_CHANGED, self.set_performance_profile)
         EVENT_BUS.on(OPENRGB_SERVICE_AURA_CHANGED, self.set_aura_state)
         EVENT_BUS.on(STEAM_SERVICE_GAME_EVENT, self.on_game_event)
-        EVENT_BUS.on(STEAM_SERVICE_CONNECTED, lambda: self.on_steam_connected_event(True))
-        EVENT_BUS.on(STEAM_SERVICE_DISCONNECTED, lambda: self.on_steam_connected_event(False))
 
     def on_autostart_changed(self, state):
         """Hanndler for autostart state change"""
         APPLICATION_SERVICE.enable_autostart(state)
 
-    def on_steam_connected_event(self, connected: bool):
-        """Handler for steam connection events"""
-        self._game_profile_button.setEnabled(connected)
-
     def on_game_event(self, running_games: int):
         """Handler for game events"""
         enable = running_games == 0
         self._profile_dropdown.setEnabled(enable)
-        self._game_profile_button.setEnabled(enable)
 
     def closeEvent(self, event):  # pylint: disable=invalid-name
         """Override the close event to hide the window instead of closing it."""

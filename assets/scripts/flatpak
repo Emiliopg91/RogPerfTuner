@@ -8,14 +8,14 @@ import sys
 
 
 # === Configuración del logger ===
-class CustomFormatter(logging.Formatter):
-    def formatTime(self, record, datefmt=None):
+class _CustomFormatter(logging.Formatter):
+    def formatTime(self, record, _=None):
         dt = datetime.fromtimestamp(record.created)
         return dt.strftime("%Y-%m-%d %H:%M:%S.%f")[:-3]
 
 
 LOGGER_FILE = os.path.join("{{logger_path}}", "runner.log")
-log_formatter = CustomFormatter("[%(asctime)s] %(message)s")
+log_formatter = _CustomFormatter("%(message)s")
 logger = logging.getLogger("launcher")
 logger.setLevel(logging.INFO)
 
@@ -24,7 +24,7 @@ console_handler = logging.StreamHandler()
 console_handler.setFormatter(log_formatter)
 logger.addHandler(console_handler)
 
-logger.info("Running flatpak wrapper")
+logger.info(">>> Running flatpak wrapper")
 
 env = os.environ.copy()
 path = env["PATH"]
@@ -45,5 +45,7 @@ for arg in sys.argv[1:]:
     cmd.append(arg)
 
 
-logger.info(f">>>Command:\n  {" ".join(cmd)}")
-exit(subprocess.run(cmd, env=env).returncode)
+logger.info(">>> Command:")
+logger.info("\t" + (" ".join(cmd)))
+
+sys.exit(subprocess.run(cmd, env=env, check=False).returncode)

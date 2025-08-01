@@ -13,7 +13,6 @@ from PyQt5.QtWidgets import (
 from PyQt5.QtCore import Qt
 from PyQt5.QtGui import QIcon
 
-from rcc.communications.client.websocket.steam.steam_client import SteamGameDetails, STEAM_CLIENT
 from rcc.models.mangohud_level import MangoHudLevel
 from rcc.models.wine_sync_option import WineSyncOption
 from rcc.services.hardware_service import HARDWARE_SERVICE
@@ -31,14 +30,14 @@ class GameList(QDialog):
 
     def __init__(
         self, parent: QWidget, manage_parent=False, app_id: int = None
-    ):  # pylint: disable=too-many-locals, too-many-branches
+    ):  # pylint: disable=too-many-locals, too-many-branches, too-many-statements
         super().__init__(parent)
         if GameList.INSTANCE is None:  # pylint: disable=too-many-nested-blocks
             GameList.INSTANCE = self
             self.__parent = parent
             self.__manage_parent = manage_parent
             self.setWindowTitle(TRANSLATOR.translate("game.performance.configuration"))
-            self.setFixedSize(800, 600)
+            self.setFixedSize(1000, 600)
             self.setWindowIcon(QIcon(f"{ICONS_PATH}/icon-45x45.png"))
             self.setAttribute(Qt.WA_DeleteOnClose)
             self.setWindowFlags(self.windowFlags() & ~Qt.WindowContextHelpButtonHint)
@@ -68,6 +67,7 @@ class GameList(QDialog):
             columns = [
                 TRANSLATOR.translate("game.title"),
                 TRANSLATOR.translate("used.gpu"),
+                TRANSLATOR.translate("used.steamdeck"),
             ]
 
             if STEAM_SERVICE.metrics_enabled:
@@ -98,47 +98,60 @@ class GameList(QDialog):
 
             # Llenar la tabla con datos
             row = 0
-            game_details = STEAM_CLIENT.get_apps_details(*appids)  # pylint: disable=unused-variable
-            game_details = sorted(game_details, key=lambda item: item.name)
-            for game in game_details:
+            for appid in appids:
                 try:
                     col = 0
                     # Title
-                    item = QTableWidgetItem(game.name)
+                    item = QTableWidgetItem(game_cfg[appid].name)
                     item.setFlags(Qt.ItemIsEnabled)
-                    item.setToolTip(f"{game.appid}")
+                    item.setToolTip(f"{appid}")
                     table.setItem(row, col, item)
                     col += 1
 
                     # GPU
                     gpu_combo = NoScrollComboBox()
-                    gpu_combo.setEnabled(app_id is None or app_id == game.appid)  # Usar la subclase personalizada
+                    gpu_combo.setEnabled(app_id is None or app_id == appid)  # Usar la subclase personalizada
                     gpu_combo.addItem(TRANSLATOR.translate("label.dgpu.auto"), None)
                     gpu_combo.setCurrentIndex(0)
                     for i, gpu in enumerate(HARDWARE_SERVICE.gpus):
                         gpu_combo.addItem(f"{gpu.value.capitalize()}", gpu)
-                        if gpu == STEAM_SERVICE.get_prefered_gpu(game.appid):
+                        if gpu == STEAM_SERVICE.get_prefered_gpu(appid):
                             gpu_combo.setCurrentIndex(i + 1)
 
                     gpu_combo.currentIndexChanged.connect(
-                        lambda _, widget=gpu_combo, game=game: self.__on_gpu_changed(  # pylint: disable=line-too-long
+                        lambda _, widget=gpu_combo, game=appid: self.__on_gpu_changed(  # pylint: disable=line-too-long
                             widget, game
                         )
                     )
                     table.setCellWidget(row, col, gpu_combo)
                     col += 1
 
+                    # GPU
+                    steamdeck_combo = NoScrollComboBox()
+                    steamdeck_combo.setEnabled(app_id is None or app_id == appid)  # Usar la subclase personalizada
+                    steamdeck_combo.addItem(TRANSLATOR.translate("label.steamdeck.no"), False)
+                    steamdeck_combo.addItem(TRANSLATOR.translate("label.steamdeck.yes"), True)
+                    steamdeck_combo.setCurrentIndex(1 if STEAM_SERVICE.is_steamdeck(appid) else 0)
+
+                    steamdeck_combo.currentIndexChanged.connect(
+                        lambda _, widget=steamdeck_combo, game=appid: self.__on_steamdeck_changed(  # pylint: disable=line-too-long
+                            widget, game
+                        )
+                    )
+                    table.setCellWidget(row, col, steamdeck_combo)
+                    col += 1
+
                     # Metrics
                     if STEAM_SERVICE.metrics_enabled:
                         metrics_combo = NoScrollComboBox()  # Usar la subclase personalizada
-                        metrics_combo.setEnabled(app_id is None or app_id == game.appid)
+                        metrics_combo.setEnabled(app_id is None or app_id == appid)
                         for level in MangoHudLevel:
                             metrics_combo.addItem(TRANSLATOR.translate(f"label.level.{level}"), level)
-                            if level == STEAM_SERVICE.get_metrics_level(game.appid):
+                            if level == STEAM_SERVICE.get_metrics_level(appid):
                                 metrics_combo.setCurrentIndex(level.value)
 
                         metrics_combo.currentIndexChanged.connect(
-                            lambda _, widget=metrics_combo, game=game: self.__on_metrics_changed(  # pylint: disable=line-too-long
+                            lambda _, widget=metrics_combo, game=appid: self.__on_metrics_changed(  # pylint: disable=line-too-long
                                 widget, game
                             )
                         )
@@ -146,32 +159,32 @@ class GameList(QDialog):
                         col += 1
 
                     sync_combo = NoScrollComboBox()  # Usar la subclase personalizada
-                    sync_combo.setEnabled(app_id is None or app_id == game.appid)
+                    sync_combo.setEnabled(app_id is None or app_id == appid)
                     for i, option in enumerate(WineSyncOption):
                         sync_combo.addItem(TRANSLATOR.translate(f"label.winesync.{option}"), option)
-                        if option == STEAM_SERVICE.get_wine_sync(game.appid):
+                        if option == STEAM_SERVICE.get_wine_sync(appid):
                             sync_combo.setCurrentIndex(i)
 
                     sync_combo.currentIndexChanged.connect(
-                        lambda _, widget=sync_combo, game=game: self.__on_winesync_changed(  # pylint: disable=line-too-long
+                        lambda _, widget=sync_combo, game=appid: self.__on_winesync_changed(  # pylint: disable=line-too-long
                             widget, game
                         )
                     )
-                    sync_combo.setEnabled(STEAM_SERVICE.is_proton(game.appid))
+                    sync_combo.setEnabled(STEAM_SERVICE.is_proton(appid))
                     table.setCellWidget(row, col, sync_combo)
                     col += 1
 
                     env_input = QLineEdit()
-                    env_input.setText(STEAM_SERVICE.get_environment(game.appid))
-                    env_input.setEnabled(app_id is None or app_id == game.appid)
-                    env_input.textChanged.connect(lambda text, game=game: self.__on_environment_changed(text, game))
+                    env_input.setText(STEAM_SERVICE.get_environment(appid))
+                    env_input.setEnabled(app_id is None or app_id == appid)
+                    env_input.textChanged.connect(lambda text, game=appid: self.__on_environment_changed(text, game))
                     table.setCellWidget(row, col, env_input)
                     col += 1
 
                     args_input = QLineEdit()
-                    args_input.setText(STEAM_SERVICE.get_parameters(game.appid))
-                    args_input.setEnabled(app_id is None or app_id == game.appid)
-                    args_input.textChanged.connect(lambda text, game=game: self.__on_params_changed(text, game))
+                    args_input.setText(STEAM_SERVICE.get_parameters(appid))
+                    args_input.setEnabled(app_id is None or app_id == appid)
+                    args_input.textChanged.connect(lambda text, game=appid: self.__on_params_changed(text, game))
                     table.setCellWidget(row, col, args_input)
                     col += 1
 
@@ -187,23 +200,27 @@ class GameList(QDialog):
 
             EVENT_BUS.on(STEAM_SERVICE_CONNECTED, self.close)
 
-    def __on_params_changed(self, text, game: SteamGameDetails):
-        game.launch_opts = STEAM_SERVICE.set_parameters(text, game.appid, game.launch_opts)
+    def __on_steamdeck_changed(self, widget, game: int):
+        sd = widget.currentData()
+        STEAM_SERVICE.set_steamdeck(sd, game)
 
-    def __on_environment_changed(self, text, game: SteamGameDetails):
-        game.launch_opts = STEAM_SERVICE.set_environment(text, game.appid, game.launch_opts)
+    def __on_params_changed(self, text, game: int):
+        STEAM_SERVICE.set_parameters(text, game)
 
-    def __on_metrics_changed(self, widget, game: SteamGameDetails):
+    def __on_environment_changed(self, text, game: int):
+        STEAM_SERVICE.set_environment(text, game)
+
+    def __on_metrics_changed(self, widget, game: int):
         level = widget.currentData()
-        game.launch_opts = STEAM_SERVICE.set_metrics_level(level, game.appid, game.launch_opts)
+        STEAM_SERVICE.set_metrics_level(level, game)
 
-    def __on_winesync_changed(self, widget, game: SteamGameDetails):
+    def __on_winesync_changed(self, widget, game: int):
         level = widget.currentData()
-        game.launch_opts = STEAM_SERVICE.set_wine_sync(level, game.appid, game.launch_opts)
+        STEAM_SERVICE.set_wine_sync(level, game)
 
-    def __on_gpu_changed(self, widget, game: SteamGameDetails):
+    def __on_gpu_changed(self, widget, game: int):
         gpu_brand = widget.currentData()
-        game.launch_opts = STEAM_SERVICE.set_prefered_gpu(gpu_brand, game.appid, game.launch_opts)
+        STEAM_SERVICE.set_prefered_gpu(gpu_brand, game)
 
     def show(self):
         """Override default show behaviour"""

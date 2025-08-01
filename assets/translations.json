@@ -250,5 +250,17 @@
   "params":{
     "en": "Parameters",
     "es": "Parámetros"
+  },
+  "used.steamdeck": {
+    "en":"Mode",
+    "es":"Modo"
+  },
+  "label.steamdeck.no": {
+    "en":"Computer",
+    "es":"Ordenador"
+  },
+  "label.steamdeck.yes": {
+    "en":"SteamDeck",
+    "es":"SteamDeck"
   }
 }
