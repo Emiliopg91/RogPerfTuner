@@ -23,8 +23,6 @@ from rcc.utils.events import (
     OPENRGB_SERVICE_AURA_CHANGED,
     HARDWARE_SERVICE_BATTERY_THRESHOLD_CHANGED,
     PLATFORM_SERVICE_PROFILE_CHANGED,
-    STEAM_SERVICE_CONNECTED,
-    STEAM_SERVICE_DISCONNECTED,
     STEAM_SERVICE_GAME_EVENT,
 )
 from framework.logger import Logger
@@ -142,7 +140,6 @@ class TrayIcon:  # pylint: disable=too-many-instance-attributes
         if STEAM_SERVICE.rccdc_enabled:
             # Add "Games" option
             self._games_menu = QMenu("    " + TRANSLATOR.translate("games"))
-            self._games_menu.setEnabled(STEAM_SERVICE.steam_connected)
             self._select_profile_action = QAction(f"{TRANSLATOR.translate("label.game.configure")}...")
             self._select_profile_action.triggered.connect(self.on_open_game_list)
             self._games_menu.addAction(self._select_profile_action)
@@ -228,8 +225,6 @@ class TrayIcon:  # pylint: disable=too-many-instance-attributes
         EVENT_BUS.on(PLATFORM_SERVICE_PROFILE_CHANGED, self.set_performance_profile)
         EVENT_BUS.on(OPENRGB_SERVICE_AURA_CHANGED, self.set_aura_state)
         EVENT_BUS.on(STEAM_SERVICE_GAME_EVENT, self.on_game_event)
-        EVENT_BUS.on(STEAM_SERVICE_CONNECTED, lambda: self.on_steam_connected_event(True))
-        EVENT_BUS.on(STEAM_SERVICE_DISCONNECTED, lambda: self.on_steam_connected_event(False))
 
         self._tray.activated.connect(self.on_tray_icon_activated)
 
@@ -237,11 +232,6 @@ class TrayIcon:  # pylint: disable=too-many-instance-attributes
         """Handler for game events"""
         enable = running_games == 0
         self._profile_menu.setEnabled(enable)
-        self._games_menu.setEnabled(enable)
-
-    def on_steam_connected_event(self, connected: bool):
-        """Handler for steam connection events"""
-        self._games_menu.setEnabled(connected)
 
     def on_tray_icon_activated(self, reason):
         """Restore main window"""
