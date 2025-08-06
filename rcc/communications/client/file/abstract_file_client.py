@@ -25,8 +25,11 @@ class AbstractFileClient(ABC):
         if tail > 0:
             cmd += f" | tail -n{tail}"
 
-        return SHELL.run_command(cmd, output=True)[1]
+        return SHELL.run_command(cmd)[1]
 
     def write(self, content, sudo=False):
         """Write content to file"""
-        SHELL.run_command(f"echo '{content}' | tee {self.__path}", sudo)
+        if sudo:
+            SHELL.run_sudo_command(f"echo '{content}' | tee {self.__path}")
+
+        SHELL.run_command(f"echo '{content}' | tee {self.__path}")

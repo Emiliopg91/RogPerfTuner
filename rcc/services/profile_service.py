@@ -7,7 +7,7 @@ from framework.singleton import singleton
 from rcc.communications.client.cmd.linux.cpupower_client import CPU_POWER_CLIENT
 from rcc.communications.client.dbus.asus.core.fan_curves_client import FAN_CURVES_CLIENT
 from rcc.communications.client.dbus.asus.core.platform_client import PLATFORM_CLIENT
-from rcc.communications.client.dbus.linux.power_profiles_client import POWER_PROFILE_CLIENT
+from rcc.communications.client.cmd.linux.power_profiles_client import POWER_PROFILE_CLIENT
 from rcc.communications.client.dbus.linux.upower_client import UPOWER_CLIENT
 from rcc.gui.notifier import NOTIFIER
 from rcc.models.cpu_governor import CpuGovernor
@@ -47,6 +47,7 @@ class ProfileService:
             PLATFORM_CLIENT.platfom_profile_linked_epp = True
 
         self.__curves: dict[PlatformProfile, list[FanCurve]] = {}
+
         if FAN_CURVES_CLIENT.available:
             self._logger.info("Configuring improved fan curves")
             for p in PlatformProfile:

@@ -41,5 +41,10 @@ class FanCurvesClient(AsusBaseClient):
             "SetFanCurve", QDBusArgument(profile.value, QMetaType.UInt), QDBusArgument(fan_curve.to_dbus())
         )
 
+    @property
+    def available(self):
+        """Availability flag"""
+        return False
+
 
 FAN_CURVES_CLIENT = FanCurvesClient()

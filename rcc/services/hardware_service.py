@@ -79,7 +79,7 @@ class HardwareService:
             gpus = list(SWITCHEROO_CLIENT.gpus)
             for gpu in sorted(gpus, key=lambda x: (x["Name"])):
                 self._logger.info(f"{gpu["Name"]}")
-                if gpu["Discrete"]:
+                if not gpu["Default"]:
                     brand = GpuBrand(gpu["Name"].split(" ")[0].lower())
                     env = None
                     if len(gpu["Environment"]) > 1:
@@ -141,6 +141,7 @@ class HardwareService:
         icds = [
             icd
             for icd in [
+                f"/usr/share/vulkan/icd.d/{gpu.value}_icd.json",
                 f"/usr/share/vulkan/icd.d/{gpu.value}_icd.i686.json",
                 f"/usr/share/vulkan/icd.d/{gpu.value}_icd.x86_64.json",
             ]
@@ -327,10 +328,8 @@ class HardwareService:
             f"Setting CPU priority to {self.CPU_PRIORITY} and " + f"IO priority to {self.IO_PRIORITY} for PID {pid}"
         )
 
-        SHELL.run_command(
+        SHELL.run_sudo_command(
             f"renice -n {self.CPU_PRIORITY} -p {pid} && " + f"ionice -c {self.IO_CLASS} -n {self.IO_PRIORITY} -p {pid}",
-            sudo=True,
-            check=True,
         )
 
 

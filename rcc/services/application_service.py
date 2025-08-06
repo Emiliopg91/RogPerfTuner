@@ -98,7 +98,7 @@ fi
         """Relaunch the application after 1 second"""
         NOTIFIER.show_toast(TRANSLATOR.translate("applying.update"))
         EVENT_BUS.emit("stop")
-        SHELL.run_command(f'nohup bash -c "sleep 1 && {self.RUNNER_FILE_PATH}" > /dev/null 2>&1 &', check=False)
+        SHELL.run_command(f'nohup bash -c "sleep 1 && {self.RUNNER_FILE_PATH}" > /dev/null 2>&1 &')
         os.kill(os.getpid(), signal.SIGKILL)
 
     def generate_run(self) -> None:

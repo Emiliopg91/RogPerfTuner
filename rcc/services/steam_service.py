@@ -141,9 +141,7 @@ class SteamService:  # pylint: disable=too-many-public-methods
             self.__set_profile_for_games()
             self._logger.rem_tab()
 
-    OFFSET = 76561197960265728
-
-    def __get_steamid32_from_custom_url(self, custom_url: str) -> int | None:
+    def __get_steamid32(self, custom_url: str) -> int | None:
         url = f"https://steamcommunity.com/id/{custom_url}?xml=1"
         r = requests.get(url)
         if r.status_code != 200 or "<steamID64>" not in r.text:
@@ -154,7 +152,7 @@ class SteamService:  # pylint: disable=too-many-public-methods
             return None
 
         steamid64 = int(match.group(1))
-        return steamid64 - self.OFFSET
+        return steamid64 - 76561197960265728
 
     def __first_game_run(self, gid: int, name: str, env: dict[str, str]):
         self._logger.info("Retrieving game details...")
@@ -179,21 +177,21 @@ class SteamService:  # pylint: disable=too-many-public-methods
 
         icon_url = STEAM_CLIENT.get_icon(gid)
         icon_path = os.path.expanduser(
-            f"~/.steam/steam/userdata/{self.__get_steamid32_from_custom_url(env["SteamAppUser"])}/config/grid/{gid}_icon.png"
+            f"~/.steam/steam/userdata/{self.__get_steamid32(env["SteamAppUser"])}/config/grid/{gid}_icon.png"
         )
-        if icon_url and icon_url != "null":
-            try:
+        try:
+            if icon_url and icon_url != "null":
                 respuesta = requests.get(icon_url)
                 respuesta.raise_for_status()
 
                 with open(icon_path, "wb") as archivo:
                     archivo.write(respuesta.content)
                 entry.icon_path = icon_path
-            except Exception as e:
-                self._logger.error(f"Error downloading image: {e}")
-        else:
-            if os.path.exists(icon_path):
-                entry.icon_path = icon_path
+            else:
+                if os.path.exists(icon_path):
+                    entry.icon_path = icon_path
+        except Exception as e:
+            self._logger.error(f"Error getting icon: {e}")
 
         CONFIGURATION.games[gid] = entry
         CONFIGURATION.save_config()
@@ -238,8 +236,8 @@ class SteamService:  # pylint: disable=too-many-public-methods
     def __copy_plugin(self, src: str, dst: str, is_update: bool):
         SHELL.run_command(f"cp -R {src} {USER_PLUGIN_FOLDER}", False)
         if is_update:
-            SHELL.run_command(f"rm -R {dst}", True)
-        SHELL.run_command(f"cp -R {os.path.join(USER_PLUGIN_FOLDER, 'RCCDeckyCompanion')} {dst}", True)
+            SHELL.run_sudo_command(f"rm -R {dst}", True)
+        SHELL.run_sudo_command(f"cp -R {os.path.join(USER_PLUGIN_FOLDER, 'RCCDeckyCompanion')} {dst}", True)
         Thread(target=lambda: SYSTEM_CTL_CLIENT.restart_service("plugin_loader")).start()
 
     def get_metrics_level(self, app_id) -> MangoHudLevel:

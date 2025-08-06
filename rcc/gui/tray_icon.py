@@ -304,12 +304,12 @@ class TrayIcon:  # pylint: disable=too-many-instance-attributes
     @staticmethod
     def on_open_logs():
         """Open log file"""
-        SHELL.run_command(f"xdg-open '{LOG_FILE}'", check=False)
+        SHELL.run_command(f"xdg-open '{LOG_FILE}'", False)
 
     @staticmethod
     def on_open_settings():
         """Open log file"""
-        SHELL.run_command(f"xdg-open '{CONFIG_FILE}'", check=False)
+        SHELL.run_command(f"xdg-open '{CONFIG_FILE}'", False)
 
     @staticmethod
     def on_quit():

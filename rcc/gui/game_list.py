@@ -11,7 +11,7 @@ from PyQt5.QtWidgets import (
     QLineEdit,
 )
 from PyQt5.QtCore import Qt
-from PyQt5.QtGui import QIcon, QPixmap
+from PyQt5.QtGui import QIcon, QPixmap, QColor
 
 from rcc.models.mangohud_level import MangoHudLevel
 from rcc.models.wine_sync_option import WineSyncOption
@@ -98,11 +98,16 @@ class GameList(QDialog):
 
             row = 0
             for appid in sorted(appids, key=lambda e: game_cfg[e].name):
+                is_running = appid in STEAM_SERVICE.running_games
                 try:
                     col = 0
                     # Title
 
-                    item = QTableWidgetItem(game_cfg[appid].name)
+                    item = QTableWidgetItem(
+                        game_cfg[appid].name
+                        if not is_running
+                        else game_cfg[appid].name + " (" + TRANSLATOR.translate("running") + "...)"
+                    )
                     if STEAM_SERVICE.get_icon_path(appid):
                         pixmap = QPixmap(STEAM_SERVICE.get_icon_path(appid)).scaled(
                             32, 32, Qt.KeepAspectRatio, Qt.SmoothTransformation
@@ -111,12 +116,14 @@ class GameList(QDialog):
                         item.setIcon(icon)
                     item.setFlags(Qt.ItemIsEnabled)
                     item.setToolTip(f"{appid}")
+                    if is_running:
+                        item.setForeground(QColor("green"))
                     table.setItem(row, col, item)
                     col += 1
 
                     # GPU
                     gpu_combo = NoScrollComboBox()
-                    gpu_combo.setEnabled(app_id is None or app_id == appid)  # Usar la subclase personalizada
+                    gpu_combo.setEnabled(not is_running)  # Usar la subclase personalizada
                     gpu_combo.addItem(TRANSLATOR.translate("label.dgpu.auto"), None)
                     gpu_combo.setCurrentIndex(0)
                     for i, gpu in enumerate(HARDWARE_SERVICE.gpus):
@@ -134,7 +141,7 @@ class GameList(QDialog):
 
                     # GPU
                     steamdeck_combo = NoScrollComboBox()
-                    steamdeck_combo.setEnabled(app_id is None or app_id == appid)  # Usar la subclase personalizada
+                    steamdeck_combo.setEnabled(not is_running)  # Usar la subclase personalizada
                     steamdeck_combo.addItem(TRANSLATOR.translate("label.steamdeck.no"), False)
                     steamdeck_combo.addItem(TRANSLATOR.translate("label.steamdeck.yes"), True)
                     steamdeck_combo.setCurrentIndex(1 if STEAM_SERVICE.is_steamdeck(appid) else 0)
@@ -150,7 +157,7 @@ class GameList(QDialog):
                     # Metrics
                     if STEAM_SERVICE.metrics_enabled:
                         metrics_combo = NoScrollComboBox()  # Usar la subclase personalizada
-                        metrics_combo.setEnabled(app_id is None or app_id == appid)
+                        metrics_combo.setEnabled(not is_running)
                         for level in MangoHudLevel:
                             metrics_combo.addItem(TRANSLATOR.translate(f"label.level.{level}"), level)
                             if level == STEAM_SERVICE.get_metrics_level(appid):
@@ -165,7 +172,6 @@ class GameList(QDialog):
                         col += 1
 
                     sync_combo = NoScrollComboBox()  # Usar la subclase personalizada
-                    sync_combo.setEnabled(app_id is None or app_id == appid)
                     for i, option in enumerate(WineSyncOption):
                         sync_combo.addItem(TRANSLATOR.translate(f"label.winesync.{option}"), option)
                         if option == STEAM_SERVICE.get_wine_sync(appid):
@@ -176,20 +182,20 @@ class GameList(QDialog):
                             widget, game
                         )
                     )
-                    sync_combo.setEnabled(STEAM_SERVICE.is_proton(appid))
+                    sync_combo.setEnabled(not is_running and STEAM_SERVICE.is_proton(appid))
                     table.setCellWidget(row, col, sync_combo)
                     col += 1
 
                     env_input = QLineEdit()
                     env_input.setText(STEAM_SERVICE.get_environment(appid))
-                    env_input.setEnabled(app_id is None or app_id == appid)
+                    env_input.setEnabled(not is_running)
                     env_input.textChanged.connect(lambda text, game=appid: self.__on_environment_changed(text, game))
                     table.setCellWidget(row, col, env_input)
                     col += 1
 
                     args_input = QLineEdit()
                     args_input.setText(STEAM_SERVICE.get_parameters(appid))
-                    args_input.setEnabled(app_id is None or app_id == appid)
+                    args_input.setEnabled(not is_running)
                     args_input.textChanged.connect(lambda text, game=appid: self.__on_params_changed(text, game))
                     table.setCellWidget(row, col, args_input)
                     col += 1

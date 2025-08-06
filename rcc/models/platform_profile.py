@@ -6,4 +6,4 @@ class PlatformProfile(IntEnum):
 
     BALANCED = 0
     PERFORMANCE = 1
-    QUIET = 2
+    LOW_POWER = 3

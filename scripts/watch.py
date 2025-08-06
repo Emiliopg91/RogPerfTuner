@@ -9,6 +9,8 @@ from watchdog.events import FileSystemEventHandler
 
 workspace = os.path.abspath(os.path.join(os.path.dirname(os.path.abspath(__file__)), ".."))
 
+from PyQt5.QtCore import QLibraryInfo, QLibraryInfo
+
 
 class ChangeHandler(FileSystemEventHandler):
     """Change handler class"""
@@ -45,7 +47,12 @@ def run_main():
     command = ["python3", os.path.join(workspace, "main.py")]
     for i in range(1, len(sys.argv)):
         command.append(sys.argv[i])
-    return subprocess.Popen(command)
+    env = os.environ.copy()
+    env["QT_QPA_PLATFORM"] = ""
+    env["QT_PLUGIN_PATH"] = os.path.join(
+        os.path.dirname(__file__), "..", ".venv/lib/python3.13/site-packages/PyQt5/Qt5/plugins"
+    )
+    return subprocess.Popen(command, env=env)
 
 
 if __name__ == "__main__":

@@ -120,7 +120,7 @@ class PerformanceProfile(IntEnum):
     def platform_profile(self) -> PlatformProfile:
         """Get associated platform profile"""
         if self == PerformanceProfile.QUIET:
-            return PlatformProfile.QUIET
+            return PlatformProfile.LOW_POWER
         if self == PerformanceProfile.BALANCED:
             return PlatformProfile.BALANCED
 
