@@ -24,7 +24,7 @@ from framework.singleton import singleton
 class ApplicationService:
     """Class for managing applicaion aspects"""
 
-    RUNNER_FILE_PATH = os.path.join(USER_BIN_FOLDER, "launch.sh")
+    RUNNER_FILE_PATH = os.path.join(USER_BIN_FOLDER, "application", "launch.sh")
     UPDATE_FILE_PATH = f"{os.path.join(USER_UPDATE_FOLDER, APP_NAME)}.AppImage"
 
     DESKTOP_FILE_CONTENT = f"""[Desktop Entry]
@@ -37,14 +37,6 @@ Terminal=False
 Type=Application
 Categories=Utility;
     """
-
-    RUNNER_FILE_CONTENT = f"""#!/bin/bash
-if [[ -f "{UPDATE_FILE_PATH}" ]]; then
-    cp "{UPDATE_FILE_PATH}" "{os.getenv("APPIMAGE")}"
-    chmod 755 "{os.getenv("APPIMAGE")}"
-fi
-"{os.getenv("APPIMAGE")}"
-"""
 
     def __init__(self):
         self._logger = Logger()
@@ -103,10 +95,13 @@ fi
 
     def generate_run(self) -> None:
         """Generate runner file"""
-
-        with open(self.RUNNER_FILE_PATH, "w", encoding="utf-8") as file:
-            file.write(self.RUNNER_FILE_CONTENT)
-        os.chmod(self.RUNNER_FILE_PATH, 0o755)
+        SHELL.copy_scripts(
+            "application",
+            {
+                "update": self.UPDATE_FILE_PATH,
+                "appimage": os.getenv("APPIMAGE"),
+            },
+        )
 
         self._logger.debug(f"Launch file '{self.RUNNER_FILE_PATH}' written successfully")
 

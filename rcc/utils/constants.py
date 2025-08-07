@@ -3,6 +3,7 @@ from pathlib import Path
 
 import os
 import shutil
+import socket
 import sys
 
 import toml
@@ -52,6 +53,11 @@ USER_ICON_FOLDER = os.path.join(USER_FOLDER, "icons")
 if not os.path.exists(USER_ICON_FOLDER):
     os.makedirs(USER_ICON_FOLDER)
 
+USER_GAME_ICONS_PATH = os.path.join(USER_ICON_FOLDER, "games")
+
+if not os.path.exists(USER_GAME_ICONS_PATH):
+    os.makedirs(USER_GAME_ICONS_PATH)
+
 USER_PLUGIN_FOLDER = os.path.join(USER_FOLDER, "plugin")
 
 if not os.path.exists(USER_PLUGIN_FOLDER):
@@ -79,11 +85,6 @@ if not os.path.exists(USER_CONFIG_FOLDER):
 
 ASSET_SCRIPTS_FOLDER = os.path.join(BASE_PATH, "assets", "scripts")
 
-USER_SCRIPTS_FOLDER = os.path.join(USER_FOLDER, "scripts")
-
-if not os.path.exists(USER_SCRIPTS_FOLDER):
-    os.makedirs(USER_SCRIPTS_FOLDER)
-
 USER_LOG_FOLDER = os.path.join(USER_FOLDER, "logs")
 
 if not os.path.exists(USER_LOG_FOLDER):
@@ -100,3 +101,14 @@ CONFIG_FILE = os.path.join(USER_CONFIG_FOLDER, "config.yml")
 LOG_OLD_FOLDER = os.path.join(USER_LOG_FOLDER, "old")
 
 LOG_FILE = os.path.join(USER_LOG_FOLDER, f"{datetime.now().strftime("%Y-%m-%d %H:%M:%S")}.log")
+
+REST_SERVER_PORT = None
+with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
+    s.bind(("", 0))
+    REST_SERVER_PORT = s.getsockname()[1]
+
+STEAM_BIN_PATH = shutil.which("steam")
+
+MANGOHUD_BIN_PATH = shutil.which("mangohud")
+
+UPDATE_FILE_PATH = f"{os.path.join(USER_UPDATE_FOLDER, APP_NAME)}.AppImage"

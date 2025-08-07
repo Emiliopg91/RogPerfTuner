@@ -1,15 +1,13 @@
 # pylint: disable=missing-function-docstring, duplicate-code
 
 import logging
-import os
-import socket
 from threading import Thread
 from flask import Flask, jsonify
 from rcc.services.hardware_service import HARDWARE_SERVICE
 from rcc.services.steam_service import STEAM_SERVICE
 from rcc.services.rgb_service import RGB_SERVICE
 from rcc.services.profile_service import PROFILE_SERVICE
-from rcc.utils.constants import ASSET_SCRIPTS_FOLDER, USER_LOG_FOLDER, USER_SCRIPTS_FOLDER
+from rcc.utils.constants import REST_SERVER_PORT
 from framework.logger import Logger
 from framework.singleton import singleton
 
@@ -91,30 +89,7 @@ class RESTServer:
     """REST server initializer and script generator"""
 
     def __init__(self):
-        with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
-            s.bind(("", 0))
-            self._port = s.getsockname()[1]
-
-        os.makedirs(USER_SCRIPTS_FOLDER, exist_ok=True)
-
-        # Listar todos los archivos dentro de ASSET_SCRIPTS_FOLDER
-        for file in os.listdir(ASSET_SCRIPTS_FOLDER):
-            src_path = os.path.join(ASSET_SCRIPTS_FOLDER, file)
-            dst_path = os.path.join(USER_SCRIPTS_FOLDER, file)
-
-            if os.path.isfile(dst_path):
-                os.unlink(dst_path)
-
-            with open(src_path, "r") as f:
-                content = f.read()
-
-            content = content.replace("{{port}}", str(self._port))
-            content = content.replace("{{logger_path}}", USER_LOG_FOLDER)
-
-            with open(dst_path, "w") as f:
-                f.write(content)
-
-            os.chmod(dst_path, 0o755)
+        self._port = REST_SERVER_PORT
 
     def run_flask(self):
         logger.info(f"Starting REST server on http://127.0.0.1:{self._port}")

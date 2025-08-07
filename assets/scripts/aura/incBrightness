@@ -4,20 +4,20 @@ import urllib.error
 
 
 def main():
-    url = "http://127.0.0.1:{{port}}/nextProfile"
+    url = "http://127.0.0.1:{{rest_port}}/increaseBrightness"
     req = urllib.request.Request(url, method="GET")
     try:
         with urllib.request.urlopen(req) as response:
             if response.status == 200:
-                print("Request to nextProfile successful")
+                print("Request to increaseBrightness successful")
             else:
                 print(f"Unexpected status code: {response.status}")
     except urllib.error.HTTPError as e:
-        print(f"HTTP error calling nextProfile: {e.code} {e.reason}")
+        print(f"HTTP error calling increaseBrightness: {e.code} {e.reason}")
     except urllib.error.URLError as e:
-        print(f"URL error calling nextProfile: {e.reason}")
+        print(f"URL error calling increaseBrightness: {e.reason}")
     except Exception as e:
-        print(f"General error calling nextProfile: {e}")
+        print(f"General error calling increaseBrightness: {e}")
 
 
 if __name__ == "__main__":

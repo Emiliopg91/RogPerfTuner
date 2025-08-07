@@ -1,6 +1,5 @@
 import os
 from dataclasses import dataclass
-import re
 from signal import Signals
 from threading import Thread
 import time
@@ -9,8 +8,6 @@ from psutil import NoSuchProcess, Process
 import requests
 
 from framework.logger import Logger
-from rcc.communications.client.cmd.linux.mangohud_client import MANGO_HUD_CLIENT
-from rcc.communications.client.cmd.linux.systemctl_client import SYSTEM_CTL_CLIENT
 from rcc.communications.client.tcp.openrgb.effects.gaming import GAMING_EFFECT
 from rcc.communications.client.websocket.steam.steam_client import STEAM_CLIENT
 from rcc.models.gpu_brand import GpuBrand
@@ -23,7 +20,14 @@ from rcc.services.profile_service import PROFILE_SERVICE
 from rcc.services.rgb_service import RGB_SERVICE
 from rcc.utils.beans import EVENT_BUS
 from rcc.utils.configuration import CONFIGURATION
-from rcc.utils.constants import DEV_MODE, RCCDC_ASSET_PATH, USER_PLUGIN_FOLDER, USER_SCRIPTS_FOLDER
+from rcc.utils.constants import (
+    DEV_MODE,
+    MANGOHUD_BIN_PATH,
+    RCCDC_ASSET_PATH,
+    USER_BIN_FOLDER,
+    USER_GAME_ICONS_PATH,
+    USER_PLUGIN_FOLDER,
+)
 from rcc.utils.events import STEAM_SERVICE_CONNECTED, STEAM_SERVICE_DISCONNECTED, STEAM_SERVICE_GAME_EVENT
 from rcc.utils.shell import SHELL
 
@@ -39,7 +43,7 @@ class RunningGameModel:
 class SteamService:  # pylint: disable=too-many-public-methods
     """Steam service"""
 
-    WRAPPER_PATH = os.path.join(USER_SCRIPTS_FOLDER, "wrapper")
+    WRAPPER_PATH = os.path.join(USER_BIN_FOLDER, "steam", "run")
 
     DECKY_SERVICE_PATH = os.path.expanduser(os.path.join("~", "homebrew", "services", "PluginLoader"))
     PLUGINS_FOLDER = os.path.expanduser(os.path.join("~", "homebrew", "plugins"))
@@ -88,7 +92,7 @@ class SteamService:  # pylint: disable=too-many-public-methods
     @property
     def metrics_enabled(self):
         """Flag metrics availability"""
-        return MANGO_HUD_CLIENT.available
+        return MANGOHUD_BIN_PATH is not None
 
     def get_games(self) -> dict[int, GameEntry]:
         """Get games and setting"""
@@ -141,19 +145,6 @@ class SteamService:  # pylint: disable=too-many-public-methods
             self.__set_profile_for_games()
             self._logger.rem_tab()
 
-    def __get_steamid32(self, custom_url: str) -> int | None:
-        url = f"https://steamcommunity.com/id/{custom_url}?xml=1"
-        r = requests.get(url)
-        if r.status_code != 200 or "<steamID64>" not in r.text:
-            return None
-
-        match = re.search(r"<steamID64>(\d+)</steamID64>", r.text)
-        if not match:
-            return None
-
-        steamid64 = int(match.group(1))
-        return steamid64 - 76561197960265728
-
     def __first_game_run(self, gid: int, name: str, env: dict[str, str]):
         self._logger.info("Retrieving game details...")
 
@@ -176,14 +167,13 @@ class SteamService:  # pylint: disable=too-many-public-methods
             entry.args = launch_opts
 
         icon_url = STEAM_CLIENT.get_icon(gid)
-        icon_path = os.path.expanduser(
-            f"~/.steam/steam/userdata/{self.__get_steamid32(env["SteamAppUser"])}/config/grid/{gid}_icon.png"
-        )
+        icon_path = os.path.join(USER_GAME_ICONS_PATH, f"{gid}.png")
         try:
             if icon_url and icon_url != "null":
                 respuesta = requests.get(icon_url)
                 respuesta.raise_for_status()
 
+                self._logger.info(f"Downloading icon from '{icon_url}' to '{icon_path}'")
                 with open(icon_path, "wb") as archivo:
                     archivo.write(respuesta.content)
                 entry.icon_path = icon_path
@@ -202,7 +192,7 @@ class SteamService:  # pylint: disable=too-many-public-methods
         overlay_id = env["SteamOverlayGameId"]
         self._logger.info(f"Relaunching with Overlay GameId {overlay_id}...")
         time.sleep(1)
-        SHELL.run_command(f"{env["STEAMSCRIPT"]} steam://rungameid/{overlay_id}")
+        SHELL.run_command(f"{os.path.join(USER_BIN_FOLDER,"steam","launch.sh")} {overlay_id}")
         self._logger.info("Relauched")
 
     @property
@@ -234,11 +224,11 @@ class SteamService:  # pylint: disable=too-many-public-methods
             self._rccdc_enabled = False
 
     def __copy_plugin(self, src: str, dst: str, is_update: bool):
-        SHELL.run_command(f"cp -R {src} {USER_PLUGIN_FOLDER}", False)
-        if is_update:
-            SHELL.run_sudo_command(f"rm -R {dst}", True)
-        SHELL.run_sudo_command(f"cp -R {os.path.join(USER_PLUGIN_FOLDER, 'RCCDeckyCompanion')} {dst}", True)
-        Thread(target=lambda: SYSTEM_CTL_CLIENT.restart_service("plugin_loader")).start()
+        SHELL.run_command(
+            os.path.join(USER_BIN_FOLDER, "steam", "rcc_plugin.sh")
+            + f"{"1" if is_update else "0"} {src} {USER_PLUGIN_FOLDER} {dst} "
+            + f"{os.path.join(USER_PLUGIN_FOLDER, 'RCCDeckyCompanion')}"
+        )
 
     def get_metrics_level(self, app_id) -> MangoHudLevel:
         """Get level for game"""
@@ -354,7 +344,7 @@ class SteamService:  # pylint: disable=too-many-public-methods
                 environment["MANGOHUD_CONFIG"] = f"preset={game.metrics_level}"
                 environment["MANGOHUD_DLSYM"] = "1"
                 environment["MANGOHUD"] = "1"
-                wrappers.append("mangohud")
+                wrappers.append(MANGOHUD_BIN_PATH)
 
             if game.env is not None and len(game.env.strip()):
                 env = game.env.strip()

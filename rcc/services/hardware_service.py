@@ -30,6 +30,7 @@ from rcc.models.performance_profile import PerformanceProfile
 from rcc.models.ssd_scheduler import SsdScheduler
 from rcc.models.usb_identifier import UsbIdentifier
 from rcc.utils.beans import EVENT_BUS, TRANSLATOR
+from rcc.utils.constants import USER_BIN_FOLDER
 from rcc.utils.events import (
     HARDWARE_SERVICE_BATTERY_THRESHOLD_CHANGED,
     HARDWARE_SERVICE_ON_BATTERY,
@@ -329,7 +330,8 @@ class HardwareService:
         )
 
         SHELL.run_sudo_command(
-            f"renice -n {self.CPU_PRIORITY} -p {pid} && " + f"ionice -c {self.IO_CLASS} -n {self.IO_PRIORITY} -p {pid}",
+            f"{os.path.join(USER_BIN_FOLDER, "performance", "renice.sh")} {pid} {self.CPU_PRIORITY} "
+            + f"{self.IO_CLASS} {self.IO_PRIORITY}"
         )
 
 

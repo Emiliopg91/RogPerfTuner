@@ -51,22 +51,13 @@ def log_input():
     logger.info("\t%s", " ".join(sys.argv[1:]))
 
 
-def extract_appid() -> int:
-    app_id = None
-    for p in command[1:]:
-        if p.startswith("AppId="):
-            app_id = p.split("=")[1]
-            break
-    return app_id
-
-
 def query_for_app_cfg(app_id: int):
     env_vars = []
     wrappers = []
     args = ""
     try:
         logger.info("Sending config query for AppId %s", app_id)
-        API_URL = f"http://localhost:{{port}}/getParamRunningApp/{app_id}"
+        API_URL = f"http://localhost:{{rest_port}}/getParamRunningApp/{app_id}"
         req = Request(
             API_URL,
             headers={"Accept": "application/json"},
@@ -102,7 +93,7 @@ def query_for_app_cfg(app_id: int):
 def query_for_app_renice():
     try:
         logger.info("Request renice for %s", os.getpid())
-        API_URL = f"http://localhost:{{port}}/renice/{os.getpid()}"
+        API_URL = f"http://localhost:{{rest_port}}/renice/{os.getpid()}"
         req = Request(
             API_URL,
             headers={"Accept": "application/json"},
@@ -171,7 +162,7 @@ try:
 
     command = sys.argv[1:]
 
-    app_id = extract_appid()
+    app_id = child_env.get("SteamGameId", None)
 
     if app_id is not None:
         (env, wrap, args) = query_for_app_cfg(app_id)
