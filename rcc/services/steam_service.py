@@ -340,7 +340,7 @@ class SteamService:  # pylint: disable=too-many-public-methods
             if game.gpu is not None:
                 environment.update(HARDWARE_SERVICE.get_gpu_selector_env(GpuBrand(game.gpu)))
 
-            if self.metrics_enabled:
+            if MANGOHUD_BIN_PATH is not None and self.metrics_enabled:
                 environment["MANGOHUD_CONFIG"] = f"preset={game.metrics_level}"
                 environment["MANGOHUD_DLSYM"] = "1"
                 environment["MANGOHUD"] = "1"

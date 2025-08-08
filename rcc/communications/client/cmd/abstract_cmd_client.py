@@ -1,6 +1,8 @@
 from abc import ABC
+import os
 import shutil
 
+from framework.logger import Logger
 from rcc.utils.shell import SHELL
 
 
@@ -8,14 +10,15 @@ class AbstractCmdClient(ABC):
     """Abstract class for commands"""
 
     def __init__(self, command: str):
-        self.__command = command
-
-        self._available = shutil.which(self.__command) is not None
+        self._logger = Logger()
+        self.__command = shutil.which(command)
+        if self.__command is None:
+            self._logger.error(f"Command {command} not found in path {os.environ["PATH"]}")
 
     @property
     def available(self):
         """Availability flag"""
-        return self._available
+        return self.__command is not None
 
     def _run_command(self, args="", sudo=False):
         if sudo:
