@@ -186,81 +186,85 @@
   "metrics": {
     "en": "Metrics",
     "es": "Métricas"
-  }, 
-  "label.level":{
-    "en":"Level",
+  },
+  "label.level": {
+    "en": "Level",
     "es": "Nivel"
   },
-  "label.level.0":{
-    "en":"Disabled",
+  "label.level.0": {
+    "en": "Disabled",
     "es": "Desactivado"
   },
-  "label.level.1":{
-    "en":"Only FPS",
+  "label.level.1": {
+    "en": "Only FPS",
     "es": "Solo FPS"
   },
-  "label.level.2":{
-    "en":"Horizontal",
+  "label.level.2": {
+    "en": "Horizontal",
     "es": "Horizontal"
   },
-  "label.level.3":{
-    "en":"Extended",
+  "label.level.3": {
+    "en": "Extended",
     "es": "Extendido"
   },
-  "label.level.4":{
-    "en":"Detailed",
+  "label.level.4": {
+    "en": "Detailed",
     "es": "Detallado"
   },
   "application": {
-    "en":"Application",
-    "es":"Aplicación"
+    "en": "Application",
+    "es": "Aplicación"
   },
   "autostart": {
     "en": "Start on boot",
     "es": "Iniciar automaticamente"
   },
-  "winesync":  {
-    "en":"Synchronization",
-    "es":"Sincronización"
+  "winesync": {
+    "en": "Synchronization",
+    "es": "Sincronización"
   },
-  "label.winesync.auto":{
-    "en":"Auto",
-    "es":"Auto"
+  "label.winesync.auto": {
+    "en": "Auto",
+    "es": "Auto"
   },
-  "label.winesync.ntsync":{
-    "en":"NTSync",
-    "es":"NTSync"
+  "label.winesync.ntsync": {
+    "en": "NTSync",
+    "es": "NTSync"
   },
-  "label.winesync.esync":{
-    "en":"ESync",
-    "es":"ESync"
+  "label.winesync.esync": {
+    "en": "ESync",
+    "es": "ESync"
   },
-  "label.winesync.fsync":{
-    "en":"FSync",
-    "es":"FSync"
+  "label.winesync.fsync": {
+    "en": "FSync",
+    "es": "FSync"
   },
-  "label.winesync.none":{
-    "en":"None",
-    "es":"No"
+  "label.winesync.none": {
+    "en": "None",
+    "es": "No"
   },
-  "environment":{
-    "en":"Environment",
-    "es":"Entorno"
+  "environment": {
+    "en": "Environment",
+    "es": "Entorno"
   },
-  "params":{
+  "params": {
     "en": "Parameters",
     "es": "Parámetros"
   },
   "used.steamdeck": {
-    "en":"Mode",
-    "es":"Modo"
+    "en": "Mode",
+    "es": "Modo"
   },
   "label.steamdeck.no": {
-    "en":"Computer",
-    "es":"Ordenador"
+    "en": "Computer",
+    "es": "Ordenador"
   },
   "label.steamdeck.yes": {
-    "en":"SteamDeck",
-    "es":"SteamDeck"
+    "en": "SteamDeck",
+    "es": "SteamDeck"
+  },
+  "running": {
+    "en": "Running",
+    "es": "Ejecutando"
   }
 }
