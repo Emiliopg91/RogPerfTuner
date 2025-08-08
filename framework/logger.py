@@ -70,7 +70,7 @@ class Logger:
         self._logger.addHandler(Logger.file_handler)
         self._logger.addHandler(Logger.console_handler)
 
-        level = Logger.config_map.get(self._class_name, "INFO").upper()
+        level = Logger.config_map.get(self._class_name.strip(), "INFO").upper()
         if level == "CRITICAL":
             self._logger.setLevel(logging.CRITICAL)
         elif level == "ERROR":
