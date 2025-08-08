@@ -26,7 +26,6 @@ from rcc.utils.constants import (
     RCCDC_ASSET_PATH,
     USER_BIN_FOLDER,
     USER_GAME_ICONS_PATH,
-    USER_PLUGIN_FOLDER,
 )
 from rcc.utils.events import STEAM_SERVICE_CONNECTED, STEAM_SERVICE_DISCONNECTED, STEAM_SERVICE_GAME_EVENT
 from rcc.utils.shell import SHELL
@@ -211,11 +210,11 @@ class SteamService:  # pylint: disable=too-many-public-methods
         if os.path.exists(self.DECKY_SERVICE_PATH):
             if not os.path.exists(self.RCCDC_PATH):
                 self._logger.info("Installing plugin for first time")
-                self.__copy_plugin(RCCDC_ASSET_PATH, os.path.join(self.PLUGINS_FOLDER, "RCCDeckyCompanion"), False)
+                self.__copy_plugin()
             else:
                 if os.path.getmtime(self.RCCDC_PATH) < os.path.getmtime(RCCDC_ASSET_PATH):
                     self._logger.info("Updating Decky plugin")
-                    self.__copy_plugin(RCCDC_ASSET_PATH, os.path.join(self.PLUGINS_FOLDER, "RCCDeckyCompanion"), True)
+                    self.__copy_plugin()
                 else:
                     self._logger.debug("Plugin up to date")
             self._rccdc_enabled = True
@@ -223,12 +222,13 @@ class SteamService:  # pylint: disable=too-many-public-methods
             self._logger.warning("No Decky installation found, skipping plugin installation")
             self._rccdc_enabled = False
 
-    def __copy_plugin(self, src: str, dst: str, is_update: bool):
-        SHELL.run_sudo_command(
-            os.path.join(USER_BIN_FOLDER, "steam", "rcc_plugin.sh")
-            + f" {"1" if is_update else "0"} {src} {USER_PLUGIN_FOLDER} {dst} "
-            + f"{os.path.join(USER_PLUGIN_FOLDER, 'RCCDeckyCompanion')}"
-        )
+    def __copy_plugin(self):
+        Thread(
+            target=lambda: SHELL.run_sudo_command(
+                os.path.join(USER_BIN_FOLDER, "steam", "rcc_plugin.sh")
+                + f" {RCCDC_ASSET_PATH} {os.path.join(self.PLUGINS_FOLDER, "RCCDeckyCompanion")}"
+            )
+        ).start()
 
     def get_metrics_level(self, app_id) -> MangoHudLevel:
         """Get level for game"""
