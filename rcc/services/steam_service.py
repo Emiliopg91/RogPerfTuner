@@ -224,7 +224,7 @@ class SteamService:  # pylint: disable=too-many-public-methods
             self._rccdc_enabled = False
 
     def __copy_plugin(self, src: str, dst: str, is_update: bool):
-        SHELL.run_command(
+        SHELL.run_sudo_command(
             os.path.join(USER_BIN_FOLDER, "steam", "rcc_plugin.sh")
             + f"{"1" if is_update else "0"} {src} {USER_PLUGIN_FOLDER} {dst} "
             + f"{os.path.join(USER_PLUGIN_FOLDER, 'RCCDeckyCompanion')}"
