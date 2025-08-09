@@ -121,6 +121,8 @@ class Shell:
         self.__logger.debug(f"Command finished with result {excode} after {(time.time()-t0):.3f}")
 
         if check and excode != 0:
+            print(stdout)
+            print(stderr)
             raise subprocess.CalledProcessError(excode, command, stdout, stderr)
 
         return excode, stdout, stderr
@@ -145,7 +147,7 @@ class Shell:
         final_cmd = command
         input_txt = None
         if sudo:
-            final_cmd = f'sudo -S bash -c "{final_cmd}"'
+            final_cmd = f'sudo -S bash -l "{final_cmd}"'
             input_txt = self.__pwd
 
         self.__logger.debug(f"Running command '{final_cmd}'")
