@@ -18,6 +18,7 @@ class Shell:
     sudo_session = None
     STD_LOCK = Lock()
     SUDO_LOCK = Lock()
+    ENV = os.environ.copy()
 
     def __init__(self):
         self.__logger = Logger()
@@ -30,6 +31,7 @@ class Shell:
                 "steam_path": STEAM_BIN_PATH,
             }
         )
+        self.ENV["LD_LIBRARY_PATH"] = ""
 
     def __read_until_end(self, stream, end_marker, output_list, rc_holder=None):
         for line in stream:
@@ -53,7 +55,7 @@ class Shell:
             stderr=subprocess.PIPE,
             text=True,
             bufsize=1,
-            env=os.environ.copy(),
+            env=self.ENV,
         )
 
     def __init_sudo_session(self):
@@ -67,7 +69,7 @@ class Shell:
             stderr=subprocess.PIPE,
             text=True,
             bufsize=1,
-            env=os.environ.copy(),
+            env=self.ENV,
         )
 
         self.sudo_session.stdin.write(self.__pwd)
