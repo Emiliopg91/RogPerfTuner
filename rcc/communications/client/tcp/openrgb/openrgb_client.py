@@ -135,6 +135,7 @@ class OpenRgbClient:
                 stdout=log_file,
                 stderr=log_file,
                 text=True,
+                env=os.environ.copy(),
             )
 
             self._orgb_process.wait()
