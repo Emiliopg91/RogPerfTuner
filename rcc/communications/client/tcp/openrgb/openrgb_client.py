@@ -130,12 +130,14 @@ class OpenRgbClient:
             command.append("--gui")
         with open(os.path.join(USER_LOG_FOLDER, "OpenRGB.log"), "w", encoding="utf-8") as log_file:
             self.logger.debug(f"Running command '{" ".join(command)}'")
+            env = os.environ.copy()
+            env["LD_LIBRARY_PATH"] = ""
             self._orgb_process = subprocess.Popen(  # pylint: disable=consider-using-with
                 command,
                 stdout=log_file,
                 stderr=log_file,
                 text=True,
-                env=os.environ.copy(),
+                env=env,
             )
 
             self._orgb_process.wait()
