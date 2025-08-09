@@ -14,7 +14,7 @@ from rcc.communications.client.cmd.asus.asusctl_client import ASUS_CTL_CLIENT
 from rcc.communications.client.tcp.openrgb.effects.gaming import GAMING_EFFECT
 from rcc.models.rgb_brightness import RgbBrightness
 from rcc.models.usb_identifier import UsbIdentifier
-from rcc.utils.constants import ORGB_PATH, UDEV_PATH
+from rcc.utils.constants import ORGB_PATH, UDEV_PATH, USER_LOG_FOLDER
 from rcc.communications.client.tcp.openrgb.effects.base.abstract_effect import AbstractEffect
 from rcc.communications.client.tcp.openrgb.effects.breathing import BREATHING_EFFECT
 from rcc.communications.client.tcp.openrgb.effects.dance_floor import DANCE_FLOOR_EFFECT
@@ -128,16 +128,18 @@ class OpenRgbClient:
         command = [ORGB_PATH, "--server-host", "localhost", "--server-port", str(self._port)]
         if "--orgb-gui" in sys.argv:
             command.append("--gui")
-        self._orgb_process = subprocess.Popen(  # pylint: disable=consider-using-with
-            command,
-            stdout=subprocess.PIPE,
-            stderr=subprocess.PIPE,
-            text=True,
-        )
+        with open(os.path.join(USER_LOG_FOLDER, "OpenRGB.log"), "w", encoding="utf-8") as log_file:
+            self.logger.debug(f"Running command '{" ".join(command)}'")
+            self._orgb_process = subprocess.Popen(  # pylint: disable=consider-using-with
+                command,
+                stdout=log_file,
+                stderr=log_file,
+                text=True,
+            )
 
-        self._orgb_process.wait()
-        self.logger.info(f"OpenRgb finished with code {self._orgb_process.returncode}")
-        self._orgb_process = None
+            self._orgb_process.wait()
+            self.logger.info(f"OpenRgb finished with code {self._orgb_process.returncode}")
+            self._orgb_process = None
 
     def _wait_for_server(self) -> bool:
         while True:
