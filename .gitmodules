@@ -7,3 +7,9 @@
 [submodule "submodules/OpenRGB-cppSDK"]
 	path = submodules/OpenRGB-cppSDK
 	url = https://github.com/Emiliopg91/Youda008-OpenRGB-cppSDK
+[submodule "submodules/OpenRGB"]
+	path = submodules/OpenRGB
+	url = https://github.com/Emiliopg91/OpenRGB
+[submodule "submodules/RccDeckyCompanion"]
+	path = submodules/RccDeckyCompanion
+	url = https://github.com/Emiliopg91/RccDeckyCompanion
