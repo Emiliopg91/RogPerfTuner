@@ -1,0 +1,10 @@
+
+build/.qt/
+
+.Debug
+
+build/
+
+.Release
+
+dist/
