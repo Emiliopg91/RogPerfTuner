@@ -5,7 +5,7 @@ BUILD_TYPE ?= Debug
 MAKEFILE_DIR := $(dir $(realpath $(lastword $(MAKEFILE_LIST))))
 
 clean:
-	rm -rf build dist .Debug .Release .qt CMakeCache.txt cmake_install.cmake CMakeFiles
+	rm -rf build dist .Debug .Release .qt CMakeCache.txt **/cmake_install.cmake CMakeFiles
 
 config:        
 	@if [ ! -f .$(BUILD_TYPE) ]; then \

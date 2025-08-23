@@ -8,3 +8,5 @@ build/
 .Release
 
 dist/
+
+**/cmake_install.cmake
