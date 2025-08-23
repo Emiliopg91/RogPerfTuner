@@ -1,6 +1,9 @@
-[submodule "submodules/OpenRGB"]
-	path = submodules/OpenRGB
-	url = https://github.com/Emiliopg91/OpenRGB
-[submodule "submodules/RCCDeckyCompanion"]
-	path = submodules/RCCDeckyCompanion
-	url = git@github.com:Emiliopg91/RCCDeckyCompanion.git
+[submodule "submodules/json"]
+	path = submodules/json
+	url = https://github.com/Emiliopg91/nlohmann-json
+[submodule "submodules/spdlog"]
+	path = submodules/spdlog
+	url = https://github.com/Emiliopg91/gabime-spdlog
+[submodule "submodules/OpenRGB-cppSDK"]
+	path = submodules/OpenRGB-cppSDK
+	url = https://github.com/Emiliopg91/Youda008-OpenRGB-cppSDK

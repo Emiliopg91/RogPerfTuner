@@ -1,0 +1,14 @@
+cmake_minimum_required(VERSION 3.16)
+
+project(RogControlCenter VERSION 1.0.0 LANGUAGES CXX)
+
+set(JSON_BuildTests OFF CACHE INTERNAL "")
+add_subdirectory(submodules/json)
+
+add_subdirectory(submodules/spdlog)
+
+add_subdirectory(submodules/OpenRGB-cppSDK)
+
+add_subdirectory(commons)
+
+add_subdirectory(core)

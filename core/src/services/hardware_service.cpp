@@ -1,0 +1,142 @@
+#include "RccCommons.hpp"
+
+#include "../../include/clients/dbus/asus/core/platform_client.hpp"
+#include "../../include/clients/dbus/asus/armoury/intel/pl1_spd_client.hpp"
+#include "../../include/clients/dbus/asus/armoury/nvidia/nv_boost_client.hpp"
+#include "../../include/clients/dbus/asus/armoury/nvidia/nv_temp_client.hpp"
+#include "../../include/clients/dbus/linux/notifications_client.hpp"
+#include "../../include/clients/file/boost_control_client.hpp"
+#include "../../include/clients/file/cpuinfo_client.hpp"
+#include "../../include/clients/file/ssd_scheduler_client.hpp"
+#include "../../include/clients/shell/switcherooctl_client.hpp"
+#include "../../include/gui/toaster.hpp"
+#include "../../include/services/hardware_service.hpp"
+
+HardwareService::HardwareService()
+{
+    logger.info("Initializing HardwareService");
+    logger.add_tab();
+
+    logger.info("Detecting CPU");
+    logger.add_tab();
+    std::string cpuinfo_out = CPUInfoClient::getInstance().read(5);
+    if (StringUtils::isSubstring("GenuineIntel", cpuinfo_out))
+    {
+        cpu = CpuBrand::Enum::INTEL;
+        auto lines = StringUtils::splitLines(cpuinfo_out);
+        auto line = lines[lines.size() - 1];
+        auto pos = line.find(":");
+        if (pos != std::string::npos)
+        {
+            line = line.substr(pos + 2);
+            logger.info(line);
+        }
+    }
+
+    logger.add_tab();
+    if (cpu == CpuBrand::Enum::INTEL)
+    {
+        if (Pl1SpdClient::getInstance().available())
+        {
+            logger.info("TDP control available");
+        }
+        if (BoostControlClient::getInstance().available())
+        {
+            logger.info("Boost control available");
+        }
+    }
+    logger.rem_tab();
+    logger.rem_tab();
+
+    logger.info("Detecting GPUs");
+    logger.add_tab();
+    auto detected_gpus = SwitcherooCtlClient::getInstance().getGpus();
+    for (auto gpu : detected_gpus)
+    {
+        logger.info(gpu.name);
+        if (!gpu.default_flag)
+        {
+            auto brand = static_cast<GpuBrand>(GpuBrand::fromString(StringUtils::toLowerCase(StringUtils::split(gpu.name, ' ')[0])));
+            std::string env;
+            if (!gpu.environment.empty())
+            {
+                for (auto gpu_env : gpu.environment)
+                    env = env + gpu_env + " ";
+            }
+            env = StringUtils::trim(env);
+            gpus[brand.toString()] = env;
+
+            logger.add_tab();
+            if (brand == GpuBrand::Enum::NVIDIA)
+            {
+                if (NvBoostClient::getInstance().available())
+                {
+                    logger.info("Dynamic boost control available");
+                }
+                if (NvTempClient::getInstance().available())
+                {
+                    logger.info("Throttle temperature control available");
+                }
+            }
+            logger.rem_tab();
+        }
+    }
+    logger.rem_tab();
+
+    if (SsdSchedulerClient::getInstance().available())
+    {
+        logger.info("Getting available SSD schedulers");
+        logger.add_tab();
+        ssd_schedulers = SsdSchedulerClient::getInstance().get_schedulers();
+        for (auto sched : ssd_schedulers)
+            logger.info(sched.toString());
+        logger.rem_tab();
+    }
+
+    if (PlatformClient::getInstance().available())
+    {
+        logger.info("Getting battery charge limit");
+        logger.add_tab();
+        charge_limit = PlatformClient::getInstance().getBatteryLimit();
+        logger.info(std::to_string(charge_limit.toInt()) + "%");
+        logger.rem_tab();
+    }
+
+    /*
+        if UPOWER_CLIENT.available:
+            self.__on_bat = UPOWER_CLIENT.on_battery
+            UPOWER_CLIENT.on_battery_change(self._on_ac_battery_change)
+
+        self.__running_games = 0
+
+        self._connected_usb: list[UsbIdentifier] = []
+        self._usb_mutex = Lock()
+        thread = Thread(name="UsbChecker", target=self.__monitor_for_usb)
+        thread.start()
+
+        if KEYBOARD_BRIGHTNESS_CONTROL.available:
+            KEYBOARD_BRIGHTNESS_CONTROL.on_brightness_change(self._on_kb_brightness_change)
+
+        EVENT_BUS.on(STEAM_SERVICE_GAME_EVENT, self.__on_game_event)
+    */
+
+    logger.rem_tab();
+}
+
+BatteryThreshold HardwareService::getChargeThreshold()
+{
+    return charge_limit;
+}
+
+void HardwareService::setChargeThreshold(BatteryThreshold threshold)
+{
+    logger.info("Setting charge limit to " + std::to_string(threshold.toInt()) + "%");
+    PlatformClient::getInstance()
+        .setBatteryLimit(threshold);
+    logger.info("Charge limit setted succesfully");
+
+    std::unordered_map<std::string, std::any> replacements = {
+        {"value", threshold.toInt()}};
+
+    Toaster::getInstance().showToast(Translator::getInstance().translate("applied.battery.threshold", replacements));
+}

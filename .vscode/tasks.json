@@ -2,10 +2,21 @@
     "version": "2.0.0",
     "tasks": [
         {
-            "label": "dev",
+            "label": "CMake Configure",
             "type": "shell",
-            "command": "make dev",
+            "command": "cmake -S . -B build -DCMAKE_BUILD_TYPE=Debug",
             "problemMatcher": []
+        },
+        {
+            "label": "CMake Build",
+            "type": "shell",
+            "command": "cmake --build build",
+            "group": {
+                "kind": "build",
+                "isDefault": true
+            },
+            "problemMatcher": ["$gcc"],
+            "dependsOn": ["CMake Configure"]
         }
     ]
 }

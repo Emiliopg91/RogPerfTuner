@@ -1,0 +1,33 @@
+#pragma once
+
+#include "../abstract/abstract_dbus_client.hpp"
+#include "../../models/power_profile.hpp"
+
+class PowerProfileClient : public AbstractDbusClient
+{
+public:
+    static PowerProfileClient &getInstance()
+    {
+        static PowerProfileClient instance;
+        return instance;
+    }
+
+    PowerProfile getPowerProfile()
+    {
+        return PowerProfile::fromString(this->getProperty<QString>(QString("ActiveProfile")).toStdString());
+    }
+
+    void setPowerProfile(PowerProfile val)
+    {
+        this->setProperty<QString>(QString("ActiveProfile"), QString::fromStdString(val.toString()));
+    }
+
+private:
+    PowerProfileClient() : AbstractDbusClient(true,
+                                              QString("net.hadess.PowerProfiles"),
+                                              QString("/net/hadess/PowerProfiles"),
+                                              QString("net.hadess.PowerProfiles"),
+                                              true)
+    {
+    }
+};

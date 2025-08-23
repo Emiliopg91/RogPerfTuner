@@ -1,0 +1,2 @@
+"/usr/bin/gcc-ar" qc libRccCommons.a CMakeFiles/RccCommons.dir/src/configuration/configuration.cpp.o CMakeFiles/RccCommons.dir/src/logger/logger_provider.cpp.o CMakeFiles/RccCommons.dir/src/shell/shell.cpp.o CMakeFiles/RccCommons.dir/src/translator/translator.cpp.o
+"/usr/bin/gcc-ranlib" libRccCommons.a
