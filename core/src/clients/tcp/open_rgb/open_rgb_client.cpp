@@ -7,6 +7,15 @@
 #include "RccCommons.hpp"
 
 #include "../../../../include/clients/tcp/open_rgb/open_rgb_client.hpp"
+#include "../../../../include/clients/tcp/open_rgb/effects/breathing_effect.hpp"
+#include "../../../../include/clients/tcp/open_rgb/effects/dance_floor_effect.hpp"
+#include "../../../../include/clients/tcp/open_rgb/effects/digital_rain_effect.hpp"
+#include "../../../../include/clients/tcp/open_rgb/effects/drops_effect.hpp"
+#include "../../../../include/clients/tcp/open_rgb/effects/gaming.hpp"
+#include "../../../../include/clients/tcp/open_rgb/effects/rainbow_wave.hpp"
+#include "../../../../include/clients/tcp/open_rgb/effects/spectrum_cycle_effect.hpp"
+#include "../../../../include/clients/tcp/open_rgb/effects/starry_night_effect.hpp"
+#include "../../../../include/clients/tcp/open_rgb/effects/static_effect.hpp"
 #include "../../../../include/clients/shell/asusctl_client.hpp"
 
 OpenRgbClient::OpenRgbClient()
@@ -23,6 +32,17 @@ OpenRgbClient::OpenRgbClient()
     getAvailableDevices();
 
     loadCompatibleDevices();
+
+    availableEffects.push_back(std::unique_ptr<AbstractEffect>(&BreathingEffect::getInstance(client)));
+    availableEffects.push_back(std::unique_ptr<AbstractEffect>(&DanceFloorEffect::getInstance(client)));
+    availableEffects.push_back(std::unique_ptr<AbstractEffect>(&DigitalRainEffect::getInstance(client)));
+    availableEffects.push_back(std::unique_ptr<AbstractEffect>(&DropsEffect::getInstance(client)));
+    availableEffects.push_back(std::unique_ptr<AbstractEffect>(&GamingEffect::getInstance(client)));
+    availableEffects.push_back(std::unique_ptr<AbstractEffect>(&RainbowWave::getInstance(client)));
+    availableEffects.push_back(std::unique_ptr<AbstractEffect>(&SpectrumCycleEffect::getInstance(client)));
+    availableEffects.push_back(std::unique_ptr<AbstractEffect>(&StarryNightEffect::getInstance(client)));
+    availableEffects.push_back(std::unique_ptr<AbstractEffect>(&StaticEffect::getInstance(client)));
+
     logger.rem_tab();
 }
 
@@ -95,7 +115,7 @@ void OpenRgbClient::runner()
     std::string portVal = std::to_string(port);
 
     // Vector de strings para mantener la memoria válida
-    std::vector<std::string> argsStr = {hostArg, hostVal, portArg, portVal};
+    std::vector<std::string> argsStr = {hostArg, hostVal, portArg, portVal, "-v"};
 
     // Vector de punteros a char terminado en nullptr
     std::vector<char *> argv;
@@ -125,8 +145,8 @@ void OpenRgbClient::getAvailableDevices()
     logger.info("Getting available devices");
     logger.add_tab();
 
-    auto devList = client.requestDeviceList();
-    for (auto &dev : devList.devices)
+    detectedDevices = client.requestDeviceList().devices;
+    for (auto &dev : detectedDevices)
     {
         const orgb::Mode *directMode = dev.findMode("Direct");
         if (directMode)
@@ -138,4 +158,29 @@ void OpenRgbClient::getAvailableDevices()
     }
 
     logger.rem_tab();
+}
+std::vector<std::string> OpenRgbClient::getAvailableEffects()
+{
+    std::vector<std::string> result;
+    for (auto &effect : availableEffects)
+    {
+        result.push_back(effect->getName());
+    }
+    return result;
+}
+
+void OpenRgbClient::applyEffect(std::string effectName, RgbBrightness brightness)
+{
+    for (const auto &effect : availableEffects)
+    {
+        effect->stop();
+    }
+    for (const auto &effect : availableEffects)
+    {
+        if (effect->getName() == effectName)
+        {
+            effect->start(detectedDevices, brightness);
+            break;
+        }
+    }
 }

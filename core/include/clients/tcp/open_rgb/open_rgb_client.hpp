@@ -3,6 +3,8 @@
 #include "RccCommons.hpp"
 #include "OpenRGB/Client.hpp"
 
+#include "../../../../include/clients/tcp/open_rgb/effects/abstract/abstract_effect.hpp"
+
 class OpenRgbClient
 {
 public:
@@ -14,6 +16,8 @@ public:
 
     std::vector<UsbIdentifier> getCompatibleDevices();
     std::string getDeviceName(UsbIdentifier);
+    std::vector<std::string> getAvailableEffects();
+    void applyEffect(std::string effect, RgbBrightness brightness);
 
 private:
     std::vector<UsbIdentifier> compatibleDevices;
@@ -22,6 +26,8 @@ private:
     Logger logger{"OpenRgbClient"};
     int port = 0;
     orgb::Client client{"RogControlCenters"};
+    orgb::DeviceList detectedDevices;
+    std::vector<std::unique_ptr<AbstractEffect>> availableEffects;
 
     OpenRgbClient();
 

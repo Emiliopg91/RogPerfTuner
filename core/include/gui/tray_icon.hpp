@@ -19,4 +19,6 @@ private:
     QSystemTrayIcon tray_icon_;
     void onBatteryLimitChanged(BatteryThreshold);
     void onPerformanceProfileChanged(PerformanceProfile);
+    void onEffectChanged(std::string);
+    void onBrightnessChanged(RgbBrightness);
 };

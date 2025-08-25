@@ -664,10 +664,10 @@ index b70416d..70df01d 100644
 -
  #endif // OPENRGB_CLIENT_INCLUDED
 diff --git a/include/OpenRGB/Color.hpp b/include/OpenRGB/Color.hpp
-index 2deb0b2..2d24983 100644
+index 2deb0b2..75f2758 100644
 --- a/include/OpenRGB/Color.hpp
 +++ b/include/OpenRGB/Color.hpp
-@@ -8,69 +8,64 @@
+@@ -8,69 +8,65 @@
  #ifndef OPENRGB_COLOR_INCLUDED
  #define OPENRGB_COLOR_INCLUDED
  
@@ -763,6 +763,7 @@ index 2deb0b2..2d24983 100644
 -void print( Color color );
 +		friend std::ostream &operator<<(std::ostream &os, Color color) noexcept;
 +		friend std::istream &operator>>(std::istream &is, Color &color) noexcept;
++		friend Color operator*(const Color &color, double factor);
 +	};
  
 +	void print(Color color);
@@ -3450,7 +3451,7 @@ index 9bc8fde..c8f71db 100644
  
  } // namespace orgb
 diff --git a/src/Color.cpp b/src/Color.cpp
-index 6163aeb..5c8b445 100644
+index 6163aeb..78cab7a 100644
 --- a/src/Color.cpp
 +++ b/src/Color.cpp
 @@ -11,10 +11,11 @@
@@ -3466,7 +3467,7 @@ index 6163aeb..5c8b445 100644
  #include <cstdio>
  #include <iostream>
  #include <ios>
-@@ -22,106 +23,178 @@ using own::BinaryInputStream;
+@@ -22,106 +23,186 @@ using own::BinaryInputStream;
  #include <string>
  #include <unordered_map>
  
@@ -3637,14 +3638,20 @@ index 6163aeb..5c8b445 100644
 +			r_ = x;
 +			g_ = 0;
 +			b_ = c;
-+		}
+ 		}
 +		else
 +		{ // 300-360
 +			r_ = c;
 +			g_ = 0;
 +			b_ = x;
- 		}
--	}
++		}
++
++		uint8_t r = static_cast<uint8_t>(std::ceil((r_ + m) * 255.0f));
++		uint8_t g = static_cast<uint8_t>(std::ceil((g_ + m) * 255.0f));
++		uint8_t b = static_cast<uint8_t>(std::ceil((b_ + m) * 255.0f));
++
++		return {r, g, b};
+ 	}
 -	return false;
 -}
  
@@ -3653,16 +3660,23 @@ index 6163aeb..5c8b445 100644
 -	stream << color.r << color.g << color.b << color.padding;
 -	return stream;
 -}
-+		uint8_t r = static_cast<uint8_t>(std::ceil((r_ + m) * 255.0f));
-+		uint8_t g = static_cast<uint8_t>(std::ceil((g_ + m) * 255.0f));
-+		uint8_t b = static_cast<uint8_t>(std::ceil((b_ + m) * 255.0f));
++	Color operator*(const Color &color, double factor)
++	{
++		return Color(
++			static_cast<uint8_t>(std::round(color.r * factor)),
++			static_cast<uint8_t>(std::round(color.g * factor)),
++			static_cast<uint8_t>(std::round(color.b * factor)));
++	}
  
 -BinaryInputStream & operator>>( BinaryInputStream & stream, Color & color ) noexcept
 -{
 -	stream >> color.r >> color.g >> color.b >> color.padding;
 -	return stream;
 -}
-+		return {r, g, b};
++	BinaryOutputStream &operator<<(BinaryOutputStream &stream, Color color)
++	{
++		stream << color.r << color.g << color.b << color.padding;
++		return stream;
 +	}
  
 -std::ostream & operator<<( std::ostream & os, Color color ) noexcept
@@ -3679,10 +3693,10 @@ index 6163aeb..5c8b445 100644
 -	std::string colorStr;
 -	is >> colorStr;
 -	if (!color.fromString( colorStr ))
-+	BinaryOutputStream &operator<<(BinaryOutputStream &stream, Color color)
++	BinaryInputStream &operator>>(BinaryInputStream &stream, Color &color) noexcept
  	{
 -		is.setstate( std::ios::failbit );
-+		stream << color.r << color.g << color.b << color.padding;
++		stream >> color.r >> color.g >> color.b >> color.padding;
 +		return stream;
  	}
 -	return is;
@@ -3692,12 +3706,6 @@ index 6163aeb..5c8b445 100644
 -{
 -	printf( "#%02X%02X%02X", uint(color.r), uint(color.g), uint(color.b) );
 -}
-+	BinaryInputStream &operator>>(BinaryInputStream &stream, Color &color) noexcept
-+	{
-+		stream >> color.r >> color.g >> color.b >> color.padding;
-+		return stream;
-+	}
- 
 +	std::ostream &operator<<(std::ostream &os, Color color) noexcept
 +	{
 +		std::ios_base::fmtflags origFlags(os.flags());
@@ -3707,7 +3715,6 @@ index 6163aeb..5c8b445 100644
 +		return os;
 +	}
  
--//======================================================================================================================
 +	std::istream &operator>>(std::istream &is, Color &color) noexcept
 +	{
 +		std::string colorStr;
@@ -3718,7 +3725,8 @@ index 6163aeb..5c8b445 100644
 +		}
 +		return is;
 +	}
-+
+ 
+-//======================================================================================================================
 +	void print(Color color)
 +	{
 +		printf("#%02X%02X%02X", uint(color.r), uint(color.g), uint(color.b));

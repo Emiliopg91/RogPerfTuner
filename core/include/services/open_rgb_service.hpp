@@ -13,10 +13,18 @@ public:
     }
 
     std::string getDeviceName(UsbIdentifier);
+    std::vector<std::string> getAvailableEffects();
+    std::string getCurrentEffect();
+    RgbBrightness getCurrentBrightness();
+    void setBrightness(RgbBrightness newBrightness);
+    void setEffect(std::string newEffect);
 
 private:
     OpenRgbService();
 
     std::map<std::string, std::string> compatibleDeviceNames;
     Logger logger{"OpenRgbService"};
+    RgbBrightness brightness = RgbBrightness::Enum::MAX;
+    std::string effect;
+    void applyAura(bool temporal = false);
 };

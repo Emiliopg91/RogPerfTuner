@@ -1,5 +1,6 @@
 #include "../../include/gui/tray_icon.hpp"
 #include "../../include/services/hardware_service.hpp"
+#include "../../include/services/open_rgb_service.hpp"
 #include "../../include/services/profile_service.hpp"
 
 #include "RccCommons.hpp"
@@ -44,6 +45,57 @@ TrayIcon::TrayIcon()
     // -------------------------
     // -------------------------
     // Battery menu
+    // -------------------------
+
+    menu->addSeparator();
+
+    // -------------------------
+    // Aura menu
+    // -------------------------
+    QAction *auraTitle = new QAction("AuraSync", menu);
+    auraTitle->setEnabled(false);
+    menu->addAction(auraTitle);
+    // -------------------------
+    // Effect submenu
+    // -------------------------
+    QMenu *effectMenu = new QMenu(("    " + translator.translate("effect")).c_str(), menu);
+    QActionGroup *effectGroup = new QActionGroup(menu);
+    auto effects = OpenRgbService::getInstance().getAvailableEffects();
+    for (std::string item : effects)
+    {
+        QAction *act = new QAction(item.c_str(), effectGroup);
+        act->setCheckable(true);
+        act->setChecked(item == OpenRgbService::getInstance().getCurrentEffect());
+        QObject::connect(act, &QAction::triggered, [this, item]()
+                         { this->onEffectChanged(item); });
+        effectMenu->addAction(act);
+    }
+    menu->insertMenu(nullptr, effectMenu);
+    // -------------------------
+    // Effect submenu
+    // -------------------------
+    // -------------------------
+    // Brightness submenu
+    // -------------------------
+    QMenu *brightnessMenu = new QMenu(("    " + translator.translate("brightness")).c_str(), menu);
+    QActionGroup *brightnessGroup = new QActionGroup(menu);
+    auto levels = RgbBrightness::getAll();
+    for (RgbBrightness item : levels)
+    {
+        QAction *act = new QAction(
+            Translator::getInstance().translate("label.brightness." + item.toName()).c_str(), brightnessGroup);
+        act->setCheckable(true);
+        act->setChecked(item == OpenRgbService::getInstance().getCurrentBrightness());
+        QObject::connect(act, &QAction::triggered, [this, item]()
+                         { this->onBrightnessChanged(item); });
+        brightnessMenu->addAction(act);
+    }
+    menu->insertMenu(nullptr, brightnessMenu);
+    // -------------------------
+    // Brightness submenu
+    // -------------------------
+    // -------------------------
+    // Aura menu
     // -------------------------
 
     menu->addSeparator();
@@ -104,4 +156,14 @@ void TrayIcon::onBatteryLimitChanged(BatteryThreshold value)
 void TrayIcon::onPerformanceProfileChanged(PerformanceProfile value)
 {
     ProfileService::getInstance().setPerformanceProfile(value);
+}
+
+void TrayIcon::onEffectChanged(std::string effect)
+{
+    OpenRgbService::getInstance().setEffect(effect);
+}
+
+void TrayIcon::onBrightnessChanged(RgbBrightness brightness)
+{
+    OpenRgbService::getInstance().setBrightness(brightness);
 }

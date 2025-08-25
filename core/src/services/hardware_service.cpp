@@ -182,9 +182,11 @@ BatteryThreshold HardwareService::getChargeThreshold()
 void HardwareService::setChargeThreshold(BatteryThreshold threshold)
 {
     logger.info("Setting charge limit to " + std::to_string(threshold.toInt()) + "%");
+    auto t0 = std::chrono::high_resolution_clock::now();
     PlatformClient::getInstance()
         .setBatteryLimit(threshold);
-    logger.info("Charge limit setted succesfully");
+    auto t1 = std::chrono::high_resolution_clock::now();
+    logger.info("Charge limit setted after " + std::to_string(std::chrono::duration_cast<std::chrono::milliseconds>(t1 - t0).count()) + " ms");
 
     std::unordered_map<std::string, std::any> replacements = {
         {"value", threshold.toInt()}};
