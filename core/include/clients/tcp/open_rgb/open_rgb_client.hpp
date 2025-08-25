@@ -1,6 +1,7 @@
 #pragma once
 
 #include "RccCommons.hpp"
+#include "OpenRGB/Client.hpp"
 
 class OpenRgbClient
 {
@@ -20,10 +21,13 @@ private:
     std::thread runnerThread;
     Logger logger{"OpenRgbClient"};
     int port = 0;
+    orgb::Client client{"RogControlCenters"};
 
     OpenRgbClient();
 
     void loadCompatibleDevices();
     void startOpenRgbProcess();
+    void startOpenRgbClient();
+    void getAvailableDevices();
     void runner();
 };

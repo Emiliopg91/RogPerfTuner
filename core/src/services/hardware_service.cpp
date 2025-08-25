@@ -136,13 +136,6 @@ void HardwareService::setupDeviceLoop()
                                                                      {
                                                                          return !OpenRgbService::getInstance().getDeviceName(dev).empty();
                                                                      }));
-    logger.info("Detected compatible device(s):");
-    logger.add_tab();
-    for (auto dev : connectedDevices)
-    {
-        logger.info(OpenRgbService::getInstance().getDeviceName(dev));
-    }
-    logger.rem_tab();
     EventBus::getInstance().on(Events::UDEV_CLIENT_DEVICE_EVENT, [this, &udevClient]()
                                {
         auto [current, added, removed] = udevClient.compare_connected_devs(connectedDevices,

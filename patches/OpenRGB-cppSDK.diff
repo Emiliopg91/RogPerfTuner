@@ -1,0 +1,3729 @@
+diff --git a/include/OpenRGB/Client.hpp b/include/OpenRGB/Client.hpp
+index b70416d..70df01d 100644
+--- a/include/OpenRGB/Client.hpp
++++ b/include/OpenRGB/Client.hpp
+@@ -8,365 +8,359 @@
+ #ifndef OPENRGB_CLIENT_INCLUDED
+ #define OPENRGB_CLIENT_INCLUDED
+ 
+-
+ #include "DeviceInfo.hpp"
+ #include "Color.hpp"
+-#include "SystemErrorType.hpp"  // HACK: read the comment at the top of that header file
++#include "SystemErrorType.hpp" // HACK: read the comment at the top of that header file
+ 
+-#include <string>  // client name
+-#include <memory>  // unique_ptr<Socket>
+-#include <chrono>  // timeout
++#include <string> // client name
++#include <memory> // unique_ptr<Socket>
++#include <chrono> // timeout
+ 
+-namespace own {
++namespace own
++{
+ 	class TcpSocket;
+ }
+ 
++namespace orgb
++{
+ 
+-namespace orgb {
+-
++	constexpr uint16_t defaultPort = 6742;
+ 
+-constexpr uint16_t defaultPort = 6742;
++	//======================================================================================================================
+ 
++	/// All the possible ways how the connect operation can end up
++	enum class ConnectStatus
++	{
++		Success,			  ///< The operation was successful.
++		NetworkingInitFailed, ///< Operation failed because underlying networking system could not be initialized. Call getLastSystemError() for more info.
++		AlreadyConnected,	  ///< Connect operation failed because the socket is already connected. Call disconnect() first.
++		HostNotResolved,	  ///< The hostname you entered could not be resolved to IP address. Call getLastSystemError() for more info.
++		ConnectFailed,		  ///< Could not connect to the target server, either it's down or the port is closed. Call getLastSystemError() for more info.
++		RequestVersionFailed, ///< Failed to send the client's protocol version or receive the server's protocol version. Call getLastSystemError() for more info.
++		VersionNotSupported,  ///< The protocol version of the server is not supported. Please update the OpenRGB app.
++		SendNameFailed,		  ///< Failed to send the client name to the server. Call getLastSystemError() for more info.
++		OtherSystemError,	  ///< Other system error. Call getLastSystemError() for more info.
++		UnexpectedError,	  ///< Internal error of this library. This should not happen unless there is a mistake in the code, please create a github issue.
++	};
++	const char *enumString(ConnectStatus status) noexcept;
+ 
+-//======================================================================================================================
++	/// All the possible ways how a request can end up
++	enum class RequestStatus
++	{
++		Success,		   ///< The request was succesful.
++		NotConnected,	   ///< Request failed because the client is not connected. Call connect() first.
++		SendRequestFailed, ///< Failed to send the request message.
++		ConnectionClosed,  ///< Server has closed the connection.
++		NoReply,		   ///< No reply has arrived from the server in given timeout. In case this happens too often, you may try to increase the timeout.
++		ReceiveError,	   ///< There has been some other error while trying to receive a reply. Call getLastSystemError() for more info.
++		InvalidReply,	   ///< The reply from the server is invalid.
++		UnexpectedError,   ///< Internal error of this library. This should not happen unless there is a mistake in the code, please create a github issue.
++	};
++	const char *enumString(RequestStatus status) noexcept;
+ 
+-/// All the possible ways how the connect operation can end up
+-enum class ConnectStatus
+-{
+-	Success,                 ///< The operation was successful.
+-	NetworkingInitFailed,    ///< Operation failed because underlying networking system could not be initialized. Call getLastSystemError() for more info.
+-	AlreadyConnected,        ///< Connect operation failed because the socket is already connected. Call disconnect() first.
+-	HostNotResolved,         ///< The hostname you entered could not be resolved to IP address. Call getLastSystemError() for more info.
+-	ConnectFailed,           ///< Could not connect to the target server, either it's down or the port is closed. Call getLastSystemError() for more info.
+-	RequestVersionFailed,    ///< Failed to send the client's protocol version or receive the server's protocol version. Call getLastSystemError() for more info.
+-	VersionNotSupported,     ///< The protocol version of the server is not supported. Please update the OpenRGB app.
+-	SendNameFailed,          ///< Failed to send the client name to the server. Call getLastSystemError() for more info.
+-	OtherSystemError,        ///< Other system error. Call getLastSystemError() for more info.
+-	UnexpectedError,         ///< Internal error of this library. This should not happen unless there is a mistake in the code, please create a github issue.
+-};
+-const char * enumString( ConnectStatus status ) noexcept;
+-
+-/// All the possible ways how a request can end up
+-enum class RequestStatus
+-{
+-	Success,            ///< The request was succesful.
+-	NotConnected,       ///< Request failed because the client is not connected. Call connect() first.
+-	SendRequestFailed,  ///< Failed to send the request message.
+-	ConnectionClosed,   ///< Server has closed the connection.
+-	NoReply,            ///< No reply has arrived from the server in given timeout. In case this happens too often, you may try to increase the timeout.
+-	ReceiveError,       ///< There has been some other error while trying to receive a reply. Call getLastSystemError() for more info.
+-	InvalidReply,       ///< The reply from the server is invalid.
+-	UnexpectedError,    ///< Internal error of this library. This should not happen unless there is a mistake in the code, please create a github issue.
+-};
+-const char * enumString( RequestStatus status ) noexcept;
+-
+-/// All the possible results of a check whether the locally stored device list is out of date
+-enum class UpdateStatus
+-{
+-	UpToDate,           ///< The current device list seems up to date.
+-	OutOfDate,          ///< Server has sent a notification message indicating that the device list has changed. Call requestDeviceList() again.
+-	ConnectionClosed,   ///< Server has closed the connection.
+-	UnexpectedMessage,  ///< Server has sent some other kind of message that we didn't expect.
+-	CantRestoreSocket,  ///< Error has occured while trying to restore socket to its original state and the socket has been closed. Call getLastSystemError() for more info. This should never happen, but one never knows.
+-	OtherSystemError,   ///< Other system error. Call getLastSystemError() for more info.
+-	UnexpectedError,    ///< Internal error of this library. This should not happen unless there is a mistake in the code, please create a github issue.
+-};
+-const char * enumString( UpdateStatus status ) noexcept;
+-
+-/// Result and output of a device list request
+-struct DeviceListResult
+-{
+-	RequestStatus status;  ///< whether the request suceeded or why it didn't
+-	DeviceList devices;    ///< output of a successfull request
+-};
++	/// All the possible results of a check whether the locally stored device list is out of date
++	enum class UpdateStatus
++	{
++		UpToDate,		   ///< The current device list seems up to date.
++		OutOfDate,		   ///< Server has sent a notification message indicating that the device list has changed. Call requestDeviceList() again.
++		ConnectionClosed,  ///< Server has closed the connection.
++		UnexpectedMessage, ///< Server has sent some other kind of message that we didn't expect.
++		CantRestoreSocket, ///< Error has occured while trying to restore socket to its original state and the socket has been closed. Call getLastSystemError() for more info. This should never happen, but one never knows.
++		OtherSystemError,  ///< Other system error. Call getLastSystemError() for more info.
++		UnexpectedError,   ///< Internal error of this library. This should not happen unless there is a mistake in the code, please create a github issue.
++	};
++	const char *enumString(UpdateStatus status) noexcept;
+ 
+-/// Result and output of a device count request
+-struct DeviceCountResult
+-{
+-	RequestStatus status;  ///< whether the request suceeded or why it didn't
+-	uint32_t count;        ///< output of a successfull request
+-};
++	/// Result and output of a device list request
++	struct DeviceListResult
++	{
++		RequestStatus status; ///< whether the request suceeded or why it didn't
++		DeviceList devices;	  ///< output of a successfull request
++	};
+ 
+-/// Result and output of a single device request
+-struct DeviceInfoResult
+-{
+-	RequestStatus status;  ///< whether the request suceeded or why it didn't
+-	std::unique_ptr< Device > device;  ///< output of a successfull request
+-	// The device has to be a pointer because user is not allowed to use the constructors.
+-};
++	/// Result and output of a device count request
++	struct DeviceCountResult
++	{
++		RequestStatus status; ///< whether the request suceeded or why it didn't
++		uint32_t count;		  ///< output of a successfull request
++	};
+ 
+-/// Result and output of a profile list request
+-struct ProfileListResult
+-{
+-	RequestStatus status;  ///< whether the request suceeded or why it didn't
+-	std::vector< std::string > profiles;  ///< output of a successfull request
+-};
++	/// Result and output of a single device request
++	struct DeviceInfoResult
++	{
++		RequestStatus status;			///< whether the request suceeded or why it didn't
++		std::unique_ptr<Device> device; ///< output of a successfull request
++										// The device has to be a pointer because user is not allowed to use the constructors.
++	};
+ 
++	/// Result and output of a profile list request
++	struct ProfileListResult
++	{
++		RequestStatus status;			   ///< whether the request suceeded or why it didn't
++		std::vector<std::string> profiles; ///< output of a successfull request
++	};
+ 
+-//======================================================================================================================
+-/// OpenRGB network client.
+-/** Use this to communicate with the OpenRGB service in order to set colors on your RGB devices. */
++	//======================================================================================================================
++	/// OpenRGB network client.
++	/** Use this to communicate with the OpenRGB service in order to set colors on your RGB devices. */
+ 
+-class Client
+-{
++	class Client
++	{
+ 
+- public:
++	public:
++		/// Creates a client of specified or default name. Does not connect anywhere yet.
++		Client(const std::string &clientName = "orgb::Client") noexcept;
+ 
+-	/// Creates a client of specified or default name. Does not connect anywhere yet.
+-	Client( const std::string & clientName = "orgb::Client" ) noexcept;
++		~Client() noexcept;
+ 
+-	~Client() noexcept;
++		// The connection cannot be shared.
++		Client(const Client &other) = delete;
+ 
+-	// The connection cannot be shared.
+-	Client( const Client & other ) = delete;
++		Client(Client &&other) noexcept = default;
++		Client &operator=(Client &&other) noexcept = default;
+ 
+-	Client( Client && other ) noexcept = default;
+-	Client & operator=( Client && other ) noexcept = default;
++		/// Tells whether the client is currently connected to a server.
++		bool isConnected() const noexcept;
+ 
+-	/// Tells whether the client is currently connected to a server.
+-	bool isConnected() const noexcept;
++		//-- return-value-oriented exception-less API ----------------------------------------------------------------------
+ 
+-	//-- return-value-oriented exception-less API ----------------------------------------------------------------------
++		/// Connects to the OpenRGB server determined by a host name and announces our client name.
++		ConnectStatus connect(const std::string &host, uint16_t port = defaultPort) noexcept;
+ 
+-	/// Connects to the OpenRGB server determined by a host name and announces our client name.
+-	ConnectStatus connect( const std::string & host, uint16_t port = defaultPort ) noexcept;
++		/// Closes connection to the server.
++		/** It will return false if the client is not connected or some rare system error occurs. */
++		bool disconnect() noexcept;
+ 
+-	/// Closes connection to the server.
+-	/** It will return false if the client is not connected or some rare system error occurs. */
+-	bool disconnect() noexcept;
++		/// Sets a timeout for receiving request answers.
++		bool setTimeout(std::chrono::milliseconds timeout) noexcept;
+ 
+-	/// Sets a timeout for receiving request answers.
+-	bool setTimeout( std::chrono::milliseconds timeout ) noexcept;
++		/// Queries the server for information about all its RGB devices.
++		DeviceListResult requestDeviceList() noexcept;
+ 
+-	/// Queries the server for information about all its RGB devices.
+-	DeviceListResult requestDeviceList() noexcept;
++		/// Queries the server for the number of its RGB devices.
++		/** This is useful when for some reason you want to request the devices manually one by one. */
++		DeviceCountResult requestDeviceCount() noexcept;
+ 
+-	/// Queries the server for the number of its RGB devices.
+-	/** This is useful when for some reason you want to request the devices manually one by one. */
+-	DeviceCountResult requestDeviceCount() noexcept;
++		/// Queries the server for information about a single RGB devices.
++		/** After you set a color or change a mode, you can optionally use this to update */
++		DeviceInfoResult requestDeviceInfo(uint32_t deviceIdx) noexcept;
+ 
+-	/// Queries the server for information about a single RGB devices.
+-	/** After you set a color or change a mode, you can optionally use this to update */
+-	DeviceInfoResult requestDeviceInfo( uint32_t deviceIdx ) noexcept;
++		/// Checks if the device list you downloaded earlier via requestDeviceList() hasn't been changed on the server.
++		/** In case it has been changed, you need to call requestDeviceList() again. */
++		UpdateStatus checkForDeviceUpdates() noexcept;
+ 
+-	/// Checks if the device list you downloaded earlier via requestDeviceList() hasn't been changed on the server.
+-	/** In case it has been changed, you need to call requestDeviceList() again. */
+-	UpdateStatus checkForDeviceUpdates() noexcept;
++		/// Switches the device to a directly controlled color mode.
++		/** This seems unsupported by many RGB controllers, and it's probably deprecated in the OpenRGB app. */
++		RequestStatus switchToCustomMode(const Device &device) noexcept;
+ 
+-	/// Switches the device to a directly controlled color mode.
+-	/** This seems unsupported by many RGB controllers, and it's probably deprecated in the OpenRGB app. */
+-	RequestStatus switchToCustomMode( const Device & device ) noexcept;
++		/// Updates the parameters of a mode and also switches the device to this mode.
++		/** If you just want to switch the mode, use one of the Mode objects received from the server via requestDeviceList().
++		 * If you want to change the parameters of a mode, create a copy of the Mode object, change the parameters of the copy
++		 * and pass the copy to this function. */
++		RequestStatus changeMode(const Device &device, const Mode &mode) noexcept;
+ 
+-	/// Updates the parameters of a mode and also switches the device to this mode.
+-	/** If you just want to switch the mode, use one of the Mode objects received from the server via requestDeviceList().
+-	  * If you want to change the parameters of a mode, create a copy of the Mode object, change the parameters of the copy
+-	  * and pass the copy to this function. */
+-	RequestStatus changeMode( const Device & device, const Mode & mode ) noexcept;
++		/// Saves the mode parameters into the device memory to make it persistent??
++		/** I don't really know what this does, ask the OpenRGB devs. */
++		RequestStatus saveMode(const Device &device, const Mode &mode) noexcept;
+ 
+-	/// Saves the mode parameters into the device memory to make it persistent??
+-	/** I don't really know what this does, ask the OpenRGB devs. */
+-	RequestStatus saveMode( const Device & device, const Mode & mode ) noexcept;
++		/// Sets one unified color for the whole device.
++		RequestStatus setDeviceColor(const Device &device, Color color) noexcept;
+ 
+-	/// Sets one unified color for the whole device.
+-	RequestStatus setDeviceColor( const Device & device, Color color ) noexcept;
++		/// Sets one unified color for the whole device.
++		RequestStatus setDeviceColors(const Device &device, std::vector<Color> colors) noexcept;
+ 
+-	/// Sets a color of a particular zone of a device.
+-	RequestStatus setZoneColor( const Zone & zone, Color color ) noexcept;
++		/// Sets a color of a particular zone of a device.
++		RequestStatus setZoneColor(const Zone &zone, Color color) noexcept;
+ 
+-	/// Resizes a zone of leds, if the device supports it.
+-	RequestStatus setZoneSize( const Zone & zone, uint32_t newSize ) noexcept;
++		/// Resizes a zone of leds, if the device supports it.
++		RequestStatus setZoneSize(const Zone &zone, uint32_t newSize) noexcept;
+ 
+-	/// Sets a color of a single selected LED.
+-	RequestStatus setLEDColor( const LED & led, Color color ) noexcept;
++		/// Sets a color of a single selected LED.
++		RequestStatus setLEDColor(const LED &led, Color color) noexcept;
+ 
+-	/// Queries the server for a list of saved profiles.
+-	ProfileListResult requestProfileList();
++		/// Queries the server for a list of saved profiles.
++		ProfileListResult requestProfileList();
+ 
+-	/// Saves the current configuration of all devices under a new profile name.
+-	RequestStatus saveProfile( const std::string & profileName );
++		/// Saves the current configuration of all devices under a new profile name.
++		RequestStatus saveProfile(const std::string &profileName);
+ 
+-	/// Applies an existing profile.
+-	RequestStatus loadProfile( const std::string & profileName );
++		/// Applies an existing profile.
++		RequestStatus loadProfile(const std::string &profileName);
+ 
+-	/// Removes an existing profile.
+-	RequestStatus deleteProfile( const std::string & profileName );
++		/// Removes an existing profile.
++		RequestStatus deleteProfile(const std::string &profileName);
+ 
+ #ifndef NO_EXCEPTIONS
+ 
+-	//-- exception-oriented API ----------------------------------------------------------------------------------------
+-
+-	/// Exception-throwing variant of connect( const std::string &, uint16_t ).
+-	/** \throws UserError when the client is already connected
+-	  * \throws ConnectionError when the network is down, such host does not exist or the host refuses connection
+-	  * \throws SystemError when there was an error inside the operating system */
+-	void connectX( const std::string & host, uint16_t port = 6742 );
+-
+-	/// Exception-throwing variant of disconnect().
+-	/** \throws UserError when the client is not connected */
+-	void disconnectX();
+-
+-	/// Exception-throwing variant of setTimeout().
+-	/** \throws SystemError when there was an error inside the operating system */
+-	void setTimeoutX( std::chrono::milliseconds timeout );
+-
+-	/// Exception-throwing variant of requestDeviceList().
+-	/** \throws UserError when the client is not connected
+-	  * \throws ConnectionError when a request couldn't be sent or no valid reply was received
+-	  * \throws SystemError when there was an error inside the operating system */
+-	DeviceList requestDeviceListX();
+-
+-	/// Exception-throwing variant of requestDeviceCount().
+-	/** \throws UserError when the client is not connected
+-	  * \throws ConnectionError when a request couldn't be sent or no valid reply was received
+-	  * \throws SystemError when there was an error inside the operating system */
+-	uint32_t requestDeviceCountX();
+-
+-	/// Exception-throwing variant of requestDeviceInfo().
+-	/** \throws UserError when the client is not connected
+-	  * \throws ConnectionError when a request couldn't be sent or no valid reply was received
+-	  * \throws SystemError when there was an error inside the operating system */
+-	std::unique_ptr< Device > requestDeviceInfoX( uint32_t deviceIdx );
+-
+-	/// Exception-throwing variant of checkForDeviceUpdates().
+-	/** \throws ConnectionError when the server closes the connection or sends an invalid packet
+-	  * \throws SystemError when there was an error inside the operating system */
+-	bool isDeviceListOutdatedX();
+-
+-	/// Exception-throwing variant of switchToCustomMode().
+-	/** \throws UserError when the client is not connected
+-	  * \throws ConnectionError when a request couldn't be sent
+-	  * \throws SystemError when there was an error inside the operating system */
+-	void switchToCustomModeX( const Device & device );
+-
+-	/// Exception-throwing variant of changeMode().
+-	/** \throws UserError when the client is not connected
+-	  * \throws ConnectionError when a request couldn't be sent
+-	  * \throws SystemError when there was an error inside the operating system */
+-	void changeModeX( const Device & device, const Mode & mode );
+-
+-	/// Exception-throwing variant of saveMode().
+-	/** \throws UserError when the client is not connected
+-	  * \throws ConnectionError when a request couldn't be sent
+-	  * \throws SystemError when there was an error inside the operating system */
+-	void saveModeX( const Device & device, const Mode & mode );
+-
+-	/// Exception-throwing variant of setDeviceColor().
+-	/** \throws UserError when the client is not connected
+-	  * \throws ConnectionError when a request couldn't be sent
+-	  * \throws SystemError when there was an error inside the operating system */
+-	void setDeviceColorX( const Device & device, Color color );
+-
+-	/// Exception-throwing variant of setZoneColor().
+-	/** \throws UserError when the client is not connected
+-	  * \throws ConnectionError when a request couldn't be sent
+-	  * \throws SystemError when there was an error inside the operating system */
+-	void setZoneColorX( const Zone & zone, Color color );
+-
+-	/// Exception-throwing variant of setZoneSize().
+-	/** \throws UserError when the client is not connected
+-	  * \throws ConnectionError when a request couldn't be sent
+-	  * \throws SystemError when there was an error inside the operating system */
+-	void setZoneSizeX( const Zone & zone, uint32_t newSize );
+-
+-	/// Exception-throwing variant of setLEDColor().
+-	/** \throws UserError when the client is not connected
+-	  * \throws ConnectionError when a request couldn't be sent
+-	  * \throws SystemError when there was an error inside the operating system */
+-	void setLEDColorX( const LED & led, Color color );
+-
+-	/// Exception-throwing variant of requestProfileList().
+-	/** \throws UserError when the client is not connected
+-	  * \throws ConnectionError when a request couldn't be sent or no valid reply was received
+-	  * \throws SystemError when there was an error inside the operating system */
+-	std::vector< std::string > requestProfileListX();
+-
+-	/// Exception-throwing variant of saveProfile().
+-	/** \throws UserError when the client is not connected
+-	  * \throws ConnectionError when a request couldn't be sent
+-	  * \throws SystemError when there was an error inside the operating system */
+-	void saveProfileX( const std::string & profileName );
+-
+-	/// Exception-throwing variant of loadProfile().
+-	/** \throws UserError when the client is not connected
+-	  * \throws ConnectionError when a request couldn't be sent
+-	  * \throws SystemError when there was an error inside the operating system */
+-	void loadProfileX( const std::string & profileName );
+-
+-	/// Exception-throwing variant of deleteProfile().
+-	/** \throws UserError when the client is not connected
+-	  * \throws ConnectionError when a request couldn't be sent
+-	  * \throws SystemError when there was an error inside the operating system */
+-	void deleteProfileX( const std::string & profileName );
++		//-- exception-oriented API ----------------------------------------------------------------------------------------
++
++		/// Exception-throwing variant of connect( const std::string &, uint16_t ).
++		/** \throws UserError when the client is already connected
++		 * \throws ConnectionError when the network is down, such host does not exist or the host refuses connection
++		 * \throws SystemError when there was an error inside the operating system */
++		void connectX(const std::string &host, uint16_t port = 6742);
++
++		/// Exception-throwing variant of disconnect().
++		/** \throws UserError when the client is not connected */
++		void disconnectX();
++
++		/// Exception-throwing variant of setTimeout().
++		/** \throws SystemError when there was an error inside the operating system */
++		void setTimeoutX(std::chrono::milliseconds timeout);
++
++		/// Exception-throwing variant of requestDeviceList().
++		/** \throws UserError when the client is not connected
++		 * \throws ConnectionError when a request couldn't be sent or no valid reply was received
++		 * \throws SystemError when there was an error inside the operating system */
++		DeviceList requestDeviceListX();
++
++		/// Exception-throwing variant of requestDeviceCount().
++		/** \throws UserError when the client is not connected
++		 * \throws ConnectionError when a request couldn't be sent or no valid reply was received
++		 * \throws SystemError when there was an error inside the operating system */
++		uint32_t requestDeviceCountX();
++
++		/// Exception-throwing variant of requestDeviceInfo().
++		/** \throws UserError when the client is not connected
++		 * \throws ConnectionError when a request couldn't be sent or no valid reply was received
++		 * \throws SystemError when there was an error inside the operating system */
++		std::unique_ptr<Device> requestDeviceInfoX(uint32_t deviceIdx);
++
++		/// Exception-throwing variant of checkForDeviceUpdates().
++		/** \throws ConnectionError when the server closes the connection or sends an invalid packet
++		 * \throws SystemError when there was an error inside the operating system */
++		bool isDeviceListOutdatedX();
++
++		/// Exception-throwing variant of switchToCustomMode().
++		/** \throws UserError when the client is not connected
++		 * \throws ConnectionError when a request couldn't be sent
++		 * \throws SystemError when there was an error inside the operating system */
++		void switchToCustomModeX(const Device &device);
++
++		/// Exception-throwing variant of changeMode().
++		/** \throws UserError when the client is not connected
++		 * \throws ConnectionError when a request couldn't be sent
++		 * \throws SystemError when there was an error inside the operating system */
++		void changeModeX(const Device &device, const Mode &mode);
++
++		/// Exception-throwing variant of saveMode().
++		/** \throws UserError when the client is not connected
++		 * \throws ConnectionError when a request couldn't be sent
++		 * \throws SystemError when there was an error inside the operating system */
++		void saveModeX(const Device &device, const Mode &mode);
++
++		/// Exception-throwing variant of setDeviceColor().
++		/** \throws UserError when the client is not connected
++		 * \throws ConnectionError when a request couldn't be sent
++		 * \throws SystemError when there was an error inside the operating system */
++		void setDeviceColorX(const Device &device, Color color);
++
++		/// Exception-throwing variant of setZoneColor().
++		/** \throws UserError when the client is not connected
++		 * \throws ConnectionError when a request couldn't be sent
++		 * \throws SystemError when there was an error inside the operating system */
++		void setZoneColorX(const Zone &zone, Color color);
++
++		/// Exception-throwing variant of setZoneSize().
++		/** \throws UserError when the client is not connected
++		 * \throws ConnectionError when a request couldn't be sent
++		 * \throws SystemError when there was an error inside the operating system */
++		void setZoneSizeX(const Zone &zone, uint32_t newSize);
++
++		/// Exception-throwing variant of setLEDColor().
++		/** \throws UserError when the client is not connected
++		 * \throws ConnectionError when a request couldn't be sent
++		 * \throws SystemError when there was an error inside the operating system */
++		void setLEDColorX(const LED &led, Color color);
++
++		/// Exception-throwing variant of requestProfileList().
++		/** \throws UserError when the client is not connected
++		 * \throws ConnectionError when a request couldn't be sent or no valid reply was received
++		 * \throws SystemError when there was an error inside the operating system */
++		std::vector<std::string> requestProfileListX();
++
++		/// Exception-throwing variant of saveProfile().
++		/** \throws UserError when the client is not connected
++		 * \throws ConnectionError when a request couldn't be sent
++		 * \throws SystemError when there was an error inside the operating system */
++		void saveProfileX(const std::string &profileName);
++
++		/// Exception-throwing variant of loadProfile().
++		/** \throws UserError when the client is not connected
++		 * \throws ConnectionError when a request couldn't be sent
++		 * \throws SystemError when there was an error inside the operating system */
++		void loadProfileX(const std::string &profileName);
++
++		/// Exception-throwing variant of deleteProfile().
++		/** \throws UserError when the client is not connected
++		 * \throws ConnectionError when a request couldn't be sent
++		 * \throws SystemError when there was an error inside the operating system */
++		void deleteProfileX(const std::string &profileName);
+ 
+ #endif // NO_EXCEPTIONS
+ 
+-	/// Returns the system error code that caused the last failure.
+-	system_error_t getLastSystemError() const noexcept;
+-
+-	/// Converts the numeric value of the last system error to a user-friendly string.
+-	std::string getLastSystemErrorStr() const noexcept;
+-
+-	/// Converts the given numeric error code to a user-friendly string.
+-	std::string getSystemErrorStr( system_error_t errorCode ) const noexcept;
+-
+- private: // helpers
+-
+-	ConnectStatus _connect( const std::string & host, uint16_t port );
+-	bool _disconnect() noexcept;
+-	bool _setTimeout( std::chrono::milliseconds timeout ) noexcept;
+-	DeviceListResult _requestDeviceList();
+-	DeviceCountResult _requestDeviceCount();
+-	DeviceInfoResult _requestDeviceInfo( uint32_t deviceIdx );
+-	UpdateStatus _checkForDeviceUpdates() noexcept;
+-	RequestStatus _switchToCustomMode( const Device & device );
+-	RequestStatus _changeMode( const Device & device, const Mode & mode );
+-	RequestStatus _saveMode( const Device & device, const Mode & mode );
+-	RequestStatus _setDeviceColor( const Device & device, Color color );
+-	RequestStatus _setZoneColor( const Zone & zone, Color color );
+-	RequestStatus _setZoneSize( const Zone & zone, uint32_t newSize );
+-	RequestStatus _setLEDColor( const LED & led, Color color );
+-	ProfileListResult _requestProfileList();
+-	RequestStatus _saveProfile( const std::string & profileName );
+-	RequestStatus _loadProfile( const std::string & profileName );
+-	RequestStatus _deleteProfile( const std::string & profileName );
+-
+-	template< typename Message, typename ... ConstructorArgs >
+-	bool sendMessage( ConstructorArgs ... args );
+-
+-	template< typename Message >
+-	struct RecvResult
+-	{
+-		RequestStatus status;
+-		Message message;
+-	};
+-	template< typename Message >
+-	RecvResult< Message > awaitMessage() noexcept;
+-
+-	UpdateStatus checkForUpdateMessageArrival() noexcept;
++		/// Returns the system error code that caused the last failure.
++		system_error_t getLastSystemError() const noexcept;
++
++		/// Converts the numeric value of the last system error to a user-friendly string.
++		std::string getLastSystemErrorStr() const noexcept;
++
++		/// Converts the given numeric error code to a user-friendly string.
++		std::string getSystemErrorStr(system_error_t errorCode) const noexcept;
++
++	private: // helpers
++		ConnectStatus _connect(const std::string &host, uint16_t port);
++		bool _disconnect() noexcept;
++		bool _setTimeout(std::chrono::milliseconds timeout) noexcept;
++		DeviceListResult _requestDeviceList();
++		DeviceCountResult _requestDeviceCount();
++		DeviceInfoResult _requestDeviceInfo(uint32_t deviceIdx);
++		UpdateStatus _checkForDeviceUpdates() noexcept;
++		RequestStatus _switchToCustomMode(const Device &device);
++		RequestStatus _changeMode(const Device &device, const Mode &mode);
++		RequestStatus _saveMode(const Device &device, const Mode &mode);
++		RequestStatus _setDeviceColor(const Device &device, Color color);
++		RequestStatus _setDeviceColors(const Device &device, std::vector<Color> colors);
++		RequestStatus _setZoneColor(const Zone &zone, Color color);
++		RequestStatus _setZoneSize(const Zone &zone, uint32_t newSize);
++		RequestStatus _setLEDColor(const LED &led, Color color);
++		ProfileListResult _requestProfileList();
++		RequestStatus _saveProfile(const std::string &profileName);
++		RequestStatus _loadProfile(const std::string &profileName);
++		RequestStatus _deleteProfile(const std::string &profileName);
++
++		template <typename Message, typename... ConstructorArgs>
++		bool sendMessage(ConstructorArgs... args);
++
++		template <typename Message>
++		struct RecvResult
++		{
++			RequestStatus status;
++			Message message;
++		};
++		template <typename Message>
++		RecvResult<Message> awaitMessage() noexcept;
++
++		UpdateStatus checkForUpdateMessageArrival() noexcept;
+ 
+ #ifndef NO_EXCEPTIONS
+-	void connectStatusToException( ConnectStatus status );
+-	void requestStatusToException( RequestStatus status );
++		void connectStatusToException(ConnectStatus status);
++		void requestStatusToException(RequestStatus status);
+ #endif // NO_EXCEPTIONS
+ 
+- private:
+-
+-	std::string _clientName;
+-
+-	// a pointer so that we don't have to include the TcpSocket and all its OS dependancies here
+-	std::unique_ptr< own::TcpSocket > _socket;
+-
+-	uint32_t _negotiatedProtocolVersion;
++	private:
++		std::string _clientName;
+ 
+-	bool _isDeviceListOutOfDate;
++		// a pointer so that we don't have to include the TcpSocket and all its OS dependancies here
++		std::unique_ptr<own::TcpSocket> _socket;
+ 
+-};
++		uint32_t _negotiatedProtocolVersion;
+ 
++		bool _isDeviceListOutOfDate;
++	};
+ 
+-//======================================================================================================================
+-
++	//======================================================================================================================
+ 
+ } // namespace orgb
+ 
+-
+ #endif // OPENRGB_CLIENT_INCLUDED
+diff --git a/include/OpenRGB/Color.hpp b/include/OpenRGB/Color.hpp
+index 2deb0b2..2d24983 100644
+--- a/include/OpenRGB/Color.hpp
++++ b/include/OpenRGB/Color.hpp
+@@ -8,69 +8,64 @@
+ #ifndef OPENRGB_COLOR_INCLUDED
+ #define OPENRGB_COLOR_INCLUDED
+ 
+-
+ #include <cstdint>
+ #include <iosfwd>
+ #include <string>
+ 
+-namespace own {
++namespace own
++{
+ 	class BinaryOutputStream;
+ 	class BinaryInputStream;
+ }
+ 
+-
+-namespace orgb {
+-
+-
+-//======================================================================================================================
+-/// Simple representation of a color with 3 8-bit values for red, green, blue components
+-
+-
+-class Color
++namespace orgb
+ {
+ 
+- public:
+-
+-	uint8_t r;
+-	uint8_t g;
+-	uint8_t b;
+-	uint8_t padding;
++	//======================================================================================================================
++	/// Simple representation of a color with 3 8-bit values for red, green, blue components
+ 
+-	Color() noexcept = default;
+-	Color( uint8_t red, uint8_t green, uint8_t blue ) noexcept : r( red ), g( green ), b( blue ) {}
++	class Color
++	{
+ 
+-	/// Attempts to deduce a color from a string description.
+-	/** Possible ways to define a color are:
+-	  * 1. hex number of 6 digits, for example "AB34EF", may be preceeded by '#' character
+-	  * 2. a word, for example "red", "cyan", "black", case doesn't matter */
+-	bool fromString( const std::string & str ) noexcept;
++	public:
++		uint8_t r;
++		uint8_t g;
++		uint8_t b;
++		uint8_t padding;
+ 
+-	// predefined basic colors for instant use
+-	static const Color Black;
+-	static const Color White;
+-	static const Color Red;
+-	static const Color Green;
+-	static const Color Blue;
+-	static const Color Yellow;
+-	static const Color Magenta;
+-	static const Color Cyan;
++		Color() noexcept = default;
++		Color(uint8_t red, uint8_t green, uint8_t blue) noexcept : r(red), g(green), b(blue) {}
+ 
+-	constexpr size_t calcSize() const noexcept { return sizeof(r) + sizeof(g) + sizeof(b) + 1; }
+-	friend own::BinaryOutputStream & operator<<( own::BinaryOutputStream & stream, Color color );
+-	friend own::BinaryInputStream & operator>>( own::BinaryInputStream & stream, Color & color ) noexcept;
++		/// Attempts to deduce a color from a string description.
++		/** Possible ways to define a color are:
++		 * 1. hex number of 6 digits, for example "AB34EF", may be preceeded by '#' character
++		 * 2. a word, for example "red", "cyan", "black", case doesn't matter */
++		bool fromString(const std::string &str) noexcept;
++		static Color fromRgb(const std::string &str) noexcept;
++		static Color fromHsv(const float hsv, const float saturation, const float value) noexcept;
+ 
+-	friend std::ostream & operator<<( std::ostream & os, Color color ) noexcept;
+-	friend std::istream & operator>>( std::istream & is, Color & color ) noexcept;
++		// predefined basic colors for instant use
++		static const Color Black;
++		static const Color White;
++		static const Color Red;
++		static const Color Green;
++		static const Color Blue;
++		static const Color Yellow;
++		static const Color Magenta;
++		static const Color Cyan;
+ 
+-};
++		constexpr size_t calcSize() const noexcept { return sizeof(r) + sizeof(g) + sizeof(b) + 1; }
++		friend own::BinaryOutputStream &operator<<(own::BinaryOutputStream &stream, Color color);
++		friend own::BinaryInputStream &operator>>(own::BinaryInputStream &stream, Color &color) noexcept;
+ 
+-void print( Color color );
++		friend std::ostream &operator<<(std::ostream &os, Color color) noexcept;
++		friend std::istream &operator>>(std::istream &is, Color &color) noexcept;
++	};
+ 
++	void print(Color color);
+ 
+-//======================================================================================================================
+-
++	//======================================================================================================================
+ 
+ } // namespace orgb
+ 
+-
+ #endif // OPENRGB_COLOR_INCLUDED
+diff --git a/include/OpenRGB/DeviceInfo.hpp b/include/OpenRGB/DeviceInfo.hpp
+index 6f15b55..9094962 100644
+--- a/include/OpenRGB/DeviceInfo.hpp
++++ b/include/OpenRGB/DeviceInfo.hpp
+@@ -8,448 +8,434 @@
+ #ifndef OPENRGB_DEVICE_INCLUDED
+ #define OPENRGB_DEVICE_INCLUDED
+ 
+-
+ #include "Exceptions.hpp"
+ 
+ #include "Color.hpp"
+ 
+ #include <string>
+ #include <vector>
+-#include <memory>  // unique_ptr<Device>
+-
+-
+-namespace orgb {
+-
+-
+-//======================================================================================================================
+-//  enums
++#include <memory> // unique_ptr<Device>
+ 
+-/// Type of device with RGB LEDs
+-enum class DeviceType : uint32_t
++namespace orgb
+ {
+-	Motherboard   = 0,
+-	DRAM          = 1,
+-	GPU           = 2,
+-	Cooler        = 3,
+-	LedStrip      = 4,
+-	Keyboard      = 5,
+-	Mouse         = 6,
+-	MouseMat      = 7,
+-	Headset       = 8,
+-	HeadsetStand  = 9,
+-	Gamepad       = 10,
+-	Light         = 11,
+-    Speaker       = 12,
+-    Virtual       = 13,
+-	Unknown,
+-};
+-const char * enumString( DeviceType ) noexcept;
+-
+-/// Which features the mode supports
+-enum ModeFlags : uint32_t
+-{
+-	HasSpeed              = (1 << 0),  ///< the speed attribute in ModeDescription is present
+-	HasDirectionLR        = (1 << 1),  ///< the direction attribute in ModeDescription can have Left or Right values
+-	HasDirectionUD        = (1 << 2),  ///< the direction attribute in ModeDescription can have Up or Down values
+-	HasDirectionHV        = (1 << 3),  ///< the direction attribute in ModeDescription can have Horizontal or Vertical values
+-	HasBrightness         = (1 << 4),  ///< the brightness attribute in ModeDescription is present
+-	HasPerLedColor        = (1 << 5),  ///< the color_mode attribute in ModeDescription can be set to PerLed
+-	HasModeSpecificColor  = (1 << 6),  ///< the color_mode attribute in ModeDescription can be set to ModeSpecific
+-	HasRandomColor        = (1 << 7),  ///< the color_mode attribute in ModeDescription can be set to Random
+-};
+-std::string modeFlagsToString( uint32_t flags );
+-
+-/// Direction of the color effect
+-enum class Direction : uint32_t
+-{
+-	Left        = 0,
+-	Right       = 1,
+-	Up          = 2,
+-	Down        = 3,
+-	Horizontal  = 4,
+-	Vertical    = 5,
+-};
+-const char * enumString( Direction ) noexcept;
+-
+-/// How the colors of a mode are set
+-enum class ColorMode : uint32_t
+-{
+-	None          = 0,  ///< mode has no colors
+-	PerLed        = 1,  ///< mode has per LED colors
+-	ModeSpecific  = 2,  ///< mode specific colors
+-	Random        = 3,  ///< mode has random colors
+-};
+-const char * enumString( ColorMode ) noexcept;
+-
+-/// Type of RGB zone
+-enum class ZoneType : uint32_t
+-{
+-	Single  = 0,
+-	Linear  = 1,
+-	Matrix  = 2,
+-};
+-const char * enumString( ZoneType ) noexcept;
+-
+-
+-//======================================================================================================================
+-/// Represents a particular LED on an RGB device.
+-
+-class LED
+-{
+-
+- public:
+-
+-	// metadata
+-	const uint32_t idx;        ///< index of this LED in the device's list of LEDs
+-	const uint32_t parentIdx;  ///< index of the parent device in the device list
+-
+-	// LED description
+-	const std::string  name;
+-	const uint32_t     value;  ///< device-specific value
+-
+- private:  // for internal use only
+-
+-	friend struct protocol;
+-	LED();
+-	size_t calcSize( uint32_t protocolVersion ) const noexcept;
+-	void serialize( own::BinaryOutputStream & stream, uint32_t protocolVersion ) const;
+-	bool deserialize( own::BinaryInputStream & stream, uint32_t protocolVersion, uint32_t idx, uint32_t parentIdx ) noexcept;
+-
+-};
+ 
++	//======================================================================================================================
++	//  enums
+ 
+-//======================================================================================================================
+-/// Represents a group of LEDs on an RGB device. Only some devices have zones.
+-
+-class Zone
+-{
+-
+- public:
+-
+-	// metadata
+-	const uint32_t idx;        ///< index of this zone in the device's list of zones
+-	const uint32_t parentIdx;  ///< index of the parent device in the device list
+-
+-	// zone description
+-	const std::string  name;
+-	const ZoneType     type;
+-	const uint32_t     leds_min;       ///< minimum size of the zone
+-	const uint32_t     leds_max;       ///< maximum size of the zone
+-	const uint32_t     leds_count;     ///< current size of the zone
+-	// optional
+-	const uint32_t     matrix_height;  ///< if the zone type is matrix, this is its height
+-	const uint32_t     matrix_width;   ///< if the zone type is matrix, this is its width
+-	const std::vector< uint32_t >  matrix_values;  ///< TODO: what is this?
+-
+- private:  // for internal use only
+-
+-	friend struct protocol;
+-	Zone();
+-	size_t calcSize( uint32_t protocolVersion ) const noexcept;
+-	void serialize( own::BinaryOutputStream & stream, uint32_t protocolVersion ) const;
+-	bool deserialize( own::BinaryInputStream & stream, uint32_t protocolVersion, uint32_t idx, uint32_t parentIdx ) noexcept;
+-
+-};
+-
+-
+-//======================================================================================================================
+-/// Represents a color mode of an RGB device, like "breathing", "flashing", "rainbow" or "direct".
+-
+-class Mode
+-{
+-
+- public:
+-
+-	// metadata
+-	const uint32_t idx;        ///< index of this mode in the device's list of modes
+-	const uint32_t parentIdx;  ///< index of the parent device in the device list
+-
+-	// Attributes that are not marked with const are the mode parameters that can be set,
+-	// others are just informational and need to remain constant.
+-	const std::string  name;
+-	const uint32_t     value;           ///< device-specific value
+-	const uint32_t     flags;           ///< see ModeFlags for possible bit flags
+-	const uint32_t     speed_min;       ///< minimum speed value, this attribute is valid only if ModeFlags::HasSpeed is set, otherwise it's uninitialized
+-	const uint32_t     speed_max;       ///< maximum speed value, this attribute is valid only if ModeFlags::HasSpeed is set, otherwise it's uninitialized
+-	const uint32_t     brightness_min;  ///< minimum brightness value, this attribute is valid only if ModeFlags::HasBrightness is set, otherwise it's uninitialized
+-	const uint32_t     brightness_max;  ///< maximum brightness value, this attribute is valid only if ModeFlags::HasBrightness is set, otherwise it's uninitialized
+-	const uint32_t     colors_min;      ///< minimum number of mode colors
+-	const uint32_t     colors_max;      ///< maximum number of mode colors
+-	/// Speed of the effect.
+-	/** This attribute is enabled only if ModeFlags::HasSpeed is set, otherwise it's uninitialized.
+-	  * The possible values are determined by #speed_min and #speed_max. */
+-	      uint32_t      speed;
+-	/// Brightness of the lights.
+-	/** This attribute is enabled only if ModeFlags::HasBrightness is set, otherwise it's uninitialized.
+-	  * The possible values are determined by #brightness_min and #brightness_max. */
+-	      uint32_t      brightness;
+-	/// Direction of the color effect.
+-	/** This attribute is enabled only if any of ModeFlags::HasDirectionXY is set in #flags, otherwise it's uninitialized.
+-	  * The possible values are also determined by #flags. */
+-	      Direction     direction;
+-	const ColorMode     color_mode;  ///< how the colors of a mode are set
+-	/// Mode-specific list of colors.
+-	      std::vector< Color >  colors;
+-
+- private:  // for internal use only
+-
+-	friend struct protocol;
+-	friend class Device;
+-	friend struct UpdateMode;
+-	friend struct SaveMode;
+-	Mode();
+-	size_t calcSize( uint32_t protocolVersion ) const noexcept;
+-	void serialize( own::BinaryOutputStream & stream, uint32_t protocolVersion ) const;
+-	bool deserialize( own::BinaryInputStream & stream, uint32_t protocolVersion, uint32_t idx, uint32_t parentIdx ) noexcept;
+-
+-};
+-
+-
+-//======================================================================================================================
+-/// Represents an RGB-capable device. Device can have modes, zones and individual LEDs.
+-
+-class Device
+-{
+-
+- public:
+-
+-	// metadata
+-	const uint32_t idx;  ///< index of this device in the device list
+-
+-	// device description
+-	const DeviceType   type;
+-	const std::string  name;
+-	const std::string  vendor;
+-	const std::string  description;
+-	const std::string  version;
+-	const std::string  serial;
+-	const std::string  location;
+-	const uint32_t     active_mode;
+-
+-	// device subobjects
+-	const std::vector< Mode > modes;
+-	const std::vector< Zone > zones;
+-	const std::vector< LED >  leds;
+-	const std::vector< Color > colors;
+-
+- public:
+-
+-	/// Finds the first mode with a specific name.
+-	/** \returns nullptr when mode with this name is not found. */
+-	const Mode * findMode( const std::string & name ) const noexcept
+-	{
+-		for (const auto & mode : modes)
+-			if (mode.name == name)
+-				return &mode;
+-		return nullptr;
+-	}
+-
+-	/// Finds the first zone with a specific name.
+-	/** \returns nullptr when zone with this name is not found. */
+-	const Zone * findZone( const std::string & name ) const noexcept
++	/// Type of device with RGB LEDs
++	enum class DeviceType : uint32_t
+ 	{
+-		for (const auto & zone : zones)
+-			if (zone.name == name)
+-				return &zone;
+-		return nullptr;
+-	}
+-
+-	/// Finds the first LED with a specific name.
+-	/** \returns nullptr when LED with this name is not found. */
+-	const LED * findLED( const std::string & name ) const noexcept
++		Motherboard = 0,
++		DRAM = 1,
++		GPU = 2,
++		Cooler = 3,
++		LedStrip = 4,
++		Keyboard = 5,
++		Mouse = 6,
++		MouseMat = 7,
++		Headset = 8,
++		HeadsetStand = 9,
++		Gamepad = 10,
++		Light = 11,
++		Speaker = 12,
++		Virtual = 13,
++		Unknown,
++	};
++	const char *enumString(DeviceType) noexcept;
++
++	/// Which features the mode supports
++	enum ModeFlags : uint32_t
+ 	{
+-		for (const auto & led : leds)
+-			if (led.name == name)
+-				return &led;
+-		return nullptr;
+-	}
+-
+-#ifndef NO_EXCEPTIONS
+-
+-	/// Exception-throwing variant of findModeX( const std::string & ) const.
+-	/** \throws NotFound when mode with this name is not found. */
+-	const Mode & findModeX( const std::string & name ) const
++		HasSpeed = (1 << 0),			 ///< the speed attribute in ModeDescription is present
++		HasDirectionLR = (1 << 1),		 ///< the direction attribute in ModeDescription can have Left or Right values
++		HasDirectionUD = (1 << 2),		 ///< the direction attribute in ModeDescription can have Up or Down values
++		HasDirectionHV = (1 << 3),		 ///< the direction attribute in ModeDescription can have Horizontal or Vertical values
++		HasBrightness = (1 << 4),		 ///< the brightness attribute in ModeDescription is present
++		HasPerLedColor = (1 << 5),		 ///< the color_mode attribute in ModeDescription can be set to PerLed
++		HasModeSpecificColor = (1 << 6), ///< the color_mode attribute in ModeDescription can be set to ModeSpecific
++		HasRandomColor = (1 << 7),		 ///< the color_mode attribute in ModeDescription can be set to Random
++	};
++	std::string modeFlagsToString(uint32_t flags);
++
++	/// Direction of the color effect
++	enum class Direction : uint32_t
+ 	{
+-		for (const auto & mode : modes)
+-			if (mode.name == name)
+-				return mode;
+-		throw NotFound( "Mode of such name was not found" );
+-	}
+-
+-	/// Exception-throwing variant of findZoneX( const std::string & ) const.
+-	/** \throws NotFound when zone with this name is not found. */
+-	const Zone & findZoneX( const std::string & name ) const
++		Left = 0,
++		Right = 1,
++		Up = 2,
++		Down = 3,
++		Horizontal = 4,
++		Vertical = 5,
++	};
++	const char *enumString(Direction) noexcept;
++
++	/// How the colors of a mode are set
++	enum class ColorMode : uint32_t
+ 	{
+-		for (const auto & zone : zones)
+-			if (zone.name == name)
+-				return zone;
+-		throw NotFound( "Zone of such name was not found" );
+-	}
+-
+-	/// Exception-throwing variant of findLEDX( const std::string & ) const.
+-	/** \throws NotFound when LED with this name is not found. */
+-	const LED & findLEDX( const std::string & name ) const
++		None = 0,		  ///< mode has no colors
++		PerLed = 1,		  ///< mode has per LED colors
++		ModeSpecific = 2, ///< mode specific colors
++		Random = 3,		  ///< mode has random colors
++	};
++	const char *enumString(ColorMode) noexcept;
++
++	/// Type of RGB zone
++	enum class ZoneType : uint32_t
+ 	{
+-		for (const auto & led : leds)
+-			if (led.name == name)
+-				return led;
+-		throw NotFound( "LED of such name was not found" );
+-	}
++		Single = 0,
++		Linear = 1,
++		Matrix = 2,
++	};
++	const char *enumString(ZoneType) noexcept;
+ 
+-#endif // NO_EXCEPTIONS
+-
+- private:  // for internal use only
+-
+-	friend struct ReplyControllerData;
+-	size_t calcSize( uint32_t protocolVersion ) const noexcept;
+-	void serialize( own::BinaryOutputStream & stream, uint32_t protocolVersion ) const;
+-	bool deserialize( own::BinaryInputStream & stream, uint32_t protocolVersion, uint32_t deviceIdx ) noexcept;
+-
+-	friend class DeviceList;
+-	friend class Client;
+-	Device();
+-	Device( const Device & other ) = default;
+-	Device( Device && other ) = default;
+-
+-};
++	//======================================================================================================================
++	/// Represents a particular LED on an RGB device.
+ 
++	class LED
++	{
+ 
+-//======================================================================================================================
+-/** Convenience wrapper around iterator to container of pointers
+-  * that skips the additional needed dereference and returns a reference directly. */
+-
+-template< typename IterType >
+-class PointerIterator
+-{
+-	IterType _origIter;
+- public:
+-	PointerIterator( const IterType & origIter ) : _origIter( origIter ) {}
+-	auto operator*() -> decltype( **_origIter ) const { return **_origIter; }
+-	auto operator->() -> decltype( *_origIter ) const { return *_origIter; }
+-	PointerIterator & operator++() { ++_origIter; return *this; }
+-	PointerIterator operator++(int) { auto tmp = *this; ++_origIter; return tmp; }
+-	friend bool operator==(const PointerIterator & a, const PointerIterator & b) { return a._origIter == b._origIter; }
+-	friend bool operator!=(const PointerIterator & a, const PointerIterator & b) { return a._origIter != b._origIter; }
+-};
+-
++	public:
++		// metadata
++		const uint32_t idx;		  ///< index of this LED in the device's list of LEDs
++		const uint32_t parentIdx; ///< index of the parent device in the device list
+ 
+-//======================================================================================================================
+-/// Searchable list of all RGB-capable devices detected by OpenRGB.
++		// LED description
++		const std::string name;
++		const uint32_t value; ///< device-specific value
+ 
+-class DeviceList
+-{
++	private: // for internal use only
++		friend struct protocol;
++		LED();
++		size_t calcSize(uint32_t protocolVersion) const noexcept;
++		void serialize(own::BinaryOutputStream &stream, uint32_t protocolVersion) const;
++		bool deserialize(own::BinaryInputStream &stream, uint32_t protocolVersion, uint32_t idx, uint32_t parentIdx) noexcept;
++	};
+ 
+-	// Pointers are more practical here, because they are faster to move and we can easily wrap them arround in the API
+-	using DeviceListType = std::vector< std::unique_ptr< Device > >;
+-	DeviceListType _list;
++	//======================================================================================================================
++	/// Represents a group of LEDs on an RGB device. Only some devices have zones.
+ 
+- public:
++	class Zone
++	{
+ 
+-	size_t size() const noexcept { return _list.size(); }
++	public:
++		// metadata
++		const uint32_t idx;		  ///< index of this zone in the device's list of zones
++		const uint32_t parentIdx; ///< index of the parent device in the device list
++
++		// zone description
++		const std::string name;
++		const ZoneType type;
++		const uint32_t leds_min;   ///< minimum size of the zone
++		const uint32_t leds_max;   ///< maximum size of the zone
++		const uint32_t leds_count; ///< current size of the zone
++		// optional
++		const uint32_t matrix_height;			   ///< if the zone type is matrix, this is its height
++		const uint32_t matrix_width;			   ///< if the zone type is matrix, this is its width
++		const std::vector<uint32_t> matrix_values; ///< TODO: what is this?
++
++	private: // for internal use only
++		friend struct protocol;
++		Zone();
++		size_t calcSize(uint32_t protocolVersion) const noexcept;
++		void serialize(own::BinaryOutputStream &stream, uint32_t protocolVersion) const;
++		bool deserialize(own::BinaryInputStream &stream, uint32_t protocolVersion, uint32_t idx, uint32_t parentIdx) noexcept;
++	};
++
++	//======================================================================================================================
++	/// Represents a color mode of an RGB device, like "breathing", "flashing", "rainbow" or "direct".
++
++	class Mode
++	{
+ 
+-	/// Use this if you intend to populate the DeviceList manually using individual calls to Client::requestDeviceInfo().
+-	void append( std::unique_ptr< Device > && device )  { _list.push_back( std::move(device) ); }
++	public:
++		// metadata
++		const uint32_t idx;		  ///< index of this mode in the device's list of modes
++		const uint32_t parentIdx; ///< index of the parent device in the device list
++
++		// Attributes that are not marked with const are the mode parameters that can be set,
++		// others are just informational and need to remain constant.
++		const std::string name;
++		const uint32_t value;		   ///< device-specific value
++		const uint32_t flags;		   ///< see ModeFlags for possible bit flags
++		const uint32_t speed_min;	   ///< minimum speed value, this attribute is valid only if ModeFlags::HasSpeed is set, otherwise it's uninitialized
++		const uint32_t speed_max;	   ///< maximum speed value, this attribute is valid only if ModeFlags::HasSpeed is set, otherwise it's uninitialized
++		const uint32_t brightness_min; ///< minimum brightness value, this attribute is valid only if ModeFlags::HasBrightness is set, otherwise it's uninitialized
++		const uint32_t brightness_max; ///< maximum brightness value, this attribute is valid only if ModeFlags::HasBrightness is set, otherwise it's uninitialized
++		const uint32_t colors_min;	   ///< minimum number of mode colors
++		const uint32_t colors_max;	   ///< maximum number of mode colors
++									   /// Speed of the effect.
++									   /** This attribute is enabled only if ModeFlags::HasSpeed is set, otherwise it's uninitialized.
++										* The possible values are determined by #speed_min and #speed_max. */
++		uint32_t speed;
++		/// Brightness of the lights.
++		/** This attribute is enabled only if ModeFlags::HasBrightness is set, otherwise it's uninitialized.
++		 * The possible values are determined by #brightness_min and #brightness_max. */
++		uint32_t brightness;
++		/// Direction of the color effect.
++		/** This attribute is enabled only if any of ModeFlags::HasDirectionXY is set in #flags, otherwise it's uninitialized.
++		 * The possible values are also determined by #flags. */
++		Direction direction;
++		const ColorMode color_mode; ///< how the colors of a mode are set
++									/// Mode-specific list of colors.
++		std::vector<Color> colors;
++
++	private: // for internal use only
++		friend struct protocol;
++		friend class Device;
++		friend struct UpdateMode;
++		friend struct SaveMode;
++		Mode();
++		size_t calcSize(uint32_t protocolVersion) const noexcept;
++		void serialize(own::BinaryOutputStream &stream, uint32_t protocolVersion) const;
++		bool deserialize(own::BinaryInputStream &stream, uint32_t protocolVersion, uint32_t idx, uint32_t parentIdx) noexcept;
++	};
++
++	//======================================================================================================================
++	/// Represents an RGB-capable device. Device can have modes, zones and individual LEDs.
++
++	class Device
++	{
+ 
+-	/// Use this to update your DeviceList after the call to Client::requestDeviceInfo().
+-	void replace( uint32_t deviceIdx, std::unique_ptr< Device > && device )  { _list[ deviceIdx ] = std::move(device); }
++	public:
++		// metadata
++		const uint32_t idx; ///< index of this device in the device list
++
++		// device description
++		const DeviceType type;
++		const std::string name;
++		const std::string vendor;
++		const std::string description;
++		const std::string version;
++		const std::string serial;
++		const std::string location;
++		const uint32_t active_mode;
++
++		// device subobjects
++		const std::vector<Mode> modes;
++		const std::vector<Zone> zones;
++		const std::vector<LED> leds;
++		const std::vector<Color> colors;
++
++	public:
++		/// Finds the first mode with a specific name.
++		/** \returns nullptr when mode with this name is not found. */
++		const Mode *findMode(const std::string &name) const noexcept
++		{
++			for (const auto &mode : modes)
++				if (mode.name == name)
++					return &mode;
++			return nullptr;
++		}
++
++		/// Finds the first zone with a specific name.
++		/** \returns nullptr when zone with this name is not found. */
++		const Zone *findZone(const std::string &name) const noexcept
++		{
++			for (const auto &zone : zones)
++				if (zone.name == name)
++					return &zone;
++			return nullptr;
++		}
++
++		/// Finds the first LED with a specific name.
++		/** \returns nullptr when LED with this name is not found. */
++		const LED *findLED(const std::string &name) const noexcept
++		{
++			for (const auto &led : leds)
++				if (led.name == name)
++					return &led;
++			return nullptr;
++		}
+ 
+-	void clear() noexcept  { _list.clear(); }
++#ifndef NO_EXCEPTIONS
+ 
+-	PointerIterator< DeviceListType::const_iterator > begin() const noexcept  { return _list.begin(); }
+-	PointerIterator< DeviceListType::const_iterator > end() const noexcept    { return _list.end(); }
++		/// Exception-throwing variant of findModeX( const std::string & ) const.
++		/** \throws NotFound when mode with this name is not found. */
++		const Mode &findModeX(const std::string &name) const
++		{
++			for (const auto &mode : modes)
++				if (mode.name == name)
++					return mode;
++			throw NotFound("Mode of such name was not found");
++		}
++
++		/// Exception-throwing variant of findZoneX( const std::string & ) const.
++		/** \throws NotFound when zone with this name is not found. */
++		const Zone &findZoneX(const std::string &name) const
++		{
++			for (const auto &zone : zones)
++				if (zone.name == name)
++					return zone;
++			throw NotFound("Zone of such name was not found");
++		}
++
++		/// Exception-throwing variant of findLEDX( const std::string & ) const.
++		/** \throws NotFound when LED with this name is not found. */
++		const LED &findLEDX(const std::string &name) const
++		{
++			for (const auto &led : leds)
++				if (led.name == name)
++					return led;
++			throw NotFound("LED of such name was not found");
++		}
+ 
+-	const Device & operator[]( uint32_t deviceIdx ) const noexcept { return *_list[ deviceIdx ]; }
++#endif // NO_EXCEPTIONS
+ 
+-	/// Iterate over all devices of specific type.
+-	template< typename FuncType >
+-	void forEach( DeviceType deviceType, FuncType loopBody ) const
+-	{
+-		for (const Device & device : *this)
+-			if (device.type == deviceType)
+-				loopBody( device );
+-	}
+-
+-	/// Iterate over all devices of specific vendor.
+-	template< typename FuncType >
+-	void forEach( const std::string & vendor, FuncType loopBody ) const
++	private: // for internal use only
++		friend struct ReplyControllerData;
++		size_t calcSize(uint32_t protocolVersion) const noexcept;
++		void serialize(own::BinaryOutputStream &stream, uint32_t protocolVersion) const;
++		bool deserialize(own::BinaryInputStream &stream, uint32_t protocolVersion, uint32_t deviceIdx) noexcept;
++
++		friend class DeviceList;
++		friend class Client;
++		Device();
++		Device(const Device &other) = default;
++		Device(Device &&other) = default;
++	};
++
++	//======================================================================================================================
++	/** Convenience wrapper around iterator to container of pointers
++	 * that skips the additional needed dereference and returns a reference directly. */
++
++	template <typename IterType>
++	class PointerIterator
+ 	{
+-		for (const Device & device : *this)
+-			if (device.vendor == vendor)
+-				loopBody( device );
+-	}
+-
+-	/// Finds the first device of specific type.
+-	/** \returns nullptr when device of this type is not found */
+-	const Device * find( DeviceType deviceType ) const noexcept
++		IterType _origIter;
++
++	public:
++		PointerIterator(const IterType &origIter) : _origIter(origIter) {}
++		auto operator*() -> decltype(**_origIter) const { return **_origIter; }
++		auto operator->() -> decltype(*_origIter) const { return *_origIter; }
++		PointerIterator &operator++()
++		{
++			++_origIter;
++			return *this;
++		}
++		PointerIterator operator++(int)
++		{
++			auto tmp = *this;
++			++_origIter;
++			return tmp;
++		}
++		friend bool operator==(const PointerIterator &a, const PointerIterator &b) { return a._origIter == b._origIter; }
++		friend bool operator!=(const PointerIterator &a, const PointerIterator &b) { return a._origIter != b._origIter; }
++	};
++
++	//======================================================================================================================
++	/// Searchable list of all RGB-capable devices detected by OpenRGB.
++
++	class DeviceList
+ 	{
+-		for (const Device & device : *this)
+-			if (device.type == deviceType)
+-				return &device;
+-		return nullptr;
+-	}
+-
+-	/// Finds the first device with a specific name.
+-	/** \returns nullptr when device with this name is not found */
+-	const Device * find( const std::string & deviceName ) const noexcept
+-	{
+-		for (const Device & device : *this)
+-			if (device.name == deviceName)
+-				return &device;
+-		return nullptr;
+-	}
++
++		// Pointers are more practical here, because they are faster to move and we can easily wrap them arround in the API
++		using DeviceListType = std::vector<std::unique_ptr<Device>>;
++		DeviceListType _list;
++
++	public:
++		size_t size() const noexcept { return _list.size(); }
++
++		/// Use this if you intend to populate the DeviceList manually using individual calls to Client::requestDeviceInfo().
++		void append(std::unique_ptr<Device> &&device) { _list.push_back(std::move(device)); }
++
++		/// Use this to update your DeviceList after the call to Client::requestDeviceInfo().
++		void replace(uint32_t deviceIdx, std::unique_ptr<Device> &&device) { _list[deviceIdx] = std::move(device); }
++
++		void clear() noexcept { _list.clear(); }
++
++		PointerIterator<DeviceListType::const_iterator> begin() const noexcept { return _list.begin(); }
++		PointerIterator<DeviceListType::const_iterator> end() const noexcept { return _list.end(); }
++
++		const Device &operator[](uint32_t deviceIdx) const noexcept { return *_list[deviceIdx]; }
++
++		const DeviceListType &devices() const
++		{
++			return _list; // referencia constante
++		}
++		/// Iterate over all devices of specific type.
++		template <typename FuncType>
++		void forEach(DeviceType deviceType, FuncType loopBody) const
++		{
++			for (const Device &device : *this)
++				if (device.type == deviceType)
++					loopBody(device);
++		}
++
++		/// Iterate over all devices of specific vendor.
++		template <typename FuncType>
++		void forEach(const std::string &vendor, FuncType loopBody) const
++		{
++			for (const Device &device : *this)
++				if (device.vendor == vendor)
++					loopBody(device);
++		}
++
++		/// Finds the first device of specific type.
++		/** \returns nullptr when device of this type is not found */
++		const Device *find(DeviceType deviceType) const noexcept
++		{
++			for (const Device &device : *this)
++				if (device.type == deviceType)
++					return &device;
++			return nullptr;
++		}
++
++		/// Finds the first device with a specific name.
++		/** \returns nullptr when device with this name is not found */
++		const Device *find(const std::string &deviceName) const noexcept
++		{
++			for (const Device &device : *this)
++				if (device.name == deviceName)
++					return &device;
++			return nullptr;
++		}
+ 
+ #ifndef NO_EXCEPTIONS
+ 
+-	/// Exception-throwing variant of find( DeviceType ) const
+-	/** \throws NotFound when device of this type is not found */
+-	const Device & findX( DeviceType deviceType ) const
+-	{
+-		for (const Device & device : *this)
+-			if (device.type == deviceType)
+-				return device;
+-		throw NotFound( "Device of such type was not found" );
+-	}
+-
+-	/// Exception-throwing variant of find( const std::string & ) const.
+-	/** \throws NotFound when device with this name is not found */
+-	const Device & findX( const std::string & deviceName ) const
+-	{
+-		for (const Device & device : *this)
+-			if (device.name == deviceName)
+-				return device;
+-		throw NotFound( "Device of such name was not found" );
+-	}
++		/// Exception-throwing variant of find( DeviceType ) const
++		/** \throws NotFound when device of this type is not found */
++		const Device &findX(DeviceType deviceType) const
++		{
++			for (const Device &device : *this)
++				if (device.type == deviceType)
++					return device;
++			throw NotFound("Device of such type was not found");
++		}
++
++		/// Exception-throwing variant of find( const std::string & ) const.
++		/** \throws NotFound when device with this name is not found */
++		const Device &findX(const std::string &deviceName) const
++		{
++			for (const Device &device : *this)
++				if (device.name == deviceName)
++					return device;
++			throw NotFound("Device of such name was not found");
++		}
+ 
+ #endif // NO_EXCEPTIONS
+ 
+- private:  // for internal use only
+-
+-	// this should only be used by the Client when constructing the list from the server response
+-	friend class Client;
+-	void reserve( size_t newSize )   { _list.reserve( newSize ); }
+-	void append( Device && device )  { _list.emplace_back( new Device( std::move(device) ) ); }
+-
+-};
+-
++	private: // for internal use only
++		// this should only be used by the Client when constructing the list from the server response
++		friend class Client;
++		void reserve(size_t newSize) { _list.reserve(newSize); }
++		void append(Device &&device) { _list.emplace_back(new Device(std::move(device))); }
++	};
+ 
+-//======================================================================================================================
+-//  printing utils
+-
+-void print( const Device & device, unsigned int indentLevel = 0 );
+-void print( const Mode & mode, unsigned int indentLevel = 0 );
+-void print( const Zone & zone, unsigned int indentLevel = 0 );
+-void print( const LED & led, unsigned int indentLevel = 0 );
++	//======================================================================================================================
++	//  printing utils
+ 
+-void print( std::ostream & os, const Device & device, unsigned int indentLevel = 0 );
+-void print( std::ostream & os, const Mode & mode, unsigned int indentLevel = 0 );
+-void print( std::ostream & os, const Zone & zone, unsigned int indentLevel = 0 );
+-void print( std::ostream & os, const LED & led, unsigned int indentLevel = 0 );
++	void print(const Device &device, unsigned int indentLevel = 0);
++	void print(const Mode &mode, unsigned int indentLevel = 0);
++	void print(const Zone &zone, unsigned int indentLevel = 0);
++	void print(const LED &led, unsigned int indentLevel = 0);
+ 
++	void print(std::ostream &os, const Device &device, unsigned int indentLevel = 0);
++	void print(std::ostream &os, const Mode &mode, unsigned int indentLevel = 0);
++	void print(std::ostream &os, const Zone &zone, unsigned int indentLevel = 0);
++	void print(std::ostream &os, const LED &led, unsigned int indentLevel = 0);
+ 
+-//======================================================================================================================
+-
++	//======================================================================================================================
+ 
+ } // namespace orgb
+ 
+-
+ #endif // OPENRGB_DEVICE_INCLUDED
+diff --git a/src/Client.cpp b/src/Client.cpp
+index 9bc8fde..c8f71db 100644
+--- a/src/Client.cpp
++++ b/src/Client.cpp
+@@ -12,18 +12,18 @@
+ #include "ProtocolMessages.hpp"
+ 
+ #include <CppUtils-Network/Socket.hpp>
+-using own::TcpSocket;
+ using own::SocketError;
++using own::TcpSocket;
+ #include <CppUtils-Network/SystemErrorInfo.hpp>
+-using own::getLastError;
+ using own::getErrorString;
++using own::getLastError;
+ 
+ #include <CppUtils-Essential/BinaryStream.hpp>
+-using own::BinaryOutputStream;
+ using own::BinaryInputStream;
++using own::BinaryOutputStream;
+ #include <CppUtils-Essential/ContainerUtils.hpp>
+-using own::span;
+ using own::make_span;
++using own::span;
+ #include <CppUtils-Essential/LangUtils.hpp>
+ using fut::make_unique;
+ #include <CppUtils-Essential/CriticalError.hpp>
+@@ -37,1014 +37,1056 @@ using std::array;
+ #include <chrono>
+ using std::chrono::milliseconds;
+ 
++namespace orgb
++{
+ 
+-namespace orgb {
+-
++	//======================================================================================================================
++	//  enum to string conversion
+ 
+-//======================================================================================================================
+-//  enum to string conversion
+-
+-const char * enumString( ConnectStatus status ) noexcept
+-{
+-	static const char * const ConnectStatusStr [] =
++	const char *enumString(ConnectStatus status) noexcept
+ 	{
+-		"The operation was successful.",
+-		"Operation failed because underlying networking system could not be initialized.",
+-		"Connect operation failed because the socket is already connected.",
+-		"The hostname you entered could not be resolved to IP address.",
+-		"Could not connect to the target server, either it's down or the port is closed.",
+-		"Failed to send the client's protocol version or receive the server's protocol version",
+-		"The protocol version of the server is not supported. Please update the OpenRGB app.",
+-		"Failed to send the client name to the server.",
+-		"Other system error.",
+-		"Internal error of this library. Please create a github issue.",
+-	};
+-	static_assert( size_t(ConnectStatus::UnexpectedError) + 1 == fut::size(ConnectStatusStr), "update the ConnectStatusStr" );
++		static const char *const ConnectStatusStr[] =
++			{
++				"The operation was successful.",
++				"Operation failed because underlying networking system could not be initialized.",
++				"Connect operation failed because the socket is already connected.",
++				"The hostname you entered could not be resolved to IP address.",
++				"Could not connect to the target server, either it's down or the port is closed.",
++				"Failed to send the client's protocol version or receive the server's protocol version",
++				"The protocol version of the server is not supported. Please update the OpenRGB app.",
++				"Failed to send the client name to the server.",
++				"Other system error.",
++				"Internal error of this library. Please create a github issue.",
++			};
++		static_assert(size_t(ConnectStatus::UnexpectedError) + 1 == fut::size(ConnectStatusStr), "update the ConnectStatusStr");
++
++		if (size_t(status) < fut::size(ConnectStatusStr))
++		{
++			return ConnectStatusStr[size_t(status)];
++		}
++		else
++		{
++			return "<invalid status>";
++		}
++	}
+ 
+-	if (size_t(status) < fut::size(ConnectStatusStr))
++	const char *enumString(RequestStatus status) noexcept
+ 	{
+-		return ConnectStatusStr[ size_t(status) ];
++		static const char *const RequestStatusStr[] =
++			{
++				"The request was succesful.",
++				"Request failed because the client is not connected.",
++				"Failed to send the request message.",
++				"Server has closed the connection.",
++				"No reply has arrived from the server in given timeout.",
++				"There has been some other error while trying to receive a reply.",
++				"The reply from the server is invalid.",
++				"Internal error of this library. Please create a github issue.",
++			};
++		static_assert(size_t(RequestStatus::UnexpectedError) + 1 == fut::size(RequestStatusStr), "update the RequestStatusStr");
++
++		if (size_t(status) < fut::size(RequestStatusStr))
++		{
++			return RequestStatusStr[size_t(status)];
++		}
++		else
++		{
++			return "<invalid status>";
++		}
+ 	}
+-	else
++
++	const char *enumString(UpdateStatus status) noexcept
+ 	{
+-		return "<invalid status>";
++		static const char *const UpdateStatusStr[] =
++			{
++				"The current device list seems up to date.",
++				"Server has sent a notification message indicating that the device list has changed.",
++				"Server has closed the connection.",
++				"Server has sent some other kind of message that we didn't expect.",
++				"Error has occured while trying to restore socket to its original state and the socket has been closed.",
++				"Other system error.",
++				"Internal error of this library. Please create a github issue.",
++			};
++		static_assert(size_t(UpdateStatus::UnexpectedError) + 1 == fut::size(UpdateStatusStr), "update the UpdateStatusStr");
++
++		if (size_t(status) < fut::size(UpdateStatusStr))
++		{
++			return UpdateStatusStr[size_t(status)];
++		}
++		else
++		{
++			return "<invalid status>";
++		}
+ 	}
+-}
+ 
+-const char * enumString( RequestStatus status ) noexcept
+-{
+-	static const char * const RequestStatusStr [] =
+-	{
+-		"The request was succesful.",
+-		"Request failed because the client is not connected.",
+-		"Failed to send the request message.",
+-		"Server has closed the connection.",
+-		"No reply has arrived from the server in given timeout.",
+-		"There has been some other error while trying to receive a reply.",
+-		"The reply from the server is invalid.",
+-		"Internal error of this library. Please create a github issue.",
+-	};
+-	static_assert( size_t(RequestStatus::UnexpectedError) + 1 == fut::size(RequestStatusStr), "update the RequestStatusStr" );
++	//======================================================================================================================
++	//  Client: main API
+ 
+-	if (size_t(status) < fut::size(RequestStatusStr))
++	Client::Client(const std::string &clientName) noexcept
++		: _clientName(clientName),
++		  _socket(new TcpSocket),
++		  _negotiatedProtocolVersion(0),
++		  _isDeviceListOutOfDate(true)
+ 	{
+-		return RequestStatusStr[ size_t(status) ];
+ 	}
+-	else
+-	{
+-		return "<invalid status>";
+-	}
+-}
+ 
+-const char * enumString( UpdateStatus status ) noexcept
+-{
+-	static const char * const UpdateStatusStr [] =
+-	{
+-		"The current device list seems up to date.",
+-		"Server has sent a notification message indicating that the device list has changed.",
+-		"Server has closed the connection.",
+-		"Server has sent some other kind of message that we didn't expect.",
+-		"Error has occured while trying to restore socket to its original state and the socket has been closed.",
+-		"Other system error.",
+-		"Internal error of this library. Please create a github issue.",
+-	};
+-	static_assert( size_t(UpdateStatus::UnexpectedError) + 1 == fut::size(UpdateStatusStr), "update the UpdateStatusStr" );
++	Client::~Client() noexcept {}
+ 
+-	if (size_t(status) < fut::size(UpdateStatusStr))
++	bool Client::isConnected() const noexcept
+ 	{
+-		return UpdateStatusStr[ size_t(status) ];
++		return _socket->isConnected();
+ 	}
+-	else
++
++	ConnectStatus Client::_connect(const std::string &host, uint16_t port)
+ 	{
+-		return "<invalid status>";
+-	}
+-}
++		SocketError connectRes = _socket->connect(host, port);
++		if (connectRes != SocketError::Success)
++		{
++			switch (connectRes)
++			{
++			case SocketError::AlreadyConnected:
++				return ConnectStatus::AlreadyConnected;
++			case SocketError::NetworkingInitFailed:
++				return ConnectStatus::NetworkingInitFailed;
++			case SocketError::HostNotResolved:
++				return ConnectStatus::HostNotResolved;
++			case SocketError::ConnectFailed:
++				return ConnectStatus::ConnectFailed;
++			default:
++				return ConnectStatus::OtherSystemError;
++			}
++		}
+ 
++		// rather set some default timeout for recv operations, user can always override this
++		_socket->setTimeout(milliseconds(500));
+ 
+-//======================================================================================================================
+-//  Client: main API
++		bool sendVersionRes = sendMessage<RequestProtocolVersion>(implementedProtocolVersion);
++		if (!sendVersionRes)
++		{
++			_socket->disconnect(); // revert to the state before this function was called
++			return ConnectStatus::RequestVersionFailed;
++		}
+ 
+-Client::Client( const std::string & clientName ) noexcept
+-:
+-	_clientName( clientName ),
+-	_socket( new TcpSocket ),
+-	_negotiatedProtocolVersion( 0 ),
+-	_isDeviceListOutOfDate( true )
+-{}
++		auto requestVersionRes = awaitMessage<ReplyProtocolVersion>();
++		if (requestVersionRes.status != RequestStatus::Success)
++		{
++			_socket->disconnect(); // revert to the state before this function was called
++			return ConnectStatus::RequestVersionFailed;
++		}
+ 
+-Client::~Client() noexcept {}
++		if (requestVersionRes.message.serverVersion == 0)
++		{
++			// Support for the very first version-less OpenRGB protocol will not be maintained.
++			_socket->disconnect(); // revert to the state before this function was called
++			return ConnectStatus::VersionNotSupported;
++		}
+ 
+-bool Client::isConnected() const noexcept
+-{
+-	return _socket->isConnected();
+-}
++		_negotiatedProtocolVersion = std::min(implementedProtocolVersion, requestVersionRes.message.serverVersion);
+ 
+-ConnectStatus Client::_connect( const std::string & host, uint16_t port )
+-{
+-	SocketError connectRes = _socket->connect( host, port );
+-	if (connectRes != SocketError::Success)
+-	{
+-		switch (connectRes)
++		bool sendNameRes = sendMessage<SetClientName>(_clientName);
++		if (!sendNameRes)
+ 		{
+-			case SocketError::AlreadyConnected:      return ConnectStatus::AlreadyConnected;
+-			case SocketError::NetworkingInitFailed:  return ConnectStatus::NetworkingInitFailed;
+-			case SocketError::HostNotResolved:       return ConnectStatus::HostNotResolved;
+-			case SocketError::ConnectFailed:         return ConnectStatus::ConnectFailed;
+-			default:                                 return ConnectStatus::OtherSystemError;
++			_socket->disconnect(); // revert to the state before this function was called
++			return ConnectStatus::SendNameFailed;
+ 		}
+-	}
+ 
+-	// rather set some default timeout for recv operations, user can always override this
+-	_socket->setTimeout( milliseconds( 500 ) );
++		// The list isn't trully out of date, because there isn't any list yet. But let's say it is, because
++		// it simplifies writing an application loop. This way user can just write
++		//
++		// while (true)
++		// {
++		//     if (!client.isConnected())
++		//         client.connect();
++		//     if (client.isDeviceListOutOfDate())
++		//         deviceList = client.requestDeviceList();
++		//     ...
++		//     change colors
++		//     ...
++		// }
++		_isDeviceListOutOfDate = true;
+ 
+-	bool sendVersionRes = sendMessage< RequestProtocolVersion >( implementedProtocolVersion );
+-	if (!sendVersionRes)
+-	{
+-		_socket->disconnect();  // revert to the state before this function was called
+-		return ConnectStatus::RequestVersionFailed;
++		return ConnectStatus::Success;
+ 	}
+ 
+-	auto requestVersionRes = awaitMessage< ReplyProtocolVersion >();
+-	if (requestVersionRes.status != RequestStatus::Success)
++	bool Client::_disconnect() noexcept
+ 	{
+-		_socket->disconnect();  // revert to the state before this function was called
+-		return ConnectStatus::RequestVersionFailed;
++		SocketError status = _socket->disconnect();
++		if (status == SocketError::Success)
++			return true;
++		else if (status == SocketError::NotConnected)
++			return false;
++		else
++			// This can happen if the client doesn't respond to a server's FIN packet by calling close() in time and the
++			// server just forcibly ends the connection producing a network error.
++			// In this case, the user doesn't need to know because he wanted the socket closed and that's what's gonna happen.255
++			return true;
+ 	}
+ 
+-	if (requestVersionRes.message.serverVersion == 0)
++	bool Client::_setTimeout(std::chrono::milliseconds timeout) noexcept
+ 	{
+-		// Support for the very first version-less OpenRGB protocol will not be maintained.
+-		_socket->disconnect();  // revert to the state before this function was called
+-		return ConnectStatus::VersionNotSupported;
+-	}
++		// Currently we cannot set timeout on a socket that is not connected, because the actual system socket is created
++		// during connect operation, so the preceeding setTimeout calls would go to nowhere.
++		if (!_socket->isConnected())
++		{
++			return false;
++		}
+ 
+-	_negotiatedProtocolVersion = std::min( implementedProtocolVersion, requestVersionRes.message.serverVersion );
++		return _socket->setTimeout(timeout);
++	}
+ 
+-	bool sendNameRes = sendMessage< SetClientName >( _clientName );
+-	if (!sendNameRes)
++	DeviceListResult Client::_requestDeviceList()
+ 	{
+-		_socket->disconnect();  // revert to the state before this function was called
+-		return ConnectStatus::SendNameFailed;
+-	}
++		if (!_socket->isConnected())
++		{
++			return {RequestStatus::NotConnected, {}};
++		}
+ 
+-	// The list isn't trully out of date, because there isn't any list yet. But let's say it is, because
+-	// it simplifies writing an application loop. This way user can just write
+-	//
+-	// while (true)
+-	// {
+-	//     if (!client.isConnected())
+-	//         client.connect();
+-	//     if (client.isDeviceListOutOfDate())
+-	//         deviceList = client.requestDeviceList();
+-	//     ...
+-	//     change colors
+-	//     ...
+-	// }
+-	_isDeviceListOutOfDate = true;
++		DeviceListResult result;
+ 
+-	return ConnectStatus::Success;
+-}
++		do
++		{
++			result.devices.clear();
++			_isDeviceListOutOfDate = false;
+ 
+-bool Client::_disconnect() noexcept
+-{
+-	SocketError status = _socket->disconnect();
+-	if (status == SocketError::Success)
+-		return true;
+-	else if (status == SocketError::NotConnected)
+-		return false;
+-	else
+-		// This can happen if the client doesn't respond to a server's FIN packet by calling close() in time and the
+-		// server just forcibly ends the connection producing a network error.
+-		// In this case, the user doesn't need to know because he wanted the socket closed and that's what's gonna happen.255
+-		return true;
+-}
+-
+-bool Client::_setTimeout( std::chrono::milliseconds timeout ) noexcept
+-{
+-	// Currently we cannot set timeout on a socket that is not connected, because the actual system socket is created
+-	// during connect operation, so the preceeding setTimeout calls would go to nowhere.
+-	if (!_socket->isConnected())
+-	{
+-		return false;
+-	}
++			bool sent = sendMessage<RequestControllerCount>();
++			if (!sent)
++			{
++				result.status = RequestStatus::SendRequestFailed;
++				return result;
++			}
+ 
+-	return _socket->setTimeout( timeout );
+-}
++			auto deviceCountResult = awaitMessage<ReplyControllerCount>();
++			if (deviceCountResult.status != RequestStatus::Success)
++			{
++				result.status = deviceCountResult.status;
++				return result;
++			}
+ 
+-DeviceListResult Client::_requestDeviceList()
+-{
+-	if (!_socket->isConnected())
+-	{
+-		return { RequestStatus::NotConnected, {} };
+-	}
++			for (uint32_t deviceIdx = 0; deviceIdx < deviceCountResult.message.count; ++deviceIdx)
++			{
++				sent = sendMessage<RequestControllerData>(deviceIdx, _negotiatedProtocolVersion);
++				if (!sent)
++				{
++					result.status = RequestStatus::SendRequestFailed;
++					return result;
++				}
++
++				auto deviceDataResult = awaitMessage<ReplyControllerData>();
++				if (deviceDataResult.status != RequestStatus::Success)
++				{
++					result.status = deviceDataResult.status;
++					return result;
++				}
++
++				result.devices.append(move(deviceDataResult.message.device_desc));
++			}
++		}
++		// In the middle of the update we might receive DeviceListUpdated message. In that case we need to start again.
++		while (_isDeviceListOutOfDate);
+ 
+-	DeviceListResult result;
++		result.status = RequestStatus::Success;
++		return result;
++	}
+ 
+-	do
++	DeviceCountResult Client::_requestDeviceCount()
+ 	{
+-		result.devices.clear();
+-		_isDeviceListOutOfDate = false;
++		if (!_socket->isConnected())
++		{
++			return {RequestStatus::NotConnected, 0};
++		}
++
++		DeviceCountResult result;
+ 
+-		bool sent = sendMessage< RequestControllerCount >();
++		bool sent = sendMessage<RequestControllerCount>();
+ 		if (!sent)
+ 		{
+ 			result.status = RequestStatus::SendRequestFailed;
+ 			return result;
+ 		}
+ 
+-		auto deviceCountResult = awaitMessage< ReplyControllerCount >();
++		auto deviceCountResult = awaitMessage<ReplyControllerCount>();
+ 		if (deviceCountResult.status != RequestStatus::Success)
+ 		{
+ 			result.status = deviceCountResult.status;
+ 			return result;
+ 		}
+ 
+-		for (uint32_t deviceIdx = 0; deviceIdx < deviceCountResult.message.count; ++deviceIdx)
++		result.count = deviceCountResult.message.count;
++		result.status = RequestStatus::Success;
++		return result;
++	}
++
++	DeviceInfoResult Client::_requestDeviceInfo(uint32_t deviceIdx)
++	{
++		if (!_socket->isConnected())
+ 		{
+-			sent = sendMessage< RequestControllerData >( deviceIdx, _negotiatedProtocolVersion );
+-			if (!sent)
+-			{
+-				result.status = RequestStatus::SendRequestFailed;
+-				return result;
+-			}
++			return {RequestStatus::NotConnected, nullptr};
++		}
+ 
+-			auto deviceDataResult = awaitMessage< ReplyControllerData >();
+-			if (deviceDataResult.status != RequestStatus::Success)
+-			{
+-				result.status = deviceDataResult.status;
+-				return result;
+-			}
++		DeviceInfoResult result;
+ 
+-			result.devices.append( move( deviceDataResult.message.device_desc ) );
++		bool sent = sendMessage<RequestControllerData>(deviceIdx, _negotiatedProtocolVersion);
++		if (!sent)
++		{
++			result.status = RequestStatus::SendRequestFailed;
++			return result;
+ 		}
++
++		auto deviceDataResult = awaitMessage<ReplyControllerData>();
++		if (deviceDataResult.status != RequestStatus::Success)
++		{
++			result.status = deviceDataResult.status;
++			return result;
++		}
++
++		result.device.reset(new Device(move(deviceDataResult.message.device_desc)));
++		result.status = RequestStatus::Success;
++		return result;
+ 	}
+-	// In the middle of the update we might receive DeviceListUpdated message. In that case we need to start again.
+-	while (_isDeviceListOutOfDate);
+ 
+-	result.status = RequestStatus::Success;
+-	return result;
+-}
++	UpdateStatus Client::_checkForDeviceUpdates() noexcept
++	{
++		if (_isDeviceListOutOfDate)
++		{
++			// Last time we found DeviceListUpdated message in the socket, and user haven't requested the new list yet,
++			// no need to look again, keep reporting "out of date" until he calls requestDeviceList().
++			return UpdateStatus::OutOfDate;
++		}
+ 
+-DeviceCountResult Client::_requestDeviceCount()
+-{
+-	if (!_socket->isConnected())
++		// Last time we checked there wasn't any DeviceListUpdated message, but it already might be now, so let's check.
++		UpdateStatus status = checkForUpdateMessageArrival();
++		if (status == UpdateStatus::OutOfDate)
++		{
++			// DeviceListUpdated message found, cache this discovery until user calls requestDeviceList().
++			_isDeviceListOutOfDate = true;
++		}
++
++		return status;
++	}
++
++	RequestStatus Client::_switchToCustomMode(const Device &device)
+ 	{
+-		return { RequestStatus::NotConnected, 0 };
++		if (!_socket->isConnected())
++		{
++			return RequestStatus::NotConnected;
++		}
++
++		if (!sendMessage<SetCustomMode>(device.idx))
++		{
++			return RequestStatus::SendRequestFailed;
++		}
++
++		return RequestStatus::Success;
+ 	}
+ 
+-	DeviceCountResult result;
++	RequestStatus Client::_changeMode(const Device &device, const Mode &mode)
++	{
++		if (!_socket->isConnected())
++		{
++			return RequestStatus::NotConnected;
++		}
++
++		if (!sendMessage<UpdateMode>(device.idx, mode.idx, mode, _negotiatedProtocolVersion))
++		{
++			return RequestStatus::SendRequestFailed;
++		}
++
++		return RequestStatus::Success;
++	}
+ 
+-	bool sent = sendMessage< RequestControllerCount >();
+-	if (!sent)
++	RequestStatus Client::_saveMode(const Device &device, const Mode &mode)
+ 	{
+-		result.status = RequestStatus::SendRequestFailed;
+-		return result;
++		if (!_socket->isConnected())
++		{
++			return RequestStatus::NotConnected;
++		}
++
++		if (!sendMessage<SaveMode>(device.idx, mode.idx, mode, _negotiatedProtocolVersion))
++		{
++			return RequestStatus::SendRequestFailed;
++		}
++
++		return RequestStatus::Success;
+ 	}
+ 
+-	auto deviceCountResult = awaitMessage< ReplyControllerCount >();
+-	if (deviceCountResult.status != RequestStatus::Success)
++	RequestStatus Client::_setDeviceColor(const Device &device, Color color)
+ 	{
+-		result.status = deviceCountResult.status;
+-		return result;
++		if (!_socket->isConnected())
++		{
++			return RequestStatus::NotConnected;
++		}
++
++		std::vector<Color> allColorsInDevice(device.leds.size(), color);
++		if (!sendMessage<UpdateLEDs>(device.idx, allColorsInDevice))
++		{
++			return RequestStatus::SendRequestFailed;
++		}
++
++		return RequestStatus::Success;
+ 	}
+ 
+-	result.count = deviceCountResult.message.count;
+-	result.status = RequestStatus::Success;
+-	return result;
+-}
++	RequestStatus Client::_setDeviceColors(const Device &device, std::vector<Color> colors)
++	{
++		if (!_socket->isConnected())
++		{
++			return RequestStatus::NotConnected;
++		}
++
++		if (!sendMessage<UpdateLEDs>(device.idx, colors))
++		{
++			return RequestStatus::SendRequestFailed;
++		}
+ 
+-DeviceInfoResult Client::_requestDeviceInfo( uint32_t deviceIdx )
+-{
+-	if (!_socket->isConnected())
++		return RequestStatus::Success;
++	}
++
++	RequestStatus Client::_setZoneColor(const Zone &zone, Color color)
+ 	{
+-		return { RequestStatus::NotConnected, nullptr };
++		if (!_socket->isConnected())
++		{
++			return RequestStatus::NotConnected;
++		}
++
++		std::vector<Color> allColorsInZone(zone.leds_count, color);
++		if (!sendMessage<UpdateZoneLEDs>(zone.parentIdx, zone.idx, allColorsInZone))
++		{
++			return RequestStatus::SendRequestFailed;
++		}
++
++		return RequestStatus::Success;
+ 	}
+ 
+-	DeviceInfoResult result;
++	RequestStatus Client::_setZoneSize(const Zone &zone, uint32_t newSize)
++	{
++		if (!_socket->isConnected())
++		{
++			return RequestStatus::NotConnected;
++		}
++
++		if (!sendMessage<ResizeZone>(zone.parentIdx, zone.idx, newSize))
++		{
++			return RequestStatus::SendRequestFailed;
++		}
+ 
+-	bool sent = sendMessage< RequestControllerData >( deviceIdx, _negotiatedProtocolVersion );
+-	if (!sent)
++		return RequestStatus::Success;
++	}
++
++	RequestStatus Client::_setLEDColor(const LED &led, Color color)
+ 	{
+-		result.status = RequestStatus::SendRequestFailed;
+-		return result;
++		if (!_socket->isConnected())
++		{
++			return RequestStatus::NotConnected;
++		}
++
++		if (!sendMessage<UpdateSingleLED>(led.parentIdx, led.idx, color))
++		{
++			return RequestStatus::SendRequestFailed;
++		}
++
++		return RequestStatus::Success;
+ 	}
+ 
+-	auto deviceDataResult = awaitMessage< ReplyControllerData >();
+-	if (deviceDataResult.status != RequestStatus::Success)
++	ProfileListResult Client::_requestProfileList()
+ 	{
+-		result.status = deviceDataResult.status;
++		if (!_socket->isConnected())
++		{
++			return {RequestStatus::NotConnected, {}};
++		}
++
++		ProfileListResult result;
++
++		bool sent = sendMessage<RequestProfileList>();
++		if (!sent)
++		{
++			result.status = RequestStatus::SendRequestFailed;
++			return result;
++		}
++
++		auto deviceDataResult = awaitMessage<ReplyProfileList>();
++		if (deviceDataResult.status != RequestStatus::Success)
++		{
++			result.status = deviceDataResult.status;
++			return result;
++		}
++
++		result.profiles = move(deviceDataResult.message.profiles);
++		result.status = RequestStatus::Success;
+ 		return result;
+ 	}
+ 
+-	result.device.reset( new Device( move( deviceDataResult.message.device_desc ) ) );
+-	result.status = RequestStatus::Success;
+-	return result;
+-}
+-
+-UpdateStatus Client::_checkForDeviceUpdates() noexcept
+-{
+-	if (_isDeviceListOutOfDate)
++	RequestStatus Client::_saveProfile(const std::string &profileName)
+ 	{
+-		// Last time we found DeviceListUpdated message in the socket, and user haven't requested the new list yet,
+-		// no need to look again, keep reporting "out of date" until he calls requestDeviceList().
+-		return UpdateStatus::OutOfDate;
++		if (!_socket->isConnected())
++		{
++			return RequestStatus::NotConnected;
++		}
++
++		if (!sendMessage<RequestSaveProfile>(profileName))
++		{
++			return RequestStatus::SendRequestFailed;
++		}
++
++		return RequestStatus::Success;
+ 	}
+ 
+-	// Last time we checked there wasn't any DeviceListUpdated message, but it already might be now, so let's check.
+-	UpdateStatus status = checkForUpdateMessageArrival();
+-	if (status == UpdateStatus::OutOfDate)
++	RequestStatus Client::_loadProfile(const std::string &profileName)
+ 	{
+-		// DeviceListUpdated message found, cache this discovery until user calls requestDeviceList().
+-		_isDeviceListOutOfDate = true;
+-	}
++		if (!_socket->isConnected())
++		{
++			return RequestStatus::NotConnected;
++		}
+ 
+-	return status;
+-}
++		if (!sendMessage<RequestLoadProfile>(profileName))
++		{
++			return RequestStatus::SendRequestFailed;
++		}
+ 
+-RequestStatus Client::_switchToCustomMode( const Device & device )
+-{
+-	if (!_socket->isConnected())
+-	{
+-		return RequestStatus::NotConnected;
++		return RequestStatus::Success;
+ 	}
+ 
+-	if (!sendMessage< SetCustomMode >( device.idx ))
++	RequestStatus Client::_deleteProfile(const std::string &profileName)
+ 	{
+-		return RequestStatus::SendRequestFailed;
+-	}
++		if (!_socket->isConnected())
++		{
++			return RequestStatus::NotConnected;
++		}
+ 
+-	return RequestStatus::Success;
+-}
++		if (!sendMessage<RequestLoadProfile>(profileName))
++		{
++			return RequestStatus::SendRequestFailed;
++		}
+ 
+-RequestStatus Client::_changeMode( const Device & device, const Mode & mode )
+-{
+-	if (!_socket->isConnected())
+-	{
+-		return RequestStatus::NotConnected;
++		return RequestStatus::Success;
+ 	}
+ 
+-	if (!sendMessage< UpdateMode >( device.idx, mode.idx, mode, _negotiatedProtocolVersion ))
++	system_error_t Client::getLastSystemError() const noexcept
+ 	{
+-		return RequestStatus::SendRequestFailed;
++		return _socket->getLastSystemError();
+ 	}
+ 
+-	return RequestStatus::Success;
+-}
+-
+-RequestStatus Client::_saveMode( const Device & device, const Mode & mode )
+-{
+-	if (!_socket->isConnected())
++	string Client::getLastSystemErrorStr() const noexcept
+ 	{
+-		return RequestStatus::NotConnected;
++		return getErrorString(getLastSystemError());
+ 	}
+ 
+-	if (!sendMessage< SaveMode >( device.idx, mode.idx, mode, _negotiatedProtocolVersion ))
++	string Client::getSystemErrorStr(system_error_t errorCode) const noexcept
+ 	{
+-		return RequestStatus::SendRequestFailed;
++		return getErrorString(errorCode);
+ 	}
+ 
+-	return RequestStatus::Success;
+-}
++	//======================================================================================================================
++	//  Client: exception-less wrappers of the API
++
++#define CATCH_ALL(...)                                                            \
++	catch (const std::exception &ex)                                              \
++	{                                                                             \
++		fprintf(stderr, "Unexpected std::exception was thrown: %s\n", ex.what()); \
++		__VA_ARGS__                                                               \
++	}                                                                             \
++	catch (...)                                                                   \
++	{                                                                             \
++		fprintf(stderr, "Unexpected unknown exception was thrown\n");             \
++		__VA_ARGS__                                                               \
++	}
+ 
+-RequestStatus Client::_setDeviceColor( const Device & device, Color color )
+-{
+-	if (!_socket->isConnected())
++	ConnectStatus Client::connect(const std::string &host, uint16_t port) noexcept
+ 	{
+-		return RequestStatus::NotConnected;
++		try
++		{
++			return _connect(host, port);
++		}
++		CATCH_ALL(
++			return ConnectStatus::UnexpectedError;)
+ 	}
+ 
+-	std::vector< Color > allColorsInDevice( device.leds.size(), color );
+-	if (!sendMessage< UpdateLEDs >( device.idx, allColorsInDevice ))
++	bool Client::disconnect() noexcept
+ 	{
+-		return RequestStatus::SendRequestFailed;
++		try
++		{
++			return _disconnect();
++		}
++		CATCH_ALL(
++			return false;)
+ 	}
+ 
+-	return RequestStatus::Success;
+-}
+-
+-RequestStatus Client::_setZoneColor( const Zone & zone, Color color )
+-{
+-	if (!_socket->isConnected())
++	bool Client::setTimeout(std::chrono::milliseconds timeout) noexcept
+ 	{
+-		return RequestStatus::NotConnected;
++		return _setTimeout(timeout);
+ 	}
+ 
+-	std::vector< Color > allColorsInZone( zone.leds_count, color );
+-	if (!sendMessage< UpdateZoneLEDs >( zone.parentIdx, zone.idx, allColorsInZone ))
++	DeviceListResult Client::requestDeviceList() noexcept
+ 	{
+-		return RequestStatus::SendRequestFailed;
++		try
++		{
++			return _requestDeviceList();
++		}
++		CATCH_ALL(
++			return {RequestStatus::UnexpectedError, {}};)
+ 	}
+ 
+-	return RequestStatus::Success;
+-}
+-
+-RequestStatus Client::_setZoneSize( const Zone & zone, uint32_t newSize )
+-{
+-	if (!_socket->isConnected())
++	DeviceCountResult Client::requestDeviceCount() noexcept
+ 	{
+-		return RequestStatus::NotConnected;
++		try
++		{
++			return _requestDeviceCount();
++		}
++		CATCH_ALL(
++			return {RequestStatus::UnexpectedError, 0};)
+ 	}
+ 
+-	if (!sendMessage< ResizeZone >( zone.parentIdx, zone.idx, newSize ))
++	DeviceInfoResult Client::requestDeviceInfo(uint32_t deviceIdx) noexcept
+ 	{
+-		return RequestStatus::SendRequestFailed;
++		try
++		{
++			return _requestDeviceInfo(deviceIdx);
++		}
++		CATCH_ALL(
++			return {RequestStatus::UnexpectedError, {}};)
+ 	}
+ 
+-	return RequestStatus::Success;
+-}
+-
+-RequestStatus Client::_setLEDColor( const LED & led, Color color )
+-{
+-	if (!_socket->isConnected())
++	UpdateStatus Client::checkForDeviceUpdates() noexcept
+ 	{
+-		return RequestStatus::NotConnected;
++		return _checkForDeviceUpdates();
+ 	}
+ 
+-	if (!sendMessage< UpdateSingleLED >( led.parentIdx, led.idx, color ))
++	RequestStatus Client::switchToCustomMode(const Device &device) noexcept
+ 	{
+-		return RequestStatus::SendRequestFailed;
++		try
++		{
++			return _switchToCustomMode(device);
++		}
++		CATCH_ALL(
++			return RequestStatus::UnexpectedError;)
+ 	}
+ 
+-	return RequestStatus::Success;
+-}
+-
+-ProfileListResult Client::_requestProfileList()
+-{
+-	if (!_socket->isConnected())
++	RequestStatus Client::changeMode(const Device &device, const Mode &mode) noexcept
+ 	{
+-		return { RequestStatus::NotConnected, {} };
++		try
++		{
++			return _changeMode(device, mode);
++		}
++		CATCH_ALL(
++			return RequestStatus::UnexpectedError;)
+ 	}
+ 
+-	ProfileListResult result;
+-
+-	bool sent = sendMessage< RequestProfileList >();
+-	if (!sent)
++	RequestStatus Client::saveMode(const Device &device, const Mode &mode) noexcept
+ 	{
+-		result.status = RequestStatus::SendRequestFailed;
+-		return result;
++		try
++		{
++			return _saveMode(device, mode);
++		}
++		CATCH_ALL(
++			return RequestStatus::UnexpectedError;)
+ 	}
+ 
+-	auto deviceDataResult = awaitMessage< ReplyProfileList >();
+-	if (deviceDataResult.status != RequestStatus::Success)
++	RequestStatus Client::setDeviceColor(const Device &device, Color color) noexcept
+ 	{
+-		result.status = deviceDataResult.status;
+-		return result;
++		try
++		{
++			return _setDeviceColor(device, color);
++		}
++		CATCH_ALL(
++			return RequestStatus::UnexpectedError;)
+ 	}
+ 
+-	result.profiles = move( deviceDataResult.message.profiles );
+-	result.status = RequestStatus::Success;
+-	return result;
+-}
+-
+-RequestStatus Client::_saveProfile( const std::string & profileName )
+-{
+-	if (!_socket->isConnected())
++	RequestStatus Client::setDeviceColors(const Device &device, std::vector<Color> colors) noexcept
+ 	{
+-		return RequestStatus::NotConnected;
++		try
++		{
++			return _setDeviceColors(device, colors);
++		}
++		CATCH_ALL(
++			return RequestStatus::UnexpectedError;)
+ 	}
+ 
+-	if (!sendMessage< RequestSaveProfile >( profileName ))
++	RequestStatus Client::setZoneColor(const Zone &zone, Color color) noexcept
+ 	{
+-		return RequestStatus::SendRequestFailed;
++		try
++		{
++			return _setZoneColor(zone, color);
++		}
++		CATCH_ALL(
++			return RequestStatus::UnexpectedError;)
+ 	}
+ 
+-	return RequestStatus::Success;
+-}
+-
+-RequestStatus Client::_loadProfile( const std::string & profileName )
+-{
+-	if (!_socket->isConnected())
++	RequestStatus Client::setZoneSize(const Zone &zone, uint32_t newSize) noexcept
+ 	{
+-		return RequestStatus::NotConnected;
++		try
++		{
++			return _setZoneSize(zone, newSize);
++		}
++		CATCH_ALL(
++			return RequestStatus::UnexpectedError;)
+ 	}
+ 
+-	if (!sendMessage< RequestLoadProfile >( profileName ))
++	RequestStatus Client::setLEDColor(const LED &led, Color color) noexcept
+ 	{
+-		return RequestStatus::SendRequestFailed;
++		try
++		{
++			return _setLEDColor(led, color);
++		}
++		CATCH_ALL(
++			return RequestStatus::UnexpectedError;)
+ 	}
+ 
+-	return RequestStatus::Success;
+-}
+-
+-RequestStatus Client::_deleteProfile( const std::string & profileName )
+-{
+-	if (!_socket->isConnected())
++	ProfileListResult Client::requestProfileList()
+ 	{
+-		return RequestStatus::NotConnected;
++		try
++		{
++			return _requestProfileList();
++		}
++		CATCH_ALL(
++			return {RequestStatus::UnexpectedError, {}};)
+ 	}
+ 
+-	if (!sendMessage< RequestLoadProfile >( profileName ))
++	RequestStatus Client::saveProfile(const std::string &profileName)
+ 	{
+-		return RequestStatus::SendRequestFailed;
++		try
++		{
++			return _saveProfile(profileName);
++		}
++		CATCH_ALL(
++			return RequestStatus::UnexpectedError;)
+ 	}
+ 
+-	return RequestStatus::Success;
+-}
+-
+-system_error_t Client::getLastSystemError() const noexcept
+-{
+-	return _socket->getLastSystemError();
+-}
+-
+-string Client::getLastSystemErrorStr() const noexcept
+-{
+-	return getErrorString( getLastSystemError() );
+-}
+-
+-string Client::getSystemErrorStr( system_error_t errorCode ) const noexcept
+-{
+-	return getErrorString( errorCode );
+-}
+-
+-
+-//======================================================================================================================
+-//  Client: exception-less wrappers of the API
+-
+-#define CATCH_ALL( ... ) \
+-	catch (const std::exception & ex) { \
+-		fprintf( stderr, "Unexpected std::exception was thrown: %s\n", ex.what() ); \
+-		__VA_ARGS__ \
+-	} catch (...) { \
+-		fprintf( stderr, "Unexpected unknown exception was thrown\n" ); \
+-		__VA_ARGS__ \
++	RequestStatus Client::loadProfile(const std::string &profileName)
++	{
++		try
++		{
++			return _loadProfile(profileName);
++		}
++		CATCH_ALL(
++			return RequestStatus::UnexpectedError;)
+ 	}
+ 
+-ConnectStatus Client::connect( const std::string & host, uint16_t port ) noexcept
+-{
+-	try {
+-		return _connect( host, port );
+-	} CATCH_ALL (
+-		return ConnectStatus::UnexpectedError;
+-	)
+-}
+-
+-bool Client::disconnect() noexcept
+-{
+-	try {
+-		return _disconnect();
+-	} CATCH_ALL (
+-		return false;
+-	)
+-}
+-
+-bool Client::setTimeout( std::chrono::milliseconds timeout ) noexcept
+-{
+-	return _setTimeout( timeout );
+-}
+-
+-DeviceListResult Client::requestDeviceList() noexcept
+-{
+-	try {
+-		return _requestDeviceList();
+-	} CATCH_ALL (
+-		return { RequestStatus::UnexpectedError, {} };
+-	)
+-}
+-
+-DeviceCountResult Client::requestDeviceCount() noexcept
+-{
+-	try {
+-		return _requestDeviceCount();
+-	} CATCH_ALL (
+-		return { RequestStatus::UnexpectedError, 0 };
+-	)
+-}
+-
+-DeviceInfoResult Client::requestDeviceInfo( uint32_t deviceIdx ) noexcept
+-{
+-	try {
+-		return _requestDeviceInfo( deviceIdx );
+-	} CATCH_ALL (
+-		return { RequestStatus::UnexpectedError, {} };
+-	)
+-}
+-
+-UpdateStatus Client::checkForDeviceUpdates() noexcept
+-{
+-	return _checkForDeviceUpdates();
+-}
+-
+-RequestStatus Client::switchToCustomMode( const Device & device ) noexcept
+-{
+-	try {
+-		return _switchToCustomMode( device );
+-	} CATCH_ALL (
+-		return RequestStatus::UnexpectedError;
+-	)
+-}
+-
+-RequestStatus Client::changeMode( const Device & device, const Mode & mode ) noexcept
+-{
+-	try {
+-		return _changeMode( device, mode );
+-	} CATCH_ALL (
+-		return RequestStatus::UnexpectedError;
+-	)
+-}
+-
+-RequestStatus Client::saveMode( const Device & device, const Mode & mode ) noexcept
+-{
+-	try {
+-		return _saveMode( device, mode );
+-	} CATCH_ALL (
+-		return RequestStatus::UnexpectedError;
+-	)
+-}
+-
+-RequestStatus Client::setDeviceColor( const Device & device, Color color ) noexcept
+-{
+-	try {
+-		return _setDeviceColor( device, color );
+-	} CATCH_ALL (
+-		return RequestStatus::UnexpectedError;
+-	)
+-}
+-
+-RequestStatus Client::setZoneColor( const Zone & zone, Color color ) noexcept
+-{
+-	try {
+-		return _setZoneColor( zone, color );
+-	} CATCH_ALL (
+-		return RequestStatus::UnexpectedError;
+-	)
+-}
+-
+-RequestStatus Client::setZoneSize( const Zone & zone, uint32_t newSize ) noexcept
+-{
+-	try {
+-		return _setZoneSize( zone, newSize );
+-	} CATCH_ALL (
+-		return RequestStatus::UnexpectedError;
+-	)
+-}
+-
+-RequestStatus Client::setLEDColor( const LED & led, Color color ) noexcept
+-{
+-	try {
+-		return _setLEDColor( led, color );
+-	} CATCH_ALL (
+-		return RequestStatus::UnexpectedError;
+-	)
+-}
+-
+-ProfileListResult Client::requestProfileList()
+-{
+-	try {
+-		return _requestProfileList();
+-	} CATCH_ALL (
+-		return { RequestStatus::UnexpectedError, {} };
+-	)
+-}
+-
+-RequestStatus Client::saveProfile( const std::string & profileName )
+-{
+-	try {
+-		return _saveProfile( profileName );
+-	} CATCH_ALL (
+-		return RequestStatus::UnexpectedError;
+-	)
+-}
+-
+-RequestStatus Client::loadProfile( const std::string & profileName )
+-{
+-	try {
+-		return _loadProfile( profileName );
+-	} CATCH_ALL (
+-		return RequestStatus::UnexpectedError;
+-	)
+-}
+-
+-RequestStatus Client::deleteProfile( const std::string & profileName )
+-{
+-	try {
+-		return _deleteProfile( profileName );
+-	} CATCH_ALL (
+-		return RequestStatus::UnexpectedError;
+-	)
+-}
+-
++	RequestStatus Client::deleteProfile(const std::string &profileName)
++	{
++		try
++		{
++			return _deleteProfile(profileName);
++		}
++		CATCH_ALL(
++			return RequestStatus::UnexpectedError;)
++	}
+ 
+-//======================================================================================================================
+-//  Client: exception-oriented wrappers of the API
++	//======================================================================================================================
++	//  Client: exception-oriented wrappers of the API
+ 
+ #ifndef NO_EXCEPTIONS
+ 
+-void Client::connectStatusToException( ConnectStatus status )
+-{
+-	switch (status)
++	void Client::connectStatusToException(ConnectStatus status)
+ 	{
++		switch (status)
++		{
+ 		case ConnectStatus::Success:
+ 			return;
+ 		case ConnectStatus::AlreadyConnected:
+-			throw UserError( enumString( status ) );
++			throw UserError(enumString(status));
+ 		case ConnectStatus::HostNotResolved:
+ 		case ConnectStatus::ConnectFailed:
+ 		case ConnectStatus::RequestVersionFailed:
+ 		case ConnectStatus::VersionNotSupported:
+ 		case ConnectStatus::SendNameFailed:
+-			throw ConnectionError( enumString( status ), getLastSystemError() );
++			throw ConnectionError(enumString(status), getLastSystemError());
+ 		default:
+-			throw SystemError( enumString( status ), getLastSystemError() );
++			throw SystemError(enumString(status), getLastSystemError());
++		}
+ 	}
+-}
+ 
+-void Client::requestStatusToException( RequestStatus status )
+-{
+-	switch (status)
++	void Client::requestStatusToException(RequestStatus status)
+ 	{
++		switch (status)
++		{
+ 		case RequestStatus::Success:
+ 			return;
+ 		case RequestStatus::NotConnected:
+-			throw UserError( enumString( status ) );
++			throw UserError(enumString(status));
+ 		case RequestStatus::SendRequestFailed:
+ 		case RequestStatus::ConnectionClosed:
+ 		case RequestStatus::NoReply:
+ 		case RequestStatus::InvalidReply:
+-			throw ConnectionError( enumString( status ), getLastSystemError() );
++			throw ConnectionError(enumString(status), getLastSystemError());
+ 		default:
+-			throw SystemError( enumString( status ), getLastSystemError() );
++			throw SystemError(enumString(status), getLastSystemError());
++		}
+ 	}
+-}
+ 
+-void Client::connectX( const std::string & host, uint16_t port )
+-{
+-	ConnectStatus status = _connect( host, port );
+-	connectStatusToException( status );
+-}
++	void Client::connectX(const std::string &host, uint16_t port)
++	{
++		ConnectStatus status = _connect(host, port);
++		connectStatusToException(status);
++	}
+ 
+-void Client::disconnectX()
+-{
+-	if (!_disconnect())
++	void Client::disconnectX()
+ 	{
+-		throw UserError( "The client is not connected." );
++		if (!_disconnect())
++		{
++			throw UserError("The client is not connected.");
++		}
+ 	}
+-}
+ 
+-void Client::setTimeoutX( std::chrono::milliseconds timeout )
+-{
+-	if (!_setTimeout( timeout ))
++	void Client::setTimeoutX(std::chrono::milliseconds timeout)
+ 	{
+-		throw SystemError( "Failed to set timeout", getLastSystemError() );
++		if (!_setTimeout(timeout))
++		{
++			throw SystemError("Failed to set timeout", getLastSystemError());
++		}
+ 	}
+-}
+ 
+-DeviceList Client::requestDeviceListX()
+-{
+-	DeviceListResult result = _requestDeviceList();
+-	requestStatusToException( result.status );
+-	return move( result.devices );
+-}
++	DeviceList Client::requestDeviceListX()
++	{
++		DeviceListResult result = _requestDeviceList();
++		requestStatusToException(result.status);
++		return move(result.devices);
++	}
+ 
+-uint32_t Client::requestDeviceCountX()
+-{
+-	DeviceCountResult result = _requestDeviceCount();
+-	requestStatusToException( result.status );
+-	return result.count;
+-}
++	uint32_t Client::requestDeviceCountX()
++	{
++		DeviceCountResult result = _requestDeviceCount();
++		requestStatusToException(result.status);
++		return result.count;
++	}
+ 
+-std::unique_ptr< Device > Client::requestDeviceInfoX( uint32_t deviceIdx )
+-{
+-	DeviceInfoResult result = _requestDeviceInfo( deviceIdx );
+-	requestStatusToException( result.status );
+-	return move( result.device );
+-}
++	std::unique_ptr<Device> Client::requestDeviceInfoX(uint32_t deviceIdx)
++	{
++		DeviceInfoResult result = _requestDeviceInfo(deviceIdx);
++		requestStatusToException(result.status);
++		return move(result.device);
++	}
+ 
+-bool Client::isDeviceListOutdatedX()
+-{
+-	UpdateStatus status = _checkForDeviceUpdates();
+-	switch (status)
++	bool Client::isDeviceListOutdatedX()
+ 	{
++		UpdateStatus status = _checkForDeviceUpdates();
++		switch (status)
++		{
+ 		case UpdateStatus::UpToDate:
+ 			return false;
+ 		case UpdateStatus::OutOfDate:
+ 			return true;
+ 		case UpdateStatus::ConnectionClosed:
+ 		case UpdateStatus::UnexpectedMessage:
+-			throw ConnectionError( enumString( status ), getLastSystemError() );
++			throw ConnectionError(enumString(status), getLastSystemError());
+ 		default:
+-			throw SystemError( enumString( status ), getLastSystemError() );
++			throw SystemError(enumString(status), getLastSystemError());
++		}
+ 	}
+-}
+ 
+-void Client::switchToCustomModeX( const Device & device )
+-{
+-	RequestStatus status = _switchToCustomMode( device );
+-	requestStatusToException( status );
+-}
++	void Client::switchToCustomModeX(const Device &device)
++	{
++		RequestStatus status = _switchToCustomMode(device);
++		requestStatusToException(status);
++	}
+ 
+-void Client::changeModeX( const Device & device, const Mode & mode )
+-{
+-	RequestStatus status = _changeMode( device, mode );
+-	requestStatusToException( status );
+-}
++	void Client::changeModeX(const Device &device, const Mode &mode)
++	{
++		RequestStatus status = _changeMode(device, mode);
++		requestStatusToException(status);
++	}
+ 
+-void Client::saveModeX( const Device & device, const Mode & mode )
+-{
+-	RequestStatus status = _saveMode( device, mode );
+-	requestStatusToException( status );
+-}
++	void Client::saveModeX(const Device &device, const Mode &mode)
++	{
++		RequestStatus status = _saveMode(device, mode);
++		requestStatusToException(status);
++	}
+ 
+-void Client::setDeviceColorX( const Device & device, Color color )
+-{
+-	RequestStatus status = _setDeviceColor( device, color );
+-	requestStatusToException( status );
+-}
++	void Client::setDeviceColorX(const Device &device, Color color)
++	{
++		RequestStatus status = _setDeviceColor(device, color);
++		requestStatusToException(status);
++	}
+ 
+-void Client::setZoneColorX( const Zone & zone, Color color )
+-{
+-	RequestStatus status = _setZoneColor( zone, color );
+-	requestStatusToException( status );
+-}
++	void Client::setZoneColorX(const Zone &zone, Color color)
++	{
++		RequestStatus status = _setZoneColor(zone, color);
++		requestStatusToException(status);
++	}
+ 
+-void Client::setZoneSizeX( const Zone & zone, uint32_t newSize )
+-{
+-	RequestStatus status = _setZoneSize( zone, newSize );
+-	requestStatusToException( status );
+-}
++	void Client::setZoneSizeX(const Zone &zone, uint32_t newSize)
++	{
++		RequestStatus status = _setZoneSize(zone, newSize);
++		requestStatusToException(status);
++	}
+ 
+-void Client::setLEDColorX( const LED & led, Color color )
+-{
+-	RequestStatus status = _setLEDColor( led, color );
+-	requestStatusToException( status );
+-}
++	void Client::setLEDColorX(const LED &led, Color color)
++	{
++		RequestStatus status = _setLEDColor(led, color);
++		requestStatusToException(status);
++	}
+ 
+-std::vector< std::string > Client::requestProfileListX()
+-{
+-	ProfileListResult result = _requestProfileList();
+-	requestStatusToException( result.status );
+-	return move( result.profiles );
+-}
++	std::vector<std::string> Client::requestProfileListX()
++	{
++		ProfileListResult result = _requestProfileList();
++		requestStatusToException(result.status);
++		return move(result.profiles);
++	}
+ 
+-void Client::saveProfileX( const std::string & profileName )
+-{
+-	RequestStatus status = _saveProfile( profileName );
+-	requestStatusToException( status );
+-}
++	void Client::saveProfileX(const std::string &profileName)
++	{
++		RequestStatus status = _saveProfile(profileName);
++		requestStatusToException(status);
++	}
+ 
+-void Client::loadProfileX( const std::string & profileName )
+-{
+-	RequestStatus status = _loadProfile( profileName );
+-	requestStatusToException( status );
+-}
++	void Client::loadProfileX(const std::string &profileName)
++	{
++		RequestStatus status = _loadProfile(profileName);
++		requestStatusToException(status);
++	}
+ 
+-void Client::deleteProfileX( const std::string & profileName )
+-{
+-	RequestStatus status = _deleteProfile( profileName );
+-	requestStatusToException( status );
+-}
++	void Client::deleteProfileX(const std::string &profileName)
++	{
++		RequestStatus status = _deleteProfile(profileName);
++		requestStatusToException(status);
++	}
+ 
+ #endif // NO_EXCEPTIONS
+ 
++	//======================================================================================================================
++	//  Client: helpers
+ 
+-//======================================================================================================================
+-//  Client: helpers
++	template <typename Message, typename... ConstructorArgs>
++	bool Client::sendMessage(ConstructorArgs... args)
++	{
++		Message message(args...);
+ 
+-template< typename Message, typename ... ConstructorArgs >
+-bool Client::sendMessage( ConstructorArgs ... args )
+-{
+-	Message message( args ... );
++		// allocate buffer and serialize (header.message_size is calculated in constructor)
++		std::vector<uint8_t> buffer(message.header.size() + message.header.message_size);
++		BinaryOutputStream stream(buffer);
++		message.serialize(stream, _negotiatedProtocolVersion);
+ 
+-	// allocate buffer and serialize (header.message_size is calculated in constructor)
+-	std::vector< uint8_t > buffer( message.header.size() + message.header.message_size );
+-	BinaryOutputStream stream( buffer );
+-	message.serialize( stream, _negotiatedProtocolVersion );
++		return _socket->send(buffer) == SocketError::Success;
++	}
+ 
+-	return _socket->send( buffer ) == SocketError::Success;
+-}
++	template <typename Message>
++	Client::RecvResult<Message> Client::awaitMessage() noexcept
++	{
++		RecvResult<Message> result;
+ 
+-template< typename Message >
+-Client::RecvResult< Message > Client::awaitMessage() noexcept
+-{
+-	RecvResult< Message > result;
++		do
++		{
++			// receive header into buffer
++			array<uint8_t, Header::size()> headerBuffer;
++			size_t received;
++			SocketError headerStatus = _socket->receive(headerBuffer, received);
++			if (headerStatus != SocketError::Success)
++			{
++				if (headerStatus == SocketError::ConnectionClosed)
++					result.status = RequestStatus::ConnectionClosed;
++				else if (headerStatus == SocketError::Timeout)
++					result.status = RequestStatus::NoReply;
++				else
++					result.status = RequestStatus::ReceiveError;
++				return result;
++			}
+ 
+-	do
+-	{
+-		// receive header into buffer
+-		array< uint8_t, Header::size() > headerBuffer; size_t received;
+-		SocketError headerStatus = _socket->receive( headerBuffer, received );
+-		if (headerStatus != SocketError::Success)
++			// parse and validate the header
++			BinaryInputStream stream(headerBuffer);
++			if (!result.message.header.deserialize(stream))
++			{
++				result.status = RequestStatus::InvalidReply;
++				return result;
++			}
++
++			// the server may have sent DeviceListUpdated messsage before it received our request
++			if (result.message.header.message_type == MessageType::DEVICE_LIST_UPDATED)
++			{
++				// in that case just set our "out of date" flag and skip it for now
++				_isDeviceListOutOfDate = true;
++			}
++		} while (result.message.header.message_type == MessageType::DEVICE_LIST_UPDATED);
++
++		if (result.message.header.message_type != Message::thisType)
++		{
++			// the message is neither DeviceListUpdated, nor the type we expected
++			result.status = RequestStatus::InvalidReply;
++			return result;
++		}
++
++		// receive the message body
++		vector<uint8_t> bodyBuffer;
++		SocketError bodyStatus = _socket->receive(bodyBuffer, result.message.header.message_size);
++		if (bodyStatus != SocketError::Success)
+ 		{
+-			if (headerStatus == SocketError::ConnectionClosed)
++			if (bodyStatus == SocketError::ConnectionClosed)
+ 				result.status = RequestStatus::ConnectionClosed;
+-			else if (headerStatus == SocketError::Timeout)
++			else if (bodyStatus == SocketError::Timeout)
+ 				result.status = RequestStatus::NoReply;
+ 			else
+ 				result.status = RequestStatus::ReceiveError;
+ 			return result;
+ 		}
+ 
+-		// parse and validate the header
+-		BinaryInputStream stream( headerBuffer );
+-		if (!result.message.header.deserialize( stream ))
++		// parse and validate the body
++		BinaryInputStream stream(bodyBuffer);
++		if (!result.message.deserializeBody(stream, _negotiatedProtocolVersion))
+ 		{
+ 			result.status = RequestStatus::InvalidReply;
+-			return result;
+ 		}
+-
+-		// the server may have sent DeviceListUpdated messsage before it received our request
+-		if (result.message.header.message_type == MessageType::DEVICE_LIST_UPDATED)
++		else
+ 		{
+-			// in that case just set our "out of date" flag and skip it for now
+-			_isDeviceListOutOfDate = true;
++			result.status = RequestStatus::Success;
+ 		}
+-	}
+-	while (result.message.header.message_type == MessageType::DEVICE_LIST_UPDATED);
+ 
+-	if (result.message.header.message_type != Message::thisType)
+-	{
+-		// the message is neither DeviceListUpdated, nor the type we expected
+-		result.status = RequestStatus::InvalidReply;
+ 		return result;
+ 	}
+ 
+-	// receive the message body
+-	vector< uint8_t > bodyBuffer;
+-	SocketError bodyStatus = _socket->receive( bodyBuffer, result.message.header.message_size );
+-	if (bodyStatus != SocketError::Success)
++	UpdateStatus Client::checkForUpdateMessageArrival() noexcept
+ 	{
+-		if (bodyStatus == SocketError::ConnectionClosed)
+-			result.status = RequestStatus::ConnectionClosed;
+-		else if (bodyStatus == SocketError::Timeout)
+-			result.status = RequestStatus::NoReply;
+-		else
+-			result.status = RequestStatus::ReceiveError;
+-		return result;
+-	}
++		// We only need to check if there is any TCP message in the system input buffer, but don't wait for it.
++		// So we switch the socket to non-blocking mode and try to receive.
+ 
+-	// parse and validate the body
+-	BinaryInputStream stream( bodyBuffer );
+-	if (!result.message.deserializeBody( stream, _negotiatedProtocolVersion ))
+-	{
+-		result.status = RequestStatus::InvalidReply;
+-	}
+-	else
+-	{
+-		result.status = RequestStatus::Success;
+-	}
++		if (!_socket->setBlockingMode(false))
++		{
++			return UpdateStatus::OtherSystemError;
++		}
+ 
+-	return result;
+-}
++		auto enableBlockingAndReturn = [this](UpdateStatus returnStatus)
++		{
++			if (!_socket->setBlockingMode(true))
++			{
++				// This is bad, we changed the state of the socket and now we're unable to return it back.
++				// So rather burn everything to the ground and start from the beginning, than let things be in undefined state.
++				disconnect();
++				return UpdateStatus::CantRestoreSocket;
++			}
++			else
++			{
++				return returnStatus;
++			}
++		};
+ 
+-UpdateStatus Client::checkForUpdateMessageArrival() noexcept
+-{
+-	// We only need to check if there is any TCP message in the system input buffer, but don't wait for it.
+-	// So we switch the socket to non-blocking mode and try to receive.
++		vector<uint8_t> buffer;
++		SocketError status = _socket->receive(buffer, Header::size());
++		if (status == SocketError::WouldBlock)
++		{
++			// No message is currently in the socket, no indication that the device list is out of date.
++			return enableBlockingAndReturn(UpdateStatus::UpToDate);
++		}
++		else if (status == SocketError::ConnectionClosed)
++		{
++			return enableBlockingAndReturn(UpdateStatus::ConnectionClosed);
++		}
++		else if (status != SocketError::Success)
++		{
++			return enableBlockingAndReturn(UpdateStatus::OtherSystemError);
++		}
+ 
+-	if (!_socket->setBlockingMode( false ))
+-	{
+-		return UpdateStatus::OtherSystemError;
+-	}
++		// We have some message, so let's check what it is.
+ 
+-	auto enableBlockingAndReturn = [ this ]( UpdateStatus returnStatus )
+-	{
+-		if (!_socket->setBlockingMode( true ))
++		Header header;
++		BinaryInputStream stream(buffer);
++		if (!header.deserialize(stream) || header.message_type != MessageType::DEVICE_LIST_UPDATED)
+ 		{
+-			// This is bad, we changed the state of the socket and now we're unable to return it back.
+-			// So rather burn everything to the ground and start from the beginning, than let things be in undefined state.
+-			disconnect();
+-			return UpdateStatus::CantRestoreSocket;
++			// We received something, but something totally different than what we expected.
++			return enableBlockingAndReturn(UpdateStatus::UnexpectedMessage);
+ 		}
+ 		else
+ 		{
+-			return returnStatus;
++			// We have received a DeviceListUpdated message from the server,
++			// signal to the user that he needs to request the list again.
++			return enableBlockingAndReturn(UpdateStatus::OutOfDate);
+ 		}
+-	};
+-
+-	vector< uint8_t > buffer;
+-	SocketError status = _socket->receive( buffer, Header::size() );
+-	if (status == SocketError::WouldBlock)
+-	{
+-		// No message is currently in the socket, no indication that the device list is out of date.
+-		return enableBlockingAndReturn( UpdateStatus::UpToDate );
+ 	}
+-	else if (status == SocketError::ConnectionClosed)
+-	{
+-		return enableBlockingAndReturn( UpdateStatus::ConnectionClosed );
+-	}
+-	else if (status != SocketError::Success)
+-	{
+-		return enableBlockingAndReturn( UpdateStatus::OtherSystemError );
+-	}
+-
+-	// We have some message, so let's check what it is.
+-
+-	Header header;
+-	BinaryInputStream stream( buffer );
+-	if (!header.deserialize( stream ) || header.message_type != MessageType::DEVICE_LIST_UPDATED)
+-	{
+-		// We received something, but something totally different than what we expected.
+-		return enableBlockingAndReturn( UpdateStatus::UnexpectedMessage );
+-	}
+-	else
+-	{
+-		// We have received a DeviceListUpdated message from the server,
+-		// signal to the user that he needs to request the list again.
+-		return enableBlockingAndReturn( UpdateStatus::OutOfDate );
+-	}
+-}
+-
+-
+-//======================================================================================================================
+ 
++	//======================================================================================================================
+ 
+ } // namespace orgb
+diff --git a/src/Color.cpp b/src/Color.cpp
+index 6163aeb..5c8b445 100644
+--- a/src/Color.cpp
++++ b/src/Color.cpp
+@@ -11,10 +11,11 @@
+ #include "MiscUtils.hpp"
+ 
+ #include <CppUtils-Essential/BinaryStream.hpp>
+-using own::BinaryOutputStream;
+ using own::BinaryInputStream;
++using own::BinaryOutputStream;
+ #include <CppUtils-Essential/StringUtils.hpp>
+ 
++#include <cmath>
+ #include <cstdio>
+ #include <iostream>
+ #include <ios>
+@@ -22,106 +23,178 @@ using own::BinaryInputStream;
+ #include <string>
+ #include <unordered_map>
+ 
++namespace orgb
++{
+ 
+-namespace orgb {
+-
++	//======================================================================================================================
++	//  Color
+ 
+-//======================================================================================================================
+-//  Color
+-
+-const Color Color::Black   (0x00, 0x00, 0x00);
+-const Color Color::White   (0xFF, 0xFF, 0xFF);
+-const Color Color::Red     (0xFF, 0x00, 0x00);
+-const Color Color::Green   (0x00, 0xFF, 0x00);
+-const Color Color::Blue    (0x00, 0x00, 0xFF);
+-const Color Color::Yellow  (0xFF, 0xFF, 0x00);
+-const Color Color::Magenta (0xFF, 0x00, 0xFF);
+-const Color Color::Cyan    (0x00, 0xFF, 0xFF);
+-
+-static const std::unordered_map< std::string, Color > colorNames =
+-{
+-	{ "black", Color::Black },
+-	{ "white", Color::White },
+-	{ "red", Color::Red },
+-	{ "green", Color::Green },
+-	{ "blue", Color::Blue },
+-	{ "yellow", Color::Yellow },
+-	{ "magenta", Color::Magenta },
+-	{ "cyan", Color::Cyan },
+-};
+-
+-bool Color::fromString( const std::string & str ) noexcept
+-{
+-	if (str.empty())
+-		return false;
++	const Color Color::Black(0x00, 0x00, 0x00);
++	const Color Color::White(0xFF, 0xFF, 0xFF);
++	const Color Color::Red(0xFF, 0x00, 0x00);
++	const Color Color::Green(0x00, 0xFF, 0x00);
++	const Color Color::Blue(0x00, 0x00, 0xFF);
++	const Color Color::Yellow(0xFF, 0xFF, 0x00);
++	const Color Color::Magenta(0xFF, 0x00, 0xFF);
++	const Color Color::Cyan(0x00, 0xFF, 0xFF);
+ 
+-	uint red, green, blue;
+-	if (str[0] == '#' && sscanf( str.c_str() + 1, "%02x%02x%02x", &red, &green, &blue ) == 3)
++	static const std::unordered_map<std::string, Color> colorNames =
++		{
++			{"black", Color::Black},
++			{"white", Color::White},
++			{"red", Color::Red},
++			{"green", Color::Green},
++			{"blue", Color::Blue},
++			{"yellow", Color::Yellow},
++			{"magenta", Color::Magenta},
++			{"cyan", Color::Cyan},
++	};
++
++	bool Color::fromString(const std::string &str) noexcept
+ 	{
+-		r = uint8_t( red );
+-		g = uint8_t( green );
+-		b = uint8_t( blue );
+-		return true;
++		if (str.empty())
++			return false;
++
++		uint red, green, blue;
++		if (str[0] == '#' && sscanf(str.c_str() + 1, "%02x%02x%02x", &red, &green, &blue) == 3)
++		{
++			r = uint8_t(red);
++			g = uint8_t(green);
++			b = uint8_t(blue);
++			return true;
++		}
++		else if (sscanf(str.c_str(), "%02x%02x%02x", &red, &green, &blue) == 3)
++		{
++			r = uint8_t(red);
++			g = uint8_t(green);
++			b = uint8_t(blue);
++			return true;
++		}
++		else
++		{
++			std::string strLower = own::to_lower(str);
++			auto colorIter = colorNames.find(strLower);
++			if (colorIter != colorNames.end())
++			{
++				*this = colorIter->second;
++				return true;
++			}
++		}
++		return false;
+ 	}
+-	else if (sscanf( str.c_str(), "%02x%02x%02x", &red, &green, &blue ) == 3)
++
++	Color Color::fromRgb(const std::string &str) noexcept
+ 	{
+-		r = uint8_t( red );
+-		g = uint8_t( green );
+-		b = uint8_t( blue );
+-		return true;
++		if (!str.empty())
++		{
++			uint red, green, blue;
++			if (str[0] == '#' && sscanf(str.c_str() + 1, "%02x%02x%02x", &red, &green, &blue) == 3)
++				return {uint8_t(red), uint8_t(green), uint8_t(blue)};
++			else if (sscanf(str.c_str(), "%02x%02x%02x", &red, &green, &blue) == 3)
++				return {uint8_t(red), uint8_t(green), uint8_t(blue)};
++			else
++			{
++				std::string strLower = own::to_lower(str);
++				auto colorIter = colorNames.find(strLower);
++				if (colorIter != colorNames.end())
++				{
++					return colorIter->second;
++				}
++			}
++		}
++		return {255, 255, 255};
+ 	}
+-	else
++
++	Color Color::fromHsv(const float h, const float s, const float v) noexcept
+ 	{
+-		std::string strLower = own::to_lower( str );
+-		auto colorIter = colorNames.find( strLower );
+-		if (colorIter != colorNames.end())
++
++		float c = v * s; // Chroma
++		float x = c * (1 - std::fabs(fmod(h / 60.0, 2) - 1));
++		float m = v - c;
++
++		float r_, g_, b_;
++
++		if (h >= 0 && h < 60)
+ 		{
+-			*this = colorIter->second;
+-			return true;
++			r_ = c;
++			g_ = x;
++			b_ = 0;
++		}
++		else if (h >= 60 && h < 120)
++		{
++			r_ = x;
++			g_ = c;
++			b_ = 0;
++		}
++		else if (h >= 120 && h < 180)
++		{
++			r_ = 0;
++			g_ = c;
++			b_ = x;
++		}
++		else if (h >= 180 && h < 240)
++		{
++			r_ = 0;
++			g_ = x;
++			b_ = c;
++		}
++		else if (h >= 240 && h < 300)
++		{
++			r_ = x;
++			g_ = 0;
++			b_ = c;
++		}
++		else
++		{ // 300-360
++			r_ = c;
++			g_ = 0;
++			b_ = x;
+ 		}
+-	}
+-	return false;
+-}
+ 
+-BinaryOutputStream & operator<<( BinaryOutputStream & stream, Color color )
+-{
+-	stream << color.r << color.g << color.b << color.padding;
+-	return stream;
+-}
++		uint8_t r = static_cast<uint8_t>(std::ceil((r_ + m) * 255.0f));
++		uint8_t g = static_cast<uint8_t>(std::ceil((g_ + m) * 255.0f));
++		uint8_t b = static_cast<uint8_t>(std::ceil((b_ + m) * 255.0f));
+ 
+-BinaryInputStream & operator>>( BinaryInputStream & stream, Color & color ) noexcept
+-{
+-	stream >> color.r >> color.g >> color.b >> color.padding;
+-	return stream;
+-}
++		return {r, g, b};
++	}
+ 
+-std::ostream & operator<<( std::ostream & os, Color color ) noexcept
+-{
+-	std::ios_base::fmtflags origFlags( os.flags() );
+-	os << std::uppercase << std::hex << std::setfill('0');
+-	os << '#' << std::setw(2) << uint(color.r) << std::setw(2) << uint(color.g) << std::setw(2) << uint(color.b);
+-	os.flags( origFlags );
+-	return os;
+-}
+-
+-std::istream & operator>>( std::istream & is, Color & color ) noexcept
+-{
+-	std::string colorStr;
+-	is >> colorStr;
+-	if (!color.fromString( colorStr ))
++	BinaryOutputStream &operator<<(BinaryOutputStream &stream, Color color)
+ 	{
+-		is.setstate( std::ios::failbit );
++		stream << color.r << color.g << color.b << color.padding;
++		return stream;
+ 	}
+-	return is;
+-}
+ 
+-void print( Color color )
+-{
+-	printf( "#%02X%02X%02X", uint(color.r), uint(color.g), uint(color.b) );
+-}
++	BinaryInputStream &operator>>(BinaryInputStream &stream, Color &color) noexcept
++	{
++		stream >> color.r >> color.g >> color.b >> color.padding;
++		return stream;
++	}
+ 
++	std::ostream &operator<<(std::ostream &os, Color color) noexcept
++	{
++		std::ios_base::fmtflags origFlags(os.flags());
++		os << std::uppercase << std::hex << std::setfill('0');
++		os << '#' << std::setw(2) << uint(color.r) << std::setw(2) << uint(color.g) << std::setw(2) << uint(color.b);
++		os.flags(origFlags);
++		return os;
++	}
+ 
+-//======================================================================================================================
++	std::istream &operator>>(std::istream &is, Color &color) noexcept
++	{
++		std::string colorStr;
++		is >> colorStr;
++		if (!color.fromString(colorStr))
++		{
++			is.setstate(std::ios::failbit);
++		}
++		return is;
++	}
++
++	void print(Color color)
++	{
++		printf("#%02X%02X%02X", uint(color.r), uint(color.g), uint(color.b));
++	}
+ 
++	//======================================================================================================================
+ 
+ } // namespace orgb

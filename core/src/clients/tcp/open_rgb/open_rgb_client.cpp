@@ -19,8 +19,8 @@ OpenRgbClient::OpenRgbClient()
         AsusCtlClient::getInstance().turnOffAura();
     }
     startOpenRgbProcess();
-
-    // EVENT_BUS.on("stop", self.stop);
+    startOpenRgbClient();
+    getAvailableDevices();
 
     loadCompatibleDevices();
     logger.rem_tab();
@@ -28,7 +28,7 @@ OpenRgbClient::OpenRgbClient()
 
 void OpenRgbClient::loadCompatibleDevices()
 {
-    logger.info("Loading supported devices from " + Constants::ORGB_RULES_FILE);
+    logger.info("Loading supported devices");
 
     std::ifstream file(Constants::ORGB_RULES_FILE);
     if (!file.is_open())
@@ -109,4 +109,33 @@ void OpenRgbClient::runner()
     env.push_back(ld.data());
     int exit_code = Shell::getInstance().run_process(Constants::ORGB_PATH.c_str(), argv.data(), env.data(), Constants::LOG_ORGB_FILE);
     logger.info("Command finished with exit code " + std::to_string(exit_code));
+}
+
+void OpenRgbClient::startOpenRgbClient()
+{
+    logger.info("Connecting to server");
+    logger.add_tab();
+    client.connect("localhost", port);
+    logger.info("Connected");
+    logger.rem_tab();
+}
+
+void OpenRgbClient::getAvailableDevices()
+{
+    logger.info("Getting available devices");
+    logger.add_tab();
+
+    auto devList = client.requestDeviceList();
+    for (auto &dev : devList.devices)
+    {
+        const orgb::Mode *directMode = dev.findMode("Direct");
+        if (directMode)
+        {
+            logger.info(dev.name);
+            client.changeMode(dev, *directMode);
+            client.setDeviceColor(dev, orgb::Color::Black);
+        }
+    }
+
+    logger.rem_tab();
 }

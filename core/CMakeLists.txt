@@ -16,10 +16,10 @@ set(CMAKE_AUTOUIC ON)
 
 # Flags específicos para cada tipo de build
 if(CMAKE_BUILD_TYPE STREQUAL "Release")
-    add_compile_options(-O3 -flto -Wno-unused-result)
+    add_compile_options(-O3 -flto -Wextra -Werror -Wno-unused-result)
     set(CMAKE_INTERPROCEDURAL_OPTIMIZATION TRUE)
 elseif(CMAKE_BUILD_TYPE STREQUAL "Debug")
-    add_compile_options(-pg -O0 -Wno-unused-result)
+    add_compile_options(-pg -O0 -Wextra -Werror -Wno-unused-result)
 endif()
 
 # -----------------------------

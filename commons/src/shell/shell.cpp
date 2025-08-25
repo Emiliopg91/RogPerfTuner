@@ -189,7 +189,7 @@ pid_t Shell::launch_process(const char *command, char *const argv[], char *const
         cmd_str = cmd_str + argv[i] + " ";
     }
 
-    logger.info("Launching process: " + cmd_str);
+    logger.debug("Launching process: " + cmd_str);
     pid_t pid = fork();
     if (pid == -1)
     {
@@ -220,7 +220,7 @@ pid_t Shell::launch_process(const char *command, char *const argv[], char *const
         _exit(1);
     }
 
-    logger.info("Launched with PID " + std::to_string(pid));
+    logger.debug("Launched with PID " + std::to_string(pid));
 
     return pid;
 }

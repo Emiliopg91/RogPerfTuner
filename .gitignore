@@ -11,3 +11,5 @@ dist/
 
 **/cmake_install.cmake
 assets/OpenRGB/
+
+*.applied
