@@ -22,6 +22,8 @@ public:
 private:
     HardwareService();
 
+    void setupDeviceLoop();
+
     Logger logger{"HardwareService"};
     std::mutex mutex;
 
@@ -29,4 +31,5 @@ private:
     CpuBrand cpu = CpuBrand::Enum::INTEL;
     std::map<std::string, std::string> gpus;
     std::vector<SsdScheduler> ssd_schedulers;
+    std::vector<UsbIdentifier> connectedDevices;
 };

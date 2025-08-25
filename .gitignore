@@ -10,3 +10,4 @@ build/
 dist/
 
 **/cmake_install.cmake
+assets/OpenRGB/

@@ -5,7 +5,7 @@
             "name": "Debug MiProyecto",
             "type": "cppdbg",
             "request": "launch",
-            "program": "${workspaceFolder}/build/MiProyecto",
+            "program": "${workspaceFolder}/build/core/RogControlCenter",
             "args": [],
             "stopAtEntry": false,
             "cwd": "${workspaceFolder}",
@@ -13,7 +13,10 @@
             "miDebuggerPath": "/usr/bin/gdb",
             "preLaunchTask": "CMake Build",
             "externalConsole": false,
-            "console": "integratedTerminal"
+            "console": "integratedTerminal",
+            "environment": [
+                { "name": "RCC_ASSETS_DIR", "value": "${workspaceFolder}/assets" }
+            ]
         }
     ]
 }

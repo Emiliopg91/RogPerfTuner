@@ -2,7 +2,7 @@
 
 #include "./abstract/abstract_cmd_client.hpp"
 
-class AsusCtlClient : AbstractCmdClient
+class AsusCtlClient : public AbstractCmdClient
 {
 private:
     AsusCtlClient() : AbstractCmdClient("asusctl", "AsusCtlClient") {}

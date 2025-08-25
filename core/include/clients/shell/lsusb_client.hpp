@@ -1,6 +1,5 @@
 #pragma once
 
-#include "../../models/usb_identifier.hpp"
 #include <libudev.h>
 #include <vector>
 #include <functional>
@@ -8,11 +7,49 @@
 #include <string>
 #include <stdexcept>
 
+#include "RccCommons.hpp"
+#include "../../utils/events.hpp"
+
 class LsUsbClient
 {
 private:
+    struct udev *udev;
+    struct udev_monitor *mon;
+    std::thread runner;
+    int fd;
+    std::atomic<bool> stop;
+
     LsUsbClient()
     {
+        udev = udev_new();
+        if (!udev)
+            throw std::runtime_error("Couldn't initialize udev client");
+
+        mon = udev_monitor_new_from_netlink(udev, "udev");
+        udev_monitor_filter_add_match_subsystem_devtype(mon, "usb", "usb_device");
+        udev_monitor_enable_receiving(mon);
+        fd = udev_monitor_get_fd(mon);
+
+        stop = false;
+        runner = std::thread([this]()
+                             {
+            while (!stop)
+            {
+                fd_set fds;
+                FD_ZERO(&fds);
+                FD_SET(fd, &fds);
+                
+                // select() bloquea hasta que haya datos o pasen 0.1 seg
+                int ret = select(fd + 1, &fds, NULL, NULL, NULL);
+                if (ret > 0 && FD_ISSET(fd, &fds))
+                {
+                    struct udev_device* dev = udev_monitor_receive_device(mon);
+                    if (dev) {
+                        udev_device_unref(dev);
+                    }
+                    EventBus::getInstance().emit_event(Events::UDEV_CLIENT_DEVICE_EVENT);
+                }
+            } });
     }
 
 public:
@@ -22,16 +59,22 @@ public:
         return instance;
     }
 
-    // Enumerar dispositivos USB usando libudev
+    ~LsUsbClient()
+    {
+        stop = true;
+        if (runner.joinable())
+        {
+            runner.join();
+        }
+        udev_monitor_unref(mon);
+        udev_unref(udev);
+    }
+
     std::vector<UsbIdentifier> get_usb_dev(
         std::function<bool(const UsbIdentifier &)> dev_filter = nullptr)
     {
         std::vector<UsbIdentifier>
             devices;
-
-        struct udev *udev = udev_new();
-        if (!udev)
-            throw std::runtime_error("No se pudo inicializar udev");
 
         struct udev_enumerate *enumerate = udev_enumerate_new(udev);
         udev_enumerate_add_match_subsystem(enumerate, "usb");
@@ -67,17 +110,17 @@ public:
         }
 
         udev_enumerate_unref(enumerate);
-        udev_unref(udev);
 
         return devices;
     }
 
+    template <typename Predicate>
     // Comparar dispositivos actuales con anteriores
     std::tuple<std::vector<UsbIdentifier>,
                std::vector<UsbIdentifier>,
                std::vector<UsbIdentifier>>
     compare_connected_devs(const std::vector<UsbIdentifier> &previous,
-                           std::function<bool(const UsbIdentifier &)> dev_filter = nullptr)
+                           Predicate dev_filter = nullptr)
     {
         auto current_usb = get_usb_dev(dev_filter);
         std::vector<UsbIdentifier> added;

@@ -2,6 +2,7 @@
 #include <unistd.h>
 
 #include "../include/services/hardware_service.hpp"
+#include "../include/services/open_rgb_service.hpp"
 #include "../include/services/profile_service.hpp"
 #include "../include/configuration/configuration.hpp"
 #include "../include/gui/tray_icon.hpp"
@@ -22,6 +23,7 @@ int main(int argc, char **argv)
 	{
 		std::cout << "Dev mode enabled" << std::endl;
 	}
+	std::cout << "Assets directory: " << Constants::ASSETS_DIR << std::endl;
 
 	LoggerProvider::initialize();
 	Logger logger{};
@@ -47,8 +49,9 @@ int main(int argc, char **argv)
 	Toaster::getInstance()
 		.showToast(Translator::getInstance().translate("initializing"));
 
+	OpenRgbService::getInstance();
 	HardwareService::getInstance();
-	ProfileService::getInstance();
+	ProfileService::getInstance().restoreProfile();
 
 	logger.info("Creating tray icon");
 	TrayIcon::getInstance();

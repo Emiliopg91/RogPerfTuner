@@ -16,6 +16,7 @@ config:
 
 build: config
 	cmake --build build -- -j$(NUM_CORES)
+	if [[ ! -d "assets/OpenRGB" ]]; then cd assets && $(MAKEFILE_DIR)submodules/OpenRGB/OpenRGB.AppImage --appimage-extract && mv squashfs-root OpenRGB; fi
 
 release:
 	rm -rf dist

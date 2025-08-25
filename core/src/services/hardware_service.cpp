@@ -9,8 +9,12 @@
 #include "../../include/clients/file/cpuinfo_client.hpp"
 #include "../../include/clients/file/ssd_scheduler_client.hpp"
 #include "../../include/clients/shell/switcherooctl_client.hpp"
+#include "../../include/clients/shell/lsusb_client.hpp"
+#include "../../include/clients/tcp/open_rgb/open_rgb_client.hpp"
 #include "../../include/gui/toaster.hpp"
 #include "../../include/services/hardware_service.hpp"
+#include "../../include/services/open_rgb_service.hpp"
+#include "../../include/utils/events.hpp"
 
 HardwareService::HardwareService()
 {
@@ -102,6 +106,7 @@ HardwareService::HardwareService()
         logger.rem_tab();
     }
 
+    setupDeviceLoop();
     /*
         if UPOWER_CLIENT.available:
             self.__on_bat = UPOWER_CLIENT.on_battery
@@ -121,6 +126,59 @@ HardwareService::HardwareService()
     */
 
     logger.rem_tab();
+}
+
+void HardwareService::setupDeviceLoop()
+{
+    auto &udevClient = LsUsbClient::getInstance();
+    connectedDevices = std::get<0>(udevClient.compare_connected_devs({},
+                                                                     [](const UsbIdentifier &dev)
+                                                                     {
+                                                                         return !OpenRgbService::getInstance().getDeviceName(dev).empty();
+                                                                     }));
+    logger.info("Detected compatible device(s):");
+    logger.add_tab();
+    for (auto dev : connectedDevices)
+    {
+        logger.info(OpenRgbService::getInstance().getDeviceName(dev));
+    }
+    logger.rem_tab();
+    EventBus::getInstance().on(Events::UDEV_CLIENT_DEVICE_EVENT, [this, &udevClient]()
+                               {
+        auto [current, added, removed] = udevClient.compare_connected_devs(connectedDevices,
+                                                                           [](const UsbIdentifier &dev)
+                                                                           {
+                                                                               return !OpenRgbService::getInstance().getDeviceName(dev).empty();
+                                                                           });
+
+        if (added.size() > 0)
+        {
+            logger.info("Added compatible device(s):");
+            logger.add_tab();
+            for (auto dev : added)
+            {
+                logger.info(OpenRgbService::getInstance().getDeviceName(dev));
+            }
+            logger.rem_tab();
+        }
+
+        if (removed.size() > 0)
+        {
+            logger.info("Removed compatible device(s):");
+            logger.add_tab();
+            for (auto dev : removed)
+            {
+                logger.info(OpenRgbService::getInstance().getDeviceName(dev));
+            }
+            logger.rem_tab();
+        }
+
+        if (added.size() > 0 || removed.size() > 0)
+        {
+            EventBus::getInstance().emit_event(Events::HARDWARE_SERVICE_USB_ADDED_REMOVED);
+        }
+
+        connectedDevices = current; });
 }
 
 BatteryThreshold HardwareService::getChargeThreshold()

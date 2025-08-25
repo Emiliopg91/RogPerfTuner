@@ -6,67 +6,81 @@
 #include <functional>
 #include <future>
 #include <mutex>
-#include <any>
+#include <memory>
 #include <stdexcept>
-#include <typeindex>
 
 class EventBus
 {
 private:
+    EventBus() = default;
+    EventBus(const EventBus &) = delete;
+    EventBus &operator=(const EventBus &) = delete;
+
     struct BaseHolder
     {
         virtual ~BaseHolder() = default;
     };
 
-    template <typename... Args>
     struct Holder : BaseHolder
     {
-        std::vector<std::function<void(Args...)>> callbacks;
+        std::vector<std::function<void()>> callbacks;
     };
 
     std::unordered_map<std::string, std::unique_ptr<BaseHolder>> listeners;
     std::mutex mtx;
 
 public:
-    // Registrar un callback para un evento con tipo específico
-    template <typename... Args>
-    void on(const std::string &event, std::function<void(Args...)> callback)
+    static EventBus &getInstance()
     {
+        static EventBus instance;
+        return instance;
+    }
+
+    template <typename Callback>
+    void on(const std::string &event, Callback &&callback)
+    {
+        // Convertimos cualquier lambda a std::function<void()>
+        auto func = [cb = std::forward<Callback>(callback)]()
+        {
+            cb(); // los argumentos deben capturarse dentro de la lambda si los necesita
+        };
+
         std::lock_guard<std::mutex> lock(mtx);
+
         auto it = listeners.find(event);
         if (it == listeners.end())
         {
-            auto holder = std::make_unique<Holder<Args...>>();
-            holder->callbacks.push_back(std::move(callback));
+            auto holder = std::make_unique<Holder>();
+            holder->callbacks.push_back(std::move(func));
             listeners[event] = std::move(holder);
         }
         else
         {
-            auto *typed = dynamic_cast<Holder<Args...> *>(it->second.get());
+            auto *typed = dynamic_cast<Holder *>(it->second.get());
             if (!typed)
                 throw std::runtime_error("Tipo de callback diferente para este evento");
-            typed->callbacks.push_back(std::move(callback));
+            typed->callbacks.push_back(std::move(func));
         }
     }
 
     template <typename... Args>
     void emit_event(const std::string &event, Args... args)
     {
-        std::vector<std::function<void(Args...)>> to_call;
+        std::vector<std::function<void()>> to_call;
         {
             std::lock_guard<std::mutex> lock(mtx);
             auto it = listeners.find(event);
             if (it == listeners.end())
                 return;
-            auto *typed = dynamic_cast<Holder<Args...> *>(it->second.get());
+            auto *typed = dynamic_cast<Holder *>(it->second.get());
             if (!typed)
-                throw std::runtime_error("Tipo de parámetros incorrecto al emitir evento");
-            to_call = typed->callbacks; // copia para ejecutar fuera del lock
+                throw std::runtime_error("Holder no válido");
+            to_call = typed->callbacks; // copiar para ejecutar fuera del lock
         }
 
         for (auto &callback : to_call)
         {
-            std::async(std::launch::async, callback, args...);
+            std::async(std::launch::async, callback);
         }
     }
 };

@@ -14,6 +14,7 @@ public:
 
     PerformanceProfile getPerformanceProfile();
     void setPerformanceProfile(PerformanceProfile profile, bool temporal = false, bool force = false);
+    void restoreProfile();
 
 private:
     ProfileService();

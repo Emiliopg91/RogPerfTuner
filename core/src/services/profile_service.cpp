@@ -54,7 +54,7 @@ void ProfileService::setPerformanceProfile(PerformanceProfile profile, bool temp
             auto t0 = std::chrono::high_resolution_clock::now();
 
             setPlatformProfile(profile);
-            // setFanCurves(profile);
+            //  setFanCurves(profile);
             setBoost(profile);
             setCpuGovernor(profile);
             setSsdScheduler(profile);
@@ -268,4 +268,9 @@ void ProfileService::setTgp(PerformanceProfile profile)
 
         logger.rem_tab();
     }
+}
+
+void ProfileService::restoreProfile()
+{
+    setPerformanceProfile(Configuration::getInstance().getConfiguration().platform.profiles.profile, false, true);
 }

@@ -29,8 +29,11 @@ AbstractDbusClient::AbstractDbusClient(bool systemBus,
 
     iface_ = new QDBusInterface(serviceName_, objectPath_, interfaceName_, bus_, this);
     available_ = iface_->isValid();
-    if (!available_ && required)
-        throw std::runtime_error("Failed to create D-Bus interface: " + serviceName_.toStdString());
+    if (!available_)
+    {
+        if (required)
+            throw std::runtime_error("Failed to create D-Bus interface: " + serviceName_.toStdString());
+    }
 }
 
 AbstractDbusClient::~AbstractDbusClient() = default;

@@ -27,6 +27,8 @@
 #include "shell/shell.hpp"
 #include "translator/translator.hpp"
 #include "utils/constants.hpp"
+#include "utils/debouncer.hpp"
 #include "utils/event_bus.hpp"
 #include "utils/file_utils.hpp"
+#include "utils/net_utils.hpp"
 #include "utils/string_utils.hpp"

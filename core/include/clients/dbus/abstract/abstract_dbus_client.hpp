@@ -17,6 +17,7 @@ public:
                                 const QString &interface,
                                 bool required = true,
                                 QObject *parent = nullptr);
+
     ~AbstractDbusClient() override;
 
     bool available() const;
@@ -30,6 +31,7 @@ private:
     QDBusConnection bus_;
     QDBusInterface *iface_;
     bool available_;
+    QMap<QString, QVariant> previousValues;
 
 protected:
     template <typename Ret = QVariant>
@@ -101,5 +103,34 @@ protected:
             return reply.arguments().first().value<QDBusVariant>().variant().value<T>();
 
         throw std::runtime_error(("DBus Get returned no value for property: " + prop.toStdString()));
+    }
+
+private slots:
+    void onPropertiesChanged(const QString &iface,
+                             const QVariantMap &changedProps,
+                             const QStringList &invalidatedProps)
+    {
+        // Filtramos solo para la interfaz de este cliente
+        if (iface != interfaceName_)
+            return;
+
+        Q_UNUSED(invalidatedProps)
+
+        for (auto it = changedProps.constBegin(); it != changedProps.constEnd(); ++it)
+        {
+            const QString &propName = it.key();
+            const QVariant &newValue = it.value();
+
+            QVariant oldValue;
+            if (previousValues.contains(propName))
+                oldValue = previousValues[propName];
+
+            qDebug() << "Property changed:" << propName
+                     << "Old value:" << oldValue
+                     << "New value:" << newValue;
+
+            // Guardamos el nuevo valor
+            previousValues[propName] = newValue;
+        }
     }
 };

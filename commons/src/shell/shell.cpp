@@ -4,6 +4,7 @@
 #include <cstring>
 #include <iostream>
 #include <algorithm>
+#include <sys/prctl.h>
 
 #include "../../include/shell/shell.hpp"
 
@@ -35,6 +36,8 @@ Shell::BashSession Shell::start_bash(const std::vector<std::string> &args, const
     if (pid == 0)
     {
         // Child
+        prctl(PR_SET_PDEATHSIG, SIGTERM);
+
         dup2(in_pipe[0], STDIN_FILENO);
         dup2(out_pipe[1], STDOUT_FILENO);
         dup2(err_pipe[1], STDERR_FILENO);
@@ -164,4 +167,69 @@ CommandResult Shell::run_command(const std::string &cmd, bool check)
 CommandResult Shell::run_elevated_command(const std::string &cmd, bool check)
 {
     return send_command(elevated_bash, cmd, check);
+}
+
+std::vector<char *> Shell::copyEnviron()
+{
+    std::vector<char *> envCopy;
+    for (char **env = environ; *env != nullptr; ++env)
+    {
+        envCopy.emplace_back(*env); // copia de la cadena
+    }
+    return envCopy;
+}
+
+pid_t Shell::launch_process(const char *command, char *const argv[], char *const env[], std::string outFile)
+{
+    std::string cmd_str = command;
+    cmd_str += " ";
+
+    for (int i = 1; argv[i] != nullptr; i++)
+    {
+        cmd_str = cmd_str + argv[i] + " ";
+    }
+
+    logger.info("Launching process: " + cmd_str);
+    pid_t pid = fork();
+    if (pid == -1)
+    {
+        perror("fork");
+        return -1;
+    }
+
+    if (pid == 0)
+    {
+        if (outFile.size() > 0)
+        {
+            int fd = open(outFile.c_str(), O_WRONLY | O_CREAT | O_TRUNC, 0644);
+            if (dup2(fd, STDOUT_FILENO) < 0)
+            {
+                perror("dup2 stdout");
+                exit(EXIT_FAILURE);
+            }
+            if (dup2(fd, STDERR_FILENO) < 0)
+            {
+                perror("dup2 stderr");
+                exit(EXIT_FAILURE);
+            }
+            close(fd); // ya no necesitamos fd original
+        }
+        prctl(PR_SET_PDEATHSIG, SIGTERM);
+        execve(command, argv, env);
+        perror("execvp");
+        _exit(1);
+    }
+
+    logger.info("Launched with PID " + std::to_string(pid));
+
+    return pid;
+}
+
+int Shell::run_process(const char *command, char *const argv[], char *const env[], std::string outFile)
+{
+    auto pid = launch_process(command, argv, env, outFile);
+
+    int status;
+    waitpid(pid, &status, 0);
+    return status;
 }

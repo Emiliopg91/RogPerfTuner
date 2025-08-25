@@ -59,7 +59,12 @@ public:
     inline static const std::string LOG_DIR = Constants::APP_DIR + "/logs";
     inline static const std::string LOG_OLD_DIR = Constants::LOG_DIR + "/old";
     inline static const std::string LOG_FILE = Constants::LOG_DIR + "/current.log";
+    inline static const std::string LOG_ORGB_FILE = Constants::LOG_DIR + "/OpenRGB.log";
 
     inline static const std::string ICONS_DIR = Constants::ASSETS_DIR + "/icons";
     inline static const std::string ICON_FILE = Constants::ICONS_DIR + "/icon-45x45.png";
+
+    inline static const std::string ORGB_DIR = Constants::ASSETS_DIR + "/OpenRGB";
+    inline static const std::string ORGB_RULES_FILE = Constants::ORGB_DIR + "/usr/lib/udev/rules.d/60-openrgb.rules";
+    inline static const std::string ORGB_PATH = Constants::ORGB_DIR + "/AppRun";
 };
