@@ -288,3 +288,10 @@ void ProfileService::restoreProfile()
 {
     setPerformanceProfile(Configuration::getInstance().getConfiguration().platform.profiles.profile, false, true);
 }
+
+PerformanceProfile ProfileService::nextPerformanceProfile()
+{
+    auto nextProfile = ProfileUtils::nextPerformanceProfile(currentProfile);
+    setPerformanceProfile(nextProfile);
+    return nextProfile;
+}

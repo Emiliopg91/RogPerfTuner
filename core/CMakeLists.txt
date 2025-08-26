@@ -34,13 +34,13 @@ find_package(Qt6 REQUIRED COMPONENTS Core DBus Gui Widgets)
 file(GLOB_RECURSE SOURCES
     "${CMAKE_CURRENT_SOURCE_DIR}/src/*.cpp"
 )
+list(FILTER SOURCES EXCLUDE REGEX ".*/src/scripts/.*")
 
 file(GLOB_RECURSE HEADERS
     "${CMAKE_CURRENT_SOURCE_DIR}/include/*.hpp"
 )
 
 add_executable(RogControlCenter ${SOURCES} ${HEADERS})
-
 target_link_libraries(RogControlCenter PRIVATE 
     Qt6::Core
     Qt6::Gui
@@ -49,7 +49,22 @@ target_link_libraries(RogControlCenter PRIVATE
     spdlog::spdlog 
     spdlog::spdlog_header_only
     nlohmann_json::nlohmann_json
+    httplib::httplib
     udev
     orgbsdk
+    RccCommons
+)
+
+add_executable(NextEffect "${CMAKE_CURRENT_SOURCE_DIR}/src/scripts/next_effect.cpp")
+target_link_libraries(NextEffect PRIVATE 
+    nlohmann_json::nlohmann_json
+    httplib::httplib
+    RccCommons
+)
+
+add_executable(IncBrightness "${CMAKE_CURRENT_SOURCE_DIR}/src/scripts/increase_brightness.cpp")
+target_link_libraries(IncBrightness PRIVATE 
+    nlohmann_json::nlohmann_json
+    httplib::httplib
     RccCommons
 )

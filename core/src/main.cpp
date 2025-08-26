@@ -1,6 +1,8 @@
 #include <QApplication>
 #include <unistd.h>
+#include "httplib.h"
 
+#include "../include/servers/http/http_server.hpp"
 #include "../include/services/hardware_service.hpp"
 #include "../include/services/open_rgb_service.hpp"
 #include "../include/services/profile_service.hpp"
@@ -53,11 +55,12 @@ int main(int argc, char **argv)
 	HardwareService::getInstance();
 	ProfileService::getInstance().restoreProfile();
 
+	HttpServer::getInstance();
+
 	logger.info("Creating tray icon");
 	TrayIcon::getInstance();
 
 	logger.rem_tab();
 	logger.info("Application ready");
-
 	return app.exec();
 }

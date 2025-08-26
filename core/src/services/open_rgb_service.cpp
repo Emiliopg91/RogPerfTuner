@@ -105,3 +105,29 @@ void OpenRgbService::disableDevice(UsbIdentifier identifier)
 {
     OpenRgbClient::getInstance().disableDevice(getDeviceName(identifier));
 }
+
+RgbBrightness OpenRgbService::increaseBrightness()
+{
+    auto next = brightness.getNextBrightness();
+    OpenRgbService::getInstance().setBrightness(next);
+    return next;
+}
+
+RgbBrightness OpenRgbService::decreaseBrightness()
+{
+    auto next = brightness.getPreviousBrightness();
+    OpenRgbService::getInstance().setBrightness(next);
+    return next;
+}
+
+std::string OpenRgbService::nextEffect()
+{
+    auto list = getAvailableEffects();
+    auto it = std::find(list.begin(), list.end(), effect);
+    ++it;
+    if (it == list.end())
+        it = list.begin();
+    auto next = *it;
+    OpenRgbService::getInstance().setEffect(next);
+    return next;
+}

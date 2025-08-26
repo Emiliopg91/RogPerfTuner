@@ -1,1 +1,0 @@
-"{{steam_path}}" steam://rungameid/$1

@@ -13,3 +13,7 @@ dist/
 assets/OpenRGB/
 
 *.applied
+
+*.cmake
+
+scripts/CMakeFiles/

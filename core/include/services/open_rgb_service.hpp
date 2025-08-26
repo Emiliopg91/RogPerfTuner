@@ -1,3 +1,5 @@
+#pragma once
+
 #include <mutex>
 
 #include "RccCommons.hpp"
@@ -19,6 +21,10 @@ public:
     void setBrightness(RgbBrightness newBrightness);
     void setEffect(std::string newEffect);
     void disableDevice(UsbIdentifier);
+
+    RgbBrightness increaseBrightness();
+    RgbBrightness decreaseBrightness();
+    std::string nextEffect();
 
 private:
     OpenRgbService();

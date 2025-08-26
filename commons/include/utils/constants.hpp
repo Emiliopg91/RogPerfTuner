@@ -39,8 +39,7 @@ public:
         const char *dir = std::getenv("RCC_ASSETS_DIR");
         if (!dir)
         {
-            std::cerr << "Error: undefined environment variable RCC_ASSETS_DIR\n";
-            std::exit(EXIT_FAILURE);
+            dir = std::getenv("PWD");
         }
         return std::string(dir);
     }();
@@ -67,4 +66,11 @@ public:
     inline static const std::string ORGB_DIR = Constants::ASSETS_DIR + "/OpenRGB";
     inline static const std::string ORGB_RULES_FILE = Constants::ORGB_DIR + "/usr/lib/udev/rules.d/60-openrgb.rules";
     inline static const std::string ORGB_PATH = Constants::ORGB_DIR + "/AppRun";
+
+    inline static const std::string URL_PERF_PROF = "/performance/profile/next";
+    inline static const std::string URL_INC_BRIGHT = "/rgb/brightness/increase";
+    inline static const std::string URL_DEC_BRIGHT = "/rgb/brightness/decrease";
+    inline static const std::string URL_NEXT_EFF = "/rgb/effect/next";
+
+    inline static const int HTTP_PORT = 18157;
 };

@@ -27,6 +27,9 @@ release:
 	mkdir dist dist/RogControlCenter
 	cp ./build/core/RogControlCenter dist/RogControlCenter
 	cp -r assets dist/RogControlCenter
+	mkdir assets/scripts
+	cp build/core/NextEffect assets/nextEffect
+	cp build/core/IncreaseBright assets/incBrightness
 	tar -czvf dist/RogControlCenter.tgz dist/RogControlCenter/*
 
 apply_patches:

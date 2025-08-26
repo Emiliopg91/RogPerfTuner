@@ -13,3 +13,6 @@
 [submodule "submodules/RccDeckyCompanion"]
 	path = submodules/RccDeckyCompanion
 	url = https://github.com/Emiliopg91/RccDeckyCompanion
+[submodule "submodules/httplib"]
+	path = submodules/httplib
+	url = https://github.com/Emiliopg91/yhirose-cpp-httplib
