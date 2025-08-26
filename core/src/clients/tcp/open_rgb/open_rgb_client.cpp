@@ -3,6 +3,7 @@
 #include <vector>
 #include <regex>
 #include <algorithm>
+#include <csignal>
 
 #include "RccCommons.hpp"
 
@@ -20,18 +21,6 @@
 
 OpenRgbClient::OpenRgbClient()
 {
-    logger.info("Initializing OpenRgbClient");
-    logger.add_tab();
-
-    if (AsusCtlClient::getInstance().available())
-    {
-        AsusCtlClient::getInstance().turnOffAura();
-    }
-    startOpenRgbProcess();
-    startOpenRgbClient();
-    getAvailableDevices();
-
-    loadCompatibleDevices();
 
     availableEffects.push_back(std::unique_ptr<AbstractEffect>(&BreathingEffect::getInstance(client)));
     availableEffects.push_back(std::unique_ptr<AbstractEffect>(&DanceFloorEffect::getInstance(client)));
@@ -43,6 +32,42 @@ OpenRgbClient::OpenRgbClient()
     availableEffects.push_back(std::unique_ptr<AbstractEffect>(&StarryNightEffect::getInstance(client)));
     availableEffects.push_back(std::unique_ptr<AbstractEffect>(&StaticEffect::getInstance(client)));
 
+    loadCompatibleDevices();
+
+    start();
+}
+
+void OpenRgbClient::start()
+{
+    logger.info("Initializing OpenRgbClient");
+    logger.add_tab();
+
+    if (AsusCtlClient::getInstance().available())
+    {
+        AsusCtlClient::getInstance().turnOffAura();
+    }
+    startOpenRgbProcess();
+    startOpenRgbClient();
+    getAvailableDevices();
+
+    logger.rem_tab();
+}
+
+void OpenRgbClient::stop()
+{
+    logger.info("Stopping OpenRgbClient");
+    logger.add_tab();
+    for (auto &effect : availableEffects)
+    {
+        effect->stop();
+    }
+    for (auto &dev : detectedDevices)
+    {
+        client.setDeviceColor(dev, Color::Black);
+    }
+    client.disconnect();
+    std::this_thread::sleep_for(std::chrono::milliseconds(100));
+    stopOpenRgbProcess();
     logger.rem_tab();
 }
 
@@ -107,6 +132,19 @@ void OpenRgbClient::startOpenRgbProcess()
     logger.rem_tab();
 }
 
+void OpenRgbClient::stopOpenRgbProcess()
+{
+    logger.info("Stopping OpenRGB server");
+    logger.add_tab();
+    kill(pid, SIGKILL);
+    if (runnerThread.joinable())
+    {
+        runnerThread.join(); // o runnerThread.join();
+    }
+    logger.info("OpenRGB server killed");
+    logger.rem_tab();
+}
+
 void OpenRgbClient::runner()
 {
     std::string hostArg = "--server-host";
@@ -114,20 +152,22 @@ void OpenRgbClient::runner()
     std::string portArg = "--server-port";
     std::string portVal = std::to_string(port);
 
-    // Vector de strings para mantener la memoria válida
     std::vector<std::string> argsStr = {hostArg, hostVal, portArg, portVal, "-v"};
-
-    // Vector de punteros a char terminado en nullptr
     std::vector<char *> argv;
-    argv.push_back((char *)Constants::ORGB_PATH.c_str()); // argv[0] normalmente es el nombre del binario
+    argv.push_back(const_cast<char *>(Constants::ORGB_PATH.c_str()));
     for (auto &s : argsStr)
-        argv.push_back((char *)s.c_str());
-    argv.push_back(nullptr); // execve requiere nullptr al final
+        argv.push_back(const_cast<char *>(s.c_str()));
+    argv.push_back(nullptr);
 
-    auto env = Shell::getInstance().copyEnviron();
-    std::string ld = "LD_LIBRARY_PATH=\"\"";
-    env.push_back(ld.data());
-    int exit_code = Shell::getInstance().run_process(Constants::ORGB_PATH.c_str(), argv.data(), env.data(), Constants::LOG_ORGB_FILE);
+    std::vector<std::string> envStrings = Shell::getInstance().copyEnviron();
+    envStrings.push_back("LD_LIBRARY_PATH=");
+    std::vector<char *> env;
+    for (auto &s : envStrings)
+        env.push_back(s.data());
+    env.push_back(nullptr);
+
+    pid = Shell::getInstance().launch_process(Constants::ORGB_PATH.c_str(), argv.data(), env.data(), Constants::LOG_ORGB_FILE);
+    int exit_code = Shell::getInstance().wait_for(pid);
     logger.info("Command finished with exit code " + std::to_string(exit_code));
 }
 

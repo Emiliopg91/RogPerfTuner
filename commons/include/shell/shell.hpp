@@ -22,8 +22,8 @@ public:
     CommandResult run_command(const std::string &cmd, bool check = true);
     CommandResult run_elevated_command(const std::string &cmd, bool check = true);
     pid_t launch_process(const char *command, char *const argv[], char *const env[], std::string outFile = "");
-    int run_process(const char *command, char *const argv[], char *const env[], std::string outFile = "");
-    std::vector<char *> copyEnviron();
+    int wait_for(pid_t pid);
+    std::vector<std::string> copyEnviron();
 
 private:
     Shell(const std::string &sudo_password);

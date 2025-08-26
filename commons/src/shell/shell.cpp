@@ -169,10 +169,10 @@ CommandResult Shell::run_elevated_command(const std::string &cmd, bool check)
     return send_command(elevated_bash, cmd, check);
 }
 
-std::vector<char *> Shell::copyEnviron()
+std::vector<std::string> Shell::copyEnviron()
 {
-    std::vector<char *> envCopy;
-    for (char **env = environ; *env != nullptr; ++env)
+    std::vector<std::string> envCopy;
+    for (char **env = ::environ; *env != nullptr; ++env)
     {
         envCopy.emplace_back(*env); // copia de la cadena
     }
@@ -216,7 +216,7 @@ pid_t Shell::launch_process(const char *command, char *const argv[], char *const
         }
         prctl(PR_SET_PDEATHSIG, SIGTERM);
         execve(command, argv, env);
-        perror("execvp");
+        perror("execve");
         _exit(1);
     }
 
@@ -225,10 +225,8 @@ pid_t Shell::launch_process(const char *command, char *const argv[], char *const
     return pid;
 }
 
-int Shell::run_process(const char *command, char *const argv[], char *const env[], std::string outFile)
+int Shell::wait_for(pid_t pid)
 {
-    auto pid = launch_process(command, argv, env, outFile);
-
     int status;
     waitpid(pid, &status, 0);
     return status;

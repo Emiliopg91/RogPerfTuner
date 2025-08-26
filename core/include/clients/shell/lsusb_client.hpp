@@ -47,7 +47,7 @@ private:
                     if (dev) {
                         udev_device_unref(dev);
                     }
-                    EventBus::getInstance().emit_event(Events::UDEV_CLIENT_DEVICE_EVENT);
+                    EventBus::getInstance().emit_async(Events::UDEV_CLIENT_DEVICE_EVENT);
                 }
             } });
     }

@@ -34,6 +34,17 @@ AbstractDbusClient::AbstractDbusClient(bool systemBus,
         if (required)
             throw std::runtime_error("Failed to create D-Bus interface: " + serviceName_.toStdString());
     }
+
+    // === Conectar la señal de cambios de propiedades ===
+    // Escucha cualquier cambio en las propiedades de la interfaz
+    bus_.connect(
+        serviceName_,                                                // service
+        objectPath_,                                                 // path
+        "org.freedesktop.DBus.Properties",                           // interfaz que emite la señal
+        "PropertiesChanged",                                         // señal a escuchar
+        this,                                                        // objeto que recibirá la señal
+        SLOT(onPropertiesChanged(QString, QVariantMap, QStringList)) // slot a ejecutar
+    );
 }
 
 AbstractDbusClient::~AbstractDbusClient() = default;

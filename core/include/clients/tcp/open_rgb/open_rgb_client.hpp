@@ -18,6 +18,8 @@ public:
     std::string getDeviceName(UsbIdentifier);
     std::vector<std::string> getAvailableEffects();
     void applyEffect(std::string effect, RgbBrightness brightness);
+    void start();
+    void stop();
 
 private:
     std::vector<UsbIdentifier> compatibleDevices;
@@ -25,6 +27,7 @@ private:
     std::thread runnerThread;
     Logger logger{"OpenRgbClient"};
     int port = 0;
+    pid_t pid = 0;
     orgb::Client client{"RogControlCenters"};
     orgb::DeviceList detectedDevices;
     std::vector<std::unique_ptr<AbstractEffect>> availableEffects;
@@ -34,6 +37,7 @@ private:
     void loadCompatibleDevices();
     void startOpenRgbProcess();
     void startOpenRgbClient();
+    void stopOpenRgbProcess();
     void getAvailableDevices();
     void runner();
 };

@@ -43,7 +43,7 @@ public:
     }
 
 private:
-    DropsEffect(Client &client) : AbstractEffect(client, "Drops")
+    DropsEffect(Client &client) : AbstractEffect(client, "DropsEffect")
     {
         _available_colors = {
             Color{0, 0, 0},

@@ -4,7 +4,9 @@
 #include "../../include/clients/dbus/asus/armoury/intel/pl1_spd_client.hpp"
 #include "../../include/clients/dbus/asus/armoury/nvidia/nv_boost_client.hpp"
 #include "../../include/clients/dbus/asus/armoury/nvidia/nv_temp_client.hpp"
+#include "../../include/clients/dbus/asus/armoury/other/panel_overdrive_client.hpp"
 #include "../../include/clients/dbus/linux/notifications_client.hpp"
+#include "../../include/clients/dbus/linux/upower_client.hpp"
 #include "../../include/clients/file/boost_control_client.hpp"
 #include "../../include/clients/file/cpuinfo_client.hpp"
 #include "../../include/clients/file/ssd_scheduler_client.hpp"
@@ -107,18 +109,16 @@ HardwareService::HardwareService()
     }
 
     setupDeviceLoop();
+
+    runningGames = 0;
+
+    if (UPowerClient::getInstance().available())
+    {
+        onBattery = UPowerClient::getInstance().isOnBattery();
+        UPowerClient::getInstance().onBatteryChange([this]()
+                                                    { this->onBatteryEvent(); });
+    }
     /*
-        if UPOWER_CLIENT.available:
-            self.__on_bat = UPOWER_CLIENT.on_battery
-            UPOWER_CLIENT.on_battery_change(self._on_ac_battery_change)
-
-        self.__running_games = 0
-
-        self._connected_usb: list[UsbIdentifier] = []
-        self._usb_mutex = Lock()
-        thread = Thread(name="UsbChecker", target=self.__monitor_for_usb)
-        thread.start()
-
         if KEYBOARD_BRIGHTNESS_CONTROL.available:
             KEYBOARD_BRIGHTNESS_CONTROL.on_brightness_change(self._on_kb_brightness_change)
 
@@ -168,7 +168,7 @@ void HardwareService::setupDeviceLoop()
 
         if (added.size() > 0 || removed.size() > 0)
         {
-            EventBus::getInstance().emit_event(Events::HARDWARE_SERVICE_USB_ADDED_REMOVED);
+            EventBus::getInstance().emit_async(Events::HARDWARE_SERVICE_USB_ADDED_REMOVED);
         }
 
         connectedDevices = current; });
@@ -192,4 +192,31 @@ void HardwareService::setChargeThreshold(BatteryThreshold threshold)
         {"value", threshold.toInt()}};
 
     Toaster::getInstance().showToast(Translator::getInstance().translate("applied.battery.threshold", replacements));
+}
+
+void HardwareService::onBatteryEvent(bool muted)
+{
+    onBattery = UPowerClient::getInstance().isOnBattery();
+
+    if (PanelOverdriveClient::getInstance().available())
+    {
+        PanelOverdriveClient::getInstance().setCurrentValue(runningGames > 0 && !onBattery);
+    }
+
+    if (runningGames == 0)
+    {
+        if (!muted)
+        {
+            std::string t1 = onBattery ? "un" : "";
+            std::string t2 = !onBattery ? "dis" : "";
+            logger.info(
+                "AC " + t1 + "plugged, battery " + t2 + "engaged");
+            logger.add_tab();
+        }
+        EventBus::getInstance().emit_sequential(Events::HARDWARE_SERVICE_ON_BATTERY);
+        if (!muted)
+        {
+            logger.rem_tab();
+        }
+    }
 }

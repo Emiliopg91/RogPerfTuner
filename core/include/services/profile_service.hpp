@@ -20,7 +20,8 @@ private:
     ProfileService();
 
     Logger logger{"ProfileService"};
-    bool onBattery;
+    bool onBattery = false;
+    int runningGames = 0;
     std::mutex mutex;
     PerformanceProfile currentProfile = PerformanceProfile::Enum::PERFORMANCE;
 

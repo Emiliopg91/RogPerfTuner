@@ -51,5 +51,5 @@ target_link_libraries(RogControlCenter PRIVATE
     nlohmann_json::nlohmann_json
     udev
     orgbsdk
-    RccCommons 
+    RccCommons
 )

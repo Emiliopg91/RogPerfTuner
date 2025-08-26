@@ -26,5 +26,6 @@ private:
     Logger logger{"OpenRgbService"};
     RgbBrightness brightness = RgbBrightness::Enum::MAX;
     std::string effect;
-    void applyAura(bool temporal = false);
+    void applyAura();
+    void reload();
 };

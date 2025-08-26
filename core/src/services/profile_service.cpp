@@ -9,6 +9,7 @@
 #include "../../include/gui/toaster.hpp"
 #include "../../include/services/hardware_service.hpp"
 #include "../../include/services/profile_service.hpp"
+#include "../../include/utils/events.hpp"
 #include "../../include/utils/profile_utils.hpp"
 #include "RccCommons.hpp"
 
@@ -32,6 +33,16 @@ ProfileService::ProfileService()
         PlatformClient::getInstance().setChangePlatformProfileOnBattery(false);
         PlatformClient::getInstance().setPlatformProfileLinkedEpp(true);
     }
+
+    EventBus::getInstance().on(Events::HARDWARE_SERVICE_ON_BATTERY, [this]()
+                               { onBattery = UPowerClient::getInstance().isOnBattery(); 
+                                if(runningGames==0){
+                                    if(onBattery){
+                                        setPerformanceProfile(PerformanceProfile::Enum::QUIET,true,true);
+                                    } else {
+                                        restoreProfile();
+                                    }
+                                } });
 
     logger.rem_tab();
 }
@@ -63,8 +74,11 @@ void ProfileService::setPerformanceProfile(PerformanceProfile profile, bool temp
             setTgp(profile);
 
             currentProfile = profile;
-            Configuration::getInstance().getConfiguration().platform.profiles.profile = profile;
-            Configuration::getInstance().saveConfig();
+            if (!temporal)
+            {
+                Configuration::getInstance().getConfiguration().platform.profiles.profile = profile;
+                Configuration::getInstance().saveConfig();
+            }
 
             auto t1 = std::chrono::high_resolution_clock::now();
             logger.rem_tab();
@@ -97,7 +111,7 @@ void ProfileService::setPlatformProfile(PerformanceProfile profile)
         }
         catch (std::exception e)
         {
-            logger.error("Error while platform profile: {}", e.what());
+            logger.error("Error while setting platform profile: {}", e.what());
         }
         logger.rem_tab();
     }

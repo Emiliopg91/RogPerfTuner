@@ -18,6 +18,12 @@ public:
         return this->getProperty<bool>(QString("OnBattery"));
     }
 
+    template <typename Callback>
+    void onBatteryChange(Callback &&callback)
+    {
+        this->onPropertyChange("OnBattery", callback);
+    }
+
 private:
     UPowerClient() : AbstractDbusClient(true,
                                         QString("org.freedesktop.UPower"),

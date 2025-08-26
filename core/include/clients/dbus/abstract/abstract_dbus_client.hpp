@@ -7,6 +7,8 @@
 #include <functional>
 #include <stdexcept>
 
+#include "RccCommons.hpp"
+
 class AbstractDbusClient : public QObject
 {
     Q_OBJECT
@@ -31,7 +33,6 @@ private:
     QDBusConnection bus_;
     QDBusInterface *iface_;
     bool available_;
-    QMap<QString, QVariant> previousValues;
 
 protected:
     template <typename Ret = QVariant>
@@ -105,12 +106,17 @@ protected:
         throw std::runtime_error(("DBus Get returned no value for property: " + prop.toStdString()));
     }
 
+    template <typename Callback>
+    void onPropertyChange(const std::string propName, Callback &&callback)
+    {
+        EventBus::getInstance().on("dbus." + interfaceName_.toStdString() + "." + propName, callback);
+    }
+
 private slots:
     void onPropertiesChanged(const QString &iface,
                              const QVariantMap &changedProps,
                              const QStringList &invalidatedProps)
     {
-        // Filtramos solo para la interfaz de este cliente
         if (iface != interfaceName_)
             return;
 
@@ -121,16 +127,7 @@ private slots:
             const QString &propName = it.key();
             const QVariant &newValue = it.value();
 
-            QVariant oldValue;
-            if (previousValues.contains(propName))
-                oldValue = previousValues[propName];
-
-            qDebug() << "Property changed:" << propName
-                     << "Old value:" << oldValue
-                     << "New value:" << newValue;
-
-            // Guardamos el nuevo valor
-            previousValues[propName] = newValue;
+            EventBus::getInstance().emit_async("dbus." + interfaceName_.toStdString() + "." + propName.toStdString());
         }
     }
 };
