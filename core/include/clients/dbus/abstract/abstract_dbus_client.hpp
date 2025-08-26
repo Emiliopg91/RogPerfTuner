@@ -109,7 +109,27 @@ protected:
     template <typename Callback>
     void onPropertyChange(const std::string propName, Callback &&callback)
     {
-        EventBus::getInstance().on("dbus." + interfaceName_.toStdString() + "." + propName, callback);
+        EventBus::getInstance().on("dbus." + interfaceName_.toStdString() + ".property." + propName, callback);
+    }
+
+    template <typename Callback>
+    void onSignal(const QString &signalName, Callback &&callback)
+    {
+        bool ok = bus_.connect(
+            serviceName_,
+            objectPath_,
+            interfaceName_,
+            signalName,
+            this,
+            SLOT(onDbusSignal(QDBusMessage)));
+
+        if (!ok)
+            throw std::runtime_error("Couldn't connect to signal: " + signalName.toStdString());
+
+        // Registra el callback en EventBus
+        EventBus::getInstance().on(
+            "dbus." + interfaceName_.toStdString() + ".signal." + signalName.toStdString(),
+            std::forward<Callback>(callback));
     }
 
 private slots:
@@ -129,5 +149,15 @@ private slots:
 
             EventBus::getInstance().emit_async("dbus." + interfaceName_.toStdString() + "." + propName.toStdString());
         }
+    }
+
+    void onDbusSignal(const QDBusMessage &msg)
+    {
+        // Nombre de la signal
+        std::string signalName = msg.member().toStdString();
+
+        // Para cualquier otra signal, solo reemitimos el nombre
+        EventBus::getInstance().emit_async(
+            "dbus." + interfaceName_.toStdString() + ".signal." + signalName);
     }
 };

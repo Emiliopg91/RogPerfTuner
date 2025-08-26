@@ -50,6 +50,7 @@ target_link_libraries(RogControlCenter PRIVATE
     spdlog::spdlog_header_only
     nlohmann_json::nlohmann_json
     httplib::httplib
+    ixwebsocket::ixwebsocket
     udev
     orgbsdk
     RccCommons

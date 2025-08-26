@@ -4,6 +4,8 @@ project(RogControlCenter VERSION 1.0.0 LANGUAGES CXX)
 
 add_subdirectory(submodules/httplib)
 
+add_subdirectory(submodules/ixwebsocket)
+
 set(JSON_BuildTests OFF CACHE INTERNAL "")
 add_subdirectory(submodules/json)
 

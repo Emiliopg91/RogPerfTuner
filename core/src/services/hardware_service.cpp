@@ -6,6 +6,7 @@
 #include "../../include/clients/dbus/asus/armoury/nvidia/nv_temp_client.hpp"
 #include "../../include/clients/dbus/asus/armoury/other/panel_overdrive_client.hpp"
 #include "../../include/clients/dbus/linux/notifications_client.hpp"
+#include "../../include/clients/dbus/linux/power_management_kb_brightness.hpp"
 #include "../../include/clients/dbus/linux/upower_client.hpp"
 #include "../../include/clients/file/boost_control_client.hpp"
 #include "../../include/clients/file/cpuinfo_client.hpp"
@@ -118,10 +119,16 @@ HardwareService::HardwareService()
         UPowerClient::getInstance().onBatteryChange([this]()
                                                     { this->onBatteryEvent(); });
     }
-    /*
-        if KEYBOARD_BRIGHTNESS_CONTROL.available:
-            KEYBOARD_BRIGHTNESS_CONTROL.on_brightness_change(self._on_kb_brightness_change)
 
+    if (PMKeyboardBrightness::getInstance().available())
+    {
+        PMKeyboardBrightness::getInstance().onBrightnessChange([this]()
+                                                               { 
+                                                                if(PMKeyboardBrightness::getInstance().getKeyboardBrightness()==0){
+                                                                    PMKeyboardBrightness::getInstance().setKeyboardBrightnessSilent(2);
+                                                                } });
+    }
+    /*
         EVENT_BUS.on(STEAM_SERVICE_GAME_EVENT, self.__on_game_event)
     */
 
