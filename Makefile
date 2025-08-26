@@ -45,6 +45,15 @@ release:
 
 	tar -czvf dist/RogControlCenter.tgz dist/RogControlCenter/*
 
+	rm -rf dist/appimage-fs
+	cp -r dist/RogControlCenter dist/appimage-fs
+	cp resources/AppRun dist/appimage-fs/
+	cp resources/RogControlCenter.desktop dist/appimage-fs/RogControlCenter.desktop
+	cp assets/icons/rog-logo.svg dist/appimage-fs/icon.svg
+	chmod 777 -R resources/appimagetool dist/appimage-fs
+	cd dist && ../resources/appimagetool appimage-fs RogControlCenter.AppImage 
+	rm -R dist/appimage-fs
+
 apply_patches:
 	@if [ ! -f "patches/OpenRGB-cppSDK.diff.applied" ]; then \
 		cd submodules/OpenRGB-cppSDK && git apply ../../patches/OpenRGB-cppSDK.diff && touch ../../patches/OpenRGB-cppSDK.diff.applied; \

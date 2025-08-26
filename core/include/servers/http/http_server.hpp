@@ -7,27 +7,19 @@
 
 #include <nlohmann/json.hpp>
 using json = nlohmann::json;
-
 class HttpServer
 {
 private:
     httplib::Server svr;
-    Logger logger{"HttpServer"};
     std::thread runner;
+    std::atomic<bool> started{false};
+    Logger logger{"HttpServer"};
 
     HttpServer()
     {
         logger.info("Initializing HTTP server");
 
-        svr.set_pre_routing_handler([this](const httplib::Request &req, httplib::Response &res)
-                                    { 
-                                        logger.info("Incoming "+req.method+" request to "+req.path);
-                                        logger.add_tab();
-                                        return httplib::Server::HandlerResponse::Unhandled; });
-        svr.set_post_routing_handler([this](const httplib::Request &req, httplib::Response &res)
-                                     { 
-                                        logger.rem_tab(); 
-                                        logger.info("Finished request wit status: " + std::to_string(res.status)); });
+        svr.set_idle_interval(std::chrono::milliseconds(100));
 
         svr.Get("/ping", [this](const httplib::Request &req, httplib::Response &res) {});
 
@@ -59,8 +51,17 @@ private:
 
             res.set_content(response.dump(4), "application/json"); });
 
-        runner = std::thread([this]()
-                             { run(); });
+        if (!svr.bind_to_port("127.0.0.1", Constants::HTTP_PORT))
+        {
+            throw std::runtime_error("Cannot bind to port");
+        }
+
+        runner = std::thread([this]
+                             {
+            started = true;
+            logger.info("Server listening on 127.0.0.1:" + std::to_string(Constants::HTTP_PORT));
+            svr.listen_after_bind();            // <- entra al bucle
+            logger.info("Server loop exited"); });
     }
 
 public:
@@ -70,9 +71,32 @@ public:
         return instance;
     }
 
-    void run()
+    ~HttpServer()
     {
-        logger.info("Server up and running on localhost:" + Constants::HTTP_PORT);
-        svr.listen("127.0.0.1", Constants::HTTP_PORT);
+        stop();
+    }
+
+    void stop()
+    {
+        try
+        {
+            static std::atomic<bool> stopping{false};
+            bool expected = false;
+            if (!stopping.compare_exchange_strong(expected, true))
+                return;
+
+            logger.info("Stopping HTTP server");
+            logger.add_tab();
+            svr.stop();
+
+            logger.info("Waiting for thread to join");
+            if (runner.joinable())
+                runner.join();
+            logger.rem_tab();
+            logger.info("HTTP server stopped");
+        }
+        catch (...)
+        {
+        }
     }
 };

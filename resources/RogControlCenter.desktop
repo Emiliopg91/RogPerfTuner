@@ -1,0 +1,8 @@
+[Desktop Entry]
+Name=RogControlCenter
+Comment=An utility to manage Asus Rog laptop performance
+Exec=RogControlCenter
+Icon=icon
+Terminal=false
+Type=Application
+Categories=Utility;

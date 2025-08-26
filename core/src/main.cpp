@@ -2,6 +2,7 @@
 #include <unistd.h>
 #include "httplib.h"
 
+#include "../include/clients/tcp/open_rgb/open_rgb_client.hpp"
 #include "../include/servers/http/http_server.hpp"
 #include "../include/services/hardware_service.hpp"
 #include "../include/services/open_rgb_service.hpp"
@@ -62,5 +63,17 @@ int main(int argc, char **argv)
 
 	logger.rem_tab();
 	logger.info("Application ready");
+	std::atexit([]()
+				{ 
+					Logger logger{};
+					logger.info("Starting application shutdown");
+					logger.add_tab();
+					OpenRgbClient::getInstance().stop();
+					HttpServer::getInstance().stop();
+					logger.rem_tab();
+					logger.info("Shutdown finished"); 
+					std::this_thread::sleep_for(std::chrono::milliseconds(100));
+					kill(getpid(),SIGKILL); });
+
 	return app.exec();
 }

@@ -6,6 +6,81 @@
 #include <spdlog/async.h>
 #include <spdlog/fmt/ostr.h>
 
+static std::string format_file_time(std::filesystem::file_time_type ftime)
+{
+    using namespace std::chrono;
+    auto sctp = time_point_cast<system_clock::duration>(
+        ftime - std::filesystem::file_time_type::clock::now() + system_clock::now());
+    auto tt = system_clock::to_time_t(sctp);
+    auto ns = duration_cast<nanoseconds>(sctp.time_since_epoch()).count() % 1000000000;
+
+    std::tm tm{};
+    localtime_r(&tt, &tm);
+
+    std::ostringstream oss;
+    oss << std::put_time(&tm, "%Y%m%d.%H%M%S")
+        << std::setw(3) << std::setfill('0') << (ns / 1000000);
+    return oss.str();
+}
+
+static void rotate_current_log(const std::filesystem::path &logDir,
+                               const std::filesystem::path &oldDir)
+{
+    namespace fs = std::filesystem;
+
+    if (!fs::exists(logDir))
+        return;
+
+    for (auto &entry : fs::directory_iterator(logDir))
+    {
+        if (!entry.is_regular_file())
+            continue;
+        auto path = entry.path();
+        if (path.extension() != ".log")
+            continue;
+
+        if (path.filename() == "current.log")
+        {
+            // Mover a old/current.<timestamp>.log
+            auto ftime = fs::last_write_time(path);
+            auto stamp = format_file_time(ftime);
+            auto newName = "current." + stamp + ".log";
+            auto target = oldDir / newName;
+            fs::rename(path, target);
+        }
+        else
+        {
+            // Cualquier otro log se borra
+            fs::remove(path);
+        }
+    }
+
+    // Limitar a 5 históricos de current.log
+    if (!fs::exists(oldDir))
+        return;
+    std::vector<fs::directory_entry> currents;
+    for (auto &entry : fs::directory_iterator(oldDir))
+    {
+        if (!entry.is_regular_file())
+            continue;
+        if (entry.path().filename().string().rfind("current.", 0) == 0 &&
+            entry.path().extension() == ".log")
+        {
+            currents.push_back(entry);
+        }
+    }
+
+    std::sort(currents.begin(), currents.end(), [](auto &a, auto &b)
+              {
+                  return fs::last_write_time(a) > fs::last_write_time(b); // más nuevos primero
+              });
+
+    for (size_t i = 5; i < currents.size(); ++i)
+    {
+        fs::remove(currents[i].path());
+    }
+}
+
 std::map<std::string, std::string> LoggerProvider::configMap{};
 void LoggerProvider::initialize()
 {
@@ -20,6 +95,8 @@ void LoggerProvider::initialize()
     {
         std::filesystem::create_directories(dirPath2);
     }
+
+    rotate_current_log(dirPath, dirPath2);
 
     spdlog::init_thread_pool(8192, 1);
 
