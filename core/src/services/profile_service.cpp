@@ -1,11 +1,11 @@
 
 #include "../../include/clients/dbus/asus/core/fan_curves_client.hpp"
 #include "../../include/clients/dbus/asus/core/platform_client.hpp"
+#include "../../include/clients/dbus/linux/power_profile_client.hpp"
 #include "../../include/clients/dbus/linux/upower_client.hpp"
 #include "../../include/clients/file/boost_control_client.hpp"
 #include "../../include/clients/file/ssd_scheduler_client.hpp"
 #include "../../include/clients/shell/cpupower_client.hpp"
-#include "../../include/clients/shell/power_profiles_client.hpp"
 #include "../../include/gui/toaster.hpp"
 #include "../../include/services/hardware_service.hpp"
 #include "../../include/services/profile_service.hpp"
@@ -204,7 +204,7 @@ void ProfileService::setPowerProfile(PerformanceProfile profile)
         logger.add_tab();
         try
         {
-            PowerProfileClient::getInstance().setProfile(powerProfile);
+            PowerProfileClient::getInstance().setPowerProfile(powerProfile);
         }
         catch (std::exception e)
         {
