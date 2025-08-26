@@ -7,7 +7,7 @@ PATCH_DIR := patches
 SUBMODULE_DIR := submodules
 
 clean:
-	rm -rf build dist .Debug .Release .qt CMakeCache.txt **/cmake_install.cmake CMakeFiles patches/OpenRGB-cppSDK.diff.applied
+	rm -rf build dist .Debug .Release .qt CMakeCache.txt **/cmake_install.cmake CMakeFiles patches/OpenRGB-cppSDK.diff.applied assets/scripts assets/bin assets/OpenRGB assets/RccDeckyCompanion
 	cd submodules/OpenRGB-cppSDK && git reset --hard
 
 config:        
@@ -19,17 +19,30 @@ config:
 
 build: config apply_patches
 	cmake --build build -- -j$(NUM_CORES)
-	if [[ ! -d "assets/OpenRGB" ]]; then cd assets && $(MAKEFILE_DIR)submodules/OpenRGB/OpenRGB.AppImage --appimage-extract && mv squashfs-root OpenRGB; fi
+
+	rm -rf assets/bin
+	mkdir assets/bin assets/bin/rgb  assets/bin/performance
+	cp build/core/NextEffect assets/bin/rgb/nextEffect
+	cp build/core/IncBrightness assets/bin/rgb/incBrightness
+	cp build/core/DecBrightness assets/bin/rgb/decBrightness
+	cp build/core/NextProfile assets/bin/performance/nextProfile
+
+	if [ ! -d "assets/OpenRGB" ]; then \
+	    cd submodules/OpenRGB && ./build.sh && ./OpenRGB.AppImage --appimage-extract && cp -r squashfs-root ../../assets/OpenRGB; \
+	fi
+
+	if [ ! -d "assets/RccDeckyCompanion" ]; then \
+	    cd submodules/RccDeckyCompanion && ./cli/decky.py build && cp -r out/RccDeckyCompanion ../../assets/RccDeckyCompanion; \
+	fi
 
 release:
 	rm -rf dist
 	make build BUILD_TYPE=Release
+
 	mkdir dist dist/RogControlCenter
 	cp ./build/core/RogControlCenter dist/RogControlCenter
 	cp -r assets dist/RogControlCenter
-	mkdir assets/scripts
-	cp build/core/NextEffect assets/nextEffect
-	cp build/core/IncreaseBright assets/incBrightness
+
 	tar -czvf dist/RogControlCenter.tgz dist/RogControlCenter/*
 
 apply_patches:

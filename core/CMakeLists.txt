@@ -56,15 +56,25 @@ target_link_libraries(RogControlCenter PRIVATE
 )
 
 add_executable(NextEffect "${CMAKE_CURRENT_SOURCE_DIR}/src/scripts/next_effect.cpp")
-target_link_libraries(NextEffect PRIVATE 
-    nlohmann_json::nlohmann_json
+target_link_libraries(NextEffect PRIVATE
     httplib::httplib
     RccCommons
 )
 
 add_executable(IncBrightness "${CMAKE_CURRENT_SOURCE_DIR}/src/scripts/increase_brightness.cpp")
 target_link_libraries(IncBrightness PRIVATE 
-    nlohmann_json::nlohmann_json
+    httplib::httplib
+    RccCommons
+)
+
+add_executable(DecBrightness "${CMAKE_CURRENT_SOURCE_DIR}/src/scripts/decrease_brightness.cpp")
+target_link_libraries(DecBrightness PRIVATE 
+    httplib::httplib
+    RccCommons
+)
+
+add_executable(NextProfile "${CMAKE_CURRENT_SOURCE_DIR}/src/scripts/next_profile.cpp")
+target_link_libraries(NextProfile PRIVATE 
     httplib::httplib
     RccCommons
 )

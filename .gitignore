@@ -10,7 +10,10 @@ build/
 dist/
 
 **/cmake_install.cmake
+
+assets/bin/
 assets/OpenRGB/
+assets/RccDeckyCompanion/
 
 *.applied
 
