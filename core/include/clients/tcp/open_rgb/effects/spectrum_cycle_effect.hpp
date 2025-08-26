@@ -20,8 +20,11 @@ protected:
         {
             for (auto &dev : devices)
             {
-                std::vector<Color> colors(dev.leds.size(), Color::fromHsv(offset, 1, 1));
-                _set_colors(dev, colors);
+                if (dev.enabled)
+                {
+                    std::vector<Color> colors(dev.leds.size(), Color::fromHsv(offset, 1, 1));
+                    _set_colors(dev, colors);
+                }
             }
 
             offset = (offset + 1) % 360;

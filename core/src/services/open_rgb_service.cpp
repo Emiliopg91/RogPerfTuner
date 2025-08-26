@@ -100,3 +100,8 @@ void OpenRgbService::applyAura()
     logger.rem_tab();
     logger.info("Aura applied after " + std::to_string(std::chrono::duration_cast<std::chrono::milliseconds>(t1 - t0).count()) + " ms");
 }
+
+void OpenRgbService::disableDevice(UsbIdentifier identifier)
+{
+    OpenRgbClient::getInstance().disableDevice(getDeviceName(identifier));
+}

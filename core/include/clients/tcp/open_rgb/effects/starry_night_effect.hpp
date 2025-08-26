@@ -26,7 +26,7 @@ private:
         std::uniform_int_distribution<int> sleep_dist(0, 150);
         std::uniform_int_distribution<int> led_dist(0, device.leds.size() - 1);
 
-        while (_is_running)
+        while (device.enabled && _is_running)
         {
             std::vector<Color> new_colors(device.leds.size());
             int active_count = 0;

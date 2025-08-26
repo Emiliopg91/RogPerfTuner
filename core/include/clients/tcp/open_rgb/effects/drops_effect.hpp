@@ -56,7 +56,7 @@ private:
     void _effect_thread(size_t dev_index, Device &dev)
     {
         std::vector<Color> leds(dev.leds.size(), Color::fromRgb("#000000"));
-        while (_is_running)
+        while (dev.enabled && _is_running)
         {
             auto next_t = _get_next(dev_index, dev);
             leds[next_t.index] = next_t.color;
@@ -64,7 +64,7 @@ private:
             int naps = 4;
             for (int i = 0; i < naps; ++i)
             {
-                if (_is_running)
+                if (dev.enabled && _is_running)
                 {
                     double nap_time = 2500.0 / leds.size() /
                                       (random_int(6, 10) / 10.0) / naps;

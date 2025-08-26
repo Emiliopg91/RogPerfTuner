@@ -777,10 +777,10 @@ index 2deb0b2..75f2758 100644
 -
  #endif // OPENRGB_COLOR_INCLUDED
 diff --git a/include/OpenRGB/DeviceInfo.hpp b/include/OpenRGB/DeviceInfo.hpp
-index 6f15b55..9094962 100644
+index 6f15b55..63de2dc 100644
 --- a/include/OpenRGB/DeviceInfo.hpp
 +++ b/include/OpenRGB/DeviceInfo.hpp
-@@ -8,448 +8,434 @@
+@@ -8,448 +8,435 @@
  #ifndef OPENRGB_DEVICE_INCLUDED
  #define OPENRGB_DEVICE_INCLUDED
  
@@ -1310,6 +1310,7 @@ index 6f15b55..9094962 100644
 +		const std::vector<Zone> zones;
 +		const std::vector<LED> leds;
 +		const std::vector<Color> colors;
++		bool enabled = true;
 +
 +	public:
 +		/// Finds the first mode with a specific name.
@@ -1616,7 +1617,7 @@ index 6f15b55..9094962 100644
 -
  #endif // OPENRGB_DEVICE_INCLUDED
 diff --git a/src/Client.cpp b/src/Client.cpp
-index 9bc8fde..c8f71db 100644
+index 9bc8fde..77b4736 100644
 --- a/src/Client.cpp
 +++ b/src/Client.cpp
 @@ -12,18 +12,18 @@
@@ -1642,7 +1643,7 @@ index 9bc8fde..c8f71db 100644
  #include <CppUtils-Essential/LangUtils.hpp>
  using fut::make_unique;
  #include <CppUtils-Essential/CriticalError.hpp>
-@@ -37,1014 +37,1056 @@ using std::array;
+@@ -37,1014 +37,1061 @@ using std::array;
  #include <chrono>
  using std::chrono::milliseconds;
  
@@ -1651,12 +1652,12 @@ index 9bc8fde..c8f71db 100644
  
 -namespace orgb {
 -
+-
+-//======================================================================================================================
+-//  enum to string conversion
 +	//======================================================================================================================
 +	//  enum to string conversion
  
--//======================================================================================================================
--//  enum to string conversion
--
 -const char * enumString( ConnectStatus status ) noexcept
 -{
 -	static const char * const ConnectStatusStr [] =
@@ -1771,18 +1772,18 @@ index 9bc8fde..c8f71db 100644
 +	//  Client: main API
  
 -	if (size_t(status) < fut::size(RequestStatusStr))
+-	{
+-		return RequestStatusStr[ size_t(status) ];
+-	}
+-	else
 +	Client::Client(const std::string &clientName) noexcept
 +		: _clientName(clientName),
 +		  _socket(new TcpSocket),
 +		  _negotiatedProtocolVersion(0),
 +		  _isDeviceListOutOfDate(true)
  	{
--		return RequestStatusStr[ size_t(status) ];
- 	}
--	else
--	{
 -		return "<invalid status>";
--	}
+ 	}
 -}
  
 -const char * enumString( UpdateStatus status ) noexcept
@@ -2066,10 +2067,10 @@ index 9bc8fde..c8f71db 100644
 +		{
 +			return {RequestStatus::NotConnected, 0};
 +		}
-+
-+		DeviceCountResult result;
  
 -		bool sent = sendMessage< RequestControllerCount >();
++		DeviceCountResult result;
++
 +		bool sent = sendMessage<RequestControllerCount>();
  		if (!sent)
  		{
@@ -2217,17 +2218,19 @@ index 9bc8fde..c8f71db 100644
  	{
 -		result.status = deviceCountResult.status;
 -		return result;
-+		if (!_socket->isConnected())
++		if (device.enabled)
 +		{
-+			return RequestStatus::NotConnected;
-+		}
++			if (!_socket->isConnected())
++			{
++				return RequestStatus::NotConnected;
++			}
 +
-+		std::vector<Color> allColorsInDevice(device.leds.size(), color);
-+		if (!sendMessage<UpdateLEDs>(device.idx, allColorsInDevice))
-+		{
-+			return RequestStatus::SendRequestFailed;
++			std::vector<Color> allColorsInDevice(device.leds.size(), color);
++			if (!sendMessage<UpdateLEDs>(device.idx, allColorsInDevice))
++			{
++				return RequestStatus::SendRequestFailed;
++			}
 +		}
-+
 +		return RequestStatus::Success;
  	}
  
@@ -2237,14 +2240,17 @@ index 9bc8fde..c8f71db 100644
 -}
 +	RequestStatus Client::_setDeviceColors(const Device &device, std::vector<Color> colors)
 +	{
-+		if (!_socket->isConnected())
++		if (device.enabled)
 +		{
-+			return RequestStatus::NotConnected;
-+		}
++			if (!_socket->isConnected())
++			{
++				return RequestStatus::NotConnected;
++			}
 +
-+		if (!sendMessage<UpdateLEDs>(device.idx, colors))
-+		{
-+			return RequestStatus::SendRequestFailed;
++			if (!sendMessage<UpdateLEDs>(device.idx, colors))
++			{
++				return RequestStatus::SendRequestFailed;
++			}
 +		}
  
 -DeviceInfoResult Client::_requestDeviceInfo( uint32_t deviceIdx )
@@ -2282,12 +2288,12 @@ index 9bc8fde..c8f71db 100644
 +		{
 +			return RequestStatus::SendRequestFailed;
 +		}
++
++		return RequestStatus::Success;
++	}
  
 -	bool sent = sendMessage< RequestControllerData >( deviceIdx, _negotiatedProtocolVersion );
 -	if (!sent)
-+		return RequestStatus::Success;
-+	}
-+
 +	RequestStatus Client::_setLEDColor(const LED &led, Color color)
  	{
 -		result.status = RequestStatus::SendRequestFailed;
@@ -3417,7 +3423,7 @@ index 9bc8fde..c8f71db 100644
 -	{
 -		// No message is currently in the socket, no indication that the device list is out of date.
 -		return enableBlockingAndReturn( UpdateStatus::UpToDate );
- 	}
+-	}
 -	else if (status == SocketError::ConnectionClosed)
 -	{
 -		return enableBlockingAndReturn( UpdateStatus::ConnectionClosed );
@@ -3441,7 +3447,7 @@ index 9bc8fde..c8f71db 100644
 -		// We have received a DeviceListUpdated message from the server,
 -		// signal to the user that he needs to request the list again.
 -		return enableBlockingAndReturn( UpdateStatus::OutOfDate );
--	}
+ 	}
 -}
 -
 -

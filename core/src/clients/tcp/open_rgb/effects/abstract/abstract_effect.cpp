@@ -59,7 +59,7 @@ void AbstractEffect::_sleep(double seconds)
 
 void AbstractEffect::_set_colors(Device &dev, const std::vector<orgb::Color> &colors)
 {
-    if (_is_running)
+    if (dev.enabled && _is_running)
     {
         std::lock_guard<std::mutex> lock(_mutex);
         if (_is_running)

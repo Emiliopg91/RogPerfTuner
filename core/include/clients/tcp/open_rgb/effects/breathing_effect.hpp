@@ -20,8 +20,11 @@ public:
 
             for (auto &dev : devices)
             {
-                std::vector<Color> colors(dev.leds.size(), new_color);
-                _set_colors(dev, colors);
+                if (dev.enabled)
+                {
+                    std::vector<Color> colors(dev.leds.size(), new_color);
+                    _set_colors(dev, colors);
+                }
             }
 
             offset = (offset + 1) % _step_count;

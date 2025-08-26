@@ -54,7 +54,10 @@ protected:
         {
             for (auto &dev : devices)
             {
-                _set_colors(dev, _get_random_colors(dev.leds.size()));
+                if (dev.enabled)
+                {
+                    _set_colors(dev, _get_random_colors(dev.leds.size()));
+                }
             }
             _sleep(0.5);
         }

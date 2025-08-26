@@ -224,3 +224,12 @@ void OpenRgbClient::applyEffect(std::string effectName, RgbBrightness brightness
         }
     }
 }
+
+void OpenRgbClient::disableDevice(std::string devName)
+{
+    for (auto &dev : detectedDevices.devices())
+    {
+        if (dev->name == devName)
+            dev->enabled = false;
+    }
+}

@@ -18,6 +18,7 @@ public:
     RgbBrightness getCurrentBrightness();
     void setBrightness(RgbBrightness newBrightness);
     void setEffect(std::string newEffect);
+    void disableDevice(UsbIdentifier);
 
 private:
     OpenRgbService();
@@ -26,6 +27,7 @@ private:
     Logger logger{"OpenRgbService"};
     RgbBrightness brightness = RgbBrightness::Enum::MAX;
     std::string effect;
+
     void applyAura();
     void reload();
 };

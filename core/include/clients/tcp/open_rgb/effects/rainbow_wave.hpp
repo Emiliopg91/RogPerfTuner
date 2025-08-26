@@ -39,37 +39,40 @@ public:
         {
             for (auto &dev : devices)
             {
-                std::vector<Color> colors(dev.leds.size(), Color(0, 0, 0));
-                size_t offset = 0;
-
-                for (auto &zone : dev.zones)
+                if (dev.enabled)
                 {
-                    if (zone.type == orgb::ZoneType::Matrix)
+                    std::vector<Color> colors(dev.leds.size(), Color(0, 0, 0));
+                    size_t offset = 0;
+
+                    for (auto &zone : dev.zones)
                     {
-                        for (size_t r = 0; r < zone.matrix_height; ++r)
+                        if (zone.type == orgb::ZoneType::Matrix)
                         {
-                            for (size_t c = 0; c < zone.matrix_width; ++c)
+                            for (size_t r = 0; r < zone.matrix_height; ++r)
                             {
-                                if (zone.matrix_values[(r * zone.matrix_width) + c] < colors.size())
+                                for (size_t c = 0; c < zone.matrix_width; ++c)
                                 {
-                                    size_t rainbow_index = std::round(rainbow.size() * (c / static_cast<double>(zone.matrix_width)));
-                                    colors[offset + zone.matrix_values[(r * zone.matrix_width) + c]] = Color::fromHsv(rainbow[rainbow_index], 1, 1);
+                                    if (zone.matrix_values[(r * zone.matrix_width) + c] < colors.size())
+                                    {
+                                        size_t rainbow_index = std::round(rainbow.size() * (c / static_cast<double>(zone.matrix_width)));
+                                        colors[offset + zone.matrix_values[(r * zone.matrix_width) + c]] = Color::fromHsv(rainbow[rainbow_index], 1, 1);
+                                    }
                                 }
                             }
                         }
-                    }
-                    else
-                    {
-                        for (size_t l = 0; l < zone.leds_count; ++l)
+                        else
                         {
-                            size_t rainbow_index = std::floor(rainbow.size() * (l / static_cast<double>(zone.leds_count)));
-                            colors[offset + l] = Color::fromHsv(rainbow[rainbow_index], 1, 1);
+                            for (size_t l = 0; l < zone.leds_count; ++l)
+                            {
+                                size_t rainbow_index = std::floor(rainbow.size() * (l / static_cast<double>(zone.leds_count)));
+                                colors[offset + l] = Color::fromHsv(rainbow[rainbow_index], 1, 1);
+                            }
                         }
+                        offset += zone.leds_count;
                     }
-                    offset += zone.leds_count;
-                }
 
-                _set_colors(dev, colors);
+                    _set_colors(dev, colors);
+                }
             }
 
             _sleep(4.0 / rainbow.size());

@@ -166,8 +166,12 @@ void HardwareService::setupDeviceLoop()
             logger.rem_tab();
         }
 
-        if (added.size() > 0 || removed.size() > 0)
+        if (removed.size() > 0 && added.size() == 0)
         {
+            for(auto dev:removed){
+                OpenRgbService::getInstance().disableDevice(dev);
+            }
+        }else if(removed.size() > 0 || added.size() > 0){
             EventBus::getInstance().emit_async(Events::HARDWARE_SERVICE_USB_ADDED_REMOVED);
         }
 

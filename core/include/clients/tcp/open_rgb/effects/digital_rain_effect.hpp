@@ -224,7 +224,7 @@ private:
         std::uniform_int_distribution<int> hue_dist(0, 359);
         int hue = hue_dist(_rng);
 
-        while (_is_running)
+        while (dev.enabled && _is_running)
         {
             _decrement_matrix(zone_status);
             _get_next_matrix(zone_status);

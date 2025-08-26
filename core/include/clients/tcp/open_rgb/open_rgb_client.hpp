@@ -20,6 +20,7 @@ public:
     void applyEffect(std::string effect, RgbBrightness brightness);
     void start();
     void stop();
+    void disableDevice(std::string);
 
 private:
     std::vector<UsbIdentifier> compatibleDevices;
