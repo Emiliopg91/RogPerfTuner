@@ -4,6 +4,7 @@
 
 #include "../include/clients/tcp/open_rgb/open_rgb_client.hpp"
 #include "../include/servers/http/http_server.hpp"
+#include "../include/services/application_service.hpp"
 #include "../include/services/hardware_service.hpp"
 #include "../include/services/open_rgb_service.hpp"
 #include "../include/services/profile_service.hpp"
@@ -55,6 +56,7 @@ int main(int argc, char **argv)
 	OpenRgbService::getInstance();
 	HardwareService::getInstance();
 	ProfileService::getInstance().restoreProfile();
+	ApplicationService::getInstance();
 
 	HttpServer::getInstance();
 

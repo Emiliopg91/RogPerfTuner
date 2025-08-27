@@ -18,6 +18,7 @@ private:
     HttpServer()
     {
         logger.info("Initializing HTTP server");
+        logger.add_tab();
 
         svr.set_idle_interval(std::chrono::milliseconds(100));
 
@@ -62,6 +63,12 @@ private:
             logger.info("Server listening on 127.0.0.1:" + std::to_string(Constants::HTTP_PORT));
             svr.listen_after_bind();            // <- entra al bucle
             logger.info("Server loop exited"); });
+
+        while (!started)
+        {
+            std::this_thread::sleep_for(std::chrono::milliseconds(10));
+        }
+        logger.rem_tab();
     }
 
 public:
@@ -89,7 +96,6 @@ public:
             logger.add_tab();
             svr.stop();
 
-            logger.info("Waiting for thread to join");
             if (runner.joinable())
                 runner.join();
             logger.rem_tab();

@@ -3,6 +3,7 @@
 #include <string>
 #include <filesystem>
 #include <iostream>
+#include <fstream>
 
 #include "../logger/logger.hpp"
 
@@ -44,5 +45,23 @@ public:
             logger.error(fmt::format("Error de filesystem: {}", e.what()));
             return false;
         }
+    }
+
+    static inline void copy(const std::string src, const std::string dst)
+    {
+        std::filesystem::copy_file(src, dst, std::filesystem::copy_options::overwrite_existing);
+    }
+
+    static inline void writeFileContent(const std::string path, const std::string content)
+    {
+        std::ofstream file(path, std::ios::out | std::ios::trunc);
+        if (!file.is_open())
+        {
+            logger.error("Couldn't open file " + path);
+            return;
+        }
+
+        file << content;
+        file.close();
     }
 };

@@ -18,7 +18,7 @@
 
 TrayIcon::TrayIcon()
 {
-    tray_icon_.setIcon(QIcon::fromTheme(Constants::ICON_FILE.c_str()));
+    tray_icon_.setIcon(QIcon::fromTheme(Constants::ASSET_ICON_FILE.c_str()));
     tray_icon_.setToolTip("RogControlCenter");
 
     auto translator = Translator::getInstance();

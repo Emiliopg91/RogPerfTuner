@@ -45,12 +45,34 @@ public:
     }();
 
     inline static const bool DEV_MODE = std::getenv("RCC_MODE") == nullptr || StringUtils::toLowerCase(std::getenv("RCC_MODE")) == "dev";
+    inline const static std::string APP_NAME = "RogControlCenter";
 
     inline static const std::string EXECUTABLE_PATH = Constants::getExecutablePath();
     inline static const std::string EXECUTABLE_DIR = Constants::getExecutableDir();
 
     inline static const std::string HOME_DIR = std::getenv("HOME");
+
+    inline static const std::string APPIMAGE_FILE = []()
+    {
+        const char *appimage = std::getenv("APPIMAGE");
+        if (appimage == nullptr)
+            appimage = "";
+        return appimage;
+    }();
+    inline static const std::string AUTOSTART_FILE = HOME_DIR + "/.config/autostart/" + APP_NAME + ".desktop";
+    inline static const std::string APP_DRAW_FILE = HOME_DIR + "/.local/share/applications/" + APP_NAME + ".desktop";
+
     inline static const std::string APP_DIR = Constants::HOME_DIR + "/.config/RogControlCenter";
+
+    inline static const std::string UPDATE_DIR = Constants::APP_DIR + "/update";
+    inline static const std::string UPDATE_FILE = Constants::UPDATE_DIR + "/" + APP_NAME + ".AppImage";
+
+    inline static const std::string BIN_DIR = Constants::APP_DIR + "/bin";
+    inline static const std::string BIN_APPLICATION_DIR = Constants::BIN_DIR + "/application";
+    inline static const std::string LAUNCHER_FILE = Constants::BIN_APPLICATION_DIR + "/launcher.sh";
+
+    inline static const std::string ICONS_DIR = Constants::APP_DIR + "/icons";
+    inline static const std::string ICON_FILE = Constants::ICONS_DIR + "/icon.svg";
 
     inline static const std::string CONFIG_DIR = Constants::APP_DIR + "/config";
     inline static const std::string CONFIG_FILE = Constants::CONFIG_DIR + "/config.json";
@@ -60,8 +82,8 @@ public:
     inline static const std::string LOG_FILE = Constants::LOG_DIR + "/current.log";
     inline static const std::string LOG_ORGB_FILE = Constants::LOG_DIR + "/OpenRGB.log";
 
-    inline static const std::string ICONS_DIR = Constants::ASSETS_DIR + "/icons";
-    inline static const std::string ICON_FILE = Constants::ICONS_DIR + "/icon-45x45.png";
+    inline static const std::string ASSET_ICONS_DIR = Constants::ASSETS_DIR + "/icons";
+    inline static const std::string ASSET_ICON_FILE = Constants::ASSET_ICONS_DIR + "/rog-logo.svg";
 
     inline static const std::string ORGB_DIR = Constants::ASSETS_DIR + "/OpenRGB";
     inline static const std::string ORGB_RULES_FILE = Constants::ORGB_DIR + "/usr/lib/udev/rules.d/60-openrgb.rules";
