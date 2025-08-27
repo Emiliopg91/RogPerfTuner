@@ -5,6 +5,7 @@
 #include "../clients/dbus/asus/armoury/intel/pl2_sppt_client.hpp"
 #include "../clients/dbus/asus/armoury/nvidia/nv_boost_client.hpp"
 #include "../clients/dbus/asus/armoury/nvidia/nv_temp_client.hpp"
+#include "../models/platform_profile.hpp"
 
 class ProfileUtils
 {

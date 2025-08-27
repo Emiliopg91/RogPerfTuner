@@ -4,6 +4,7 @@
 #include <algorithm>
 #include <cctype>
 #include <random>
+#include <array>
 #include <iomanip>
 
 class StringUtils

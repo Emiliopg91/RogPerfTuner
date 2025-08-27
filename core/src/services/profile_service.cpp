@@ -1,4 +1,5 @@
 
+#include "../../include/configuration/configuration.hpp"
 #include "../../include/clients/dbus/asus/core/fan_curves_client.hpp"
 #include "../../include/clients/dbus/asus/core/platform_client.hpp"
 #include "../../include/clients/dbus/linux/power_profile_client.hpp"
@@ -7,8 +8,11 @@
 #include "../../include/clients/file/ssd_scheduler_client.hpp"
 #include "../../include/clients/shell/cpupower_client.hpp"
 #include "../../include/gui/toaster.hpp"
+#include "../../include/models/ssd_scheduler.hpp"
+#include "../../include/models/power_profile.hpp"
 #include "../../include/services/hardware_service.hpp"
 #include "../../include/services/profile_service.hpp"
+#include "../../include/translator/translator.hpp"
 #include "../../include/utils/events.hpp"
 #include "../../include/utils/profile_utils.hpp"
 #include "RccCommons.hpp"
@@ -85,6 +89,7 @@ void ProfileService::setPerformanceProfile(PerformanceProfile profile, bool temp
             logger.info("Profile setted after " + std::to_string(std::chrono::duration_cast<std::chrono::milliseconds>(t1 - t0).count()) + " ms");
             std::unordered_map<std::string, std::any> values = {{"profile", StringUtils::toLowerCase(Translator::getInstance().translate("label.profile." + profileName))}};
             Toaster::getInstance().showToast(Translator::getInstance().translate("profile.applied", values));
+            EventBus::getInstance().emit_async(Events::PROFILE_SERVICE_ON_PROFILE);
         }
         catch (std::exception e)
         {

@@ -1,8 +1,8 @@
 #pragma once
 
 #include <iostream>
+#include "RccCommons.hpp"
 #include "logger_provider.hpp"
-#include "../utils/string_utils.hpp"
 
 template <typename... Args>
 using format_string_t = fmt::format_string<Args...>;

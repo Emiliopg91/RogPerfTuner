@@ -8,7 +8,9 @@
 
 #include "RccCommons.hpp"
 
+#include "../../include/configuration/configuration.hpp"
 #include "../../include/gui/password_dialog.hpp"
+#include "../../include/translator/translator.hpp"
 
 bool PasswordDialog::showDialog()
 {

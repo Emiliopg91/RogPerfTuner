@@ -6,6 +6,12 @@ class Events
 {
 public:
     inline const static std::string UDEV_CLIENT_DEVICE_EVENT = "UDEV_CLIENT_DEVICE_EVENT";
+
     inline const static std::string HARDWARE_SERVICE_USB_ADDED_REMOVED = "HARDWARE_SERVICE_USB_ADDED_REMOVED";
     inline const static std::string HARDWARE_SERVICE_ON_BATTERY = "HARDWARE_SERVICE_ON_BATTERY";
+
+    inline const static std::string ORGB_SERVICE_ON_BRIGHTNESS = "ORGB_SERVICE_ON_BRIGHTNESS";
+    inline const static std::string ORGB_SERVICE_ON_EFFECT = "ORGB_SERVICE_ON_EFFECT";
+
+    inline const static std::string PROFILE_SERVICE_ON_PROFILE = "PROFILE_SERVICE_ON_PROFILE";
 };

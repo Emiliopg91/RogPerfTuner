@@ -1,6 +1,12 @@
 #include <mutex>
 #include "RccCommons.hpp"
 
+#include "../logger/logger.hpp"
+#include "../models/battery_charge_threshold.hpp"
+#include "../models/cpu_brand.hpp"
+#include "../models/ssd_scheduler.hpp"
+#include "../models/usb_identifier.hpp"
+
 class HardwareService
 {
 

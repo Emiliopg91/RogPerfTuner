@@ -6,6 +6,7 @@
 #include <stdexcept>
 
 #include "RccCommons.hpp"
+#include "../../../shell/shell.hpp"
 
 class AbstractFileClient
 {

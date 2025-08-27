@@ -1,4 +1,5 @@
 #include "abstract/abstract_file_client.hpp"
+#include "../../utils/file_utils.hpp"
 
 class BoostControlClient : public AbstractFileClient
 {

@@ -4,8 +4,9 @@
 #include <iostream>
 #include <libsecret/secret.h>
 
+#include "RccCommons.hpp"
+
 #include "../../include/configuration/configuration.hpp"
-#include "../../include/utils/constants.hpp"
 #include "../../include/utils/file_utils.hpp"
 
 void Configuration::loadConfig()
@@ -77,7 +78,20 @@ std::string Configuration::getPassword()
     GError *error = nullptr;
 
     const SecretSchema schema = {
-        "rog_control_center_password", SECRET_SCHEMA_NONE, {{"key", SECRET_SCHEMA_ATTRIBUTE_STRING}, {nullptr, SECRET_SCHEMA_ATTRIBUTE_STRING}}};
+        "rog_control_center_password", // name
+        SECRET_SCHEMA_NONE,            // flags
+        {                              // attributes
+         {"key", SECRET_SCHEMA_ATTRIBUTE_STRING},
+         {NULL, (SecretSchemaAttributeType)0}},
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0 // reserved1..reserved7
+    };
 
     gchar *password = secret_password_lookup_sync(
         &schema,
@@ -103,9 +117,21 @@ void Configuration::setPassword(std::string pss)
 
     GError *error = nullptr;
 
-    // Definimos un esquema mínimo con un atributo fijo
     const SecretSchema schema = {
-        "rog_control_center_password", SECRET_SCHEMA_NONE, {{"key", SECRET_SCHEMA_ATTRIBUTE_STRING}, {nullptr, SECRET_SCHEMA_ATTRIBUTE_STRING}}};
+        "rog_control_center_password", // name
+        SECRET_SCHEMA_NONE,            // flags
+        {                              // attributes
+         {"key", SECRET_SCHEMA_ATTRIBUTE_STRING},
+         {NULL, (SecretSchemaAttributeType)0}},
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0 // reserved1..reserved7
+    };
 
     secret_password_store_sync(
         &schema,

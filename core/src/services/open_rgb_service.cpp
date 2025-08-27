@@ -1,8 +1,11 @@
 #include "RccCommons.hpp"
 
+#include "../../include/configuration/configuration.hpp"
 #include "../../include/clients/dbus/linux/upower_client.hpp"
 #include "../../include/clients/tcp/open_rgb/open_rgb_client.hpp"
+#include "../../include/models/usb_identifier.hpp"
 #include "../../include/services/open_rgb_service.hpp"
+#include "../../include/translator/translator.hpp"
 #include "../../include/utils/events.hpp"
 
 OpenRgbService::OpenRgbService()
@@ -62,14 +65,22 @@ RgbBrightness OpenRgbService::getCurrentBrightness()
 
 void OpenRgbService::setBrightness(RgbBrightness newBrightness)
 {
-    brightness = newBrightness;
-    applyAura();
+    if (brightness != newBrightness)
+    {
+        brightness = newBrightness;
+        applyAura();
+        EventBus::getInstance().emit_async(Events::ORGB_SERVICE_ON_BRIGHTNESS);
+    }
 }
 
 void OpenRgbService::setEffect(std::string newEffect)
 {
-    effect = newEffect;
-    applyAura();
+    if (effect != newEffect)
+    {
+        effect = newEffect;
+        applyAura();
+        EventBus::getInstance().emit_async(Events::ORGB_SERVICE_ON_EFFECT);
+    }
 }
 
 void OpenRgbService::reload()

@@ -1,7 +1,13 @@
 #include "../../include/gui/tray_icon.hpp"
+#include "../../include/models/battery_charge_threshold.hpp"
+#include "../../include/models/performance_profile.hpp"
+#include "../../include/models/rgb_brightness.hpp"
 #include "../../include/services/hardware_service.hpp"
 #include "../../include/services/open_rgb_service.hpp"
 #include "../../include/services/profile_service.hpp"
+#include "../../include/translator/translator.hpp"
+#include "../../include/utils/events.hpp"
+#include "../../include/utils/event_bus.hpp"
 
 #include "RccCommons.hpp"
 
@@ -69,6 +75,7 @@ TrayIcon::TrayIcon()
         QObject::connect(act, &QAction::triggered, [this, item]()
                          { this->onEffectChanged(item); });
         effectMenu->addAction(act);
+        effectActions[item] = act;
     }
     menu->insertMenu(nullptr, effectMenu);
     // -------------------------
@@ -89,6 +96,7 @@ TrayIcon::TrayIcon()
         QObject::connect(act, &QAction::triggered, [this, item]()
                          { this->onBrightnessChanged(item); });
         brightnessMenu->addAction(act);
+        brightnessActions[item.toName()] = act;
     }
     menu->insertMenu(nullptr, brightnessMenu);
     // -------------------------
@@ -121,6 +129,7 @@ TrayIcon::TrayIcon()
         QObject::connect(act, &QAction::triggered, [this, item]()
                          { this->onPerformanceProfileChanged(item); });
         profileMenu->addAction(act);
+        perfProfileActions[item.toName()] = act;
     }
     menu->insertMenu(nullptr, profileMenu);
     // -------------------------
@@ -146,6 +155,33 @@ TrayIcon::TrayIcon()
     tray_icon_.setContextMenu(menu);
 
     tray_icon_.show();
+
+    EventBus::getInstance().on(Events::ORGB_SERVICE_ON_BRIGHTNESS, [this]()
+                               { setAuraBrightness(); });
+
+    EventBus::getInstance().on(Events::ORGB_SERVICE_ON_EFFECT, [this]()
+                               { setAuraEffect(); });
+
+    EventBus::getInstance().on(Events::PROFILE_SERVICE_ON_PROFILE, [this]()
+                               { setPerformanceProfile(); });
+}
+
+void TrayIcon::setAuraBrightness()
+{
+    auto key = OpenRgbService::getInstance().getCurrentBrightness().toName();
+    brightnessActions[key]->setChecked(true);
+}
+
+void TrayIcon::setAuraEffect()
+{
+    auto key = OpenRgbService::getInstance().getCurrentEffect();
+    effectActions[key]->setChecked(true);
+}
+
+void TrayIcon::setPerformanceProfile()
+{
+    auto key = ProfileService::getInstance().getPerformanceProfile();
+    perfProfileActions[key.toName()]->setChecked(true);
 }
 
 void TrayIcon::onBatteryLimitChanged(BatteryThreshold value)

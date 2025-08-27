@@ -3,7 +3,7 @@
 #include <fstream>
 
 #include <nlohmann/json.hpp>
-#include "../../include/utils/constants.hpp"
+#include "RccCommons.hpp"
 #include "../../include/translator/translator.hpp"
 
 using json = nlohmann::json;

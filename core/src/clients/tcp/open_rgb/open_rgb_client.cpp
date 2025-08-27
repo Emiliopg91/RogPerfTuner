@@ -18,6 +18,10 @@
 #include "../../../../include/clients/tcp/open_rgb/effects/starry_night_effect.hpp"
 #include "../../../../include/clients/tcp/open_rgb/effects/static_effect.hpp"
 #include "../../../../include/clients/shell/asusctl_client.hpp"
+#include "../../../../include/models/rgb_brightness.hpp"
+#include "../../../../include/models/usb_identifier.hpp"
+#include "../../../../include/shell/shell.hpp"
+#include "../../../../include/utils/net_utils.hpp"
 
 OpenRgbClient::OpenRgbClient()
 {

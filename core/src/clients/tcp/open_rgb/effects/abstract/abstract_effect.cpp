@@ -1,4 +1,8 @@
+#include <thread>
+#include <mutex>
+
 #include "../../../../../../include/clients/tcp/open_rgb/effects/abstract/abstract_effect.hpp"
+#include "../../../../../../include/models/rgb_brightness.hpp"
 
 double AbstractEffect::brightnessMap(RgbBrightness b)
 {

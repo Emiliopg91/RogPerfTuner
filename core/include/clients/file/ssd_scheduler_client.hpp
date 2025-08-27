@@ -1,6 +1,7 @@
 #include "abstract/abstract_file_client.hpp"
 
 #include "RccCommons.hpp"
+#include "../../models/ssd_scheduler.hpp"
 
 class SsdSchedulerClient : public AbstractFileClient
 {

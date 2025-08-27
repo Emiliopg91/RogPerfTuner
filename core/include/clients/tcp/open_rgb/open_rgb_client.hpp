@@ -3,7 +3,9 @@
 #include "RccCommons.hpp"
 #include "OpenRGB/Client.hpp"
 
-#include "../../../../include/clients/tcp/open_rgb/effects/abstract/abstract_effect.hpp"
+#include "../../../../include/models/usb_identifier.hpp"
+
+#include "effects/abstract/abstract_effect.hpp"
 
 class OpenRgbClient
 {

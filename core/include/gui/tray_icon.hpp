@@ -1,8 +1,12 @@
 #pragma once
 
-#include "RccCommons.hpp"
-
 #include <QSystemTrayIcon>
+#include <QAction>
+
+#include "RccCommons.hpp"
+#include "../models/battery_charge_threshold.hpp"
+#include "../models/performance_profile.hpp"
+#include "../models/rgb_brightness.hpp"
 
 class TrayIcon
 {
@@ -17,8 +21,17 @@ private:
     TrayIcon();
 
     QSystemTrayIcon tray_icon_;
+
+    std::map<std::string, QAction *> brightnessActions;
+    std::map<std::string, QAction *> effectActions;
+    std::map<std::string, QAction *> perfProfileActions;
+
     void onBatteryLimitChanged(BatteryThreshold);
     void onPerformanceProfileChanged(PerformanceProfile);
     void onEffectChanged(std::string);
     void onBrightnessChanged(RgbBrightness);
+
+    void setAuraBrightness();
+    void setAuraEffect();
+    void setPerformanceProfile();
 };

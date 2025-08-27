@@ -15,8 +15,12 @@
 #include "../../include/clients/shell/lsusb_client.hpp"
 #include "../../include/clients/tcp/open_rgb/open_rgb_client.hpp"
 #include "../../include/gui/toaster.hpp"
+#include "../../include/models/battery_charge_threshold.hpp"
+#include "../../include/models/cpu_brand.hpp"
+#include "../../include/models/gpu_brand.hpp"
 #include "../../include/services/hardware_service.hpp"
 #include "../../include/services/open_rgb_service.hpp"
+#include "../../include/translator/translator.hpp"
 #include "../../include/utils/events.hpp"
 
 HardwareService::HardwareService()

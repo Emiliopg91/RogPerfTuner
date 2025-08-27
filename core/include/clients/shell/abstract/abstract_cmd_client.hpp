@@ -7,6 +7,9 @@
 
 #include "RccCommons.hpp"
 
+#include "../../../models/command_result.hpp"
+#include "../../../shell/shell.hpp"
+
 class AbstractCmdClient
 {
 protected:

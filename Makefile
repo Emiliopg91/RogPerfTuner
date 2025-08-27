@@ -7,7 +7,7 @@ PATCH_DIR := patches
 SUBMODULE_DIR := submodules
 
 clean:
-	rm -rf build dist .Debug .Release .qt CMakeCache.txt **/cmake_install.cmake CMakeFiles patches/OpenRGB-cppSDK.diff.applied assets/scripts assets/bin assets/OpenRGB assets/RccDeckyCompanion
+	rm -rf build dist .Debug .Release .qt CMakeCache.txt **/cmake_install.cmake CMakeFiles patches/OpenRGB-cppSDK.diff.applied assets/scripts assets/bin assets/OpenRGB assets/RccDeckyCompanion **/CMakeFiles
 	cd submodules/OpenRGB-cppSDK && git reset --hard
 
 config:        

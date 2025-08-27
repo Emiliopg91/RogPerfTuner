@@ -41,6 +41,11 @@ file(GLOB_RECURSE HEADERS
 )
 
 add_executable(RogControlCenter ${SOURCES} ${HEADERS})
+
+find_package(PkgConfig REQUIRED)
+pkg_check_modules(LIBSECRET REQUIRED libsecret-1)
+
+target_include_directories(RogControlCenter PRIVATE ${LIBSECRET_INCLUDE_DIRS})
 target_link_libraries(RogControlCenter PRIVATE 
     Qt6::Core
     Qt6::Gui
@@ -51,6 +56,7 @@ target_link_libraries(RogControlCenter PRIVATE
     nlohmann_json::nlohmann_json
     httplib::httplib
     ixwebsocket::ixwebsocket
+    ${LIBSECRET_LIBRARIES}
     udev
     orgbsdk
     RccCommons

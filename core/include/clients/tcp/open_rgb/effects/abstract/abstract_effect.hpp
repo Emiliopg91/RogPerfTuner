@@ -4,6 +4,9 @@
 
 #include "RccCommons.hpp"
 #include "OpenRGB/Client.hpp"
+#include "../../../../../logger/logger.hpp"
+#include "../../../../../models/rgb_brightness.hpp"
+
 using orgb::Client;
 using orgb::Color;
 using orgb::ConnectStatus;

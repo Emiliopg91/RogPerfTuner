@@ -3,6 +3,9 @@
 #include <mutex>
 
 #include "RccCommons.hpp"
+#include "../logger/logger.hpp"
+#include "../models/rgb_brightness.hpp"
+#include "../models/usb_identifier.hpp"
 
 class OpenRgbService
 {

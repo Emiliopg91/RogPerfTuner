@@ -8,6 +8,7 @@
 #include <stdexcept>
 
 #include "RccCommons.hpp"
+#include "../../../utils/event_bus.hpp"
 
 class AbstractDbusClient : public QObject
 {
