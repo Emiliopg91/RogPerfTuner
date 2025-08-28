@@ -36,9 +36,9 @@ public:
     {
         std::string cmd = "echo '" + content + "' | tee " + path_;
         if (sudo_)
-            Shell::getInstance().run_elevated_command(cmd).stdout_str;
+            Shell::getInstance().run_elevated_command(cmd);
         else
-            Shell::getInstance().run_command(cmd).stdout_str;
+            Shell::getInstance().run_command(cmd);
     }
 
     bool available()

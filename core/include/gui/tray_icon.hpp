@@ -31,7 +31,7 @@ private:
     void onEffectChanged(std::string);
     void onBrightnessChanged(RgbBrightness);
 
-    void setAuraBrightness();
-    void setAuraEffect();
-    void setPerformanceProfile();
+    void setAuraBrightness(RgbBrightness);
+    void setAuraEffect(std::string);
+    void setPerformanceProfile(PerformanceProfile);
 };

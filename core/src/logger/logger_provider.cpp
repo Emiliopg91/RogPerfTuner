@@ -103,8 +103,8 @@ void LoggerProvider::initialize()
     console_sink = std::make_shared<spdlog::sinks::stdout_color_sink_mt>();
     file_sink = std::make_shared<spdlog::sinks::basic_file_sink_mt>(Constants::LOG_FILE, true);
 
-    console_sink->set_pattern("%^[%Y-%m-%d %H:%M:%S.%e] [%-7l] [%t] [%n] %v%$");
-    file_sink->set_pattern("[%Y-%m-%d %H:%M:%S.%e] [%-7l] [%t] [%n] %v");
+    console_sink->set_pattern("%^[%Y-%m-%d %H:%M:%S.%e] [%-7l] [%n] %v%$");
+    file_sink->set_pattern("[%Y-%m-%d %H:%M:%S.%e] [%-7l] [%n] %v");
 
     auto main_logger = std::make_shared<spdlog::async_logger>(
         "Default", spdlog::sinks_init_list{console_sink, file_sink},

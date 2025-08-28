@@ -70,7 +70,7 @@ void OpenRgbService::setBrightness(RgbBrightness newBrightness)
     {
         brightness = newBrightness;
         applyAura();
-        EventBus::getInstance().emit_async(Events::ORGB_SERVICE_ON_BRIGHTNESS);
+        EventBus::getInstance().emit_event(Events::ORGB_SERVICE_ON_BRIGHTNESS, newBrightness);
     }
 }
 
@@ -80,7 +80,7 @@ void OpenRgbService::setEffect(std::string newEffect)
     {
         effect = newEffect;
         applyAura();
-        EventBus::getInstance().emit_async(Events::ORGB_SERVICE_ON_EFFECT);
+        EventBus::getInstance().emit_event(Events::ORGB_SERVICE_ON_EFFECT, newEffect);
     }
 }
 

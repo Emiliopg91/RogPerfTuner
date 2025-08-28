@@ -7,62 +7,89 @@ PATCH_DIR := patches
 SUBMODULE_DIR := submodules
 
 clean:
-	rm -rf build dist .Debug .Release .qt CMakeCache.txt **/cmake_install.cmake CMakeFiles patches/OpenRGB-cppSDK.diff.applied assets/scripts assets/bin assets/OpenRGB assets/RccDeckyCompanion **/CMakeFiles
-	cd submodules/OpenRGB-cppSDK && git reset --hard
+	@echo "#######################################################################"
+	@echo "######################### Cleaning workspace ##########################"
+	@echo "#######################################################################"
+	@rm -rf build dist .Debug .Release .qt CMakeCache.txt **/cmake_install.cmake CMakeFiles patches/OpenRGB-cppSDK.diff.applied assets/scripts assets/bin assets/OpenRGB assets/RccDeckyCompanion **/CMakeFiles
+	@cd submodules/OpenRGB-cppSDK && git reset --hard > /dev/null
 
-config:        
-	@if [ ! -f .$(BUILD_TYPE) ]; then \
-		make clean; \
-	fi
-	cmake -B build -S . -DCMAKE_BUILD_TYPE=$(BUILD_TYPE) -DCMAKE_CXX_COMPILER=clang++
-	touch .$(BUILD_TYPE)
+config:
+	@echo "#######################################################################"
+	@echo "######################## Configuring compiler ########################"
+	@echo "#######################################################################"
+	@cmake -B build -S . -DCMAKE_BUILD_TYPE=$BUILD_TYPE
+
+
+	@cmake -B build -S . -DCMAKE_BUILD_TYPE=$(BUILD_TYPE) -DCMAKE_CXX_COMPILER=clang++
+	@touch .$(BUILD_TYPE)
 
 build: config apply_patches
-	cmake --build build -- -j$(NUM_CORES)
+	@echo "#######################################################################"
+	@echo "##################### Compiling RogControlCenter ######################"
+	@echo "#######################################################################"
+	@cmake --build build -- -j$(NUM_CORES)
 
-	rm -rf assets/bin
-	mkdir assets/bin assets/bin/rgb  assets/bin/performance
-	cp build/core/NextEffect assets/bin/rgb/nextEffect
-	cp build/core/IncBrightness assets/bin/rgb/incBrightness
-	cp build/core/DecBrightness assets/bin/rgb/decBrightness
-	cp build/core/NextProfile assets/bin/performance/nextProfile
+	@rm -rf assets/bin
+	@mkdir assets/bin assets/bin/rgb  assets/bin/performance
+	@cp build/core/NextEffect assets/bin/rgb/nextEffect
+	@cp build/core/IncBrightness assets/bin/rgb/incBrightness
+	@cp build/core/DecBrightness assets/bin/rgb/decBrightness
+	@cp build/core/NextProfile assets/bin/performance/nextProfile
 
-	if [ ! -d "assets/OpenRGB" ]; then \
-	    cd submodules/OpenRGB && ./build.sh && ./OpenRGB.AppImage --appimage-extract && cp -r squashfs-root ../../assets/OpenRGB; \
+	@if [ ! -d "assets/OpenRGB" ]; then \
+		echo "#######################################################################" && \
+		echo "######################### Compiling OpenRGB ###########################" && \
+		echo "#######################################################################" && \
+		cd submodules/OpenRGB && ./build.sh \
+		./OpenRGB.AppImage --appimage-extract > /dev/null && cp -r squashfs-root ../../assets/OpenRGB; \
 	fi
 
-	if [ ! -d "assets/RccDeckyCompanion" ]; then \
+	@if [ ! -d "assets/RccDeckyCompanion" ]; then \
+		echo "#######################################################################" && \
+		echo "#################### Compiling RccDeckyCompanion ######################" && \
+		echo "#######################################################################" && \
 	    cd submodules/RccDeckyCompanion && ./cli/decky.py build && cp -r out/RccDeckyCompanion ../../assets/RccDeckyCompanion; \
 	fi
 
-	grep -E 'project\(.*VERSION' CMakeLists.txt | sed -E 's/.*VERSION[[:space:]]+([0-9]+\.[0-9]+\.[0-9]+).*/\1/' > assets/version
+	@grep -E 'project\(.*VERSION' CMakeLists.txt | sed -E 's/.*VERSION[[:space:]]+([0-9]+\.[0-9]+\.[0-9]+).*/\1/' | xargs echo -n > assets/version
 
 release:
-	rm -rf dist
-	make build BUILD_TYPE=Release
+	@rm -rf dist
+	@make build BUILD_TYPE=Release
 
-	mkdir dist dist/RogControlCenter
-	cp ./build/core/RogControlCenter dist/RogControlCenter
-	cp -r assets dist/RogControlCenter
+	@echo "#######################################################################"
+	@echo "####################### Generating Dist folder ########################"
+	@echo "#######################################################################"
+	@mkdir dist dist/RogControlCenter
+	@cp ./build/core/RogControlCenter dist/RogControlCenter
+	@cp -r assets dist/RogControlCenter
 
-	tar -czvf dist/RogControlCenter.tgz dist/RogControlCenter/*
+	@echo "#######################################################################"
+	@echo "######################### Generating Tar GZip #########################"
+	@echo "#######################################################################"
+	@tar -czvf dist/RogControlCenter.tgz dist/RogControlCenter/* > /dev/null
 
-	rm -rf dist/appimage-fs
-	cp -r dist/RogControlCenter dist/appimage-fs
-	cp resources/AppRun dist/appimage-fs/
-	cp resources/RogControlCenter.desktop dist/appimage-fs/RogControlCenter.desktop
-	cp assets/icons/rog-logo.svg dist/appimage-fs/icon.svg
-	chmod 777 -R resources/appimagetool dist/appimage-fs
-	cd dist && ../resources/appimagetool appimage-fs RogControlCenter.AppImage 
-	rm -R dist/appimage-fs
+	@echo "#######################################################################"
+	@echo "######################### Generating AppImage #########################"
+	@echo "#######################################################################"
+	@rm -rf dist/appimage-fs
+	@cp -r dist/RogControlCenter dist/appimage-fs
+	@cp resources/AppRun dist/appimage-fs/
+	@cp resources/RogControlCenter.desktop dist/appimage-fs/RogControlCenter.desktop
+	@cp assets/icons/rog-logo.svg dist/appimage-fs/icon.svg
+	@chmod 777 -R resources/appimagetool dist/appimage-fs
+	@VERSION=$$(cat assets/version); ./resources/appimagetool -n dist/appimage-fs dist/RogControlCenter.AppImage
 
 apply_patches:
+	@echo "#######################################################################"
+	@echo "########################## Applying patches ###########################"
+	@echo "#######################################################################"
 	@if [ ! -f "patches/OpenRGB-cppSDK.diff.applied" ]; then \
 		cd submodules/OpenRGB-cppSDK && git apply ../../patches/OpenRGB-cppSDK.diff && touch ../../patches/OpenRGB-cppSDK.diff.applied; \
 	fi
 
 build_debug:
-	make build BUILD_TYPE=Debug
+	@make build BUILD_TYPE=Debug
 
 run: build
 	@touch /tmp/fake.AppImage

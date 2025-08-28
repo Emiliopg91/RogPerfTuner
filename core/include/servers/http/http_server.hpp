@@ -22,30 +22,30 @@ private:
 
         svr.set_idle_interval(std::chrono::milliseconds(100));
 
-        svr.Get("/ping", [this](const httplib::Request &req, httplib::Response &res) {});
+        svr.Get("/ping", [this](const httplib::Request&, httplib::Response&) {});
 
-        svr.Get(Constants::URL_PERF_PROF, [this](const httplib::Request &req, httplib::Response &res)
+        svr.Get(Constants::URL_PERF_PROF, [this](const httplib::Request &, httplib::Response &res)
                 {
             json response;
             response["profile"] = ProfileService::getInstance().nextPerformanceProfile().toName();
 
             res.set_content(response.dump(4), "application/json"); });
 
-        svr.Get(Constants::URL_INC_BRIGHT, [this](const httplib::Request &req, httplib::Response &res)
+        svr.Get(Constants::URL_INC_BRIGHT, [this](const httplib::Request &, httplib::Response &res)
                 {
             json response;
             response["brightness"] = OpenRgbService::getInstance().increaseBrightness().toName();
 
             res.set_content(response.dump(4), "application/json"); });
 
-        svr.Get(Constants::URL_DEC_BRIGHT, [this](const httplib::Request &req, httplib::Response &res)
+        svr.Get(Constants::URL_DEC_BRIGHT, [this](const httplib::Request &, httplib::Response &res)
                 {
             json response;
             response["brightness"] = OpenRgbService::getInstance().decreaseBrightness().toName();
 
             res.set_content(response.dump(4), "application/json"); });
 
-        svr.Get(Constants::URL_NEXT_EFF, [this](const httplib::Request &req, httplib::Response &res)
+        svr.Get(Constants::URL_NEXT_EFF, [this](const httplib::Request &, httplib::Response &res)
                 {
             json response;
             response["effect"] = OpenRgbService::getInstance().nextEffect();

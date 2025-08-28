@@ -107,10 +107,12 @@ protected:
         throw std::runtime_error(("DBus Get returned no value for property: " + prop.toStdString()));
     }
 
-    template <typename Callback>
-    void onPropertyChange(const std::string propName, Callback &&callback)
+    template <typename Param, typename Callback>
+    void onPropertyChange(const std::string &propName, Callback &&callback)
     {
-        EventBus::getInstance().on("dbus." + interfaceName_.toStdString() + ".property." + propName, callback);
+        EventBus::getInstance().on<Param>(
+            "dbus." + interfaceName_.toStdString() + ".property." + propName,
+            std::forward<Callback>(callback));
     }
 
     template <typename Callback>
@@ -128,7 +130,7 @@ protected:
             throw std::runtime_error("Couldn't connect to signal: " + signalName.toStdString());
 
         // Registra el callback en EventBus
-        EventBus::getInstance().on<>(
+        EventBus::getInstance().on(
             "dbus." + interfaceName_.toStdString() + ".signal." + signalName.toStdString(),
             std::forward<Callback>(callback));
     }
@@ -148,7 +150,79 @@ private slots:
             const QString &propName = it.key();
             const QVariant &newValue = it.value();
 
-            EventBus::getInstance().emit_async("dbus." + interfaceName_.toStdString() + ".property." + propName.toStdString());
+            std::string eventName = "dbus." + interfaceName_.toStdString() + ".property." + propName.toStdString();
+            auto type = newValue.metaType().id();
+
+            if (type == QMetaType::Int)
+            {
+                int val = newValue.toInt();
+                EventBus::getInstance().emit_event<int>(eventName, val);
+            }
+            else if (type == QMetaType::UInt)
+            {
+                uint val = newValue.toUInt();
+                EventBus::getInstance().emit_event<uint>(eventName, val);
+            }
+            else if (type == QMetaType::LongLong)
+            {
+                qint64 val = newValue.toLongLong();
+                EventBus::getInstance().emit_event<qint64>(eventName, val);
+            }
+            else if (type == QMetaType::ULongLong)
+            {
+                quint64 val = newValue.toULongLong();
+                EventBus::getInstance().emit_event<quint64>(eventName, val);
+            }
+            else if (type == QMetaType::Double)
+            {
+                double val = newValue.toDouble();
+                EventBus::getInstance().emit_event<double>(eventName, val);
+            }
+            else if (type == QMetaType::Bool)
+            {
+                bool val = newValue.toBool();
+                EventBus::getInstance().emit_event<bool>(eventName, val);
+            }
+            else if (type == QMetaType::QChar)
+            {
+                QChar val = newValue.toChar();
+                EventBus::getInstance().emit_event<QChar>(eventName, val);
+            }
+            else if (type == QMetaType::QString)
+            {
+                QString val = newValue.toString();
+                EventBus::getInstance().emit_event<QString>(eventName, val);
+            }
+            else if (type == QMetaType::QByteArray)
+            {
+                QByteArray val = newValue.toByteArray();
+                EventBus::getInstance().emit_event<QByteArray>(eventName, val);
+            }
+            else if (type == QMetaType::QStringList)
+            {
+                QStringList val = newValue.toStringList();
+                EventBus::getInstance().emit_event<QStringList>(eventName, val);
+            }
+            else if (type == QMetaType::QVariantList)
+            {
+                QVariantList val = newValue.toList();
+                EventBus::getInstance().emit_event<QVariantList>(eventName, val);
+            }
+            else if (type == QMetaType::QVariantMap)
+            {
+                QVariantMap val = newValue.toMap();
+                EventBus::getInstance().emit_event<QVariantMap>(eventName, val);
+            }
+            else if (type == QMetaType::QVariantHash)
+            {
+                QVariantHash val = newValue.toHash();
+                EventBus::getInstance().emit_event<QVariantHash>(eventName, val);
+            }
+            else
+            {
+                QString val = newValue.toString();
+                EventBus::getInstance().emit_event<QString>(eventName, val);
+            }
         }
     }
 
@@ -158,7 +232,7 @@ private slots:
         std::string signalName = msg.member().toStdString();
 
         // Para cualquier otra signal, solo reemitimos el nombre
-        EventBus::getInstance().emit_async(
+        EventBus::getInstance().emit_event(
             "dbus." + interfaceName_.toStdString() + ".signal." + signalName);
     }
 };

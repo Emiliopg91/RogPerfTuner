@@ -120,8 +120,8 @@ HardwareService::HardwareService()
     if (UPowerClient::getInstance().available())
     {
         onBattery = UPowerClient::getInstance().isOnBattery();
-        UPowerClient::getInstance().onBatteryChange([this]()
-                                                    { this->onBatteryEvent(); });
+        UPowerClient::getInstance().onBatteryChange([this](bool onBat)
+                                                    { this->onBatteryEvent(onBat); });
     }
 
     if (PMKeyboardBrightness::getInstance().available())
@@ -183,7 +183,7 @@ void HardwareService::setupDeviceLoop()
                 OpenRgbService::getInstance().disableDevice(dev);
             }
         }else if(removed.size() > 0 || added.size() > 0){
-            EventBus::getInstance().emit_async(Events::HARDWARE_SERVICE_USB_ADDED_REMOVED);
+            EventBus::getInstance().emit_event(Events::HARDWARE_SERVICE_USB_ADDED_REMOVED);
         }
 
         connectedDevices = current; });
@@ -209,9 +209,9 @@ void HardwareService::setChargeThreshold(BatteryThreshold threshold)
     Toaster::getInstance().showToast(Translator::getInstance().translate("applied.battery.threshold", replacements));
 }
 
-void HardwareService::onBatteryEvent(bool muted)
+void HardwareService::onBatteryEvent(bool onBat, bool muted)
 {
-    onBattery = UPowerClient::getInstance().isOnBattery();
+    onBattery = onBat;
 
     if (PanelOverdriveClient::getInstance().available())
     {
@@ -228,7 +228,7 @@ void HardwareService::onBatteryEvent(bool muted)
                 "AC " + t1 + "plugged, battery " + t2 + "engaged");
             logger.add_tab();
         }
-        EventBus::getInstance().emit_sequential(Events::HARDWARE_SERVICE_ON_BATTERY);
+        EventBus::getInstance().emit_event(Events::HARDWARE_SERVICE_ON_BATTERY);
         if (!muted)
         {
             logger.rem_tab();

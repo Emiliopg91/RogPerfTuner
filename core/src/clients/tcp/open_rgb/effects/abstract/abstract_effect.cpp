@@ -30,7 +30,7 @@ void AbstractEffect::start(DeviceList &devices, RgbBrightness brightness)
         }
         return;
     }
-    devices;
+    
     _logger.info("Starting effect '" + getName() + "' with " + StringUtils::toLowerCase(brightness.toName()) + " brightness");
     _brightness = brightnessMap(brightness);
     _is_running = true;

@@ -29,7 +29,7 @@ private:
     HardwareService();
 
     void setupDeviceLoop();
-    void onBatteryEvent(bool muted = false);
+    void onBatteryEvent(bool onBattery, bool muted = false);
 
     Logger logger{"HardwareService"};
     std::mutex mutex;

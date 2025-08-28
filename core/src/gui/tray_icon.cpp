@@ -156,32 +156,29 @@ TrayIcon::TrayIcon()
 
     tray_icon_.show();
 
-    EventBus::getInstance().on(Events::ORGB_SERVICE_ON_BRIGHTNESS, [this]()
-                               { setAuraBrightness(); });
+    EventBus::getInstance().on<RgbBrightness>(Events::ORGB_SERVICE_ON_BRIGHTNESS, [this](RgbBrightness brightness)
+                                              { setAuraBrightness(brightness); });
 
-    EventBus::getInstance().on(Events::ORGB_SERVICE_ON_EFFECT, [this]()
-                               { setAuraEffect(); });
+    EventBus::getInstance().on<std::string>(Events::ORGB_SERVICE_ON_EFFECT, [this](std::string effect)
+                                            { setAuraEffect(effect); });
 
-    EventBus::getInstance().on(Events::PROFILE_SERVICE_ON_PROFILE, [this]()
-                               { setPerformanceProfile(); });
+    EventBus::getInstance().on<PerformanceProfile>(Events::PROFILE_SERVICE_ON_PROFILE, [this](PerformanceProfile profile)
+                                                   { setPerformanceProfile(profile); });
 }
 
-void TrayIcon::setAuraBrightness()
+void TrayIcon::setAuraBrightness(RgbBrightness brightness)
 {
-    auto key = OpenRgbService::getInstance().getCurrentBrightness().toName();
-    brightnessActions[key]->setChecked(true);
+    brightnessActions[brightness.toName()]->setChecked(true);
 }
 
-void TrayIcon::setAuraEffect()
+void TrayIcon::setAuraEffect(std::string effect)
 {
-    auto key = OpenRgbService::getInstance().getCurrentEffect();
-    effectActions[key]->setChecked(true);
+    effectActions[effect]->setChecked(true);
 }
 
-void TrayIcon::setPerformanceProfile()
+void TrayIcon::setPerformanceProfile(PerformanceProfile profile)
 {
-    auto key = ProfileService::getInstance().getPerformanceProfile();
-    perfProfileActions[key.toName()]->setChecked(true);
+    perfProfileActions[profile.toName()]->setChecked(true);
 }
 
 void TrayIcon::onBatteryLimitChanged(BatteryThreshold value)

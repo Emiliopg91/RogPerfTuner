@@ -21,7 +21,7 @@ public:
     template <typename Callback>
     void onBatteryChange(Callback &&callback)
     {
-        this->onPropertyChange("OnBattery", callback);
+        this->onPropertyChange<bool>("OnBattery", std::forward<Callback>(callback));
     }
 
 private:

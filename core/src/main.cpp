@@ -36,7 +36,7 @@ int main(int argc, char **argv)
 	logger.info("###################################################");
 	logger.info("#            Starting RogControlCenter            #");
 	logger.info("###################################################");
-	logger.info("  Version " + Constants::APP_VERSION);
+	logger.info("Version " + Constants::APP_VERSION);
 	logger.info("Starting initialization");
 	logger.add_tab();
 

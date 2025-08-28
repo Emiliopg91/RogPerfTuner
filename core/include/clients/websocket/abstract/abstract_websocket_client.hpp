@@ -30,12 +30,14 @@ public:
 
     void send_message(const WebsocketMessage &message);
 
+    /*
     template <typename Callback>
     void on(const std::string &event, std::function<void(std::vector<std::any, std::allocator<std::any>>)> callback)
     {
         std::lock_guard<std::mutex> lock(_event_mutex);
         EventBus::getInstance().on("ws." + _name + "." + event, callback);
     }
+    */
 
     // Invoke estilo Python con timeout (en milisegundos)
     std::vector<std::any, std::allocator<std::any>> invoke(const std::string &method, const std::vector<std::any> &args, int timeout_ms = 3000);
