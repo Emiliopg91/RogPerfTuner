@@ -91,7 +91,8 @@
         "qactiongroup": "cpp",
         "qaction": "cpp",
         "qapplication": "cpp",
-        "qvboxlayout": "cpp"
+        "qvboxlayout": "cpp",
+        "*.inc": "cpp"
     },
     "cmake.generator": "Ninja",
     "cmake.buildDirectory": "${workspaceFolder}/build"

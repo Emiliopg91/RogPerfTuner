@@ -128,7 +128,7 @@ protected:
             throw std::runtime_error("Couldn't connect to signal: " + signalName.toStdString());
 
         // Registra el callback en EventBus
-        EventBus::getInstance().on(
+        EventBus::getInstance().on<>(
             "dbus." + interfaceName_.toStdString() + ".signal." + signalName.toStdString(),
             std::forward<Callback>(callback));
     }
@@ -148,7 +148,7 @@ private slots:
             const QString &propName = it.key();
             const QVariant &newValue = it.value();
 
-            EventBus::getInstance().emit_async("dbus." + interfaceName_.toStdString() + "." + propName.toStdString());
+            EventBus::getInstance().emit_async("dbus." + interfaceName_.toStdString() + ".property." + propName.toStdString());
         }
     }
 

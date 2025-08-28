@@ -4,6 +4,7 @@
 #include <unistd.h>
 #include <limits.h>
 #include <filesystem>
+#include "file_utils.hpp"
 #include "string_utils.hpp"
 
 class Constants
@@ -45,7 +46,14 @@ public:
     }();
 
     inline static const bool DEV_MODE = std::getenv("RCC_MODE") == nullptr || StringUtils::toLowerCase(std::getenv("RCC_MODE")) == "dev";
+
     inline const static std::string APP_NAME = "RogControlCenter";
+    inline const static std::string APP_VERSION = []()
+    {
+        if (FileUtils::exists(ASSETS_DIR + "/" + "version"))
+            return StringUtils::trim(FileUtils::readFileContent(ASSETS_DIR + "/" + "version"));
+        return std::string("");
+    }();
 
     inline static const std::string EXECUTABLE_PATH = Constants::getExecutablePath();
     inline static const std::string EXECUTABLE_DIR = Constants::getExecutableDir();
@@ -62,7 +70,7 @@ public:
     inline static const std::string AUTOSTART_FILE = HOME_DIR + "/.config/autostart/" + APP_NAME + ".desktop";
     inline static const std::string APP_DRAW_FILE = HOME_DIR + "/.local/share/applications/" + APP_NAME + ".desktop";
 
-    inline static const std::string APP_DIR = Constants::HOME_DIR + "/.config/RogControlCenter";
+    inline static const std::string APP_DIR = Constants::HOME_DIR + "/.config/" + APP_NAME;
 
     inline static const std::string UPDATE_DIR = Constants::APP_DIR + "/update";
     inline static const std::string UPDATE_FILE = Constants::UPDATE_DIR + "/" + APP_NAME + ".AppImage";
@@ -95,4 +103,5 @@ public:
     inline static const std::string URL_NEXT_EFF = "/rgb/effect/next";
 
     inline static const int HTTP_PORT = 18157;
+    inline static const int WS_PORT = HTTP_PORT + 1;
 };

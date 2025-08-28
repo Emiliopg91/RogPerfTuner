@@ -8,6 +8,7 @@
 #include "../include/services/hardware_service.hpp"
 #include "../include/services/open_rgb_service.hpp"
 #include "../include/services/profile_service.hpp"
+#include "../include/services/steam_service.hpp"
 #include "../include/configuration/configuration.hpp"
 #include "../include/gui/tray_icon.hpp"
 #include "../include/gui/password_dialog.hpp"
@@ -35,6 +36,7 @@ int main(int argc, char **argv)
 	logger.info("###################################################");
 	logger.info("#            Starting RogControlCenter            #");
 	logger.info("###################################################");
+	logger.info("  Version " + Constants::APP_VERSION);
 	logger.info("Starting initialization");
 	logger.add_tab();
 
@@ -43,6 +45,9 @@ int main(int argc, char **argv)
 
 	Translator::getInstance();
 
+	Toaster::getInstance()
+		.showToast(Translator::getInstance().translate("initializing"));
+
 	if (Configuration::getInstance().getPassword().length() == 0)
 	{
 		PasswordDialog::getInstance().showDialog();
@@ -50,13 +55,11 @@ int main(int argc, char **argv)
 
 	Shell::getInstance(Configuration::getInstance().getPassword());
 
-	Toaster::getInstance()
-		.showToast(Translator::getInstance().translate("initializing"));
-
 	OpenRgbService::getInstance();
 	HardwareService::getInstance();
-	ProfileService::getInstance().restoreProfile();
+	ProfileService::getInstance();
 	ApplicationService::getInstance();
+	SteamService::getInstance();
 
 	HttpServer::getInstance();
 

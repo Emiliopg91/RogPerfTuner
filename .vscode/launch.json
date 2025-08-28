@@ -15,6 +15,7 @@
             "externalConsole": false,
             "console": "integratedTerminal",
             "environment": [
+                { "name": "APPIMAGE", "value": "/tmp/fake.AppImage" }
                 { "name": "RCC_ASSETS_DIR", "value": "${workspaceFolder}/assets" }
             ]
         }

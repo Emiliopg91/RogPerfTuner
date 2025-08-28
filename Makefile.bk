@@ -14,7 +14,7 @@ config:
 	@if [ ! -f .$(BUILD_TYPE) ]; then \
 		make clean; \
 	fi
-	cmake -B build -S . -DCMAKE_BUILD_TYPE=$(BUILD_TYPE) -DCMAKE_CXX_COMPILER=clang++
+	cmake -B build -S . -DCMAKE_BUILD_TYPE=$(BUILD_TYPE)
 	touch .$(BUILD_TYPE)
 
 build: config apply_patches

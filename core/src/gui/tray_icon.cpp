@@ -19,7 +19,7 @@
 TrayIcon::TrayIcon()
 {
     tray_icon_.setIcon(QIcon::fromTheme(Constants::ASSET_ICON_FILE.c_str()));
-    tray_icon_.setToolTip("RogControlCenter");
+    tray_icon_.setToolTip(QString::fromStdString(Constants::APP_NAME + " v" + Constants::APP_VERSION));
 
     auto translator = Translator::getInstance();
 

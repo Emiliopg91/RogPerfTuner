@@ -1,172 +1,66 @@
 #pragma once
+
 #include <ixwebsocket/IXWebSocket.h>
-#include <queue>
+#include <iostream>
 #include <thread>
+#include <queue>
 #include <mutex>
 #include <condition_variable>
 #include <unordered_map>
-#include <functional>
-#include <atomic>
 #include <chrono>
-#include <iostream>
-#include <nlohmann/json.hpp>
+#include <nlohmann/json.hpp> // Manejo de JSON
 
-#include "RccCommons.hpp"
+#include "../../../logger/logger.hpp"
+#include "../../../models/websocket_message.hpp"
+#include "../../../utils/event_bus.hpp"
 
 using json = nlohmann::json;
 
-class WebSocketClient
+struct WSMethodResponse
 {
-private:
-    std::string host;
-    int port;
-    ix::WebSocket ws;
-    std::thread runner;
-    std::thread sender_thread;
-    std::queue<std::string> message_queue;
-    std::mutex queue_mtx;
-    std::condition_variable queue_cv;
-    std::atomic<bool> running{true};
-    std::atomic<bool> connected{false};
+    WebsocketMessage data;
+    std::string error;
+    bool received = false;
+};
 
-    std::unordered_map<std::string, std::function<void(const json &)>> event_handlers;
-    std::unordered_map<std::string, std::queue<json>> response_map;
-    Logger logger{"WebSocketClient"};
-
+class AbstractWebsocketClient
+{
 public:
-    WebSocketClient(std::string host_, int port_)
-        : host(host_), port(port_)
+    AbstractWebsocketClient(const std::string &host, int port, std::string name);
+
+    void send_message(const WebsocketMessage &message);
+
+    template <typename Callback>
+    void on(const std::string &event, std::function<void(std::vector<std::any, std::allocator<std::any>>)> callback)
     {
-        ws.setUrl("ws://" + host + ":" + std::to_string(port));
-
-        ws.setOnMessageCallback([this](const ix::WebSocketMessagePtr &msg)
-                                {
-            if (msg->type == ix::WebSocketMessageType::Open)
-            {
-                connected = true;
-                logger.info("Connected to WebSocket server");
-            }
-            else if (msg->type == ix::WebSocketMessageType::Close)
-            {
-                connected = false;
-                logger.info("Disconnected from WebSocket server");
-            }
-            else if (msg->type == ix::WebSocketMessageType::Error)
-            {
-                connected = false;
-                logger.info("WebSocket error: " + msg->errorInfo.reason);
-            }
-            else if (msg->type == ix::WebSocketMessageType::Message)
-            {
-                try
-                {
-                    auto j = json::parse(msg->str);
-                    std::string type = j.value("type", "");
-                    if (type == "EVENT")
-                    {
-                        auto name = j["name"].get<std::string>();
-                        if (event_handlers.count(name))
-                            event_handlers[name](j["data"]);
-                    }
-                    else if (type == "RESPONSE")
-                    {
-                        auto id = j["id"].get<std::string>();
-                        response_map[id].push(j);
-                    }
-                }
-                catch (...)
-                {
-                    logger.info("Failed to parse incoming message");
-                }
-            } });
-
-        runner = std::thread([this]()
-                             { ws.start(); });
-
-        sender_thread = std::thread([this]()
-                                    { this->message_sender(); });
+        std::lock_guard<std::mutex> lock(_event_mutex);
+        EventBus::getInstance().on("ws." + _name + "." + event, callback);
     }
 
-    ~WebSocketClient()
-    {
-        running = false;
-        ws.stop();
-        if (runner.joinable())
-            runner.join();
-        queue_cv.notify_all();
-        if (sender_thread.joinable())
-            sender_thread.join();
-    }
+    // Invoke estilo Python con timeout (en milisegundos)
+    std::vector<std::any, std::allocator<std::any>> invoke(const std::string &method, const std::vector<std::any> &args, int timeout_ms = 3000);
 
-    void message_sender()
-    {
-        while (running)
-        {
-            std::unique_lock<std::mutex> lock(queue_mtx);
-            queue_cv.wait(lock, [this]
-                          { return !message_queue.empty() || !running; });
+private:
+    ix::WebSocket _ws;
+    std::string _name;
+    std::string _host;
+    int _port;
+    bool _connected = false;
+    Logger logger;
 
-            while (!message_queue.empty())
-            {
-                auto msg = message_queue.front();
-                message_queue.pop();
-                lock.unlock();
+    std::queue<std::string> _message_queue;
+    std::mutex _queue_mutex;
+    std::condition_variable _queue_cv;
 
-                if (connected)
-                    ws.send(msg);
+    std::unordered_map<std::string, std::function<void(std::vector<std::any>)>> _event_callbacks;
+    std::mutex _event_mutex;
 
-                lock.lock();
-            }
-        }
-    }
+    std::unordered_map<std::string, WSMethodResponse *> _responses;
+    std::mutex _response_mutex;
 
-    void send_message(const json &msg)
-    {
-        {
-            std::lock_guard<std::mutex> lock(queue_mtx);
-            message_queue.push(msg.dump());
-        }
-        queue_cv.notify_one();
-    }
+    int _id_counter = 0;
 
-    json invoke(const std::string &method, const json &args, int timeout_ms = 3000)
-    {
-        if (!connected)
-            throw std::runtime_error("No connection");
+    void trigger_event(const std::string &name, std::vector<std::any> data);
 
-        json msg = {
-            {"type", "REQUEST"},
-            {"id", std::to_string(rand())}, // simple id
-            {"name", method},
-            {"data", args}};
-        std::string id = msg["id"];
-
-        response_map[id] = std::queue<json>();
-        send_message(msg);
-
-        auto t0 = std::chrono::steady_clock::now();
-        while (true)
-        {
-            if (!response_map[id].empty())
-            {
-                json resp = response_map[id].front();
-                response_map[id].pop();
-                response_map.erase(id);
-                return resp["data"];
-            }
-
-            if (std::chrono::steady_clock::now() - t0 > std::chrono::milliseconds(timeout_ms))
-            {
-                response_map.erase(id);
-                throw std::runtime_error("Timeout waiting for response");
-            }
-
-            std::this_thread::sleep_for(std::chrono::milliseconds(10));
-        }
-    }
-
-    void on(const std::string &event, std::function<void(const json &)> callback)
-    {
-        event_handlers[event] = callback;
-    }
+    void handle_message(const std::string &payload);
 };

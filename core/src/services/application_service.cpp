@@ -2,9 +2,10 @@
 
 #include "../../include/gui/toaster.hpp"
 #include "../../include/services/application_service.hpp"
+#include "../../include/services/steam_service.hpp"
 #include "../../include/shell/shell.hpp"
 #include "../../include/translator/translator.hpp"
-#include "../../include/utils/file_utils.hpp"
+#include "../../include/utils/autoupdater.hpp"
 
 ApplicationService::ApplicationService()
 {
@@ -29,6 +30,12 @@ ApplicationService::ApplicationService()
             logger.debug("Menu entry file '" + Constants::APP_DRAW_FILE + "' written successfully");
         }
     }
+
+    AutoUpdater::getInstance([this]()
+                             { applyUpdate(); },
+
+                             [this]() -> bool
+                             { return SteamService::getInstance().getRunningGames().empty(); });
 
     logger.rem_tab();
 }

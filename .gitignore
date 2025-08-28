@@ -20,3 +20,5 @@ assets/RccDeckyCompanion/
 *.cmake
 
 scripts/CMakeFiles/
+
+assets/version

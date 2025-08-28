@@ -39,14 +39,21 @@ ProfileService::ProfileService()
     }
 
     EventBus::getInstance().on(Events::HARDWARE_SERVICE_ON_BATTERY, [this]()
-                               { onBattery = UPowerClient::getInstance().isOnBattery(); 
-                                if(runningGames==0){
-                                    if(onBattery){
-                                        setPerformanceProfile(PerformanceProfile::Enum::QUIET,true,true);
-                                    } else {
-                                        restoreProfile();
-                                    }
-                                } });
+                               {
+        onBattery = UPowerClient::getInstance().isOnBattery();
+        if (runningGames == 0)
+        {
+            if (onBattery)
+            {
+                setPerformanceProfile(PerformanceProfile::Enum::QUIET, true, true);
+            }
+            else
+            {
+                restoreProfile();
+            }
+        } });
+
+    restoreProfile();
 
     logger.rem_tab();
 }

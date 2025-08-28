@@ -7,7 +7,6 @@
 #include "RccCommons.hpp"
 
 #include "../../include/configuration/configuration.hpp"
-#include "../../include/utils/file_utils.hpp"
 
 void Configuration::loadConfig()
 {
