@@ -50,7 +50,6 @@ public:
         no_params_listeners[event].emplace_back(std::move(callback));
     }
 
-    // Emitir de forma secuencial
     void emit_event(const std::string &event)
     {
         std::vector<std::function<void()>> to_call;
@@ -59,7 +58,7 @@ public:
             auto it = no_params_listeners.find(event);
             if (it == no_params_listeners.end())
                 return;
-            to_call = it->second; // copia de los callbacks
+            to_call = it->second;
         }
 
         for (auto &callback : to_call)
@@ -78,7 +77,7 @@ public:
     void on(const std::string &event, Callback &&callback)
     {
         using FuncType = std::function<void(Args...)>;
-        auto func = FuncType(std::forward<Callback>(callback)); // convierte lambda en std::function
+        auto func = FuncType(std::forward<Callback>(callback));
 
         std::lock_guard<std::mutex> lock(mtx);
         auto it = with_params_listeners.find(event);
@@ -95,7 +94,7 @@ public:
         {
             auto *typed = dynamic_cast<HolderType *>(it->second.get());
             if (!typed)
-                throw std::runtime_error("Tipo de callback diferente para este evento");
+                throw std::runtime_error("Invalid holder");
             typed->callbacks.push_back(std::move(func));
         }
     }
@@ -114,7 +113,7 @@ public:
 
             auto *typed = dynamic_cast<HolderType *>(it->second.get());
             if (!typed)
-                throw std::runtime_error("Tipo de argumentos inválido para este evento");
+                throw std::runtime_error("Invalid holder");
             to_call = typed->callbacks;
         }
 
