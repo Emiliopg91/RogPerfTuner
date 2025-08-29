@@ -44,7 +44,7 @@ public:
         return instance;
     }
 
-    void on(const std::string &event, std::function<void()> callback)
+    void on_without_data(const std::string &event, std::function<void()> callback)
     {
         std::lock_guard<std::mutex> lock(mtx);
         no_params_listeners[event].emplace_back(std::move(callback));
@@ -74,7 +74,7 @@ public:
     }
 
     template <typename... Args, typename Callback>
-    void on(const std::string &event, Callback &&callback)
+    void on_with_data(const std::string &event, Callback &&callback)
     {
         using FuncType = std::function<void(Args...)>;
         auto func = FuncType(std::forward<Callback>(callback));

@@ -24,11 +24,11 @@ AbstractWebsocketClient::AbstractWebsocketClient(const std::string &host, int po
                 this->handle_message(msg->str);
             } else if (msg->type == ix::WebSocketMessageType::Open) {
                 this->_connected = true;
-                trigger_event("connected", {});
+                trigger_event("connect");
                 logger.info("Connected");
             } else if (msg->type == ix::WebSocketMessageType::Close) {
                 this->_connected = false;
-                trigger_event("disconnected", {});
+                trigger_event("disconnect");
                 logger.info("Disconnected");
             } });
 
@@ -98,13 +98,16 @@ std::vector<std::any, std::allocator<std::any>> AbstractWebsocketClient::invoke(
     return resp.data.data;
 }
 
-void AbstractWebsocketClient::trigger_event(const std::string &name, std::vector<std::any> data)
+void AbstractWebsocketClient::trigger_event(const std::string &name, std::optional<std::vector<std::any>> data)
 {
-    std::lock_guard<std::mutex> lock(_event_mutex);
-    auto eventName = "ws." + _name + "." + name;
-    if (_event_callbacks.find(eventName) != _event_callbacks.end())
+    auto eventName = "ws." + _name + ".event." + name;
+    if (data.has_value())
     {
-        _event_callbacks[eventName](data); // Enviamos solo el vector de data
+        EventBus::getInstance().emit_event(eventName, data);
+    }
+    else
+    {
+        EventBus::getInstance().emit_event(eventName);
     }
 }
 

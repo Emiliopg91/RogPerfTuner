@@ -38,8 +38,8 @@ ProfileService::ProfileService()
         PlatformClient::getInstance().setPlatformProfileLinkedEpp(true);
     }
 
-    EventBus::getInstance().on(Events::HARDWARE_SERVICE_ON_BATTERY, [this]()
-                               {
+    EventBus::getInstance().on_without_data(Events::HARDWARE_SERVICE_ON_BATTERY, [this]()
+                                            {
         onBattery = UPowerClient::getInstance().isOnBattery();
         if (runningGames == 0)
         {

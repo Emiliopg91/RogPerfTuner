@@ -24,13 +24,13 @@ OpenRgbService::OpenRgbService()
 
     applyAura();
 
-    EventBus::getInstance().on(Events::HARDWARE_SERVICE_ON_BATTERY, [this]()
-                               { 
+    EventBus::getInstance().on_without_data(Events::HARDWARE_SERVICE_ON_BATTERY, [this]()
+                                            { 
                                 auto brightness = UPowerClient::getInstance().isOnBattery() ? RgbBrightness::Enum::OFF : this->brightness; 
                                 OpenRgbClient::getInstance().applyEffect(effect, brightness); });
 
-    EventBus::getInstance().on(Events::HARDWARE_SERVICE_USB_ADDED_REMOVED, [this]()
-                               { reload(); });
+    EventBus::getInstance().on_without_data(Events::HARDWARE_SERVICE_USB_ADDED_REMOVED, [this]()
+                                            { reload(); });
 
     logger.rem_tab();
 }

@@ -13,7 +13,8 @@ private:
     {
         logger.info("Initializing SteamClient");
         logger.add_tab();
-        SteamClient::getInstance();
+        SteamClient::getInstance().onConnect([]()
+                                             { std::cout << "Cliente iniciado" << std::endl; });
         logger.rem_tab();
     };
 

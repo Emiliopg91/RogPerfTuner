@@ -147,8 +147,8 @@ void HardwareService::setupDeviceLoop()
                                                                      {
                                                                          return !OpenRgbService::getInstance().getDeviceName(dev).empty();
                                                                      }));
-    EventBus::getInstance().on(Events::UDEV_CLIENT_DEVICE_EVENT, [this, &udevClient]()
-                               {
+    EventBus::getInstance().on_without_data(Events::UDEV_CLIENT_DEVICE_EVENT, [this, &udevClient]()
+                                            {
         auto [current, added, removed] = udevClient.compare_connected_devs(connectedDevices,
                                                                            [](const UsbIdentifier &dev)
                                                                            {

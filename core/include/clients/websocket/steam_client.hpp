@@ -3,7 +3,7 @@
 #include "RccCommons.hpp"
 #include "abstract/abstract_websocket_client.hpp"
 
-class SteamClient : private AbstractWebsocketClient
+class SteamClient : public AbstractWebsocketClient
 {
 private:
     SteamClient() : AbstractWebsocketClient("localhost", Constants::WS_PORT, "SteamClient")

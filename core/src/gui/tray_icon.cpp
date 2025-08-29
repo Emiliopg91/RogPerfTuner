@@ -156,14 +156,14 @@ TrayIcon::TrayIcon()
 
     tray_icon_.show();
 
-    EventBus::getInstance().on<RgbBrightness>(Events::ORGB_SERVICE_ON_BRIGHTNESS, [this](RgbBrightness brightness)
-                                              { setAuraBrightness(brightness); });
+    EventBus::getInstance().on_with_data<RgbBrightness>(Events::ORGB_SERVICE_ON_BRIGHTNESS, [this](RgbBrightness brightness)
+                                                        { setAuraBrightness(brightness); });
 
-    EventBus::getInstance().on<std::string>(Events::ORGB_SERVICE_ON_EFFECT, [this](std::string effect)
-                                            { setAuraEffect(effect); });
+    EventBus::getInstance().on_with_data<std::string>(Events::ORGB_SERVICE_ON_EFFECT, [this](std::string effect)
+                                                      { setAuraEffect(effect); });
 
-    EventBus::getInstance().on<PerformanceProfile>(Events::PROFILE_SERVICE_ON_PROFILE, [this](PerformanceProfile profile)
-                                                   { setPerformanceProfile(profile); });
+    EventBus::getInstance().on_with_data<PerformanceProfile>(Events::PROFILE_SERVICE_ON_PROFILE, [this](PerformanceProfile profile)
+                                                             { setPerformanceProfile(profile); });
 }
 
 void TrayIcon::setAuraBrightness(RgbBrightness brightness)

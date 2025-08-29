@@ -30,17 +30,28 @@ public:
 
     void send_message(const WebsocketMessage &message);
 
-    /*
-    template <typename Callback>
-    void on(const std::string &event, std::function<void(std::vector<std::any, std::allocator<std::any>>)> callback)
-    {
-        std::lock_guard<std::mutex> lock(_event_mutex);
-        EventBus::getInstance().on("ws." + _name + "." + event, callback);
-    }
-    */
+    std::vector<std::any> invoke(const std::string &method, const std::vector<std::any> &args, int timeout_ms = 3000);
 
-    // Invoke estilo Python con timeout (en milisegundos)
-    std::vector<std::any, std::allocator<std::any>> invoke(const std::string &method, const std::vector<std::any> &args, int timeout_ms = 3000);
+    template <typename Callback>
+    void onConnect(Callback callback)
+    {
+        on("connect", callback);
+    }
+
+protected:
+    template <typename... Args, typename Callback>
+    void on(const std::string &name, Callback &&callback)
+    {
+        auto eventName = "ws." + _name + ".event." + name;
+        if constexpr (sizeof...(Args) == 0)
+        {
+            EventBus::getInstance().on_without_data(eventName, callback);
+        }
+        else
+        {
+            EventBus::getInstance().on_with_data(eventName, callback);
+        }
+    }
 
 private:
     ix::WebSocket _ws;
@@ -54,15 +65,12 @@ private:
     std::mutex _queue_mutex;
     std::condition_variable _queue_cv;
 
-    std::unordered_map<std::string, std::function<void(std::vector<std::any>)>> _event_callbacks;
-    std::mutex _event_mutex;
-
     std::unordered_map<std::string, WSMethodResponse *> _responses;
     std::mutex _response_mutex;
 
     int _id_counter = 0;
 
-    void trigger_event(const std::string &name, std::vector<std::any> data);
+    void trigger_event(const std::string &name, std::optional<std::vector<std::any>> data = std::nullopt);
 
     void handle_message(const std::string &payload);
 };
