@@ -25,11 +25,9 @@ AbstractWebsocketClient::AbstractWebsocketClient(const std::string &host, int po
             } else if (msg->type == ix::WebSocketMessageType::Open) {
                 this->_connected = true;
                 trigger_event("connect");
-                logger.info("Connected");
             } else if (msg->type == ix::WebSocketMessageType::Close) {
                 this->_connected = false;
                 trigger_event("disconnect");
-                logger.info("Disconnected");
             } });
 
     std::thread([this]
@@ -101,9 +99,9 @@ std::vector<std::any, std::allocator<std::any>> AbstractWebsocketClient::invoke(
 void AbstractWebsocketClient::trigger_event(const std::string &name, std::optional<std::vector<std::any>> data)
 {
     auto eventName = "ws." + _name + ".event." + name;
-    if (data.has_value())
+    if (data.has_value() && !data.value().empty())
     {
-        EventBus::getInstance().emit_event(eventName, data);
+        EventBus::getInstance().emit_event(eventName, std::move(data.value()));
     }
     else
     {

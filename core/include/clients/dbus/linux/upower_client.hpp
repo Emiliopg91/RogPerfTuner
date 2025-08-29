@@ -18,10 +18,9 @@ public:
         return this->getProperty<bool>(QString("OnBattery"));
     }
 
-    template <typename Callback>
-    void onBatteryChange(Callback &&callback)
+    void onBatteryChange(CallbackWithParams &&callback)
     {
-        this->onPropertyChange<bool>("OnBattery", std::forward<Callback>(callback));
+        this->onPropertyChange("OnBattery", std::move(callback));
     }
 
 private:

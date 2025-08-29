@@ -16,6 +16,41 @@
 #include <QApplication>
 #include <QActionGroup>
 
+void TrayIcon::setAuraBrightness(RgbBrightness brightness)
+{
+    brightnessActions[brightness.toName()]->setChecked(true);
+}
+
+void TrayIcon::setAuraEffect(std::string effect)
+{
+    effectActions[effect]->setChecked(true);
+}
+
+void TrayIcon::setPerformanceProfile(PerformanceProfile profile)
+{
+    perfProfileActions[profile.toName()]->setChecked(true);
+}
+
+void onBatteryLimitChanged(BatteryThreshold value)
+{
+    HardwareService::getInstance().setChargeThreshold(value);
+}
+
+void onPerformanceProfileChanged(PerformanceProfile value)
+{
+    ProfileService::getInstance().setPerformanceProfile(value);
+}
+
+void onEffectChanged(std::string effect)
+{
+    OpenRgbService::getInstance().setEffect(effect);
+}
+
+void onBrightnessChanged(RgbBrightness brightness)
+{
+    OpenRgbService::getInstance().setBrightness(brightness);
+}
+
 TrayIcon::TrayIcon()
 {
     tray_icon_.setIcon(QIcon::fromTheme(Constants::ASSET_ICON_FILE.c_str()));
@@ -41,8 +76,8 @@ TrayIcon::TrayIcon()
         QAction *act = new QAction((std::to_string(bct.toInt()) + "%").c_str(), chargeGroup);
         act->setCheckable(true);
         act->setChecked(bct == HardwareService::getInstance().getChargeThreshold());
-        QObject::connect(act, &QAction::triggered, [this, bct]()
-                         { this->onBatteryLimitChanged(bct); });
+        QObject::connect(act, &QAction::triggered, [bct]()
+                         { onBatteryLimitChanged(bct); });
         chargeLimitMenu->addAction(act);
     }
     menu->insertMenu(nullptr, chargeLimitMenu);
@@ -72,8 +107,8 @@ TrayIcon::TrayIcon()
         QAction *act = new QAction(item.c_str(), effectGroup);
         act->setCheckable(true);
         act->setChecked(item == OpenRgbService::getInstance().getCurrentEffect());
-        QObject::connect(act, &QAction::triggered, [this, item]()
-                         { this->onEffectChanged(item); });
+        QObject::connect(act, &QAction::triggered, [item]()
+                         { onEffectChanged(item); });
         effectMenu->addAction(act);
         effectActions[item] = act;
     }
@@ -93,8 +128,8 @@ TrayIcon::TrayIcon()
             Translator::getInstance().translate("label.brightness." + item.toName()).c_str(), brightnessGroup);
         act->setCheckable(true);
         act->setChecked(item == OpenRgbService::getInstance().getCurrentBrightness());
-        QObject::connect(act, &QAction::triggered, [this, item]()
-                         { this->onBrightnessChanged(item); });
+        QObject::connect(act, &QAction::triggered, [item]()
+                         { onBrightnessChanged(item); });
         brightnessMenu->addAction(act);
         brightnessActions[item.toName()] = act;
     }
@@ -126,8 +161,8 @@ TrayIcon::TrayIcon()
         QAction *act = new QAction(translator.translate("label.profile." + item.toName()).c_str(), profileGroup);
         act->setCheckable(true);
         act->setChecked(item == ProfileService::getInstance().getPerformanceProfile());
-        QObject::connect(act, &QAction::triggered, [this, item]()
-                         { this->onPerformanceProfileChanged(item); });
+        QObject::connect(act, &QAction::triggered, [item]()
+                         { onPerformanceProfileChanged(item); });
         profileMenu->addAction(act);
         perfProfileActions[item.toName()] = act;
     }
@@ -156,47 +191,15 @@ TrayIcon::TrayIcon()
 
     tray_icon_.show();
 
-    EventBus::getInstance().on_with_data<RgbBrightness>(Events::ORGB_SERVICE_ON_BRIGHTNESS, [this](RgbBrightness brightness)
-                                                        { setAuraBrightness(brightness); });
+    EventBus::getInstance().on_with_data(Events::ORGB_SERVICE_ON_BRIGHTNESS, [this](CallbackParam data)
+                                         { setAuraBrightness(std::any_cast<RgbBrightness>(data[0])); });
 
-    EventBus::getInstance().on_with_data<std::string>(Events::ORGB_SERVICE_ON_EFFECT, [this](std::string effect)
-                                                      { setAuraEffect(effect); });
+    EventBus::getInstance().on_with_data(Events::ORGB_SERVICE_ON_EFFECT, [this](CallbackParam data)
+                                         { setAuraEffect(std::any_cast<std::string>(data[0])); });
 
-    EventBus::getInstance().on_with_data<PerformanceProfile>(Events::PROFILE_SERVICE_ON_PROFILE, [this](PerformanceProfile profile)
-                                                             { setPerformanceProfile(profile); });
-}
+    EventBus::getInstance().on_with_data(Events::PROFILE_SERVICE_ON_PROFILE, [this](CallbackParam data)
+                                         { setPerformanceProfile(std::any_cast<PerformanceProfile>(data[0])); });
 
-void TrayIcon::setAuraBrightness(RgbBrightness brightness)
-{
-    brightnessActions[brightness.toName()]->setChecked(true);
-}
-
-void TrayIcon::setAuraEffect(std::string effect)
-{
-    effectActions[effect]->setChecked(true);
-}
-
-void TrayIcon::setPerformanceProfile(PerformanceProfile profile)
-{
-    perfProfileActions[profile.toName()]->setChecked(true);
-}
-
-void TrayIcon::onBatteryLimitChanged(BatteryThreshold value)
-{
-    HardwareService::getInstance().setChargeThreshold(value);
-}
-
-void TrayIcon::onPerformanceProfileChanged(PerformanceProfile value)
-{
-    ProfileService::getInstance().setPerformanceProfile(value);
-}
-
-void TrayIcon::onEffectChanged(std::string effect)
-{
-    OpenRgbService::getInstance().setEffect(effect);
-}
-
-void TrayIcon::onBrightnessChanged(RgbBrightness brightness)
-{
-    OpenRgbService::getInstance().setBrightness(brightness);
+    EventBus::getInstance().on_with_data(Events::STEAM_SERVICE_GAME_EVENT, [this, profileMenu](CallbackParam data)
+                                         { profileMenu->setEnabled(std::any_cast<size_t>(data[0]) == 0); });
 }

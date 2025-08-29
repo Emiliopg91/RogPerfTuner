@@ -19,6 +19,7 @@ public:
 
     BatteryThreshold getChargeThreshold();
     void setChargeThreshold(BatteryThreshold threshold);
+    void setPanelOverdrive(bool);
 
     std::map<std::string, std::string> getGpus()
     {

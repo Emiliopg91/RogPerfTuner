@@ -107,12 +107,11 @@ protected:
         throw std::runtime_error(("DBus Get returned no value for property: " + prop.toStdString()));
     }
 
-    template <typename Param, typename Callback>
-    void onPropertyChange(const std::string &propName, Callback &&callback)
+    void onPropertyChange(const std::string &propName, CallbackWithParams &&callback)
     {
-        EventBus::getInstance().on_with_data<Param>(
+        EventBus::getInstance().on_with_data(
             "dbus." + interfaceName_.toStdString() + ".property." + propName,
-            std::forward<Callback>(callback));
+            std::forward<CallbackWithParams>(callback));
     }
 
     template <typename Callback>
@@ -156,72 +155,67 @@ private slots:
             if (type == QMetaType::Int)
             {
                 int val = newValue.toInt();
-                EventBus::getInstance().emit_event(eventName, val);
+                EventBus::getInstance().emit_event(eventName, {val});
             }
             else if (type == QMetaType::UInt)
             {
                 uint val = newValue.toUInt();
-                EventBus::getInstance().emit_event(eventName, val);
+                EventBus::getInstance().emit_event(eventName, {val});
             }
             else if (type == QMetaType::LongLong)
             {
                 qint64 val = newValue.toLongLong();
-                EventBus::getInstance().emit_event(eventName, val);
+                EventBus::getInstance().emit_event(eventName, {val});
             }
             else if (type == QMetaType::ULongLong)
             {
                 quint64 val = newValue.toULongLong();
-                EventBus::getInstance().emit_event(eventName, val);
+                EventBus::getInstance().emit_event(eventName, {val});
             }
             else if (type == QMetaType::Double)
             {
                 double val = newValue.toDouble();
-                EventBus::getInstance().emit_event(eventName, val);
+                EventBus::getInstance().emit_event(eventName, {val});
             }
             else if (type == QMetaType::Bool)
             {
                 bool val = newValue.toBool();
-                EventBus::getInstance().emit_event(eventName, val);
+                EventBus::getInstance().emit_event(eventName, {val});
             }
             else if (type == QMetaType::QChar)
             {
                 QChar val = newValue.toChar();
-                EventBus::getInstance().emit_event(eventName, val);
+                EventBus::getInstance().emit_event(eventName, {val});
             }
             else if (type == QMetaType::QString)
             {
                 QString val = newValue.toString();
-                EventBus::getInstance().emit_event(eventName, val);
-            }
-            else if (type == QMetaType::QByteArray)
-            {
-                QByteArray val = newValue.toByteArray();
-                EventBus::getInstance().emit_event(eventName, val);
+                EventBus::getInstance().emit_event(eventName, {val});
             }
             else if (type == QMetaType::QStringList)
             {
                 QStringList val = newValue.toStringList();
-                EventBus::getInstance().emit_event(eventName, val);
+                EventBus::getInstance().emit_event(eventName, {val});
             }
             else if (type == QMetaType::QVariantList)
             {
                 QVariantList val = newValue.toList();
-                EventBus::getInstance().emit_event(eventName, val);
+                EventBus::getInstance().emit_event(eventName, {val});
             }
             else if (type == QMetaType::QVariantMap)
             {
                 QVariantMap val = newValue.toMap();
-                EventBus::getInstance().emit_event(eventName, val);
+                EventBus::getInstance().emit_event(eventName, {val});
             }
             else if (type == QMetaType::QVariantHash)
             {
                 QVariantHash val = newValue.toHash();
-                EventBus::getInstance().emit_event(eventName, val);
+                EventBus::getInstance().emit_event(eventName, {val});
             }
             else
             {
                 QString val = newValue.toString();
-                EventBus::getInstance().emit_event(eventName, val);
+                EventBus::getInstance().emit_event(eventName, {val});
             }
         }
     }

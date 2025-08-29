@@ -14,4 +14,6 @@ public:
     inline const static std::string ORGB_SERVICE_ON_EFFECT = "ORGB_SERVICE_ON_EFFECT";
 
     inline const static std::string PROFILE_SERVICE_ON_PROFILE = "PROFILE_SERVICE_ON_PROFILE";
+
+    inline const static std::string STEAM_SERVICE_GAME_EVENT = "STEAM_SERVICE_GAME_EVENT";
 };

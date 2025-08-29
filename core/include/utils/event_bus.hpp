@@ -7,7 +7,12 @@
 #include <future>
 #include <mutex>
 #include <typeindex>
+#include <any>
 #include "../logger/logger.hpp"
+
+typedef std::vector<std::any> CallbackParam;
+typedef std::function<void(CallbackParam)> CallbackWithParams;
+typedef std::function<void()> Callback;
 
 class EventBus
 {
@@ -16,25 +21,8 @@ private:
     EventBus(const EventBus &) = delete;
     EventBus &operator=(const EventBus &) = delete;
 
-    struct BaseHolder
-    {
-        virtual ~BaseHolder() = default;
-        virtual std::type_index getType() const = 0;
-    };
-
-    template <typename... Args>
-    struct Holder : BaseHolder
-    {
-        std::vector<std::function<void(Args...)>> callbacks;
-
-        std::type_index getType() const override
-        {
-            return typeid(Holder<Args...>);
-        }
-    };
-
-    std::unordered_map<std::string, std::vector<std::function<void()>>> no_params_listeners;
-    std::unordered_map<std::string, std::unique_ptr<BaseHolder>> with_params_listeners;
+    std::unordered_map<std::string, std::vector<Callback>> no_params_listeners;
+    std::unordered_map<std::string, std::vector<CallbackWithParams>> with_params_listeners;
     std::mutex mtx;
 
 public:
@@ -44,7 +32,7 @@ public:
         return instance;
     }
 
-    void on_without_data(const std::string &event, std::function<void()> callback)
+    void on_without_data(const std::string &event, Callback callback)
     {
         std::lock_guard<std::mutex> lock(mtx);
         no_params_listeners[event].emplace_back(std::move(callback));
@@ -73,37 +61,26 @@ public:
         }
     }
 
-    template <typename... Args, typename Callback>
-    void on_with_data(const std::string &event, Callback &&callback)
+    void on_with_data(const std::string &event, CallbackWithParams &&callback)
     {
-        using FuncType = std::function<void(Args...)>;
-        auto func = FuncType(std::forward<Callback>(callback));
-
         std::lock_guard<std::mutex> lock(mtx);
         auto it = with_params_listeners.find(event);
 
-        using HolderType = Holder<Args...>;
-
         if (it == with_params_listeners.end())
         {
-            auto holder = std::make_unique<HolderType>();
-            holder->callbacks.push_back(std::move(func));
+            auto holder = std::vector<CallbackWithParams>();
+            holder.push_back(std::move(callback));
             with_params_listeners[event] = std::move(holder);
         }
         else
         {
-            auto *typed = dynamic_cast<HolderType *>(it->second.get());
-            if (!typed)
-                throw std::runtime_error("Invalid holder");
-            typed->callbacks.push_back(std::move(func));
+            with_params_listeners[event].push_back(std::move(callback));
         }
     }
 
-    template <typename... Args>
-    void emit_event(const std::string &event, Args... args)
+    void emit_event(const std::string &event, std::vector<std::any> args)
     {
-        using HolderType = Holder<Args...>;
-        std::vector<std::function<void(Args...)>> to_call;
+        std::vector<std::function<void(std::vector<std::any>)>> to_call;
 
         {
             std::lock_guard<std::mutex> lock(mtx);
@@ -111,17 +88,14 @@ public:
             if (it == with_params_listeners.end())
                 return;
 
-            auto *typed = dynamic_cast<HolderType *>(it->second.get());
-            if (!typed)
-                throw std::runtime_error("Invalid holder");
-            to_call = typed->callbacks;
+            to_call = it->second;
         }
 
         for (auto &callback : to_call)
         {
             try
             {
-                callback(args...);
+                callback(args);
             }
             catch (const std::exception &e)
             {

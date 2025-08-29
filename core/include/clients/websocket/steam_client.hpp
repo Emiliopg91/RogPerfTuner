@@ -16,4 +16,14 @@ public:
         static SteamClient instance;
         return instance;
     }
+
+    void onGameLaunch(CallbackWithParams &&callback)
+    {
+        on_with_params("launch_game", std::move(callback));
+    }
+
+    void onGameStop(CallbackWithParams &&callback)
+    {
+        on_with_params("stop_game", std::move(callback));
+    }
 };

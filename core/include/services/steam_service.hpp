@@ -7,16 +7,16 @@ class SteamService
 {
 private:
     Logger logger{"SteamService"};
-    std::map<int, std::string> runningGames;
+    std::map<unsigned int, std::string> runningGames;
 
-    SteamService()
-    {
-        logger.info("Initializing SteamClient");
-        logger.add_tab();
-        SteamClient::getInstance().onConnect([]()
-                                             { std::cout << "Cliente iniciado" << std::endl; });
-        logger.rem_tab();
-    };
+    SteamService();
+
+    void onConnect(bool onBoot = false);
+    void onDisconnect();
+    void onGameLaunch(unsigned int gid, std::string name, int pid);
+    void onFirstGameRun(unsigned int gid, std::string name, std::map<std::string, std::string> env);
+    void onGameStop(unsigned int gid, std::string name);
+    void setProfileForGames(bool onConnect = false);
 
 public:
     static SteamService &getInstance()
@@ -25,5 +25,5 @@ public:
         return instance;
     }
 
-    const std::map<int, std::string> &getRunningGames() const;
+    const std::map<unsigned int, std::string> &getRunningGames() const;
 };

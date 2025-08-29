@@ -26,11 +26,6 @@ private:
     std::map<std::string, QAction *> effectActions;
     std::map<std::string, QAction *> perfProfileActions;
 
-    void onBatteryLimitChanged(BatteryThreshold);
-    void onPerformanceProfileChanged(PerformanceProfile);
-    void onEffectChanged(std::string);
-    void onBrightnessChanged(RgbBrightness);
-
     void setAuraBrightness(RgbBrightness);
     void setAuraEffect(std::string);
     void setPerformanceProfile(PerformanceProfile);

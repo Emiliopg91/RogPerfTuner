@@ -21,8 +21,10 @@ public:
     std::vector<std::string> getAvailableEffects();
     std::string getCurrentEffect();
     RgbBrightness getCurrentBrightness();
+
     void setBrightness(RgbBrightness newBrightness);
-    void setEffect(std::string newEffect);
+    void setEffect(std::string newEffect, bool temporal = false);
+    void restoreAura();
     void disableDevice(UsbIdentifier);
 
     RgbBrightness increaseBrightness();
@@ -37,6 +39,6 @@ private:
     RgbBrightness brightness = RgbBrightness::Enum::MAX;
     std::string effect;
 
-    void applyAura();
+    void applyAura(bool temporal = false);
     void reload();
 };

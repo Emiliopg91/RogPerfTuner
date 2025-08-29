@@ -69,14 +69,14 @@ int main(int argc, char **argv)
 	logger.rem_tab();
 	logger.info("Application ready");
 	std::atexit([]()
-				{ 
+				{
 					Logger logger{};
 					logger.info("Starting application shutdown");
 					logger.add_tab();
 					OpenRgbClient::getInstance().stop();
 					HttpServer::getInstance().stop();
 					logger.rem_tab();
-					logger.info("Shutdown finished"); 
+					logger.info("Shutdown finished");
 					std::this_thread::sleep_for(std::chrono::milliseconds(100));
 					kill(getpid(),SIGKILL); });
 

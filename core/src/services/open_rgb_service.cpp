@@ -19,10 +19,7 @@ OpenRgbService::OpenRgbService()
         compatibleDeviceNames[d.id_vendor + ":" + d.id_product] = d.name;
     }
 
-    effect = Configuration::getInstance().getConfiguration().open_rgb.last_effect.value_or("Static");
-    brightness = Configuration::getInstance().getConfiguration().open_rgb.brightness;
-
-    applyAura();
+    restoreAura();
 
     EventBus::getInstance().on_without_data(Events::HARDWARE_SERVICE_ON_BATTERY, [this]()
                                             { 
@@ -33,6 +30,14 @@ OpenRgbService::OpenRgbService()
                                             { reload(); });
 
     logger.rem_tab();
+}
+
+void OpenRgbService::restoreAura()
+{
+    effect = Configuration::getInstance().getConfiguration().open_rgb.last_effect.value_or("Static");
+    brightness = Configuration::getInstance().getConfiguration().open_rgb.brightness;
+
+    applyAura();
 }
 
 std::string OpenRgbService::getDeviceName(UsbIdentifier identifier)
@@ -70,17 +75,17 @@ void OpenRgbService::setBrightness(RgbBrightness newBrightness)
     {
         brightness = newBrightness;
         applyAura();
-        EventBus::getInstance().emit_event(Events::ORGB_SERVICE_ON_BRIGHTNESS, newBrightness);
+        EventBus::getInstance().emit_event(Events::ORGB_SERVICE_ON_BRIGHTNESS, {newBrightness});
     }
 }
 
-void OpenRgbService::setEffect(std::string newEffect)
+void OpenRgbService::setEffect(std::string newEffect, bool temporal)
 {
     if (effect != newEffect)
     {
         effect = newEffect;
-        applyAura();
-        EventBus::getInstance().emit_event(Events::ORGB_SERVICE_ON_EFFECT, newEffect);
+        applyAura(temporal);
+        EventBus::getInstance().emit_event(Events::ORGB_SERVICE_ON_EFFECT, {newEffect});
     }
 }
 
@@ -97,16 +102,19 @@ void OpenRgbService::reload()
     logger.info("Reloaded after " + std::to_string(std::chrono::duration_cast<std::chrono::milliseconds>(t1 - t0).count()) + " ms");
 }
 
-void OpenRgbService::applyAura()
+void OpenRgbService::applyAura(bool temporal)
 {
     logger.info("Applying aura settings");
     logger.add_tab();
     auto t0 = std::chrono::high_resolution_clock::now();
     OpenRgbClient::getInstance().applyEffect(effect, brightness);
 
-    Configuration::getInstance().getConfiguration().open_rgb.brightness = brightness;
-    Configuration::getInstance().getConfiguration().open_rgb.last_effect = effect;
-    Configuration::getInstance().saveConfig();
+    if (!temporal)
+    {
+        Configuration::getInstance().getConfiguration().open_rgb.brightness = brightness;
+        Configuration::getInstance().getConfiguration().open_rgb.last_effect = effect;
+        Configuration::getInstance().saveConfig();
+    }
 
     auto t1 = std::chrono::high_resolution_clock::now();
     logger.rem_tab();

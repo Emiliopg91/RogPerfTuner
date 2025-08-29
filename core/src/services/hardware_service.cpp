@@ -120,8 +120,8 @@ HardwareService::HardwareService()
     if (UPowerClient::getInstance().available())
     {
         onBattery = UPowerClient::getInstance().isOnBattery();
-        UPowerClient::getInstance().onBatteryChange([this](bool onBat)
-                                                    { this->onBatteryEvent(onBat); });
+        UPowerClient::getInstance().onBatteryChange([this](CallbackParam data)
+                                                    { this->onBatteryEvent(std::any_cast<bool>(data[0])); });
     }
 
     if (PMKeyboardBrightness::getInstance().available())
@@ -234,4 +234,10 @@ void HardwareService::onBatteryEvent(bool onBat, bool muted)
             logger.rem_tab();
         }
     }
+}
+
+void HardwareService::setPanelOverdrive(bool enable)
+{
+    if (PanelOverdriveClient::getInstance().available())
+        PanelOverdriveClient::getInstance().setCurrentValue(enable);
 }

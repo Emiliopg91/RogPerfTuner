@@ -32,25 +32,32 @@ public:
 
     std::vector<std::any> invoke(const std::string &method, const std::vector<std::any> &args, int timeout_ms = 3000);
 
-    template <typename Callback>
-    void onConnect(Callback callback)
+    void onConnect(Callback &&callback)
     {
-        on("connect", callback);
+        on_without_params("connect", std::move(callback));
+    }
+
+    void onDisconnect(Callback &&callback)
+    {
+        on_without_params("disconnect", std::move(callback));
+    }
+
+    bool connected()
+    {
+        return _connected;
     }
 
 protected:
-    template <typename... Args, typename Callback>
-    void on(const std::string &name, Callback &&callback)
+    void on_without_params(const std::string &name, Callback &&callback)
     {
         auto eventName = "ws." + _name + ".event." + name;
-        if constexpr (sizeof...(Args) == 0)
-        {
-            EventBus::getInstance().on_without_data(eventName, callback);
-        }
-        else
-        {
-            EventBus::getInstance().on_with_data(eventName, callback);
-        }
+        EventBus::getInstance().on_without_data(eventName, callback);
+    }
+
+    void on_with_params(const std::string &name, CallbackWithParams &&callback)
+    {
+        auto eventName = "ws." + _name + ".event." + name;
+        EventBus::getInstance().on_with_data(eventName, std::move(callback));
     }
 
 private:

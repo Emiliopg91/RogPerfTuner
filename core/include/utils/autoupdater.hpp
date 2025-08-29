@@ -37,7 +37,7 @@ private:
     std::string repository = Constants::APP_NAME;
     std::string update_path;
 
-    std::function<void()> restart_method;
+    Callback restart_method;
     std::function<bool()> perform_update_check;
 
     static constexpr int CHECK_INTERVAL = 24 * 60 * 60;
@@ -202,7 +202,7 @@ private:
         }
     }
 
-    AutoUpdater(std::function<void()> restart_method_,
+    AutoUpdater(Callback restart_method_,
                 std::function<bool()> perform_update_check_ = nullptr)
         : restart_method(restart_method_),
           perform_update_check(perform_update_check_)
@@ -217,7 +217,7 @@ private:
     }
 
 public:
-    static AutoUpdater &getInstance(std::function<void()> restart_method_,
+    static AutoUpdater &getInstance(Callback restart_method_,
                                     std::function<bool()> perform_update_check_ = nullptr)
     {
         static AutoUpdater instance(restart_method_, perform_update_check_);
