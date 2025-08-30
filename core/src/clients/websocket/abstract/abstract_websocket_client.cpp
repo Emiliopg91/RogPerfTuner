@@ -48,54 +48,6 @@ AbstractWebsocketClient::AbstractWebsocketClient(const std::string &host, int po
     _ws.start();
 }
 
-void AbstractWebsocketClient::send_message(const WebsocketMessage &message)
-{
-    {
-        std::lock_guard<std::mutex> lock(_queue_mutex);
-        _message_queue.push(message.to_json());
-    }
-    _queue_cv.notify_one();
-}
-
-// Invoke estilo Python con timeout (en milisegundos)
-std::vector<std::any, std::allocator<std::any>> AbstractWebsocketClient::invoke(const std::string &method, const std::vector<std::any> &args, int timeout_ms)
-{
-    if (!_connected)
-        throw std::runtime_error("No connection to server");
-
-    WebsocketMessage message;
-    message.type = "REQUEST";
-    message.name = method;
-    message.data = args;
-    message.id = StringUtils::generateUUIDv4();
-
-    WSMethodResponse resp;
-    {
-        std::lock_guard<std::mutex> lock(_response_mutex);
-        _responses[message.id] = &resp;
-    }
-
-    send_message(message);
-
-    auto start = std::chrono::steady_clock::now();
-    while (!resp.received)
-    {
-        std::this_thread::sleep_for(std::chrono::milliseconds(10));
-        auto now = std::chrono::steady_clock::now();
-        if (std::chrono::duration_cast<std::chrono::milliseconds>(now - start).count() > timeout_ms)
-        {
-            std::lock_guard<std::mutex> lock(_response_mutex);
-            _responses.erase(message.id);
-            throw std::runtime_error("WebSocketTimeoutError");
-        }
-    }
-
-    if (!resp.error.empty())
-        throw std::runtime_error("WebSocketInvocationError: " + resp.error);
-
-    return resp.data.data;
-}
-
 void AbstractWebsocketClient::trigger_event(const std::string &name, std::optional<std::vector<std::any>> data)
 {
     auto eventName = "ws." + _name + ".event." + name;
@@ -127,12 +79,46 @@ void AbstractWebsocketClient::handle_message(const std::string &payload)
     else if (msg.type == "RESPONSE")
     {
         std::lock_guard<std::mutex> lock(_response_mutex);
-        if (_responses.find(msg.id) != _responses.end())
+        auto it = _promises.find(msg.id);
+        if (it != _promises.end())
         {
-            auto *resp = _responses[msg.id];
-            resp->data = msg;
-            resp->received = true;
-            _responses.erase(msg.id);
+            WSMethodResponse wsmr{msg, ""};
+            it->second.set_value(wsmr); // <- usar la referencia directamente
+            _promises.erase(it);        // opcional: limpiar la promesa ya cumplida
         }
     }
+}
+
+std::vector<std::any> AbstractWebsocketClient::invoke(const std::string &method, const std::vector<std::any> &args, int timeout_ms)
+{
+    if (!_connected)
+        throw std::runtime_error("No connection to server");
+
+    WebsocketMessage message{"REQUEST", method, args, StringUtils::generateUUIDv4()};
+
+    std::promise<WSMethodResponse> prom;
+    std::future fut = prom.get_future();
+    {
+        std::lock_guard<std::mutex> lock(_response_mutex);
+        _promises[message.id] = std::move(prom);
+    }
+
+    {
+        std::lock_guard<std::mutex> lock(_queue_mutex);
+        _message_queue.push(message.to_json());
+    }
+    _queue_cv.notify_one();
+
+    if (fut.wait_for(std::chrono::milliseconds(timeout_ms)) == std::future_status::timeout)
+    {
+        logger.error("No response for " + method + " after " + std::to_string(timeout_ms) + " ms");
+        throw std::runtime_error("WebSocketTimeoutError");
+    }
+
+    WSMethodResponse resp = fut.get();
+
+    if (!resp.error.empty())
+        throw std::runtime_error("WebSocketInvocationError: " + resp.error);
+
+    return resp.data.data;
 }

@@ -4,7 +4,7 @@
 
 #include "../../include/configuration/configuration.hpp"
 #include "../../include/models/gpu_brand.hpp"
-#include "../../include/models/steam_game_client.hpp"
+#include "../../include/models/steam_game_details.hpp"
 #include "../../include/services/hardware_service.hpp"
 #include "../../include/services/open_rgb_service.hpp"
 #include "../../include/services/profile_service.hpp"
@@ -137,7 +137,7 @@ void SteamService::onFirstGameRun(unsigned int gid, std::string name, std::map<s
 
     auto proton = environment.find("STEAM_COMPAT_PROTON") != environment.end();
 
-    SteamGameDetails details;
+    SteamGameDetails details = SteamClient::getInstance().getAppsDetails({gid})[0];
     auto launch_opts = details.launch_opts;
 
     std::string env, args;
@@ -165,11 +165,22 @@ void SteamService::onFirstGameRun(unsigned int gid, std::string name, std::map<s
     Configuration::getInstance().getConfiguration().games[std::to_string(gid)] = entry;
     Configuration::getInstance().saveConfig();
 
+    SteamClient::getInstance().setLaunchOptions(gid, WRAPPER_PATH + " %command%");
+    logger.info("Configuration finished");
+
+    auto overlayId = environment.find("SteamOverlayGameId")->second;
+    logger.info("Relaunching game with SteamOverlayId " + overlayId + "...");
+
+    Shell::getInstance().run_command("steam steam://rungameid/" + overlayId);
+
+    logger.rem_tab();
     logger.rem_tab();
 }
 
 void SteamService::onGameLaunch(unsigned int gid, std::string name, int pid)
 {
+    logger.info("Launched '" + name + "' (" + std::to_string(gid) + ") with PID " + std::to_string(pid));
+    logger.add_tab();
     if (Configuration::getInstance().getConfiguration().games.find(std::to_string(gid)) == Configuration::getInstance().getConfiguration().games.end())
     {
         logger.info("Game not configured");
@@ -195,20 +206,19 @@ void SteamService::onGameLaunch(unsigned int gid, std::string name, int pid)
         Shell::getInstance().run_elevated_command(oss.str(), false);
         logger.rem_tab();
 
-        onFirstGameRun(gid, name, env);
-
-        logger.rem_tab();
+        std::thread([this, gid, name, env]()
+                    { onFirstGameRun(gid, name, env); })
+            .detach();
+        ;
     }
     else if (runningGames.find(gid) == runningGames.end())
     {
-        logger.info("Launched '" + name + "' (" + std::to_string(gid) + ") with PID " + std::to_string(pid));
         runningGames[gid] = name;
-        logger.add_tab();
         setProfileForGames();
-        logger.rem_tab();
 
         EventBus::getInstance().emit_event(Events::STEAM_SERVICE_GAME_EVENT, {runningGames.size()});
     }
+    logger.rem_tab();
 }
 
 void SteamService::onGameStop(unsigned int gid, std::string name)

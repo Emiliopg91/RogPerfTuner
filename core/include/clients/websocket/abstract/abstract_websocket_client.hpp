@@ -8,6 +8,7 @@
 #include <condition_variable>
 #include <unordered_map>
 #include <chrono>
+#include <future>
 #include <nlohmann/json.hpp> // Manejo de JSON
 
 #include "../../../logger/logger.hpp"
@@ -20,15 +21,12 @@ struct WSMethodResponse
 {
     WebsocketMessage data;
     std::string error;
-    bool received = false;
 };
 
 class AbstractWebsocketClient
 {
 public:
     AbstractWebsocketClient(const std::string &host, int port, std::string name);
-
-    void send_message(const WebsocketMessage &message);
 
     std::vector<std::any> invoke(const std::string &method, const std::vector<std::any> &args, int timeout_ms = 3000);
 
@@ -72,7 +70,7 @@ private:
     std::mutex _queue_mutex;
     std::condition_variable _queue_cv;
 
-    std::unordered_map<std::string, WSMethodResponse *> _responses;
+    std::unordered_map<std::string, std::promise<WSMethodResponse>> _promises;
     std::mutex _response_mutex;
 
     int _id_counter = 0;

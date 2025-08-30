@@ -6,6 +6,7 @@
 class SteamService
 {
 private:
+    inline static std::string WRAPPER_PATH = Constants::BIN_DIR + "/steam/run";
     Logger logger{"SteamService"};
     std::map<unsigned int, std::string> runningGames;
 
