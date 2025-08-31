@@ -11,7 +11,7 @@
 class LoggerProvider
 {
 public:
-    static void initialize();
+    static void initialize(std::string fileName, std::string path);
     static std::shared_ptr<spdlog::logger> getLogger(const std::string &name = "Default");
     static void setConfigMap(std::map<std::string, std::string> configMap);
 

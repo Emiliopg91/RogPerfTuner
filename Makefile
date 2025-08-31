@@ -19,8 +19,6 @@ config:
 	@echo "#######################################################################"
 	@cmake -B build -S . -DCMAKE_BUILD_TYPE=$BUILD_TYPE
 
-
-	@cmake -B build -S . -DCMAKE_BUILD_TYPE=$(BUILD_TYPE) -DCMAKE_CXX_COMPILER=clang++
 	@touch .$(BUILD_TYPE)
 
 build: config apply_patches

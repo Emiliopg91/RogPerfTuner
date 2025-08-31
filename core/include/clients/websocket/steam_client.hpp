@@ -36,14 +36,15 @@ public:
         {
             converted.emplace_back(val);
         }
+
         std::vector<SteamGameDetails> result;
 
         auto invResult = invoke("get_apps_details", converted);
 
-        json j = std::any_cast<json>(invResult[0]);
-        for (auto e : j.items())
+        auto map = (std::any_cast<json>(invResult[0])).get<std::map<std::string, SteamGameDetails>>();
+        for (const auto &[key, val] : map)
         {
-            result.emplace_back(SteamGameDetails::from_json(e.value()));
+            result.emplace_back(val);
         }
 
         return result;

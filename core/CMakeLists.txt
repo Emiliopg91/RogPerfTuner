@@ -62,26 +62,43 @@ target_link_libraries(RogControlCenter PRIVATE
     RccCommons
 )
 
-add_executable(NextEffect "${CMAKE_CURRENT_SOURCE_DIR}/src/scripts/next_effect.cpp")
+add_executable(NextEffect "${CMAKE_CURRENT_SOURCE_DIR}/src/scripts/rgb/next_effect.cpp")
 target_link_libraries(NextEffect PRIVATE
     httplib::httplib
     RccCommons
 )
 
-add_executable(IncBrightness "${CMAKE_CURRENT_SOURCE_DIR}/src/scripts/increase_brightness.cpp")
+add_executable(IncBrightness "${CMAKE_CURRENT_SOURCE_DIR}/src/scripts/rgb/increase_brightness.cpp")
 target_link_libraries(IncBrightness PRIVATE 
     httplib::httplib
     RccCommons
 )
 
-add_executable(DecBrightness "${CMAKE_CURRENT_SOURCE_DIR}/src/scripts/decrease_brightness.cpp")
+add_executable(DecBrightness "${CMAKE_CURRENT_SOURCE_DIR}/src/scripts/rgb/decrease_brightness.cpp")
 target_link_libraries(DecBrightness PRIVATE 
     httplib::httplib
     RccCommons
 )
 
-add_executable(NextProfile "${CMAKE_CURRENT_SOURCE_DIR}/src/scripts/next_profile.cpp")
+add_executable(NextProfile "${CMAKE_CURRENT_SOURCE_DIR}/src/scripts/performance/next_profile.cpp")
 target_link_libraries(NextProfile PRIVATE 
     httplib::httplib
+    RccCommons
+)
+
+add_executable(SteamRunner 
+    "${CMAKE_CURRENT_SOURCE_DIR}/include/logger/logger_provider.hpp"
+    "${CMAKE_CURRENT_SOURCE_DIR}/include/logger/logger.hpp"
+    "${CMAKE_CURRENT_SOURCE_DIR}/include/models/steam_game_config.hpp"
+    "${CMAKE_CURRENT_SOURCE_DIR}/include/shell/shell.hpp"
+    "${CMAKE_CURRENT_SOURCE_DIR}/src/logger/logger_provider.cpp"
+    "${CMAKE_CURRENT_SOURCE_DIR}/src/shell/shell.cpp"
+    "${CMAKE_CURRENT_SOURCE_DIR}/src/scripts/steam/run.cpp"
+)
+target_link_libraries(SteamRunner PRIVATE 
+    nlohmann_json::nlohmann_json
+    httplib::httplib
+    spdlog::spdlog 
+    spdlog::spdlog_header_only
     RccCommons
 )

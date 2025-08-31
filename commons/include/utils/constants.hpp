@@ -87,8 +87,9 @@ public:
 
     inline static const std::string LOG_DIR = Constants::APP_DIR + "/logs";
     inline static const std::string LOG_OLD_DIR = Constants::LOG_DIR + "/old";
-    inline static const std::string LOG_FILE = Constants::LOG_DIR + "/current.log";
+    inline static const std::string LOG_FILE_NAME = "RogControlCenter.log";
     inline static const std::string LOG_ORGB_FILE = Constants::LOG_DIR + "/OpenRGB.log";
+    inline static const std::string LOG_RUNNER_FILE_NAME = "Runner.log";
 
     inline static const std::string ASSET_ICONS_DIR = Constants::ASSETS_DIR + "/icons";
     inline static const std::string ASSET_ICON_FILE = Constants::ASSET_ICONS_DIR + "/rog-logo.svg";
@@ -101,6 +102,8 @@ public:
     inline static const std::string URL_INC_BRIGHT = "/rgb/brightness/increase";
     inline static const std::string URL_DEC_BRIGHT = "/rgb/brightness/decrease";
     inline static const std::string URL_NEXT_EFF = "/rgb/effect/next";
+    inline static const std::string URL_RENICE = "/performance/renice";
+    inline static const std::string URL_GAME_CFG = "/game/config";
 
     inline static const int HTTP_PORT = 18157;
     inline static const int WS_PORT = HTTP_PORT + 1;

@@ -23,8 +23,9 @@ static std::string format_file_time(std::filesystem::file_time_type ftime)
     return oss.str();
 }
 
-static void rotate_current_log(const std::filesystem::path &logDir,
-                               const std::filesystem::path &oldDir)
+static void rotate_log(const std::string &fileName,
+                       const std::filesystem::path &logDir,
+                       const std::filesystem::path &oldDir)
 {
     namespace fs = std::filesystem;
 
@@ -39,12 +40,11 @@ static void rotate_current_log(const std::filesystem::path &logDir,
         if (path.extension() != ".log")
             continue;
 
-        if (path.filename() == "current.log")
+        if (path.filename() == fileName + ".log")
         {
-            // Mover a old/current.<timestamp>.log
             auto ftime = fs::last_write_time(path);
             auto stamp = format_file_time(ftime);
-            auto newName = "current." + stamp + ".log";
+            auto newName = fileName + "." + stamp + ".log";
             auto target = oldDir / newName;
             fs::rename(path, target);
         }
@@ -63,7 +63,7 @@ static void rotate_current_log(const std::filesystem::path &logDir,
     {
         if (!entry.is_regular_file())
             continue;
-        if (entry.path().filename().string().rfind("current.", 0) == 0 &&
+        if (entry.path().filename().string().rfind(fileName + ".", 0) == 0 &&
             entry.path().extension() == ".log")
         {
             currents.push_back(entry);
@@ -82,26 +82,26 @@ static void rotate_current_log(const std::filesystem::path &logDir,
 }
 
 std::map<std::string, std::string> LoggerProvider::configMap{};
-void LoggerProvider::initialize()
+void LoggerProvider::initialize(std::string fileName, std::string path)
 {
-    std::filesystem::path dirPath(Constants::LOG_DIR);
+    std::filesystem::path dirPath(path);
     if (!std::filesystem::exists(dirPath))
     {
         std::filesystem::create_directories(dirPath);
     }
 
-    std::filesystem::path dirPath2(Constants::LOG_OLD_DIR);
+    std::filesystem::path dirPath2(path + "/old");
     if (!std::filesystem::exists(dirPath2))
     {
         std::filesystem::create_directories(dirPath2);
     }
 
-    rotate_current_log(dirPath, dirPath2);
+    rotate_log(fileName, dirPath, dirPath2);
 
     spdlog::init_thread_pool(8192, 1);
 
     console_sink = std::make_shared<spdlog::sinks::stdout_color_sink_mt>();
-    file_sink = std::make_shared<spdlog::sinks::basic_file_sink_mt>(Constants::LOG_FILE, true);
+    file_sink = std::make_shared<spdlog::sinks::basic_file_sink_mt>(path + "/" + fileName + ".log", true);
 
     console_sink->set_pattern("%^[%Y-%m-%d %H:%M:%S.%e] [%-7l] [%n] %v%$");
     file_sink->set_pattern("[%Y-%m-%d %H:%M:%S.%e] [%-7l] [%n] %v");

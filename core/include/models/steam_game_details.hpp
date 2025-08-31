@@ -22,16 +22,21 @@ struct SteamGameDetails
 
         return g;
     }
-
-    // to_json
-    inline json to_json()
-    {
-        json j{
-            {"appid", appid},
-            {"name", name},
-            {"is_steam_app", is_steam_app},
-            {"launch_opts", launch_opts}};
-
-        return j;
-    }
 };
+
+inline void from_json(const json &j, SteamGameDetails &g)
+{
+    g.appid = j.value("appid", 0);
+    g.name = j.value("name", "");
+    g.is_steam_app = j.value("is_steam_app", true);
+    g.launch_opts = j.value("launch_opts", "%command%");
+}
+
+inline void to_json(json &j, const SteamGameDetails &g)
+{
+    j = json{
+        {"appid", g.appid},
+        {"name", g.name},
+        {"is_steam_app", g.is_steam_app},
+        {"launch_opts", g.launch_opts}};
+}

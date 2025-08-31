@@ -30,7 +30,7 @@ int main(int argc, char **argv)
 	}
 	std::cout << "Assets directory: " << Constants::ASSETS_DIR << std::endl;
 
-	LoggerProvider::initialize();
+	LoggerProvider::initialize(Constants::LOG_FILE_NAME, Constants::LOG_DIR);
 	Logger logger{};
 
 	logger.info("###################################################");
