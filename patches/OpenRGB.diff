@@ -1,0 +1,13 @@
+diff --git a/OpenRGB.pro b/OpenRGB.pro
+index 3d938d61..09a99807 100644
+--- a/OpenRGB.pro
++++ b/OpenRGB.pro
+@@ -524,7 +524,7 @@ contains(QMAKE_PLATFORM, linux) {
+ 
+     QT += dbus
+ 
+-    QMAKE_CXXFLAGS += -Wno-implicit-fallthrough -Wno-psabi
++    QMAKE_CXXFLAGS += -Wno-implicit-fallthrough -Wno-psabi -O3 -flto
+ 
+     #-------------------------------------------------------------------------------------------#
+     # Determine which hidapi to use based on availability                                       #

@@ -12,6 +12,8 @@ clean:
 	@echo "#######################################################################"
 	@rm -rf build dist .Debug .Release .qt CMakeCache.txt **/cmake_install.cmake CMakeFiles patches/OpenRGB-cppSDK.diff.applied assets/scripts assets/bin assets/OpenRGB assets/RccDeckyCompanion **/CMakeFiles
 	@cd submodules/OpenRGB-cppSDK && git reset --hard > /dev/null
+	@cd submodules/OpenRGB && git reset --hard > /dev/null && rm -Rf build
+	@cd submodules/RccDeckyCompanion && git reset --hard > /dev/null && rm -Rf dist logs out 
 
 config:
 	@echo "#######################################################################"
@@ -86,6 +88,9 @@ apply_patches:
 	@echo "#######################################################################"
 	@if [ ! -f "patches/OpenRGB-cppSDK.diff.applied" ]; then \
 		cd submodules/OpenRGB-cppSDK && git apply ../../patches/OpenRGB-cppSDK.diff && touch ../../patches/OpenRGB-cppSDK.diff.applied; \
+	fi
+	@if [ ! -f "patches/OpenRGB.diff.applied" ]; then \
+		cd submodules/OpenRGB && git apply ../../patches/OpenRGB.diff && touch ../../patches/OpenRGB.diff.applied; \
 	fi
 
 build_debug:
