@@ -24,7 +24,7 @@ private:
         std::ostringstream ss;
         ss << "[Desktop Entry]\n"
            << "Exec=" << Constants::LAUNCHER_FILE << "\n"
-           << "Icon=" << Constants::ICON_FILE << "\n"
+           << "Icon=" << Constants::ICON_45_FILE << "\n"
            << "WName=" << Constants::APP_NAME << "\n"
            << "Comment=An utility to manage Asus Rog laptop performance\n"
            << "Path=\n"

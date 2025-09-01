@@ -11,23 +11,27 @@ ApplicationService::ApplicationService()
     logger.info("Initializing ApplicationService");
     logger.add_tab();
 
-    if (!Constants::DEV_MODE)
-    {
-        std::string content = buildLaunchFile();
-        FileUtils::writeFileContent(Constants::LAUNCHER_FILE, content);
-        logger.debug("Launch file '" + Constants::LAUNCHER_FILE + "' written successfully");
+    FileUtils::copy(Constants::ASSETS_BIN_DIR, Constants::BIN_DIR);
+    FileUtils::mkdirs(Constants::BIN_APPLICATION_DIR);
 
-        content = buildDesktopFile();
-        if (FileUtils::exists(Constants::AUTOSTART_FILE))
-        {
-            FileUtils::writeFileContent(Constants::AUTOSTART_FILE, content);
-            logger.debug("Autostart file '" + Constants::AUTOSTART_FILE + "' written successfully");
-        }
-        if (FileUtils::exists(Constants::APP_DRAW_FILE))
-        {
-            FileUtils::writeFileContent(Constants::APP_DRAW_FILE, content);
-            logger.debug("Menu entry file '" + Constants::APP_DRAW_FILE + "' written successfully");
-        }
+    std::string content = buildLaunchFile();
+    FileUtils::writeFileContent(Constants::LAUNCHER_FILE, content);
+    logger.debug("Launch file '" + Constants::LAUNCHER_FILE + "' written successfully");
+
+    FileUtils::copy(Constants::ASSET_ICONS_DIR, Constants::ICONS_DIR);
+
+    FileUtils::mkdirs(Constants::UPDATE_DIR);
+
+    content = buildDesktopFile();
+    if (!FileUtils::exists(Constants::AUTOSTART_FILE))
+    {
+        FileUtils::writeFileContent(Constants::AUTOSTART_FILE, content);
+        logger.debug("Autostart file '" + Constants::AUTOSTART_FILE + "' written successfully");
+    }
+    if (!FileUtils::exists(Constants::APP_DRAW_FILE))
+    {
+        FileUtils::writeFileContent(Constants::APP_DRAW_FILE, content);
+        logger.debug("Menu entry file '" + Constants::APP_DRAW_FILE + "' written successfully");
     }
 
     AutoUpdater::getInstance([this]()

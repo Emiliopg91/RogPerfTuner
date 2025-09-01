@@ -29,7 +29,7 @@ static void rotate_log(const std::string &fileName,
 {
     namespace fs = std::filesystem;
 
-    if (!fs::exists(logDir))
+    if (!FileUtils::exists(logDir))
         return;
 
     for (auto &entry : fs::directory_iterator(logDir))
@@ -42,20 +42,14 @@ static void rotate_log(const std::string &fileName,
 
         if (path.filename() == fileName + ".log")
         {
-            auto ftime = fs::last_write_time(path);
+            auto ftime = FileUtils::getMTime(path);
             auto stamp = format_file_time(ftime);
             auto newName = fileName + "." + stamp + ".log";
             auto target = oldDir / newName;
             fs::rename(path, target);
         }
-        else
-        {
-            // Cualquier otro log se borra
-            fs::remove(path);
-        }
     }
 
-    // Limitar a 5 históricos de current.log
     if (!fs::exists(oldDir))
         return;
     std::vector<fs::directory_entry> currents;
@@ -84,30 +78,41 @@ static void rotate_log(const std::string &fileName,
 std::map<std::string, std::string> LoggerProvider::configMap{};
 void LoggerProvider::initialize(std::string fileName, std::string path)
 {
-    std::filesystem::path dirPath(path);
-    if (!std::filesystem::exists(dirPath))
-    {
-        std::filesystem::create_directories(dirPath);
-    }
-
-    std::filesystem::path dirPath2(path + "/old");
-    if (!std::filesystem::exists(dirPath2))
-    {
-        std::filesystem::create_directories(dirPath2);
-    }
-
-    rotate_log(fileName, dirPath, dirPath2);
-
     console_sink = std::make_shared<spdlog::sinks::stdout_color_sink_mt>();
-    file_sink = std::make_shared<spdlog::sinks::basic_file_sink_mt>(path + "/" + fileName + ".log", true);
-
     console_sink->set_pattern("%^[%Y-%m-%d %H:%M:%S.%e] [%-7l] [%n] %v%$");
-    file_sink->set_pattern("[%Y-%m-%d %H:%M:%S.%e] [%-7l] [%n] %v");
+
+    auto sinkList = spdlog::sinks_init_list{console_sink};
+
+    if (!fileName.empty() && !path.empty())
+    {
+        std::filesystem::path dirPath(path);
+        FileUtils::mkdirs(dirPath);
+
+        std::filesystem::path dirPath2(path + "/old");
+        FileUtils::mkdirs(dirPath2);
+
+        rotate_log(fileName, dirPath, dirPath2);
+
+        file_sink = std::make_shared<spdlog::sinks::basic_file_sink_mt>(path + "/" + fileName + ".log", true);
+
+        file_sink.value()->set_pattern("[%Y-%m-%d %H:%M:%S.%e] [%-7l] [%n] %v");
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Winit-list-lifetime"
+        sinkList = spdlog::sinks_init_list{console_sink, file_sink.value()};
+#pragma GCC diagnostic pop
+    }
 
     auto main_logger = std::make_shared<spdlog::logger>(
-        "Default", spdlog::sinks_init_list{console_sink, file_sink});
-    main_logger->set_level(spdlog::level::info);
-    main_logger->flush_on(spdlog::level::info);
+        "Default", sinkList);
+
+    defaultLevel = spdlog::level::info;
+    if (getenv("RCC_LOG_LEVEL"))
+    {
+        defaultLevel = spdlog::level::from_str(StringUtils::toLowerCase(getenv("RCC_LOG_LEVEL")));
+    }
+
+    main_logger->set_level(defaultLevel);
+    main_logger->flush_on(defaultLevel);
 
     spdlog::set_default_logger(main_logger);
 }
@@ -129,10 +134,18 @@ std::shared_ptr<spdlog::logger> LoggerProvider::getLogger(const std::string &nam
         display_name.resize(15);
     }
 
+    auto sinkList = spdlog::sinks_init_list{console_sink};
+    if (file_sink.has_value())
+    {
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Winit-list-lifetime"
+        sinkList = spdlog::sinks_init_list{console_sink, file_sink.value()};
+#pragma GCC diagnostic pop
+    }
     auto logger = std::make_shared<spdlog::logger>(
-        display_name, spdlog::sinks_init_list{console_sink, file_sink});
+        display_name, sinkList);
 
-    auto level = spdlog::level::info;
+    auto level = defaultLevel;
     auto it2 = LoggerProvider::configMap.find(name);
     if (it2 != configMap.end())
     {

@@ -19,9 +19,9 @@ struct GameEntry
     std::optional<std::string> args = std::nullopt;
     std::optional<std::string> env = std::nullopt;
     std::optional<std::string> gpu = std::nullopt;
-    std::optional<std::string> icon_path = std::nullopt;
     MangoHudLevel metrics_level = MangoHudLevel::Enum::NO_DISPLAY;
     std::string name;
+    std::string overlayId;
     bool proton = true;
     bool steamdeck = false;
     WineSyncOption sync = WineSyncOption::Enum::AUTO;
@@ -67,10 +67,10 @@ inline void to_json(json &j, const GameEntry &g)
     j["args"] = g.args ? json(*g.args) : json(nullptr);
     j["env"] = g.env ? json(*g.env) : json(nullptr);
     j["gpu"] = g.gpu ? json(*g.gpu) : json(nullptr);
-    j["icon_path"] = g.icon_path ? json(*g.icon_path) : json(nullptr);
 
     j["metrics_level"] = g.metrics_level.toInt();
     j["name"] = g.name;
+    j["overlayId"] = g.overlayId;
     j["proton"] = g.proton;
     j["steamdeck"] = g.steamdeck;
     j["sync"] = g.sync.toString();
@@ -94,14 +94,10 @@ inline void from_json(const json &j, GameEntry &g)
     else
         g.gpu = std::nullopt;
 
-    if (j.contains("icon_path") && !j.at("icon_path").is_null())
-        g.icon_path = j.at("icon_path").get<std::string>();
-    else
-        g.icon_path = std::nullopt;
-
     // Campos obligatorios (sin optional)
     g.metrics_level = MangoHudLevel::fromInt(j.at("metrics_level").get<int>());
     g.name = j.at("name").get<std::string>();
+    g.overlayId = j.at("overlayId").get<std::string>();
     g.proton = j.at("proton").get<bool>();
     g.steamdeck = j.at("steamdeck").get<bool>();
     g.sync = WineSyncOption::fromString(j.at("sync").get<std::string>());

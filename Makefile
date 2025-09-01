@@ -34,6 +34,7 @@ build: config apply_patches
 	@cp build/RccScripts/DecBrightness assets/bin/rgb/decBrightness
 	@cp build/RccScripts/NextProfile assets/bin/performance/nextProfile
 	@cp build/RccScripts/SteamRunner assets/bin/steam/run
+	@cp build/RccScripts/FlatpakWrapper assets/bin/steam/flatpak
 
 	@if [ ! -d "assets/OpenRGB" ]; then \
 		echo "#######################################################################" && \
@@ -75,7 +76,7 @@ release:
 	@cp -r dist/RogControlCenter dist/appimage-fs
 	@cp resources/AppRun dist/appimage-fs/
 	@cp resources/RogControlCenter.desktop dist/appimage-fs/RogControlCenter.desktop
-	@cp assets/icons/rog-logo.svg dist/appimage-fs/icon.svg
+	@cp assets/icons/icon.svg dist/appimage-fs/icon.svg
 	@chmod 777 -R resources/appimagetool dist/appimage-fs
 	@VERSION=$$(cat assets/version); ./resources/appimagetool -n dist/appimage-fs dist/RogControlCenter.AppImage
 

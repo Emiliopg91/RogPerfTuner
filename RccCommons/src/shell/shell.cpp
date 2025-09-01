@@ -233,15 +233,56 @@ uint8_t Shell::wait_for(pid_t pid)
 {
     int status;
     waitpid(pid, &status, 0);
-    return static_cast<uint8_t>(status);
+
+    if (WIFEXITED(status))
+    {
+        int exit_code = WEXITSTATUS(status);
+        return static_cast<uint8_t>(exit_code);
+    }
+    else if (WIFSIGNALED(status))
+    {
+        int sig = WTERMSIG(status);
+        return static_cast<uint8_t>(128 + sig);
+    }
+    else
+    {
+        return 255;
+    }
 }
 
 std::optional<std::string> Shell::which(std::string cmd)
 {
-    auto res = run_command("which " + cmd);
+    auto tmp = whichAll(cmd);
+    if (!tmp.empty())
+        return std::move(tmp[0]);
+    return std::nullopt;
+}
+
+std::vector<std::string> Shell::whichAll(std::string cmd)
+{
+
+    std::lock_guard<std::mutex> lock(which_mtx);
+
+    auto it = whichCache.find(cmd);
+    if (it != whichCache.end())
+    {
+        return it->second;
+    }
+
+    std::vector<std::string> all;
+    auto res = run_command("which -a " + cmd);
     if (res.exit_code == 0)
     {
-        return StringUtils::trim(res.stdout_str);
+        std::istringstream ss(res.stdout_str);
+        std::string line;
+        while (std::getline(ss, line))
+        {
+            line = StringUtils::trim(line);
+            if (!line.empty())
+                all.push_back(line);
+        }
+        whichCache[cmd] = all;
     }
-    return std::nullopt;
+
+    return all;
 }

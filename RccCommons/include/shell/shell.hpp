@@ -26,6 +26,7 @@ public:
     uint8_t wait_for(pid_t pid);
     std::vector<std::string> copyEnviron();
     std::optional<std::string> which(std::string cmd);
+    std::vector<std::string> whichAll(std::string cmd);
 
 private:
     Shell(const std::string &sudo_password);
@@ -47,4 +48,6 @@ private:
     void close_bash(BashSession &session);
     CommandResult send_command(BashSession &session, const std::string &cmd, bool check);
     std::mutex mtx;
+    std::mutex which_mtx;
+    std::map<std::string, std::vector<std::string>> whichCache;
 };

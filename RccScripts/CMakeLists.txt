@@ -22,7 +22,6 @@ add_executable(NextEffect "${CMAKE_CURRENT_SOURCE_DIR}/src/rgb/next_effect.cpp")
 target_link_libraries(NextEffect PRIVATE
     httplib::httplib
     spdlog::spdlog 
-    spdlog::spdlog_header_only
     RccCommons
 )
 
@@ -30,7 +29,6 @@ add_executable(IncBrightness "${CMAKE_CURRENT_SOURCE_DIR}/src/rgb/increase_brigh
 target_link_libraries(IncBrightness PRIVATE 
     httplib::httplib
     spdlog::spdlog 
-    spdlog::spdlog_header_only
     RccCommons
 )
 
@@ -38,7 +36,6 @@ add_executable(DecBrightness "${CMAKE_CURRENT_SOURCE_DIR}/src/rgb/decrease_brigh
 target_link_libraries(DecBrightness PRIVATE 
     httplib::httplib
     spdlog::spdlog 
-    spdlog::spdlog_header_only
     RccCommons
 )
 
@@ -46,7 +43,6 @@ add_executable(NextProfile "${CMAKE_CURRENT_SOURCE_DIR}/src/performance/next_pro
 target_link_libraries(NextProfile PRIVATE 
     httplib::httplib
     spdlog::spdlog 
-    spdlog::spdlog_header_only
     RccCommons
 )
 
@@ -55,6 +51,12 @@ target_link_libraries(SteamRunner PRIVATE
     nlohmann_json::nlohmann_json
     httplib::httplib
     spdlog::spdlog 
-    spdlog::spdlog_header_only
+    RccCommons
+)
+
+add_executable(FlatpakWrapper "${CMAKE_CURRENT_SOURCE_DIR}/src/steam/flatpak.cpp")
+target_link_libraries(FlatpakWrapper PRIVATE 
+    nlohmann_json::nlohmann_json
+    spdlog::spdlog 
     RccCommons
 )

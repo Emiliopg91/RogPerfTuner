@@ -10,4 +10,7 @@ target_include_directories(RccCommons PUBLIC
     ${LIBSECRET_INCLUDE_DIRS}
 )
 
-target_link_libraries(RccCommons PUBLIC nlohmann_json::nlohmann_json)
+target_link_libraries(RccCommons PUBLIC
+    nlohmann_json::nlohmann_json
+    spdlog::spdlog 
+)

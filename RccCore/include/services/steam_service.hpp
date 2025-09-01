@@ -9,6 +9,8 @@ private:
     inline static std::string WRAPPER_PATH = Constants::BIN_DIR + "/steam/run";
     Logger logger{"SteamService"};
     std::map<unsigned int, std::string> runningGames;
+    bool rccdcEnabled = false;
+    std::thread installer;
 
     SteamService();
 
@@ -18,6 +20,9 @@ private:
     void onFirstGameRun(unsigned int gid, std::string name, std::map<std::string, std::string> env);
     void onGameStop(unsigned int gid, std::string name);
     void setProfileForGames(bool onConnect = false);
+    void installRccDC();
+    void copyPlugin();
+    bool checkIfRequiredInstallation();
 
 public:
     static SteamService &getInstance()

@@ -7,6 +7,7 @@
 #include <filesystem>
 #include <fstream>
 #include <iostream>
+#include "RccCommons.hpp"
 
 #ifndef CPPHTTPLIB_OPENSSL_SUPPORT
 #define CPPHTTPLIB_OPENSSL_SUPPORT
@@ -159,8 +160,7 @@ private:
     {
         try
         {
-            std::filesystem::path dest = std::filesystem::path(Constants::UPDATE_FILE);
-            std::filesystem::rename(update_path, dest);
+            FileUtils::move(update_path, Constants::UPDATE_FILE);
             logger.info("File copied to update folder");
         }
         catch (const std::exception &e)

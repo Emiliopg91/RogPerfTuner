@@ -54,4 +54,9 @@ public:
     {
         invoke("set_launch_options", {appid, launchOpts});
     }
+
+    std::string getIcon(int appid)
+    {
+        return std::any_cast<std::string>(invoke("get_icon", {appid})[0]);
+    }
 };

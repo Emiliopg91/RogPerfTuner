@@ -17,6 +17,7 @@
 #include "../include/gui/toaster.hpp"
 #include "../include/translator/translator.hpp"
 #include "../include/utils/constants.hpp"
+#include "../include/utils/single_instance.hpp"
 
 int main(int argc, char **argv)
 {
@@ -24,6 +25,9 @@ int main(int argc, char **argv)
 	argv[0][std::strlen(argv[0])] = '\0';
 
 	std::cout << "Running application " + Constants::EXECUTABLE_PATH << " with PID " << getpid() << std::endl;
+
+	SingleInstance::getInstance().acquire();
+
 	if (Constants::DEV_MODE)
 	{
 		std::cout << "Dev mode enabled" << std::endl;
@@ -65,6 +69,7 @@ int main(int argc, char **argv)
 
 	logger.info("Creating tray icon");
 	TrayIcon::getInstance();
+	app.setDesktopFileName(QString::fromStdString(Constants::APP_DRAW_FILE));
 
 	logger.rem_tab();
 	logger.info("Application ready");

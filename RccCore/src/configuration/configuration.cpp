@@ -10,7 +10,7 @@
 
 void Configuration::loadConfig()
 {
-    if (std::filesystem::exists(Constants::CONFIG_FILE))
+    if (FileUtils::exists(Constants::CONFIG_FILE))
     {
         logger.debug("Loading settings from '{}'", Constants::CONFIG_FILE);
         try

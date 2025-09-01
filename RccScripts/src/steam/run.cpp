@@ -14,6 +14,7 @@
 #include <sys/types.h>
 #include <sys/wait.h>
 #include <unistd.h>
+#include <sys/prctl.h>
 #include "httplib.h"
 
 #include "RccCommons.hpp"
@@ -25,9 +26,29 @@
 #include <cstring>
 #include <iostream>
 
+void reader_thread(int fd, Logger logger, bool error)
+{
+    char buffer[4096];
+    ssize_t n;
+    while ((n = read(fd, buffer, sizeof(buffer) - 1)) > 0)
+    {
+        buffer[n] = '\0';
+        std::string chunk(buffer, n);
+
+        std::stringstream ss(chunk);
+        std::string line;
+        while (std::getline(ss, line))
+        {
+            if (error)
+                logger.error("[STDERR] {}", line);
+            else
+                logger.info("[STDOUT] {}", line);
+        }
+    }
+}
+
 int run_command(Logger &logger,
                 const std::vector<std::string> &cmd,
-                const std::map<std::string, std::string> &env_vars,
                 const std::vector<std::string> &wrappers,
                 const std::string &parameters)
 {
@@ -53,35 +74,10 @@ int run_command(Logger &logger,
     }
     argv.push_back(nullptr);
 
-    std::vector<std::string> env_strings;
-    std::vector<char *> env;
-    env.reserve(env_vars.size() + 1);
-    for (auto &kv : env_vars)
-    {
-        env_strings.push_back(kv.first + "=" + kv.second);
-    }
-    for (auto &e : env_strings)
-    {
-        env.push_back(const_cast<char *>(e.c_str()));
-    }
-    env.push_back(nullptr);
-
     char *command = argv[0];
     std::vector<char *> argp;
     for (size_t i = 1; i < argv.size(); i++)
         argp.push_back(argv[i]);
-
-    auto whichResult = Shell::getInstance().which(std::string(command));
-    if (!whichResult.has_value())
-    {
-        logger.error("Command " + std::string(command) + " not found");
-        exit(127);
-    }
-
-    std::string finalCommandStr = StringUtils::trim(
-        Shell::getInstance().run_command("which " + std::string(command)).stdout_str);
-
-    argv[0] = const_cast<char *>(whichResult.value().c_str());
 
     std::ostringstream ss;
     for (auto &arg : argv)
@@ -91,8 +87,78 @@ int run_command(Logger &logger,
 
     logger.info(">>> Running command: '" + StringUtils::trim(ss.str()) + "'");
     logger.add_tab();
-    pid_t pid = Shell::getInstance().launch_process(argv[0], argv.data(), env.data(), Constants::LOG_DIR + "/" + Constants::LOG_RUNNER_FILE_NAME + ".log");
-    auto exit_code = Shell::getInstance().wait_for(pid);
+
+    std::string cmd_str = command;
+    cmd_str += " ";
+
+    for (int i = 1; argv[i] != nullptr; i++)
+    {
+        cmd_str = cmd_str + argv[i] + " ";
+    }
+
+    int pipe_stdout[2];
+    pipe(pipe_stdout);
+    int pipe_stderr[2];
+    pipe(pipe_stderr);
+
+    logger.debug("Launching process: " + cmd_str);
+    pid_t pid = fork();
+    if (pid == -1)
+    {
+        perror("fork");
+        return -1;
+    }
+
+    if (pid == 0)
+    {
+        prctl(PR_SET_PDEATHSIG, SIGTERM);
+
+        dup2(pipe_stdout[1], STDOUT_FILENO);
+        dup2(pipe_stderr[1], STDERR_FILENO);
+
+        close(pipe_stdout[0]);
+        close(pipe_stdout[1]);
+        close(pipe_stderr[0]);
+        close(pipe_stderr[1]);
+
+        execvp(argv[0], argv.data());
+        perror("execve");
+        _exit(1);
+    }
+
+    logger.debug("Launched with PID " + std::to_string(pid));
+    close(pipe_stdout[1]);
+    close(pipe_stderr[1]);
+
+    Logger subLogger{"Subprocess"};
+    std::thread t_out(reader_thread, pipe_stdout[0], subLogger, false);
+    std::thread t_err(reader_thread, pipe_stderr[0], subLogger, true);
+
+    int status;
+    int exit_code;
+    waitpid(pid, &status, 0);
+
+    close(pipe_stdout[0]);
+    close(pipe_stderr[0]);
+
+    t_out.join();
+    t_err.join();
+
+    if (WIFEXITED(status))
+    {
+        exit_code = WEXITSTATUS(status);
+        exit_code = static_cast<uint8_t>(exit_code);
+    }
+    else if (WIFSIGNALED(status))
+    {
+        int sig = WTERMSIG(status);
+        exit_code = static_cast<uint8_t>(128 + sig);
+    }
+    else
+    {
+        exit_code = 255;
+    }
+
     logger.rem_tab();
     logger.info("Command finished with exit code " + std::to_string(exit_code));
 
@@ -111,7 +177,11 @@ int main(int argc, char *argv[])
         return 1;
     }
 
-    logger.info("===== Lanzamiento iniciado =====");
+    std::string dirname = FileUtils::dirname(argv[0]);
+    std::string path = dirname + ":" + getenv("PATH");
+    setenv("PATH", path.c_str(), 1);
+
+    logger.info("===== Started wrapping =====");
     logger.info(">>> Entorno:");
     logger.add_tab();
     for (char **env = environ; *env; ++env)
@@ -128,9 +198,9 @@ int main(int argc, char *argv[])
     logger.info(cmdline.str());
     logger.rem_tab();
 
-    std::map<std::string, std::string> child_env;
     std::vector<std::string> wrappers;
     std::string parameters;
+    std::vector<std::string> command;
 
     for (char **env = environ; *env; ++env)
     {
@@ -138,20 +208,29 @@ int main(int argc, char *argv[])
         size_t pos = entry.find('=');
         if (pos != std::string::npos)
         {
-            child_env[entry.substr(0, pos)] = entry.substr(pos + 1);
+            setenv(entry.substr(0, pos).c_str(), entry.substr(pos + 1).c_str(), 1);
         }
     }
 
-    std::string script_dir = argv[0];
-    size_t pos = script_dir.find_last_of('/');
-    if (pos != std::string::npos)
+    auto whichResult = Shell::getInstance().whichAll("flatpak");
+    if (whichResult.size() > 1)
     {
-        std::string path = script_dir.substr(0, pos) + ":" + child_env["PATH"];
-        child_env["PATH"] = path;
+        setenv("ORIG_FLATPAK_BIN", StringUtils::trim(whichResult[whichResult.size() - 1]).c_str(), 1);
     }
 
-    std::vector<std::string> command;
-    for (int i = 1; i < argc; i++)
+    auto cmdWhichResult = Shell::getInstance().whichAll(std::string(argv[1]));
+    if (whichResult.empty())
+    {
+        logger.error("Command " + std::string(argv[1]) + " not found");
+        exit(127);
+    }
+    std::string finalCommandStr = StringUtils::trim(cmdWhichResult[0]);
+
+    logger.info(std::string(argv[1]) + " -> " + finalCommandStr);
+
+    command.push_back(finalCommandStr);
+
+    for (int i = 2; i < argc; i++)
         command.push_back(argv[i]);
 
     httplib::Client cli("localhost", Constants::HTTP_PORT);
@@ -160,8 +239,7 @@ int main(int argc, char *argv[])
     if (steamId)
     {
         logger.info("Requesting configuration");
-        auto id = std::stoll(steamId);
-        auto res = cli.Get(Constants::URL_GAME_CFG + "?appid=" + std::to_string(id));
+        auto res = cli.Get(Constants::URL_GAME_CFG + "?appid=" + steamId);
 
         if (!res || res->status != 200)
         {
@@ -174,10 +252,21 @@ int main(int argc, char *argv[])
 
             for (const auto &[key, val] : cfg.environment)
             {
-                child_env[key] = val;
+                setenv(key.c_str(), val.c_str(), 1);
             }
             wrappers = cfg.wrappers;
             parameters = cfg.parameters;
+
+            if (!cfg.environment.empty())
+            {
+                std::string envAdded;
+                for (const auto &[key, val] : cfg.environment)
+                {
+                    envAdded = envAdded + key + ";";
+                }
+                envAdded.pop_back();
+                setenv("OVERRIDE_FLATPAK_ENV", envAdded.c_str(), 1);
+            }
         }
     }
     else
@@ -192,7 +281,7 @@ int main(int argc, char *argv[])
         logger.error("Error on renice request");
     }
 
-    int code = run_command(logger, command, child_env, wrappers, parameters);
+    int code = run_command(logger, command, wrappers, parameters);
 
     return code;
 }

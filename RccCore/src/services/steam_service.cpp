@@ -6,6 +6,7 @@
 
 #include "../../include/configuration/configuration.hpp"
 #include "../../include/models/gpu_brand.hpp"
+#include "../../include/models/semantic_version.hpp"
 #include "../../include/models/steam_game_details.hpp"
 #include "../../include/services/hardware_service.hpp"
 #include "../../include/services/open_rgb_service.hpp"
@@ -29,6 +30,8 @@ SteamService::SteamService()
     {
         onConnect(true);
     }
+
+    installRccDC();
 
     SteamClient::getInstance().onConnect([this]()
                                          { onConnect(); });
@@ -162,20 +165,91 @@ void SteamService::onFirstGameRun(unsigned int gid, std::string name, std::map<s
         args = launch_opts;
     }
 
-    GameEntry entry{args, env, gpu, std::nullopt, MangoHudLevel::Enum::NO_DISPLAY, name, proton, false, WineSyncOption::Enum::AUTO};
+    auto overlayId = environment.find("SteamOverlayGameId")->second;
+
+    GameEntry entry{args, env, gpu, MangoHudLevel::Enum::NO_DISPLAY, name, overlayId, proton, false, WineSyncOption::Enum::AUTO};
     Configuration::getInstance().getConfiguration().games[std::to_string(gid)] = entry;
     Configuration::getInstance().saveConfig();
 
     SteamClient::getInstance().setLaunchOptions(gid, WRAPPER_PATH + " %command%");
     logger.info("Configuration finished");
 
-    auto overlayId = environment.find("SteamOverlayGameId")->second;
     logger.info("Relaunching game with SteamOverlayId " + overlayId + "...");
 
     Shell::getInstance().run_command("steam steam://rungameid/" + overlayId);
 
     logger.rem_tab();
     logger.rem_tab();
+}
+
+bool SteamService::checkIfRequiredInstallation()
+{
+    std::ifstream fileAsset(Constants::RCCDC_PATH + "/package.json");
+    std::ifstream fileRunning(Constants::RCCDC_ASSET_PATH + "/package.json");
+
+    nlohmann::json jA, jR;
+    fileAsset >> jA;
+    fileRunning >> jR;
+
+    SemanticVersion vA = SemanticVersion::parse(jA["version"]);
+    SemanticVersion vR = SemanticVersion::parse(jR["version"]);
+
+    return vA > vR;
+}
+
+void SteamService::installRccDC()
+{
+    try
+    {
+        if (FileUtils::exists(Constants::DECKY_SERVICE_PATH))
+        {
+            if (!FileUtils::exists(Constants::RCCDC_PATH))
+            {
+                logger.info("Installing plugin for first time");
+                copyPlugin();
+            }
+            else
+            {
+                if (checkIfRequiredInstallation())
+                {
+                    logger.info("Updating Decky plugin");
+                    copyPlugin();
+                }
+                else
+                {
+                    logger.info("Plugin up to date");
+                }
+            }
+            rccdcEnabled = true;
+        }
+        else
+        {
+            logger.warn("No Decky installation found, skipping plugin installation");
+            rccdcEnabled = false;
+        }
+    }
+    catch (std::exception e)
+    {
+        logger.error("Error while installing RCCDeckyCompanion plugin: {}", e.what());
+    }
+}
+
+void SteamService::copyPlugin()
+{
+    installer = std::thread([]()
+                            {
+        FileUtils::copy(Constants::RCCDC_ASSET_PATH, Constants::USER_PLUGIN_DIR);
+
+        std::vector<std::string> commands{
+            "if [[ -d \"" + Constants::RCCDC_PATH + "\" ]]; then rm -R \"" + Constants::RCCDC_PATH + "\"; fi",
+            "chmod 777 \"" + Constants::PLUGINS_FOLDER + "/..\"",
+            "mv \"" + Constants::USER_PLUGIN_DIR + "\" \"" + Constants::RCCDC_PATH + "\"",
+            "systemctl restart plugin_loader.service"};
+
+        for (auto cmd : commands)
+        {
+            Shell::getInstance().run_elevated_command(cmd);
+        } });
 }
 
 void SteamService::onGameLaunch(unsigned int gid, std::string name, int pid)
@@ -286,7 +360,25 @@ SteamGameConfig SteamService::getConfiguration(std::string gid)
 
     auto games = Configuration::getInstance().getConfiguration().games;
     auto it = games.find(gid);
+
+    std::optional<GameEntry> entry = std::nullopt;
     if (it != games.end())
+    {
+        entry = it->second;
+    }
+    else
+    {
+        for (const auto &[key, val] : Configuration::getInstance().getConfiguration().games)
+        {
+            if (val.overlayId == gid)
+            {
+                entry = val;
+                break;
+            }
+        }
+    }
+
+    if (entry.has_value())
     {
         auto entry = it->second;
         if (entry.env.has_value())
