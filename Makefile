@@ -17,7 +17,7 @@ config:
 	@echo "#######################################################################"
 	@echo "######################## Configuring compiler ########################"
 	@echo "#######################################################################"
-	@cmake -B build -S . -DCMAKE_BUILD_TYPE=$BUILD_TYPE
+	@cmake -B build -S . -DCMAKE_BUILD_TYPE=$(BUILD_TYPE)
 
 	@touch .$(BUILD_TYPE)
 
@@ -28,11 +28,12 @@ build: config apply_patches
 	@cmake --build build -- -j$(NUM_CORES)
 
 	@rm -rf assets/bin
-	@mkdir assets/bin assets/bin/rgb  assets/bin/performance
-	@cp build/core/NextEffect assets/bin/rgb/nextEffect
-	@cp build/core/IncBrightness assets/bin/rgb/incBrightness
-	@cp build/core/DecBrightness assets/bin/rgb/decBrightness
-	@cp build/core/NextProfile assets/bin/performance/nextProfile
+	@mkdir assets/bin assets/bin/rgb  assets/bin/performance assets/bin/steam
+	@cp build/RccScripts/NextEffect assets/bin/rgb/nextEffect
+	@cp build/RccScripts/IncBrightness assets/bin/rgb/incBrightness
+	@cp build/RccScripts/DecBrightness assets/bin/rgb/decBrightness
+	@cp build/RccScripts/NextProfile assets/bin/performance/nextProfile
+	@cp build/RccScripts/SteamRunner assets/bin/steam/run
 
 	@if [ ! -d "assets/OpenRGB" ]; then \
 		echo "#######################################################################" && \
@@ -59,7 +60,7 @@ release:
 	@echo "####################### Generating Dist folder ########################"
 	@echo "#######################################################################"
 	@mkdir dist dist/RogControlCenter
-	@cp ./build/core/RogControlCenter dist/RogControlCenter
+	@cp ./build/RccCore/RogControlCenter dist/RogControlCenter
 	@cp -r assets dist/RogControlCenter
 
 	@echo "#######################################################################"
@@ -91,6 +92,6 @@ build_debug:
 
 run: build
 	@touch /tmp/fake.AppImage
-	@echo "Running 'APPIMAGE=/tmp/fake.AppImage RCC_ASSETS_DIR=$(MAKEFILE_DIR)assets ./build/core/RogControlCenter'"
+	@echo "Running 'APPIMAGE=/tmp/fake.AppImage RCC_ASSETS_DIR=$(MAKEFILE_DIR)assets ./build/RccCore/RogControlCenter'"
 	@echo ""
-	@APPIMAGE=/tmp/fake.AppImage RCC_ASSETS_DIR=$(MAKEFILE_DIR)assets ./build/core/RogControlCenter
+	@APPIMAGE=/tmp/fake.AppImage RCC_ASSETS_DIR=$(MAKEFILE_DIR)assets ./build/RccCore/RogControlCenter

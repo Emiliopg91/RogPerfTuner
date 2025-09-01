@@ -13,6 +13,8 @@ add_subdirectory(submodules/spdlog)
 
 add_subdirectory(submodules/OpenRGB-cppSDK)
 
-add_subdirectory(commons)
+add_subdirectory(RccCommons)
 
-add_subdirectory(core)
+add_subdirectory(RccScripts)
+
+add_subdirectory(RccCore)
