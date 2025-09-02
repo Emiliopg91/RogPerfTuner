@@ -157,16 +157,16 @@ jobs:
       - package
     runs-on: ubuntu-latest
     steps:
-      - name: Configure git client
-        run: |
-          git config user.name "GitHub Actions"
-          git config user.email "actions@github.com"
-
       - name: Checkout repository
         uses: actions/checkout@v4
         with:
           submodules: recursive
           fetch-depth: 0
+
+      - name: Configure git client
+        run: |
+          git config user.name "GitHub Actions"
+          git config user.email "actions@github.com"
 
       - name: Create tag
         run: |
