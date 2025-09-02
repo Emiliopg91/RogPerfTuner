@@ -45,7 +45,7 @@ public:
         return std::string(dir);
     }();
 
-    inline static const bool DEV_MODE = std::getenv("RCC_MODE") == nullptr || StringUtils::toLowerCase(std::getenv("RCC_MODE")) == "dev";
+    inline static const bool DEV_MODE = std::getenv("RCC_MODE") != nullptr && StringUtils::toLowerCase(std::getenv("RCC_MODE")) == "dev";
 
     inline const static std::string APP_NAME = "RogControlCenter";
     inline const static std::string APP_VERSION = []()
