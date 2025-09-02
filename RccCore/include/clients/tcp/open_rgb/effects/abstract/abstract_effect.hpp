@@ -4,7 +4,7 @@
 
 #include "RccCommons.hpp"
 #include "OpenRGB/Client.hpp"
-#include "../../../../../models/rgb_brightness.hpp"
+#include "../../../../../models/hardware/rgb_brightness.hpp"
 
 using orgb::Client;
 using orgb::Color;

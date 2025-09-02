@@ -1,4 +1,3 @@
-
 #include "../../include/configuration/configuration.hpp"
 #include "../../include/clients/dbus/asus/core/fan_curves_client.hpp"
 #include "../../include/clients/dbus/asus/core/platform_client.hpp"
@@ -8,13 +7,15 @@
 #include "../../include/clients/file/ssd_scheduler_client.hpp"
 #include "../../include/clients/shell/cpupower_client.hpp"
 #include "../../include/gui/toaster.hpp"
-#include "../../include/models/ssd_scheduler.hpp"
-#include "../../include/models/power_profile.hpp"
+#include "../../include/models/performance/cpu_governor.hpp"
+#include "../../include/models/performance/ssd_scheduler.hpp"
+#include "../../include/models/performance/power_profile.hpp"
 #include "../../include/services/hardware_service.hpp"
 #include "../../include/services/profile_service.hpp"
 #include "../../include/translator/translator.hpp"
 #include "../../include/utils/events.hpp"
 #include "../../include/utils/profile_utils.hpp"
+
 #include "RccCommons.hpp"
 
 ProfileService::ProfileService()

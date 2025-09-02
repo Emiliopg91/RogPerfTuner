@@ -3,8 +3,8 @@
 #include "RccCommons.hpp"
 
 #include "../asus_base_client.hpp"
-#include "../../../../models/battery_charge_threshold.hpp"
-#include "../../../../models/platform_profile.hpp"
+#include "../../../../models/hardware/battery_charge_threshold.hpp"
+#include "../../../../models/performance/platform_profile.hpp"
 
 class PlatformClient : public AsusBaseClient
 {

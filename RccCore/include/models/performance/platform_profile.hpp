@@ -1,9 +1,7 @@
 #pragma once
 
-#include "base/int_enum.hpp"
-// --------------------
-// Meta independiente
-// --------------------
+#include "../base/int_enum.hpp"
+
 struct PlatformProfileMeta
 {
     enum class Enum : int

@@ -5,9 +5,9 @@
 #include "RccCommons.hpp"
 
 #include "../../include/configuration/configuration.hpp"
-#include "../../include/models/gpu_brand.hpp"
-#include "../../include/models/semantic_version.hpp"
-#include "../../include/models/steam_game_details.hpp"
+#include "../../include/models/hardware/gpu_brand.hpp"
+#include "../../include/models/others/semantic_version.hpp"
+#include "../../include/models/steam/steam_game_details.hpp"
 #include "../../include/services/hardware_service.hpp"
 #include "../../include/services/open_rgb_service.hpp"
 #include "../../include/services/profile_service.hpp"

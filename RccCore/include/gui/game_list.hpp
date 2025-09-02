@@ -19,9 +19,9 @@
 #include "../services/steam_service.hpp" // tu clase equivalente
 #include "../services/hardware_service.hpp"
 #include "../translator/translator.hpp"
-#include "../models/gpu_brand.hpp"
-#include "../models/mangohud_level.hpp"
-#include "../models/wine_sync_option.hpp"
+#include "../models/hardware/gpu_brand.hpp"
+#include "../models/steam/mangohud_level.hpp"
+#include "../models/steam/wine_sync_option.hpp"
 #include "../utils/gui_utils.hpp"
 
 class GameList : public QDialog

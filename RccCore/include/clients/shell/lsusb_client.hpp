@@ -8,7 +8,7 @@
 #include <stdexcept>
 
 #include "RccCommons.hpp"
-#include "../../models/usb_identifier.hpp"
+#include "../../models/hardware/usb_identifier.hpp"
 #include "../../utils/events.hpp"
 
 class LsUsbClient

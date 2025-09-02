@@ -1,7 +1,6 @@
 #pragma once
 
-#include "base/int_enum.hpp"
-#include "cpu_governor.hpp"
+#include "../base/int_enum.hpp"
 
 struct PerformanceProfileMeta
 {

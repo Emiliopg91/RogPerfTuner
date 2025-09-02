@@ -1,6 +1,6 @@
 #pragma once
 
-#include "../models/settings.hpp"
+#include "../models/settings/root_config.hpp"
 #include "RccCommons.hpp"
 
 class Configuration

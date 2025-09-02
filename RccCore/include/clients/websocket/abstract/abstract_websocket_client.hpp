@@ -12,7 +12,7 @@
 #include <nlohmann/json.hpp> // Manejo de JSON
 
 #include "RccCommons.hpp"
-#include "../../../models/websocket_message.hpp"
+#include "../../../models/others/websocket_message.hpp"
 #include "../../../utils/event_bus.hpp"
 
 using json = nlohmann::json;

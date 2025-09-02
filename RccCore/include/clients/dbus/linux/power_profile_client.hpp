@@ -2,7 +2,7 @@
 
 #include "RccCommons.hpp"
 #include "../abstract/abstract_dbus_client.hpp"
-#include "../../../models/power_profile.hpp"
+#include "../../../models/performance/power_profile.hpp"
 
 class PowerProfileClient : public AbstractDbusClient
 {

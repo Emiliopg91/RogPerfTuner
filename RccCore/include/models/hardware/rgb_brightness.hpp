@@ -1,6 +1,6 @@
 #pragma once
 
-#include "base/int_enum.hpp"
+#include "../base/int_enum.hpp"
 
 struct RgbBrightnessMeta
 {

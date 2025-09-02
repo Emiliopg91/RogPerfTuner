@@ -17,9 +17,9 @@
 
 #include "RccCommons.hpp"
 
-#include "../models/battery_charge_threshold.hpp"
-#include "../models/performance_profile.hpp"
-#include "../models/rgb_brightness.hpp"
+#include "../models/hardware/battery_charge_threshold.hpp"
+#include "../models/performance/performance_profile.hpp"
+#include "../models/hardware/rgb_brightness.hpp"
 
 class MainWindow : public QMainWindow
 {

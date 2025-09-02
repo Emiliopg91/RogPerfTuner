@@ -2,7 +2,7 @@
 #include <mutex>
 
 #include "../../../../../../include/clients/tcp/open_rgb/effects/abstract/abstract_effect.hpp"
-#include "../../../../../../include/models/rgb_brightness.hpp"
+#include "../../../../../../include/models/hardware/rgb_brightness.hpp"
 
 double AbstractEffect::brightnessMap(RgbBrightness b)
 {
@@ -30,7 +30,7 @@ void AbstractEffect::start(DeviceList &devices, RgbBrightness brightness)
         }
         return;
     }
-    
+
     _logger.info("Starting effect '" + getName() + "' with " + StringUtils::toLowerCase(brightness.toName()) + " brightness");
     _brightness = brightnessMap(brightness);
     _is_running = true;

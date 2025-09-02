@@ -1,6 +1,6 @@
 #pragma once
 
-#include "base/str_enum.hpp"
+#include "../base/str_enum.hpp"
 
 struct WineSyncOptionMeta
 {

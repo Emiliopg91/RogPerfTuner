@@ -1,10 +1,10 @@
 #pragma once
 
 #include "RccCommons.hpp"
-#include "../models/gpu_brand.hpp"
-#include "../models/mangohud_level.hpp"
-#include "../models/settings.hpp"
-#include "../models/wine_sync_option.hpp"
+#include "../models/hardware/gpu_brand.hpp"
+#include "../models/steam/mangohud_level.hpp"
+#include "../models/settings/root_config.hpp"
+#include "../models/steam/wine_sync_option.hpp"
 #include "../clients/websocket/steam_client.hpp"
 
 class SteamService

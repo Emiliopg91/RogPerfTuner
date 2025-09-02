@@ -6,7 +6,7 @@
 #include <iostream>
 #include <algorithm>
 #include "abstract/abstract_cmd_client.hpp"
-#include "../../models/gpu_info.hpp"
+#include "../../models/hardware/gpu_info.hpp"
 
 #include "RccCommons.hpp"
 

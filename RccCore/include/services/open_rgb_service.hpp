@@ -3,8 +3,8 @@
 #include <mutex>
 
 #include "RccCommons.hpp"
-#include "../models/rgb_brightness.hpp"
-#include "../models/usb_identifier.hpp"
+#include "../models/hardware/rgb_brightness.hpp"
+#include "../models/hardware/usb_identifier.hpp"
 
 class OpenRgbService
 {

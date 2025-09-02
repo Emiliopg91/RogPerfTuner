@@ -3,7 +3,7 @@
 #include "../../include/configuration/configuration.hpp"
 #include "../../include/clients/dbus/linux/upower_client.hpp"
 #include "../../include/clients/tcp/open_rgb/open_rgb_client.hpp"
-#include "../../include/models/usb_identifier.hpp"
+#include "../../include/models/hardware/usb_identifier.hpp"
 #include "../../include/services/open_rgb_service.hpp"
 #include "../../include/translator/translator.hpp"
 #include "../../include/utils/events.hpp"

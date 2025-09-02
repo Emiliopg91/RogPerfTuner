@@ -17,9 +17,9 @@
 #include "../../include/services/steam_service.hpp" // tu clase equivalente
 #include "../../include/services/hardware_service.hpp"
 #include "../../include/translator/translator.hpp"
-#include "../../include/models/gpu_brand.hpp"
-#include "../../include/models/mangohud_level.hpp"
-#include "../../include/models/wine_sync_option.hpp"
+#include "../../include/models/hardware/gpu_brand.hpp"
+#include "../../include/models/steam/mangohud_level.hpp"
+#include "../../include/models/steam/wine_sync_option.hpp"
 #include "../../include/utils/gui_utils.hpp"
 
 #include "../../include/gui/game_list.hpp"

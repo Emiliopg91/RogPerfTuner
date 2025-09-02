@@ -3,10 +3,10 @@
 #include <mutex>
 #include "RccCommons.hpp"
 
-#include "../models/battery_charge_threshold.hpp"
-#include "../models/cpu_brand.hpp"
-#include "../models/ssd_scheduler.hpp"
-#include "../models/usb_identifier.hpp"
+#include "../models/hardware/battery_charge_threshold.hpp"
+#include "../models/hardware/cpu_brand.hpp"
+#include "../models/hardware/usb_identifier.hpp"
+#include "../models/performance/ssd_scheduler.hpp"
 
 class HardwareService
 {

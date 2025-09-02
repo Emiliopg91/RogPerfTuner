@@ -3,7 +3,7 @@
 #include <mutex>
 
 #include "RccCommons.hpp"
-#include "../../include/models/performance_profile.hpp"
+#include "../../include/models/performance/performance_profile.hpp"
 
 class ProfileService
 {

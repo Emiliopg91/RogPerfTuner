@@ -2,6 +2,7 @@
 
 #include <string>
 #include "./abstract/abstract_cmd_client.hpp"
+#include "../../models/performance/cpu_governor.hpp"
 #include "RccCommons.hpp"
 
 class CpuPowerClient : public AbstractCmdClient
