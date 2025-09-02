@@ -114,6 +114,33 @@ jobs:
           sudo apt-get update
           sudo apt-get install -y libfuse2
 
+      - name: Create folders
+          mkdir -p build/RccCore
+
+      - name: Download binary artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: binary
+          path: build/RccCore
+
+      - name: Download assets artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: assets
+          path: assets
+
+      - name: Download OpenRGB artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: OpenRGB
+          path: assets/OpenRGB
+
+      - name: Download RccDeckyCompanion artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: RccDeckyCompanion
+          path: assets/RccDeckyCompanion
+
       - name: Package
         run: |
           make package
