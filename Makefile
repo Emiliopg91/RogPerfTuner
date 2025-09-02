@@ -1,7 +1,7 @@
 .PHONY: config build build_release build_debug run clean release
 
 NUM_CORES := $(shell nproc)
-BUILD_TYPE ?= Debug
+BUILD_TYPE ?= Release
 MAKEFILE_DIR := $(dir $(realpath $(lastword $(MAKEFILE_LIST))))
 PATCH_DIR := patches
 SUBMODULE_DIR := submodules
@@ -23,10 +23,15 @@ config:
 
 	@touch .$(BUILD_TYPE)
 
-build: config apply_patches
+build_rogcontrolcenter: config
 	@echo "#######################################################################"
 	@echo "##################### Compiling RogControlCenter ######################"
 	@echo "#######################################################################"
+
+	@if [ ! -f "patches/OpenRGB-cppSDK.diff.applied" ]; then \
+		cd submodules/OpenRGB-cppSDK && git apply ../../patches/OpenRGB-cppSDK.diff && touch ../../patches/OpenRGB-cppSDK.diff.applied; \
+	fi
+
 	@cmake --build build -- -j$(NUM_CORES)
 
 	@rm -rf assets/bin
@@ -38,6 +43,12 @@ build: config apply_patches
 	@cp build/RccScripts/SteamRunner assets/bin/steam/run
 	@cp build/RccScripts/FlatpakWrapper assets/bin/steam/flatpak
 
+	@grep -E 'project\(.*VERSION' CMakeLists.txt | sed -E 's/.*VERSION[[:space:]]+([0-9]+\.[0-9]+\.[0-9]+).*/\1/' | xargs echo -n > assets/version
+
+build_openrgb: 
+	@if [ ! -f "patches/OpenRGB.diff.applied" ]; then \
+		cd submodules/OpenRGB && git apply ../../patches/OpenRGB.diff && touch ../../patches/OpenRGB.diff.applied; \
+	fi
 	@if [ ! -d "assets/OpenRGB" ]; then \
 		echo "#######################################################################" && \
 		echo "######################### Compiling OpenRGB ###########################" && \
@@ -46,6 +57,7 @@ build: config apply_patches
 		./OpenRGB.AppImage --appimage-extract > /dev/null && cp -r squashfs-root ../../assets/OpenRGB; \
 	fi
 
+build_rccdc:
 	@if [ ! -d "assets/RccDeckyCompanion" ]; then \
 		echo "#######################################################################" && \
 		echo "#################### Compiling RccDeckyCompanion ######################" && \
@@ -53,12 +65,9 @@ build: config apply_patches
 	    cd submodules/RccDeckyCompanion && ./cli/decky.py build && cp -r out/RccDeckyCompanion ../../assets/RccDeckyCompanion; \
 	fi
 
-	@grep -E 'project\(.*VERSION' CMakeLists.txt | sed -E 's/.*VERSION[[:space:]]+([0-9]+\.[0-9]+\.[0-9]+).*/\1/' | xargs echo -n > assets/version
+build: build_rogcontrolcenter build_openrgb build_rccdc
 
-release:
-	@rm -rf dist
-	@make build BUILD_TYPE=Release
-
+package:
 	@echo "#######################################################################"
 	@echo "####################### Generating Dist folder ########################"
 	@echo "#######################################################################"
@@ -82,21 +91,15 @@ release:
 	@chmod 777 -R resources/appimagetool dist/appimage-fs
 	@VERSION=$$(cat assets/version); ./resources/appimagetool -n dist/appimage-fs dist/RogControlCenter.AppImage
 
-apply_patches:
-	@echo "#######################################################################"
-	@echo "########################## Applying patches ###########################"
-	@echo "#######################################################################"
-	@if [ ! -f "patches/OpenRGB-cppSDK.diff.applied" ]; then \
-		cd submodules/OpenRGB-cppSDK && git apply ../../patches/OpenRGB-cppSDK.diff && touch ../../patches/OpenRGB-cppSDK.diff.applied; \
-	fi
-	@if [ ! -f "patches/OpenRGB.diff.applied" ]; then \
-		cd submodules/OpenRGB && git apply ../../patches/OpenRGB.diff && touch ../../patches/OpenRGB.diff.applied; \
-	fi
+release:
+	@rm -rf dist
+	@make build BUILD_TYPE=Release
+	@make package
 
 build_debug:
 	@make build BUILD_TYPE=Debug
 
-run: build
+run: build_debug
 	@touch /tmp/fake.AppImage
 	@echo "Running 'APPIMAGE=/tmp/fake.AppImage RCC_ASSETS_DIR=$(MAKEFILE_DIR)assets ./build/RccCore/RogControlCenter'"
 	@echo ""
