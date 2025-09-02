@@ -194,8 +194,10 @@ void SteamService::onFirstGameRun(unsigned int gid, std::string name, std::map<s
     logger.info("Configuration finished");
 
     logger.info("Relaunching game with SteamOverlayId " + overlayId + "...");
+    std::this_thread::sleep_for(std::chrono::milliseconds(250));
 
-    Shell::getInstance().run_command("steam steam://rungameid/" + overlayId);
+    Shell::getInstance()
+        .run_command("steam steam://rungameid/" + overlayId);
 
     logger.rem_tab();
     logger.rem_tab();
@@ -297,6 +299,7 @@ void SteamService::onGameLaunch(unsigned int gid, std::string name, int pid)
         {
             oss << " " << pid;
         }
+        std::this_thread::sleep_for(std::chrono::milliseconds(250));
         Shell::getInstance().run_elevated_command(oss.str(), false);
         logger.rem_tab();
 

@@ -196,17 +196,23 @@ BatteryThreshold HardwareService::getChargeThreshold()
 
 void HardwareService::setChargeThreshold(BatteryThreshold threshold)
 {
-    logger.info("Setting charge limit to " + std::to_string(threshold.toInt()) + "%");
-    auto t0 = std::chrono::high_resolution_clock::now();
-    PlatformClient::getInstance()
-        .setBatteryLimit(threshold);
-    auto t1 = std::chrono::high_resolution_clock::now();
-    logger.info("Charge limit setted after " + std::to_string(std::chrono::duration_cast<std::chrono::milliseconds>(t1 - t0).count()) + " ms");
+    std::lock_guard<std::mutex> lock(actionMutex);
+    if (charge_limit != threshold)
+    {
+        logger.info("Setting charge limit to " + std::to_string(threshold.toInt()) + "%");
+        auto t0 = std::chrono::high_resolution_clock::now();
+        PlatformClient::getInstance()
+            .setBatteryLimit(threshold);
+        auto t1 = std::chrono::high_resolution_clock::now();
 
-    std::unordered_map<std::string, std::any> replacements = {
-        {"value", threshold.toInt()}};
+        charge_limit = threshold;
+        logger.info("Charge limit setted after " + std::to_string(std::chrono::duration_cast<std::chrono::milliseconds>(t1 - t0).count()) + " ms");
 
-    Toaster::getInstance().showToast(Translator::getInstance().translate("applied.battery.threshold", replacements));
+        std::unordered_map<std::string, std::any> replacements = {
+            {"value", threshold.toInt()}};
+        Toaster::getInstance().showToast(Translator::getInstance().translate("applied.battery.threshold", replacements));
+        EventBus::getInstance().emit_event(Events::HARDWARE_SERVICE_THRESHOLD_CHANGED, {threshold});
+    }
 }
 
 void HardwareService::onBatteryEvent(bool onBat, bool muted)

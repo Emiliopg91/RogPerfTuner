@@ -22,6 +22,7 @@ private:
 
     QSystemTrayIcon tray_icon_;
 
+    std::map<std::string, QAction *> thresholdActions;
     std::map<std::string, QAction *> brightnessActions;
     std::map<std::string, QAction *> effectActions;
     std::map<std::string, QAction *> perfProfileActions;
@@ -29,4 +30,5 @@ private:
     void setAuraBrightness(RgbBrightness);
     void setAuraEffect(std::string);
     void setPerformanceProfile(PerformanceProfile);
+    void setBatteryThreshold(BatteryThreshold threshold);
 };

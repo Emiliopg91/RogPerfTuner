@@ -47,6 +47,7 @@ void Configuration::loadConfig()
 
         saveConfig();
     }
+    logger.info("Configuration loaded");
 }
 
 void Configuration::saveConfig()

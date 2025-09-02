@@ -71,6 +71,7 @@ RgbBrightness OpenRgbService::getCurrentBrightness()
 
 void OpenRgbService::setBrightness(RgbBrightness newBrightness)
 {
+    std::lock_guard<std::mutex> lock(actionMutex);
     if (brightness != newBrightness)
     {
         brightness = newBrightness;
@@ -81,6 +82,7 @@ void OpenRgbService::setBrightness(RgbBrightness newBrightness)
 
 void OpenRgbService::setEffect(std::string newEffect, bool temporal)
 {
+    std::lock_guard<std::mutex> lock(actionMutex);
     if (effect != newEffect)
     {
         effect = newEffect;

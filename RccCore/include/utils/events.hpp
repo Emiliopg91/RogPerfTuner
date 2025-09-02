@@ -9,6 +9,7 @@ public:
 
     inline const static std::string HARDWARE_SERVICE_USB_ADDED_REMOVED = "HARDWARE_SERVICE_USB_ADDED_REMOVED";
     inline const static std::string HARDWARE_SERVICE_ON_BATTERY = "HARDWARE_SERVICE_ON_BATTERY";
+    inline const static std::string HARDWARE_SERVICE_THRESHOLD_CHANGED = "HARDWARE_SERVICE_THRESHOLD_CHANGED";
 
     inline const static std::string ORGB_SERVICE_ON_BRIGHTNESS = "ORGB_SERVICE_ON_BRIGHTNESS";
     inline const static std::string ORGB_SERVICE_ON_EFFECT = "ORGB_SERVICE_ON_EFFECT";

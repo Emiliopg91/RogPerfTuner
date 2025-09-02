@@ -40,7 +40,7 @@ private:
     void onBatteryEvent(bool onBattery, bool muted = false);
 
     Logger logger{"HardwareService"};
-    std::mutex mutex;
+    std::mutex actionMutex;
 
     BatteryThreshold charge_limit = BatteryThreshold::Enum::CT_100;
     CpuBrand cpu = CpuBrand::Enum::INTEL;

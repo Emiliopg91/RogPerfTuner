@@ -35,6 +35,9 @@ private:
 
     std::map<std::string, std::string> compatibleDeviceNames;
     Logger logger{"OpenRgbService"};
+
+    std::mutex actionMutex;
+
     RgbBrightness brightness = RgbBrightness::Enum::MAX;
     std::string effect;
 

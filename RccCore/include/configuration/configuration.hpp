@@ -13,6 +13,7 @@ public:
     }
 
     void saveConfig();
+    void loadConfig();
 
     RootConfig &getConfiguration()
     {
@@ -30,6 +31,5 @@ private:
         loadConfig();
     }
     std::optional<RootConfig> config = std::nullopt;
-    void loadConfig();
     Logger logger{"Configuration"};
 };

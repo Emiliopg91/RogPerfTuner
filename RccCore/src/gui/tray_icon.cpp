@@ -1,4 +1,6 @@
+#include "../../include/configuration/configuration.hpp"
 #include "../../include/gui/game_list.hpp"
+#include "../../include/gui/main_window.hpp"
 #include "../../include/gui/tray_icon.hpp"
 #include "../../include/models/battery_charge_threshold.hpp"
 #include "../../include/models/performance_profile.hpp"
@@ -17,11 +19,37 @@
 #include <QApplication>
 #include <QActionGroup>
 
+void openSettings()
+{
+    Shell::getInstance().run_command("xdg-open " + Constants::CONFIG_FILE);
+}
+
+void reloadSettings()
+{
+    Configuration::getInstance().loadConfig();
+}
+
+void openLogs()
+{
+    Shell::getInstance().run_command("xdg-open " + Constants::LOG_DIR + "/" + Constants::LOG_FILE_NAME + ".log");
+}
+
 void openGameList()
 {
     if (!GameList::INSTANCE)
-        GameList::INSTANCE = new GameList();
+        if (MainWindow::INSTANCE)
+            GameList::INSTANCE = new GameList(MainWindow::INSTANCE);
+        else
+            GameList::INSTANCE = new GameList();
     GameList::INSTANCE->show();
+}
+
+void openMainWindow()
+{
+    if (!MainWindow::INSTANCE)
+        MainWindow::INSTANCE = new MainWindow();
+
+    MainWindow::INSTANCE->show();
 }
 
 void TrayIcon::setAuraBrightness(RgbBrightness brightness)
@@ -37,6 +65,11 @@ void TrayIcon::setAuraEffect(std::string effect)
 void TrayIcon::setPerformanceProfile(PerformanceProfile profile)
 {
     perfProfileActions[profile.toName()]->setChecked(true);
+}
+
+void TrayIcon::setBatteryThreshold(BatteryThreshold threshold)
+{
+    thresholdActions[threshold.toName()]->setChecked(true);
 }
 
 void onBatteryLimitChanged(BatteryThreshold value)
@@ -87,6 +120,7 @@ TrayIcon::TrayIcon()
         QObject::connect(act, &QAction::triggered, [bct]()
                          { onBatteryLimitChanged(bct); });
         chargeLimitMenu->addAction(act);
+        thresholdActions[bct.toName()] = act;
     }
     menu->insertMenu(nullptr, chargeLimitMenu);
     // -------------------------
@@ -197,6 +231,67 @@ TrayIcon::TrayIcon()
 
     menu->addSeparator();
 
+    if (Constants::DEV_MODE)
+    {
+        // -------------------------
+        // Develop submenu
+        // -------------------------
+        QAction *developTitle = new QAction("Development", menu);
+        developTitle->setEnabled(false);
+        menu->addAction(developTitle);
+        // -------------------------
+        // Settings submenu
+        // -------------------------
+        QMenu *settingsMenu = new QMenu("    Settings", menu);
+        menu->insertMenu(nullptr, settingsMenu);
+
+        QAction *openSettingsAct = new QAction("Open settings");
+        QObject::connect(openSettingsAct, &QAction::triggered, []()
+                         { openSettings(); });
+        settingsMenu->addAction(openSettingsAct);
+
+        QAction *reloadSettingsAct = new QAction("Reload settings");
+        QObject::connect(reloadSettingsAct, &QAction::triggered, []()
+                         { reloadSettings(); });
+        settingsMenu->addAction(reloadSettingsAct);
+        // -------------------------
+        // Settings submenu
+        // -------------------------
+        // -------------------------
+        // Logs submenu
+        // -------------------------
+        QMenu *logsMenu = new QMenu("    Logs", menu);
+        menu->insertMenu(nullptr, logsMenu);
+
+        QAction *openLogsAct = new QAction("Open logs");
+        QObject::connect(openLogsAct, &QAction::triggered, []()
+                         { openLogs(); });
+        logsMenu->addAction(openLogsAct);
+        // -------------------------
+        // Logs submenu
+        // -------------------------
+        // -------------------------
+        // Develop menu
+        // -------------------------
+    }
+
+    menu->addSeparator();
+
+    // -------------------------
+    // Main window
+    // -------------------------
+
+    QAction *openAction = new QAction(translator.translate("open.ui").c_str(), menu);
+    QObject::connect(openAction, &QAction::triggered, []()
+                     { openMainWindow(); });
+    menu->addAction(openAction);
+
+    // -------------------------
+    // Main window
+    // -------------------------
+
+    menu->addSeparator();
+
     // -------------------------
     // Exit
     // -------------------------
@@ -220,6 +315,9 @@ TrayIcon::TrayIcon()
 
     EventBus::getInstance().on_with_data(Events::PROFILE_SERVICE_ON_PROFILE, [this](CallbackParam data)
                                          { setPerformanceProfile(std::any_cast<PerformanceProfile>(data[0])); });
+
+    EventBus::getInstance().on_with_data(Events::HARDWARE_SERVICE_THRESHOLD_CHANGED, [this](CallbackParam data)
+                                         { setBatteryThreshold(std::any_cast<BatteryThreshold>(data[0])); });
 
     EventBus::getInstance().on_with_data(Events::STEAM_SERVICE_GAME_EVENT, [this, profileMenu](CallbackParam data)
                                          { profileMenu->setEnabled(std::any_cast<size_t>(data[0]) == 0); });

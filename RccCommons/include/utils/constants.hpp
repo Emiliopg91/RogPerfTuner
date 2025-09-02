@@ -75,7 +75,7 @@ public:
     inline static const std::string AUTOSTART_FILE = HOME_DIR + "/.config/autostart/" + APP_NAME + ".desktop";
     inline static const std::string APP_DRAW_FILE = HOME_DIR + "/.local/share/applications/" + APP_NAME + ".desktop";
 
-    inline static const std::string APP_DIR = Constants::HOME_DIR + "/.config/" + APP_NAME;
+    inline static const std::string APP_DIR = Constants::HOME_DIR + "/." + APP_NAME;
 
     inline static const std::string UPDATE_DIR = Constants::APP_DIR + "/update";
     inline static const std::string UPDATE_FILE = Constants::UPDATE_DIR + "/" + APP_NAME + ".AppImage";

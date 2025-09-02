@@ -64,7 +64,7 @@ PerformanceProfile ProfileService::getPerformanceProfile()
 }
 void ProfileService::setPerformanceProfile(PerformanceProfile profile, bool temporal, bool force)
 {
-    std::lock_guard<std::mutex> lock(mutex);
+    std::lock_guard<std::mutex> lock(actionMutex);
     std::string profileName = profile.toName();
 
     if (profile != currentProfile || force)
