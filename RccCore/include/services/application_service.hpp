@@ -42,7 +42,7 @@ private:
            << "APPIMAGE_PATH=\"" << Constants::APPIMAGE_FILE << "\"\n"
            << "\n"
            << "if [[ -f \"$UPDATE_PATH\" ]]; then\n"
-           << "  cp \"$UPDATE_PATH\" \"$APPIMAGE_PATH\"\n"
+           << "  mv \"$UPDATE_PATH\" \"$APPIMAGE_PATH\"\n"
            << "  chmod 755 \"$APPIMAGE_PATH\"\n"
            << "  rm \"$UPDATE_PATH\"\n"
            << "fi\n"

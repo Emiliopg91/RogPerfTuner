@@ -79,6 +79,7 @@ public:
 
     inline static const std::string UPDATE_DIR = Constants::APP_DIR + "/update";
     inline static const std::string UPDATE_FILE = Constants::UPDATE_DIR + "/" + APP_NAME + ".AppImage";
+    inline static const std::string UPDATE_TMP_FILE = Constants::UPDATE_FILE + ".tmp";
 
     inline static const std::string ASSETS_BIN_DIR = Constants::ASSETS_DIR + "/bin";
     inline static const std::string BIN_DIR = Constants::APP_DIR + "/bin";

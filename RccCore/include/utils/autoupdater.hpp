@@ -36,7 +36,6 @@ private:
 
     std::string owner = "Emiliopg91";
     std::string repository = Constants::APP_NAME;
-    std::string update_path;
 
     Callback restart_method;
     std::function<bool()> perform_update_check;
@@ -115,7 +114,6 @@ private:
     void download_update(const Asset &asset)
     {
         namespace fs = std::filesystem;
-        std::string tmp_file = fs::temp_directory_path() / "update.tmp";
 
         logger.info("Downloading update...");
 
@@ -144,10 +142,9 @@ private:
 
         if (res && res->status == 200)
         {
-            std::ofstream ofs(tmp_file, std::ios::binary);
+            std::ofstream ofs(Constants::UPDATE_TMP_FILE, std::ios::binary);
             ofs << res->body;
             ofs.close();
-            update_path = tmp_file;
             logger.info("Download completed");
         }
         else
@@ -160,7 +157,7 @@ private:
     {
         try
         {
-            FileUtils::move(update_path, Constants::UPDATE_FILE);
+            FileUtils::move(Constants::UPDATE_TMP_FILE, Constants::UPDATE_FILE);
             logger.info("File copied to update folder");
         }
         catch (const std::exception &e)
@@ -173,7 +170,7 @@ private:
     {
         std::this_thread::sleep_for(std::chrono::seconds(1));
 
-        while (update_path.empty())
+        while (!FileUtils::exists(Constants::UPDATE_TMP_FILE))
         {
             logger.info("Checking for updates...");
             Asset asset = get_update_url();

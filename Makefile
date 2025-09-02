@@ -109,7 +109,7 @@ run: build_debug
 	@touch /tmp/fake.AppImage
 	@echo "Running 'APPIMAGE=/tmp/fake.AppImage RCC_ASSETS_DIR=$(MAKEFILE_DIR)assets ./build/RccCore/RogControlCenter'"
 	@echo ""
-	@APPIMAGE=/tmp/fake.AppImage RCC_ASSETS_DIR=$(MAKEFILE_DIR)assets ./build/RccCore/RogControlCenter
+	@APPIMAGE=/tmp/fake.AppImage RCC_MODE=DEV RCC_ASSETS_DIR=$(MAKEFILE_DIR)assets ./build/RccCore/RogControlCenter
 
 increase_version:
 	@awk '{if ($$0 ~ /project\(.*VERSION/) {match($$0, /([0-9]+)\.([0-9]+)\.([0-9]+)/, v); patch = v[3] + 1; sub(/[0-9]+\.[0-9]+\.[0-9]+/, v[1] "." v[2] "." patch);} print}' CMakeLists.txt > CMakeLists.txt.tmp && mv CMakeLists.txt.tmp CMakeLists.txt
