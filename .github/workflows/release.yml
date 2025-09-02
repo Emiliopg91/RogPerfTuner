@@ -90,8 +90,8 @@ jobs:
         run: |
           make build_rccdc
 
-      - name: Upload OpenRGB
+      - name: Upload RccDeckyCompanion
         uses: actions/upload-artifact@v4
         with:
           name: OpenRGB
-          path: assets/RCCDeckyCompanion
+          path: assets/RccDeckyCompanion
