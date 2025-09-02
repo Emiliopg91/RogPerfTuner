@@ -115,7 +115,7 @@ jobs:
           sudo apt-get install -y libfuse2
 
       - name: Create folders
-          mkdir -p build/RccCore
+        run: mkdir -p build/RccCore
 
       - name: Download binary artifact
         uses: actions/download-artifact@v4
