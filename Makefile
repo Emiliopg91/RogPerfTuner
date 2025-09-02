@@ -10,7 +10,8 @@ clean:
 	@echo "#######################################################################"
 	@echo "######################### Cleaning workspace ##########################"
 	@echo "#######################################################################"
-	@rm -rf build dist .Debug .Release .qt CMakeCache.txt **/cmake_install.cmake CMakeFiles patches/OpenRGB-cppSDK.diff.applied assets/scripts assets/bin assets/OpenRGB assets/RccDeckyCompanion **/CMakeFiles
+	@rm -rf build dist .Debug .Release .qt CMakeCache.txt **/cmake_install.cmake CMakeFiles patches/*.diff.applied assets/scripts assets/bin assets/OpenRGB assets/RccDeckyCompanion **/CMakeFiles
+	@cd submodules/httplib && git reset --hard > /dev/null
 	@cd submodules/OpenRGB-cppSDK && git reset --hard > /dev/null
 	@cd submodules/OpenRGB && git reset --hard > /dev/null && rm -Rf build
 	@cd submodules/RccDeckyCompanion && git reset --hard > /dev/null && rm -Rf dist logs out 
@@ -19,6 +20,15 @@ config:
 	@echo "#######################################################################"
 	@echo "######################## Configuring compiler ########################"
 	@echo "#######################################################################"
+
+	@if [ ! -f "patches/OpenRGB-cppSDK.diff.applied" ]; then \
+		cd submodules/OpenRGB-cppSDK && git apply ../../patches/OpenRGB-cppSDK.diff && touch ../../patches/OpenRGB-cppSDK.diff.applied; \
+	fi
+
+	@if [ ! -f "patches/httplib.applied" ]; then \
+		cd submodules/httplib && git apply ../../patches/httplib.diff && touch ../../patches/httplib.diff.applied; \
+	fi
+	
 	@cmake -B build -S . -DCMAKE_BUILD_TYPE=$(BUILD_TYPE)
 
 	@touch .$(BUILD_TYPE)
@@ -27,10 +37,6 @@ build_rogcontrolcenter: config
 	@echo "#######################################################################"
 	@echo "##################### Compiling RogControlCenter ######################"
 	@echo "#######################################################################"
-
-	@if [ ! -f "patches/OpenRGB-cppSDK.diff.applied" ]; then \
-		cd submodules/OpenRGB-cppSDK && git apply ../../patches/OpenRGB-cppSDK.diff && touch ../../patches/OpenRGB-cppSDK.diff.applied; \
-	fi
 
 	@cmake --build build -- -j$(NUM_CORES)
 
