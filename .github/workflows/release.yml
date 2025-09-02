@@ -35,4 +35,92 @@ jobs:
       - name: Get version
         id: get_version
         run: |
-          echo "version=$(uv run scripts/version.py)" >> $GITHUB_OUTPUT
+          echo "version=$(cat assets/version)" >> $GITHUB_OUTPUT
+
+      - name: Upload binary
+        uses: actions/upload-artifact@v4
+        with:
+          name: binary
+          path: build/RccCore/RogControlCenter
+
+      - name: Upload assets
+        uses: actions/upload-artifact@v4
+        with:
+          name: assets
+          path: assets
+
+  build_openrgb:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          submodules: recursive
+          fetch-depth: 0
+
+      - name: Install Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+
+      - name: Install dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y libfuse2
+
+      - name: Compile
+        run: |
+          make build_rogcontrolcenter
+
+      - name: Upload OpenRGB
+        uses: actions/upload-artifact@v4
+        with:
+          name: OpenRGB
+          path: assets/OpenRGB
+
+  build_openrgb:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          submodules: recursive
+          fetch-depth: 0
+
+      - name: Install dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y libfuse2
+
+      - name: Compile
+        run: |
+          make build_openrgb
+
+      - name: Upload OpenRGB
+        uses: actions/upload-artifact@v4
+        with:
+          name: OpenRGB
+          path: assets/OpenRGB
+          
+  build_rccdc:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          submodules: recursive
+          fetch-depth: 0
+
+      - name: Install dependencies
+        run: |
+          npm i -g pnpm@8.5.1 shx@0.3.4
+
+      - name: Compile
+        run: |
+          make build_rccdc
+
+      - name: Upload OpenRGB
+        uses: actions/upload-artifact@v4
+        with:
+          name: OpenRGB
+          path: assets/RCCDeckyCompanion
