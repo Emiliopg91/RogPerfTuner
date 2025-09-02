@@ -148,5 +148,53 @@ jobs:
       - name: Upload AppImage
         uses: actions/upload-artifact@v4
         with:
-          name: RccDeckyCompanion
+          name: AppImage
           path: dist/RogControlCenter.AppImage
+
+  release:
+    needs:
+      - prepare_and_install
+      - package
+    runs-on: ubuntu-latest
+    steps:
+      - name: Configure git client
+        run: |
+          git config user.name "GitHub Actions"
+          git config user.email "actions@github.com"
+
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          submodules: recursive
+          fetch-depth: 0
+
+      - name: Download AppImage artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: AppImage
+          path: dist
+
+      - name: Create GitHub release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ needs.prepare_and_install.outputs.version }}
+          name: ${{ needs.prepare_and_install.outputs.version }}
+          files: |
+            dist/RogControlCenter.AppImage
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Clean artifact
+        run: rm dist/RogControlCenter.AppImage
+
+      - name: Create tag
+        run: |
+          git tag "${{ needs.prepare_and_install.outputs.version }}"
+          make increase_version
+          git add CMakeLists.txt > /dev/null
+          git commit -m "[ci skip] Ready for next development iteration" > /dev/null
+
+      - name: Push changes to main and force push to develop
+        run: |
+          git push origin
+          git push origin main:develop --force
