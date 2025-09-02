@@ -269,7 +269,7 @@ void ProfileService::setTgp(PerformanceProfile profile)
             try
             {
                 auto nvb = onBattery ? ProfileUtils::batteryNvBoost(profile) : ProfileUtils::acNvBoost(profile);
-                logger.info("Dynamic Boost: " + std::to_string(nvb) + "ºC");
+                logger.info("Dynamic Boost: " + std::to_string(nvb) + "W");
                 NvBoostClient::getInstance().setCurrentValue(nvb);
             }
             catch (std::exception e)
