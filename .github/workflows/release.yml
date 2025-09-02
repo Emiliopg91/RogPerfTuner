@@ -58,35 +58,6 @@ jobs:
           submodules: recursive
           fetch-depth: 0
 
-      - name: Install Python
-        uses: actions/setup-python@v5
-        with:
-          python-version: "3.13"
-
-      - name: Install dependencies
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y libfuse2
-
-      - name: Compile
-        run: |
-          make build_rogcontrolcenter
-
-      - name: Upload OpenRGB
-        uses: actions/upload-artifact@v4
-        with:
-          name: OpenRGB
-          path: assets/OpenRGB
-
-  build_openrgb:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
-        with:
-          submodules: recursive
-          fetch-depth: 0
-
       - name: Install dependencies
         run: |
           sudo apt-get update
@@ -101,7 +72,7 @@ jobs:
         with:
           name: OpenRGB
           path: assets/OpenRGB
-          
+
   build_rccdc:
     runs-on: ubuntu-latest
     steps:
