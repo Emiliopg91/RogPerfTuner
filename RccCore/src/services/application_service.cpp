@@ -22,6 +22,8 @@ ApplicationService::ApplicationService()
 
     FileUtils::mkdirs(Constants::UPDATE_DIR);
 
+    Shell::getInstance().run_elevated_command("chmod 777 " + Constants::BIN_DIR);
+
     content = buildDesktopFile();
     if (!FileUtils::exists(Constants::AUTOSTART_FILE))
     {
