@@ -28,7 +28,9 @@ jobs:
           sudo apt-get install -y qt6-base-dev qt6-tools-dev qt6-tools-dev-tools build-essential cmake libsecret-1-dev libzstd-dev pkg-config
 
       - name: Compile
-        run: make build_rogcontrolcenter
+        run: |
+          cmake --version
+          make build_rogcontrolcenter
 
       - name: Get version
         id: get_version
