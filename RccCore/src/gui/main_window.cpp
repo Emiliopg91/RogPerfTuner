@@ -37,6 +37,7 @@ MainWindow::MainWindow(QWidget *parent)
     performanceLayout->setContentsMargins(20, 20, 20, 20);
 
     _profileDropdown = new QComboBox();
+    _profileDropdown->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Preferred);
     auto items = PerformanceProfile::getAll();
     std::reverse(items.begin(), items.end());
     for (PerformanceProfile item : items)
@@ -52,6 +53,7 @@ MainWindow::MainWindow(QWidget *parent)
                               _profileDropdown);
 
     _gameProfileButton = new QPushButton(QString::fromStdString(Translator::getInstance().translate("label.game.configure")));
+    _gameProfileButton->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Preferred);
     connect(_gameProfileButton, &QPushButton::clicked, this, &MainWindow::openGameList);
     performanceLayout->addRow(new QLabel(QString::fromStdString(Translator::getInstance().translate("games") + ":")),
                               _gameProfileButton);
@@ -65,6 +67,7 @@ MainWindow::MainWindow(QWidget *parent)
     auraLayout->setContentsMargins(20, 20, 20, 20);
 
     _effectDropdown = new QComboBox();
+    _effectDropdown->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Preferred);
     auto effects = OpenRgbService::getInstance().getAvailableEffects();
     for (const auto effect : effects)
         _effectDropdown->addItem(QString::fromStdString(effect), QString::fromStdString(effect));
@@ -77,6 +80,7 @@ MainWindow::MainWindow(QWidget *parent)
                        _effectDropdown);
 
     _brightnessDropdown = new QComboBox();
+    _brightnessDropdown->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Preferred);
     auto brightnesses = RgbBrightness::getAll();
     for (RgbBrightness b : brightnesses)
     {
@@ -99,6 +103,7 @@ MainWindow::MainWindow(QWidget *parent)
     settingsLayout->setContentsMargins(20, 20, 20, 20);
 
     _thresholdDropdown = new QComboBox();
+    _thresholdDropdown->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Preferred);
     auto thresholds = BatteryThreshold::getAll();
     for (BatteryThreshold t : thresholds)
         _thresholdDropdown->addItem(QString::number(t.toInt()) + "%", t.toInt());
