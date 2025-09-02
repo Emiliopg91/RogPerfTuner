@@ -9,7 +9,6 @@
 #include "../../include/services/profile_service.hpp"
 #include "../../include/services/steam_service.hpp"
 #include "../../include/translator/translator.hpp"
-#include "../../include/utils/events.hpp"
 
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent), _logger(new Logger())

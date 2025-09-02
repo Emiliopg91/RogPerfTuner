@@ -13,7 +13,7 @@
 
 #include "RccCommons.hpp"
 #include "../../../models/others/websocket_message.hpp"
-#include "../../../utils/event_bus.hpp"
+#include "../../../events/event_bus.hpp"
 
 using json = nlohmann::json;
 

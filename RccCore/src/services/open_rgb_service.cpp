@@ -6,7 +6,6 @@
 #include "../../include/models/hardware/usb_identifier.hpp"
 #include "../../include/services/open_rgb_service.hpp"
 #include "../../include/translator/translator.hpp"
-#include "../../include/utils/events.hpp"
 
 OpenRgbService::OpenRgbService()
 {

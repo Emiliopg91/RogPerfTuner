@@ -21,7 +21,6 @@
 #include "../../include/services/hardware_service.hpp"
 #include "../../include/services/open_rgb_service.hpp"
 #include "../../include/translator/translator.hpp"
-#include "../../include/utils/events.hpp"
 
 HardwareService::HardwareService()
 {

@@ -9,7 +9,6 @@
 
 #include "RccCommons.hpp"
 #include "../../models/hardware/usb_identifier.hpp"
-#include "../../utils/events.hpp"
 
 class LsUsbClient
 {

@@ -13,7 +13,6 @@
 #include "../../include/services/hardware_service.hpp"
 #include "../../include/services/profile_service.hpp"
 #include "../../include/translator/translator.hpp"
-#include "../../include/utils/events.hpp"
 #include "../../include/utils/profile_utils.hpp"
 
 #include "RccCommons.hpp"

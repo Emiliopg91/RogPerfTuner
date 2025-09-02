@@ -9,7 +9,7 @@
 
 #include "../../../../include/clients/websocket/abstract/abstract_websocket_client.hpp"
 #include "../../../../include/models/others/websocket_message.hpp"
-#include "../../../../include/utils/event_bus.hpp"
+#include "../../../../include/events/event_bus.hpp"
 
 using json = nlohmann::json;
 

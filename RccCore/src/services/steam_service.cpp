@@ -12,7 +12,6 @@
 #include "../../include/services/open_rgb_service.hpp"
 #include "../../include/services/profile_service.hpp"
 #include "../../include/services/steam_service.hpp"
-#include "../../include/utils/events.hpp"
 
 bool SteamService::metricsEnabled()
 {

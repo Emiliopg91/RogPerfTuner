@@ -9,8 +9,7 @@
 #include "../../include/services/open_rgb_service.hpp"
 #include "../../include/services/profile_service.hpp"
 #include "../../include/translator/translator.hpp"
-#include "../../include/utils/events.hpp"
-#include "../../include/utils/event_bus.hpp"
+#include "../../include/events/event_bus.hpp"
 
 #include "RccCommons.hpp"
 
