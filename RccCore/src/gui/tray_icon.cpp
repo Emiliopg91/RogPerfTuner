@@ -1,3 +1,4 @@
+#include "../../include/gui/game_list.hpp"
 #include "../../include/gui/tray_icon.hpp"
 #include "../../include/models/battery_charge_threshold.hpp"
 #include "../../include/models/performance_profile.hpp"
@@ -15,6 +16,13 @@
 #include <QMenu>
 #include <QApplication>
 #include <QActionGroup>
+
+void openGameList()
+{
+    if (!GameList::INSTANCE)
+        GameList::INSTANCE = new GameList();
+    GameList::INSTANCE->show();
+}
 
 void TrayIcon::setAuraBrightness(RgbBrightness brightness)
 {
@@ -169,6 +177,19 @@ TrayIcon::TrayIcon()
     menu->insertMenu(nullptr, profileMenu);
     // -------------------------
     // Profile submenu
+    // -------------------------
+    // -------------------------
+    // Game submenu
+    // -------------------------
+    QMenu *gamesMenu = new QMenu(("    " + translator.translate("games")).c_str(), menu);
+    menu->insertMenu(nullptr, gamesMenu);
+
+    QAction *act = new QAction((translator.translate("label.game.configure") + "...").c_str());
+    QObject::connect(act, &QAction::triggered, []()
+                     { openGameList(); });
+    gamesMenu->addAction(act);
+    // -------------------------
+    // Game submenu
     // -------------------------
     // -------------------------
     // Performance menu

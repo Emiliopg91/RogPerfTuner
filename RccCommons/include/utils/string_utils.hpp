@@ -114,4 +114,17 @@ public:
 
         return tokens;
     }
+
+    static inline std::string capitalize(const std::string &input)
+    {
+        if (input.empty())
+            return input;
+
+        std::string result = input;
+        result[0] = std::toupper(static_cast<unsigned char>(result[0]));
+        std::transform(result.begin() + 1, result.end(), result.begin() + 1,
+                       [](unsigned char c)
+                       { return std::tolower(c); });
+        return result;
+    }
 };

@@ -14,9 +14,28 @@
 #include "../../include/services/steam_service.hpp"
 #include "../../include/utils/events.hpp"
 
+bool SteamService::metricsEnabled()
+{
+    auto mangohud_which = Shell::getInstance().which("mangohud");
+    return mangohud_which.has_value();
+}
+
+bool SteamService::isRunning(unsigned int appid) const
+{
+    for (const auto &[key, val] : runningGames)
+        if (key == appid)
+            return true;
+    return false;
+}
+
 const std::map<unsigned int, std::string> &SteamService::getRunningGames() const
 {
     return runningGames;
+}
+
+const std::map<std::string, GameEntry> &SteamService::getGames() const
+{
+    return Configuration::getInstance().getConfiguration().games;
 }
 
 SteamService::SteamService()
@@ -440,4 +459,79 @@ SteamGameConfig SteamService::getConfiguration(std::string gid)
     }
 
     return cfg;
+}
+
+std::optional<GpuBrand> SteamService::getPreferedGpu(unsigned int gid)
+{
+    return Configuration::getInstance().getConfiguration().games[std::to_string(gid)].gpu;
+}
+
+void SteamService::setPreferedGpu(unsigned int gid, std::optional<GpuBrand> gpu)
+{
+    if (gpu.has_value())
+        Configuration::getInstance().getConfiguration().games[std::to_string(gid)].gpu = gpu.value().toString();
+    else
+        Configuration::getInstance().getConfiguration().games[std::to_string(gid)].gpu = std::nullopt;
+
+    Configuration::getInstance().saveConfig();
+}
+
+bool SteamService::isSteamDeck(unsigned int gid)
+{
+    return Configuration::getInstance().getConfiguration().games[std::to_string(gid)].steamdeck;
+}
+
+void SteamService::setSteamDeck(unsigned int gid, bool value)
+{
+    Configuration::getInstance().getConfiguration().games[std::to_string(gid)].steamdeck = value;
+    Configuration::getInstance().saveConfig();
+}
+
+MangoHudLevel SteamService::getMetricsLevel(unsigned int gid)
+{
+    return Configuration::getInstance().getConfiguration().games[std::to_string(gid)].metrics_level;
+}
+
+void SteamService::setMetricsLevel(unsigned int gid, MangoHudLevel level)
+{
+    Configuration::getInstance().getConfiguration().games[std::to_string(gid)].metrics_level = level;
+    Configuration::getInstance().saveConfig();
+}
+
+WineSyncOption SteamService::getWineSync(unsigned int gid)
+{
+    return Configuration::getInstance().getConfiguration().games[std::to_string(gid)].sync;
+}
+
+void SteamService::setWineSync(unsigned int gid, WineSyncOption level)
+{
+    Configuration::getInstance().getConfiguration().games[std::to_string(gid)].sync = level;
+    Configuration::getInstance().saveConfig();
+}
+
+bool SteamService::isProton(unsigned int gid)
+{
+    return Configuration::getInstance().getConfiguration().games[std::to_string(gid)].proton;
+}
+
+std::string SteamService::getEnvironment(unsigned int gid)
+{
+    return Configuration::getInstance().getConfiguration().games[std::to_string(gid)].env.value_or("");
+}
+
+void SteamService::setEnvironment(unsigned int gid, std::string env)
+{
+    Configuration::getInstance().getConfiguration().games[std::to_string(gid)].env = env;
+    Configuration::getInstance().saveConfig();
+}
+
+std::string SteamService::getParameters(unsigned int gid)
+{
+    return Configuration::getInstance().getConfiguration().games[std::to_string(gid)].args.value_or("");
+}
+
+void SteamService::setParameters(unsigned int gid, std::string args)
+{
+    Configuration::getInstance().getConfiguration().games[std::to_string(gid)].args = args;
+    Configuration::getInstance().saveConfig();
 }
