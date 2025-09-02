@@ -153,7 +153,7 @@ jobs:
 
   release:
     needs:
-      - prepare_and_install
+      - build_rogcontrolcenter
       - package
     runs-on: ubuntu-latest
     steps:
@@ -167,6 +167,13 @@ jobs:
         with:
           submodules: recursive
           fetch-depth: 0
+
+      - name: Create tag
+        run: |
+          git tag "${{ needs.prepare_and_install.outputs.version }}"
+          make increase_version
+          git add CMakeLists.txt > /dev/null
+          git commit -m "[ci skip] Ready for next development iteration" > /dev/null
 
       - name: Download AppImage artifact
         uses: actions/download-artifact@v4
@@ -183,16 +190,6 @@ jobs:
             dist/RogControlCenter.AppImage
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
-      - name: Clean artifact
-        run: rm dist/RogControlCenter.AppImage
-
-      - name: Create tag
-        run: |
-          git tag "${{ needs.prepare_and_install.outputs.version }}"
-          make increase_version
-          git add CMakeLists.txt > /dev/null
-          git commit -m "[ci skip] Ready for next development iteration" > /dev/null
 
       - name: Push changes to main and force push to develop
         run: |
