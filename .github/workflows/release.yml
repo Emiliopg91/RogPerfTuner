@@ -93,5 +93,5 @@ jobs:
       - name: Upload RccDeckyCompanion
         uses: actions/upload-artifact@v4
         with:
-          name: OpenRGB
+          name: RccDeckyCompanion
           path: assets/RccDeckyCompanion

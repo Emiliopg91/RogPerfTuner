@@ -25,10 +25,10 @@ config:
 		cd submodules/OpenRGB-cppSDK && git apply ../../patches/OpenRGB-cppSDK.diff && touch ../../patches/OpenRGB-cppSDK.diff.applied; \
 	fi
 
-	@if [ ! -f "patches/httplib.applied" ]; then \
+	@if [ ! -f "patches/httplib.diff.applied" ]; then \
 		cd submodules/httplib && git apply ../../patches/httplib.diff && touch ../../patches/httplib.diff.applied; \
 	fi
-	
+
 	@cmake -B build -S . -DCMAKE_BUILD_TYPE=$(BUILD_TYPE)
 
 	@touch .$(BUILD_TYPE)
