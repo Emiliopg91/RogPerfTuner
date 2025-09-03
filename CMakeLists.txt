@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.16)
 
-project(RogControlCenter VERSION 4.0.5 LANGUAGES CXX)
+project(RogControlCenter VERSION 4.0.6 LANGUAGES CXX)
 
 add_subdirectory(submodules/httplib)
 
