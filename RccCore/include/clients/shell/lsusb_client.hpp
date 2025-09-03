@@ -70,11 +70,9 @@ public:
         udev_unref(udev);
     }
 
-    std::vector<UsbIdentifier> get_usb_dev(
-        std::function<bool(const UsbIdentifier &)> dev_filter = nullptr)
+    const std::vector<UsbIdentifier> get_usb_dev(const std::function<bool(const UsbIdentifier &)> &dev_filter = nullptr)
     {
-        std::vector<UsbIdentifier>
-            devices;
+        std::vector<UsbIdentifier> devices;
 
         struct udev_enumerate *enumerate = udev_enumerate_new(udev);
         udev_enumerate_add_match_subsystem(enumerate, "usb");
@@ -116,11 +114,11 @@ public:
 
     template <typename Predicate>
     // Comparar dispositivos actuales con anteriores
-    std::tuple<std::vector<UsbIdentifier>,
-               std::vector<UsbIdentifier>,
-               std::vector<UsbIdentifier>>
+    const std::tuple<std::vector<UsbIdentifier>,
+                     std::vector<UsbIdentifier>,
+                     std::vector<UsbIdentifier>>
     compare_connected_devs(const std::vector<UsbIdentifier> &previous,
-                           Predicate dev_filter = nullptr)
+                           const Predicate &dev_filter = nullptr)
     {
         auto current_usb = get_usb_dev(dev_filter);
         std::vector<UsbIdentifier> added;

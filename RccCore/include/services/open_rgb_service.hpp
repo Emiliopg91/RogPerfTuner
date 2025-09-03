@@ -16,15 +16,15 @@ public:
         return instance;
     }
 
-    std::string getDeviceName(UsbIdentifier);
+    std::string getDeviceName(const UsbIdentifier &);
     std::vector<std::string> getAvailableEffects();
     std::string getCurrentEffect();
     RgbBrightness getCurrentBrightness();
 
-    void setBrightness(RgbBrightness newBrightness);
-    void setEffect(std::string newEffect, bool temporal = false);
+    void setBrightness(const RgbBrightness &newBrightness);
+    void setEffect(const std::string &newEffect, const bool &temporal = false);
     void restoreAura();
-    void disableDevice(UsbIdentifier);
+    void disableDevice(const UsbIdentifier &);
 
     RgbBrightness increaseBrightness();
     RgbBrightness decreaseBrightness();
@@ -41,6 +41,6 @@ private:
     RgbBrightness brightness = RgbBrightness::Enum::MAX;
     std::string effect;
 
-    void applyAura(bool temporal = false);
+    void applyAura(const bool &temporal = false);
     void reload();
 };

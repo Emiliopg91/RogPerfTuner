@@ -39,7 +39,7 @@ void OpenRgbService::restoreAura()
     applyAura();
 }
 
-std::string OpenRgbService::getDeviceName(UsbIdentifier identifier)
+std::string OpenRgbService::getDeviceName(const UsbIdentifier &identifier)
 {
     std::string key = identifier.id_vendor + ":" + identifier.id_product;
     auto it = compatibleDeviceNames.find(key);
@@ -68,7 +68,7 @@ RgbBrightness OpenRgbService::getCurrentBrightness()
     return brightness;
 }
 
-void OpenRgbService::setBrightness(RgbBrightness newBrightness)
+void OpenRgbService::setBrightness(const RgbBrightness &newBrightness)
 {
     std::lock_guard<std::mutex> lock(actionMutex);
     if (brightness != newBrightness)
@@ -79,7 +79,7 @@ void OpenRgbService::setBrightness(RgbBrightness newBrightness)
     }
 }
 
-void OpenRgbService::setEffect(std::string newEffect, bool temporal)
+void OpenRgbService::setEffect(const std::string &newEffect, const bool &temporal)
 {
     std::lock_guard<std::mutex> lock(actionMutex);
     if (effect != newEffect)
@@ -103,7 +103,7 @@ void OpenRgbService::reload()
     logger.info("Reloaded after " + std::to_string(std::chrono::duration_cast<std::chrono::milliseconds>(t1 - t0).count()) + " ms");
 }
 
-void OpenRgbService::applyAura(bool temporal)
+void OpenRgbService::applyAura(const bool &temporal)
 {
     logger.info("Applying aura settings");
     logger.add_tab();
@@ -122,7 +122,7 @@ void OpenRgbService::applyAura(bool temporal)
     logger.info("Aura applied after " + std::to_string(std::chrono::duration_cast<std::chrono::milliseconds>(t1 - t0).count()) + " ms");
 }
 
-void OpenRgbService::disableDevice(UsbIdentifier identifier)
+void OpenRgbService::disableDevice(const UsbIdentifier &identifier)
 {
     OpenRgbClient::getInstance().disableDevice(getDeviceName(identifier));
 }

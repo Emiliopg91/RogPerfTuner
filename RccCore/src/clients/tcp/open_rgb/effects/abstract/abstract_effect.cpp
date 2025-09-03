@@ -4,7 +4,7 @@
 #include "../../../../../../include/clients/tcp/open_rgb/effects/abstract/abstract_effect.hpp"
 #include "../../../../../../include/models/hardware/rgb_brightness.hpp"
 
-double AbstractEffect::brightnessMap(RgbBrightness b)
+double AbstractEffect::brightnessMap(const RgbBrightness &b)
 {
     if (b == RgbBrightness::Enum::LOW)
         return 0.25;
@@ -16,7 +16,7 @@ double AbstractEffect::brightnessMap(RgbBrightness b)
     return 1;
 }
 
-void AbstractEffect::start(DeviceList &devices, RgbBrightness brightness)
+void AbstractEffect::start(const DeviceList &devices, const RgbBrightness &brightness)
 {
     if (_is_running)
         stop();
@@ -50,7 +50,7 @@ void AbstractEffect::stop()
     }
 }
 
-void AbstractEffect::_sleep(double seconds)
+void AbstractEffect::_sleep(const double &seconds)
 {
     double remaining = seconds;
     while (_is_running && remaining > 0)

@@ -39,5 +39,5 @@ public:
 
     void on_with_data(const std::string &event, CallbackWithParams &&callback);
 
-    void emit_event(const std::string &event, std::vector<std::any> args);
+    void emit_event(const std::string &event, const std::vector<std::any> &args);
 };

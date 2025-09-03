@@ -11,7 +11,7 @@ public:
         return instance;
     }
 
-    void apply_effect(DeviceList &devices)
+    void apply_effect(const DeviceList &devices)
     {
         for (auto &dev : devices)
         {

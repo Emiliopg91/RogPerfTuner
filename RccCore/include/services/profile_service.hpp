@@ -16,7 +16,7 @@ public:
     }
 
     PerformanceProfile getPerformanceProfile();
-    void setPerformanceProfile(PerformanceProfile profile, bool temporal = false, bool force = false);
+    void setPerformanceProfile(const PerformanceProfile &profile, const bool &temporal = false, const bool &force = false);
     void restoreProfile();
 
     PerformanceProfile nextPerformanceProfile();
@@ -30,12 +30,12 @@ private:
     std::mutex actionMutex;
     PerformanceProfile currentProfile = PerformanceProfile::Enum::PERFORMANCE;
 
-    void setPlatformProfile(PerformanceProfile profile);
-    void setFanCurves(PerformanceProfile profile);
-    void setBoost(PerformanceProfile profile);
-    void setSsdScheduler(PerformanceProfile profile);
-    void setCpuGovernor(PerformanceProfile profile);
-    void setPowerProfile(PerformanceProfile profile);
-    void setTdps(PerformanceProfile profile);
-    void setTgp(PerformanceProfile profile);
+    void setPlatformProfile(const PerformanceProfile &profile);
+    void setFanCurves(const PerformanceProfile &profile);
+    void setBoost(const PerformanceProfile &profile);
+    void setSsdScheduler(const PerformanceProfile &profile);
+    void setCpuGovernor(const PerformanceProfile &profile);
+    void setPowerProfile(const PerformanceProfile &profile);
+    void setTdps(const PerformanceProfile &profile);
+    void setTgp(const PerformanceProfile &profile);
 };

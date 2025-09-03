@@ -13,7 +13,7 @@ public:
     }
 
 protected:
-    void apply_effect(DeviceList &devices) override
+    void apply_effect(const DeviceList &devices) override
     {
         int offset = 0;
         while (_is_running)

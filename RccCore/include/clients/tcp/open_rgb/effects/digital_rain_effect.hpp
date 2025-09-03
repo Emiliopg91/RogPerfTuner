@@ -264,7 +264,7 @@ public:
     }
 
 protected:
-    void apply_effect(DeviceList &devices)
+    void apply_effect(const DeviceList &devices)
     {
         std::vector<std::thread> threads;
 

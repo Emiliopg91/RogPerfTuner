@@ -10,7 +10,7 @@
 class AbstractCmdClient
 {
 protected:
-    AbstractCmdClient(std::string command, std::string name, bool required = true)
+    AbstractCmdClient(const std::string &command, const std::string &name, const bool &required = true)
         : command_(command), available_(true)
     {
         logger_ = Logger{name};
@@ -24,7 +24,7 @@ protected:
         }
     }
 
-    CommandResult run_command(const std::string &args = "", bool check = true, bool sudo = false)
+    CommandResult run_command(const std::string &args = "", const bool &check = true, const bool &sudo = false)
     {
         if (!available_)
             throw std::runtime_error(fmt::format("Command {} not available", command_));

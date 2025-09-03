@@ -36,7 +36,7 @@ public:
         return os;
     }
 
-    static Enum fromString(const std::string &v)
+    const static Enum &fromString(const std::string &v)
     {
         const auto &table = Derived::metaTable();
         for (size_t i = 0; i < N; ++i)

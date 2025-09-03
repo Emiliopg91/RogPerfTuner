@@ -11,7 +11,7 @@ public:
         return instance;
     }
 
-    int show_notification(std::string app_name, std::string app_icon, std::string title, std::string body, int timeout)
+    int show_notification(const std::string &app_name, const std::string &app_icon, const std::string &title, const std::string &body, const int &timeout)
     {
         uint id = 0;
         return this->call<uint>(QString("Notify"), {QString::fromStdString(app_name),
@@ -24,7 +24,7 @@ public:
                                                     timeout});
     }
 
-    int close_notification(uint id)
+    int close_notification(const uint &id)
     {
         return this->call<int>(QString("CloseNotification"), {id});
     }

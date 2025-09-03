@@ -23,7 +23,7 @@ public:
 
     GamingEffect(Client &client) : AbstractEffect(client, "Gaming") {}
 
-    void apply_effect(DeviceList &devices)
+    void apply_effect(const DeviceList &devices)
     {
         for (auto &dev : devices)
         {

@@ -17,7 +17,7 @@ public:
         return instance;
     }
 
-    void apply_effect(DeviceList &devices)
+    void apply_effect(const DeviceList &devices)
     {
         _buffer.clear();
         _buffer.resize(devices.size());

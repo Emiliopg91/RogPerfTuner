@@ -62,7 +62,7 @@ PerformanceProfile ProfileService::getPerformanceProfile()
 {
     return currentProfile;
 }
-void ProfileService::setPerformanceProfile(PerformanceProfile profile, bool temporal, bool force)
+void ProfileService::setPerformanceProfile(const PerformanceProfile &profile, const bool &temporal, const bool &force)
 {
     std::lock_guard<std::mutex> lock(actionMutex);
     std::string profileName = profile.toName();
@@ -109,7 +109,7 @@ void ProfileService::setPerformanceProfile(PerformanceProfile profile, bool temp
     }
 }
 
-void ProfileService::setPlatformProfile(PerformanceProfile profile)
+void ProfileService::setPlatformProfile(const PerformanceProfile &profile)
 {
     if (PlatformClient::getInstance().available())
     {
@@ -129,7 +129,7 @@ void ProfileService::setPlatformProfile(PerformanceProfile profile)
     }
 }
 
-void ProfileService::setFanCurves(PerformanceProfile profile)
+void ProfileService::setFanCurves(const PerformanceProfile &profile)
 {
     if (FanCurvesClient::getInstance().available())
     {
@@ -150,7 +150,7 @@ void ProfileService::setFanCurves(PerformanceProfile profile)
     }
 }
 
-void ProfileService::setBoost(PerformanceProfile)
+void ProfileService::setBoost(const PerformanceProfile &)
 {
     if (BoostControlClient::getInstance().available())
     {
@@ -169,7 +169,7 @@ void ProfileService::setBoost(PerformanceProfile)
     }
 }
 
-void ProfileService::setSsdScheduler(PerformanceProfile profile)
+void ProfileService::setSsdScheduler(const PerformanceProfile &profile)
 {
     if (SsdSchedulerClient::getInstance().available())
     {
@@ -188,7 +188,7 @@ void ProfileService::setSsdScheduler(PerformanceProfile profile)
     }
 }
 
-void ProfileService::setCpuGovernor(PerformanceProfile profile)
+void ProfileService::setCpuGovernor(const PerformanceProfile &profile)
 {
     if (CpuPowerClient::getInstance().available())
     {
@@ -207,7 +207,7 @@ void ProfileService::setCpuGovernor(PerformanceProfile profile)
     }
 }
 
-void ProfileService::setPowerProfile(PerformanceProfile profile)
+void ProfileService::setPowerProfile(const PerformanceProfile &profile)
 {
     if (PowerProfileClient::getInstance().available())
     {
@@ -226,7 +226,7 @@ void ProfileService::setPowerProfile(PerformanceProfile profile)
     }
 }
 
-void ProfileService::setTdps(PerformanceProfile profile)
+void ProfileService::setTdps(const PerformanceProfile &profile)
 {
     if (Pl1SpdClient::getInstance().available())
     {
@@ -257,7 +257,7 @@ void ProfileService::setTdps(PerformanceProfile profile)
     }
 }
 
-void ProfileService::setTgp(PerformanceProfile profile)
+void ProfileService::setTgp(const PerformanceProfile &profile)
 {
     if (NvTempClient::getInstance().available() || NvBoostClient::getInstance().available())
     {

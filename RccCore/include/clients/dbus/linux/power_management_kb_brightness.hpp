@@ -16,13 +16,13 @@ public:
         return call<int>("keyboardBrightness");
     }
 
-    void setKeyboardBrightnessSilent(int brightness)
+    void setKeyboardBrightnessSilent(const int &brightness)
     {
         call("setKeyboardBrightnessSilent", {brightness});
     }
 
     template <typename Callback>
-    void onBrightnessChange(Callback &&callback)
+    void onBrightnessChange(const Callback &&callback)
     {
         this->onSignal("keyboardBrightnessChanged", callback);
     }

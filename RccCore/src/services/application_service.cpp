@@ -1,5 +1,8 @@
 #include "RccCommons.hpp"
 
+#include <signal.h>
+#include <unistd.h>
+
 #include "../../include/gui/toaster.hpp"
 #include "../../include/services/application_service.hpp"
 #include "../../include/services/steam_service.hpp"
@@ -51,6 +54,17 @@ void ApplicationService::applyUpdate()
     logger.add_tab();
     Toaster::getInstance().showToast(Translator::getInstance().translate("applying.update"));
     Shell::getInstance().run_command("nohup bash -c \"sleep 1 && " + Constants::LAUNCHER_FILE + "\" > /dev/null 2>&1 &");
-    exit(0);
+    shutdown();
     logger.rem_tab();
+}
+
+void ApplicationService::shutdown()
+{
+    shuttingDown = true;
+    logger.info("Starting application shutdown");
+    logger.add_tab();
+    EventBus::getInstance().emit_event(Events::APPLICATION_STOP);
+    logger.rem_tab();
+    logger.info("Shutdown finished");
+    kill(getpid(), SIGTERM);
 }

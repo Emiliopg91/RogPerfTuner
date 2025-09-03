@@ -22,7 +22,7 @@ public:
         return instance;
     }
 
-    std::vector<GPUInfo> getGpus()
+    const std::vector<GPUInfo> getGpus()
     {
         CommandResult result = run_command();
         std::vector<GPUInfo> gpus;

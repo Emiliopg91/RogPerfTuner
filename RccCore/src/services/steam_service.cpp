@@ -19,7 +19,7 @@ bool SteamService::metricsEnabled()
     return mangohud_which.has_value();
 }
 
-bool SteamService::isRunning(unsigned int appid) const
+bool SteamService::isRunning(const unsigned int &appid) const
 {
     for (const auto &[key, val] : runningGames)
         if (key == appid)
@@ -375,7 +375,7 @@ void SteamService::onDisconnect()
     logger.rem_tab();
 }
 
-SteamGameConfig SteamService::getConfiguration(std::string gid)
+const SteamGameConfig SteamService::getConfiguration(const std::string &gid)
 {
     SteamGameConfig cfg;
 
@@ -464,12 +464,12 @@ SteamGameConfig SteamService::getConfiguration(std::string gid)
     return cfg;
 }
 
-std::optional<GpuBrand> SteamService::getPreferedGpu(unsigned int gid)
+const std::optional<GpuBrand> SteamService::getPreferedGpu(const unsigned int &gid)
 {
     return Configuration::getInstance().getConfiguration().games[std::to_string(gid)].gpu;
 }
 
-void SteamService::setPreferedGpu(unsigned int gid, std::optional<GpuBrand> gpu)
+void SteamService::setPreferedGpu(const unsigned int &gid, const std::optional<GpuBrand> &gpu)
 {
     if (gpu.has_value())
         Configuration::getInstance().getConfiguration().games[std::to_string(gid)].gpu = gpu.value().toString();
@@ -479,61 +479,61 @@ void SteamService::setPreferedGpu(unsigned int gid, std::optional<GpuBrand> gpu)
     Configuration::getInstance().saveConfig();
 }
 
-bool SteamService::isSteamDeck(unsigned int gid)
+bool SteamService::isSteamDeck(const unsigned int &gid)
 {
     return Configuration::getInstance().getConfiguration().games[std::to_string(gid)].steamdeck;
 }
 
-void SteamService::setSteamDeck(unsigned int gid, bool value)
+void SteamService::setSteamDeck(const unsigned int &gid, const bool &value)
 {
     Configuration::getInstance().getConfiguration().games[std::to_string(gid)].steamdeck = value;
     Configuration::getInstance().saveConfig();
 }
 
-MangoHudLevel SteamService::getMetricsLevel(unsigned int gid)
+const MangoHudLevel SteamService::getMetricsLevel(const unsigned int &gid)
 {
     return Configuration::getInstance().getConfiguration().games[std::to_string(gid)].metrics_level;
 }
 
-void SteamService::setMetricsLevel(unsigned int gid, MangoHudLevel level)
+void SteamService::setMetricsLevel(const unsigned int &gid, const MangoHudLevel &level)
 {
     Configuration::getInstance().getConfiguration().games[std::to_string(gid)].metrics_level = level;
     Configuration::getInstance().saveConfig();
 }
 
-WineSyncOption SteamService::getWineSync(unsigned int gid)
+const WineSyncOption SteamService::getWineSync(const unsigned int &gid)
 {
     return Configuration::getInstance().getConfiguration().games[std::to_string(gid)].sync;
 }
 
-void SteamService::setWineSync(unsigned int gid, WineSyncOption level)
+void SteamService::setWineSync(const unsigned int &gid, const WineSyncOption &level)
 {
     Configuration::getInstance().getConfiguration().games[std::to_string(gid)].sync = level;
     Configuration::getInstance().saveConfig();
 }
 
-bool SteamService::isProton(unsigned int gid)
+bool SteamService::isProton(const unsigned int &gid)
 {
     return Configuration::getInstance().getConfiguration().games[std::to_string(gid)].proton;
 }
 
-std::string SteamService::getEnvironment(unsigned int gid)
+const std::string SteamService::getEnvironment(const unsigned int &gid)
 {
     return Configuration::getInstance().getConfiguration().games[std::to_string(gid)].env.value_or("");
 }
 
-void SteamService::setEnvironment(unsigned int gid, std::string env)
+void SteamService::setEnvironment(const unsigned int &gid, const std::string &env)
 {
     Configuration::getInstance().getConfiguration().games[std::to_string(gid)].env = env;
     Configuration::getInstance().saveConfig();
 }
 
-std::string SteamService::getParameters(unsigned int gid)
+const std::string SteamService::getParameters(const unsigned int &gid)
 {
     return Configuration::getInstance().getConfiguration().games[std::to_string(gid)].args.value_or("");
 }
 
-void SteamService::setParameters(unsigned int gid, std::string args)
+void SteamService::setParameters(const unsigned int &gid, const std::string &args)
 {
     Configuration::getInstance().getConfiguration().games[std::to_string(gid)].args = args;
     Configuration::getInstance().saveConfig();

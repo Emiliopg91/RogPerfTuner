@@ -235,7 +235,7 @@ BatteryThreshold HardwareService::getChargeThreshold()
     return charge_limit;
 }
 
-void HardwareService::setChargeThreshold(BatteryThreshold threshold)
+void HardwareService::setChargeThreshold(const BatteryThreshold &threshold)
 {
     std::lock_guard<std::mutex> lock(actionMutex);
     if (charge_limit != threshold)
@@ -256,7 +256,7 @@ void HardwareService::setChargeThreshold(BatteryThreshold threshold)
     }
 }
 
-void HardwareService::onBatteryEvent(bool onBat, bool muted)
+void HardwareService::onBatteryEvent(const bool &onBat, const bool &muted)
 {
     onBattery = onBat;
 
@@ -283,7 +283,7 @@ void HardwareService::onBatteryEvent(bool onBat, bool muted)
     }
 }
 
-void HardwareService::setPanelOverdrive(bool enable)
+void HardwareService::setPanelOverdrive(const bool &enable)
 {
     if (PanelOverdriveClient::getInstance().available())
         PanelOverdriveClient::getInstance().setCurrentValue(enable);
@@ -293,7 +293,7 @@ void HardwareService::renice(const pid_t &pid)
     Shell::getInstance().run_elevated_command(fmt::format("renice -n {} -p {} && ionice -c {} -n {} -p {}", CPU_PRIORITY, pid, IO_CLASS, IO_PRIORITY, pid));
 }
 
-std::map<std::string, std::string> HardwareService::getGpuSelectorEnv(std::string gpu)
+std::map<std::string, std::string> HardwareService::getGpuSelectorEnv(const std::string &gpu)
 {
     std::map<std::string, std::string> env;
 

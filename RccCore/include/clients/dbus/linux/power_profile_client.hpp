@@ -13,12 +13,12 @@ public:
         return instance;
     }
 
-    PowerProfile getPowerProfile()
+    const PowerProfile getPowerProfile()
     {
         return PowerProfile::fromString(this->getProperty<QString>(QString("ActiveProfile")).toStdString());
     }
 
-    void setPowerProfile(PowerProfile val)
+    void setPowerProfile(const PowerProfile &val)
     {
         this->setProperty<QString>(QString("ActiveProfile"), QString::fromStdString(val.toString()));
     }

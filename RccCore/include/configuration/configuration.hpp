@@ -23,7 +23,7 @@ public:
     }
 
     std::string getPassword();
-    void setPassword(std::string pss);
+    void setPassword(const std::string &pss);
 
 private:
     Configuration()

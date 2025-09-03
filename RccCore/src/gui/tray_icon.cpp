@@ -5,6 +5,7 @@
 #include "../../include/models/hardware/battery_charge_threshold.hpp"
 #include "../../include/models/performance/performance_profile.hpp"
 #include "../../include/models/hardware/rgb_brightness.hpp"
+#include "../../include/services/application_service.hpp"
 #include "../../include/services/hardware_service.hpp"
 #include "../../include/services/open_rgb_service.hpp"
 #include "../../include/services/profile_service.hpp"
@@ -296,7 +297,7 @@ TrayIcon::TrayIcon()
     // -------------------------
     QAction *quitAction = new QAction(translator.translate("close").c_str(), menu);
     QObject::connect(quitAction, &QAction::triggered, []()
-                     { exit(0); });
+                     { ApplicationService::getInstance().shutdown(); });
     menu->addAction(quitAction);
     // -------------------------
     // Exit

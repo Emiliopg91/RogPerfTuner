@@ -12,7 +12,7 @@ public:
         return instance;
     }
 
-    void apply_effect(DeviceList &devices)
+    void apply_effect(const DeviceList &devices)
     {
         // Calcular la longitud de la zona más grande
         size_t longest_zone = 0;

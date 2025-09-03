@@ -26,9 +26,9 @@ struct WSMethodResponse
 class AbstractWebsocketClient
 {
 public:
-    AbstractWebsocketClient(const std::string &host, int port, std::string name);
+    AbstractWebsocketClient(const std::string &host, const int &port, const std::string &name);
 
-    std::vector<std::any> invoke(const std::string &method, const std::vector<std::any> &args, int timeout_ms = 3000);
+    std::vector<std::any> invoke(const std::string &method, const std::vector<std::any> &args, const int &timeout_ms = 3000);
 
     void onConnect(Callback &&callback)
     {
@@ -75,7 +75,7 @@ private:
 
     int _id_counter = 0;
 
-    void trigger_event(const std::string &name, std::optional<std::vector<std::any>> data = std::nullopt);
+    void trigger_event(const std::string &name, const std::optional<std::vector<std::any>> &data = std::nullopt);
 
     void handle_message(const std::string &payload);
 };

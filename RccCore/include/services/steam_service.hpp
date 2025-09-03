@@ -38,27 +38,27 @@ public:
     const std::map<unsigned int, std::string> &getRunningGames() const;
     const std::map<std::string, GameEntry> &getGames() const;
 
-    bool isRunning(unsigned int appid) const;
+    bool isRunning(const unsigned int &appid) const;
     bool metricsEnabled();
-    SteamGameConfig getConfiguration(std::string gid);
+    const SteamGameConfig getConfiguration(const std::string &gid);
 
-    std::optional<GpuBrand> getPreferedGpu(unsigned int gid);
-    void setPreferedGpu(unsigned int gid, std::optional<GpuBrand> gpu);
+    const std::optional<GpuBrand> getPreferedGpu(const unsigned int &gid);
+    void setPreferedGpu(const unsigned int &gid, const std::optional<GpuBrand> &gpu);
 
-    bool isSteamDeck(unsigned int gid);
-    void setSteamDeck(unsigned int gid, bool value);
+    bool isSteamDeck(const unsigned int &gid);
+    void setSteamDeck(const unsigned int &gid, const bool &value);
 
-    MangoHudLevel getMetricsLevel(unsigned int gid);
-    void setMetricsLevel(unsigned int gid, MangoHudLevel level);
+    const MangoHudLevel getMetricsLevel(const unsigned int &gid);
+    void setMetricsLevel(const unsigned int &gid, const MangoHudLevel &level);
 
-    WineSyncOption getWineSync(unsigned int gid);
-    void setWineSync(unsigned int gid, WineSyncOption level);
+    const WineSyncOption getWineSync(const unsigned int &gid);
+    void setWineSync(const unsigned int &gid, const WineSyncOption &level);
 
-    bool isProton(unsigned int gid);
+    bool isProton(const unsigned int &gid);
 
-    std::string getEnvironment(unsigned int gid);
-    void setEnvironment(unsigned int gid, std::string env);
+    const std::string getEnvironment(const unsigned int &gid);
+    void setEnvironment(const unsigned int &gid, const std::string &env);
 
-    std::string getParameters(unsigned int gid);
-    void setParameters(unsigned int gid, std::string env);
+    const std::string getParameters(const unsigned int &gid);
+    void setParameters(const unsigned int &gid, const std::string &env);
 };

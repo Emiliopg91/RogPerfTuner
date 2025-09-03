@@ -28,7 +28,7 @@ public:
         on_with_params("stop_game", std::move(callback));
     }
 
-    std::vector<SteamGameDetails> getAppsDetails(std::vector<unsigned int> appIds)
+    const std::vector<SteamGameDetails> getAppsDetails(const std::vector<unsigned int> &appIds)
     {
         std::vector<std::any> converted;
         converted.reserve(appIds.size());
@@ -50,12 +50,12 @@ public:
         return result;
     }
 
-    void setLaunchOptions(int appid, std::string launchOpts)
+    void setLaunchOptions(const int &appid, const std::string &launchOpts)
     {
         invoke("set_launch_options", {appid, launchOpts});
     }
 
-    std::string getIcon(int appid)
+    std::string getIcon(const int &appid)
     {
         return std::any_cast<std::string>(invoke("get_icon", {appid})[0]);
     }

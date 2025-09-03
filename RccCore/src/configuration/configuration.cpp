@@ -112,7 +112,7 @@ std::string Configuration::getPassword()
     return result;
 }
 
-void Configuration::setPassword(std::string pss)
+void Configuration::setPassword(const std::string &pss)
 {
 
     GError *error = nullptr;

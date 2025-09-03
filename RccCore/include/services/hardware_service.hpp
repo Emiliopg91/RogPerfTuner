@@ -19,10 +19,10 @@ public:
     }
 
     BatteryThreshold getChargeThreshold();
-    void setChargeThreshold(BatteryThreshold threshold);
-    void setPanelOverdrive(bool);
+    void setChargeThreshold(const BatteryThreshold &threshold);
+    void setPanelOverdrive(const bool &);
     void renice(const pid_t &);
-    std::map<std::string, std::string> getGpuSelectorEnv(std::string);
+    std::map<std::string, std::string> getGpuSelectorEnv(const std::string &);
 
     std::map<std::string, std::string> getGpus()
     {
@@ -37,7 +37,7 @@ private:
     inline static uint8_t IO_CLASS = 2;
 
     void setupDeviceLoop();
-    void onBatteryEvent(bool onBattery, bool muted = false);
+    void onBatteryEvent(const bool &onBattery, const bool &muted = false);
 
     Logger logger{"HardwareService"};
     std::mutex actionMutex;

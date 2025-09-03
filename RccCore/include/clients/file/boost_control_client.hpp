@@ -38,7 +38,7 @@ public:
         return instance;
     }
 
-    void set_boost(bool enabled)
+    void set_boost(bool &enabled)
     {
         write(enabled ? on : off);
     }
@@ -47,7 +47,7 @@ private:
     std::string on;
     std::string off;
 
-    BoostControlClient(std::string path, std::string on, std::string off) : AbstractFileClient(path, "CPUInfoClient", true), on(on), off(off)
+    BoostControlClient(const std::string &path, const std::string &on, const std::string &off) : AbstractFileClient(path, "CPUInfoClient", true), on(on), off(off)
     {
     }
 };

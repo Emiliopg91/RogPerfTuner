@@ -16,13 +16,12 @@ public:
         return instance;
     }
 
-    std::vector<UsbIdentifier> getCompatibleDevices();
-    std::string getDeviceName(UsbIdentifier);
-    std::vector<std::string> getAvailableEffects();
-    void applyEffect(std::string effect, RgbBrightness brightness);
+    const std::vector<UsbIdentifier> getCompatibleDevices();
+    const std::vector<std::string> getAvailableEffects();
+    void applyEffect(const std::string &effect, const RgbBrightness &brightness);
     void start();
     void stop();
-    void disableDevice(std::string);
+    void disableDevice(const std::string &);
 
 private:
     std::vector<UsbIdentifier> compatibleDevices;

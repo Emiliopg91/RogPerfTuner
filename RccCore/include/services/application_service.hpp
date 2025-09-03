@@ -14,12 +14,14 @@ public:
     }
 
     void applyUpdate();
+    void shutdown();
 
 private:
     Logger logger{"ApplicationService"};
     bool rccdcEnabled = false;
+    bool shuttingDown = false;
 
-    std::string buildDesktopFile()
+    const std::string buildDesktopFile()
     {
         std::ostringstream ss;
         ss << "[Desktop Entry]\n"
@@ -34,7 +36,7 @@ private:
         return ss.str();
     }
 
-    std::string buildLaunchFile()
+    const std::string buildLaunchFile()
     {
         std::ostringstream ss;
         ss << "#!/bin/bash\n"

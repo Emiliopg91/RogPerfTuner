@@ -18,12 +18,16 @@
 #include "../../../../include/clients/tcp/open_rgb/effects/starry_night_effect.hpp"
 #include "../../../../include/clients/tcp/open_rgb/effects/static_effect.hpp"
 #include "../../../../include/clients/shell/asusctl_client.hpp"
+#include "../../../../include/events/event_bus.hpp"
 #include "../../../../include/models/hardware/rgb_brightness.hpp"
 #include "../../../../include/models/hardware/usb_identifier.hpp"
 #include "../../../../include/utils/net_utils.hpp"
 
 OpenRgbClient::OpenRgbClient()
 {
+
+    EventBus::getInstance().on_without_data(Events::APPLICATION_STOP, [this]()
+                                            { stop(); });
 
     availableEffects.push_back(std::unique_ptr<AbstractEffect>(&BreathingEffect::getInstance(client)));
     availableEffects.push_back(std::unique_ptr<AbstractEffect>(&DanceFloorEffect::getInstance(client)));
@@ -116,7 +120,7 @@ void OpenRgbClient::loadCompatibleDevices()
     logger.debug("Detected support for " + std::to_string(compatibleDevices.size()) + " devices");
 }
 
-std::vector<UsbIdentifier> OpenRgbClient::getCompatibleDevices()
+const std::vector<UsbIdentifier> OpenRgbClient::getCompatibleDevices()
 {
     return compatibleDevices;
 }
@@ -150,12 +154,7 @@ void OpenRgbClient::stopOpenRgbProcess()
 
 void OpenRgbClient::runner()
 {
-    std::string hostArg = "--server-host";
-    std::string hostVal = "localhost";
-    std::string portArg = "--server-port";
-    std::string portVal = std::to_string(port);
-
-    std::vector<std::string> argsStr = {hostArg, hostVal, portArg, portVal, "-v"};
+    std::vector<std::string> argsStr = {"--server-host", "localhost", "--server-port", std::to_string(port), "-v"};
     std::vector<char *> argv;
     argv.push_back(const_cast<char *>(Constants::ORGB_PATH.c_str()));
     for (auto &s : argsStr)
@@ -202,7 +201,7 @@ void OpenRgbClient::getAvailableDevices()
 
     logger.rem_tab();
 }
-std::vector<std::string> OpenRgbClient::getAvailableEffects()
+const std::vector<std::string> OpenRgbClient::getAvailableEffects()
 {
     std::vector<std::string> result;
     for (auto &effect : availableEffects)
@@ -212,7 +211,7 @@ std::vector<std::string> OpenRgbClient::getAvailableEffects()
     return result;
 }
 
-void OpenRgbClient::applyEffect(std::string effectName, RgbBrightness brightness)
+void OpenRgbClient::applyEffect(const std::string &effectName, const RgbBrightness &brightness)
 {
     for (const auto &effect : availableEffects)
     {
@@ -228,7 +227,7 @@ void OpenRgbClient::applyEffect(std::string effectName, RgbBrightness brightness
     }
 }
 
-void OpenRgbClient::disableDevice(std::string devName)
+void OpenRgbClient::disableDevice(const std::string &devName)
 {
     for (auto &dev : detectedDevices.devices())
     {

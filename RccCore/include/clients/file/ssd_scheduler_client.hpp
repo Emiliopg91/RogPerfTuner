@@ -12,12 +12,12 @@ public:
         return instance;
     }
 
-    void setScheduler(SsdScheduler scheduler)
+    void setScheduler(const SsdScheduler &scheduler)
     {
         this->write(scheduler.toString());
     }
 
-    std::vector<SsdScheduler> get_schedulers()
+    const std::vector<SsdScheduler> get_schedulers()
     {
         std::vector<SsdScheduler> result;
         std::string output = this->read();

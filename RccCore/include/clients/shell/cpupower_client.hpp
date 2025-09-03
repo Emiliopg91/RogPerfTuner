@@ -17,7 +17,7 @@ public:
         return instance;
     }
 
-    void setGovernor(CpuGovernor governor)
+    void setGovernor(const CpuGovernor &governor)
     {
         run_command("frequency-set -g " + governor.toString(), true, true);
     }

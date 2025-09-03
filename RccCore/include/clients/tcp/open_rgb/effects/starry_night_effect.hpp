@@ -66,7 +66,7 @@ public:
     }
 
 protected:
-    void apply_effect(DeviceList &devices) override
+    void apply_effect(const DeviceList &devices) override
     {
         _threads.clear();
         for (auto &device : devices)

@@ -55,7 +55,7 @@ void EventBus::on_with_data(const std::string &event, CallbackWithParams &&callb
     }
 }
 
-void EventBus::emit_event(const std::string &event, std::vector<std::any> args)
+void EventBus::emit_event(const std::string &event, const std::vector<std::any> &args)
 {
     std::vector<std::function<void(std::vector<std::any>)>> to_call;
 

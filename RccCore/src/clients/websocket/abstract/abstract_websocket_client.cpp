@@ -13,7 +13,7 @@
 
 using json = nlohmann::json;
 
-AbstractWebsocketClient::AbstractWebsocketClient(const std::string &host, int port, std::string name)
+AbstractWebsocketClient::AbstractWebsocketClient(const std::string &host, const int &port, const std::string &name)
     : _name(name), _host(host), _port(port), logger(Logger(name))
 {
     _ws.setUrl("ws://" + _host + ":" + std::to_string(_port));
@@ -48,12 +48,12 @@ AbstractWebsocketClient::AbstractWebsocketClient(const std::string &host, int po
     _ws.start();
 }
 
-void AbstractWebsocketClient::trigger_event(const std::string &name, std::optional<std::vector<std::any>> data)
+void AbstractWebsocketClient::trigger_event(const std::string &name, const std::optional<std::vector<std::any>> &data)
 {
     auto eventName = "ws." + _name + ".event." + name;
     if (data.has_value() && !data.value().empty())
     {
-        EventBus::getInstance().emit_event(eventName, std::move(data.value()));
+        EventBus::getInstance().emit_event(eventName, data.value());
     }
     else
     {
@@ -89,7 +89,7 @@ void AbstractWebsocketClient::handle_message(const std::string &payload)
     }
 }
 
-std::vector<std::any> AbstractWebsocketClient::invoke(const std::string &method, const std::vector<std::any> &args, int timeout_ms)
+std::vector<std::any> AbstractWebsocketClient::invoke(const std::string &method, const std::vector<std::any> &args, const int &timeout_ms)
 {
     if (!_connected)
         throw std::runtime_error("No connection to server");

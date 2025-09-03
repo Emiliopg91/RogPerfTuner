@@ -28,7 +28,7 @@ protected:
     std::thread _thread;
     Client &_client;
 
-    static double brightnessMap(RgbBrightness b);
+    static double brightnessMap(const RgbBrightness &b);
 
 public:
     AbstractEffect(Client &client, const std::string &name)
@@ -41,23 +41,23 @@ public:
         stop();
     }
 
-    void start(DeviceList &devices, RgbBrightness brightness);
+    void start(const DeviceList &devices, const RgbBrightness &brightness);
 
     void stop();
 
-    std::string getName()
+    const std::string getName()
     {
         return _name;
     }
 
 protected:
-    void _sleep(double seconds);
+    void _sleep(const double &seconds);
 
     void _set_colors(Device &dev, const std::vector<orgb::Color> &colors);
-    virtual void apply_effect(DeviceList &devices) = 0;
+    virtual void apply_effect(const DeviceList &devices) = 0;
 
 private:
-    void _thread_main(DeviceList &devices)
+    void _thread_main(const DeviceList &devices)
     {
         apply_effect(devices);
         _logger.info("Effect finished");
