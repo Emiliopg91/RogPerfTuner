@@ -33,14 +33,19 @@ config:
 
 	@touch .$(BUILD_TYPE)
 
-build_rogcontrolcenter: config
+format:
+	@echo "#######################################################################"
+	@echo "#################### Formatting RogControlCenter ######################"
+	@echo "#######################################################################"
+
+	@clang-format -i $$(find RccCommons -name '*.cpp' -o -name '*.hpp')
+	@clang-format -i $$(find RccCore -name '*.cpp' -o -name '*.hpp')
+	@clang-format -i $$(find RccScripts -name '*.cpp' -o -name '*.hpp')
+
+build_rogcontrolcenter: config format
 	@echo "#######################################################################"
 	@echo "##################### Compiling RogControlCenter ######################"
 	@echo "#######################################################################"
-
-	clang-format -i $$(find RccCommons include -name '*.cpp' -o -name '*.hpp') 2> /dev/null
-	clang-format -i $$(find RccCore include -name '*.cpp' -o -name '*.hpp') 2> /dev/null
-	clang-format -i $$(find RccScripts include -name '*.cpp' -o -name '*.hpp') 2> /dev/null
 
 	@cmake --build build -- -j$(NUM_CORES)
 
