@@ -3,7 +3,7 @@
 #include "../asus_base_client.hpp"
 
 class ArmouryBaseClient : public AsusBaseClient {
-   public:
+  public:
 	ArmouryBaseClient(std::string object_path_sufix, bool required = false)
 		: AsusBaseClient("AsusArmoury", "asus_armoury/" + object_path_sufix, required) {
 	}

@@ -9,12 +9,12 @@ struct WineSyncOptionMeta {
 };
 
 class WineSyncOption : public StrEnum<WineSyncOption, WineSyncOptionMeta::Enum, 5> {
-   public:
+  public:
 	using Enum = WineSyncOptionMeta::Enum;
 	using Base = StrEnum<WineSyncOption, Enum, 5>;
 	using Base::Base;
 
-   private:
+  private:
 	static constexpr std::array<WineSyncOptionMeta, 5> table{{{Enum::AUTO, "AUTO", "auto"},
 															  {Enum::NTSYNC, "NTSYNC", "ntsync"},
 															  {Enum::FSYNC, "FSYNC", "fsync"},

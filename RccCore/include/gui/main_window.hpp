@@ -23,14 +23,14 @@
 class MainWindow : public QMainWindow {
 	Q_OBJECT
 
-   public:
+  public:
 	explicit MainWindow(QWidget* parent = nullptr);
 	inline static MainWindow* INSTANCE = nullptr;
 
-   protected:
+  protected:
 	void closeEvent(QCloseEvent* event) override;
 
-   private slots:
+  private slots:
 	void onGameEvent(int runningGames);
 
 	void setPerformanceProfile(PerformanceProfile value);
@@ -51,7 +51,7 @@ class MainWindow : public QMainWindow {
 
 	void openGameList();
 
-   private:
+  private:
 	Logger* _logger;
 
 	QComboBox* _profileDropdown;

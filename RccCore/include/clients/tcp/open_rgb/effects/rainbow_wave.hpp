@@ -1,3 +1,4 @@
+#pragma once
 #include <algorithm>
 #include <cmath>
 #include <vector>
@@ -5,7 +6,7 @@
 #include "abstract/abstract_effect.hpp"
 
 class RainbowWave : public AbstractEffect {
-   public:
+  public:
 	static RainbowWave& getInstance(Client& client) {
 		static RainbowWave instance{client};
 		return instance;
@@ -70,7 +71,7 @@ class RainbowWave : public AbstractEffect {
 		}
 	}
 
-   private:
+  private:
 	RainbowWave(Client& client) : AbstractEffect(client, "Rainbow wave") {
 	}
 };

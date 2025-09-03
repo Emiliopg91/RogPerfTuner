@@ -4,13 +4,14 @@
 #include <iostream>
 #include <stdexcept>
 #include <string>
+#include <vector>
 
 // --------------------
 // Base genérica
 // --------------------
 template <typename Derived, typename EnumType, typename MetaType, size_t N>
 class IntEnum {
-   public:
+  public:
 	using Enum = EnumType;
 
 	IntEnum(Enum e) : value(e) {
@@ -58,6 +59,6 @@ class IntEnum {
 		return all;
 	}
 
-   protected:
+  protected:
 	Enum value;
 };

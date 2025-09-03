@@ -1,8 +1,9 @@
+#pragma once
 #include "RccCommons.hpp"
 #include "abstract/abstract_file_client.hpp"
 
 class BoostControlClient : public AbstractFileClient {
-   public:
+  public:
 	static BoostControlClient& getInstance() {
 		static bool initialized = false;
 		static std::string path;
@@ -33,7 +34,7 @@ class BoostControlClient : public AbstractFileClient {
 		write(enabled ? on : off);
 	}
 
-   private:
+  private:
 	std::string on;
 	std::string off;
 

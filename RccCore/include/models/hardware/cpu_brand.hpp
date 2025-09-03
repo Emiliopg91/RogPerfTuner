@@ -9,12 +9,12 @@ struct CpuBrandMeta {
 };
 
 class CpuBrand : public StrEnum<CpuBrand, CpuBrandMeta::Enum, 3> {
-   public:
+  public:
 	using Enum = CpuBrandMeta::Enum;
 	using Base = StrEnum<CpuBrand, Enum, 3>;
 	using Base::Base;
 
-   private:
+  private:
 	static constexpr std::array<CpuBrandMeta, 3> table{{{Enum::INTEL, "INTEL", "intel"}}};
 
 	friend Base;

@@ -9,12 +9,12 @@ struct PowerProfileMeta {
 };
 
 class PowerProfile : public StrEnum<PowerProfile, PowerProfileMeta::Enum, 3> {
-   public:
+  public:
 	using Enum = PowerProfileMeta::Enum;
 	using Base = StrEnum<PowerProfile, Enum, 3>;
 	using Base::Base;
 
-   private:
+  private:
 	static constexpr std::array<PowerProfileMeta, 3> table{{{Enum::BALANCED, "BALANCED", "balanced"},
 															{Enum::PERFORMANCE, "PERFORMANCE", "performance"},
 															{Enum::POWERSAVER, "POWERSAVER", "power-saver"}}};

@@ -9,12 +9,12 @@ struct CpuGovernorMeta {
 };
 
 class CpuGovernor : public StrEnum<CpuGovernor, CpuGovernorMeta::Enum, 3> {
-   public:
+  public:
 	using Enum = CpuGovernorMeta::Enum;
 	using Base = StrEnum<CpuGovernor, Enum, 3>;
 	using Base::Base;
 
-   private:
+  private:
 	static constexpr std::array<CpuGovernorMeta, 3> table{
 		{{Enum::POWERSAVE, "POWERSAVE", "powersave"}, {Enum::PERFORMANCE, "PERFORMANCE", "performance"}}};
 

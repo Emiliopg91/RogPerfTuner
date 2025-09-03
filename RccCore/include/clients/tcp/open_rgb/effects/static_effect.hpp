@@ -3,7 +3,7 @@
 #include "abstract/abstract_effect.hpp"
 
 class StaticEffect : public AbstractEffect {
-   public:
+  public:
 	static StaticEffect& getInstance(Client& client) {
 		static StaticEffect instance{client};
 		return instance;
@@ -19,7 +19,7 @@ class StaticEffect : public AbstractEffect {
 		}
 	}
 
-   private:
+  private:
 	StaticEffect(Client& client) : AbstractEffect(client, "Static") {
 	}
 };

@@ -6,7 +6,7 @@
 #include "RccCommons.hpp"
 
 class PlatformClient : public AsusBaseClient {
-   public:
+  public:
 	static PlatformClient& getInstance() {
 		static PlatformClient instance;
 		return instance;
@@ -60,7 +60,7 @@ class PlatformClient : public AsusBaseClient {
 		this->setProperty<bool>(QString("ChangePlatformProfileOnAc"), enable);
 	}
 
-   private:
+  private:
 	PlatformClient() : AsusBaseClient("Platform") {
 	}
 };

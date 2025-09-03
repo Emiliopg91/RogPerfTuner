@@ -12,7 +12,7 @@
 #include "RccCommons.hpp"
 
 class LsUsbClient {
-   private:
+  private:
 	struct udev* udev;
 	struct udev_monitor* mon;
 	std::thread runner;
@@ -49,7 +49,7 @@ class LsUsbClient {
 		});
 	}
 
-   public:
+  public:
 	static LsUsbClient& getInstance() {
 		static LsUsbClient instance;
 		return instance;

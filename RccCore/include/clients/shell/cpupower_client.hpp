@@ -7,11 +7,11 @@
 #include "RccCommons.hpp"
 
 class CpuPowerClient : public AbstractCmdClient {
-   private:
+  private:
 	CpuPowerClient() : AbstractCmdClient("cpupower", "CpuPowerClient") {
 	}
 
-   public:
+  public:
 	static CpuPowerClient& getInstance() {
 		static CpuPowerClient instance;
 		return instance;

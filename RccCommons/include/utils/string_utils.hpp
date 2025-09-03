@@ -8,7 +8,7 @@
 #include <string>
 
 class StringUtils {
-   public:
+  public:
 	// Trim al inicio
 	static inline std::string ltrim(const std::string& s) {
 		std::string result = s;

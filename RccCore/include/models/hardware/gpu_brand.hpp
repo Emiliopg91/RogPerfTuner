@@ -9,12 +9,12 @@ struct GpuBrandMeta {
 };
 
 class GpuBrand : public StrEnum<GpuBrand, GpuBrandMeta::Enum, 3> {
-   public:
+  public:
 	using Enum = GpuBrandMeta::Enum;
 	using Base = StrEnum<GpuBrand, Enum, 3>;
 	using Base::Base;
 
-   private:
+  private:
 	static constexpr std::array<GpuBrandMeta, 3> table{
 		{{Enum::INTEL, "INTEL", "intel"}, {Enum::NVIDIA, "NVIDIA", "nvidia"}}};
 

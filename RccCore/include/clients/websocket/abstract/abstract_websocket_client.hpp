@@ -24,7 +24,7 @@ struct WSMethodResponse {
 };
 
 class AbstractWebsocketClient {
-   public:
+  public:
 	AbstractWebsocketClient(const std::string& host, const int& port, const std::string& name);
 
 	std::vector<std::any> invoke(const std::string& method, const std::vector<std::any>& args,
@@ -42,7 +42,7 @@ class AbstractWebsocketClient {
 		return _connected;
 	}
 
-   protected:
+  protected:
 	void on_without_params(const std::string& name, Callback&& callback) {
 		auto eventName = "ws." + _name + ".event." + name;
 		EventBus::getInstance().on_without_data(eventName, callback);
@@ -53,7 +53,7 @@ class AbstractWebsocketClient {
 		EventBus::getInstance().on_with_data(eventName, std::move(callback));
 	}
 
-   private:
+  private:
 	ix::WebSocket _ws;
 	std::string _name;
 	std::string _host;

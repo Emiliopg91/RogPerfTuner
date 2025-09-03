@@ -9,13 +9,13 @@
 #include "RccCommons.hpp"
 
 class TrayIcon {
-   public:
+  public:
 	static TrayIcon& getInstance() {
 		static TrayIcon instance;
 		return instance;
 	}
 
-   private:
+  private:
 	TrayIcon();
 
 	QSystemTrayIcon tray_icon_;

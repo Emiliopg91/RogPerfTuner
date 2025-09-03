@@ -3,7 +3,7 @@
 #include "../abstract/abstract_dbus_client.hpp"
 
 class PMKeyboardBrightness : public AbstractDbusClient {
-   public:
+  public:
 	static PMKeyboardBrightness& getInstance() {
 		static PMKeyboardBrightness instance;
 		return instance;
@@ -22,7 +22,7 @@ class PMKeyboardBrightness : public AbstractDbusClient {
 		this->onSignal("keyboardBrightnessChanged", callback);
 	}
 
-   private:
+  private:
 	PMKeyboardBrightness()
 		: AbstractDbusClient(false, "org.kde.Solid.PowerManagement",
 							 "/org/kde/Solid/PowerManagement/Actions/KeyboardBrightnessControl",

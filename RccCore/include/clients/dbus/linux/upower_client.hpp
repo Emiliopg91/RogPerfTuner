@@ -4,7 +4,7 @@
 #include "RccCommons.hpp"
 
 class UPowerClient : public AbstractDbusClient {
-   public:
+  public:
 	static UPowerClient& getInstance() {
 		static UPowerClient instance;
 		return instance;
@@ -18,7 +18,7 @@ class UPowerClient : public AbstractDbusClient {
 		this->onPropertyChange("OnBattery", std::move(callback));
 	}
 
-   private:
+  private:
 	UPowerClient()
 		: AbstractDbusClient(true, QString("org.freedesktop.UPower"), QString("/org/freedesktop/UPower"),
 							 QString("org.freedesktop.UPower"), true) {

@@ -3,7 +3,7 @@
 #include "../abstract/abstract_dbus_client.hpp"
 
 class AsusBaseClient : public AbstractDbusClient {
-   public:
+  public:
 	AsusBaseClient(std::string interface_sufix, std::string object_path_sufix = "", bool required = false)
 		: AbstractDbusClient(
 			  true, QString("xyz.ljones.Asusd"),

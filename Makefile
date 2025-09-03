@@ -38,6 +38,10 @@ build_rogcontrolcenter: config
 	@echo "##################### Compiling RogControlCenter ######################"
 	@echo "#######################################################################"
 
+	clang-format -i $$(find RccCommons include -name '*.cpp' -o -name '*.hpp') 2> /dev/null
+	clang-format -i $$(find RccCore include -name '*.cpp' -o -name '*.hpp') 2> /dev/null
+	clang-format -i $$(find RccScripts include -name '*.cpp' -o -name '*.hpp') 2> /dev/null
+
 	@cmake --build build -- -j$(NUM_CORES)
 
 	@rm -rf assets/bin

@@ -11,12 +11,12 @@ struct MangoHudLevelMeta {
 };
 
 class MangoHudLevel : public IntEnum<MangoHudLevel, MangoHudLevelMeta::Enum, MangoHudLevelMeta, 5> {
-   public:
+  public:
 	using Enum = MangoHudLevelMeta::Enum;
 	using Base = IntEnum<MangoHudLevel, Enum, MangoHudLevelMeta, 5>;
 	using Base::Base;
 
-   private:
+  private:
 	static constexpr std::array<MangoHudLevelMeta, 5> table{{{Enum::NO_DISPLAY, "NO_DISPLAY", 0},
 															 {Enum::FPS_ONLY, "FPS_ONLY", 1},
 															 {Enum::HORIZONTAL_VIEW, "HORIZONTAL_VIEW", 2},

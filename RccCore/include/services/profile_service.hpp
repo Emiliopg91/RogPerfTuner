@@ -6,7 +6,7 @@
 #include "RccCommons.hpp"
 
 class ProfileService {
-   public:
+  public:
 	static ProfileService& getInstance() {
 		static ProfileService instance;
 		return instance;
@@ -19,7 +19,7 @@ class ProfileService {
 
 	PerformanceProfile nextPerformanceProfile();
 
-   private:
+  private:
 	ProfileService();
 
 	Logger logger{"ProfileService"};

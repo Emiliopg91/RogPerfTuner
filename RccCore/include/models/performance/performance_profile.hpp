@@ -9,12 +9,12 @@ struct PerformanceProfileMeta {
 };
 
 class PerformanceProfile : public IntEnum<PerformanceProfile, PerformanceProfileMeta::Enum, PerformanceProfileMeta, 3> {
-   public:
+  public:
 	using Enum = PerformanceProfileMeta::Enum;
 	using Base = IntEnum<PerformanceProfile, Enum, PerformanceProfileMeta, 3>;
 	using Base::Base;
 
-   private:
+  private:
 	static constexpr std::array<PerformanceProfileMeta, 3> table{
 		{{Enum::QUIET, "QUIET", 0}, {Enum::BALANCED, "BALANCED", 1}, {Enum::PERFORMANCE, "PERFORMANCE", 2}}};
 

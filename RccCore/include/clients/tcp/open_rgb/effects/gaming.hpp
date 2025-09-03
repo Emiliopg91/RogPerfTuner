@@ -1,3 +1,4 @@
+#pragma once
 #include <chrono>
 #include <map>
 #include <regex>
@@ -8,7 +9,7 @@
 #include "abstract/abstract_effect.hpp"
 
 class GamingEffect : public AbstractEffect {
-   public:
+  public:
 	static GamingEffect& getInstance(Client& client) {
 		static GamingEffect instance{client};
 		return instance;

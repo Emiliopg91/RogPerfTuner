@@ -11,11 +11,11 @@
 #include "abstract/abstract_cmd_client.hpp"
 
 class SwitcherooCtlClient : AbstractCmdClient {
-   private:
+  private:
 	SwitcherooCtlClient() : AbstractCmdClient("switcherooctl", "SwitcherooCtlClient") {
 	}
 
-   public:
+  public:
 	static SwitcherooCtlClient& getInstance() {
 		static SwitcherooCtlClient instance;
 		return instance;

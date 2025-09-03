@@ -1,9 +1,10 @@
+#pragma once
 #include <string>
 
 #include "RccCommons.hpp"
 
 class Toaster {
-   public:
+  public:
 	static Toaster& getInstance() {
 		static Toaster instance;
 		return instance;
@@ -11,6 +12,6 @@ class Toaster {
 
 	void showToast(std::string message, bool can_be_hidden = true, std::string icon = Constants::ASSET_ICON_FILE);
 
-   private:
+  private:
 	uint last_id = 0;
 };

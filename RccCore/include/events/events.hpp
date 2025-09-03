@@ -3,7 +3,7 @@
 #include <string>
 
 class Events {
-   public:
+  public:
 	inline const static std::string APPLICATION_STOP = "APPLICATION_STOP";
 
 	inline const static std::string UDEV_CLIENT_DEVICE_EVENT = "UDEV_CLIENT_DEVICE_EVENT";

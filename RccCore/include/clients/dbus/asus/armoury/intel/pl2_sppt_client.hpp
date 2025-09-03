@@ -3,7 +3,7 @@
 #include "../armoury_base_client.hpp"
 
 class Pl2SpptClient : public ArmouryBaseClient {
-   public:
+  public:
 	static Pl2SpptClient& getInstance() {
 		static Pl2SpptClient instance;
 		return instance;

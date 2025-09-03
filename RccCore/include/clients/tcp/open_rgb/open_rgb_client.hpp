@@ -6,7 +6,7 @@
 #include "effects/abstract/abstract_effect.hpp"
 
 class OpenRgbClient {
-   public:
+  public:
 	static OpenRgbClient& getInstance() {
 		static OpenRgbClient instance;
 		return instance;
@@ -19,7 +19,7 @@ class OpenRgbClient {
 	void stop();
 	void disableDevice(const std::string&);
 
-   private:
+  private:
 	std::vector<UsbIdentifier> compatibleDevices;
 	std::map<std::string, std::string> compatibleDeviceNames;
 	std::thread runnerThread;

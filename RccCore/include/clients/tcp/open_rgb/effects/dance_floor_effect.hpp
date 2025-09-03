@@ -1,3 +1,4 @@
+#pragma once
 #include <chrono>
 #include <random>
 #include <thread>
@@ -6,7 +7,7 @@
 #include "abstract/abstract_effect.hpp"
 
 class DanceFloorEffect : public AbstractEffect {
-   private:
+  private:
 	std::mt19937 _rng;
 
 	Color _get_random_color() {
@@ -30,7 +31,7 @@ class DanceFloorEffect : public AbstractEffect {
 		return colors;
 	}
 
-   public:
+  public:
 	static DanceFloorEffect& getInstance(Client& client) {
 		static DanceFloorEffect instance{client};
 		return instance;
@@ -40,7 +41,7 @@ class DanceFloorEffect : public AbstractEffect {
 		_rng = std::mt19937(rd());
 	}
 
-   protected:
+  protected:
 	void apply_effect(const DeviceList& devices) {
 		while (_is_running) {
 			for (auto& dev : devices) {

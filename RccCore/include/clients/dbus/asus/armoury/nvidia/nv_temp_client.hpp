@@ -3,7 +3,7 @@
 #include "../armoury_base_client.hpp"
 
 class NvTempClient : public ArmouryBaseClient {
-   public:
+  public:
 	static NvTempClient& getInstance() {
 		static NvTempClient instance;
 		return instance;

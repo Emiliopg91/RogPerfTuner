@@ -8,7 +8,7 @@
 #include "RccCommons.hpp"
 
 class AbstractFileClient {
-   public:
+  public:
 	std::string read(const int& head = 0, const int& tail = 0) {
 		if (!available_)
 			throw std::runtime_error(fmt::format("File {} doesn't exist", path_));
@@ -39,7 +39,7 @@ class AbstractFileClient {
 		return available_;
 	}
 
-   protected:
+  protected:
 	AbstractFileClient(const std::string& path, const std::string& name, const bool& sudo = false,
 					   const bool& required = true)
 		: path_(path), sudo_(sudo) {
@@ -53,7 +53,7 @@ class AbstractFileClient {
 		}
 	}
 
-   private:
+  private:
 	std::string path_;
 	bool sudo_;
 	bool available_;

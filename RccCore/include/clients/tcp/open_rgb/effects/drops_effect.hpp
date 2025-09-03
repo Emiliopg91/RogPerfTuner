@@ -1,3 +1,4 @@
+#pragma once
 #include <algorithm>
 #include <chrono>
 #include <cmath>
@@ -9,7 +10,7 @@
 #include "abstract/abstract_effect.hpp"
 
 class DropsEffect : public AbstractEffect {
-   public:
+  public:
 	static DropsEffect& getInstance(Client& client) {
 		static DropsEffect instance(client);
 		return instance;
@@ -34,7 +35,7 @@ class DropsEffect : public AbstractEffect {
 		}
 	}
 
-   private:
+  private:
 	DropsEffect(Client& client) : AbstractEffect(client, "Drops") {
 		_available_colors = {Color{0, 0, 0}, Color{0, 0, 0}, Color{255, 255, 255}, Color{255, 0, 0},
 							 Color{0, 255, 255}};

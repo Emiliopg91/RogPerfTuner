@@ -3,7 +3,7 @@
 #include "../abstract/abstract_dbus_client.hpp"
 
 class NotificationClient : public AbstractDbusClient {
-   public:
+  public:
 	static NotificationClient& getInstance() {
 		static NotificationClient instance;
 		return instance;
@@ -22,7 +22,7 @@ class NotificationClient : public AbstractDbusClient {
 		return this->call<int>(QString("CloseNotification"), {id});
 	}
 
-   private:
+  private:
 	NotificationClient()
 		: AbstractDbusClient(false, QString("org.freedesktop.Notifications"), QString("/org/freedesktop/Notifications"),
 							 QString("org.freedesktop.Notifications"), true) {

@@ -9,12 +9,12 @@ struct SsdSchedulerMeta {
 };
 
 class SsdScheduler : public StrEnum<SsdScheduler, SsdSchedulerMeta::Enum, 2> {
-   public:
+  public:
 	using Enum = SsdSchedulerMeta::Enum;
 	using Base = StrEnum<SsdScheduler, Enum, 2>;
 	using Base::Base;
 
-   private:
+  private:
 	static constexpr std::array<SsdSchedulerMeta, 2> table{
 		{{Enum::NOOP, "NOOP", "none"}, {Enum::MQ_DEADLINE, "MQ_DEADLINE", "mq-deadline"}}};
 

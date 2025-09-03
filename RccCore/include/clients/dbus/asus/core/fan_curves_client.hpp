@@ -5,7 +5,7 @@
 #include "RccCommons.hpp"
 
 class FanCurvesClient : public AsusBaseClient {
-   public:
+  public:
 	static FanCurvesClient& getInstance() {
 		static FanCurvesClient instance;
 		return instance;
@@ -23,7 +23,7 @@ class FanCurvesClient : public AsusBaseClient {
 		call("SetFanCurvesEnabled", {static_cast<uint>(profile.toInt()), true});
 	}
 
-   private:
+  private:
 	FanCurvesClient() : AsusBaseClient("FanCurves") {
 	}
 };

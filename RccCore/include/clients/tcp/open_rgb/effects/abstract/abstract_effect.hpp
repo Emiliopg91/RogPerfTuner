@@ -18,7 +18,7 @@ using orgb::Mode;
 using orgb::RequestStatus;
 
 class AbstractEffect {
-   protected:
+  protected:
 	bool _is_running   = false;
 	double _brightness = 0;
 	std::string _name;
@@ -29,7 +29,7 @@ class AbstractEffect {
 
 	static double brightnessMap(const RgbBrightness& b);
 
-   public:
+  public:
 	AbstractEffect(Client& client, const std::string& name) : _name(name), _client(client) {
 	}
 
@@ -45,13 +45,13 @@ class AbstractEffect {
 		return _name;
 	}
 
-   protected:
+  protected:
 	void _sleep(const double& seconds);
 
 	void _set_colors(Device& dev, const std::vector<orgb::Color>& colors);
 	virtual void apply_effect(const DeviceList& devices) = 0;
 
-   private:
+  private:
 	void _thread_main(const DeviceList& devices) {
 		apply_effect(devices);
 		_logger.info("Effect finished");

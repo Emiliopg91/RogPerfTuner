@@ -5,7 +5,7 @@
 #include "RccCommons.hpp"
 
 class PowerProfileClient : public AbstractDbusClient {
-   public:
+  public:
 	static PowerProfileClient& getInstance() {
 		static PowerProfileClient instance;
 		return instance;
@@ -19,7 +19,7 @@ class PowerProfileClient : public AbstractDbusClient {
 		this->setProperty<QString>(QString("ActiveProfile"), QString::fromStdString(val.toString()));
 	}
 
-   private:
+  private:
 	PowerProfileClient()
 		: AbstractDbusClient(true, QString("net.hadess.PowerProfiles"), QString("/net/hadess/PowerProfiles"),
 							 QString("net.hadess.PowerProfiles"), true) {

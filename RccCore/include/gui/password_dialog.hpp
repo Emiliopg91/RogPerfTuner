@@ -10,7 +10,7 @@
 class PasswordDialog : public QDialog {
 	Q_OBJECT
 
-   public:
+  public:
 	static PasswordDialog& getInstance() {
 		static PasswordDialog instance;
 		return instance;
@@ -18,7 +18,7 @@ class PasswordDialog : public QDialog {
 
 	bool showDialog();
 
-   private:
+  private:
 	PasswordDialog(QWidget* parent = nullptr);
 
 	void onAccept();

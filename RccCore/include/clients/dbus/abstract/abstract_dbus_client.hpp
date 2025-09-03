@@ -12,7 +12,7 @@
 
 class AbstractDbusClient : public QObject {
 	Q_OBJECT
-   public:
+  public:
 	explicit AbstractDbusClient(bool systemBus, const QString& service, const QString& objectPath,
 								const QString& interface, bool required = true, QObject* parent = nullptr);
 
@@ -20,7 +20,7 @@ class AbstractDbusClient : public QObject {
 
 	bool available() const;
 
-   private:
+  private:
 	void checkAvailable() const;
 	bool systemBus_;
 	QString serviceName_;
@@ -30,7 +30,7 @@ class AbstractDbusClient : public QObject {
 	QDBusInterface* iface_;
 	bool available_;
 
-   protected:
+  protected:
 	template <typename Ret = QVariant>
 	Ret call(const QString& method, const QVariantList& args = {}) {
 		checkAvailable();
@@ -108,7 +108,7 @@ class AbstractDbusClient : public QObject {
 			std::forward<Callback>(callback));
 	}
 
-   private slots:
+  private slots:
 	void onPropertiesChanged(const QString& iface, const QVariantMap& changedProps,
 							 const QStringList& invalidatedProps) {
 		if (iface != interfaceName_)

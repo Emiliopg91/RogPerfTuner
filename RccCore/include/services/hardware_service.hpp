@@ -9,7 +9,7 @@
 #include "RccCommons.hpp"
 
 class HardwareService {
-   public:
+  public:
 	static HardwareService& getInstance() {
 		static HardwareService instance;
 		return instance;
@@ -25,7 +25,7 @@ class HardwareService {
 		return gpus;
 	}
 
-   private:
+  private:
 	HardwareService();
 
 	inline static int8_t CPU_PRIORITY = -17;

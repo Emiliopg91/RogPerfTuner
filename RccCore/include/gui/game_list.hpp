@@ -25,15 +25,15 @@
 
 class GameList : public QDialog {
 	Q_OBJECT
-   public:
+  public:
 	inline static GameList* INSTANCE = nullptr;
 
 	GameList(QWidget* parent = nullptr, bool manage_parent = false);
 
-   protected:
+  protected:
 	void closeEvent(QCloseEvent* event) override;
 
-   private:
+  private:
 	QWidget* parentWidget = nullptr;
 	bool manageParent	  = false;
 };

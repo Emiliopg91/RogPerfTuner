@@ -3,7 +3,7 @@
 #include "abstract/abstract_effect.hpp"
 
 class BreathingEffect : public AbstractEffect {
-   public:
+  public:
 	static BreathingEffect& getInstance(Client& client) {
 		static BreathingEffect instance{client};
 		return instance;
@@ -30,7 +30,7 @@ class BreathingEffect : public AbstractEffect {
 		}
 	}
 
-   private:
+  private:
 	BreathingEffect(Client& client)
 		: AbstractEffect(client, "Breathing"), _total_time(4.0), _pause_time(1.0), _frequency(0.05) {
 		_step_count = static_cast<int>((_total_time - _pause_time) / _frequency);

@@ -6,7 +6,7 @@
 #include <string>
 
 class FileUtils {
-   public:
+  public:
 	static inline bool exists(const std::string& path) {
 		return exists(std::filesystem::path(path));
 	}

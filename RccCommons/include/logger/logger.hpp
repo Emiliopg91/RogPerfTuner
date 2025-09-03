@@ -9,7 +9,7 @@ template <typename... Args>
 using format_string_t = fmt::format_string<Args...>;
 
 class Logger {
-   public:
+  public:
 	void setLevel(std::string levelStr) {
 		setLevel(spdlog::level::from_str(StringUtils::toLowerCase(levelStr)));
 	}
@@ -74,7 +74,7 @@ class Logger {
 		tabs -= 1;
 	}
 
-   private:
+  private:
 	inline static int tabs = 0;
 	inline static std::mutex mutex;
 	std::shared_ptr<spdlog::logger> logger;

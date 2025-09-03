@@ -9,12 +9,12 @@ struct PlatformProfileMeta {
 };
 
 class PlatformProfile : public IntEnum<PlatformProfile, PlatformProfileMeta::Enum, PlatformProfileMeta, 3> {
-   public:
+  public:
 	using Enum = PlatformProfileMeta::Enum;
 	using Base = IntEnum<PlatformProfile, Enum, PlatformProfileMeta, 3>;
 	using Base::Base;
 
-   private:
+  private:
 	static constexpr std::array<PlatformProfileMeta, 3> table{
 		{{Enum::BALANCED, "BALANCED", 0}, {Enum::PERFORMANCE, "PERFORMANCE", 1}, {Enum::LOW_POWER, "LOW_POWER", 3}}};
 

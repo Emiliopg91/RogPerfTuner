@@ -1,9 +1,10 @@
+#pragma once
 #include "../../models/performance/ssd_scheduler.hpp"
 #include "RccCommons.hpp"
 #include "abstract/abstract_file_client.hpp"
 
 class SsdSchedulerClient : public AbstractFileClient {
-   public:
+  public:
 	static SsdSchedulerClient& getInstance() {
 		static SsdSchedulerClient instance;
 		return instance;
@@ -40,7 +41,7 @@ class SsdSchedulerClient : public AbstractFileClient {
 		return result;
 	}
 
-   private:
+  private:
 	SsdSchedulerClient() : AbstractFileClient("/sys/block/nvme*/queue/scheduler", "SsdSchedulerClient", true, false) {
 	}
 };

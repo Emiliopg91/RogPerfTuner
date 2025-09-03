@@ -1,3 +1,4 @@
+#pragma once
 #include <chrono>
 #include <random>
 #include <thread>
@@ -6,7 +7,7 @@
 #include "abstract/abstract_effect.hpp"
 
 class StarryNightEffect : public AbstractEffect {
-   private:
+  private:
 	int _max_steps = 30;
 	std::vector<std::thread> _threads;
 	std::mt19937 _rng{std::random_device{}()};
@@ -53,13 +54,13 @@ class StarryNightEffect : public AbstractEffect {
 	StarryNightEffect(Client& client) : AbstractEffect(client, "Starry night") {
 	}
 
-   public:
+  public:
 	static StarryNightEffect& getInstance(Client& client) {
 		static StarryNightEffect instance{client};
 		return instance;
 	}
 
-   protected:
+  protected:
 	void apply_effect(const DeviceList& devices) override {
 		_threads.clear();
 		for (auto& device : devices) {

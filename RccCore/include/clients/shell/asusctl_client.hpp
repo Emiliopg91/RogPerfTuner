@@ -3,11 +3,11 @@
 #include "./abstract/abstract_cmd_client.hpp"
 
 class AsusCtlClient : public AbstractCmdClient {
-   private:
+  private:
 	AsusCtlClient() : AbstractCmdClient("asusctl", "AsusCtlClient") {
 	}
 
-   public:
+  public:
 	static AsusCtlClient& getInstance() {
 		static AsusCtlClient instance;
 		return instance;

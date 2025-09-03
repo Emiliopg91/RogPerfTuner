@@ -9,7 +9,7 @@
 #include <QWheelEvent>
 
 class GuiUtils {
-   public:
+  public:
 	template <typename T>
 	static void centerWindowOnCurrentScreen(T* element) {
 		// Obtener la posición actual del cursor
@@ -29,11 +29,11 @@ class GuiUtils {
 // Subclase de QComboBox que ignora el evento de rueda
 class NoScrollComboBox : public QComboBox {
 	Q_OBJECT
-   public:
+  public:
 	explicit NoScrollComboBox(QWidget* parent = nullptr) : QComboBox(parent) {
 	}
 
-   protected:
+  protected:
 	void wheelEvent(QWheelEvent* event) override {
 		event->ignore();  // Ignorar el evento de rueda
 	}

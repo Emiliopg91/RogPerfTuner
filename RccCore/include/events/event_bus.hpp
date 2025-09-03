@@ -17,7 +17,7 @@ typedef std::function<void(CallbackParam)> CallbackWithParams;
 typedef std::function<void()> Callback;
 
 class EventBus {
-   private:
+  private:
 	EventBus()							 = default;
 	EventBus(const EventBus&)			 = delete;
 	EventBus& operator=(const EventBus&) = delete;
@@ -26,7 +26,7 @@ class EventBus {
 	std::unordered_map<std::string, std::vector<CallbackWithParams>> with_params_listeners;
 	std::mutex mtx;
 
-   public:
+  public:
 	static EventBus& getInstance() {
 		static EventBus instance;
 		return instance;

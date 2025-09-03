@@ -1,8 +1,14 @@
 #pragma once
 
+#include <array>
+#include <iostream>
+#include <stdexcept>
+#include <string>
+#include <vector>
+
 template <typename Derived, typename EnumType, size_t N>
 class StrEnum {
-   public:
+  public:
 	using Enum = EnumType;
 
 	StrEnum(Enum e) : value(e) {
@@ -56,6 +62,6 @@ class StrEnum {
 		return all;
 	}
 
-   protected:
+  protected:
 	Enum value;
 };

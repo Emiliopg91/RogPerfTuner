@@ -4,7 +4,7 @@
 #include "RccCommons.hpp"
 
 class Configuration {
-   public:
+  public:
 	static Configuration& getInstance() {
 		static Configuration instance;
 		return instance;
@@ -22,7 +22,7 @@ class Configuration {
 	std::string getPassword();
 	void setPassword(const std::string& pss);
 
-   private:
+  private:
 	Configuration() {
 		loadConfig();
 	}

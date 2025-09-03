@@ -8,7 +8,7 @@
 #include "RccCommons.hpp"
 
 class SteamService {
-   private:
+  private:
 	inline static std::string WRAPPER_PATH = Constants::BIN_DIR + "/steam/run";
 	Logger logger{"SteamService"};
 	std::map<unsigned int, std::string> runningGames;
@@ -27,7 +27,7 @@ class SteamService {
 	void copyPlugin();
 	bool checkIfRequiredInstallation();
 
-   public:
+  public:
 	static SteamService& getInstance() {
 		static SteamService instance;
 		return instance;

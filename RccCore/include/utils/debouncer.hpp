@@ -1,3 +1,4 @@
+#pragma once
 #include <atomic>
 #include <chrono>
 #include <functional>
@@ -7,7 +8,7 @@
 
 template <typename... Args>
 class Debouncer {
-   public:
+  public:
 	template <typename F>
 	Debouncer(int delayMs, F&& callback) : delay(delayMs), func(std::forward<F>(callback)), active(false), stop(false) {
 	}
@@ -41,7 +42,7 @@ class Debouncer {
 			worker.join();
 	}
 
-   private:
+  private:
 	int delay;
 	std::function<void(Args...)> func;
 	std::thread worker;

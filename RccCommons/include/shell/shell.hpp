@@ -8,7 +8,7 @@
 #include "../models/command_result.hpp"
 
 class Shell {
-   public:
+  public:
 	// Devuelve la instancia única del singleton
 	static Shell& getInstance(const std::string& sudo_password = "") {
 		static Shell instance(sudo_password);
@@ -25,7 +25,7 @@ class Shell {
 	std::optional<std::string> which(std::string cmd);
 	std::vector<std::string> whichAll(std::string cmd);
 
-   private:
+  private:
 	Shell(const std::string& sudo_password);
 
 	struct BashSession {

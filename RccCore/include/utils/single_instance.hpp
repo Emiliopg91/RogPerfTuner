@@ -1,3 +1,4 @@
+#pragma once
 #include <unistd.h>
 
 #include <RccCommons.hpp>
@@ -8,7 +9,7 @@
 #include <string>
 
 class SingleInstance {
-   public:
+  public:
 	static SingleInstance& getInstance() {
 		static SingleInstance instance;
 		return instance;
@@ -38,7 +39,7 @@ class SingleInstance {
 		out.close();
 	}
 
-   private:
+  private:
 	SingleInstance() {
 	}
 	Logger logger{"SingleInstance"};

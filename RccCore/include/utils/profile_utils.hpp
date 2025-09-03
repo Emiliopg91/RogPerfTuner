@@ -8,7 +8,7 @@
 #include "RccCommons.hpp"
 
 class ProfileUtils {
-   public:
+  public:
 	inline static int acIntelPl1Spl(PerformanceProfile profile) {
 		auto& client = Pl1SpdClient::getInstance();
 
@@ -146,7 +146,7 @@ class ProfileUtils {
 			return SsdScheduler::Enum::MQ_DEADLINE;
 	}
 
-   private:
+  private:
 	inline static int acTdpToBatteryTdp(int tdp, int minTdp) {
 		return std::max(minTdp, static_cast<int>(std::round(tdp * 0.6)));
 	}

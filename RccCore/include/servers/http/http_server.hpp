@@ -10,7 +10,7 @@
 #include "httplib.h"
 using json = nlohmann::json;
 class HttpServer {
-   private:
+  private:
 	httplib::Server svr;
 	std::thread runner;
 	std::atomic<bool> started{false};
@@ -83,7 +83,7 @@ class HttpServer {
 		logger.rem_tab();
 	}
 
-   public:
+  public:
 	static HttpServer& getInstance() {
 		static HttpServer instance;
 		return instance;

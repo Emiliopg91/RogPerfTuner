@@ -7,7 +7,7 @@
 #include "RccCommons.hpp"
 
 class OpenRgbService {
-   public:
+  public:
 	static OpenRgbService& getInstance() {
 		static OpenRgbService instance;
 		return instance;
@@ -27,7 +27,7 @@ class OpenRgbService {
 	RgbBrightness decreaseBrightness();
 	std::string nextEffect();
 
-   private:
+  private:
 	OpenRgbService();
 
 	std::map<std::string, std::string> compatibleDeviceNames;

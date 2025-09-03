@@ -1,3 +1,4 @@
+#pragma once
 #include <algorithm>
 #include <chrono>
 #include <cmath>
@@ -65,7 +66,7 @@ double getCPUUsagePercent() {
 }
 
 class DigitalRainEffect : public AbstractEffect {
-   private:
+  private:
 	int _max_count	 = 15;
 	double _cpu		 = 0.0;
 	double _nap_time = 0.07;
@@ -139,7 +140,7 @@ class DigitalRainEffect : public AbstractEffect {
 				return false;  // fuera de rango -> no disponible
 			if (zone_status[r][column].cur_val != 0)
 				return false;  // hay algo encendido
-			// Nota: No comprobamos pos_idx aquí; puede ser -1 en columnas huecas de la matriz
+							   // Nota: No comprobamos pos_idx aquí; puede ser -1 en columnas huecas de la matriz
 		}
 		return true;
 	}
@@ -206,7 +207,7 @@ class DigitalRainEffect : public AbstractEffect {
 		}
 	}
 
-   public:
+  public:
 	static DigitalRainEffect& getInstance(Client& client) {
 		static DigitalRainEffect instance{client};
 		return instance;
@@ -222,7 +223,7 @@ class DigitalRainEffect : public AbstractEffect {
 		}
 	}
 
-   protected:
+  protected:
 	void apply_effect(const DeviceList& devices) {
 		std::vector<std::thread> threads;
 

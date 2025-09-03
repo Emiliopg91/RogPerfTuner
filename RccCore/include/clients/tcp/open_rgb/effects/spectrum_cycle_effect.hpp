@@ -1,3 +1,4 @@
+#pragma once
 #include <chrono>
 #include <thread>
 #include <vector>
@@ -5,13 +6,13 @@
 #include "abstract/abstract_effect.hpp"
 
 class SpectrumCycleEffect : public AbstractEffect {
-   public:
+  public:
 	static SpectrumCycleEffect& getInstance(Client& client) {
 		static SpectrumCycleEffect instance{client};
 		return instance;
 	}
 
-   protected:
+  protected:
 	void apply_effect(const DeviceList& devices) override {
 		int offset = 0;
 		while (_is_running) {
@@ -27,7 +28,7 @@ class SpectrumCycleEffect : public AbstractEffect {
 		}
 	}
 
-   private:
+  private:
 	SpectrumCycleEffect(Client& client) : AbstractEffect(client, "Spectrum cycle") {
 	}
 };

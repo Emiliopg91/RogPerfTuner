@@ -8,7 +8,7 @@
 #include "RccCommons.hpp"
 
 class AbstractCmdClient {
-   protected:
+  protected:
 	AbstractCmdClient(const std::string& command, const std::string& name, const bool& required = true)
 		: command_(command), available_(true) {
 		logger_ = Logger{name};
@@ -36,12 +36,12 @@ class AbstractCmdClient {
 		return result;
 	}
 
-   public:
+  public:
 	bool available() {
 		return available_;
 	}
 
-   private:
+  private:
 	std::string command_;
 	bool available_;
 	Logger logger_;

@@ -30,7 +30,7 @@ struct Asset {
 };
 
 class AutoUpdater {
-   private:
+  private:
 	Logger logger{"AutoUpdater"};
 
 	std::string owner	   = "Emiliopg91";
@@ -180,7 +180,7 @@ class AutoUpdater {
 		}
 	}
 
-   public:
+  public:
 	static AutoUpdater& getInstance(Callback restart_method_, std::function<bool()> perform_update_check_ = nullptr) {
 		static AutoUpdater instance(restart_method_, perform_update_check_);
 		return instance;

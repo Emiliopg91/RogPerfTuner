@@ -9,7 +9,7 @@ struct RgbBrightnessMeta {
 };
 
 class RgbBrightness : public IntEnum<RgbBrightness, RgbBrightnessMeta::Enum, RgbBrightnessMeta, 5> {
-   public:
+  public:
 	using Enum = RgbBrightnessMeta::Enum;
 	using Base = IntEnum<RgbBrightness, Enum, RgbBrightnessMeta, 5>;
 	using Base::Base;
@@ -44,7 +44,7 @@ class RgbBrightness : public IntEnum<RgbBrightness, RgbBrightnessMeta::Enum, Rgb
 		}
 	}
 
-   private:
+  private:
 	static constexpr std::array<RgbBrightnessMeta, 5> table{{{Enum::MAX, "MAX", 4},
 															 {Enum::HIGH, "HIGH", 3},
 															 {Enum::MEDIUM, "MEDIUM", 2},

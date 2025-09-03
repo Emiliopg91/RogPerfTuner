@@ -10,7 +10,7 @@
 #include "string_utils.hpp"
 
 class Constants {
-   private:
+  private:
 	static std::string getExecutablePath() {
 		char buffer[PATH_MAX];
 		ssize_t len = readlink("/proc/self/exe", buffer, sizeof(buffer) - 1);
@@ -31,7 +31,7 @@ class Constants {
 		throw std::runtime_error("No se pudo obtener la ruta del ejecutable");
 	}
 
-   public:
+  public:
 	inline static const std::string ASSETS_DIR = [] {
 		const char* dir = std::getenv("RCC_ASSETS_DIR");
 		if (!dir) {

@@ -5,7 +5,7 @@
 #include "RccCommons.hpp"
 
 class ApplicationService {
-   public:
+  public:
 	static ApplicationService& getInstance() {
 		static ApplicationService instance;
 		return instance;
@@ -14,7 +14,7 @@ class ApplicationService {
 	void applyUpdate();
 	void shutdown();
 
-   private:
+  private:
 	Logger logger{"ApplicationService"};
 	bool rccdcEnabled = false;
 	bool shuttingDown = false;

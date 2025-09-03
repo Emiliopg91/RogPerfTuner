@@ -5,7 +5,7 @@
 #include "RccCommons.hpp"
 
 class Translator {
-   public:
+  public:
 	static Translator& getInstance() {
 		static Translator instance;
 		return instance;
@@ -13,7 +13,7 @@ class Translator {
 
 	std::string translate(const std::string& msg, const std::unordered_map<std::string, std::any>& replacement = {});
 
-   private:
+  private:
 	inline static std::string FALLBACK_LANG = "en";
 	Translator();
 	Logger logger{"Translator"};
