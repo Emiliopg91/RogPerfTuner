@@ -27,7 +27,7 @@ jobs:
           sudo apt-get update
           sudo apt-get install -y qt6-base-dev qt6-tools-dev qt6-tools-dev-tools build-essential cmake libsecret-1-dev libzstd-dev pkg-config libudev-dev clang-format
 
-      - name: format
+      - name: Format
         run: |
           make format
           if [[ -n $(git status --porcelain) ]]; then
@@ -180,6 +180,7 @@ jobs:
 
       - name: Create tag
         run: |
+          git pull --rebase origin main
           git tag "${{ needs.build_rogcontrolcenter.outputs.version }}"
           make increase_version
           git add CMakeLists.txt > /dev/null
@@ -203,5 +204,5 @@ jobs:
 
       - name: Push changes to main and force push to develop
         run: |
-          git push origin
+          git push origin main
           git push origin main:develop --force
