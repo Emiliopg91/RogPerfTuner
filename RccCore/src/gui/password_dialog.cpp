@@ -62,9 +62,7 @@ bool PasswordDialog::checkPassword(const QString& password) {
 	QProcess process;
 
 	QStringList args;
-	args << "-k"
-		 << "-S"
-		 << "echo" << "Password correct";
+	args << "-k" << "-S" << "echo" << "Password correct";
 
 	process.start("sudo", args);
 
