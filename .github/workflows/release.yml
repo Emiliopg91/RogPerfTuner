@@ -183,8 +183,12 @@ jobs:
           git pull --rebase origin main
           git tag "${{ needs.build_rogcontrolcenter.outputs.version }}"
           make increase_version
+          git push origin main
+          git push origin main:develop --force
+          git checkout develop
           git add CMakeLists.txt > /dev/null
           git commit -m "[ci skip] Ready for next development iteration" > /dev/null
+          git push origin develop --force
 
       - name: Download AppImage artifact
         uses: actions/download-artifact@v4
@@ -201,8 +205,3 @@ jobs:
             dist/RogControlCenter.AppImage
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
-      - name: Push changes to main and force push to develop
-        run: |
-          git push origin main
-          git push origin main:develop --force
