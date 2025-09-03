@@ -243,7 +243,7 @@ int main(int argc, char *argv[])
 
         if (!res || res->status != 200)
         {
-            logger.error("Error on configuration request");
+            logger.error("Error on configuration request: " + std::to_string(res->status));
         }
         else
         {

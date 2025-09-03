@@ -82,7 +82,7 @@ GameList::GameList(QWidget *parent, bool manage_parent)
 
     int row = 0;
     std::sort(appIds.begin(), appIds.end(), [&](int a, int b)
-              { return gameCfg[std::to_string(a)].name < gameCfg[std::to_string(b)].name; });
+              { return gameCfg[std::to_string(a)].name > gameCfg[std::to_string(b)].name; });
 
     for (unsigned int appid : appIds)
     {

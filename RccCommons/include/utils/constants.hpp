@@ -86,6 +86,12 @@ public:
     inline static const std::string BIN_APPLICATION_DIR = Constants::BIN_DIR + "/application";
     inline static const std::string LAUNCHER_FILE = Constants::BIN_APPLICATION_DIR + "/launcher.sh";
 
+    inline static const std::string LIB_DIR = Constants::APP_DIR + "/lib";
+    inline static const std::string LIB_VK_DIR = Constants::LIB_DIR + "/vk/icd.d/";
+    inline static const std::string USR_SHARE_VK_DIR = "/usr/share/vulkan/icd.d/";
+    inline static const std::string LIB_OCL_DIR = Constants::LIB_DIR + "/ocl/icd.d/";
+    inline static const std::string USR_SHARE_OCL_DIR = "/etc/OpenCL/vendors/";
+
     inline static const std::string ICONS_DIR = Constants::APP_DIR + "/icons";
     inline static const std::string ICON_FILE = Constants::ICONS_DIR + "/icon.svg";
     inline static const std::string ICON_45_FILE = Constants::ICONS_DIR + "/icon-45x45.png";

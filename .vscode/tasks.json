@@ -4,7 +4,7 @@
         {
             "label": "CMake Build",
             "type": "shell",
-            "command": "make build",
+            "command": "make build_debug",
             "group": {
                 "kind": "build",
                 "isDefault": true

@@ -108,4 +108,14 @@ public:
     {
         std::filesystem::copy(src, dst, std::filesystem::copy_options::recursive | std::filesystem::copy_options::overwrite_existing);
     }
+
+    inline static void remove(std::string src)
+    {
+        remove(std::filesystem::path(src));
+    }
+
+    inline static void remove(std::filesystem::path src)
+    {
+        std::filesystem::remove_all(src);
+    }
 };

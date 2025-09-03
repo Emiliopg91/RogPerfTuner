@@ -401,10 +401,10 @@ SteamGameConfig SteamService::getConfiguration(std::string gid)
 
     if (entry.has_value())
     {
-        auto entry = it->second;
-        if (entry.env.has_value())
+        auto gameEntry = entry.value();
+        if (gameEntry.env.has_value())
         {
-            std::istringstream ss(entry.env.value());
+            std::istringstream ss(gameEntry.env.value());
             std::string token;
             std::map<std::string, std::string> env_vars;
 
@@ -422,24 +422,25 @@ SteamGameConfig SteamService::getConfiguration(std::string gid)
             for (const auto &[key, val] : env_vars)
             {
                 cfg.environment[key] = val;
+                logger.info("Added env {}={}", key, val);
             }
         }
-        if (entry.args.has_value())
+        if (gameEntry.args.has_value())
         {
-            cfg.parameters = entry.args.value();
+            cfg.parameters = gameEntry.args.value();
         }
 
-        cfg.environment["SteamDeck"] = entry.steamdeck ? "1" : "0";
-        if (entry.proton)
+        cfg.environment["SteamDeck"] = gameEntry.steamdeck ? "1" : "0";
+        if (gameEntry.proton)
         {
-            cfg.environment["PROTON_NO_NTSYNC"] = entry.sync == WineSyncOption::Enum::NTSYNC ? "0" : "1";
-            cfg.environment["PROTON_NO_FSYNC"] = entry.sync == WineSyncOption::Enum::FSYNC ? "0" : "1";
-            cfg.environment["PROTON_NO_ESYNC"] = entry.sync == WineSyncOption::Enum::ESYNC ? "0" : "1";
+            cfg.environment["PROTON_NO_NTSYNC"] = gameEntry.sync == WineSyncOption::Enum::NTSYNC ? "0" : "1";
+            cfg.environment["PROTON_NO_FSYNC"] = gameEntry.sync == WineSyncOption::Enum::FSYNC ? "0" : "1";
+            cfg.environment["PROTON_NO_ESYNC"] = gameEntry.sync == WineSyncOption::Enum::ESYNC ? "0" : "1";
         }
 
-        if (entry.gpu.has_value())
+        if (gameEntry.gpu.has_value())
         {
-            auto gpuEnv = HardwareService::getInstance().getGpuSelectorEnv(entry.gpu.value());
+            auto gpuEnv = HardwareService::getInstance().getGpuSelectorEnv(gameEntry.gpu.value());
             for (const auto &[key, val] : gpuEnv)
             {
                 cfg.environment[key] = val;
@@ -449,7 +450,7 @@ SteamGameConfig SteamService::getConfiguration(std::string gid)
         auto mangohud_which = Shell::getInstance().which("mangohud");
         if (mangohud_which.has_value())
         {
-            cfg.environment["MANGOHUD_CONFIG"] = "preset=" + std::to_string(entry.metrics_level.toInt());
+            cfg.environment["MANGOHUD_CONFIG"] = "preset=" + std::to_string(gameEntry.metrics_level.toInt());
             cfg.environment["MANGOHUD_DLSYM"] = "1";
             cfg.environment["MANGOHUD"] = "1";
             cfg.wrappers.emplace_back(mangohud_which.value());

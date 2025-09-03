@@ -73,6 +73,47 @@ HardwareService::HardwareService()
                 for (auto gpu_env : gpu.environment)
                     env = env + gpu_env + " ";
             }
+
+            if (FileUtils::exists(Constants::LIB_VK_DIR))
+                FileUtils::remove(Constants::LIB_VK_DIR);
+            FileUtils::mkdirs(Constants::LIB_VK_DIR);
+
+            if (FileUtils::exists(Constants::LIB_OCL_DIR))
+                FileUtils::remove(Constants::LIB_OCL_DIR);
+            FileUtils::mkdirs(Constants::LIB_OCL_DIR);
+
+            std::vector<std::string> vkIcd;
+            std::vector<std::string> vkIcdVariants = {
+                brand.toString() + "_icd.json",
+                brand.toString() + "_icd.i686.json",
+                brand.toString() + "_icd.x86_64.json"};
+            for (auto var : vkIcdVariants)
+            {
+                if (FileUtils::exists(Constants::USR_SHARE_VK_DIR + var))
+                {
+                    FileUtils::copy(Constants::USR_SHARE_VK_DIR + var, Constants::LIB_VK_DIR + var);
+                    vkIcd.emplace_back(Constants::LIB_VK_DIR + var);
+                }
+            }
+            if (!vkIcd.empty())
+            {
+                std::ostringstream oss;
+
+                for (size_t i = 0; i < vkIcd.size(); ++i)
+                {
+                    if (i > 0)
+                        oss << ":";
+                    oss << vkIcd[i];
+                }
+
+                env = env + "VK_ICD_FILENAMES=" + oss.str() + " ";
+            }
+
+            if (FileUtils::exists(Constants::USR_SHARE_OCL_DIR + brand.toString() + ".icd"))
+            {
+                FileUtils::copy(Constants::USR_SHARE_OCL_DIR + brand.toString() + ".icd", Constants::LIB_OCL_DIR + brand.toString() + ".icd");
+                env = env + "OCL_ICD_FILENAMES=" + Constants::LIB_OCL_DIR + brand.toString() + ".icd" + " ";
+            }
             env = StringUtils::trim(env);
             gpus[brand.toString()] = env;
 
@@ -88,6 +129,7 @@ HardwareService::HardwareService()
                     logger.info("Throttle temperature control available");
                 }
             }
+
             logger.rem_tab();
         }
     }
@@ -278,38 +320,6 @@ std::map<std::string, std::string> HardwareService::getGpuSelectorEnv(std::strin
         for (const auto &[key, val] : env_vars)
         {
             env[key] = val;
-        }
-
-        std::vector<std::string> vkIcd;
-        std::vector<std::string> vkIcdVariants = {
-            "/usr/share/vulkan/icd.d/" + gpu + "_icd.json",
-            "/usr/share/vulkan/icd.d/" + gpu + "_icd.i686.json",
-            "/usr/share/vulkan/icd.d/" + gpu + "_icd.x86_64.json"};
-        for (auto var : vkIcdVariants)
-        {
-            if (FileUtils::exists(var))
-            {
-                vkIcd.emplace_back(var);
-            }
-        }
-        if (!vkIcd.empty())
-        {
-            std::ostringstream oss;
-
-            for (size_t i = 0; i < vkIcd.size(); ++i)
-            {
-                if (i > 0)
-                    oss << ":";
-                oss << vkIcd[i];
-            }
-
-            env["VK_ICD_FILENAMES"] = oss.str();
-        }
-
-        std::string oclIcd = "/etc/OpenCL/vendors/" + gpu + ".icd";
-        if (FileUtils::exists(oclIcd))
-        {
-            env["OCL_ICD_FILENAMES"] = oclIcd;
         }
     }
 
