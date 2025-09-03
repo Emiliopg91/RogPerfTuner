@@ -2,40 +2,38 @@
 
 #include <mutex>
 
-#include "RccCommons.hpp"
 #include "../../include/models/performance/performance_profile.hpp"
+#include "RccCommons.hpp"
 
-class ProfileService
-{
+class ProfileService {
+   public:
+	static ProfileService& getInstance() {
+		static ProfileService instance;
+		return instance;
+	}
 
-public:
-    static ProfileService &getInstance()
-    {
-        static ProfileService instance;
-        return instance;
-    }
+	PerformanceProfile getPerformanceProfile();
+	void setPerformanceProfile(const PerformanceProfile& profile, const bool& temporal = false,
+							   const bool& force = false);
+	void restoreProfile();
 
-    PerformanceProfile getPerformanceProfile();
-    void setPerformanceProfile(const PerformanceProfile &profile, const bool &temporal = false, const bool &force = false);
-    void restoreProfile();
+	PerformanceProfile nextPerformanceProfile();
 
-    PerformanceProfile nextPerformanceProfile();
+   private:
+	ProfileService();
 
-private:
-    ProfileService();
+	Logger logger{"ProfileService"};
+	bool onBattery	 = false;
+	int runningGames = 0;
+	std::mutex actionMutex;
+	PerformanceProfile currentProfile = PerformanceProfile::Enum::PERFORMANCE;
 
-    Logger logger{"ProfileService"};
-    bool onBattery = false;
-    int runningGames = 0;
-    std::mutex actionMutex;
-    PerformanceProfile currentProfile = PerformanceProfile::Enum::PERFORMANCE;
-
-    void setPlatformProfile(const PerformanceProfile &profile);
-    void setFanCurves(const PerformanceProfile &profile);
-    void setBoost(const PerformanceProfile &profile);
-    void setSsdScheduler(const PerformanceProfile &profile);
-    void setCpuGovernor(const PerformanceProfile &profile);
-    void setPowerProfile(const PerformanceProfile &profile);
-    void setTdps(const PerformanceProfile &profile);
-    void setTgp(const PerformanceProfile &profile);
+	void setPlatformProfile(const PerformanceProfile& profile);
+	void setFanCurves(const PerformanceProfile& profile);
+	void setBoost(const PerformanceProfile& profile);
+	void setSsdScheduler(const PerformanceProfile& profile);
+	void setCpuGovernor(const PerformanceProfile& profile);
+	void setPowerProfile(const PerformanceProfile& profile);
+	void setTdps(const PerformanceProfile& profile);
+	void setTgp(const PerformanceProfile& profile);
 };

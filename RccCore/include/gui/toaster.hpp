@@ -2,18 +2,15 @@
 
 #include "RccCommons.hpp"
 
-class Toaster
-{
+class Toaster {
+   public:
+	static Toaster& getInstance() {
+		static Toaster instance;
+		return instance;
+	}
 
-public:
-    static Toaster &getInstance()
-    {
-        static Toaster instance;
-        return instance;
-    }
+	void showToast(std::string message, bool can_be_hidden = true, std::string icon = Constants::ASSET_ICON_FILE);
 
-    void showToast(std::string message, bool can_be_hidden = true, std::string icon = Constants::ASSET_ICON_FILE);
-
-private:
-    uint last_id = 0;
+   private:
+	uint last_id = 0;
 };

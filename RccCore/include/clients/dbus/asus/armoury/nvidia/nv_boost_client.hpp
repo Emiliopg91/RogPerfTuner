@@ -2,16 +2,13 @@
 
 #include "../armoury_base_client.hpp"
 
-class NvBoostClient : public ArmouryBaseClient
-{
-public:
-    static NvBoostClient &getInstance()
-    {
-        static NvBoostClient instance;
-        return instance;
-    }
+class NvBoostClient : public ArmouryBaseClient {
+   public:
+	static NvBoostClient& getInstance() {
+		static NvBoostClient instance;
+		return instance;
+	}
 
-    NvBoostClient() : ArmouryBaseClient("nv_dynamic_boost", false)
-    {
-    }
+	NvBoostClient() : ArmouryBaseClient("nv_dynamic_boost", false) {
+	}
 };

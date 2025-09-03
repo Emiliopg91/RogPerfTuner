@@ -1,43 +1,37 @@
 #pragma once
 
-#include "RccCommons.hpp"
 #include <any>
 
-class Translator
-{
-public:
-    static Translator &getInstance()
-    {
-        static Translator instance;
-        return instance;
-    }
+#include "RccCommons.hpp"
 
-    std::string translate(const std::string &msg, const std::unordered_map<std::string, std::any> &replacement = {});
+class Translator {
+   public:
+	static Translator& getInstance() {
+		static Translator instance;
+		return instance;
+	}
 
-private:
-    inline static std::string FALLBACK_LANG = "en";
-    Translator();
-    Logger logger{"Translator"};
-    std::map<std::string, std::map<std::string, std::string>>
-        translations;
-    std::string currentLang = []()
-    {
-        const char *lang = std::getenv("LC_MESSAGES");
-        if (!lang || std::string(lang).empty())
-        {
-            lang = std::getenv("LANG");
-        }
-        if (!lang || std::string(lang).empty())
-        {
-            return FALLBACK_LANG;
-        }
-        std::string langStr(lang);
+	std::string translate(const std::string& msg, const std::unordered_map<std::string, std::any>& replacement = {});
 
-        auto pos = langStr.find('_');
-        if (pos != std::string::npos)
-        {
-            langStr = langStr.substr(0, pos);
-        }
-        return langStr;
-    }();
+   private:
+	inline static std::string FALLBACK_LANG = "en";
+	Translator();
+	Logger logger{"Translator"};
+	std::map<std::string, std::map<std::string, std::string>> translations;
+	std::string currentLang = []() {
+		const char* lang = std::getenv("LC_MESSAGES");
+		if (!lang || std::string(lang).empty()) {
+			lang = std::getenv("LANG");
+		}
+		if (!lang || std::string(lang).empty()) {
+			return FALLBACK_LANG;
+		}
+		std::string langStr(lang);
+
+		auto pos = langStr.find('_');
+		if (pos != std::string::npos) {
+			langStr = langStr.substr(0, pos);
+		}
+		return langStr;
+	}();
 };

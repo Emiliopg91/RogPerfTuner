@@ -1,0 +1,30 @@
+BasedOnStyle: Google
+IndentWidth: 4
+TabWidth: 4
+UseTab: Always
+ColumnLimit: 120
+
+# Preferencias C++
+Standard: c++17
+DerivePointerAlignment: false
+PointerAlignment: Left
+SpaceBeforeParens: ControlStatements
+AllowShortIfStatementsOnASingleLine: false
+AllowShortLoopsOnASingleLine: false
+BreakBeforeBraces: Attach
+IndentCaseLabels: true
+AllowAllArgumentsOnNextLine: false
+AllowShortFunctionsOnASingleLine: None
+
+# Organizar includes
+IncludeBlocks: Regroup
+SortIncludes: true
+
+# Mantener comentarios bonitos
+ReflowComments: true
+SpacesInAngles: false
+
+# Ajustes extra
+AlignOperands: true
+AlignConsecutiveAssignments: true
+AlignConsecutiveDeclarations: false

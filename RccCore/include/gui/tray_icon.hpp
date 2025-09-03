@@ -1,34 +1,32 @@
 #pragma once
 
-#include <QSystemTrayIcon>
 #include <QAction>
+#include <QSystemTrayIcon>
 
-#include "RccCommons.hpp"
 #include "../models/hardware/battery_charge_threshold.hpp"
-#include "../models/performance/performance_profile.hpp"
 #include "../models/hardware/rgb_brightness.hpp"
+#include "../models/performance/performance_profile.hpp"
+#include "RccCommons.hpp"
 
-class TrayIcon
-{
-public:
-    static TrayIcon &getInstance()
-    {
-        static TrayIcon instance;
-        return instance;
-    }
+class TrayIcon {
+   public:
+	static TrayIcon& getInstance() {
+		static TrayIcon instance;
+		return instance;
+	}
 
-private:
-    TrayIcon();
+   private:
+	TrayIcon();
 
-    QSystemTrayIcon tray_icon_;
+	QSystemTrayIcon tray_icon_;
 
-    std::map<std::string, QAction *> thresholdActions;
-    std::map<std::string, QAction *> brightnessActions;
-    std::map<std::string, QAction *> effectActions;
-    std::map<std::string, QAction *> perfProfileActions;
+	std::map<std::string, QAction*> thresholdActions;
+	std::map<std::string, QAction*> brightnessActions;
+	std::map<std::string, QAction*> effectActions;
+	std::map<std::string, QAction*> perfProfileActions;
 
-    void setAuraBrightness(RgbBrightness);
-    void setAuraEffect(std::string);
-    void setPerformanceProfile(PerformanceProfile);
-    void setBatteryThreshold(BatteryThreshold threshold);
+	void setAuraBrightness(RgbBrightness);
+	void setAuraEffect(std::string);
+	void setPerformanceProfile(PerformanceProfile);
+	void setBatteryThreshold(BatteryThreshold threshold);
 };

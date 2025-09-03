@@ -1,64 +1,62 @@
 #pragma once
 
-#include <QMainWindow>
-#include <QWidget>
-#include <QVBoxLayout>
+#include <QCheckBox>
+#include <QCloseEvent>
+#include <QComboBox>
 #include <QFormLayout>
 #include <QGroupBox>
-#include <QLabel>
-#include <QPushButton>
-#include <QCheckBox>
-#include <QComboBox>
 #include <QIcon>
+#include <QLabel>
+#include <QMainWindow>
 #include <QPixmap>
-#include <QCloseEvent>
+#include <QPushButton>
 #include <QString>
+#include <QVBoxLayout>
 #include <QVariant>
-
-#include "RccCommons.hpp"
+#include <QWidget>
 
 #include "../models/hardware/battery_charge_threshold.hpp"
-#include "../models/performance/performance_profile.hpp"
 #include "../models/hardware/rgb_brightness.hpp"
+#include "../models/performance/performance_profile.hpp"
+#include "RccCommons.hpp"
 
-class MainWindow : public QMainWindow
-{
-    Q_OBJECT
+class MainWindow : public QMainWindow {
+	Q_OBJECT
 
-public:
-    explicit MainWindow(QWidget *parent = nullptr);
-    inline static MainWindow *INSTANCE = nullptr;
+   public:
+	explicit MainWindow(QWidget* parent = nullptr);
+	inline static MainWindow* INSTANCE = nullptr;
 
-protected:
-    void closeEvent(QCloseEvent *event) override;
+   protected:
+	void closeEvent(QCloseEvent* event) override;
 
-private slots:
-    void onGameEvent(int runningGames);
+   private slots:
+	void onGameEvent(int runningGames);
 
-    void setPerformanceProfile(PerformanceProfile value);
+	void setPerformanceProfile(PerformanceProfile value);
 
-    void setBatteryChargeLimit(BatteryThreshold value);
+	void setBatteryChargeLimit(BatteryThreshold value);
 
-    void setAuraBrightness(RgbBrightness brightness);
+	void setAuraBrightness(RgbBrightness brightness);
 
-    void setAuraEffect(std::string effect);
+	void setAuraEffect(std::string effect);
 
-    void onProfileChanged(int index);
+	void onProfileChanged(int index);
 
-    void onBatteryLimitChanged(int index);
+	void onBatteryLimitChanged(int index);
 
-    void onEffectChange();
+	void onEffectChange();
 
-    void onBrightnessChange(int index);
+	void onBrightnessChange(int index);
 
-    void openGameList();
+	void openGameList();
 
-private:
-    Logger *_logger;
+   private:
+	Logger* _logger;
 
-    QComboBox *_profileDropdown;
-    QPushButton *_gameProfileButton;
-    QComboBox *_effectDropdown;
-    QComboBox *_brightnessDropdown;
-    QComboBox *_thresholdDropdown;
+	QComboBox* _profileDropdown;
+	QPushButton* _gameProfileButton;
+	QComboBox* _effectDropdown;
+	QComboBox* _brightnessDropdown;
+	QComboBox* _thresholdDropdown;
 };

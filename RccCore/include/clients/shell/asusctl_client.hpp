@@ -2,20 +2,18 @@
 
 #include "./abstract/abstract_cmd_client.hpp"
 
-class AsusCtlClient : public AbstractCmdClient
-{
-private:
-    AsusCtlClient() : AbstractCmdClient("asusctl", "AsusCtlClient") {}
+class AsusCtlClient : public AbstractCmdClient {
+   private:
+	AsusCtlClient() : AbstractCmdClient("asusctl", "AsusCtlClient") {
+	}
 
-public:
-    static AsusCtlClient &getInstance()
-    {
-        static AsusCtlClient instance;
-        return instance;
-    }
+   public:
+	static AsusCtlClient& getInstance() {
+		static AsusCtlClient instance;
+		return instance;
+	}
 
-    void turnOffAura()
-    {
-        run_command("aura static -c 000000", true, false);
-    }
+	void turnOffAura() {
+		run_command("aura static -c 000000", true, false);
+	}
 };

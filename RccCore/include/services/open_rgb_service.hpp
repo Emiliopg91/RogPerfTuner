@@ -2,45 +2,42 @@
 
 #include <mutex>
 
-#include "RccCommons.hpp"
 #include "../models/hardware/rgb_brightness.hpp"
 #include "../models/hardware/usb_identifier.hpp"
+#include "RccCommons.hpp"
 
-class OpenRgbService
-{
+class OpenRgbService {
+   public:
+	static OpenRgbService& getInstance() {
+		static OpenRgbService instance;
+		return instance;
+	}
 
-public:
-    static OpenRgbService &getInstance()
-    {
-        static OpenRgbService instance;
-        return instance;
-    }
+	std::string getDeviceName(const UsbIdentifier&);
+	std::vector<std::string> getAvailableEffects();
+	std::string getCurrentEffect();
+	RgbBrightness getCurrentBrightness();
 
-    std::string getDeviceName(const UsbIdentifier &);
-    std::vector<std::string> getAvailableEffects();
-    std::string getCurrentEffect();
-    RgbBrightness getCurrentBrightness();
+	void setBrightness(const RgbBrightness& newBrightness);
+	void setEffect(const std::string& newEffect, const bool& temporal = false);
+	void restoreAura();
+	void disableDevice(const UsbIdentifier&);
 
-    void setBrightness(const RgbBrightness &newBrightness);
-    void setEffect(const std::string &newEffect, const bool &temporal = false);
-    void restoreAura();
-    void disableDevice(const UsbIdentifier &);
+	RgbBrightness increaseBrightness();
+	RgbBrightness decreaseBrightness();
+	std::string nextEffect();
 
-    RgbBrightness increaseBrightness();
-    RgbBrightness decreaseBrightness();
-    std::string nextEffect();
+   private:
+	OpenRgbService();
 
-private:
-    OpenRgbService();
+	std::map<std::string, std::string> compatibleDeviceNames;
+	Logger logger{"OpenRgbService"};
 
-    std::map<std::string, std::string> compatibleDeviceNames;
-    Logger logger{"OpenRgbService"};
+	std::mutex actionMutex;
 
-    std::mutex actionMutex;
+	RgbBrightness brightness = RgbBrightness::Enum::MAX;
+	std::string effect;
 
-    RgbBrightness brightness = RgbBrightness::Enum::MAX;
-    std::string effect;
-
-    void applyAura(const bool &temporal = false);
-    void reload();
+	void applyAura(const bool& temporal = false);
+	void reload();
 };
