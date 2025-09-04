@@ -4,272 +4,339 @@
 #include "../../include/translator/translator.hpp"
 
 TranslationMap Translator::translations = {
-{"performance", {
-{"en", "Performance"},
-{"es", "Rendimiento"},
-}},
-{"profile", {
-{"en", "Profile"},
-{"es", "Perfil"},
-}},
-{"label.profile.TURBO", {
-{"en", "Turbo"},
-{"es", "Turbo"},
-}},
-{"label.profile.PERFORMANCE", {
-{"en", "Performance"},
-{"es", "Rendimiento"},
-}},
-{"label.profile.BALANCED", {
-{"en", "Balanced"},
-{"es", "Equilibrado"},
-}},
-{"label.profile.QUIET", {
-{"en", "Quiet"},
-{"es", "Silencioso"},
-}},
-{"effect", {
-{"en", "Effect"},
-{"es", "Efecto"},
-}},
-{"brightness", {
-{"en", "Brightness"},
-{"es", "Brillo"},
-}},
-{"label.brightness.MAX", {
-{"en", "Maximum"},
-{"es", "Máximo"},
-}},
-{"label.brightness.HIGH", {
-{"en", "High"},
-{"es", "Alto"},
-}},
-{"label.brightness.MEDIUM", {
-{"en", "Medium"},
-{"es", "Medio"},
-}},
-{"label.brightness.LOW", {
-{"en", "Low"},
-{"es", "Bajo"},
-}},
-{"label.brightness.OFF", {
-{"en", "Off"},
-{"es", "Apagado"},
-}},
-{"color", {
-{"en", "Color"},
-{"es", "Color"},
-}},
-{"color.select", {
-{"en", "Select color"},
-{"es", "Seleccione color"},
-}},
-{"battery", {
-{"en", "Battery"},
-{"es", "Bateria"},
-}},
-{"charge.threshold", {
-{"en", "Charge limit"},
-{"es", "Límite de carga"},
-}},
-{"profile.applied", {
-{"en", "Profile {profile} applied succesfully"},
-{"es", "Perfil {profile} aplicado con éxito"},
-}},
-{"applied.battery.threshold", {
-{"en", "Battery charge limit setted to {value}%"},
-{"es", "Límite de carga de bateria establecido al {value}%"},
-}},
-{"open.ui", {
-{"en", "Show interface"},
-{"es", "Mostrar interfaz"},
-}},
-{"open.logs", {
-{"en", "Open log file"},
-{"es", "Abrir registro"},
-}},
-{"close", {
-{"en", "Quit"},
-{"es", "Salir"},
-}},
-{"select.color", {
-{"en", "Pick color"},
-{"es", "Elegir color"},
-}},
-{"authentication.required", {
-{"en", "Authentication required"},
-{"es", "Autenticación requerida"},
-}},
-{"enter.sudo.password", {
-{"en", "Enter sudo password"},
-{"es", "Introduzca contraseña sudo"},
-}},
-{"accept", {
-{"en", "Accept"},
-{"es", "Aceptar"},
-}},
-{"cancel", {
-{"en", "Cancel"},
-{"es", "Cancelar"},
-}},
-{"canceled", {
-{"en", "Canceled"},
-{"es", "Cancelado"},
-}},
-{"user.canceled.operation", {
-{"en", "User canceled operation"},
-{"es", "El usuario canceló la operación"},
-}},
-{"authentication.failed", {
-{"en", "Authentication failed"},
-{"es", "Fallo de autenticación"},
-}},
-{"applying.update", {
-{"en", "Applying update, please wait"},
-{"es", "Aplicando actualizacion, espere"},
-}},
-{"update.available", {
-{"en", "Update availabe"},
-{"es", "Actualización disponible"},
-}},
-{"apply.now", {
-{"en", "Apply now"},
-{"es", "Aplicar ahora"},
-}},
-{"initializing", {
-{"en", "Initializing application"},
-{"es", "Inicializando aplicación"},
-}},
-{"boost", {
-{"en", "CPU Boost"},
-{"es", "CPU Boost"},
-}},
-{"label.boost.AUTO", {
-{"en", "Auto"},
-{"es", "Automatico"},
-}},
-{"label.boost.ON", {
-{"en", "Enabled"},
-{"es", "Activado"},
-}},
-{"label.boost.OFF", {
-{"en", "Disabled"},
-{"es", "Desactivado"},
-}},
-{"games", {
-{"en", "Games"},
-{"es", "Juegos"},
-}},
-{"label.game.configure", {
-{"en", "Setup profiles"},
-{"es", "Configurar perfiles"},
-}},
-{"profile.applied.for.game", {
-{"en", "Profile {profile} applied succesfully for {game}"},
-{"es", "Perfil {profile} aplicado con éxito para {game}"},
-}},
-{"game.title", {
-{"en", "Game"},
-{"es", "Juego"},
-}},
-{"game.performance.configuration", {
-{"en", "Game performance configuration"},
-{"es", "Configuracion de rendimiento de juegos"},
-}},
-{"label.dgpu.auto", {
-{"en", "Automatic"},
-{"es", "Automatica"},
-}},
-{"label.dgpu.discrete", {
-{"en", "Discrete"},
-{"es", "Dedicada"},
-}},
-{"used.gpu", {
-{"en", "GPU"},
-{"es", "GPU"},
-}},
-{"metrics", {
-{"en", "Metrics"},
-{"es", "Métricas"},
-}},
-{"label.level", {
-{"en", "Level"},
-{"es", "Nivel"},
-}},
-{"label.level.0", {
-{"en", "Disabled"},
-{"es", "Desactivado"},
-}},
-{"label.level.1", {
-{"en", "Only FPS"},
-{"es", "Solo FPS"},
-}},
-{"label.level.2", {
-{"en", "Horizontal"},
-{"es", "Horizontal"},
-}},
-{"label.level.3", {
-{"en", "Extended"},
-{"es", "Extendido"},
-}},
-{"label.level.4", {
-{"en", "Detailed"},
-{"es", "Detallado"},
-}},
-{"application", {
-{"en", "Application"},
-{"es", "Aplicación"},
-}},
-{"autostart", {
-{"en", "Start on boot"},
-{"es", "Iniciar automaticamente"},
-}},
-{"winesync", {
-{"en", "Synchronization"},
-{"es", "Sincronización"},
-}},
-{"label.winesync.auto", {
-{"en", "Auto"},
-{"es", "Auto"},
-}},
-{"label.winesync.ntsync", {
-{"en", "NTSync"},
-{"es", "NTSync"},
-}},
-{"label.winesync.esync", {
-{"en", "ESync"},
-{"es", "ESync"},
-}},
-{"label.winesync.fsync", {
-{"en", "FSync"},
-{"es", "FSync"},
-}},
-{"label.winesync.none", {
-{"en", "None"},
-{"es", "No"},
-}},
-{"environment", {
-{"en", "Environment"},
-{"es", "Entorno"},
-}},
-{"params", {
-{"en", "Parameters"},
-{"es", "Parámetros"},
-}},
-{"used.steamdeck", {
-{"en", "Mode"},
-{"es", "Modo"},
-}},
-{"label.steamdeck.no", {
-{"en", "Computer"},
-{"es", "Ordenador"},
-}},
-{"label.steamdeck.yes", {
-{"en", "SteamDeck"},
-{"es", "SteamDeck"},
-}},
-{"running", {
-{"en", "Running"},
-{"es", "Ejecutando"},
-}},
+	{"performance",
+	 {
+		 {"en", "Performance"},
+		 {"es", "Rendimiento"},
+	 }},
+	{"profile",
+	 {
+		 {"en", "Profile"},
+		 {"es", "Perfil"},
+	 }},
+	{"label.profile.TURBO",
+	 {
+		 {"en", "Turbo"},
+		 {"es", "Turbo"},
+	 }},
+	{"label.profile.PERFORMANCE",
+	 {
+		 {"en", "Performance"},
+		 {"es", "Rendimiento"},
+	 }},
+	{"label.profile.BALANCED",
+	 {
+		 {"en", "Balanced"},
+		 {"es", "Equilibrado"},
+	 }},
+	{"label.profile.QUIET",
+	 {
+		 {"en", "Quiet"},
+		 {"es", "Silencioso"},
+	 }},
+	{"effect",
+	 {
+		 {"en", "Effect"},
+		 {"es", "Efecto"},
+	 }},
+	{"brightness",
+	 {
+		 {"en", "Brightness"},
+		 {"es", "Brillo"},
+	 }},
+	{"label.brightness.MAX",
+	 {
+		 {"en", "Maximum"},
+		 {"es", "Máximo"},
+	 }},
+	{"label.brightness.HIGH",
+	 {
+		 {"en", "High"},
+		 {"es", "Alto"},
+	 }},
+	{"label.brightness.MEDIUM",
+	 {
+		 {"en", "Medium"},
+		 {"es", "Medio"},
+	 }},
+	{"label.brightness.LOW",
+	 {
+		 {"en", "Low"},
+		 {"es", "Bajo"},
+	 }},
+	{"label.brightness.OFF",
+	 {
+		 {"en", "Off"},
+		 {"es", "Apagado"},
+	 }},
+	{"color",
+	 {
+		 {"en", "Color"},
+		 {"es", "Color"},
+	 }},
+	{"color.select",
+	 {
+		 {"en", "Select color"},
+		 {"es", "Seleccione color"},
+	 }},
+	{"battery",
+	 {
+		 {"en", "Battery"},
+		 {"es", "Bateria"},
+	 }},
+	{"charge.threshold",
+	 {
+		 {"en", "Charge limit"},
+		 {"es", "Límite de carga"},
+	 }},
+	{"profile.applied",
+	 {
+		 {"en", "Profile {profile} applied succesfully"},
+		 {"es", "Perfil {profile} aplicado con éxito"},
+	 }},
+	{"applied.battery.threshold",
+	 {
+		 {"en", "Battery charge limit setted to {value}%"},
+		 {"es", "Límite de carga de bateria establecido al {value}%"},
+	 }},
+	{"open.ui",
+	 {
+		 {"en", "Show interface"},
+		 {"es", "Mostrar interfaz"},
+	 }},
+	{"open.logs",
+	 {
+		 {"en", "Open log file"},
+		 {"es", "Abrir registro"},
+	 }},
+	{"close",
+	 {
+		 {"en", "Quit"},
+		 {"es", "Salir"},
+	 }},
+	{"select.color",
+	 {
+		 {"en", "Pick color"},
+		 {"es", "Elegir color"},
+	 }},
+	{"authentication.required",
+	 {
+		 {"en", "Authentication required"},
+		 {"es", "Autenticación requerida"},
+	 }},
+	{"enter.sudo.password",
+	 {
+		 {"en", "Enter sudo password"},
+		 {"es", "Introduzca contraseña sudo"},
+	 }},
+	{"accept",
+	 {
+		 {"en", "Accept"},
+		 {"es", "Aceptar"},
+	 }},
+	{"cancel",
+	 {
+		 {"en", "Cancel"},
+		 {"es", "Cancelar"},
+	 }},
+	{"canceled",
+	 {
+		 {"en", "Canceled"},
+		 {"es", "Cancelado"},
+	 }},
+	{"user.canceled.operation",
+	 {
+		 {"en", "User canceled operation"},
+		 {"es", "El usuario canceló la operación"},
+	 }},
+	{"authentication.failed",
+	 {
+		 {"en", "Authentication failed"},
+		 {"es", "Fallo de autenticación"},
+	 }},
+	{"applying.update",
+	 {
+		 {"en", "Applying update, please wait"},
+		 {"es", "Aplicando actualizacion, espere"},
+	 }},
+	{"update.available",
+	 {
+		 {"en", "Update availabe"},
+		 {"es", "Actualización disponible"},
+	 }},
+	{"apply.now",
+	 {
+		 {"en", "Apply now"},
+		 {"es", "Aplicar ahora"},
+	 }},
+	{"initializing",
+	 {
+		 {"en", "Initializing application"},
+		 {"es", "Inicializando aplicación"},
+	 }},
+	{"boost",
+	 {
+		 {"en", "CPU Boost"},
+		 {"es", "CPU Boost"},
+	 }},
+	{"label.boost.AUTO",
+	 {
+		 {"en", "Auto"},
+		 {"es", "Automatico"},
+	 }},
+	{"label.boost.ON",
+	 {
+		 {"en", "Enabled"},
+		 {"es", "Activado"},
+	 }},
+	{"label.boost.OFF",
+	 {
+		 {"en", "Disabled"},
+		 {"es", "Desactivado"},
+	 }},
+	{"games",
+	 {
+		 {"en", "Games"},
+		 {"es", "Juegos"},
+	 }},
+	{"label.game.configure",
+	 {
+		 {"en", "Setup profiles"},
+		 {"es", "Configurar perfiles"},
+	 }},
+	{"profile.applied.for.game",
+	 {
+		 {"en", "Profile {profile} applied succesfully for {game}"},
+		 {"es", "Perfil {profile} aplicado con éxito para {game}"},
+	 }},
+	{"game.title",
+	 {
+		 {"en", "Game"},
+		 {"es", "Juego"},
+	 }},
+	{"game.performance.configuration",
+	 {
+		 {"en", "Game performance configuration"},
+		 {"es", "Configuracion de rendimiento de juegos"},
+	 }},
+	{"label.dgpu.auto",
+	 {
+		 {"en", "Automatic"},
+		 {"es", "Automatica"},
+	 }},
+	{"label.dgpu.discrete",
+	 {
+		 {"en", "Discrete"},
+		 {"es", "Dedicada"},
+	 }},
+	{"used.gpu",
+	 {
+		 {"en", "GPU"},
+		 {"es", "GPU"},
+	 }},
+	{"metrics",
+	 {
+		 {"en", "Metrics"},
+		 {"es", "Métricas"},
+	 }},
+	{"label.level",
+	 {
+		 {"en", "Level"},
+		 {"es", "Nivel"},
+	 }},
+	{"label.level.0",
+	 {
+		 {"en", "Disabled"},
+		 {"es", "Desactivado"},
+	 }},
+	{"label.level.1",
+	 {
+		 {"en", "Only FPS"},
+		 {"es", "Solo FPS"},
+	 }},
+	{"label.level.2",
+	 {
+		 {"en", "Horizontal"},
+		 {"es", "Horizontal"},
+	 }},
+	{"label.level.3",
+	 {
+		 {"en", "Extended"},
+		 {"es", "Extendido"},
+	 }},
+	{"label.level.4",
+	 {
+		 {"en", "Detailed"},
+		 {"es", "Detallado"},
+	 }},
+	{"application",
+	 {
+		 {"en", "Application"},
+		 {"es", "Aplicación"},
+	 }},
+	{"autostart",
+	 {
+		 {"en", "Start on boot"},
+		 {"es", "Iniciar automaticamente"},
+	 }},
+	{"winesync",
+	 {
+		 {"en", "Synchronization"},
+		 {"es", "Sincronización"},
+	 }},
+	{"label.winesync.auto",
+	 {
+		 {"en", "Auto"},
+		 {"es", "Auto"},
+	 }},
+	{"label.winesync.ntsync",
+	 {
+		 {"en", "NTSync"},
+		 {"es", "NTSync"},
+	 }},
+	{"label.winesync.esync",
+	 {
+		 {"en", "ESync"},
+		 {"es", "ESync"},
+	 }},
+	{"label.winesync.fsync",
+	 {
+		 {"en", "FSync"},
+		 {"es", "FSync"},
+	 }},
+	{"label.winesync.none",
+	 {
+		 {"en", "None"},
+		 {"es", "No"},
+	 }},
+	{"environment",
+	 {
+		 {"en", "Environment"},
+		 {"es", "Entorno"},
+	 }},
+	{"params",
+	 {
+		 {"en", "Parameters"},
+		 {"es", "Parámetros"},
+	 }},
+	{"used.steamdeck",
+	 {
+		 {"en", "Mode"},
+		 {"es", "Modo"},
+	 }},
+	{"label.steamdeck.no",
+	 {
+		 {"en", "Computer"},
+		 {"es", "Ordenador"},
+	 }},
+	{"label.steamdeck.yes",
+	 {
+		 {"en", "SteamDeck"},
+		 {"es", "SteamDeck"},
+	 }},
+	{"running",
+	 {
+		 {"en", "Running"},
+		 {"es", "Ejecutando"},
+	 }},
 };
