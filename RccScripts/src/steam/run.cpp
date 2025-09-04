@@ -204,40 +204,48 @@ int main(int argc, char* argv[]) {
 
 	httplib::Client cli("localhost", Constants::HTTP_PORT);
 
-	const char* steamId = getenv("SteamGameId");
-	if (steamId) {
-		logger.info("Requesting configuration");
-		auto res = cli.Get(Constants::URL_GAME_CFG + "?appid=" + steamId);
+	try {
+		const char* steamId = getenv("SteamGameId");
+		if (steamId) {
+			logger.info("Requesting configuration");
+			auto res = cli.Get(Constants::URL_GAME_CFG + "?appid=" + steamId);
 
-		if (!res || res->status != 200) {
-			logger.error("Error on configuration request: " + std::to_string(res->status));
-		} else {
-			auto j	 = nlohmann::json::parse(res->body);
-			auto cfg = j.get<SteamGameConfig>();
+			if (!res || res->status != 200) {
+				logger.error("Error on configuration request");
+			} else {
+				auto j	 = nlohmann::json::parse(res->body);
+				auto cfg = j.get<SteamGameConfig>();
 
-			for (const auto& [key, val] : cfg.environment) {
-				setenv(key.c_str(), val.c_str(), 1);
-			}
-			wrappers   = cfg.wrappers;
-			parameters = cfg.parameters;
-
-			if (!cfg.environment.empty()) {
-				std::string envAdded;
 				for (const auto& [key, val] : cfg.environment) {
-					envAdded = envAdded + key + ";";
+					setenv(key.c_str(), val.c_str(), 1);
 				}
-				envAdded.pop_back();
-				setenv("OVERRIDE_FLATPAK_ENV", envAdded.c_str(), 1);
+				wrappers   = cfg.wrappers;
+				parameters = cfg.parameters;
+
+				if (!cfg.environment.empty()) {
+					std::string envAdded;
+					for (const auto& [key, val] : cfg.environment) {
+						envAdded = envAdded + key + ";";
+					}
+					envAdded.pop_back();
+					setenv("OVERRIDE_FLATPAK_ENV", envAdded.c_str(), 1);
+				}
 			}
+		} else {
+			logger.warn("No AppId provided");
 		}
-	} else {
-		logger.warn("No AppId provided");
+	} catch (std::exception e) {
+		logger.error("Error requesting configuration {}", e.what());
 	}
 
-	logger.info("Requesting renice");
-	auto res = cli.Get(Constants::URL_RENICE + "?pid=" + std::to_string(getpid()));
-	if (!res || res->status != 200) {
-		logger.error("Error on renice request");
+	try {
+		logger.info("Requesting renice");
+		auto res = cli.Get(Constants::URL_RENICE + "?pid=" + std::to_string(getpid()));
+		if (!res || res->status != 200) {
+			logger.error("Error on renice request");
+		}
+	} catch (std::exception e) {
+		logger.error("Error requesting renice {}", e.what());
 	}
 
 	int code = run_command(logger, command, wrappers, parameters);
