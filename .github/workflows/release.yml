@@ -61,7 +61,7 @@ jobs:
 
       - name: Create tag
         run: |
-          git tag "$VERSION"
+          git tag "${{ env.VERSION }}"
           make increase_version
           git push origin main
           git push origin main:develop --force
@@ -73,8 +73,8 @@ jobs:
       - name: Create GitHub release
         uses: softprops/action-gh-release@v2
         with:
-          tag_name: $VERSION
-          name: $VERSION
+          tag_name: ${{ env.VERSION }}
+          name: ${{ env.VERSION }}
           files: |
             dist/RogControlCenter.AppImage
         env:
