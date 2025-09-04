@@ -6,7 +6,7 @@ on:
       - main
 
 jobs:
-  build_rogcontrolcenter:
+  compile_and_package:
     runs-on: ubuntu-latest
     outputs:
       version: ${{ steps.get_version.outputs.version }}
@@ -25,7 +25,8 @@ jobs:
       - name: Install dependencies
         run: |
           sudo apt-get update
-          sudo apt-get install -y qt6-base-dev qt6-tools-dev qt6-tools-dev-tools build-essential cmake libsecret-1-dev libzstd-dev pkg-config libudev-dev clang-format
+          sudo apt-get install -y libfuse2 qt6-base-dev qt6-tools-dev qt6-tools-dev-tools build-essential cmake libsecret-1-dev libzstd-dev pkg-config libudev-dev clang-format
+          npm i -g pnpm@8.5.1 shx@0.3.4
 
       - name: Format
         run: |
@@ -40,120 +41,12 @@ jobs:
       - name: Compile
         run: |
           cmake --version
-          make build_rogcontrolcenter
+          make release
 
       - name: Get version
         id: get_version
         run: |
           echo "version=$(cat assets/version)" >> $GITHUB_OUTPUT
-
-      - name: Upload binary
-        uses: actions/upload-artifact@v4
-        with:
-          name: binary
-          path: build/RccCore/RogControlCenter
-
-      - name: Upload assets
-        uses: actions/upload-artifact@v4
-        with:
-          name: assets
-          path: assets
-
-  build_openrgb:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
-        with:
-          submodules: recursive
-          fetch-depth: 0
-
-      - name: Install dependencies
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y libfuse2
-
-      - name: Compile
-        run: |
-          make build_openrgb
-
-      - name: Upload OpenRGB
-        uses: actions/upload-artifact@v4
-        with:
-          name: OpenRGB
-          path: assets/OpenRGB
-
-  build_rccdc:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
-        with:
-          submodules: recursive
-          fetch-depth: 0
-
-      - name: Install dependencies
-        run: |
-          npm i -g pnpm@8.5.1 shx@0.3.4
-
-      - name: Compile
-        run: |
-          make build_rccdc
-
-      - name: Upload RccDeckyCompanion
-        uses: actions/upload-artifact@v4
-        with:
-          name: RccDeckyCompanion
-          path: assets/RccDeckyCompanion
-
-  package:
-    needs:
-      - build_rogcontrolcenter
-      - build_openrgb
-      - build_rccdc
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
-        with:
-          submodules: recursive
-          fetch-depth: 0
-
-      - name: Install dependencies
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y libfuse2
-
-      - name: Create folders
-        run: mkdir -p build/RccCore
-
-      - name: Download binary artifact
-        uses: actions/download-artifact@v4
-        with:
-          name: binary
-          path: build/RccCore
-
-      - name: Download assets artifact
-        uses: actions/download-artifact@v4
-        with:
-          name: assets
-          path: assets
-
-      - name: Download OpenRGB artifact
-        uses: actions/download-artifact@v4
-        with:
-          name: OpenRGB
-          path: assets/OpenRGB
-
-      - name: Download RccDeckyCompanion artifact
-        uses: actions/download-artifact@v4
-        with:
-          name: RccDeckyCompanion
-          path: assets/RccDeckyCompanion
-
-      - name: Package
-        run: |
-          make package
 
       - name: Upload AppImage
         uses: actions/upload-artifact@v4
@@ -163,7 +56,7 @@ jobs:
 
   release:
     needs:
-      - build_rogcontrolcenter
+      - compile_and_package
       - package
     runs-on: ubuntu-latest
     steps:
@@ -181,7 +74,7 @@ jobs:
       - name: Create tag
         run: |
           git pull --rebase origin main
-          git tag "${{ needs.build_rogcontrolcenter.outputs.version }}"
+          git tag "${{ needs.compile_and_package.outputs.version }}"
           make increase_version
           git push origin main
           git push origin main:develop --force
@@ -199,8 +92,8 @@ jobs:
       - name: Create GitHub release
         uses: softprops/action-gh-release@v2
         with:
-          tag_name: ${{ needs.build_rogcontrolcenter.outputs.version }}
-          name: ${{ needs.build_rogcontrolcenter.outputs.version }}
+          tag_name: ${{ needs.compile.outputs.version }}
+          name: ${{ needs.compile.outputs.version }}
           files: |
             dist/RogControlCenter.AppImage<
         env:
