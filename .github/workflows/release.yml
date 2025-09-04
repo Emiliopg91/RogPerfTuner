@@ -36,7 +36,7 @@ jobs:
       - name: Compile
         run: |
           cmake --version
-          make release
+          PYTHONUNBUFFERED=1 make release
           if [[ -n $(git status --porcelain) ]]; then
               echo "Commiting formated files..."
               git add .
