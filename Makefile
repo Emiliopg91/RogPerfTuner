@@ -42,14 +42,15 @@ format:
 	@clang-format -i $$(find RccCore -name '*.cpp' -o -name '*.hpp')
 	@clang-format -i $$(find RccScripts -name '*.cpp' -o -name '*.hpp')
 
-build_rogcontrolcenter: config format
+build: config build_openrgb build_rccdc format 
 	@echo "#######################################################################"
 	@echo "##################### Compiling RogControlCenter ######################"
 	@echo "#######################################################################"
 
-	@cmake --build build -- -j$(NUM_CORES)
+	@rm -rf assets/bin RccCore/include/clients/tcp/open_rgb/compatible_devices.hpp RccCore/src/translator/translations.cpp
 
-	@rm -rf assets/bin
+	@cmake --build build -- -j$(NUM_CORES)
+	
 	@mkdir assets/bin assets/bin/rgb  assets/bin/performance assets/bin/steam
 	@cp build/RccScripts/NextEffect assets/bin/rgb/nextEffect
 	@cp build/RccScripts/IncBrightness assets/bin/rgb/incBrightness
@@ -79,8 +80,6 @@ build_rccdc:
 		echo "#######################################################################" && \
 	    cd submodules/RccDeckyCompanion && ./cli/decky.py build && cp -r out/RccDeckyCompanion ../../assets/RccDeckyCompanion; \
 	fi
-
-build: build_rogcontrolcenter build_openrgb build_rccdc
 
 package:
 	@echo "#######################################################################"

@@ -1,8 +1,8 @@
 #pragma once
 
-#include "../../../../include/models/hardware/usb_identifier.hpp"
 #include "OpenRGB/Client.hpp"
 #include "RccCommons.hpp"
+#include "compatible_devices.hpp"
 #include "effects/abstract/abstract_effect.hpp"
 
 class OpenRgbClient {
@@ -12,7 +12,7 @@ class OpenRgbClient {
 		return instance;
 	}
 
-	const std::vector<UsbIdentifier> getCompatibleDevices();
+	const CompatibleDeviceArray getCompatibleDevices();
 	const std::vector<std::string> getAvailableEffects();
 	void applyEffect(const std::string& effect, const RgbBrightness& brightness);
 	void start();
@@ -20,7 +20,6 @@ class OpenRgbClient {
 	void disableDevice(const std::string&);
 
   private:
-	std::vector<UsbIdentifier> compatibleDevices;
 	std::map<std::string, std::string> compatibleDeviceNames;
 	std::thread runnerThread;
 	Logger logger{"OpenRgbClient"};
@@ -32,7 +31,6 @@ class OpenRgbClient {
 
 	OpenRgbClient();
 
-	void loadCompatibleDevices();
 	void startOpenRgbProcess();
 	void startOpenRgbClient();
 	void stopOpenRgbProcess();

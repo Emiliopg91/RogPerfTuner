@@ -36,13 +36,11 @@ OpenRgbClient::OpenRgbClient() {
 	availableEffects.push_back(std::unique_ptr<AbstractEffect>(&StarryNightEffect::getInstance(client)));
 	availableEffects.push_back(std::unique_ptr<AbstractEffect>(&StaticEffect::getInstance(client)));
 
-	loadCompatibleDevices();
-
 	start();
 }
 
 void OpenRgbClient::start() {
-	logger.info("Initializing OpenRgbClient");
+	logger.info("Starting OpenRgbClient");
 	logger.add_tab();
 
 	if (AsusCtlClient::getInstance().available()) {
@@ -51,7 +49,6 @@ void OpenRgbClient::start() {
 	startOpenRgbProcess();
 	startOpenRgbClient();
 	getAvailableDevices();
-
 	logger.rem_tab();
 }
 
@@ -70,45 +67,7 @@ void OpenRgbClient::stop() {
 	logger.rem_tab();
 }
 
-void OpenRgbClient::loadCompatibleDevices() {
-	logger.info("Loading supported devices");
-
-	std::ifstream file(Constants::ORGB_RULES_FILE);
-	if (!file.is_open()) {
-		logger.error("Couldn't load " + Constants::ORGB_RULES_FILE);
-		throw std::runtime_error("Couldn't load " + Constants::ORGB_RULES_FILE);
-	}
-
-	std::string line;
-
-	// Raw string literal con delimitador custom para evitar conflicto con comillas
-	std::regex regex(
-		R"delimiter(SUBSYSTEMS==".*?", ATTRS\{idVendor\}=="([0-9a-fA-F]+)", ATTRS\{idProduct\}=="([0-9a-fA-F]+)".*?TAG\+="([a-zA-Z0-9_]+)")delimiter");
-
-	while (std::getline(file, line)) {
-		// eliminar ', TAG+="uaccess"' si existe
-		size_t pos = line.find(", TAG+=\"uaccess\"");
-		if (pos != std::string::npos) {
-			line.erase(pos, 15);
-		}
-
-		std::smatch match;
-		if (std::regex_search(line, match, regex)) {
-			std::string vendor_id	= match[1];
-			std::string product_id	= match[2];
-			std::string device_name = match[3];
-
-			std::replace(device_name.begin(), device_name.end(), '_', ' ');
-
-			compatibleDevices.emplace_back(UsbIdentifier{vendor_id, product_id, device_name});
-			compatibleDeviceNames[vendor_id + ":" + product_id] = device_name;
-		}
-	}
-
-	logger.debug("Detected support for " + std::to_string(compatibleDevices.size()) + " devices");
-}
-
-const std::vector<UsbIdentifier> OpenRgbClient::getCompatibleDevices() {
+const CompatibleDeviceArray OpenRgbClient::getCompatibleDevices() {
 	return compatibleDevices;
 }
 

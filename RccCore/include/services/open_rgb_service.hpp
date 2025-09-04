@@ -30,7 +30,6 @@ class OpenRgbService {
   private:
 	OpenRgbService();
 
-	std::map<std::string, std::string> compatibleDeviceNames;
 	Logger logger{"OpenRgbService"};
 
 	std::mutex actionMutex;

@@ -12,27 +12,15 @@ using json = nlohmann::json;
 Translator::Translator() {
 	logger.debug("User language: " + currentLang);
 
-	const std::string TRANSLATION_FILE = Constants::ASSETS_DIR + "/translations.json";
-	logger.debug("Loading translations from " + TRANSLATION_FILE);
 	try {
-		std::ifstream f(TRANSLATION_FILE);
-		if (!f) {
-			logger.error("Couldn't load translations: {}", TRANSLATION_FILE);
-			return;
-		}
-
-		nlohmann::json j;
-		f >> j;
-
-		std::map<std::string, std::map<std::string, std::string>> t2 =
-			j.get<std::map<std::string, std::map<std::string, std::string>>>();
-		for (auto& [key, entries] : j.items()) {
-			std::map<std::string, std::string> inner_map;
-			for (auto& [lang, text] : entries.items()) {
-				if (lang == FALLBACK_LANG || lang == currentLang)
-					inner_map[lang] = text.get<std::string>();
+		for (auto& [key, entries] : translations) {
+			for (auto it = entries.begin(); it != entries.end();) {
+				if (it->first != FALLBACK_LANG && it->first != currentLang) {
+					it = entries.erase(it);
+				} else {
+					++it;
+				}
 			}
-			translations[key] = std::move(inner_map);
 		}
 	} catch (const std::exception& e) {
 		logger.error(fmt::format("Error loading translations: {}", e.what()));

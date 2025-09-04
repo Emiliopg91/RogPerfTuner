@@ -11,10 +11,7 @@ OpenRgbService::OpenRgbService() {
 	logger.info("Initializing OpenRgbService");
 	logger.add_tab();
 
-	auto compatibles = OpenRgbClient::getInstance().getCompatibleDevices();
-	for (auto d : compatibles) {
-		compatibleDeviceNames[d.id_vendor + ":" + d.id_product] = d.name;
-	}
+	OpenRgbClient::getInstance();
 
 	restoreAura();
 
@@ -36,9 +33,9 @@ void OpenRgbService::restoreAura() {
 }
 
 std::string OpenRgbService::getDeviceName(const UsbIdentifier& identifier) {
-	std::string key = identifier.id_vendor + ":" + identifier.id_product;
-	auto it			= compatibleDeviceNames.find(key);
-	if (it != compatibleDeviceNames.end()) {
+	std::string key = std::string(identifier.id_vendor) + ":" + std::string(identifier.id_product);
+	auto it			= compatibleDeviceNameMap.find(key);
+	if (it != compatibleDeviceNameMap.end()) {
 		return it->second;
 	}
 

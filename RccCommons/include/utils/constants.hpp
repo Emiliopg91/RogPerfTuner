@@ -102,9 +102,8 @@ class Constants {
 	inline static const std::string ASSET_ICONS_DIR = Constants::ASSETS_DIR + "/icons";
 	inline static const std::string ASSET_ICON_FILE = Constants::ASSET_ICONS_DIR + "/icon.svg";
 
-	inline static const std::string ORGB_DIR		= Constants::ASSETS_DIR + "/OpenRGB";
-	inline static const std::string ORGB_RULES_FILE = Constants::ORGB_DIR + "/usr/lib/udev/rules.d/60-openrgb.rules";
-	inline static const std::string ORGB_PATH		= Constants::ORGB_DIR + "/AppRun";
+	inline static const std::string ORGB_DIR  = Constants::ASSETS_DIR + "/OpenRGB";
+	inline static const std::string ORGB_PATH = Constants::ORGB_DIR + "/AppRun";
 
 	inline static const std::string URL_PERF_PROF  = "/performance/profile/next";
 	inline static const std::string URL_INC_BRIGHT = "/rgb/brightness/increase";
