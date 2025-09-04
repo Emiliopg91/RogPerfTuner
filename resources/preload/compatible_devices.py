@@ -1,13 +1,22 @@
+import os
 import re
-import sys
+
+
+input_file = os.path.abspath(
+    os.path.dirname(__file__)
+    + "/../../assets/OpenRGB/usr/lib/udev/rules.d/60-openrgb.rules"
+)
+output_file = os.path.abspath(
+    os.path.dirname(__file__)
+    + "/../../RccCore/include/clients/tcp/open_rgb/compatible_devices.hpp"
+)
+
+print(f"Preloading compatibles devices from {input_file}")
 
 # Regex para extraer vendor, product y nombre
 regex = re.compile(
     r'SUBSYSTEMS==".*?", ATTRS\{idVendor\}=="([0-9a-fA-F]+)", ATTRS\{idProduct\}=="([0-9a-fA-F]+)".*?TAG\+="([a-zA-Z0-9_]+)"'
 )
-
-input_file = sys.argv[1]
-output_file = sys.argv[2]
 
 devices = []
 

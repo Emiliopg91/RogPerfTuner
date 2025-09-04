@@ -33,21 +33,20 @@ config:
 
 	@touch .$(BUILD_TYPE)
 
-format:
-	@echo "#######################################################################"
-	@echo "#################### Formatting RogControlCenter ######################"
-	@echo "#######################################################################"
-
-	@clang-format -i $$(find RccCommons -name '*.cpp' -o -name '*.hpp')
-	@clang-format -i $$(find RccCore -name '*.cpp' -o -name '*.hpp' | grep -v "RccCore/include/clients/tcp/open_rgb/compatible_devices.hpp" | grep -v "RccCore/src/translator/translations.cpp")
-	@clang-format -i $$(find RccScripts -name '*.cpp' -o -name '*.hpp')
-
-build: config build_openrgb build_rccdc format 
+build: config build_openrgb build_rccdc 
 	@echo "#######################################################################"
 	@echo "##################### Compiling RogControlCenter ######################"
 	@echo "#######################################################################"
 
 	@rm -rf assets/bin RccCore/include/clients/tcp/open_rgb/compatible_devices.hpp RccCore/src/translator/translations.cpp
+
+	@python3 resources/preload/compatible_devices.py
+	@python3 resources/preload/translations.py
+
+	@echo "Formatting code..."
+	@clang-format -i $$(find RccCommons -name '*.cpp' -o -name '*.hpp')
+	@clang-format -i $$(find RccCore -name '*.cpp' -o -name '*.hpp')
+	@clang-format -i $$(find RccScripts -name '*.cpp' -o -name '*.hpp')
 
 	@cmake --build build -- -j$(NUM_CORES)
 	

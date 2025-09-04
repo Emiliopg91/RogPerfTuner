@@ -31,32 +31,6 @@ find_package(Qt6 REQUIRED COMPONENTS Core DBus Gui Widgets)
 # -----------------------------
 # Ejecutable principal
 # -----------------------------
-find_package(Python3 REQUIRED COMPONENTS Interpreter)
-
-set(GENERATED_DEVICES ${CMAKE_CURRENT_BINARY_DIR}/include/clients/tcp/open_rgb/compatible_devices.hpp)
-add_custom_command(
-    OUTPUT ${GENERATED_DEVICES}
-    COMMAND ${CMAKE_COMMAND} -E make_directory ${CMAKE_CURRENT_BINARY_DIR}/include/clients/tcp/open_rgb
-    COMMAND ${Python3_EXECUTABLE} ${CMAKE_CURRENT_SOURCE_DIR}/../resources/preload/compatible_devices.py
-            ${CMAKE_CURRENT_SOURCE_DIR}/../assets/OpenRGB/usr/lib/udev/rules.d/60-openrgb.rules
-            ${GENERATED_DEVICES}
-    MAIN_DEPENDENCY ${CMAKE_CURRENT_SOURCE_DIR}/../assets/OpenRGB/usr/lib/udev/rules.d/60-openrgb.rules
-    COMMENT "Generating compatible_devices.hpp from 60-openrgb.rules"
-)
-add_custom_target(generate_devices DEPENDS ${GENERATED_DEVICES})
-
-set(GENERATED_TRANSLATIONS ${CMAKE_CURRENT_BINARY_DIR}/src/translator/translations.cpp)
-add_custom_command(
-    OUTPUT ${GENERATED_TRANSLATIONS}
-    COMMAND ${CMAKE_COMMAND} -E make_directory ${CMAKE_CURRENT_BINARY_DIR}/src/translator
-    COMMAND ${Python3_EXECUTABLE} ${CMAKE_CURRENT_SOURCE_DIR}/../resources/preload/translations.py
-            ${CMAKE_CURRENT_SOURCE_DIR}/../resources/translations.json
-            ${GENERATED_TRANSLATIONS}
-    MAIN_DEPENDENCY ${CMAKE_CURRENT_SOURCE_DIR}/../resources/translations.json
-    COMMENT "Generating translations.cpp from translations.json asset"
-)
-add_custom_target(generate_translations DEPENDS ${GENERATED_TRANSLATIONS})
-
 file(GLOB_RECURSE SOURCES
     "${CMAKE_CURRENT_SOURCE_DIR}/src/*.cpp"
 )
@@ -67,8 +41,6 @@ file(GLOB_RECURSE HEADERS
 )
 
 add_executable(RogControlCenter ${SOURCES} ${HEADERS})
-add_dependencies(RogControlCenter generate_devices)
-add_dependencies(RogControlCenter generate_translations)
 
 find_package(PkgConfig REQUIRED)
 pkg_check_modules(LIBSECRET REQUIRED libsecret-1)

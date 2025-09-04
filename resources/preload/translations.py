@@ -1,8 +1,15 @@
 import json
-import sys
+import os
 
-input_file = sys.argv[1]
-output_file = sys.argv[2]
+
+input_file = os.path.abspath(
+    os.path.dirname(__file__) + "/../../resources/translations.json"
+)
+output_file = os.path.abspath(
+    os.path.dirname(__file__) + "/../../RccCore/src/translator/translations.cpp"
+)
+
+print(f"Preloading translations from {input_file}")
 
 with open(input_file, "r") as f:
     translations: dict[str, dict[str, str]] = json.load(f)
