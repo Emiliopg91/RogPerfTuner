@@ -39,7 +39,7 @@ format:
 	@echo "#######################################################################"
 
 	@clang-format -i $$(find RccCommons -name '*.cpp' -o -name '*.hpp')
-	@clang-format -i $$(find RccCore -name '*.cpp' -o -name '*.hpp')
+	@clang-format -i $$(find RccCore -name '*.cpp' -o -name '*.hpp' | grep -v "RccCore/include/clients/tcp/open_rgb/compatible_devices.hpp" | grep -v "RccCore/src/translator/translations.cpp")
 	@clang-format -i $$(find RccScripts -name '*.cpp' -o -name '*.hpp')
 
 build: config build_openrgb build_rccdc format 
