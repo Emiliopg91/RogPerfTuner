@@ -15,7 +15,6 @@ clean:
 	@cd submodules/OpenRGB-cppSDK && git reset --hard > /dev/null
 	@cd submodules/OpenRGB && git reset --hard > /dev/null && rm -Rf build
 	@cd submodules/RccDeckyCompanion && git reset --hard > /dev/null && rm -Rf dist logs out 
-	@grep -E 'project\(.*VERSION' CMakeLists.txt | sed -E 's/.*VERSION[[:space:]]+([0-9]+\.[0-9]+\.[0-9]+).*/\1/' | xargs echo -n > assets/version
 
 config:
 	@echo "#######################################################################"
@@ -38,6 +37,8 @@ build: config build_openrgb build_rccdc
 	@echo "#######################################################################"
 	@echo "##################### Compiling RogControlCenter ######################"
 	@echo "#######################################################################"
+
+	@grep -E 'project\(.*VERSION' CMakeLists.txt | sed -E 's/.*VERSION[[:space:]]+([0-9]+\.[0-9]+\.[0-9]+).*/\1/' | xargs echo -n > assets/version
 
 	@rm -rf assets/bin RccCore/include/clients/tcp/open_rgb/compatible_devices.hpp RccCore/src/translator/translations.cpp
 
