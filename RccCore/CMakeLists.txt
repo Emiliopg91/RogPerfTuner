@@ -36,6 +36,7 @@ find_package(Python3 REQUIRED COMPONENTS Interpreter)
 set(GENERATED_DEVICES ${CMAKE_CURRENT_BINARY_DIR}/include/clients/tcp/open_rgb/compatible_devices.hpp)
 add_custom_command(
     OUTPUT ${GENERATED_DEVICES}
+    COMMAND ${CMAKE_COMMAND} -E make_directory ${CMAKE_CURRENT_BINARY_DIR}/include/clients/tcp/open_rgb
     COMMAND ${Python3_EXECUTABLE} ${CMAKE_CURRENT_SOURCE_DIR}/../resources/preload/compatible_devices.py
             ${CMAKE_CURRENT_SOURCE_DIR}/../assets/OpenRGB/usr/lib/udev/rules.d/60-openrgb.rules
             ${GENERATED_DEVICES}
@@ -47,7 +48,7 @@ add_custom_target(generate_devices DEPENDS ${GENERATED_DEVICES})
 set(GENERATED_TRANSLATIONS ${CMAKE_CURRENT_BINARY_DIR}/src/translator/translations.cpp)
 add_custom_command(
     OUTPUT ${GENERATED_TRANSLATIONS}
-    COMMAND ${CMAKE_COMMAND} -E make_directory ${CMAKE_CURRENT_BINARY_DIR}/include/clients/tcp/open_rgb
+    COMMAND ${CMAKE_COMMAND} -E make_directory ${CMAKE_CURRENT_BINARY_DIR}/src/translator
     COMMAND ${Python3_EXECUTABLE} ${CMAKE_CURRENT_SOURCE_DIR}/../resources/preload/translations.py
             ${CMAKE_CURRENT_SOURCE_DIR}/../resources/translations.json
             ${GENERATED_TRANSLATIONS}
