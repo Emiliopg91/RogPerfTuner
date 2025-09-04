@@ -15,6 +15,7 @@ clean:
 	@cd submodules/OpenRGB-cppSDK && git reset --hard > /dev/null
 	@cd submodules/OpenRGB && git reset --hard > /dev/null && rm -Rf build
 	@cd submodules/RccDeckyCompanion && git reset --hard > /dev/null && rm -Rf dist logs out 
+	@grep -E 'project\(.*VERSION' CMakeLists.txt | sed -E 's/.*VERSION[[:space:]]+([0-9]+\.[0-9]+\.[0-9]+).*/\1/' | xargs echo -n > assets/version
 
 config:
 	@echo "#######################################################################"
@@ -57,8 +58,6 @@ build: config build_openrgb build_rccdc
 	@cp build/RccScripts/NextProfile assets/bin/performance/nextProfile
 	@cp build/RccScripts/SteamRunner assets/bin/steam/run
 	@cp build/RccScripts/FlatpakWrapper assets/bin/steam/flatpak
-
-	@grep -E 'project\(.*VERSION' CMakeLists.txt | sed -E 's/.*VERSION[[:space:]]+([0-9]+\.[0-9]+\.[0-9]+).*/\1/' | xargs echo -n > assets/version
 
 build_openrgb: 
 	@if [ ! -f "patches/OpenRGB.diff.applied" ]; then \
