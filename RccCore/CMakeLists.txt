@@ -33,7 +33,7 @@ find_package(Qt6 REQUIRED COMPONENTS Core DBus Gui Widgets)
 # -----------------------------
 find_package(Python3 REQUIRED COMPONENTS Interpreter)
 
-set(GENERATED_DEVICES ${CMAKE_CURRENT_SOURCE_DIR}/include/clients/tcp/open_rgb/compatible_devices.hpp)
+set(GENERATED_DEVICES ${CMAKE_CURRENT_BINARY_DIR}/include/clients/tcp/open_rgb/compatible_devices.hpp)
 add_custom_command(
     OUTPUT ${GENERATED_DEVICES}
     COMMAND ${Python3_EXECUTABLE} ${CMAKE_CURRENT_SOURCE_DIR}/../resources/preload/compatible_devices.py
@@ -44,9 +44,10 @@ add_custom_command(
 )
 add_custom_target(generate_devices DEPENDS ${GENERATED_DEVICES})
 
-set(GENERATED_TRANSLATIONS ${CMAKE_CURRENT_SOURCE_DIR}/src/translator/translations.cpp)
+set(GENERATED_TRANSLATIONS ${CMAKE_CURRENT_BINARY_DIR}/src/translator/translations.cpp)
 add_custom_command(
     OUTPUT ${GENERATED_TRANSLATIONS}
+    COMMAND ${CMAKE_COMMAND} -E make_directory ${CMAKE_CURRENT_BINARY_DIR}/include/clients/tcp/open_rgb
     COMMAND ${Python3_EXECUTABLE} ${CMAKE_CURRENT_SOURCE_DIR}/../resources/preload/translations.py
             ${CMAKE_CURRENT_SOURCE_DIR}/../resources/translations.json
             ${GENERATED_TRANSLATIONS}
