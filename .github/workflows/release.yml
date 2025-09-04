@@ -57,7 +57,6 @@ jobs:
   release:
     needs:
       - compile_and_package
-      - package
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
@@ -95,6 +94,6 @@ jobs:
           tag_name: ${{ needs.compile.outputs.version }}
           name: ${{ needs.compile.outputs.version }}
           files: |
-            dist/RogControlCenter.AppImage<
+            dist/RogControlCenter.AppImage
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
