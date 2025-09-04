@@ -37,10 +37,21 @@ jobs:
         run: |
           cmake --version
           PYTHONUNBUFFERED=1 make release
-          if [[ -n $(git status --porcelain) ]]; then
-              echo "Commiting formated files..."
-              git add .
-              git commit -m "[ci skip] Auto formatted source files"
+
+          folders=("RccCommons" "RccCore" "RccScripts")
+
+          changes=0
+          for folder in "${folders[@]}"; do
+              if [[ -n $(git status --porcelain "$folder") ]]; then
+                  changes=1
+                  break
+              fi
+          done
+
+          if [[ $changes -eq 1 ]]; then
+              echo "Committing pending files before release..."
+              git add "${folders[@]}"
+              git commit -m "[ci skip] Pending files before release"
           fi
 
       - name: Get version
