@@ -50,18 +50,18 @@ jobs:
 
           if [[ $changes -eq 1 ]]; then
               echo "Committing pending files before release..."
-              git add "${folders[@]}"
+              git add .
               git commit -m "[ci skip] Pending files before release"
           fi
 
       - name: Get version
         id: get_version
         run: |
-          echo "version=$(cat assets/version)" >> $GITHUB_OUTPUT
+          echo "VERSION=$(cat assets/version)" >> $GITHUB_ENV
 
       - name: Create tag
         run: |
-          git tag "$version"
+          git tag "$VERSION"
           make increase_version
           git push origin main
           git push origin main:develop --force
@@ -73,8 +73,8 @@ jobs:
       - name: Create GitHub release
         uses: softprops/action-gh-release@v2
         with:
-          tag_name: $version
-          name: $version
+          tag_name: $VERSION
+          name: $VERSION
           files: |
             dist/RogControlCenter.AppImage
         env:
