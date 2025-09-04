@@ -317,7 +317,7 @@ TranslationMap Translator::translations = {
 	{"params",
 	 {
 		 {"en", "Parameters"},
-		 {"es", "Parámetros"},
+		 {"es", "Argumentos"},
 	 }},
 	{"used.steamdeck",
 	 {
