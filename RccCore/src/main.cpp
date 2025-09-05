@@ -20,7 +20,7 @@
 #include "httplib.h"
 
 int main(int argc, char** argv) {
-	std::strncpy(argv[0], "RogControlCenter", std::strlen(argv[0]));
+	std::strncpy(argv[0], ("RogControlCenter v" + Constants::APP_VERSION).c_str(), std::strlen(argv[0]));
 	argv[0][std::strlen(argv[0])] = '\0';
 
 	std::cout << "Running application " + Constants::EXECUTABLE_PATH << " with PID " << getpid() << std::endl;

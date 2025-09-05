@@ -13,6 +13,8 @@ class ApplicationService {
 
 	void applyUpdate();
 	void shutdown();
+	bool isAutostartEnabled();
+	void setAutostart(bool enabled);
 
   private:
 	Logger logger{"ApplicationService"};

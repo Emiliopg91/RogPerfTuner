@@ -4,8 +4,6 @@
 
 #include "RccCommons.hpp"
 
-using TranslationMap = std::map<std::string, std::map<std::string, std::string>>;
-
 class Translator {
   public:
 	static Translator& getInstance() {
@@ -17,7 +15,7 @@ class Translator {
 
   private:
 	inline static std::string FALLBACK_LANG = "en";
-	static TranslationMap translations;
+	std::map<std::string, std::string> translations;
 
 	Translator();
 	Logger logger{"Translator"};

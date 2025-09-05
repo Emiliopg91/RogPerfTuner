@@ -6,7 +6,7 @@ input_file = os.path.abspath(
     os.path.dirname(__file__) + "/../../resources/translations.json"
 )
 output_file = os.path.abspath(
-    os.path.dirname(__file__) + "/../../RccCore/src/translator/translations.cpp"
+    os.path.dirname(__file__) + "/../../RccCore/include/translator/translations.hpp"
 )
 
 print(f"Preloading translations from {input_file}")
@@ -17,9 +17,11 @@ with open(input_file, "r") as f:
 with open(output_file, "w") as out:
     out.write("#include <map>\n")
     out.write("#include <string>\n\n")
-    out.write('#include "../../include/translator/translator.hpp"\n\n')
+    out.write('#include "translator.hpp"\n\n')
 
-    out.write("TranslationMap Translator::translations = {\n")
+    out.write(
+        "std::map<std::string, std::map<std::string, std::string>> initialTranslations = {\n"
+    )
     for literal in translations:
         {out.write(f'{{"{literal}", {{\n')}
         for lang in translations[literal]:
