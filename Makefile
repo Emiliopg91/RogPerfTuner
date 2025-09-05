@@ -40,7 +40,7 @@ build: config build_openrgb build_rccdc
 
 	@grep -E 'project\(.*VERSION' CMakeLists.txt | sed -E 's/.*VERSION[[:space:]]+([0-9]+\.[0-9]+\.[0-9]+).*/\1/' | xargs echo -n > assets/version
 
-	@rm -rf assets/bin RccCore/include/clients/tcp/open_rgb/compatible_devices.hpp RccCore/src/translator/translations.cpp
+	@rm -rf assets/bin RccCore/include/clients/tcp/open_rgb/compatible_devices.hpp RccCore/include/translator/translations.hpp
 
 	@python3 resources/preload/compatible_devices.py
 	@python3 resources/preload/translations.py

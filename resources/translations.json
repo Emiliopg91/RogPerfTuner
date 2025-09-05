@@ -266,5 +266,9 @@
   "running": {
     "en": "Running",
     "es": "Ejecutando"
+  },
+  "settings": {
+    "en": "Settings",
+    "es": "Configuración"
   }
 }

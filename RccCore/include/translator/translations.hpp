@@ -1,9 +1,9 @@
 #include <map>
 #include <string>
 
-#include "../../include/translator/translator.hpp"
+#include "translator.hpp"
 
-TranslationMap Translator::translations = {
+std::map<std::string, std::map<std::string, std::string>> initialTranslations = {
 	{"performance",
 	 {
 		 {"en", "Performance"},
@@ -338,5 +338,10 @@ TranslationMap Translator::translations = {
 	 {
 		 {"en", "Running"},
 		 {"es", "Ejecutando"},
+	 }},
+	{"settings",
+	 {
+		 {"en", "Settings"},
+		 {"es", "Configuración"},
 	 }},
 };

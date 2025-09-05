@@ -16,8 +16,7 @@ ApplicationService::ApplicationService() {
 	FileUtils::copy(Constants::ASSETS_BIN_DIR, Constants::BIN_DIR);
 	FileUtils::mkdirs(Constants::BIN_APPLICATION_DIR);
 
-	std::string content = buildLaunchFile();
-	FileUtils::writeFileContent(Constants::LAUNCHER_FILE, content);
+	FileUtils::writeFileContent(Constants::LAUNCHER_FILE, buildLaunchFile());
 	logger.debug("Launch file '" + Constants::LAUNCHER_FILE + "' written successfully");
 
 	FileUtils::copy(Constants::ASSET_ICONS_DIR, Constants::ICONS_DIR);
@@ -26,13 +25,8 @@ ApplicationService::ApplicationService() {
 
 	Shell::getInstance().run_elevated_command("chmod 777 " + Constants::BIN_DIR);
 
-	content = buildDesktopFile();
-	if (!FileUtils::exists(Constants::AUTOSTART_FILE)) {
-		FileUtils::writeFileContent(Constants::AUTOSTART_FILE, content);
-		logger.debug("Autostart file '" + Constants::AUTOSTART_FILE + "' written successfully");
-	}
 	if (!FileUtils::exists(Constants::APP_DRAW_FILE)) {
-		FileUtils::writeFileContent(Constants::APP_DRAW_FILE, content);
+		FileUtils::writeFileContent(Constants::APP_DRAW_FILE, buildDesktopFile());
 		logger.debug("Menu entry file '" + Constants::APP_DRAW_FILE + "' written successfully");
 	}
 
@@ -41,6 +35,21 @@ ApplicationService::ApplicationService() {
 							 [this]() -> bool { return SteamService::getInstance().getRunningGames().empty(); });
 
 	logger.rem_tab();
+}
+
+bool ApplicationService::isAutostartEnabled() {
+	return FileUtils::exists(Constants::AUTOSTART_FILE);
+}
+void ApplicationService::setAutostart(bool enabled) {
+	if (enabled) {
+		if (!FileUtils::exists(Constants::AUTOSTART_FILE)) {
+			FileUtils::writeFileContent(Constants::AUTOSTART_FILE, buildDesktopFile());
+			logger.info("Autostart file '" + Constants::AUTOSTART_FILE + "' written successfully");
+		}
+	} else {
+		FileUtils::remove(Constants::AUTOSTART_FILE);
+		logger.info("Autostart file '" + Constants::AUTOSTART_FILE + "' deleted successfully");
+	}
 }
 
 void ApplicationService::applyUpdate() {

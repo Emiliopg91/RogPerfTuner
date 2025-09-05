@@ -5,6 +5,7 @@
 #include <fstream>
 #include <nlohmann/json.hpp>
 
+#include "../../include/translator/translations.hpp"
 #include "RccCommons.hpp"
 
 using json = nlohmann::json;
@@ -13,15 +14,23 @@ Translator::Translator() {
 	logger.debug("User language: " + currentLang);
 
 	try {
-		for (auto& [key, entries] : translations) {
-			for (auto it = entries.begin(); it != entries.end();) {
-				if (it->first != FALLBACK_LANG && it->first != currentLang) {
-					it = entries.erase(it);
-				} else {
-					++it;
+		for (auto& [key, entries] : initialTranslations) {
+			std::string literal = "";
+			auto it				= entries.find(currentLang);
+			if (it != entries.end()) {
+				literal = it->second;
+			} else {
+				logger.warn("Missing translation for '" + key + "'");
+				auto it = entries.find(FALLBACK_LANG);
+				if (it != entries.end()) {
+					literal = it->second;
 				}
 			}
+			translations[key] = literal;
 		}
+
+		initialTranslations.clear();
+		std::map<std::string, std::map<std::string, std::string>>().swap(initialTranslations);
 	} catch (const std::exception& e) {
 		logger.error(fmt::format("Error loading translations: {}", e.what()));
 	}
@@ -33,14 +42,7 @@ std::string Translator::translate(const std::string& msg,
 
 	auto it = translations.find(msg);
 	if (it != translations.end()) {
-		std::map<std::string, std::string> entry = it->second;
-		auto it2								 = entry.find(currentLang);
-		if (it2 != entry.end()) {
-			result = it2->second;
-		} else {
-			result = entry.at(FALLBACK_LANG);
-			logger.warn("Missing translation for '" + msg + "'");
-		}
+		result = it->second;
 
 		for (const auto& [key, value] : replacement) {
 			std::string placeholder = "{" + key + "}";
@@ -62,6 +64,7 @@ std::string Translator::translate(const std::string& msg,
 				pos += valStr.length();
 			}
 		}
+
 	} else {
 		logger.warn("Missing translation for '" + msg + "'");
 	}

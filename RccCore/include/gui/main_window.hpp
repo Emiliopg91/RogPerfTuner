@@ -41,6 +41,8 @@ class MainWindow : public QMainWindow {
 
 	void setAuraEffect(std::string effect);
 
+	void onAutostartChanged(bool enabled);
+
 	void onProfileChanged(int index);
 
 	void onBatteryLimitChanged(int index);
@@ -59,4 +61,5 @@ class MainWindow : public QMainWindow {
 	QComboBox* _effectDropdown;
 	QComboBox* _brightnessDropdown;
 	QComboBox* _thresholdDropdown;
+	QCheckBox* _autostart;
 };

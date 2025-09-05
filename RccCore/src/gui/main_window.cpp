@@ -13,8 +13,8 @@
 
 MainWindow::MainWindow(QWidget* parent) : QMainWindow(parent), _logger(new Logger()) {
 	setWindowTitle("RogControlCenter");
-	setGeometry(0, 0, 350, 630);
-	setFixedSize(350, 630);
+	setGeometry(0, 0, 350, 680);
+	setFixedSize(350, 680);
 	setWindowIcon(QIcon(QString::fromStdString(Constants::ICON_45_FILE)));
 
 	QWidget* centralWidget	= new QWidget(this);
@@ -94,8 +94,8 @@ MainWindow::MainWindow(QWidget* parent) : QMainWindow(parent), _logger(new Logge
 	auraGroup->setLayout(auraLayout);
 	mainLayout->addWidget(auraGroup);
 
-	// Grupo Battery
-	QGroupBox* settingsGroup	= new QGroupBox(QString::fromStdString(Translator::getInstance().translate("battery")));
+	// Grupo Settings
+	QGroupBox* settingsGroup = new QGroupBox(QString::fromStdString(Translator::getInstance().translate("settings")));
 	QFormLayout* settingsLayout = new QFormLayout();
 	settingsLayout->setContentsMargins(20, 20, 20, 20);
 
@@ -110,6 +110,13 @@ MainWindow::MainWindow(QWidget* parent) : QMainWindow(parent), _logger(new Logge
 	settingsLayout->addRow(
 		new QLabel(QString::fromStdString(Translator::getInstance().translate("charge.threshold") + ":")),
 		_thresholdDropdown);
+
+	_autostart = new QCheckBox();
+	_autostart->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Preferred);
+	_autostart->setChecked(ApplicationService::getInstance().isAutostartEnabled());
+	connect(_autostart, &QCheckBox::toggled, this, &MainWindow::onAutostartChanged);
+	settingsLayout->addRow(_autostart,
+						   new QLabel(QString::fromStdString(Translator::getInstance().translate("autostart"))));
 
 	settingsGroup->setLayout(settingsLayout);
 	mainLayout->addWidget(settingsGroup);
@@ -135,14 +142,6 @@ MainWindow::MainWindow(QWidget* parent) : QMainWindow(parent), _logger(new Logge
 
 	EventBus::getInstance().on_with_data(Events::STEAM_SERVICE_GAME_EVENT,
 										 [this](CallbackParam data) { onGameEvent(std::any_cast<int>(data[0])); });
-	/*
-	EVENT_BUS.on(Events::PROFILE_SERVICE_ON_PROFILE, [this](PerformanceProfile v)
-				 { setPerformanceProfile(v); });
-	EVENT_BUS.on(Events::ORGB_SERVICE_ON_BRIGHTNESS, [this](auto v)
-				 { setAuraState(v); });
-	EVENT_BUS.on(Events::STEAM_SERVICE_GAME_EVENT, [this](int running)
-				 { onGameEvent(running); });
-*/
 }
 
 void MainWindow::closeEvent(QCloseEvent* event) {
@@ -203,4 +202,8 @@ void MainWindow::onBrightnessChange(int index) {
 void MainWindow::openGameList() {
 	GameList* list = new GameList(this);
 	list->show();
+}
+
+void MainWindow::onAutostartChanged(bool enabled) {
+	ApplicationService::getInstance().setAutostart(enabled);
 }
