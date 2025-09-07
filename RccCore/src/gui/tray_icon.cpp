@@ -48,9 +48,6 @@ void openGameList() {
 	GameList::INSTANCE->show();
 }
 
-// ==============================
-// Implementación de slots
-// ==============================
 void TrayIcon::setAuraBrightness(RgbBrightness brightness) {
 	QMetaObject::invokeMethod(TrayIcon::INSTANCE, [=]() { brightnessActions[brightness.toName()]->setChecked(true); }, Qt::QueuedConnection);
 }
@@ -66,6 +63,10 @@ void TrayIcon::setPerformanceProfile(PerformanceProfile profile) {
 void TrayIcon::setBatteryThreshold(BatteryThreshold threshold) {
 	QMetaObject::invokeMethod(TrayIcon::INSTANCE, [=]() { thresholdActions[threshold.toName()]->setChecked(true); }, Qt::QueuedConnection);
 }
+
+// ==============================
+// Implementación de slots
+// ==============================
 
 void TrayIcon::onBatteryLimitChanged(BatteryThreshold value) {
 	HardwareService::getInstance().setChargeThreshold(value);

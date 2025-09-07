@@ -20,10 +20,6 @@ class TrayIcon : public QObject {
 	void show();
 
   public slots:
-	void setAuraBrightness(RgbBrightness brightness);
-	void setAuraEffect(const std::string& effect);
-	void setPerformanceProfile(PerformanceProfile profile);
-	void setBatteryThreshold(BatteryThreshold threshold);
 	void onBatteryLimitChanged(BatteryThreshold value);
 	void onPerformanceProfileChanged(PerformanceProfile value);
 	void onEffectChanged(std::string effect);
@@ -37,4 +33,9 @@ class TrayIcon : public QObject {
 	std::map<std::string, QAction*> brightnessActions;
 	std::map<std::string, QAction*> effectActions;
 	std::map<std::string, QAction*> perfProfileActions;
+
+	void setAuraBrightness(RgbBrightness brightness);
+	void setAuraEffect(const std::string& effect);
+	void setPerformanceProfile(PerformanceProfile profile);
+	void setBatteryThreshold(BatteryThreshold threshold);
 };
