@@ -9,8 +9,7 @@
 
 class AbstractCmdClient {
   protected:
-	AbstractCmdClient(const std::string& command, const std::string& name, const bool& required = true)
-		: command_(command), available_(true) {
+	AbstractCmdClient(const std::string& command, const std::string& name, const bool& required = true) : command_(command), available_(true) {
 		logger_ = Logger{name};
 		if (!isCommandAvailable()) {
 			if (required)

@@ -15,8 +15,7 @@ class GpuBrand : public StrEnum<GpuBrand, GpuBrandMeta::Enum, 3> {
 	using Base::Base;
 
   private:
-	static constexpr std::array<GpuBrandMeta, 3> table{
-		{{Enum::INTEL, "INTEL", "intel"}, {Enum::NVIDIA, "NVIDIA", "nvidia"}}};
+	static constexpr std::array<GpuBrandMeta, 3> table{{{Enum::INTEL, "INTEL", "intel"}, {Enum::NVIDIA, "NVIDIA", "nvidia"}}};
 
 	friend Base;
 	static constexpr const std::array<GpuBrandMeta, 3>& metaTable() {

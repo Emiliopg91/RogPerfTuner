@@ -16,8 +16,7 @@ bool PasswordDialog::showDialog() {
 	if (exec() == QDialog::Accepted)
 		return true;
 
-	QMessageBox::information(nullptr, "Canceled",
-							 QString::fromStdString(Translator::getInstance().translate("user.canceled.operation")));
+	QMessageBox::information(nullptr, "Canceled", QString::fromStdString(Translator::getInstance().translate("user.canceled.operation")));
 	exit(EXIT_FAILURE);
 }
 
@@ -54,8 +53,7 @@ void PasswordDialog::onAccept() {
 	} else {
 		ok_button_->setDisabled(false);
 		cancel_button_->setDisabled(false);
-		QMessageBox::warning(this, "Error",
-							 QString::fromStdString(Translator::getInstance().translate("authentication.failed")));
+		QMessageBox::warning(this, "Error", QString::fromStdString(Translator::getInstance().translate("authentication.failed")));
 	}
 }
 bool PasswordDialog::checkPassword(const QString& password) {

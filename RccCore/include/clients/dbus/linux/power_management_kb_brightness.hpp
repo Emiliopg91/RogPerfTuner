@@ -24,8 +24,7 @@ class PMKeyboardBrightness : public AbstractDbusClient {
 
   private:
 	PMKeyboardBrightness()
-		: AbstractDbusClient(false, "org.kde.Solid.PowerManagement",
-							 "/org/kde/Solid/PowerManagement/Actions/KeyboardBrightnessControl",
+		: AbstractDbusClient(false, "org.kde.Solid.PowerManagement", "/org/kde/Solid/PowerManagement/Actions/KeyboardBrightnessControl",
 							 "org.kde.Solid.PowerManagement.Actions.KeyboardBrightnessControl", false) {
 	}
 };

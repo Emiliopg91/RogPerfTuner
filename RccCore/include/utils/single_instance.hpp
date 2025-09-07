@@ -25,9 +25,7 @@ class SingleInstance {
 			f.close();
 
 			if (pid > 0 && kill(pid, 0) == 0) {
-				std::cout << "Application already running with pid " + StringUtils::trim(std::to_string(pid)) +
-								 ", killing..."
-						  << std::endl;
+				std::cout << "Application already running with pid " + StringUtils::trim(std::to_string(pid)) + ", killing..." << std::endl;
 				kill(pid, SIGKILL);
 			} else {
 				fs::remove(Constants::LOCK_FILE);

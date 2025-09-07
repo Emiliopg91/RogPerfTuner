@@ -160,8 +160,7 @@ void SteamService::onFirstGameRun(unsigned int gid, std::string name, std::map<s
 
 	auto overlayId = environment.find("SteamOverlayGameId")->second;
 
-	GameEntry entry{args,	   env,	   gpu,	  MangoHudLevel::Enum::NO_DISPLAY, name,
-					overlayId, proton, false, WineSyncOption::Enum::AUTO};
+	GameEntry entry{args, env, gpu, MangoHudLevel::Enum::NO_DISPLAY, name, overlayId, proton, false, WineSyncOption::Enum::AUTO};
 	Configuration::getInstance().getConfiguration().games[std::to_string(gid)] = entry;
 	Configuration::getInstance().saveConfig();
 
@@ -178,14 +177,12 @@ void SteamService::onFirstGameRun(unsigned int gid, std::string name, std::map<s
 }
 
 bool SteamService::checkIfRequiredInstallation() {
-	std::ifstream fileAsset(Constants::RCCDC_PATH + "/package.json");
 	std::ifstream fileRunning(Constants::RCCDC_ASSET_PATH + "/package.json");
 
-	nlohmann::json jA, jR;
-	fileAsset >> jA;
+	nlohmann::json jR;
 	fileRunning >> jR;
 
-	SemanticVersion vA = SemanticVersion::parse(jA["version"]);
+	SemanticVersion vA = SemanticVersion::parse(Constants::PLUGIN_VERSION);
 	SemanticVersion vR = SemanticVersion::parse(jR["version"]);
 
 	return vA > vR;
@@ -219,11 +216,10 @@ void SteamService::copyPlugin() {
 	installer = std::thread([]() {
 		FileUtils::copy(Constants::RCCDC_ASSET_PATH, Constants::USER_PLUGIN_DIR);
 
-		std::vector<std::string> commands{
-			"if [[ -d \"" + Constants::RCCDC_PATH + "\" ]]; then rm -R \"" + Constants::RCCDC_PATH + "\"; fi",
-			"chmod 777 \"" + Constants::PLUGINS_FOLDER + "/..\"",
-			"mv \"" + Constants::USER_PLUGIN_DIR + "\" \"" + Constants::RCCDC_PATH + "\"",
-			"systemctl restart plugin_loader.service"};
+		std::vector<std::string> commands{"if [[ -d \"" + Constants::RCCDC_PATH + "\" ]]; then rm -R \"" + Constants::RCCDC_PATH + "\"; fi",
+										  "chmod 777 \"" + Constants::PLUGINS_FOLDER + "/..\"",
+										  "mv \"" + Constants::USER_PLUGIN_DIR + "\" \"" + Constants::RCCDC_PATH + "\"",
+										  "systemctl restart plugin_loader.service"};
 
 		for (auto cmd : commands) {
 			Shell::getInstance().run_elevated_command(cmd);

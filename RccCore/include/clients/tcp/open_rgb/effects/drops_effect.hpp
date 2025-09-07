@@ -37,8 +37,7 @@ class DropsEffect : public AbstractEffect {
 
   private:
 	DropsEffect(Client& client) : AbstractEffect(client, "Drops") {
-		_available_colors = {Color{0, 0, 0}, Color{0, 0, 0}, Color{255, 255, 255}, Color{255, 0, 0},
-							 Color{0, 255, 255}};
+		_available_colors = {Color{0, 0, 0}, Color{0, 0, 0}, Color{255, 255, 255}, Color{255, 0, 0}, Color{0, 255, 255}};
 	}
 
 	void _effect_thread(size_t dev_index, Device& dev) {

@@ -2,7 +2,6 @@
 #include "../../include/translator/translator.hpp"
 
 #include <filesystem>
-#include <fstream>
 #include <nlohmann/json.hpp>
 
 #include "../../include/translator/translations.hpp"
@@ -36,8 +35,7 @@ Translator::Translator() {
 	}
 }
 
-std::string Translator::translate(const std::string& msg,
-								  const std::unordered_map<std::string, std::any>& replacement) {
+std::string Translator::translate(const std::string& msg, const std::unordered_map<std::string, std::any>& replacement) {
 	std::string result = msg;
 
 	auto it = translations.find(msg);

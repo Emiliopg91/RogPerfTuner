@@ -2,7 +2,7 @@ BasedOnStyle: Google
 IndentWidth: 4
 TabWidth: 4
 UseTab: Always
-ColumnLimit: 120
+ColumnLimit: 150
 
 # Preferencias C++
 Standard: c++17

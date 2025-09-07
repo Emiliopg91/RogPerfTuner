@@ -13,8 +13,8 @@
 class AbstractDbusClient : public QObject {
 	Q_OBJECT
   public:
-	explicit AbstractDbusClient(bool systemBus, const QString& service, const QString& objectPath,
-								const QString& interface, bool required = true, QObject* parent = nullptr);
+	explicit AbstractDbusClient(bool systemBus, const QString& service, const QString& objectPath, const QString& interface, bool required = true,
+								QObject* parent = nullptr);
 
 	~AbstractDbusClient() override;
 
@@ -54,8 +54,7 @@ class AbstractDbusClient : public QObject {
 	void setProperty(const QString& prop, const T& value) {
 		checkAvailable();
 
-		QDBusMessage msg =
-			QDBusMessage::createMethodCall(serviceName_, objectPath_, "org.freedesktop.DBus.Properties", "Set");
+		QDBusMessage msg = QDBusMessage::createMethodCall(serviceName_, objectPath_, "org.freedesktop.DBus.Properties", "Set");
 
 		QList<QVariant> args;
 		args.append(interfaceName_);
@@ -73,8 +72,7 @@ class AbstractDbusClient : public QObject {
 	T getProperty(const QString& prop) {
 		checkAvailable();
 
-		QDBusMessage m =
-			QDBusMessage::createMethodCall(serviceName_, objectPath_, "org.freedesktop.DBus.Properties", "Get");
+		QDBusMessage m = QDBusMessage::createMethodCall(serviceName_, objectPath_, "org.freedesktop.DBus.Properties", "Get");
 
 		m.setArguments({interfaceName_, prop});
 
@@ -96,21 +94,18 @@ class AbstractDbusClient : public QObject {
 
 	template <typename Callback>
 	void onSignal(const QString& signalName, Callback&& callback) {
-		bool ok =
-			bus_.connect(serviceName_, objectPath_, interfaceName_, signalName, this, SLOT(onDbusSignal(QDBusMessage)));
+		bool ok = bus_.connect(serviceName_, objectPath_, interfaceName_, signalName, this, SLOT(onDbusSignal(QDBusMessage)));
 
 		if (!ok)
 			throw std::runtime_error("Couldn't connect to signal: " + signalName.toStdString());
 
 		// Registra el callback en EventBus
-		EventBus::getInstance().on_without_data(
-			"dbus." + interfaceName_.toStdString() + ".signal." + signalName.toStdString(),
-			std::forward<Callback>(callback));
+		EventBus::getInstance().on_without_data("dbus." + interfaceName_.toStdString() + ".signal." + signalName.toStdString(),
+												std::forward<Callback>(callback));
 	}
 
   private slots:
-	void onPropertiesChanged(const QString& iface, const QVariantMap& changedProps,
-							 const QStringList& invalidatedProps) {
+	void onPropertiesChanged(const QString& iface, const QVariantMap& changedProps, const QStringList& invalidatedProps) {
 		if (iface != interfaceName_)
 			return;
 

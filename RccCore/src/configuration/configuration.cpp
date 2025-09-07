@@ -112,8 +112,8 @@ void Configuration::setPassword(const std::string& pss) {
 		0  // reserved1..reserved7
 	};
 
-	secret_password_store_sync(&schema, SECRET_COLLECTION_DEFAULT, "Password for RogControlCenter", pss.c_str(),
-							   nullptr, &error, "key", "default", nullptr);
+	secret_password_store_sync(&schema, SECRET_COLLECTION_DEFAULT, "Password for RogControlCenter", pss.c_str(), nullptr, &error, "key", "default",
+							   nullptr);
 
 	if (error) {
 		std::string msg = "Error saving password: " + std::string(error->message);

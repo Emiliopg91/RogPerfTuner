@@ -20,7 +20,6 @@ class UPowerClient : public AbstractDbusClient {
 
   private:
 	UPowerClient()
-		: AbstractDbusClient(true, QString("org.freedesktop.UPower"), QString("/org/freedesktop/UPower"),
-							 QString("org.freedesktop.UPower"), true) {
+		: AbstractDbusClient(true, QString("org.freedesktop.UPower"), QString("/org/freedesktop/UPower"), QString("org.freedesktop.UPower"), true) {
 	}
 };

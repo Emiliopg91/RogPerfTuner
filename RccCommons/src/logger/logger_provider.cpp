@@ -4,12 +4,12 @@
 #include <filesystem>
 
 #include "../../include/logger/logger.hpp"
+#include "../../include/utils/file_utils.hpp"
 #include "RccCommons.hpp"
 
 static std::string format_file_time(std::filesystem::file_time_type ftime) {
 	using namespace std::chrono;
-	auto sctp = time_point_cast<system_clock::duration>(ftime - std::filesystem::file_time_type::clock::now() +
-														system_clock::now());
+	auto sctp = time_point_cast<system_clock::duration>(ftime - std::filesystem::file_time_type::clock::now() + system_clock::now());
 	auto tt	  = system_clock::to_time_t(sctp);
 	auto ns	  = duration_cast<nanoseconds>(sctp.time_since_epoch()).count() % 1000000000;
 
@@ -21,8 +21,7 @@ static std::string format_file_time(std::filesystem::file_time_type ftime) {
 	return oss.str();
 }
 
-static void rotate_log(const std::string& fileName, const std::filesystem::path& logDir,
-					   const std::filesystem::path& oldDir) {
+static void rotate_log(const std::string& fileName, const std::filesystem::path& logDir, const std::filesystem::path& oldDir) {
 	namespace fs = std::filesystem;
 
 	if (!FileUtils::exists(logDir))
@@ -83,10 +82,7 @@ void LoggerProvider::initialize(std::string fileName, std::string path) {
 		file_sink = std::make_shared<spdlog::sinks::basic_file_sink_mt>(path + "/" + fileName + ".log", true);
 
 		file_sink.value()->set_pattern("[%Y-%m-%d %H:%M:%S.%e] [%-7l] [%n] %v");
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Winit-list-lifetime"
 		sinkList = spdlog::sinks_init_list{console_sink, file_sink.value()};
-#pragma GCC diagnostic pop
 	}
 
 	auto main_logger = std::make_shared<spdlog::logger>("Default", sinkList);
@@ -117,10 +113,7 @@ std::shared_ptr<spdlog::logger> LoggerProvider::getLogger(const std::string& nam
 
 	auto sinkList = spdlog::sinks_init_list{console_sink};
 	if (file_sink.has_value()) {
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Winit-list-lifetime"
 		sinkList = spdlog::sinks_init_list{console_sink, file_sink.value()};
-#pragma GCC diagnostic pop
 	}
 	auto logger = std::make_shared<spdlog::logger>(display_name, sinkList);
 

@@ -85,8 +85,7 @@ class DigitalRainEffect : public AbstractEffect {
 					std::vector<LedStatus> row;
 					for (size_t c = 0; c < zone.matrix_width; ++c) {
 						if (zone.matrix_values[(r * zone.matrix_width) + c] != INVALID_LED)
-							row.push_back(
-								LedStatus{offset + static_cast<int>(zone.matrix_values[(r * zone.matrix_width) + c])});
+							row.push_back(LedStatus{offset + static_cast<int>(zone.matrix_values[(r * zone.matrix_width) + c])});
 						else
 							row.push_back(LedStatus{INVALID_LED});
 					}
@@ -129,8 +128,7 @@ class DigitalRainEffect : public AbstractEffect {
 		}
 	}
 
-	static bool _is_matrix_column_available(const std::vector<std::vector<LedStatus>>& zone_status, std::size_t height,
-											std::size_t column) {
+	static bool _is_matrix_column_available(const std::vector<std::vector<LedStatus>>& zone_status, std::size_t height, std::size_t column) {
 		if (zone_status.empty() || zone_status[0].empty())
 			return false;
 
@@ -174,9 +172,7 @@ class DigitalRainEffect : public AbstractEffect {
 					else if (led.cur_val >= int(2 * led.max_val / 3))
 						colors[led.pos_idx] = Color::Green;
 					else
-						colors[led.pos_idx] =
-							Color::Green *
-							_sin_array[std::floor(led.cur_val * (_max_count / static_cast<double>(_max_count)))];
+						colors[led.pos_idx] = Color::Green * _sin_array[std::floor(led.cur_val * (_max_count / static_cast<double>(_max_count)))];
 				}
 			}
 		}

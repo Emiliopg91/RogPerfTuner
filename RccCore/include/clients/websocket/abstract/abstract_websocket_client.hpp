@@ -27,8 +27,7 @@ class AbstractWebsocketClient {
   public:
 	AbstractWebsocketClient(const std::string& host, const int& port, const std::string& name);
 
-	std::vector<std::any> invoke(const std::string& method, const std::vector<std::any>& args,
-								 const int& timeout_ms = 3000);
+	std::vector<std::any> invoke(const std::string& method, const std::vector<std::any>& args, const int& timeout_ms = 3000);
 
 	void onConnect(Callback&& callback) {
 		on_without_params("connect", std::move(callback));

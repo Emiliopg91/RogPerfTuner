@@ -5,8 +5,8 @@
 #include <QtDBus/QDBusReply>
 #include <QtDBus/QDBusVariant>
 
-AbstractDbusClient::AbstractDbusClient(bool systemBus, const QString& service, const QString& objectPath,
-									   const QString& interface, bool required, QObject* parent)
+AbstractDbusClient::AbstractDbusClient(bool systemBus, const QString& service, const QString& objectPath, const QString& interface, bool required,
+									   QObject* parent)
 	: QObject(parent),
 	  systemBus_(systemBus),
 	  serviceName_(service),

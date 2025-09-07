@@ -30,7 +30,7 @@ jobs:
       - name: Install dependencies
         run: |
           sudo apt-get update
-          sudo apt-get install -y libfuse2 qt6-base-dev qt6-tools-dev qt6-tools-dev-tools build-essential cmake libsecret-1-dev libzstd-dev pkg-config libudev-dev clang-format
+          sudo apt-get install -y libfuse2 qt6-base-dev qt6-tools-dev qt6-tools-dev-tools build-essential cmake libsecret-1-dev libzstd-dev pkg-config libudev-dev clang clang-format
           npm i -g pnpm@8.5.1 shx@0.3.4
 
       - name: Compile
@@ -57,7 +57,7 @@ jobs:
       - name: Get version
         id: get_version
         run: |
-          echo "VERSION=$(cat assets/version)" >> $GITHUB_ENV
+          echo "VERSION=$(cat resources/version)" >> $GITHUB_ENV
 
       - name: Create tag
         run: |

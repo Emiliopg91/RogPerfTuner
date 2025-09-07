@@ -317,7 +317,7 @@ std::map<std::string, std::map<std::string, std::string>> initialTranslations = 
 	{"params",
 	 {
 		 {"en", "Parameters"},
-		 {"es", "Argumentos"},
+		 {"es", "Parámetros"},
 	 }},
 	{"used.steamdeck",
 	 {

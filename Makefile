@@ -17,31 +17,28 @@ clean:
 	@cd submodules/RccDeckyCompanion && git reset --hard > /dev/null && rm -Rf dist logs out 
 
 config:
+	@rm -rf build dist .Debug .Release CMakeCache.txt **/cmake_install.cmake CMakeFiles assets/bin **/CMakeFiles
+	@touch .$(BUILD_TYPE);\
+
 	@echo "#######################################################################"
 	@echo "######################## Configuring compiler ########################"
 	@echo "#######################################################################"
 
-	@if [ ! -f "patches/OpenRGB-cppSDK.diff.applied" ]; then \
-		cd submodules/OpenRGB-cppSDK && git apply ../../patches/OpenRGB-cppSDK.diff && touch ../../patches/OpenRGB-cppSDK.diff.applied; \
+	@CXX=clang++ CC=clang cmake -B build -S . -G Ninja -DCMAKE_BUILD_TYPE=$(BUILD_TYPE)
+
+
+build: build_openrgb build_rccdc 
+	@if [ ! -f ".$(BUILD_TYPE)" ]; then \
+		make config; \
 	fi
 
-	@if [ ! -f "patches/httplib.diff.applied" ]; then \
-		cd submodules/httplib && git apply ../../patches/httplib.diff && touch ../../patches/httplib.diff.applied; \
-	fi
-
-	@cmake -B build -S . -DCMAKE_BUILD_TYPE=$(BUILD_TYPE)
-
-	@touch .$(BUILD_TYPE)
-
-build: config build_openrgb build_rccdc 
 	@echo "#######################################################################"
 	@echo "##################### Compiling RogControlCenter ######################"
 	@echo "#######################################################################"
 
-	@grep -E 'project\(.*VERSION' CMakeLists.txt | sed -E 's/.*VERSION[[:space:]]+([0-9]+\.[0-9]+\.[0-9]+).*/\1/' | xargs echo -n > assets/version
+	@rm -rf assets/bin
 
-	@rm -rf assets/bin RccCore/include/clients/tcp/open_rgb/compatible_devices.hpp RccCore/include/translator/translations.hpp
-
+	@python3 resources/preload/constants.py
 	@python3 resources/preload/compatible_devices.py
 	@python3 resources/preload/translations.py
 
@@ -49,6 +46,15 @@ build: config build_openrgb build_rccdc
 	@clang-format -i $$(find RccCommons -name '*.cpp' -o -name '*.hpp')
 	@clang-format -i $$(find RccCore -name '*.cpp' -o -name '*.hpp')
 	@clang-format -i $$(find RccScripts -name '*.cpp' -o -name '*.hpp')
+
+
+	@if [ ! -f "patches/httplib.diff.applied" ]; then \
+		cd submodules/httplib && git apply ../../patches/httplib.diff && touch ../../patches/httplib.diff.applied; \
+	fi
+
+	@if [ ! -f "patches/OpenRGB-cppSDK.diff.applied" ]; then \
+		cd submodules/OpenRGB-cppSDK && git apply ../../patches/OpenRGB-cppSDK.diff && touch ../../patches/OpenRGB-cppSDK.diff.applied; \
+	fi
 
 	@cmake --build build -- -j$(NUM_CORES)
 	
@@ -102,14 +108,17 @@ package:
 	@cp resources/RogControlCenter.desktop dist/appimage-fs/RogControlCenter.desktop
 	@cp assets/icons/icon.svg dist/appimage-fs/icon.svg
 	@chmod 777 -R resources/appimagetool dist/appimage-fs
-	@VERSION=$$(cat assets/version); ./resources/appimagetool -n dist/appimage-fs dist/RogControlCenter.AppImage
+	@VERSION=$$(cat resources/version); ./resources/appimagetool -n dist/appimage-fs dist/RogControlCenter.AppImage
 
 release:
 	@rm -rf dist
+	@export BUILD_TYPE=Release
 	@make build BUILD_TYPE=Release
 	@make package
 
 build_debug:
+	@
+	@export BUILD_TYPE=Debug
 	@make build BUILD_TYPE=Debug
 
 run: build_debug

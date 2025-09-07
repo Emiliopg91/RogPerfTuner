@@ -12,17 +12,14 @@ class StringUtils {
 	// Trim al inicio
 	static inline std::string ltrim(const std::string& s) {
 		std::string result = s;
-		result.erase(result.begin(),
-					 std::find_if(result.begin(), result.end(), [](unsigned char ch) { return !std::isspace(ch); }));
+		result.erase(result.begin(), std::find_if(result.begin(), result.end(), [](unsigned char ch) { return !std::isspace(ch); }));
 		return result;
 	}
 
 	// Trim al final
 	static inline std::string rtrim(const std::string& s) {
 		std::string result = s;
-		result.erase(
-			std::find_if(result.rbegin(), result.rend(), [](unsigned char ch) { return !std::isspace(ch); }).base(),
-			result.end());
+		result.erase(std::find_if(result.rbegin(), result.rend(), [](unsigned char ch) { return !std::isspace(ch); }).base(), result.end());
 		return result;
 	}
 
@@ -58,9 +55,8 @@ class StringUtils {
 		data[2] = (data[2] & 0x3FFFFFFF) | 0x80000000;	// variante 10xx
 
 		std::ostringstream oss;
-		oss << std::hex << std::setfill('0') << std::setw(8) << data[0] << "-" << std::setw(4) << (data[1] >> 16) << "-"
-			<< std::setw(4) << (data[1] & 0xFFFF) << "-" << std::setw(4) << (data[2] >> 16) << "-" << std::setw(4)
-			<< (data[2] & 0xFFFF) << std::setw(8) << data[3];
+		oss << std::hex << std::setfill('0') << std::setw(8) << data[0] << "-" << std::setw(4) << (data[1] >> 16) << "-" << std::setw(4)
+			<< (data[1] & 0xFFFF) << "-" << std::setw(4) << (data[2] >> 16) << "-" << std::setw(4) << (data[2] & 0xFFFF) << std::setw(8) << data[3];
 
 		return oss.str();
 	}
@@ -98,8 +94,21 @@ class StringUtils {
 
 		std::string result = input;
 		result[0]		   = std::toupper(static_cast<unsigned char>(result[0]));
-		std::transform(result.begin() + 1, result.end(), result.begin() + 1,
-					   [](unsigned char c) { return std::tolower(c); });
+		std::transform(result.begin() + 1, result.end(), result.begin() + 1, [](unsigned char c) { return std::tolower(c); });
 		return result;
+	}
+
+	static inline std::string leftPad(const std::string& input, size_t totalLength, char padChar = ' ') {
+		if (input.size() >= totalLength) {
+			return input;  // no necesita padding
+		}
+		return std::string(totalLength - input.size(), padChar) + input;
+	}
+
+	static inline std::string rightPad(const std::string& input, size_t totalLength, char padChar = ' ') {
+		if (input.size() >= totalLength) {
+			return input;  // no necesita padding
+		}
+		return input + std::string(totalLength - input.size(), padChar);
 	}
 };

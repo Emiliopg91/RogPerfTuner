@@ -58,8 +58,7 @@ HardwareService::HardwareService() {
 	for (auto gpu : detected_gpus) {
 		logger.info(gpu.name);
 		if (!gpu.default_flag) {
-			auto brand = static_cast<GpuBrand>(
-				GpuBrand::fromString(StringUtils::toLowerCase(StringUtils::split(gpu.name, ' ')[0])));
+			auto brand = static_cast<GpuBrand>(GpuBrand::fromString(StringUtils::toLowerCase(StringUtils::split(gpu.name, ' ')[0])));
 			std::string env;
 			if (!gpu.environment.empty()) {
 				for (auto gpu_env : gpu.environment)
@@ -75,8 +74,7 @@ HardwareService::HardwareService() {
 			FileUtils::mkdirs(Constants::LIB_OCL_DIR);
 
 			std::vector<std::string> vkIcd;
-			std::vector<std::string> vkIcdVariants = {brand.toString() + "_icd.json",
-													  brand.toString() + "_icd.i686.json",
+			std::vector<std::string> vkIcdVariants = {brand.toString() + "_icd.json", brand.toString() + "_icd.i686.json",
 													  brand.toString() + "_icd.x86_64.json"};
 			for (auto var : vkIcdVariants) {
 				if (FileUtils::exists(Constants::USR_SHARE_VK_DIR + var)) {
@@ -97,8 +95,7 @@ HardwareService::HardwareService() {
 			}
 
 			if (FileUtils::exists(Constants::USR_SHARE_OCL_DIR + brand.toString() + ".icd")) {
-				FileUtils::copy(Constants::USR_SHARE_OCL_DIR + brand.toString() + ".icd",
-								Constants::LIB_OCL_DIR + brand.toString() + ".icd");
+				FileUtils::copy(Constants::USR_SHARE_OCL_DIR + brand.toString() + ".icd", Constants::LIB_OCL_DIR + brand.toString() + ".icd");
 				env = env + "OCL_ICD_FILENAMES=" + Constants::LIB_OCL_DIR + brand.toString() + ".icd" + " ";
 			}
 			env					   = StringUtils::trim(env);
@@ -142,8 +139,7 @@ HardwareService::HardwareService() {
 
 	if (UPowerClient::getInstance().available()) {
 		onBattery = UPowerClient::getInstance().isOnBattery();
-		UPowerClient::getInstance().onBatteryChange(
-			[this](CallbackParam data) { this->onBatteryEvent(std::any_cast<bool>(data[0])); });
+		UPowerClient::getInstance().onBatteryChange([this](CallbackParam data) { this->onBatteryEvent(std::any_cast<bool>(data[0])); });
 	}
 
 	if (PMKeyboardBrightness::getInstance().available()) {
@@ -153,21 +149,17 @@ HardwareService::HardwareService() {
 			}
 		});
 	}
-	/*
-		EVENT_BUS.on(STEAM_SERVICE_GAME_EVENT, self.__on_game_event)
-	*/
 
 	logger.rem_tab();
 }
 
 void HardwareService::setupDeviceLoop() {
 	auto& udevClient = LsUsbClient::getInstance();
-	connectedDevices = std::get<0>(udevClient.compare_connected_devs(
-		{}, [](const UsbIdentifier& dev) { return !OpenRgbService::getInstance().getDeviceName(dev).empty(); }));
+	connectedDevices = std::get<0>(
+		udevClient.compare_connected_devs({}, [](const UsbIdentifier& dev) { return !OpenRgbService::getInstance().getDeviceName(dev).empty(); }));
 	EventBus::getInstance().on_without_data(Events::UDEV_CLIENT_DEVICE_EVENT, [this, &udevClient]() {
 		auto [current, added, removed] = udevClient.compare_connected_devs(
-			connectedDevices,
-			[](const UsbIdentifier& dev) { return !OpenRgbService::getInstance().getDeviceName(dev).empty(); });
+			connectedDevices, [](const UsbIdentifier& dev) { return !OpenRgbService::getInstance().getDeviceName(dev).empty(); });
 
 		if (added.size() > 0) {
 			logger.info("Added compatible device(s):");
@@ -212,12 +204,10 @@ void HardwareService::setChargeThreshold(const BatteryThreshold& threshold) {
 		auto t1 = std::chrono::high_resolution_clock::now();
 
 		charge_limit = threshold;
-		logger.info("Charge limit setted after " +
-					std::to_string(std::chrono::duration_cast<std::chrono::milliseconds>(t1 - t0).count()) + " ms");
+		logger.info("Charge limit setted after " + std::to_string(std::chrono::duration_cast<std::chrono::milliseconds>(t1 - t0).count()) + " ms");
 
 		std::unordered_map<std::string, std::any> replacements = {{"value", threshold.toInt()}};
-		Toaster::getInstance().showToast(
-			Translator::getInstance().translate("applied.battery.threshold", replacements));
+		Toaster::getInstance().showToast(Translator::getInstance().translate("applied.battery.threshold", replacements));
 		EventBus::getInstance().emit_event(Events::HARDWARE_SERVICE_THRESHOLD_CHANGED, {threshold});
 	}
 }
@@ -225,9 +215,7 @@ void HardwareService::setChargeThreshold(const BatteryThreshold& threshold) {
 void HardwareService::onBatteryEvent(const bool& onBat, const bool& muted) {
 	onBattery = onBat;
 
-	if (PanelOverdriveClient::getInstance().available()) {
-		PanelOverdriveClient::getInstance().setCurrentValue(runningGames > 0 && !onBattery);
-	}
+	setPanelOverdrive(runningGames > 0 && !onBattery);
 
 	if (runningGames == 0) {
 		if (!muted) {
@@ -244,8 +232,10 @@ void HardwareService::onBatteryEvent(const bool& onBat, const bool& muted) {
 }
 
 void HardwareService::setPanelOverdrive(const bool& enable) {
-	if (PanelOverdriveClient::getInstance().available())
+	if (PanelOverdriveClient::getInstance().available()) {
+		logger.info("Setting panel overdrive to {}", enable);
 		PanelOverdriveClient::getInstance().setCurrentValue(enable);
+	}
 }
 void HardwareService::renice(const pid_t& pid) {
 	Shell::getInstance().run_elevated_command(

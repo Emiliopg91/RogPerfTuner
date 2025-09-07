@@ -1,6 +1,6 @@
 import os
 import re
-
+import sys
 
 input_file = os.path.abspath(
     os.path.dirname(__file__)
@@ -12,6 +12,14 @@ output_file = os.path.abspath(
 )
 
 print(f"Preloading compatibles devices from {input_file}")
+
+if os.path.exists(output_file):
+    mtime1 = os.path.getmtime(input_file)
+    mtime2 = os.path.getmtime(output_file)
+
+    if mtime1 <= mtime2:
+        print("    Preload up to date")
+        sys.exit(0)
 
 # Regex para extraer vendor, product y nombre
 regex = re.compile(
@@ -75,4 +83,4 @@ with open(output_file, "w") as out:
         )
     out.write("};\n")
 
-print(f"Preloaded {len(devices)} devices in {output_file}")
+print(f"    Preloaded {len(devices)} devices in {output_file}")

@@ -15,8 +15,7 @@ class SsdScheduler : public StrEnum<SsdScheduler, SsdSchedulerMeta::Enum, 2> {
 	using Base::Base;
 
   private:
-	static constexpr std::array<SsdSchedulerMeta, 2> table{
-		{{Enum::NOOP, "NOOP", "none"}, {Enum::MQ_DEADLINE, "MQ_DEADLINE", "mq-deadline"}}};
+	static constexpr std::array<SsdSchedulerMeta, 2> table{{{Enum::NOOP, "NOOP", "none"}, {Enum::MQ_DEADLINE, "MQ_DEADLINE", "mq-deadline"}}};
 
 	friend Base;
 	static constexpr const std::array<SsdSchedulerMeta, 2>& metaTable() {

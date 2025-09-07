@@ -40,8 +40,7 @@ class AbstractFileClient {
 	}
 
   protected:
-	AbstractFileClient(const std::string& path, const std::string& name, const bool& sudo = false,
-					   const bool& required = true)
+	AbstractFileClient(const std::string& path, const std::string& name, const bool& sudo = false, const bool& required = true)
 		: path_(path), sudo_(sudo) {
 		logger_	   = Logger{name};
 		available_ = Shell::getInstance().run_command("ls " + path).exit_code == 0;

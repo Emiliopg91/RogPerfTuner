@@ -38,8 +38,7 @@ void reader_thread(int fd, Logger logger, bool error) {
 	}
 }
 
-int run_command(Logger& logger, const std::vector<std::string>& cmd, const std::vector<std::string>& wrappers,
-				const std::string& parameters) {
+int run_command(Logger& logger, const std::vector<std::string>& cmd, const std::vector<std::string>& wrappers, const std::string& parameters) {
 	std::vector<std::string> args;
 	args.insert(args.end(), wrappers.begin(), wrappers.end());
 	args.insert(args.end(), cmd.begin(), cmd.end());

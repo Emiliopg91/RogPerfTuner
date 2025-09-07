@@ -25,7 +25,7 @@ class OpenRgbClient {
 	Logger logger{"OpenRgbClient"};
 	int port  = 0;
 	pid_t pid = 0;
-	orgb::Client client{"RogControlCenters"};
+	orgb::Client client{Constants::APP_NAME};
 	orgb::DeviceList detectedDevices;
 	std::vector<std::unique_ptr<AbstractEffect>> availableEffects;
 

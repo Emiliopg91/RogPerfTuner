@@ -79,8 +79,7 @@ void AbstractWebsocketClient::handle_message(const std::string& payload) {
 	}
 }
 
-std::vector<std::any> AbstractWebsocketClient::invoke(const std::string& method, const std::vector<std::any>& args,
-													  const int& timeout_ms) {
+std::vector<std::any> AbstractWebsocketClient::invoke(const std::string& method, const std::vector<std::any>& args, const int& timeout_ms) {
 	if (!_connected)
 		throw std::runtime_error("No connection to server");
 

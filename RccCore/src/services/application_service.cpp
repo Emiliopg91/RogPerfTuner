@@ -23,7 +23,7 @@ ApplicationService::ApplicationService() {
 
 	FileUtils::mkdirs(Constants::UPDATE_DIR);
 
-	Shell::getInstance().run_elevated_command("chmod 777 " + Constants::BIN_DIR);
+	FileUtils::chmodRecursive(Constants::BIN_DIR, 0777);
 
 	if (!FileUtils::exists(Constants::APP_DRAW_FILE)) {
 		FileUtils::writeFileContent(Constants::APP_DRAW_FILE, buildDesktopFile());
@@ -56,8 +56,7 @@ void ApplicationService::applyUpdate() {
 	logger.info("Applying update");
 	logger.add_tab();
 	Toaster::getInstance().showToast(Translator::getInstance().translate("applying.update"));
-	Shell::getInstance().run_command("nohup bash -c \"sleep 1 && " + Constants::LAUNCHER_FILE +
-									 "\" > /dev/null 2>&1 &");
+	Shell::getInstance().run_command("nohup bash -c \"sleep 1 && " + Constants::LAUNCHER_FILE + "\" > /dev/null 2>&1 &");
 	shutdown();
 	logger.rem_tab();
 }

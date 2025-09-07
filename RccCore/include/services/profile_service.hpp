@@ -13,8 +13,7 @@ class ProfileService {
 	}
 
 	PerformanceProfile getPerformanceProfile();
-	void setPerformanceProfile(const PerformanceProfile& profile, const bool& temporal = false,
-							   const bool& force = false);
+	void setPerformanceProfile(const PerformanceProfile& profile, const bool& temporal = false, const bool& force = false);
 	void restoreProfile();
 
 	PerformanceProfile nextPerformanceProfile();

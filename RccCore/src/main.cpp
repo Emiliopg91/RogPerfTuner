@@ -20,10 +20,10 @@
 #include "httplib.h"
 
 int main(int argc, char** argv) {
-	std::strncpy(argv[0], ("RogControlCenter v" + Constants::APP_VERSION).c_str(), std::strlen(argv[0]));
+	std::strncpy(argv[0], (Constants::APP_NAME + " v" + Constants::APP_VERSION).c_str(), std::strlen(argv[0]));
 	argv[0][std::strlen(argv[0])] = '\0';
 
-	std::cout << "Running application " + Constants::EXECUTABLE_PATH << " with PID " << getpid() << std::endl;
+	std::cout << "Running application with PID " << getpid() << std::endl;
 
 	SingleInstance::getInstance().acquire();
 
@@ -35,8 +35,12 @@ int main(int argc, char** argv) {
 	LoggerProvider::initialize(Constants::LOG_FILE_NAME, Constants::LOG_DIR);
 	Logger logger{};
 
+	std::string title = "Starting " + Constants::APP_NAME;
+	title			  = StringUtils::leftPad(title, title.length() + (49 - title.length()) / 2);
+	title			  = StringUtils::rightPad(title, 49);
+
 	logger.info("###################################################");
-	logger.info("#            Starting RogControlCenter            #");
+	logger.info("#" + title + "#");
 	logger.info("###################################################");
 	logger.info("Version " + Constants::APP_VERSION);
 	logger.info("Starting initialization");
@@ -64,7 +68,8 @@ int main(int argc, char** argv) {
 	HttpServer::getInstance();
 
 	logger.info("Creating tray icon");
-	TrayIcon::getInstance();
+	TrayIcon::INSTANCE = new TrayIcon();
+	TrayIcon::INSTANCE->show();
 	app.setDesktopFileName(QString::fromStdString(Constants::APP_DRAW_FILE));
 
 	logger.rem_tab();

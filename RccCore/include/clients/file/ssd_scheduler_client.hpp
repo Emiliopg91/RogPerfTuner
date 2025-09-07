@@ -31,8 +31,7 @@ class SsdSchedulerClient : public AbstractFileClient {
 
 		for (SsdScheduler sched : all_schedulers) {
 			std::string token = sched.toString();
-			bool found_in_all = std::all_of(lines.begin(), lines.end(),
-											[&](const std::string& l) { return l.find(token) != std::string::npos; });
+			bool found_in_all = std::all_of(lines.begin(), lines.end(), [&](const std::string& l) { return l.find(token) != std::string::npos; });
 			if (found_in_all) {
 				result.push_back(sched);
 			}

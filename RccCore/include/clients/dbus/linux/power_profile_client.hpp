@@ -21,7 +21,7 @@ class PowerProfileClient : public AbstractDbusClient {
 
   private:
 	PowerProfileClient()
-		: AbstractDbusClient(true, QString("net.hadess.PowerProfiles"), QString("/net/hadess/PowerProfiles"),
-							 QString("net.hadess.PowerProfiles"), true) {
+		: AbstractDbusClient(true, QString("net.hadess.PowerProfiles"), QString("/net/hadess/PowerProfiles"), QString("net.hadess.PowerProfiles"),
+							 true) {
 	}
 };

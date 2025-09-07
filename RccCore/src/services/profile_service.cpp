@@ -81,11 +81,9 @@ void ProfileService::setPerformanceProfile(const PerformanceProfile& profile, co
 
 			auto t1 = std::chrono::high_resolution_clock::now();
 			logger.rem_tab();
-			logger.info("Profile setted after " +
-						std::to_string(std::chrono::duration_cast<std::chrono::milliseconds>(t1 - t0).count()) + " ms");
+			logger.info("Profile setted after " + std::to_string(std::chrono::duration_cast<std::chrono::milliseconds>(t1 - t0).count()) + " ms");
 			std::unordered_map<std::string, std::any> values = {
-				{"profile",
-				 StringUtils::toLowerCase(Translator::getInstance().translate("label.profile." + profileName))}};
+				{"profile", StringUtils::toLowerCase(Translator::getInstance().translate("label.profile." + profileName))}};
 			Toaster::getInstance().showToast(Translator::getInstance().translate("profile.applied", values));
 			EventBus::getInstance().emit_event(Events::PROFILE_SERVICE_ON_PROFILE, {profile});
 		} catch (std::exception e) {
@@ -191,15 +189,11 @@ void ProfileService::setTdps(const PerformanceProfile& profile) {
 		auto pl1 = onBattery ? ProfileUtils::batteryIntelPl1Spl(profile) : ProfileUtils::acIntelPl1Spl(profile);
 		logger.info("PL1: " + std::to_string(pl1) + "W");
 		try {
-			std::this_thread::sleep_for(std::chrono::milliseconds(50));
 			Pl1SpdClient::getInstance().setCurrentValue(pl1);
 			if (Pl2SpptClient::getInstance().available()) {
-				auto pl2 =
-					onBattery ? ProfileUtils::batteryIntelPl2Sppt(profile) : ProfileUtils::acIntelPl2Sppt(profile);
+				auto pl2 = onBattery ? ProfileUtils::batteryIntelPl2Sppt(profile) : ProfileUtils::acIntelPl2Sppt(profile);
 				logger.info("PL2: " + std::to_string(pl2) + "W");
-				std::this_thread::sleep_for(std::chrono::milliseconds(50));
 				Pl2SpptClient::getInstance().setCurrentValue(pl2);
-				std::this_thread::sleep_for(std::chrono::milliseconds(50));
 			}
 		} catch (std::exception e) {
 			logger.info("Error setting CPU TDPs");

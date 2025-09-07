@@ -42,8 +42,7 @@ class RainbowWave : public AbstractEffect {
 							for (size_t r = 0; r < zone.matrix_height; ++r) {
 								for (size_t c = 0; c < zone.matrix_width; ++c) {
 									if (zone.matrix_values[(r * zone.matrix_width) + c] < colors.size()) {
-										size_t rainbow_index =
-											std::round(rainbow.size() * (c / static_cast<double>(zone.matrix_width)));
+										size_t rainbow_index = std::round(rainbow.size() * (c / static_cast<double>(zone.matrix_width)));
 										colors[offset + zone.matrix_values[(r * zone.matrix_width) + c]] =
 											Color::fromHsv(rainbow[rainbow_index], 1, 1);
 									}
@@ -51,9 +50,8 @@ class RainbowWave : public AbstractEffect {
 							}
 						} else {
 							for (size_t l = 0; l < zone.leds_count; ++l) {
-								size_t rainbow_index =
-									std::floor(rainbow.size() * (l / static_cast<double>(zone.leds_count)));
-								colors[offset + l] = Color::fromHsv(rainbow[rainbow_index], 1, 1);
+								size_t rainbow_index = std::floor(rainbow.size() * (l / static_cast<double>(zone.leds_count)));
+								colors[offset + l]	 = Color::fromHsv(rainbow[rainbow_index], 1, 1);
 							}
 						}
 						offset += zone.leds_count;
