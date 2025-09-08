@@ -95,7 +95,8 @@
         "*.inc": "cpp",
         "shared_mutex": "cpp",
         "csetjmp": "cpp",
-        "qvariant": "cpp"
+        "qvariant": "cpp",
+        "qobject": "cpp"
     },
     "cmake.generator": "Ninja",
     "cmake.buildDirectory": "${workspaceFolder}/build"

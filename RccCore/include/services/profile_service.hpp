@@ -2,6 +2,7 @@
 
 #include <mutex>
 
+#include "../configuration/configuration.hpp"
 #include "../events/event_bus.hpp"
 #include "../models/performance/performance_profile.hpp"
 #include "../translator/translator.hpp"
@@ -29,8 +30,9 @@ class ProfileService {
 	std::mutex actionMutex;
 	PerformanceProfile currentProfile = PerformanceProfile::Enum::PERFORMANCE;
 
-	EventBus& eventBus	   = EventBus::getInstance();
-	Translator& translator = Translator::getInstance();
+	EventBus& eventBus			= EventBus::getInstance();
+	Configuration configuration = Configuration::getInstance();
+	Translator& translator		= Translator::getInstance();
 
 	void setPlatformProfile(const PerformanceProfile& profile);
 	void setFanCurves(const PerformanceProfile& profile);

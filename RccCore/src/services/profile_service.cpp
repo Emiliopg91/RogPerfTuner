@@ -21,7 +21,7 @@ ProfileService::ProfileService() {
 	logger.info("Initializing ProfileService");
 	logger.add_tab();
 
-	currentProfile = Configuration::getInstance().getConfiguration().platform.profiles.profile;
+	currentProfile = configuration.getConfiguration().platform.profiles.profile;
 
 	if (UPowerClient::getInstance().available()) {
 		onBattery		 = UPowerClient::getInstance().isOnBattery();
@@ -75,8 +75,8 @@ void ProfileService::setPerformanceProfile(const PerformanceProfile& profile, co
 
 			currentProfile = profile;
 			if (!temporal) {
-				Configuration::getInstance().getConfiguration().platform.profiles.profile = profile;
-				Configuration::getInstance().saveConfig();
+				configuration.getConfiguration().platform.profiles.profile = profile;
+				configuration.saveConfig();
 			}
 
 			auto t1 = std::chrono::high_resolution_clock::now();
@@ -233,7 +233,7 @@ void ProfileService::setTgp(const PerformanceProfile& profile) {
 }
 
 void ProfileService::restoreProfile() {
-	setPerformanceProfile(Configuration::getInstance().getConfiguration().platform.profiles.profile, false, true);
+	setPerformanceProfile(configuration.getConfiguration().platform.profiles.profile, false, true);
 }
 
 PerformanceProfile ProfileService::nextPerformanceProfile() {

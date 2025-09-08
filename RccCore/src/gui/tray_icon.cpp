@@ -31,7 +31,7 @@ void TrayIcon::openSettings() {
 }
 
 void TrayIcon::reloadSettings() {
-	Configuration::getInstance().loadConfig();
+	configuration.loadConfig();
 }
 
 void TrayIcon::openLogs() {
@@ -239,7 +239,7 @@ TrayIcon::TrayIcon(QObject* parent) : QObject(parent), tray_icon_(new QSystemTra
 		settingsMenu->addAction(openSettingsAct);
 
 		QAction* reloadSettingsAct = new QAction("Reload settings");
-		QObject::connect(reloadSettingsAct, &QAction::triggered, []() { Configuration::getInstance().loadConfig(); });
+		QObject::connect(reloadSettingsAct, &QAction::triggered, [this]() { configuration.loadConfig(); });
 		settingsMenu->addAction(reloadSettingsAct);
 		// -------------------------
 		// Settings submenu
@@ -282,7 +282,7 @@ TrayIcon::TrayIcon(QObject* parent) : QObject(parent), tray_icon_(new QSystemTra
 	// Exit
 	// -------------------------
 	QAction* quitAction = new QAction(translator.translate("close").c_str(), menu);
-	QObject::connect(quitAction, &QAction::triggered, []() { ApplicationService::getInstance().shutdown(); });
+	QObject::connect(quitAction, &QAction::triggered, [this]() { applicationService.shutdown(); });
 	menu->addAction(quitAction);
 	// -------------------------
 	// Exit

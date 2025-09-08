@@ -29,8 +29,8 @@ const std::map<unsigned int, std::string>& SteamService::getRunningGames() const
 	return runningGames;
 }
 
-const std::map<std::string, GameEntry>& SteamService::getGames() const {
-	return Configuration::getInstance().getConfiguration().games;
+const std::map<std::string, GameEntry>& SteamService::getGames() {
+	return configuration.getConfiguration().games;
 }
 
 SteamService::SteamService() {
@@ -161,8 +161,8 @@ void SteamService::onFirstGameRun(unsigned int gid, std::string name, std::map<s
 	auto overlayId = environment.find("SteamOverlayGameId")->second;
 
 	GameEntry entry{args, env, gpu, MangoHudLevel::Enum::NO_DISPLAY, name, overlayId, proton, false, WineSyncOption::Enum::AUTO};
-	Configuration::getInstance().getConfiguration().games[std::to_string(gid)] = entry;
-	Configuration::getInstance().saveConfig();
+	configuration.getConfiguration().games[std::to_string(gid)] = entry;
+	configuration.saveConfig();
 
 	SteamClient::getInstance().setLaunchOptions(gid, WRAPPER_PATH + " %command%");
 	logger.info("Configuration finished");
@@ -230,8 +230,7 @@ void SteamService::copyPlugin() {
 void SteamService::onGameLaunch(unsigned int gid, std::string name, int pid) {
 	logger.info("Launched '" + name + "' (" + std::to_string(gid) + ") with PID " + std::to_string(pid));
 	logger.add_tab();
-	if (Configuration::getInstance().getConfiguration().games.find(std::to_string(gid)) ==
-		Configuration::getInstance().getConfiguration().games.end()) {
+	if (configuration.getConfiguration().games.find(std::to_string(gid)) == configuration.getConfiguration().games.end()) {
 		logger.info("Game not configured");
 		logger.add_tab();
 
@@ -316,14 +315,14 @@ void SteamService::onDisconnect() {
 const SteamGameConfig SteamService::getConfiguration(const std::string& gid) {
 	SteamGameConfig cfg;
 
-	auto games = Configuration::getInstance().getConfiguration().games;
+	auto games = configuration.getConfiguration().games;
 	auto it	   = games.find(gid);
 
 	std::optional<GameEntry> entry = std::nullopt;
 	if (it != games.end()) {
 		entry = it->second;
 	} else {
-		for (const auto& [key, val] : Configuration::getInstance().getConfiguration().games) {
+		for (const auto& [key, val] : configuration.getConfiguration().games) {
 			if (val.overlayId == gid) {
 				entry = val;
 				break;
@@ -386,63 +385,63 @@ const SteamGameConfig SteamService::getConfiguration(const std::string& gid) {
 }
 
 const std::optional<GpuBrand> SteamService::getPreferedGpu(const unsigned int& gid) {
-	return Configuration::getInstance().getConfiguration().games[std::to_string(gid)].gpu;
+	return configuration.getConfiguration().games[std::to_string(gid)].gpu;
 }
 
 void SteamService::setPreferedGpu(const unsigned int& gid, const std::optional<GpuBrand>& gpu) {
 	if (gpu.has_value())
-		Configuration::getInstance().getConfiguration().games[std::to_string(gid)].gpu = gpu.value().toString();
+		configuration.getConfiguration().games[std::to_string(gid)].gpu = gpu.value().toString();
 	else
-		Configuration::getInstance().getConfiguration().games[std::to_string(gid)].gpu = std::nullopt;
+		configuration.getConfiguration().games[std::to_string(gid)].gpu = std::nullopt;
 
-	Configuration::getInstance().saveConfig();
+	configuration.saveConfig();
 }
 
 bool SteamService::isSteamDeck(const unsigned int& gid) {
-	return Configuration::getInstance().getConfiguration().games[std::to_string(gid)].steamdeck;
+	return configuration.getConfiguration().games[std::to_string(gid)].steamdeck;
 }
 
 void SteamService::setSteamDeck(const unsigned int& gid, const bool& value) {
-	Configuration::getInstance().getConfiguration().games[std::to_string(gid)].steamdeck = value;
-	Configuration::getInstance().saveConfig();
+	configuration.getConfiguration().games[std::to_string(gid)].steamdeck = value;
+	configuration.saveConfig();
 }
 
 const MangoHudLevel SteamService::getMetricsLevel(const unsigned int& gid) {
-	return Configuration::getInstance().getConfiguration().games[std::to_string(gid)].metrics_level;
+	return configuration.getConfiguration().games[std::to_string(gid)].metrics_level;
 }
 
 void SteamService::setMetricsLevel(const unsigned int& gid, const MangoHudLevel& level) {
-	Configuration::getInstance().getConfiguration().games[std::to_string(gid)].metrics_level = level;
-	Configuration::getInstance().saveConfig();
+	configuration.getConfiguration().games[std::to_string(gid)].metrics_level = level;
+	configuration.saveConfig();
 }
 
 const WineSyncOption SteamService::getWineSync(const unsigned int& gid) {
-	return Configuration::getInstance().getConfiguration().games[std::to_string(gid)].sync;
+	return configuration.getConfiguration().games[std::to_string(gid)].sync;
 }
 
 void SteamService::setWineSync(const unsigned int& gid, const WineSyncOption& level) {
-	Configuration::getInstance().getConfiguration().games[std::to_string(gid)].sync = level;
-	Configuration::getInstance().saveConfig();
+	configuration.getConfiguration().games[std::to_string(gid)].sync = level;
+	configuration.saveConfig();
 }
 
 bool SteamService::isProton(const unsigned int& gid) {
-	return Configuration::getInstance().getConfiguration().games[std::to_string(gid)].proton;
+	return configuration.getConfiguration().games[std::to_string(gid)].proton;
 }
 
 const std::string SteamService::getEnvironment(const unsigned int& gid) {
-	return Configuration::getInstance().getConfiguration().games[std::to_string(gid)].env.value_or("");
+	return configuration.getConfiguration().games[std::to_string(gid)].env.value_or("");
 }
 
 void SteamService::setEnvironment(const unsigned int& gid, const std::string& env) {
-	Configuration::getInstance().getConfiguration().games[std::to_string(gid)].env = env;
-	Configuration::getInstance().saveConfig();
+	configuration.getConfiguration().games[std::to_string(gid)].env = env;
+	configuration.saveConfig();
 }
 
 const std::string SteamService::getParameters(const unsigned int& gid) {
-	return Configuration::getInstance().getConfiguration().games[std::to_string(gid)].args.value_or("");
+	return configuration.getConfiguration().games[std::to_string(gid)].args.value_or("");
 }
 
 void SteamService::setParameters(const unsigned int& gid, const std::string& args) {
-	Configuration::getInstance().getConfiguration().games[std::to_string(gid)].args = args;
-	Configuration::getInstance().saveConfig();
+	configuration.getConfiguration().games[std::to_string(gid)].args = args;
+	configuration.saveConfig();
 }

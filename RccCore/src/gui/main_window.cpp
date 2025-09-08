@@ -99,7 +99,7 @@ MainWindow::MainWindow(QWidget* parent) : QMainWindow(parent), _logger(new Logge
 
 	_autostart = new QCheckBox();
 	_autostart->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Preferred);
-	_autostart->setChecked(ApplicationService::getInstance().isAutostartEnabled());
+	_autostart->setChecked(applicationService.isAutostartEnabled());
 	connect(_autostart, &QCheckBox::toggled, this, &MainWindow::onAutostartChanged);
 	settingsLayout->addRow(_autostart, new QLabel(QString::fromStdString(translator.translate("autostart"))));
 
@@ -184,5 +184,5 @@ void MainWindow::openGameList() {
 }
 
 void MainWindow::onAutostartChanged(bool enabled) {
-	ApplicationService::getInstance().setAutostart(enabled);
+	applicationService.setAutostart(enabled);
 }

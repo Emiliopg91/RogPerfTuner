@@ -1,6 +1,7 @@
 #pragma once
 
 #include "../clients/websocket/steam_client.hpp"
+#include "../configuration/configuration.hpp"
 #include "../models/hardware/gpu_brand.hpp"
 #include "../models/settings/root_config.hpp"
 #include "../models/steam/mangohud_level.hpp"
@@ -20,6 +21,7 @@ class SteamService {
 
 	Shell& shell					 = Shell::getInstance();
 	EventBus& eventBus				 = EventBus::getInstance();
+	Configuration configuration		 = Configuration::getInstance();
 	ProfileService& profileService	 = ProfileService::getInstance();
 	OpenRgbService& openRgbService	 = OpenRgbService::getInstance();
 	HardwareService& hardwareService = HardwareService::getInstance();
@@ -43,7 +45,7 @@ class SteamService {
 	}
 
 	const std::map<unsigned int, std::string>& getRunningGames() const;
-	const std::map<std::string, GameEntry>& getGames() const;
+	const std::map<std::string, GameEntry>& getGames();
 
 	bool isRunning(const unsigned int& appid) const;
 	bool metricsEnabled();

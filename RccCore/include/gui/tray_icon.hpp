@@ -6,10 +6,12 @@
 #include <QSystemTrayIcon>
 #include <map>
 
+#include "../configuration/configuration.hpp"
 #include "../events/event_bus.hpp"
 #include "../models/hardware/battery_charge_threshold.hpp"
 #include "../models/hardware/rgb_brightness.hpp"
 #include "../models/performance/performance_profile.hpp"
+#include "../services/application_service.hpp"
 #include "../services/hardware_service.hpp"
 #include "../services/open_rgb_service.hpp"
 #include "../services/profile_service.hpp"
@@ -52,10 +54,12 @@ class TrayIcon : public QObject {
 	void reloadSettings();
 	void openLogs();
 
-	Shell& shell					 = Shell::getInstance();
-	EventBus& eventBus				 = EventBus::getInstance();
-	ProfileService& profileService	 = ProfileService::getInstance();
-	OpenRgbService& openRgbService	 = OpenRgbService::getInstance();
-	HardwareService& hardwareService = HardwareService::getInstance();
-	Translator& translator			 = Translator::getInstance();
+	Shell& shell						  = Shell::getInstance();
+	EventBus& eventBus					  = EventBus::getInstance();
+	ProfileService& profileService		  = ProfileService::getInstance();
+	OpenRgbService& openRgbService		  = OpenRgbService::getInstance();
+	HardwareService& hardwareService	  = HardwareService::getInstance();
+	ApplicationService applicationService = ApplicationService::getInstance();
+	Translator& translator				  = Translator::getInstance();
+	Configuration configuration			  = Configuration::getInstance();
 };

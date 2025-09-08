@@ -26,8 +26,8 @@ OpenRgbService::OpenRgbService() {
 }
 
 void OpenRgbService::restoreAura() {
-	effect	   = Configuration::getInstance().getConfiguration().open_rgb.last_effect.value_or("Static");
-	brightness = Configuration::getInstance().getConfiguration().open_rgb.brightness;
+	effect	   = configuration.getConfiguration().open_rgb.last_effect.value_or("Static");
+	brightness = configuration.getConfiguration().open_rgb.brightness;
 
 	applyAura();
 }
@@ -93,9 +93,9 @@ void OpenRgbService::applyAura(const bool& temporal) {
 	OpenRgbClient::getInstance().applyEffect(effect, brightness);
 
 	if (!temporal) {
-		Configuration::getInstance().getConfiguration().open_rgb.brightness	 = brightness;
-		Configuration::getInstance().getConfiguration().open_rgb.last_effect = effect;
-		Configuration::getInstance().saveConfig();
+		configuration.getConfiguration().open_rgb.brightness  = brightness;
+		configuration.getConfiguration().open_rgb.last_effect = effect;
+		configuration.saveConfig();
 	}
 
 	auto t1 = std::chrono::high_resolution_clock::now();

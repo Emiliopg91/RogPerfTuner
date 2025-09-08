@@ -47,8 +47,8 @@ void PasswordDialog::onAccept() {
 	cancel_button_->setDisabled(true);
 
 	if (checkPassword(password_input_->text())) {
-		Configuration::getInstance().setPassword(password_input_->text().toStdString());
-		Configuration::getInstance().saveConfig();
+		configuration.setPassword(password_input_->text().toStdString());
+		configuration.saveConfig();
 		accept();
 	} else {
 		ok_button_->setDisabled(false);

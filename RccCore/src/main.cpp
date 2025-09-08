@@ -53,11 +53,12 @@ int main(int argc, char** argv) {
 
 	Toaster::getInstance().showToast(Translator::getInstance().translate("initializing"));
 
-	if (Configuration::getInstance().getPassword().length() == 0) {
+	Configuration configuration = Configuration::getInstance();
+	if (configuration.getPassword().length() == 0) {
 		PasswordDialog::getInstance().showDialog();
 	}
 
-	Shell::getInstance(Configuration::getInstance().getPassword());
+	Shell::getInstance(configuration.getPassword());
 
 	OpenRgbService::getInstance();
 	HardwareService::getInstance();
