@@ -15,12 +15,12 @@ OpenRgbService::OpenRgbService() {
 
 	restoreAura();
 
-	EventBus::getInstance().on_without_data(Events::HARDWARE_SERVICE_ON_BATTERY, [this]() {
+	eventBus.on_without_data(Events::HARDWARE_SERVICE_ON_BATTERY, [this]() {
 		auto brightness = UPowerClient::getInstance().isOnBattery() ? RgbBrightness::Enum::OFF : this->brightness;
 		OpenRgbClient::getInstance().applyEffect(effect, brightness);
 	});
 
-	EventBus::getInstance().on_without_data(Events::HARDWARE_SERVICE_USB_ADDED_REMOVED, [this]() { reload(); });
+	eventBus.on_without_data(Events::HARDWARE_SERVICE_USB_ADDED_REMOVED, [this]() { reload(); });
 
 	logger.rem_tab();
 }
@@ -61,7 +61,7 @@ void OpenRgbService::setBrightness(const RgbBrightness& newBrightness) {
 	if (brightness != newBrightness) {
 		brightness = newBrightness;
 		applyAura();
-		EventBus::getInstance().emit_event(Events::ORGB_SERVICE_ON_BRIGHTNESS, {newBrightness});
+		eventBus.emit_event(Events::ORGB_SERVICE_ON_BRIGHTNESS, {newBrightness});
 	}
 }
 
@@ -70,7 +70,7 @@ void OpenRgbService::setEffect(const std::string& newEffect, const bool& tempora
 	if (effect != newEffect) {
 		effect = newEffect;
 		applyAura(temporal);
-		EventBus::getInstance().emit_event(Events::ORGB_SERVICE_ON_EFFECT, {newEffect});
+		eventBus.emit_event(Events::ORGB_SERVICE_ON_EFFECT, {newEffect});
 	}
 }
 
@@ -109,13 +109,13 @@ void OpenRgbService::disableDevice(const UsbIdentifier& identifier) {
 
 RgbBrightness OpenRgbService::increaseBrightness() {
 	auto next = brightness.getNextBrightness();
-	OpenRgbService::getInstance().setBrightness(next);
+	setBrightness(next);
 	return next;
 }
 
 RgbBrightness OpenRgbService::decreaseBrightness() {
 	auto next = brightness.getPreviousBrightness();
-	OpenRgbService::getInstance().setBrightness(next);
+	setBrightness(next);
 	return next;
 }
 
@@ -126,6 +126,6 @@ std::string OpenRgbService::nextEffect() {
 	if (it == list.end())
 		it = list.begin();
 	auto next = *it;
-	OpenRgbService::getInstance().setEffect(next);
+	setEffect(next);
 	return next;
 }

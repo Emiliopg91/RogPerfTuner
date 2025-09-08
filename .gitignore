@@ -23,3 +23,6 @@ scripts/CMakeFiles/
 
 assets/version
 resources/version
+
+perf.data
+perf.data.old

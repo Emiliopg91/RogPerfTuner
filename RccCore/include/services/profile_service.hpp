@@ -2,7 +2,9 @@
 
 #include <mutex>
 
-#include "../../include/models/performance/performance_profile.hpp"
+#include "../events/event_bus.hpp"
+#include "../models/performance/performance_profile.hpp"
+#include "../translator/translator.hpp"
 #include "RccCommons.hpp"
 
 class ProfileService {
@@ -26,6 +28,9 @@ class ProfileService {
 	int runningGames = 0;
 	std::mutex actionMutex;
 	PerformanceProfile currentProfile = PerformanceProfile::Enum::PERFORMANCE;
+
+	EventBus& eventBus	   = EventBus::getInstance();
+	Translator& translator = Translator::getInstance();
 
 	void setPlatformProfile(const PerformanceProfile& profile);
 	void setFanCurves(const PerformanceProfile& profile);

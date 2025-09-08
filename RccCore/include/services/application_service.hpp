@@ -2,6 +2,9 @@
 
 #include <sstream>
 
+#include "../events/event_bus.hpp"
+#include "../services/steam_service.hpp"
+#include "../translator/translator.hpp"
 #include "RccCommons.hpp"
 
 class ApplicationService {
@@ -20,6 +23,11 @@ class ApplicationService {
 	Logger logger{"ApplicationService"};
 	bool rccdcEnabled = false;
 	bool shuttingDown = false;
+
+	Shell& shell			   = Shell::getInstance();
+	EventBus& eventBus		   = EventBus::getInstance();
+	SteamService& steamService = SteamService::getInstance();
+	Translator& translator	   = Translator::getInstance();
 
 	const std::string buildDesktopFile() {
 		std::ostringstream ss;

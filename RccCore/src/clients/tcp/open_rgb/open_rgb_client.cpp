@@ -25,10 +25,10 @@
 OpenRgbClient::OpenRgbClient() {
 	logger.info("Configuring UDEV rules");
 	logger.add_tab();
-	Shell::getInstance().run_elevated_command("cp " + Constants::ORGB_UDEV_PATH + " " + Constants::UDEV_RULES);
-	Shell::getInstance().run_elevated_command("chmod 777 " + Constants::ORGB_UDEV_PATH);
-	Shell::getInstance().run_elevated_command("udevadm control --reload-rules");
-	Shell::getInstance().run_elevated_command("udevadm trigger");
+	shell.run_elevated_command("cp " + Constants::ORGB_UDEV_PATH + " " + Constants::UDEV_RULES);
+	shell.run_elevated_command("chmod 777 " + Constants::ORGB_UDEV_PATH);
+	shell.run_elevated_command("udevadm control --reload-rules");
+	shell.run_elevated_command("udevadm trigger");
 	logger.rem_tab();
 
 	availableEffects.push_back(std::unique_ptr<AbstractEffect>(&BreathingEffect::getInstance(client)));
@@ -41,7 +41,7 @@ OpenRgbClient::OpenRgbClient() {
 	availableEffects.push_back(std::unique_ptr<AbstractEffect>(&StarryNightEffect::getInstance(client)));
 	availableEffects.push_back(std::unique_ptr<AbstractEffect>(&StaticEffect::getInstance(client)));
 
-	EventBus::getInstance().on_without_data(Events::APPLICATION_STOP, [this]() { stop(); });
+	eventBus.on_without_data(Events::APPLICATION_STOP, [this]() { stop(); });
 
 	start();
 }
@@ -50,8 +50,8 @@ void OpenRgbClient::start() {
 	logger.info("Starting OpenRgbClient");
 	logger.add_tab();
 
-	if (AsusCtlClient::getInstance().available()) {
-		AsusCtlClient::getInstance().turnOffAura();
+	if (asusCtlClient.available()) {
+		asusCtlClient.turnOffAura();
 	}
 	startOpenRgbProcess();
 	startOpenRgbClient();
@@ -109,15 +109,15 @@ void OpenRgbClient::runner() {
 		argv.push_back(const_cast<char*>(s.c_str()));
 	argv.push_back(nullptr);
 
-	std::vector<std::string> envStrings = Shell::getInstance().copyEnviron();
+	std::vector<std::string> envStrings = shell.copyEnviron();
 	envStrings.push_back("LD_LIBRARY_PATH=");
 	std::vector<char*> env;
 	for (auto& s : envStrings)
 		env.push_back(s.data());
 	env.push_back(nullptr);
 
-	pid			  = Shell::getInstance().launch_process(Constants::ORGB_PATH.c_str(), argv.data(), env.data(), Constants::LOG_ORGB_FILE);
-	int exit_code = Shell::getInstance().wait_for(pid);
+	pid			  = shell.launch_process(Constants::ORGB_PATH.c_str(), argv.data(), env.data(), Constants::LOG_ORGB_FILE);
+	int exit_code = shell.wait_for(pid);
 	logger.info("Command finished with exit code " + std::to_string(exit_code));
 }
 

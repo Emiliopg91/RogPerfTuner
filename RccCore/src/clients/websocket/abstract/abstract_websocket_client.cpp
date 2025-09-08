@@ -51,9 +51,9 @@ AbstractWebsocketClient::AbstractWebsocketClient(const std::string& host, const 
 void AbstractWebsocketClient::trigger_event(const std::string& name, const std::optional<std::vector<std::any>>& data) {
 	auto eventName = "ws." + _name + ".event." + name;
 	if (data.has_value() && !data.value().empty()) {
-		EventBus::getInstance().emit_event(eventName, data.value());
+		eventBus.emit_event(eventName, data.value());
 	} else {
-		EventBus::getInstance().emit_event(eventName);
+		eventBus.emit_event(eventName);
 	}
 }
 

@@ -32,7 +32,7 @@ ApplicationService::ApplicationService() {
 
 	AutoUpdater::getInstance([this]() { applyUpdate(); },
 
-							 [this]() -> bool { return SteamService::getInstance().getRunningGames().empty(); });
+							 [this]() -> bool { return steamService.getRunningGames().empty(); });
 
 	logger.rem_tab();
 }
@@ -55,8 +55,8 @@ void ApplicationService::setAutostart(bool enabled) {
 void ApplicationService::applyUpdate() {
 	logger.info("Applying update");
 	logger.add_tab();
-	Toaster::getInstance().showToast(Translator::getInstance().translate("applying.update"));
-	Shell::getInstance().run_command("nohup bash -c \"sleep 1 && " + Constants::LAUNCHER_FILE + "\" > /dev/null 2>&1 &");
+	Toaster::getInstance().showToast(translator.translate("applying.update"));
+	shell.run_command("nohup bash -c \"sleep 1 && " + Constants::LAUNCHER_FILE + "\" > /dev/null 2>&1 &");
 	shutdown();
 	logger.rem_tab();
 }
@@ -65,7 +65,7 @@ void ApplicationService::shutdown() {
 	shuttingDown = true;
 	logger.info("Starting application shutdown");
 	logger.add_tab();
-	EventBus::getInstance().emit_event(Events::APPLICATION_STOP);
+	eventBus.emit_event(Events::APPLICATION_STOP);
 	logger.rem_tab();
 	logger.info("Shutdown finished");
 	kill(getpid(), SIGTERM);

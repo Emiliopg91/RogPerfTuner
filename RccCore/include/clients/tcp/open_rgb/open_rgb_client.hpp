@@ -1,5 +1,7 @@
 #pragma once
 
+#include "../../../clients/shell/asusctl_client.hpp"
+#include "../../../events/event_bus.hpp"
 #include "OpenRGB/Client.hpp"
 #include "RccCommons.hpp"
 #include "compatible_devices.hpp"
@@ -28,6 +30,10 @@ class OpenRgbClient {
 	orgb::Client client{Constants::APP_NAME};
 	orgb::DeviceList detectedDevices;
 	std::vector<std::unique_ptr<AbstractEffect>> availableEffects;
+
+	Shell& shell				 = Shell::getInstance();
+	EventBus& eventBus			 = EventBus::getInstance();
+	AsusCtlClient& asusCtlClient = AsusCtlClient::getInstance();
 
 	OpenRgbClient();
 

@@ -29,6 +29,7 @@ class AbstractDbusClient : public QObject {
 	QDBusConnection bus_;
 	QDBusInterface* iface_;
 	bool available_;
+	EventBus& eventBus = EventBus::getInstance();
 
   protected:
 	template <typename Ret = QVariant>
@@ -88,8 +89,7 @@ class AbstractDbusClient : public QObject {
 	}
 
 	void onPropertyChange(const std::string& propName, CallbackWithParams&& callback) {
-		EventBus::getInstance().on_with_data("dbus." + interfaceName_.toStdString() + ".property." + propName,
-											 std::forward<CallbackWithParams>(callback));
+		eventBus.on_with_data("dbus." + interfaceName_.toStdString() + ".property." + propName, std::forward<CallbackWithParams>(callback));
 	}
 
 	template <typename Callback>
@@ -100,8 +100,7 @@ class AbstractDbusClient : public QObject {
 			throw std::runtime_error("Couldn't connect to signal: " + signalName.toStdString());
 
 		// Registra el callback en EventBus
-		EventBus::getInstance().on_without_data("dbus." + interfaceName_.toStdString() + ".signal." + signalName.toStdString(),
-												std::forward<Callback>(callback));
+		eventBus.on_without_data("dbus." + interfaceName_.toStdString() + ".signal." + signalName.toStdString(), std::forward<Callback>(callback));
 	}
 
   private slots:
@@ -120,43 +119,43 @@ class AbstractDbusClient : public QObject {
 
 			if (type == QMetaType::Int) {
 				int val = newValue.toInt();
-				EventBus::getInstance().emit_event(eventName, {val});
+				eventBus.emit_event(eventName, {val});
 			} else if (type == QMetaType::UInt) {
 				uint val = newValue.toUInt();
-				EventBus::getInstance().emit_event(eventName, {val});
+				eventBus.emit_event(eventName, {val});
 			} else if (type == QMetaType::LongLong) {
 				qint64 val = newValue.toLongLong();
-				EventBus::getInstance().emit_event(eventName, {val});
+				eventBus.emit_event(eventName, {val});
 			} else if (type == QMetaType::ULongLong) {
 				quint64 val = newValue.toULongLong();
-				EventBus::getInstance().emit_event(eventName, {val});
+				eventBus.emit_event(eventName, {val});
 			} else if (type == QMetaType::Double) {
 				double val = newValue.toDouble();
-				EventBus::getInstance().emit_event(eventName, {val});
+				eventBus.emit_event(eventName, {val});
 			} else if (type == QMetaType::Bool) {
 				bool val = newValue.toBool();
-				EventBus::getInstance().emit_event(eventName, {val});
+				eventBus.emit_event(eventName, {val});
 			} else if (type == QMetaType::QChar) {
 				QChar val = newValue.toChar();
-				EventBus::getInstance().emit_event(eventName, {val});
+				eventBus.emit_event(eventName, {val});
 			} else if (type == QMetaType::QString) {
 				QString val = newValue.toString();
-				EventBus::getInstance().emit_event(eventName, {val});
+				eventBus.emit_event(eventName, {val});
 			} else if (type == QMetaType::QStringList) {
 				QStringList val = newValue.toStringList();
-				EventBus::getInstance().emit_event(eventName, {val});
+				eventBus.emit_event(eventName, {val});
 			} else if (type == QMetaType::QVariantList) {
 				QVariantList val = newValue.toList();
-				EventBus::getInstance().emit_event(eventName, {val});
+				eventBus.emit_event(eventName, {val});
 			} else if (type == QMetaType::QVariantMap) {
 				QVariantMap val = newValue.toMap();
-				EventBus::getInstance().emit_event(eventName, {val});
+				eventBus.emit_event(eventName, {val});
 			} else if (type == QMetaType::QVariantHash) {
 				QVariantHash val = newValue.toHash();
-				EventBus::getInstance().emit_event(eventName, {val});
+				eventBus.emit_event(eventName, {val});
 			} else {
 				QString val = newValue.toString();
-				EventBus::getInstance().emit_event(eventName, {val});
+				eventBus.emit_event(eventName, {val});
 			}
 		}
 	}
@@ -166,6 +165,6 @@ class AbstractDbusClient : public QObject {
 		std::string signalName = msg.member().toStdString();
 
 		// Para cualquier otra signal, solo reemitimos el nombre
-		EventBus::getInstance().emit_event("dbus." + interfaceName_.toStdString() + ".signal." + signalName);
+		eventBus.emit_event("dbus." + interfaceName_.toStdString() + ".signal." + signalName);
 	}
 };

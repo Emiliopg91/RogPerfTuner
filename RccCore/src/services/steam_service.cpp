@@ -14,7 +14,7 @@
 #include "RccCommons.hpp"
 
 bool SteamService::metricsEnabled() {
-	auto mangohud_which = Shell::getInstance().which("mangohud");
+	auto mangohud_which = shell.which("mangohud");
 	return mangohud_which.has_value();
 }
 
@@ -123,9 +123,9 @@ void SteamService::onFirstGameRun(unsigned int gid, std::string name, std::map<s
 	logger.add_tab();
 
 	std::optional<std::string> gpu = std::nullopt;
-	if (HardwareService::getInstance().getGpus().size() > 0) {
+	if (hardwareService.getGpus().size() > 0) {
 		auto items = GpuBrand::getAll();
-		auto gpus  = HardwareService::getInstance().getGpus();
+		auto gpus  = hardwareService.getGpus();
 		for (GpuBrand g : GpuBrand::getAll()) {
 			if (gpus.find(g.toString()) != gpus.end()) {
 				gpu = g.toString();
@@ -170,7 +170,7 @@ void SteamService::onFirstGameRun(unsigned int gid, std::string name, std::map<s
 	logger.info("Relaunching game with SteamOverlayId " + overlayId + "...");
 	std::this_thread::sleep_for(std::chrono::milliseconds(250));
 
-	Shell::getInstance().run_command("steam steam://rungameid/" + overlayId);
+	shell.run_command("steam steam://rungameid/" + overlayId);
 
 	logger.rem_tab();
 	logger.rem_tab();
@@ -213,7 +213,7 @@ void SteamService::installRccDC() {
 }
 
 void SteamService::copyPlugin() {
-	installer = std::thread([]() {
+	installer = std::thread([this]() {
 		FileUtils::copy(Constants::RCCDC_ASSET_PATH, Constants::USER_PLUGIN_DIR);
 
 		std::vector<std::string> commands{"if [[ -d \"" + Constants::RCCDC_PATH + "\" ]]; then rm -R \"" + Constants::RCCDC_PATH + "\"; fi",
@@ -222,7 +222,7 @@ void SteamService::copyPlugin() {
 										  "systemctl restart plugin_loader.service"};
 
 		for (auto cmd : commands) {
-			Shell::getInstance().run_elevated_command(cmd);
+			shell.run_elevated_command(cmd);
 		}
 	});
 }
@@ -252,7 +252,7 @@ void SteamService::onGameLaunch(unsigned int gid, std::string name, int pid) {
 			oss << " " << pid;
 		}
 		std::this_thread::sleep_for(std::chrono::milliseconds(250));
-		Shell::getInstance().run_elevated_command(oss.str(), false);
+		shell.run_elevated_command(oss.str(), false);
 		logger.rem_tab();
 
 		std::thread([this, gid, name, env]() { onFirstGameRun(gid, name, env); }).detach();
@@ -261,7 +261,7 @@ void SteamService::onGameLaunch(unsigned int gid, std::string name, int pid) {
 		runningGames[gid] = name;
 		setProfileForGames();
 
-		EventBus::getInstance().emit_event(Events::STEAM_SERVICE_GAME_EVENT, {runningGames.size()});
+		eventBus.emit_event(Events::STEAM_SERVICE_GAME_EVENT, {runningGames.size()});
 	}
 	logger.rem_tab();
 }
@@ -275,20 +275,20 @@ void SteamService::onGameStop(unsigned int gid, std::string name) {
 			setProfileForGames();
 			logger.rem_tab();
 
-			EventBus::getInstance().emit_event(Events::STEAM_SERVICE_GAME_EVENT, {runningGames.size()});
+			eventBus.emit_event(Events::STEAM_SERVICE_GAME_EVENT, {runningGames.size()});
 		}
 	}
 }
 
 void SteamService::setProfileForGames(bool onConnect) {
 	if (!runningGames.empty()) {
-		HardwareService::getInstance().setPanelOverdrive(true);
-		OpenRgbService::getInstance().setEffect("Gaming", true);
-		ProfileService::getInstance().setPerformanceProfile(PerformanceProfile::Enum::PERFORMANCE, true, true);
+		hardwareService.setPanelOverdrive(true);
+		openRgbService.setEffect("Gaming", true);
+		profileService.setPerformanceProfile(PerformanceProfile::Enum::PERFORMANCE, true, true);
 	} else if (!onConnect) {
-		HardwareService::getInstance().setPanelOverdrive(false);
-		OpenRgbService::getInstance().restoreAura();
-		ProfileService::getInstance().restoreProfile();
+		hardwareService.setPanelOverdrive(false);
+		openRgbService.restoreAura();
+		profileService.restoreProfile();
 	}
 }
 
@@ -298,7 +298,7 @@ void SteamService::onConnect(bool onBoot) {
 	if (!onBoot) {
 		setProfileForGames(true);
 	}
-	EventBus::getInstance().emit_event(Events::STEAM_SERVICE_GAME_EVENT, {runningGames.size()});
+	eventBus.emit_event(Events::STEAM_SERVICE_GAME_EVENT, {runningGames.size()});
 	logger.rem_tab();
 }
 
@@ -306,8 +306,8 @@ void SteamService::onDisconnect() {
 	logger.info("Disconnected from Steam");
 	logger.add_tab();
 	if (!runningGames.empty()) {
-		ProfileService::getInstance().restoreProfile();
-		OpenRgbService::getInstance().restoreAura();
+		profileService.restoreProfile();
+		openRgbService.restoreAura();
 		runningGames.clear();
 	}
 	logger.rem_tab();
@@ -365,13 +365,13 @@ const SteamGameConfig SteamService::getConfiguration(const std::string& gid) {
 		}
 
 		if (gameEntry.gpu.has_value()) {
-			auto gpuEnv = HardwareService::getInstance().getGpuSelectorEnv(gameEntry.gpu.value());
+			auto gpuEnv = hardwareService.getGpuSelectorEnv(gameEntry.gpu.value());
 			for (const auto& [key, val] : gpuEnv) {
 				cfg.environment[key] = val;
 			}
 		}
 
-		auto mangohud_which = Shell::getInstance().which("mangohud");
+		auto mangohud_which = shell.which("mangohud");
 		if (mangohud_which.has_value()) {
 			cfg.environment["MANGOHUD_CONFIG"] = "preset=" + std::to_string(gameEntry.metrics_level.toInt());
 			cfg.environment["MANGOHUD_DLSYM"]  = "1";

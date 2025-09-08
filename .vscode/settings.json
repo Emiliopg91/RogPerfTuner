@@ -94,7 +94,8 @@
         "qvboxlayout": "cpp",
         "*.inc": "cpp",
         "shared_mutex": "cpp",
-        "csetjmp": "cpp"
+        "csetjmp": "cpp",
+        "qvariant": "cpp"
     },
     "cmake.generator": "Ninja",
     "cmake.buildDirectory": "${workspaceFolder}/build"

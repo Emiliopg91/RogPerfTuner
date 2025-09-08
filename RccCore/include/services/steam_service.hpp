@@ -5,6 +5,9 @@
 #include "../models/settings/root_config.hpp"
 #include "../models/steam/mangohud_level.hpp"
 #include "../models/steam/wine_sync_option.hpp"
+#include "./hardware_service.hpp"
+#include "./open_rgb_service.hpp"
+#include "./profile_service.hpp"
 #include "RccCommons.hpp"
 
 class SteamService {
@@ -14,6 +17,12 @@ class SteamService {
 	std::map<unsigned int, std::string> runningGames;
 	bool rccdcEnabled = false;
 	std::thread installer;
+
+	Shell& shell					 = Shell::getInstance();
+	EventBus& eventBus				 = EventBus::getInstance();
+	ProfileService& profileService	 = ProfileService::getInstance();
+	OpenRgbService& openRgbService	 = OpenRgbService::getInstance();
+	HardwareService& hardwareService = HardwareService::getInstance();
 
 	SteamService();
 

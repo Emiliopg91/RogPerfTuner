@@ -6,17 +6,26 @@
 #include <QSystemTrayIcon>
 #include <map>
 
+#include "../events/event_bus.hpp"
 #include "../models/hardware/battery_charge_threshold.hpp"
 #include "../models/hardware/rgb_brightness.hpp"
 #include "../models/performance/performance_profile.hpp"
+#include "../services/hardware_service.hpp"
+#include "../services/open_rgb_service.hpp"
+#include "../services/profile_service.hpp"
+#include "../translator/translator.hpp"
 #include "RccCommons.hpp"
 
 class TrayIcon : public QObject {
 	Q_OBJECT
 
   public:
+	inline static TrayIcon& getInstance() {
+		static TrayIcon instance;
+		return instance;
+	}
+
 	explicit TrayIcon(QObject* parent = nullptr);
-	inline static TrayIcon* INSTANCE = nullptr;
 	void show();
 
   public slots:
@@ -38,4 +47,15 @@ class TrayIcon : public QObject {
 	void setAuraEffect(const std::string& effect);
 	void setPerformanceProfile(PerformanceProfile profile);
 	void setBatteryThreshold(BatteryThreshold threshold);
+	void openMainWindow();
+	void openSettings();
+	void reloadSettings();
+	void openLogs();
+
+	Shell& shell					 = Shell::getInstance();
+	EventBus& eventBus				 = EventBus::getInstance();
+	ProfileService& profileService	 = ProfileService::getInstance();
+	OpenRgbService& openRgbService	 = OpenRgbService::getInstance();
+	HardwareService& hardwareService = HardwareService::getInstance();
+	Translator& translator			 = Translator::getInstance();
 };

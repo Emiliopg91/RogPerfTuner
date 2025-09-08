@@ -16,28 +16,28 @@ bool PasswordDialog::showDialog() {
 	if (exec() == QDialog::Accepted)
 		return true;
 
-	QMessageBox::information(nullptr, "Canceled", QString::fromStdString(Translator::getInstance().translate("user.canceled.operation")));
+	QMessageBox::information(nullptr, "Canceled", QString::fromStdString(translator.translate("user.canceled.operation")));
 	exit(EXIT_FAILURE);
 }
 
 PasswordDialog::PasswordDialog(QWidget* parent) : QDialog(parent) {
-	setWindowTitle(QString::fromStdString(Translator::getInstance().translate("authentication.required")));
+	setWindowTitle(QString::fromStdString(translator.translate("authentication.required")));
 	setFixedSize(300, 150);
 
 	QVBoxLayout* layout = new QVBoxLayout(this);
 
-	label_ = new QLabel(QString::fromStdString(Translator::getInstance().translate("enter.sudo.password")));
+	label_ = new QLabel(QString::fromStdString(translator.translate("enter.sudo.password")));
 	layout->addWidget(label_);
 
 	password_input_ = new QLineEdit();
 	password_input_->setEchoMode(QLineEdit::Password);
 	layout->addWidget(password_input_);
 
-	ok_button_ = new QPushButton(QString::fromStdString(Translator::getInstance().translate("accept")));
+	ok_button_ = new QPushButton(QString::fromStdString(translator.translate("accept")));
 	layout->addWidget(ok_button_);
 	connect(ok_button_, &QPushButton::clicked, this, &PasswordDialog::onAccept);
 
-	cancel_button_ = new QPushButton(QString::fromStdString(Translator::getInstance().translate("cancel")));
+	cancel_button_ = new QPushButton(QString::fromStdString(translator.translate("cancel")));
 	layout->addWidget(cancel_button_);
 	connect(cancel_button_, &QPushButton::clicked, this, &PasswordDialog::reject);
 }
@@ -53,7 +53,7 @@ void PasswordDialog::onAccept() {
 	} else {
 		ok_button_->setDisabled(false);
 		cancel_button_->setDisabled(false);
-		QMessageBox::warning(this, "Error", QString::fromStdString(Translator::getInstance().translate("authentication.failed")));
+		QMessageBox::warning(this, "Error", QString::fromStdString(translator.translate("authentication.failed")));
 	}
 }
 bool PasswordDialog::checkPassword(const QString& password) {

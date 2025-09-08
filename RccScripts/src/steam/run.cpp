@@ -182,12 +182,14 @@ int main(int argc, char* argv[]) {
 		}
 	}
 
-	auto whichResult = Shell::getInstance().whichAll("flatpak");
+	Shell& shell = Shell::getInstance();
+
+	auto whichResult = shell.whichAll("flatpak");
 	if (whichResult.size() > 1) {
 		setenv("ORIG_FLATPAK_BIN", StringUtils::trim(whichResult[whichResult.size() - 1]).c_str(), 1);
 	}
 
-	auto cmdWhichResult = Shell::getInstance().whichAll(std::string(argv[1]));
+	auto cmdWhichResult = shell.whichAll(std::string(argv[1]));
 	if (whichResult.empty()) {
 		logger.error("Command " + std::string(argv[1]) + " not found");
 		exit(127);

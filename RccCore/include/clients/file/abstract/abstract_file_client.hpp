@@ -22,17 +22,17 @@ class AbstractFileClient {
 		}
 
 		if (sudo_)
-			return Shell::getInstance().run_elevated_command(cmd).stdout_str;
+			return shell.run_elevated_command(cmd).stdout_str;
 		else
-			return Shell::getInstance().run_command(cmd).stdout_str;
+			return shell.run_command(cmd).stdout_str;
 	}
 
 	void write(const std::string& content) {
 		std::string cmd = "echo '" + content + "' | tee " + path_;
 		if (sudo_)
-			Shell::getInstance().run_elevated_command(cmd);
+			shell.run_elevated_command(cmd);
 		else
-			Shell::getInstance().run_command(cmd);
+			shell.run_command(cmd);
 	}
 
 	bool available() {
@@ -43,7 +43,7 @@ class AbstractFileClient {
 	AbstractFileClient(const std::string& path, const std::string& name, const bool& sudo = false, const bool& required = true)
 		: path_(path), sudo_(sudo) {
 		logger_	   = Logger{name};
-		available_ = Shell::getInstance().run_command("ls " + path).exit_code == 0;
+		available_ = shell.run_command("ls " + path).exit_code == 0;
 		if (!available_) {
 			if (required)
 				throw std::runtime_error(fmt::format("File {} doesn't exist", path_));
@@ -57,4 +57,5 @@ class AbstractFileClient {
 	bool sudo_;
 	bool available_;
 	Logger logger_;
+	Shell& shell = Shell::getInstance();
 };

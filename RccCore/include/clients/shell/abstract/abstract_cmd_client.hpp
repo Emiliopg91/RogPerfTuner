@@ -28,9 +28,9 @@ class AbstractCmdClient {
 
 		CommandResult result;
 		if (sudo)
-			result = Shell::getInstance().run_elevated_command(cmd, check);
+			result = shell.run_elevated_command(cmd, check);
 		else
-			result = Shell::getInstance().run_command(cmd, check);
+			result = shell.run_command(cmd, check);
 
 		return result;
 	}
@@ -44,6 +44,7 @@ class AbstractCmdClient {
 	std::string command_;
 	bool available_;
 	Logger logger_;
+	Shell& shell = Shell::getInstance();
 
 	bool isCommandAvailable() {
 		std::string cmd = "which " + command_ + " >/dev/null 2>&1";

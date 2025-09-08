@@ -35,7 +35,7 @@ ProfileService::ProfileService() {
 		PlatformClient::getInstance().setPlatformProfileLinkedEpp(true);
 	}
 
-	EventBus::getInstance().on_without_data(Events::HARDWARE_SERVICE_ON_BATTERY, [this]() {
+	eventBus.on_without_data(Events::HARDWARE_SERVICE_ON_BATTERY, [this]() {
 		onBattery = UPowerClient::getInstance().isOnBattery();
 		if (runningGames == 0) {
 			if (onBattery) {
@@ -83,9 +83,9 @@ void ProfileService::setPerformanceProfile(const PerformanceProfile& profile, co
 			logger.rem_tab();
 			logger.info("Profile setted after " + std::to_string(std::chrono::duration_cast<std::chrono::milliseconds>(t1 - t0).count()) + " ms");
 			std::unordered_map<std::string, std::any> values = {
-				{"profile", StringUtils::toLowerCase(Translator::getInstance().translate("label.profile." + profileName))}};
-			Toaster::getInstance().showToast(Translator::getInstance().translate("profile.applied", values));
-			EventBus::getInstance().emit_event(Events::PROFILE_SERVICE_ON_PROFILE, {profile});
+				{"profile", StringUtils::toLowerCase(translator.translate("label.profile." + profileName))}};
+			Toaster::getInstance().showToast(translator.translate("profile.applied", values));
+			eventBus.emit_event(Events::PROFILE_SERVICE_ON_PROFILE, {profile});
 		} catch (std::exception e) {
 			logger.rem_tab();
 		}

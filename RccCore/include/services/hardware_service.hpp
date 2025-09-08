@@ -2,10 +2,13 @@
 
 #include <mutex>
 
+#include "../../include/events/event_bus.hpp"
 #include "../models/hardware/battery_charge_threshold.hpp"
 #include "../models/hardware/cpu_brand.hpp"
 #include "../models/hardware/usb_identifier.hpp"
 #include "../models/performance/ssd_scheduler.hpp"
+#include "../services/open_rgb_service.hpp"
+#include "../translator/translator.hpp"
 #include "RccCommons.hpp"
 
 class HardwareService {
@@ -37,6 +40,11 @@ class HardwareService {
 
 	Logger logger{"HardwareService"};
 	std::mutex actionMutex;
+
+	Shell& shell				   = Shell::getInstance();
+	EventBus& eventBus			   = EventBus::getInstance();
+	OpenRgbService& openRgbService = OpenRgbService::getInstance();
+	Translator& translator		   = Translator::getInstance();
 
 	BatteryThreshold charge_limit = BatteryThreshold::Enum::CT_100;
 	CpuBrand cpu				  = CpuBrand::Enum::INTEL;

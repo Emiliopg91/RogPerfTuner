@@ -18,7 +18,7 @@
 #include "../models/steam/mangohud_level.hpp"
 #include "../models/steam/wine_sync_option.hpp"
 #include "../services/hardware_service.hpp"
-#include "../services/steam_service.hpp"  // tu clase equivalente
+#include "../services/steam_service.hpp"
 #include "../translator/translator.hpp"
 #include "../utils/gui_utils.hpp"
 #include "RccCommons.hpp"
@@ -36,4 +36,8 @@ class GameList : public QDialog {
   private:
 	QWidget* parentWidget = nullptr;
 	bool manageParent	  = false;
+
+	HardwareService& hardwareService = HardwareService::getInstance();
+	SteamService& steamService		 = SteamService::getInstance();
+	Translator& translator			 = Translator::getInstance();
 };

@@ -67,9 +67,7 @@ int main(int argc, char** argv) {
 
 	HttpServer::getInstance();
 
-	logger.info("Creating tray icon");
-	TrayIcon::INSTANCE = new TrayIcon();
-	TrayIcon::INSTANCE->show();
+	TrayIcon::getInstance().show();
 	app.setDesktopFileName(QString::fromStdString(Constants::APP_DRAW_FILE));
 
 	logger.rem_tab();

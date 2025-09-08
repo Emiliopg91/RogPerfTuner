@@ -1,6 +1,7 @@
 #pragma once
 #include <string>
 
+#include "../translator/translator.hpp"
 #include "RccCommons.hpp"
 
 class Toaster {
@@ -14,4 +15,6 @@ class Toaster {
 
   private:
 	uint last_id = 0;
+
+	Translator& translator = Translator::getInstance();
 };

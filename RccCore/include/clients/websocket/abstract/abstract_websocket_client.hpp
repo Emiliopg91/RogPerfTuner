@@ -44,12 +44,12 @@ class AbstractWebsocketClient {
   protected:
 	void on_without_params(const std::string& name, Callback&& callback) {
 		auto eventName = "ws." + _name + ".event." + name;
-		EventBus::getInstance().on_without_data(eventName, callback);
+		eventBus.on_without_data(eventName, callback);
 	}
 
 	void on_with_params(const std::string& name, CallbackWithParams&& callback) {
 		auto eventName = "ws." + _name + ".event." + name;
-		EventBus::getInstance().on_with_data(eventName, std::move(callback));
+		eventBus.on_with_data(eventName, std::move(callback));
 	}
 
   private:
@@ -59,6 +59,7 @@ class AbstractWebsocketClient {
 	int _port;
 	bool _connected = false;
 	Logger logger;
+	EventBus& eventBus = EventBus::getInstance();
 
 	std::queue<std::string> _message_queue;
 	std::mutex _queue_mutex;

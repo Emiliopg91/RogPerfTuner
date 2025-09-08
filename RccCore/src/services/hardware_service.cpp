@@ -155,17 +155,17 @@ HardwareService::HardwareService() {
 
 void HardwareService::setupDeviceLoop() {
 	auto& udevClient = LsUsbClient::getInstance();
-	connectedDevices = std::get<0>(
-		udevClient.compare_connected_devs({}, [](const UsbIdentifier& dev) { return !OpenRgbService::getInstance().getDeviceName(dev).empty(); }));
-	EventBus::getInstance().on_without_data(Events::UDEV_CLIENT_DEVICE_EVENT, [this, &udevClient]() {
+	connectedDevices =
+		std::get<0>(udevClient.compare_connected_devs({}, [this](const UsbIdentifier& dev) { return !openRgbService.getDeviceName(dev).empty(); }));
+	eventBus.on_without_data(Events::UDEV_CLIENT_DEVICE_EVENT, [this, &udevClient]() {
 		auto [current, added, removed] = udevClient.compare_connected_devs(
-			connectedDevices, [](const UsbIdentifier& dev) { return !OpenRgbService::getInstance().getDeviceName(dev).empty(); });
+			connectedDevices, [this](const UsbIdentifier& dev) { return !openRgbService.getDeviceName(dev).empty(); });
 
 		if (added.size() > 0) {
 			logger.info("Added compatible device(s):");
 			logger.add_tab();
 			for (auto dev : added) {
-				logger.info(OpenRgbService::getInstance().getDeviceName(dev));
+				logger.info(openRgbService.getDeviceName(dev));
 			}
 			logger.rem_tab();
 		}
@@ -174,17 +174,17 @@ void HardwareService::setupDeviceLoop() {
 			logger.info("Removed compatible device(s):");
 			logger.add_tab();
 			for (auto dev : removed) {
-				logger.info(OpenRgbService::getInstance().getDeviceName(dev));
+				logger.info(openRgbService.getDeviceName(dev));
 			}
 			logger.rem_tab();
 		}
 
 		if (removed.size() > 0 && added.size() == 0) {
 			for (auto dev : removed) {
-				OpenRgbService::getInstance().disableDevice(dev);
+				openRgbService.disableDevice(dev);
 			}
 		} else if (removed.size() > 0 || added.size() > 0) {
-			EventBus::getInstance().emit_event(Events::HARDWARE_SERVICE_USB_ADDED_REMOVED);
+			eventBus.emit_event(Events::HARDWARE_SERVICE_USB_ADDED_REMOVED);
 		}
 
 		connectedDevices = current;
@@ -207,8 +207,8 @@ void HardwareService::setChargeThreshold(const BatteryThreshold& threshold) {
 		logger.info("Charge limit setted after " + std::to_string(std::chrono::duration_cast<std::chrono::milliseconds>(t1 - t0).count()) + " ms");
 
 		std::unordered_map<std::string, std::any> replacements = {{"value", threshold.toInt()}};
-		Toaster::getInstance().showToast(Translator::getInstance().translate("applied.battery.threshold", replacements));
-		EventBus::getInstance().emit_event(Events::HARDWARE_SERVICE_THRESHOLD_CHANGED, {threshold});
+		Toaster::getInstance().showToast(translator.translate("applied.battery.threshold", replacements));
+		eventBus.emit_event(Events::HARDWARE_SERVICE_THRESHOLD_CHANGED, {threshold});
 	}
 }
 
@@ -224,7 +224,7 @@ void HardwareService::onBatteryEvent(const bool& onBat, const bool& muted) {
 			logger.info("AC " + t1 + "plugged, battery " + t2 + "engaged");
 			logger.add_tab();
 		}
-		EventBus::getInstance().emit_event(Events::HARDWARE_SERVICE_ON_BATTERY);
+		eventBus.emit_event(Events::HARDWARE_SERVICE_ON_BATTERY);
 		if (!muted) {
 			logger.rem_tab();
 		}
@@ -238,8 +238,7 @@ void HardwareService::setPanelOverdrive(const bool& enable) {
 	}
 }
 void HardwareService::renice(const pid_t& pid) {
-	Shell::getInstance().run_elevated_command(
-		fmt::format("renice -n {} -p {} && ionice -c {} -n {} -p {}", CPU_PRIORITY, pid, IO_CLASS, IO_PRIORITY, pid));
+	shell.run_elevated_command(fmt::format("renice -n {} -p {} && ionice -c {} -n {} -p {}", CPU_PRIORITY, pid, IO_CLASS, IO_PRIORITY, pid));
 }
 
 std::map<std::string, std::string> HardwareService::getGpuSelectorEnv(const std::string& gpu) {

@@ -2,8 +2,10 @@
 
 #include <mutex>
 
+#include "../../include/events/event_bus.hpp"
 #include "../models/hardware/rgb_brightness.hpp"
 #include "../models/hardware/usb_identifier.hpp"
+#include "../services/open_rgb_service.hpp"
 #include "RccCommons.hpp"
 
 class OpenRgbService {
@@ -36,6 +38,8 @@ class OpenRgbService {
 
 	RgbBrightness brightness = RgbBrightness::Enum::MAX;
 	std::string effect;
+
+	EventBus& eventBus = EventBus::getInstance();
 
 	void applyAura(const bool& temporal = false);
 	void reload();

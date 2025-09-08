@@ -8,13 +8,21 @@
 #include "../../services/steam_service.hpp"
 #include "RccCommons.hpp"
 #include "httplib.h"
+
 using json = nlohmann::json;
+
 class HttpServer {
   private:
 	httplib::Server svr;
 	std::thread runner;
 	std::atomic<bool> started{false};
 	Logger logger{"HttpServer"};
+
+	EventBus& eventBus				 = EventBus::getInstance();
+	ProfileService& profileService	 = ProfileService::getInstance();
+	OpenRgbService& openRgbService	 = OpenRgbService::getInstance();
+	HardwareService& hardwareService = HardwareService::getInstance();
+	SteamService& steamService		 = SteamService::getInstance();
 
 	HttpServer() {
 		logger.info("Initializing HTTP server");
@@ -26,40 +34,40 @@ class HttpServer {
 
 		svr.Get(Constants::URL_PERF_PROF, [this](const httplib::Request&, httplib::Response& res) {
 			json response;
-			response["profile"] = ProfileService::getInstance().nextPerformanceProfile().toName();
+			response["profile"] = profileService.nextPerformanceProfile().toName();
 
 			res.set_content(response.dump(4), "application/json");
 		});
 
 		svr.Get(Constants::URL_INC_BRIGHT, [this](const httplib::Request&, httplib::Response& res) {
 			json response;
-			response["brightness"] = OpenRgbService::getInstance().increaseBrightness().toName();
+			response["brightness"] = openRgbService.increaseBrightness().toName();
 
 			res.set_content(response.dump(4), "application/json");
 		});
 
 		svr.Get(Constants::URL_DEC_BRIGHT, [this](const httplib::Request&, httplib::Response& res) {
 			json response;
-			response["brightness"] = OpenRgbService::getInstance().decreaseBrightness().toName();
+			response["brightness"] = openRgbService.decreaseBrightness().toName();
 
 			res.set_content(response.dump(4), "application/json");
 		});
 
 		svr.Get(Constants::URL_NEXT_EFF, [this](const httplib::Request&, httplib::Response& res) {
 			json response;
-			response["effect"] = OpenRgbService::getInstance().nextEffect();
+			response["effect"] = openRgbService.nextEffect();
 
 			res.set_content(response.dump(4), "application/json");
 		});
 
 		svr.Get(Constants::URL_RENICE, [this](const httplib::Request& req, httplib::Response&) {
 			auto pidStr = req.get_param_value("pid");
-			HardwareService::getInstance().renice(static_cast<pid_t>(std::stoi(pidStr)));
+			hardwareService.renice(static_cast<pid_t>(std::stoi(pidStr)));
 		});
 
 		svr.Get(Constants::URL_GAME_CFG, [this](const httplib::Request& req, httplib::Response& res) {
 			auto gidStr = req.get_param_value("appid");
-			json j		= SteamService::getInstance().getConfiguration(gidStr);
+			json j		= steamService.getConfiguration(gidStr);
 			res.set_content(j.dump(), "application/json");
 		});
 
@@ -78,7 +86,7 @@ class HttpServer {
 			std::this_thread::sleep_for(std::chrono::milliseconds(10));
 		}
 
-		EventBus::getInstance().on_without_data(Events::APPLICATION_STOP, [this]() { stop(); });
+		eventBus.on_without_data(Events::APPLICATION_STOP, [this]() { stop(); });
 
 		logger.rem_tab();
 	}

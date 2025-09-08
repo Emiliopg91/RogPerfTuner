@@ -18,6 +18,7 @@ class LsUsbClient {
 	std::thread runner;
 	int fd;
 	std::atomic<bool> stop;
+	EventBus& eventBus = EventBus::getInstance();
 
 	LsUsbClient() {
 		udev = udev_new();
@@ -43,7 +44,7 @@ class LsUsbClient {
 					if (dev) {
 						udev_device_unref(dev);
 					}
-					EventBus::getInstance().emit_event(Events::UDEV_CLIENT_DEVICE_EVENT);
+					eventBus.emit_event(Events::UDEV_CLIENT_DEVICE_EVENT);
 				}
 			}
 		});

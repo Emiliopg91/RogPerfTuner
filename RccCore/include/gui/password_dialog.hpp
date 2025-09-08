@@ -7,6 +7,8 @@
 #include <QPushButton>
 #include <QVBoxLayout>
 
+#include "../translator/translator.hpp"
+
 class PasswordDialog : public QDialog {
 	Q_OBJECT
 
@@ -29,4 +31,6 @@ class PasswordDialog : public QDialog {
 	QLineEdit* password_input_;
 	QPushButton* ok_button_;
 	QPushButton* cancel_button_;
+
+	Translator& translator = Translator::getInstance();
 };
