@@ -1,3 +1,17 @@
+Submodule external/CppUtils-Essential contains modified content
+diff --git a/external/CppUtils-Essential/StringUtils.hpp b/external/CppUtils-Essential/StringUtils.hpp
+index 6e4c3fa..ffe7502 100644
+--- a/external/CppUtils-Essential/StringUtils.hpp
++++ b/external/CppUtils-Essential/StringUtils.hpp
+@@ -21,7 +21,7 @@
+ 
+ 
+ // suffix s is C++14
+-inline std::string operator "" _s( const char * str, size_t size )
++inline std::string operator ""_s( const char * str, size_t size )
+ {
+     return std::string( str, size );
+ }
 diff --git a/include/OpenRGB/Client.hpp b/include/OpenRGB/Client.hpp
 index b70416d..70df01d 100644
 --- a/include/OpenRGB/Client.hpp

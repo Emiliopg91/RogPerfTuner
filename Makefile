@@ -12,7 +12,7 @@ clean:
 	@echo "#######################################################################"
 	@rm -rf build dist .Debug .Release .qt CMakeCache.txt **/cmake_install.cmake CMakeFiles patches/*.diff.applied assets/scripts assets/bin assets/OpenRGB assets/RccDeckyCompanion **/CMakeFiles
 	@cd submodules/httplib && git reset --hard > /dev/null
-	@cd submodules/OpenRGB-cppSDK && git reset --hard > /dev/null
+	@cd submodules/OpenRGB-cppSDK && git reset --hard > /dev/null && git submodule foreach git reset --hard > /dev/null
 	@cd submodules/OpenRGB && git reset --hard > /dev/null && rm -Rf build
 	@cd submodules/RccDeckyCompanion && git reset --hard > /dev/null && rm -Rf dist logs out
 
@@ -114,7 +114,8 @@ package:
 	@cp resources/RogControlCenter.desktop dist/appimage-fs/RogControlCenter.desktop
 	@cp assets/icons/icon.svg dist/appimage-fs/icon.svg
 	@chmod 777 -R resources/appimagetool dist/appimage-fs
-	@VERSION=$$(cat resources/version); ./resources/appimagetool -n dist/appimage-fs dist/RogControlCenter.AppImage
+	@VERSION=$$(cat resources/version) ./resources/appimagetool -u "gh-releases-zsync|Emiliopg91|RogControlCenter|latest|RogControlCenter.AppImage.zsync" -n dist/appimage-fs dist/RogControlCenter.AppImage
+	@mv RogControlCenter.AppImage.zsync dist
 
 release:
 	@rm -rf dist

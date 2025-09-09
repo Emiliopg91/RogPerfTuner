@@ -1,0 +1,9 @@
+[Desktop Entry]
+Type=Application
+Name=OpenRGB
+Comment=Control RGB lighting
+Icon=org.openrgb.OpenRGB
+TryExec=OpenRGB
+Exec=OpenRGB
+Terminal=false
+Categories=Utility;
