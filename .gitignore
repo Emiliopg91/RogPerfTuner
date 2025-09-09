@@ -1,6 +1,8 @@
 
 build/.qt/
 
+.cache/
+
 .Debug
 
 build/
