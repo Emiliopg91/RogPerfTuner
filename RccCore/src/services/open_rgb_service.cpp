@@ -10,13 +10,13 @@ OpenRgbService::OpenRgbService() {
 	logger.info("Initializing OpenRgbService");
 	logger.add_tab();
 
-	OpenRgbClient::getInstance();
+	openRgbClient.initialize();
 
 	restoreAura();
 
 	eventBus.on_without_data(Events::HARDWARE_SERVICE_ON_BATTERY, [this]() {
-		auto brightness = UPowerClient::getInstance().isOnBattery() ? RgbBrightness::Enum::OFF : this->brightness;
-		OpenRgbClient::getInstance().applyEffect(effect, brightness);
+		auto brightness = uPowerClient.isOnBattery() ? RgbBrightness::Enum::OFF : this->brightness;
+		openRgbClient.applyEffect(effect, brightness);
 	});
 
 	eventBus.on_without_data(Events::HARDWARE_SERVICE_USB_ADDED_REMOVED, [this]() { reload(); });
@@ -42,7 +42,7 @@ std::string OpenRgbService::getDeviceName(const UsbIdentifier& identifier) {
 }
 
 std::vector<std::string> OpenRgbService::getAvailableEffects() {
-	auto all = OpenRgbClient::getInstance().getAvailableEffects();
+	auto all = openRgbClient.getAvailableEffects();
 	std::sort(all.begin(), all.end());
 	return all;
 }
@@ -77,8 +77,8 @@ void OpenRgbService::reload() {
 	auto t0 = std::chrono::high_resolution_clock::now();
 	logger.info("Reloading OpenRGB server");
 	logger.add_tab();
-	OpenRgbClient::getInstance().stop();
-	OpenRgbClient::getInstance().start();
+	openRgbClient.stop();
+	openRgbClient.start();
 	applyAura();
 	auto t1 = std::chrono::high_resolution_clock::now();
 	logger.rem_tab();
@@ -89,7 +89,7 @@ void OpenRgbService::applyAura(const bool& temporal) {
 	logger.info("Applying aura settings");
 	logger.add_tab();
 	auto t0 = std::chrono::high_resolution_clock::now();
-	OpenRgbClient::getInstance().applyEffect(effect, brightness);
+	openRgbClient.applyEffect(effect, brightness);
 
 	if (!temporal) {
 		configuration.getConfiguration().open_rgb.brightness  = brightness;
@@ -103,7 +103,7 @@ void OpenRgbService::applyAura(const bool& temporal) {
 }
 
 void OpenRgbService::disableDevice(const UsbIdentifier& identifier) {
-	OpenRgbClient::getInstance().disableDevice(getDeviceName(identifier));
+	openRgbClient.disableDevice(getDeviceName(identifier));
 }
 
 RgbBrightness OpenRgbService::increaseBrightness() {

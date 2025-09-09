@@ -16,6 +16,7 @@ class OpenRgbClient {
 	const CompatibleDeviceArray getCompatibleDevices();
 	const std::vector<std::string> getAvailableEffects();
 	void applyEffect(const std::string& effect, const RgbBrightness& brightness);
+	void initialize();
 	void start();
 	void stop();
 	void disableDevice(const std::string&);
@@ -34,7 +35,8 @@ class OpenRgbClient {
 	EventBus& eventBus			 = EventBus::getInstance();
 	AsusCtlClient& asusCtlClient = AsusCtlClient::getInstance();
 
-	OpenRgbClient();
+	OpenRgbClient() {
+	}
 
 	void startOpenRgbProcess();
 	void startOpenRgbClient();

@@ -1,15 +1,7 @@
 #include "../../include/services/profile_service.hpp"
 
-#include "../../include/clients/dbus/asus/core/fan_curves_client.hpp"
-#include "../../include/clients/dbus/asus/core/platform_client.hpp"
-#include "../../include/clients/dbus/linux/power_profile_client.hpp"
-#include "../../include/clients/dbus/linux/upower_client.hpp"
-#include "../../include/clients/file/boost_control_client.hpp"
-#include "../../include/clients/file/ssd_scheduler_client.hpp"
-#include "../../include/clients/shell/cpupower_client.hpp"
 #include "../../include/configuration/configuration.hpp"
 #include "../../include/events/events.hpp"
-#include "../../include/gui/toaster.hpp"
 #include "../../include/models/performance/cpu_governor.hpp"
 #include "../../include/models/performance/power_profile.hpp"
 #include "../../include/models/performance/ssd_scheduler.hpp"
@@ -22,20 +14,20 @@ ProfileService::ProfileService() {
 
 	currentProfile = configuration.getConfiguration().platform.profiles.profile;
 
-	if (UPowerClient::getInstance().available()) {
-		onBattery		 = UPowerClient::getInstance().isOnBattery();
+	if (uPowerClient.available()) {
+		onBattery		 = uPowerClient.isOnBattery();
 		std::string mode = onBattery ? "battery" : "AC";
 		logger.info("Laptop on " + mode + " mode");
 	}
 
-	if (PlatformClient::getInstance().available()) {
-		PlatformClient::getInstance().setChangePlatformProfileOnAc(false);
-		PlatformClient::getInstance().setChangePlatformProfileOnBattery(false);
-		PlatformClient::getInstance().setPlatformProfileLinkedEpp(true);
+	if (platformClient.available()) {
+		platformClient.setChangePlatformProfileOnAc(false);
+		platformClient.setChangePlatformProfileOnBattery(false);
+		platformClient.setPlatformProfileLinkedEpp(true);
 	}
 
 	eventBus.on_without_data(Events::HARDWARE_SERVICE_ON_BATTERY, [this]() {
-		onBattery = UPowerClient::getInstance().isOnBattery();
+		onBattery = uPowerClient.isOnBattery();
 		if (runningGames == 0) {
 			if (onBattery) {
 				setPerformanceProfile(PerformanceProfile::Enum::QUIET, true, true);
@@ -83,7 +75,7 @@ void ProfileService::setPerformanceProfile(const PerformanceProfile& profile, co
 			logger.info("Profile setted after " + std::to_string(std::chrono::duration_cast<std::chrono::milliseconds>(t1 - t0).count()) + " ms");
 			std::unordered_map<std::string, std::any> values = {
 				{"profile", StringUtils::toLowerCase(translator.translate("label.profile." + profileName))}};
-			Toaster::getInstance().showToast(translator.translate("profile.applied", values));
+			toaster.showToast(translator.translate("profile.applied", values));
 			eventBus.emit_event(Events::PROFILE_SERVICE_ON_PROFILE, {profile});
 		} catch (std::exception e) {
 			logger.rem_tab();
@@ -94,13 +86,13 @@ void ProfileService::setPerformanceProfile(const PerformanceProfile& profile, co
 }
 
 void ProfileService::setPlatformProfile(const PerformanceProfile& profile) {
-	if (PlatformClient::getInstance().available()) {
+	if (platformClient.available()) {
 		auto platformProfile = ProfileUtils::platformProfile(profile);
 		logger.info("Platform profile: {}", platformProfile.toName());
 		logger.add_tab();
 		try {
-			PlatformClient::getInstance().setPlatformProfile(platformProfile);
-			PlatformClient::getInstance().setEnablePptGroup(true);
+			platformClient.setPlatformProfile(platformProfile);
+			platformClient.setEnablePptGroup(true);
 		} catch (std::exception e) {
 			logger.error("Error while setting platform profile: {}", e.what());
 		}
@@ -109,14 +101,14 @@ void ProfileService::setPlatformProfile(const PerformanceProfile& profile) {
 }
 
 void ProfileService::setFanCurves(const PerformanceProfile& profile) {
-	if (FanCurvesClient::getInstance().available()) {
+	if (fanCurvesClient.available()) {
 		auto platformProfile = ProfileUtils::platformProfile(profile);
 		logger.info("Fan profile: {}", platformProfile.toName());
 		logger.add_tab();
 		try {
-			FanCurvesClient::getInstance().resetProfileCurve(platformProfile);
-			FanCurvesClient::getInstance().setCurveToDefaults(platformProfile);
-			FanCurvesClient::getInstance().setFanCurveEnabled(platformProfile);
+			fanCurvesClient.resetProfileCurve(platformProfile);
+			fanCurvesClient.setCurveToDefaults(platformProfile);
+			fanCurvesClient.setFanCurveEnabled(platformProfile);
 		} catch (std::exception e) {
 			logger.error("Error while setting fan curve: {}", std::string(e.what()));
 		}
@@ -125,12 +117,12 @@ void ProfileService::setFanCurves(const PerformanceProfile& profile) {
 }
 
 void ProfileService::setBoost(const PerformanceProfile&) {
-	if (BoostControlClient::getInstance().available()) {
+	if (boostControlClient.available()) {
 		bool enabled = onBattery ? ProfileUtils::batteryBoost() : ProfileUtils::acBoost();
 		logger.info("CPU boost: {}", enabled ? "ON" : "OFF");
 		logger.add_tab();
 		try {
-			BoostControlClient::getInstance().set_boost(enabled);
+			boostControlClient.set_boost(enabled);
 		} catch (std::exception e) {
 			logger.error("Error while setting CPU boost: {}", std::string(e.what()));
 		}
@@ -139,12 +131,12 @@ void ProfileService::setBoost(const PerformanceProfile&) {
 }
 
 void ProfileService::setSsdScheduler(const PerformanceProfile& profile) {
-	if (SsdSchedulerClient::getInstance().available()) {
+	if (ssdSchedulerClient.available()) {
 		SsdScheduler ssdScheduler = ProfileUtils::ssdQueueScheduler(profile);
 		logger.info("SSD scheduler: {}", ssdScheduler.toName());
 		logger.add_tab();
 		try {
-			SsdSchedulerClient::getInstance().setScheduler(ssdScheduler);
+			ssdSchedulerClient.setScheduler(ssdScheduler);
 		} catch (std::exception e) {
 			logger.error("Error while setting SSD scheduler: {}", std::string(e.what()));
 		}
@@ -153,12 +145,12 @@ void ProfileService::setSsdScheduler(const PerformanceProfile& profile) {
 }
 
 void ProfileService::setCpuGovernor(const PerformanceProfile& profile) {
-	if (CpuPowerClient::getInstance().available()) {
+	if (cpuPowerClient.available()) {
 		CpuGovernor cpuGovernor = onBattery ? ProfileUtils::batteryGovernor() : ProfileUtils::acGovernor(profile);
 		logger.info("CPU governor: {}", cpuGovernor.toName());
 		logger.add_tab();
 		try {
-			CpuPowerClient::getInstance().setGovernor(cpuGovernor);
+			cpuPowerClient.setGovernor(cpuGovernor);
 		} catch (std::exception e) {
 			logger.error("Error while setting CPU governor: {}", std::string(e.what()));
 		}
@@ -167,12 +159,12 @@ void ProfileService::setCpuGovernor(const PerformanceProfile& profile) {
 }
 
 void ProfileService::setPowerProfile(const PerformanceProfile& profile) {
-	if (PowerProfileClient::getInstance().available()) {
+	if (powerProfileClient.available()) {
 		PowerProfile powerProfile = ProfileUtils::powerProfile(profile);
 		logger.info("Power profile: {}", powerProfile.toName());
 		logger.add_tab();
 		try {
-			PowerProfileClient::getInstance().setPowerProfile(powerProfile);
+			powerProfileClient.setPowerProfile(powerProfile);
 		} catch (std::exception e) {
 			logger.error("Error while setting power profile: {}", std::string(e.what()));
 		}
@@ -181,18 +173,18 @@ void ProfileService::setPowerProfile(const PerformanceProfile& profile) {
 }
 
 void ProfileService::setTdps(const PerformanceProfile& profile) {
-	if (Pl1SpdClient::getInstance().available()) {
+	if (pl1SpdClient.available()) {
 		logger.info("TDP values");
 		logger.add_tab();
 
 		auto pl1 = onBattery ? ProfileUtils::batteryIntelPl1Spl(profile) : ProfileUtils::acIntelPl1Spl(profile);
 		logger.info("PL1: " + std::to_string(pl1) + "W");
 		try {
-			Pl1SpdClient::getInstance().setCurrentValue(pl1);
-			if (Pl2SpptClient::getInstance().available()) {
+			pl1SpdClient.setCurrentValue(pl1);
+			if (pl2SpptClient.available()) {
 				auto pl2 = onBattery ? ProfileUtils::batteryIntelPl2Sppt(profile) : ProfileUtils::acIntelPl2Sppt(profile);
 				logger.info("PL2: " + std::to_string(pl2) + "W");
-				Pl2SpptClient::getInstance().setCurrentValue(pl2);
+				pl2SpptClient.setCurrentValue(pl2);
 			}
 		} catch (std::exception e) {
 			logger.info("Error setting CPU TDPs");
@@ -203,25 +195,25 @@ void ProfileService::setTdps(const PerformanceProfile& profile) {
 }
 
 void ProfileService::setTgp(const PerformanceProfile& profile) {
-	if (NvTempClient::getInstance().available() || NvBoostClient::getInstance().available()) {
+	if (nvTempClient.available() || nvBoostClient.available()) {
 		logger.info("Nvidia GPU");
 		logger.add_tab();
 
-		if (NvBoostClient::getInstance().available()) {
+		if (nvBoostClient.available()) {
 			try {
 				auto nvb = onBattery ? ProfileUtils::batteryNvBoost(profile) : ProfileUtils::acNvBoost(profile);
 				logger.info("Dynamic Boost: " + std::to_string(nvb) + "W");
-				NvBoostClient::getInstance().setCurrentValue(nvb);
+				nvBoostClient.setCurrentValue(nvb);
 			} catch (std::exception e) {
 				logger.info("Error setting Nvidia Boost");
 			}
 		}
 
-		if (NvTempClient::getInstance().available()) {
+		if (nvTempClient.available()) {
 			try {
 				auto nvt = onBattery ? ProfileUtils::batteryNvTemp(profile) : ProfileUtils::acNvTemp();
 				logger.info("Throttle temp: " + std::to_string(nvt) + "ºC");
-				NvTempClient::getInstance().setCurrentValue(nvt);
+				nvTempClient.setCurrentValue(nvt);
 			} catch (std::exception e) {
 				logger.info("Error setting Nvidia TGP");
 			}

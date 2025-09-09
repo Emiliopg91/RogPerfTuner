@@ -27,6 +27,7 @@ class ApplicationService {
 	EventBus& eventBus		   = EventBus::getInstance();
 	SteamService& steamService = SteamService::getInstance();
 	Translator& translator	   = Translator::getInstance();
+	Toaster& toaster		   = Toaster::getInstance();
 
 	const std::string buildDesktopFile() {
 		std::ostringstream ss;

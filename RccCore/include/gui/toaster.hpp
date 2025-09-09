@@ -1,8 +1,8 @@
 #pragma once
 #include <string>
 
+#include "../clients/dbus/linux/notifications_client.hpp"
 #include "../translator/translator.hpp"
-#include "RccCommons.hpp"
 
 class Toaster {
   public:
@@ -16,5 +16,6 @@ class Toaster {
   private:
 	uint last_id = 0;
 
-	Translator& translator = Translator::getInstance();
+	Translator& translator				   = Translator::getInstance();
+	NotificationClient& notificationClient = NotificationClient::getInstance();
 };

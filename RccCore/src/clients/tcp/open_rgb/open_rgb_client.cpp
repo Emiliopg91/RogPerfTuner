@@ -19,7 +19,7 @@
 #include "../../../../include/models/hardware/rgb_brightness.hpp"
 #include "../../../../include/utils/net_utils.hpp"
 
-OpenRgbClient::OpenRgbClient() {
+void OpenRgbClient::initialize() {
 	logger.info("Configuring UDEV rules");
 	logger.add_tab();
 

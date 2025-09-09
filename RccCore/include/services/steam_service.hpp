@@ -1,5 +1,6 @@
 #pragma once
 
+#include "../clients/websocket/steam_client.hpp"
 #include "../configuration/configuration.hpp"
 #include "../models/hardware/gpu_brand.hpp"
 #include "../models/steam/mangohud_level.hpp"
@@ -22,6 +23,7 @@ class SteamService {
 	ProfileService& profileService	 = ProfileService::getInstance();
 	OpenRgbService& openRgbService	 = OpenRgbService::getInstance();
 	HardwareService& hardwareService = HardwareService::getInstance();
+	SteamClient& steamClient		 = SteamClient::getInstance();
 
 	SteamService();
 

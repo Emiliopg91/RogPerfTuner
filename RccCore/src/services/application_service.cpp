@@ -55,7 +55,7 @@ void ApplicationService::setAutostart(bool enabled) {
 void ApplicationService::applyUpdate() {
 	logger.info("Applying update");
 	logger.add_tab();
-	Toaster::getInstance().showToast(translator.translate("applying.update"));
+	toaster.showToast(translator.translate("applying.update"));
 	shell.run_command("nohup bash -c \"sleep 1 && " + Constants::LAUNCHER_FILE + "\" > /dev/null 2>&1 &");
 	shutdown();
 	logger.rem_tab();

@@ -26,7 +26,7 @@ HardwareService::HardwareService() {
 
 	logger.info("Detecting CPU");
 	logger.add_tab();
-	std::string cpuinfo_out = CPUInfoClient::getInstance().read(5);
+	std::string cpuinfo_out = cpuInfoClient.read(5);
 	if (StringUtils::isSubstring("GenuineIntel", cpuinfo_out)) {
 		cpu		   = CpuBrand::Enum::INTEL;
 		auto lines = StringUtils::splitLines(cpuinfo_out);
@@ -40,10 +40,10 @@ HardwareService::HardwareService() {
 
 	logger.add_tab();
 	if (cpu == CpuBrand::Enum::INTEL) {
-		if (Pl1SpdClient::getInstance().available()) {
+		if (pl1SpdClient.available()) {
 			logger.info("TDP control available");
 		}
-		if (BoostControlClient::getInstance().available()) {
+		if (boostControlClient.available()) {
 			logger.info("Boost control available");
 		}
 	}
@@ -52,7 +52,7 @@ HardwareService::HardwareService() {
 
 	logger.info("Detecting GPUs");
 	logger.add_tab();
-	auto detected_gpus = SwitcherooCtlClient::getInstance().getGpus();
+	auto detected_gpus = switcherooCtlClient.getGpus();
 	for (auto gpu : detected_gpus) {
 		logger.info(gpu.name);
 		if (!gpu.default_flag) {
@@ -101,10 +101,10 @@ HardwareService::HardwareService() {
 
 			logger.add_tab();
 			if (brand == GpuBrand::Enum::NVIDIA) {
-				if (NvBoostClient::getInstance().available()) {
+				if (nvBoostClient.available()) {
 					logger.info("Dynamic boost control available");
 				}
-				if (NvTempClient::getInstance().available()) {
+				if (nvTempClient.available()) {
 					logger.info("Throttle temperature control available");
 				}
 			}
@@ -114,19 +114,19 @@ HardwareService::HardwareService() {
 	}
 	logger.rem_tab();
 
-	if (SsdSchedulerClient::getInstance().available()) {
+	if (ssdSchedulerClient.available()) {
 		logger.info("Getting available SSD schedulers");
 		logger.add_tab();
-		ssd_schedulers = SsdSchedulerClient::getInstance().get_schedulers();
+		ssd_schedulers = ssdSchedulerClient.get_schedulers();
 		for (auto sched : ssd_schedulers)
 			logger.info(sched.toString());
 		logger.rem_tab();
 	}
 
-	if (PlatformClient::getInstance().available()) {
+	if (platformClient.available()) {
 		logger.info("Getting battery charge limit");
 		logger.add_tab();
-		charge_limit = PlatformClient::getInstance().getBatteryLimit();
+		charge_limit = platformClient.getBatteryLimit();
 		logger.info(std::to_string(charge_limit.toInt()) + "%");
 		logger.rem_tab();
 	}
@@ -135,15 +135,15 @@ HardwareService::HardwareService() {
 
 	runningGames = 0;
 
-	if (UPowerClient::getInstance().available()) {
-		onBattery = UPowerClient::getInstance().isOnBattery();
-		UPowerClient::getInstance().onBatteryChange([this](CallbackParam data) { this->onBatteryEvent(std::any_cast<bool>(data[0])); });
+	if (uPowerClient.available()) {
+		onBattery = uPowerClient.isOnBattery();
+		uPowerClient.onBatteryChange([this](CallbackParam data) { this->onBatteryEvent(std::any_cast<bool>(data[0])); });
 	}
 
-	if (PMKeyboardBrightness::getInstance().available()) {
-		PMKeyboardBrightness::getInstance().onBrightnessChange([this]() {
-			if (PMKeyboardBrightness::getInstance().getKeyboardBrightness() == 0) {
-				PMKeyboardBrightness::getInstance().setKeyboardBrightnessSilent(2);
+	if (pmKeyboardBrightnessClient.available()) {
+		pmKeyboardBrightnessClient.onBrightnessChange([this]() {
+			if (pmKeyboardBrightnessClient.getKeyboardBrightness() == 0) {
+				pmKeyboardBrightnessClient.setKeyboardBrightnessSilent(2);
 			}
 		});
 	}
@@ -198,14 +198,14 @@ void HardwareService::setChargeThreshold(const BatteryThreshold& threshold) {
 	if (charge_limit != threshold) {
 		logger.info("Setting charge limit to " + std::to_string(threshold.toInt()) + "%");
 		auto t0 = std::chrono::high_resolution_clock::now();
-		PlatformClient::getInstance().setBatteryLimit(threshold);
+		platformClient.setBatteryLimit(threshold);
 		auto t1 = std::chrono::high_resolution_clock::now();
 
 		charge_limit = threshold;
 		logger.info("Charge limit setted after " + std::to_string(std::chrono::duration_cast<std::chrono::milliseconds>(t1 - t0).count()) + " ms");
 
 		std::unordered_map<std::string, std::any> replacements = {{"value", threshold.toInt()}};
-		Toaster::getInstance().showToast(translator.translate("applied.battery.threshold", replacements));
+		toaster.showToast(translator.translate("applied.battery.threshold", replacements));
 		eventBus.emit_event(Events::HARDWARE_SERVICE_THRESHOLD_CHANGED, {threshold});
 	}
 }
@@ -230,9 +230,9 @@ void HardwareService::onBatteryEvent(const bool& onBat, const bool& muted) {
 }
 
 void HardwareService::setPanelOverdrive(const bool& enable) {
-	if (PanelOverdriveClient::getInstance().available()) {
+	if (panelOverdriveClient.available()) {
 		logger.info("Setting panel overdrive to {}", enable);
-		PanelOverdriveClient::getInstance().setCurrentValue(enable);
+		panelOverdriveClient.setCurrentValue(enable);
 	}
 }
 void HardwareService::renice(const pid_t& pid) {

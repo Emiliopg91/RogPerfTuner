@@ -4,7 +4,6 @@
 #include <set>
 #include <sstream>
 
-#include "../../include/clients/websocket/steam_client.hpp"
 #include "../../include/configuration/configuration.hpp"
 #include "../../include/events/events.hpp"
 #include "../../include/models/hardware/gpu_brand.hpp"
@@ -35,22 +34,21 @@ const std::map<std::string, GameEntry>& SteamService::getGames() {
 }
 
 SteamService::SteamService() {
-	logger.info("Initializing SteamClient");
+	logger.info("Initializing SteamService");
 	logger.add_tab();
 
-	SteamClient::getInstance();
 	std::this_thread::sleep_for(std::chrono::milliseconds(25));
-	if (SteamClient::getInstance().connected()) {
+	if (steamClient.connected()) {
 		onConnect(true);
 	}
 
 	installRccDC();
 
-	SteamClient::getInstance().onConnect([this]() { onConnect(); });
+	steamClient.onConnect([this]() { onConnect(); });
 
-	SteamClient::getInstance().onDisconnect([this]() { onDisconnect(); });
+	steamClient.onDisconnect([this]() { onDisconnect(); });
 
-	SteamClient::getInstance().onGameLaunch([this](std::vector<std::any> data) {
+	steamClient.onGameLaunch([this](std::vector<std::any> data) {
 		auto id	  = static_cast<uint32_t>(std::any_cast<int>(data[0]));
 		auto name = std::any_cast<std::string>(data[1]);
 		auto pid  = std::any_cast<int>(data[2]);
@@ -58,7 +56,7 @@ SteamService::SteamService() {
 		onGameLaunch(id, name, pid);
 	});
 
-	SteamClient::getInstance().onGameStop([this](std::vector<std::any> data) {
+	steamClient.onGameStop([this](std::vector<std::any> data) {
 		auto id	  = static_cast<uint32_t>(std::any_cast<int>(data[0]));
 		auto name = std::any_cast<std::string>(data[1]);
 
@@ -137,7 +135,7 @@ void SteamService::onFirstGameRun(unsigned int gid, std::string name, std::map<s
 
 	auto proton = environment.find("STEAM_COMPAT_PROTON") != environment.end();
 
-	SteamGameDetails details = SteamClient::getInstance().getAppsDetails({gid})[0];
+	SteamGameDetails details = steamClient.getAppsDetails({gid})[0];
 	auto launch_opts		 = details.launch_opts;
 
 	std::string env, args;
@@ -165,7 +163,7 @@ void SteamService::onFirstGameRun(unsigned int gid, std::string name, std::map<s
 	configuration.getConfiguration().games[std::to_string(gid)] = entry;
 	configuration.saveConfig();
 
-	SteamClient::getInstance().setLaunchOptions(gid, WRAPPER_PATH + " %command%");
+	steamClient.setLaunchOptions(gid, WRAPPER_PATH + " %command%");
 	logger.info("Configuration finished");
 
 	logger.info("Relaunching game with SteamOverlayId " + overlayId + "...");
