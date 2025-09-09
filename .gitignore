@@ -26,3 +26,5 @@ resources/version
 
 perf.data
 perf.data.old
+
+compile_commands.json
