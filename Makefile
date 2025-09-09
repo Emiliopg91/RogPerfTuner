@@ -81,7 +81,7 @@ build_openrgb:
 		echo "######################### Compiling OpenRGB ###########################" && \
 		echo "#######################################################################" && \
 		cd submodules/OpenRGB && ./build.sh \
-		./OpenRGB.AppImage --appimage-extract > /dev/null && cp -r squashfs-root ../../assets/OpenRGB; \
+		./OpenRGB.AppImage --appimage-extract && cp -r squashfs-root ../../assets/OpenRGB; \
 	fi
 
 build_rccdc:
