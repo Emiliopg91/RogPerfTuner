@@ -1,6 +1,8 @@
 #include <map>
 #include <string>
 
+#include "translator.hpp"
+
 std::map<std::string, std::map<std::string, std::string>> initialTranslations = {
 	{"performance",
 	 {
