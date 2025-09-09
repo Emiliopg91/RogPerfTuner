@@ -3,11 +3,8 @@
 #include <libsecret/secret.h>
 
 #include <cstdlib>
-#include <filesystem>
 #include <fstream>
 #include <iostream>
-
-#include "RccCommons.hpp"
 
 void Configuration::loadConfig() {
 	if (FileUtils::exists(Constants::CONFIG_FILE)) {

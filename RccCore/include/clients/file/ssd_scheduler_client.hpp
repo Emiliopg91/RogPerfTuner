@@ -1,6 +1,6 @@
 #pragma once
+
 #include "../../models/performance/ssd_scheduler.hpp"
-#include "RccCommons.hpp"
 #include "abstract/abstract_file_client.hpp"
 
 class SsdSchedulerClient : public AbstractFileClient {

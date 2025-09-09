@@ -1,5 +1,7 @@
 #pragma once
 
+#include <array>
+
 #include "../base/int_enum.hpp"
 
 struct PerformanceProfileMeta {

@@ -3,6 +3,7 @@
 
 #include <algorithm>
 
+#include "../../include/events/events.hpp"
 #include "../../include/gui/game_list.hpp"
 #include "../../include/services/application_service.hpp"
 #include "../../include/services/hardware_service.hpp"
@@ -10,6 +11,7 @@
 #include "../../include/services/profile_service.hpp"
 #include "../../include/services/steam_service.hpp"
 #include "../../include/translator/translator.hpp"
+#include "../../include/utils/gui_utils.hpp"
 
 MainWindow::MainWindow(QWidget* parent) : QMainWindow(parent), _logger(new Logger()) {
 	setWindowTitle(QString::fromStdString(Constants::APP_NAME + " v" + Constants::APP_VERSION));

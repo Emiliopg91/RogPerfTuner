@@ -2,14 +2,11 @@
 
 #include <ixwebsocket/IXWebSocket.h>
 
-#include <chrono>
 #include <condition_variable>
 #include <future>
-#include <iostream>
 #include <mutex>
 #include <nlohmann/json.hpp>  // Manejo de JSON
 #include <queue>
-#include <thread>
 #include <unordered_map>
 
 #include "../../../events/event_bus.hpp"

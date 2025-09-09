@@ -3,10 +3,7 @@
 #include <limits.h>
 #include <unistd.h>
 
-#include <filesystem>
-#include <iostream>
-
-#include "string_utils.hpp"
+#include <string>
 
 class Constants {
   public:
@@ -39,6 +36,7 @@ class Constants {
 	inline static const std::string LOCK_FILE		  = "/tmp/RogControlCenter.lock";
 	inline static const std::string UDEV_RULES		  = "/usr/lib/udev/rules.d/60-openrgb.rules";
 	inline static const std::string USR_SHARE_VK_DIR  = "/usr/share/vulkan/icd.d/";
+	inline static const std::string TMP_UDEV_PATH	  = "/tmp/60-openrgb.rules";
 
 	inline static const std::string ASSETS_BIN_DIR	 = ASSETS_DIR + "/bin";
 	inline static const std::string ASSET_ICONS_DIR	 = ASSETS_DIR + "/icons";

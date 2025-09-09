@@ -5,7 +5,6 @@
 #include "../../include/clients/dbus/asus/armoury/nvidia/nv_temp_client.hpp"
 #include "../../include/clients/dbus/asus/armoury/other/panel_overdrive_client.hpp"
 #include "../../include/clients/dbus/asus/core/platform_client.hpp"
-#include "../../include/clients/dbus/linux/notifications_client.hpp"
 #include "../../include/clients/dbus/linux/power_management_kb_brightness.hpp"
 #include "../../include/clients/dbus/linux/upower_client.hpp"
 #include "../../include/clients/file/boost_control_client.hpp"
@@ -13,14 +12,13 @@
 #include "../../include/clients/file/ssd_scheduler_client.hpp"
 #include "../../include/clients/shell/lsusb_client.hpp"
 #include "../../include/clients/shell/switcherooctl_client.hpp"
-#include "../../include/clients/tcp/open_rgb/open_rgb_client.hpp"
+#include "../../include/events/events.hpp"
 #include "../../include/gui/toaster.hpp"
 #include "../../include/models/hardware/battery_charge_threshold.hpp"
 #include "../../include/models/hardware/cpu_brand.hpp"
 #include "../../include/models/hardware/gpu_brand.hpp"
 #include "../../include/services/open_rgb_service.hpp"
 #include "../../include/translator/translator.hpp"
-#include "RccCommons.hpp"
 
 HardwareService::HardwareService() {
 	logger.info("Initializing HardwareService");

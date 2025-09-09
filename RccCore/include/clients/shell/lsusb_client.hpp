@@ -2,14 +2,17 @@
 
 #include <libudev.h>
 
+#include <atomic>
 #include <functional>
 #include <stdexcept>
 #include <string>
+#include <thread>
 #include <tuple>
 #include <vector>
 
+#include "../../events/event_bus.hpp"
+#include "../../events/events.hpp"
 #include "../../models/hardware/usb_identifier.hpp"
-#include "RccCommons.hpp"
 
 class LsUsbClient {
   private:

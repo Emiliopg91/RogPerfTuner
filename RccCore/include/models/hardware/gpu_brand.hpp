@@ -1,5 +1,7 @@
 #pragma once
 
+#include <array>
+
 #include "../base/str_enum.hpp"
 
 struct GpuBrandMeta {

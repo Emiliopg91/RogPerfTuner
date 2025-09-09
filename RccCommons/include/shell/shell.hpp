@@ -9,7 +9,6 @@
 
 class Shell {
   public:
-	// Devuelve la instancia única del singleton
 	static Shell& getInstance(const std::string& sudo_password = "") {
 		static Shell instance(sudo_password);
 		return instance;

@@ -4,6 +4,8 @@
 #include <sys/socket.h>
 #include <unistd.h>
 
+#include <stdexcept>
+
 class NetUtils {
   public:
 	inline static bool isPortFree(int port) {

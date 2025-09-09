@@ -2,15 +2,10 @@
 
 #include <any>
 #include <functional>
-#include <future>
 #include <mutex>
 #include <string>
-#include <typeindex>
 #include <unordered_map>
 #include <vector>
-
-#include "RccCommons.hpp"
-#include "events.hpp"
 
 typedef std::vector<std::any> CallbackParam;
 typedef std::function<void(CallbackParam)> CallbackWithParams;

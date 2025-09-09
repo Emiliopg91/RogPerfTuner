@@ -7,7 +7,6 @@
 
 #include <algorithm>
 #include <cstring>
-#include <iostream>
 
 namespace {
 void set_nonblocking(int fd) {

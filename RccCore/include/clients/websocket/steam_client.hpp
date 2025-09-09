@@ -1,7 +1,6 @@
 #pragma once
 
 #include "../../models/steam/steam_game_details.hpp"
-#include "RccCommons.hpp"
 #include "abstract/abstract_websocket_client.hpp"
 
 class SteamClient : public AbstractWebsocketClient {

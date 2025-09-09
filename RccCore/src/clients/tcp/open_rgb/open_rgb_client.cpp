@@ -1,8 +1,6 @@
 #include "../../../../include/clients/tcp/open_rgb/open_rgb_client.hpp"
 
-#include <algorithm>
 #include <csignal>
-#include <regex>
 #include <string>
 #include <vector>
 
@@ -17,16 +15,17 @@
 #include "../../../../include/clients/tcp/open_rgb/effects/starry_night_effect.hpp"
 #include "../../../../include/clients/tcp/open_rgb/effects/static_effect.hpp"
 #include "../../../../include/events/event_bus.hpp"
+#include "../../../../include/events/events.hpp"
 #include "../../../../include/models/hardware/rgb_brightness.hpp"
-#include "../../../../include/models/hardware/usb_identifier.hpp"
 #include "../../../../include/utils/net_utils.hpp"
-#include "RccCommons.hpp"
 
 OpenRgbClient::OpenRgbClient() {
 	logger.info("Configuring UDEV rules");
 	logger.add_tab();
-	shell.run_elevated_command("cp " + Constants::ORGB_UDEV_PATH + " " + Constants::UDEV_RULES);
-	shell.run_elevated_command("chmod 777 " + Constants::ORGB_UDEV_PATH);
+
+	shell.run_command("cp " + Constants::ORGB_UDEV_PATH + " " + Constants::TMP_UDEV_PATH);
+	shell.run_elevated_command("mv " + Constants::TMP_UDEV_PATH + " " + Constants::UDEV_RULES);
+	shell.run_elevated_command("chmod 777 " + Constants::UDEV_RULES);
 	shell.run_elevated_command("udevadm control --reload-rules");
 	shell.run_elevated_command("udevadm trigger");
 	logger.rem_tab();

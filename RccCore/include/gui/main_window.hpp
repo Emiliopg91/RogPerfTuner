@@ -25,7 +25,6 @@
 #include "../services/profile_service.hpp"
 #include "../services/steam_service.hpp"
 #include "../translator/translator.hpp"
-#include "RccCommons.hpp"
 
 class MainWindow : public QMainWindow {
 	Q_OBJECT

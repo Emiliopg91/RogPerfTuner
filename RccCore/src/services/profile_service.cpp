@@ -8,14 +8,13 @@
 #include "../../include/clients/file/ssd_scheduler_client.hpp"
 #include "../../include/clients/shell/cpupower_client.hpp"
 #include "../../include/configuration/configuration.hpp"
+#include "../../include/events/events.hpp"
 #include "../../include/gui/toaster.hpp"
 #include "../../include/models/performance/cpu_governor.hpp"
 #include "../../include/models/performance/power_profile.hpp"
 #include "../../include/models/performance/ssd_scheduler.hpp"
-#include "../../include/services/hardware_service.hpp"
 #include "../../include/translator/translator.hpp"
 #include "../../include/utils/profile_utils.hpp"
-#include "RccCommons.hpp"
 
 ProfileService::ProfileService() {
 	logger.info("Initializing ProfileService");

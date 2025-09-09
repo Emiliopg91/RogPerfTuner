@@ -14,14 +14,9 @@
 #include <QVBoxLayout>
 #include <QWidget>
 
-#include "../models/hardware/gpu_brand.hpp"
-#include "../models/steam/mangohud_level.hpp"
-#include "../models/steam/wine_sync_option.hpp"
 #include "../services/hardware_service.hpp"
 #include "../services/steam_service.hpp"
 #include "../translator/translator.hpp"
-#include "../utils/gui_utils.hpp"
-#include "RccCommons.hpp"
 
 class GameList : public QDialog {
 	Q_OBJECT

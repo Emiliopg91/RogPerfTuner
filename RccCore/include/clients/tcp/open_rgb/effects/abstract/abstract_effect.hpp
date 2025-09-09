@@ -1,5 +1,6 @@
 #pragma once
 
+#include <mutex>
 #include <string>
 
 #include "../../../../../models/hardware/rgb_brightness.hpp"

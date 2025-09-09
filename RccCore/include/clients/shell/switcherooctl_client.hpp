@@ -1,13 +1,10 @@
 #pragma once
 
-#include <algorithm>
-#include <iostream>
 #include <sstream>
 #include <string>
 #include <vector>
 
 #include "../../models/hardware/gpu_info.hpp"
-#include "RccCommons.hpp"
 #include "abstract/abstract_cmd_client.hpp"
 
 class SwitcherooCtlClient : AbstractCmdClient {

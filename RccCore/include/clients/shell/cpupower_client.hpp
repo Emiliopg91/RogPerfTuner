@@ -4,7 +4,6 @@
 
 #include "../../models/performance/cpu_governor.hpp"
 #include "./abstract/abstract_cmd_client.hpp"
-#include "RccCommons.hpp"
 
 class CpuPowerClient : public AbstractCmdClient {
   private:

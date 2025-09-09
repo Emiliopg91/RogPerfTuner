@@ -4,14 +4,15 @@
 #include <set>
 #include <sstream>
 
+#include "../../include/clients/websocket/steam_client.hpp"
 #include "../../include/configuration/configuration.hpp"
+#include "../../include/events/events.hpp"
 #include "../../include/models/hardware/gpu_brand.hpp"
 #include "../../include/models/others/semantic_version.hpp"
 #include "../../include/models/steam/steam_game_details.hpp"
 #include "../../include/services/hardware_service.hpp"
 #include "../../include/services/open_rgb_service.hpp"
 #include "../../include/services/profile_service.hpp"
-#include "RccCommons.hpp"
 
 bool SteamService::metricsEnabled() {
 	auto mangohud_which = shell.which("mangohud");

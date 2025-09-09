@@ -10,7 +10,6 @@
 
 #include "../../include/configuration/configuration.hpp"
 #include "../../include/translator/translator.hpp"
-#include "RccCommons.hpp"
 
 bool PasswordDialog::showDialog() {
 	if (exec() == QDialog::Accepted)

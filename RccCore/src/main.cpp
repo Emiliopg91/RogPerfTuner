@@ -2,7 +2,6 @@
 
 #include <QApplication>
 
-#include "../include/clients/tcp/open_rgb/open_rgb_client.hpp"
 #include "../include/configuration/configuration.hpp"
 #include "../include/gui/password_dialog.hpp"
 #include "../include/gui/toaster.hpp"
@@ -16,8 +15,6 @@
 #include "../include/translator/translator.hpp"
 #include "../include/utils/constants.hpp"
 #include "../include/utils/single_instance.hpp"
-#include "RccCommons.hpp"
-#include "httplib.h"
 
 int main(int argc, char** argv) {
 	std::strncpy(argv[0], (Constants::APP_NAME + " v" + Constants::APP_VERSION).c_str(), std::strlen(argv[0]));

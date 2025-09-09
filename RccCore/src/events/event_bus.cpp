@@ -2,14 +2,10 @@
 
 #include <any>
 #include <functional>
-#include <future>
 #include <mutex>
 #include <string>
-#include <typeindex>
 #include <unordered_map>
 #include <vector>
-
-#include "RccCommons.hpp"
 
 void EventBus::on_without_data(const std::string& event, Callback callback) {
 	std::lock_guard<std::mutex> lock(mtx);

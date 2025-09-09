@@ -2,11 +2,11 @@
 
 #include <nlohmann/json.hpp>
 
+#include "../../events/events.hpp"
 #include "../../services/hardware_service.hpp"
 #include "../../services/open_rgb_service.hpp"
 #include "../../services/profile_service.hpp"
 #include "../../services/steam_service.hpp"
-#include "RccCommons.hpp"
 #include "httplib.h"
 
 using json = nlohmann::json;

@@ -4,8 +4,11 @@
 #include "../clients/dbus/asus/armoury/intel/pl2_sppt_client.hpp"
 #include "../clients/dbus/asus/armoury/nvidia/nv_boost_client.hpp"
 #include "../clients/dbus/asus/armoury/nvidia/nv_temp_client.hpp"
+#include "../models/performance/cpu_governor.hpp"
+#include "../models/performance/performance_profile.hpp"
 #include "../models/performance/platform_profile.hpp"
-#include "RccCommons.hpp"
+#include "../models/performance/power_profile.hpp"
+#include "../models/performance/ssd_scheduler.hpp"
 
 class ProfileUtils {
   public:

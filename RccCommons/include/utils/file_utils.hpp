@@ -2,7 +2,6 @@
 
 #include <sys/stat.h>
 
-#include <cstdlib>	// getenv
 #include <filesystem>
 #include <fstream>
 #include <iostream>

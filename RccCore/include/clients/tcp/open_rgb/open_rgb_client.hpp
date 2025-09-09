@@ -3,7 +3,6 @@
 #include "../../../clients/shell/asusctl_client.hpp"
 #include "../../../events/event_bus.hpp"
 #include "OpenRGB/Client.hpp"
-#include "RccCommons.hpp"
 #include "compatible_devices.hpp"
 #include "effects/abstract/abstract_effect.hpp"
 

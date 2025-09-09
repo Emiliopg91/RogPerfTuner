@@ -1,7 +1,6 @@
 #pragma once
 
 #include <chrono>
-#include <filesystem>
 #include <fstream>
 #include <functional>
 #include <iostream>
@@ -16,7 +15,6 @@
 
 #include <nlohmann/json.hpp>
 
-#include "RccCommons.hpp"
 #include "httplib.h"
 
 using json = nlohmann::json;
@@ -31,6 +29,8 @@ struct Asset {
 
 class AutoUpdater {
   private:
+	typedef std::function<void()> Callback;
+
 	Logger logger{"AutoUpdater"};
 
 	std::string owner	   = "Emiliopg91";
@@ -100,8 +100,6 @@ class AutoUpdater {
 	}
 
 	void download_update(const Asset& asset) {
-		namespace fs = std::filesystem;
-
 		logger.info("Downloading update...");
 
 		// Separar host y path de la URL

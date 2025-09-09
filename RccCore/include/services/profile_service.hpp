@@ -6,7 +6,6 @@
 #include "../events/event_bus.hpp"
 #include "../models/performance/performance_profile.hpp"
 #include "../translator/translator.hpp"
-#include "RccCommons.hpp"
 
 class ProfileService {
   public:

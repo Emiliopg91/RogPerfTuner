@@ -6,7 +6,7 @@
 #include <QMenu>
 
 #include "../../include/configuration/configuration.hpp"
-#include "../../include/events/event_bus.hpp"
+#include "../../include/events/events.hpp"
 #include "../../include/gui/game_list.hpp"
 #include "../../include/gui/main_window.hpp"
 #include "../../include/models/hardware/battery_charge_threshold.hpp"
@@ -17,7 +17,6 @@
 #include "../../include/services/open_rgb_service.hpp"
 #include "../../include/services/profile_service.hpp"
 #include "../../include/translator/translator.hpp"
-#include "RccCommons.hpp"
 
 void TrayIcon::openMainWindow() {
 	if (!MainWindow::INSTANCE)

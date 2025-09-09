@@ -3,11 +3,11 @@
 #include <signal.h>
 #include <unistd.h>
 
+#include "../../include/events/events.hpp"
 #include "../../include/gui/toaster.hpp"
 #include "../../include/services/steam_service.hpp"
 #include "../../include/translator/translator.hpp"
 #include "../../include/utils/autoupdater.hpp"
-#include "RccCommons.hpp"
 
 ApplicationService::ApplicationService() {
 	logger.info("Initializing ApplicationService");

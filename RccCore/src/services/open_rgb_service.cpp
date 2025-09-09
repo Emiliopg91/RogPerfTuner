@@ -3,9 +3,8 @@
 #include "../../include/clients/dbus/linux/upower_client.hpp"
 #include "../../include/clients/tcp/open_rgb/open_rgb_client.hpp"
 #include "../../include/configuration/configuration.hpp"
+#include "../../include/events/events.hpp"
 #include "../../include/models/hardware/usb_identifier.hpp"
-#include "../../include/translator/translator.hpp"
-#include "RccCommons.hpp"
 
 OpenRgbService::OpenRgbService() {
 	logger.info("Initializing OpenRgbService");

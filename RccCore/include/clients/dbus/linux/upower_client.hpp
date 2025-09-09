@@ -1,7 +1,6 @@
 #pragma once
 
 #include "../abstract/abstract_dbus_client.hpp"
-#include "RccCommons.hpp"
 
 class UPowerClient : public AbstractDbusClient {
   public:

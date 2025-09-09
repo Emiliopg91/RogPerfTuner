@@ -1,7 +1,6 @@
 #pragma once
-#include <chrono>
+
 #include <random>
-#include <thread>
 #include <vector>
 
 #include "abstract/abstract_effect.hpp"

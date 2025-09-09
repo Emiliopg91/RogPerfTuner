@@ -4,11 +4,9 @@
 #include <QtCore/QVariant>
 #include <QtDBus/QDBusConnection>
 #include <QtDBus/QDBusInterface>
-#include <functional>
 #include <stdexcept>
 
 #include "../../../events/event_bus.hpp"
-#include "RccCommons.hpp"
 
 class AbstractDbusClient : public QObject {
 	Q_OBJECT

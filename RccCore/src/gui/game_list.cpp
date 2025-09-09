@@ -21,7 +21,6 @@
 #include "../../include/services/steam_service.hpp"	 // tu clase equivalente
 #include "../../include/translator/translator.hpp"
 #include "../../include/utils/gui_utils.hpp"
-#include "RccCommons.hpp"
 
 GameList::GameList(QWidget* parent, bool manage_parent) : QDialog(parent), manageParent(manage_parent), parentWidget(parent) {
 	if (!INSTANCE)

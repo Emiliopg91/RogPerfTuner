@@ -1,9 +1,7 @@
 #pragma once
-#include <chrono>
-#include <map>
+
 #include <regex>
 #include <string>
-#include <thread>
 #include <vector>
 
 #include "abstract/abstract_effect.hpp"

@@ -9,7 +9,6 @@
 #include "../models/performance/ssd_scheduler.hpp"
 #include "../services/open_rgb_service.hpp"
 #include "../translator/translator.hpp"
-#include "RccCommons.hpp"
 
 class HardwareService {
   public:

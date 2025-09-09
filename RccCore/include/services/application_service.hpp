@@ -5,7 +5,6 @@
 #include "../events/event_bus.hpp"
 #include "../services/steam_service.hpp"
 #include "../translator/translator.hpp"
-#include "RccCommons.hpp"
 
 class ApplicationService {
   public:

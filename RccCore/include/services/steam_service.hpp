@@ -1,15 +1,12 @@
 #pragma once
 
-#include "../clients/websocket/steam_client.hpp"
 #include "../configuration/configuration.hpp"
 #include "../models/hardware/gpu_brand.hpp"
-#include "../models/settings/root_config.hpp"
 #include "../models/steam/mangohud_level.hpp"
 #include "../models/steam/wine_sync_option.hpp"
 #include "./hardware_service.hpp"
 #include "./open_rgb_service.hpp"
 #include "./profile_service.hpp"
-#include "RccCommons.hpp"
 
 class SteamService {
   private:

@@ -16,7 +16,6 @@
 #include "../services/open_rgb_service.hpp"
 #include "../services/profile_service.hpp"
 #include "../translator/translator.hpp"
-#include "RccCommons.hpp"
 
 class TrayIcon : public QObject {
 	Q_OBJECT
