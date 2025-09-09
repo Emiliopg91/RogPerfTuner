@@ -7,7 +7,7 @@ index 3d938d61..09a99807 100644
      QT += dbus
  
 -    QMAKE_CXXFLAGS += -Wno-implicit-fallthrough -Wno-psabi
-+    QMAKE_CXXFLAGS += -Wno-implicit-fallthrough -Wno-psabi -O3 -flto
++    QMAKE_CXXFLAGS += -Wno-implicit-fallthrough -Wno-psabi -Wunused-parameter -Wsign-compare -Wunused-result -O3 -flto
  
      #-------------------------------------------------------------------------------------------#
      # Determine which hidapi to use based on availability                                       #

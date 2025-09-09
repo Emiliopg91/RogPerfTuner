@@ -14,7 +14,7 @@ clean:
 	@cd submodules/httplib && git reset --hard > /dev/null
 	@cd submodules/OpenRGB-cppSDK && git reset --hard > /dev/null
 	@cd submodules/OpenRGB && git reset --hard > /dev/null && rm -Rf build
-	@cd submodules/RccDeckyCompanion && git reset --hard > /dev/null && rm -Rf dist logs out 
+	@cd submodules/RccDeckyCompanion && git reset --hard > /dev/null && rm -Rf dist logs out
 
 config:
 	@rm -rf build dist .Debug .Release CMakeCache.txt **/cmake_install.cmake CMakeFiles assets/bin **/CMakeFiles
@@ -24,13 +24,19 @@ config:
 	@echo "######################## Configuring compiler ########################"
 	@echo "#######################################################################"
 
-	@CXX=clang++ CC=clang cmake -B build -S . -G Ninja -DCMAKE_BUILD_TYPE=$(BUILD_TYPE)
+	@CXX=clang++ CC=clang cmake -B build -S . -G Ninja -DCMAKE_BUILD_TYPE=$(BUILD_TYPE) -DCMAKE_EXPORT_COMPILE_COMMANDS=ON
 
+	@if [ ! -f "compile_commands.json" ]; then \
+		ln -s build/compile_commands.json .; \
+	fi
 
-build: build_openrgb build_rccdc 
+build:
 	@if [ ! -f ".$(BUILD_TYPE)" ]; then \
 		make config; \
 	fi
+
+	@make build_openrgb
+	@make build_rccdc
 
 	@echo "#######################################################################"
 	@echo "##################### Compiling RogControlCenter ######################"
@@ -57,7 +63,7 @@ build: build_openrgb build_rccdc
 	fi
 
 	@cmake --build build -- -j$(NUM_CORES)
-	
+
 	@mkdir assets/bin assets/bin/rgb  assets/bin/performance assets/bin/steam
 	@cp build/RccScripts/NextEffect assets/bin/rgb/nextEffect
 	@cp build/RccScripts/IncBrightness assets/bin/rgb/incBrightness
@@ -66,7 +72,7 @@ build: build_openrgb build_rccdc
 	@cp build/RccScripts/SteamRunner assets/bin/steam/run
 	@cp build/RccScripts/FlatpakWrapper assets/bin/steam/flatpak
 
-build_openrgb: 
+build_openrgb:
 	@if [ ! -f "patches/OpenRGB.diff.applied" ]; then \
 		cd submodules/OpenRGB && git apply ../../patches/OpenRGB.diff && touch ../../patches/OpenRGB.diff.applied; \
 	fi
@@ -117,8 +123,6 @@ release:
 	@make package
 
 build_debug:
-	@
-	@export BUILD_TYPE=Debug
 	@make build BUILD_TYPE=Debug
 
 run: build_debug
