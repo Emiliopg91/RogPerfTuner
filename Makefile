@@ -18,17 +18,22 @@ clean:
 
 config:
 	@rm -rf build dist .Debug .Release CMakeCache.txt **/cmake_install.cmake CMakeFiles assets/bin **/CMakeFiles
-	@touch .$(BUILD_TYPE);\
 
 	@echo "#######################################################################"
 	@echo "######################## Configuring compiler ########################"
 	@echo "#######################################################################"
+
+	@if [ ! -f "patches/httplib.diff.applied" ]; then \
+		cd submodules/httplib && git apply ../../patches/httplib.diff && touch ../../patches/httplib.diff.applied; \
+	fi
 
 	@CXX=clang++ CC=clang cmake -B build -S . -G Ninja -DCMAKE_BUILD_TYPE=$(BUILD_TYPE) -DCMAKE_EXPORT_COMPILE_COMMANDS=ON
 
 	@if [ ! -f "compile_commands.json" ]; then \
 		ln -s build/compile_commands.json .; \
 	fi
+
+	@touch .$(BUILD_TYPE);\
 
 build:
 	@if [ ! -f ".$(BUILD_TYPE)" ]; then \
@@ -52,11 +57,6 @@ build:
 	@clang-format -i $$(find RccCommons -name '*.cpp' -o -name '*.hpp')
 	@clang-format -i $$(find RccCore -name '*.cpp' -o -name '*.hpp')
 	@clang-format -i $$(find RccScripts -name '*.cpp' -o -name '*.hpp')
-
-
-	@if [ ! -f "patches/httplib.diff.applied" ]; then \
-		cd submodules/httplib && git apply ../../patches/httplib.diff && touch ../../patches/httplib.diff.applied; \
-	fi
 
 	@if [ ! -f "patches/OpenRGB-cppSDK.diff.applied" ]; then \
 		cd submodules/OpenRGB-cppSDK && git apply ../../patches/OpenRGB-cppSDK.diff && touch ../../patches/OpenRGB-cppSDK.diff.applied; \
