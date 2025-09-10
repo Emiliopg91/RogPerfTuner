@@ -3,7 +3,7 @@
 
 #include <algorithm>
 
-#include "../../include/events/events.hpp"
+#include "../../include/events/event_bus.hpp"
 #include "../../include/gui/game_list.hpp"
 #include "../../include/services/application_service.hpp"
 #include "../../include/services/hardware_service.hpp"
@@ -111,23 +111,23 @@ MainWindow::MainWindow(QWidget* parent) : QMainWindow(parent), _logger(new Logge
 	setCentralWidget(centralWidget);
 	GuiUtils::centerWindowOnCurrentScreen(this);
 
-	eventBus.on_with_data(Events::HARDWARE_SERVICE_THRESHOLD_CHANGED, [this](CallbackParam v) {
+	eventBus.onChargeThreshold([this](CallbackParam v) {
 		setBatteryChargeLimit(std::any_cast<BatteryThreshold>(v[0]));
 	});
 
-	eventBus.on_with_data(Events::ORGB_SERVICE_ON_BRIGHTNESS, [this](CallbackParam data) {
+	eventBus.onRgbBrightness([this](CallbackParam data) {
 		setAuraBrightness(std::any_cast<RgbBrightness>(data[0]));
 	});
 
-	eventBus.on_with_data(Events::ORGB_SERVICE_ON_EFFECT, [this](CallbackParam data) {
+	eventBus.onRgbEffect([this](CallbackParam data) {
 		setAuraEffect(std::any_cast<std::string>(data[0]));
 	});
 
-	eventBus.on_with_data(Events::PROFILE_SERVICE_ON_PROFILE, [this](CallbackParam data) {
+	eventBus.onPerformanceProfile([this](CallbackParam data) {
 		setPerformanceProfile(std::any_cast<PerformanceProfile>(data[0]));
 	});
 
-	eventBus.on_with_data(Events::STEAM_SERVICE_GAME_EVENT, [this](CallbackParam data) {
+	eventBus.onGameEvent([this](CallbackParam data) {
 		onGameEvent(std::any_cast<int>(data[0]));
 	});
 }

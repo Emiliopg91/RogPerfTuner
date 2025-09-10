@@ -5,7 +5,7 @@
 #include <sstream>
 
 #include "../../include/configuration/configuration.hpp"
-#include "../../include/events/events.hpp"
+#include "../../include/events/event_bus.hpp"
 #include "../../include/models/hardware/gpu_brand.hpp"
 #include "../../include/models/others/semantic_version.hpp"
 #include "../../include/models/steam/steam_game_details.hpp"
@@ -265,7 +265,7 @@ void SteamService::onGameLaunch(unsigned int gid, std::string name, int pid) {
 		runningGames[gid] = name;
 		setProfileForGames();
 
-		eventBus.emit_event(Events::STEAM_SERVICE_GAME_EVENT, {runningGames.size()});
+		eventBus.emitGameEvent(runningGames.size());
 	}
 	Logger::rem_tab();
 }
@@ -279,7 +279,7 @@ void SteamService::onGameStop(unsigned int gid, std::string name) {
 			setProfileForGames();
 			Logger::rem_tab();
 
-			eventBus.emit_event(Events::STEAM_SERVICE_GAME_EVENT, {runningGames.size()});
+			eventBus.emitGameEvent(runningGames.size());
 		}
 	}
 }
@@ -302,7 +302,7 @@ void SteamService::onConnect(bool onBoot) {
 	if (!onBoot) {
 		setProfileForGames(true);
 	}
-	eventBus.emit_event(Events::STEAM_SERVICE_GAME_EVENT, {runningGames.size()});
+	eventBus.emitGameEvent(runningGames.size());
 	Logger::rem_tab();
 }
 

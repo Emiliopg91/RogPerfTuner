@@ -6,7 +6,7 @@
 #include <QMenu>
 
 #include "../../include/configuration/configuration.hpp"
-#include "../../include/events/events.hpp"
+#include "../../include/events/event_bus.hpp"
 #include "../../include/gui/game_list.hpp"
 #include "../../include/gui/main_window.hpp"
 #include "../../include/models/hardware/battery_charge_threshold.hpp"
@@ -335,23 +335,23 @@ TrayIcon::TrayIcon(QObject* parent) : QObject(parent), tray_icon_(new QSystemTra
 
 	tray_icon_->setContextMenu(menu);
 
-	eventBus.on_with_data(Events::ORGB_SERVICE_ON_BRIGHTNESS, [this](CallbackParam data) {
+	eventBus.onRgbBrightness([this](CallbackParam data) {
 		setAuraBrightness(std::any_cast<RgbBrightness>(data[0]));
 	});
 
-	eventBus.on_with_data(Events::ORGB_SERVICE_ON_EFFECT, [this](CallbackParam data) {
+	eventBus.onRgbEffect([this](CallbackParam data) {
 		setAuraEffect(std::any_cast<std::string>(data[0]));
 	});
 
-	eventBus.on_with_data(Events::PROFILE_SERVICE_ON_PROFILE, [this](CallbackParam data) {
+	eventBus.onPerformanceProfile([this](CallbackParam data) {
 		setPerformanceProfile(std::any_cast<PerformanceProfile>(data[0]));
 	});
 
-	eventBus.on_with_data(Events::HARDWARE_SERVICE_THRESHOLD_CHANGED, [this](CallbackParam data) {
+	eventBus.onChargeThreshold([this](CallbackParam data) {
 		setBatteryThreshold(std::any_cast<BatteryThreshold>(data[0]));
 	});
 
-	eventBus.on_with_data(Events::STEAM_SERVICE_GAME_EVENT, [this](CallbackParam data) {
+	eventBus.onGameEvent([this](CallbackParam data) {
 		setProfileMenuEnabled(std::any_cast<size_t>(data[0]) == 0);
 	});
 }

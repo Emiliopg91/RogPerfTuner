@@ -3,7 +3,7 @@
 #include <signal.h>
 #include <unistd.h>
 
-#include "../../include/events/events.hpp"
+#include "../../include/events/event_bus.hpp"
 #include "../../include/gui/toaster.hpp"
 #include "../../include/services/steam_service.hpp"
 #include "../../include/translator/translator.hpp"
@@ -70,7 +70,7 @@ void ApplicationService::shutdown() {
 	shuttingDown = true;
 	logger.info("Starting application shutdown");
 	Logger::add_tab();
-	eventBus.emit_event(Events::APPLICATION_STOP);
+	eventBus.emitApplicationStop();
 	Logger::rem_tab();
 	logger.info("Shutdown finished");
 	kill(getpid(), SIGTERM);

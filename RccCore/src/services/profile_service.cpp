@@ -1,7 +1,7 @@
 #include "../../include/services/profile_service.hpp"
 
 #include "../../include/configuration/configuration.hpp"
-#include "../../include/events/events.hpp"
+#include "../../include/events/event_bus.hpp"
 #include "../../include/models/performance/cpu_governor.hpp"
 #include "../../include/models/performance/power_profile.hpp"
 #include "../../include/models/performance/ssd_scheduler.hpp"
@@ -26,7 +26,7 @@ ProfileService::ProfileService() {
 		platformClient.setPlatformProfileLinkedEpp(true);
 	}
 
-	eventBus.on_without_data(Events::HARDWARE_SERVICE_ON_BATTERY, [this]() {
+	eventBus.onBattery([this]() {
 		onBattery = uPowerClient.isOnBattery();
 		if (runningGames == 0) {
 			if (onBattery) {
@@ -76,7 +76,7 @@ void ProfileService::setPerformanceProfile(const PerformanceProfile& profile, co
 			std::unordered_map<std::string, std::any> values = {
 				{"profile", StringUtils::toLowerCase(translator.translate("label.profile." + profileName))}};
 			toaster.showToast(translator.translate("profile.applied", values));
-			eventBus.emit_event(Events::PROFILE_SERVICE_ON_PROFILE, {profile});
+			eventBus.emitPerformanceProfile(profile);
 		} catch (std::exception e) {
 			Logger::rem_tab();
 		}

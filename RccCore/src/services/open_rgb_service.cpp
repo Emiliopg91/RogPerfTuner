@@ -3,7 +3,7 @@
 #include "../../include/clients/dbus/linux/upower_client.hpp"
 #include "../../include/clients/tcp/open_rgb/open_rgb_client.hpp"
 #include "../../include/configuration/configuration.hpp"
-#include "../../include/events/events.hpp"
+#include "../../include/events/event_bus.hpp"
 #include "../../include/models/hardware/usb_identifier.hpp"
 
 OpenRgbService::OpenRgbService() {
@@ -14,12 +14,12 @@ OpenRgbService::OpenRgbService() {
 
 	restoreAura();
 
-	eventBus.on_without_data(Events::HARDWARE_SERVICE_ON_BATTERY, [this]() {
+	eventBus.onBattery([this]() {
 		auto brightness = uPowerClient.isOnBattery() ? RgbBrightness::Enum::OFF : this->brightness;
 		openRgbClient.applyEffect(effect, brightness);
 	});
 
-	eventBus.on_without_data(Events::HARDWARE_SERVICE_USB_ADDED_REMOVED, [this]() {
+	eventBus.onUsbAddedRemoved([this]() {
 		reload();
 	});
 
@@ -62,7 +62,7 @@ void OpenRgbService::setBrightness(const RgbBrightness& newBrightness) {
 	if (brightness != newBrightness) {
 		brightness = newBrightness;
 		applyAura();
-		eventBus.emit_event(Events::ORGB_SERVICE_ON_BRIGHTNESS, {newBrightness});
+		eventBus.emitRgbBrightness(newBrightness);
 	}
 }
 
@@ -71,7 +71,7 @@ void OpenRgbService::setEffect(const std::string& newEffect, const bool& tempora
 	if (effect != newEffect) {
 		effect = newEffect;
 		applyAura(temporal);
-		eventBus.emit_event(Events::ORGB_SERVICE_ON_EFFECT, {newEffect});
+		eventBus.emitRgbEffect(newEffect);
 	}
 }
 

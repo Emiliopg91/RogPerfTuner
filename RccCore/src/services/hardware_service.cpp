@@ -12,7 +12,7 @@
 #include "../../include/clients/file/ssd_scheduler_client.hpp"
 #include "../../include/clients/shell/lsusb_client.hpp"
 #include "../../include/clients/shell/switcherooctl_client.hpp"
-#include "../../include/events/events.hpp"
+#include "../../include/events/event_bus.hpp"
 #include "../../include/gui/toaster.hpp"
 #include "../../include/models/hardware/battery_charge_threshold.hpp"
 #include "../../include/models/hardware/cpu_brand.hpp"
@@ -158,7 +158,7 @@ void HardwareService::setupDeviceLoop() {
 	connectedDevices = std::get<0>(udevClient.compare_connected_devs({}, [this](const UsbIdentifier& dev) {
 		return !openRgbService.getDeviceName(dev).empty();
 	}));
-	eventBus.on_without_data(Events::UDEV_CLIENT_DEVICE_EVENT, [this, &udevClient]() {
+	eventBus.onDeviceEvent([this, &udevClient]() {
 		auto [current, added, removed] = udevClient.compare_connected_devs(connectedDevices, [this](const UsbIdentifier& dev) {
 			return !openRgbService.getDeviceName(dev).empty();
 		});
@@ -186,7 +186,7 @@ void HardwareService::setupDeviceLoop() {
 				openRgbService.disableDevice(dev);
 			}
 		} else if (removed.size() > 0 || added.size() > 0) {
-			eventBus.emit_event(Events::HARDWARE_SERVICE_USB_ADDED_REMOVED);
+			eventBus.emitDeviceEvent();
 		}
 
 		connectedDevices = current;
@@ -210,7 +210,7 @@ void HardwareService::setChargeThreshold(const BatteryThreshold& threshold) {
 
 		std::unordered_map<std::string, std::any> replacements = {{"value", threshold.toInt()}};
 		toaster.showToast(translator.translate("applied.battery.threshold", replacements));
-		eventBus.emit_event(Events::HARDWARE_SERVICE_THRESHOLD_CHANGED, {threshold});
+		eventBus.emitChargeThreshold(threshold);
 	}
 }
 
@@ -226,7 +226,7 @@ void HardwareService::onBatteryEvent(const bool& onBat, const bool& muted) {
 			logger.info("AC " + t1 + "plugged, battery " + t2 + "engaged");
 			Logger::add_tab();
 		}
-		eventBus.emit_event(Events::HARDWARE_SERVICE_ON_BATTERY);
+		eventBus.emitBattery();
 		if (!muted) {
 			Logger::rem_tab();
 		}

@@ -11,7 +11,6 @@
 #include <vector>
 
 #include "../../events/event_bus.hpp"
-#include "../../events/events.hpp"
 #include "../../models/hardware/usb_identifier.hpp"
 
 class LsUsbClient {
@@ -47,7 +46,7 @@ class LsUsbClient {
 					if (dev) {
 						udev_device_unref(dev);
 					}
-					eventBus.emit_event(Events::UDEV_CLIENT_DEVICE_EVENT);
+					eventBus.emitDeviceEvent();
 				}
 			}
 		});

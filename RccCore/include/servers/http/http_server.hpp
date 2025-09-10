@@ -2,11 +2,12 @@
 
 #include <nlohmann/json.hpp>
 
-#include "../../events/events.hpp"
+#include "../../events/event_bus.hpp"
 #include "../../services/hardware_service.hpp"
 #include "../../services/open_rgb_service.hpp"
 #include "../../services/profile_service.hpp"
 #include "../../services/steam_service.hpp"
+#include "RccCommons.hpp"
 #include "httplib.h"
 
 using json = nlohmann::json;
@@ -87,7 +88,7 @@ class HttpServer {
 			std::this_thread::sleep_for(std::chrono::milliseconds(10));
 		}
 
-		eventBus.on_without_data(Events::APPLICATION_STOP, [this]() {
+		eventBus.onApplicationStop([this]() {
 			stop();
 		});
 

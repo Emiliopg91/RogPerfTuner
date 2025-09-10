@@ -15,7 +15,6 @@
 #include "../../../../include/clients/tcp/open_rgb/effects/starry_night_effect.hpp"
 #include "../../../../include/clients/tcp/open_rgb/effects/static_effect.hpp"
 #include "../../../../include/events/event_bus.hpp"
-#include "../../../../include/events/events.hpp"
 #include "../../../../include/models/hardware/rgb_brightness.hpp"
 #include "../../../../include/utils/net_utils.hpp"
 
@@ -40,7 +39,7 @@ void OpenRgbClient::initialize() {
 	availableEffects.push_back(std::unique_ptr<AbstractEffect>(&StarryNightEffect::getInstance(client)));
 	availableEffects.push_back(std::unique_ptr<AbstractEffect>(&StaticEffect::getInstance(client)));
 
-	eventBus.on_without_data(Events::APPLICATION_STOP, [this]() {
+	eventBus.onApplicationStop([this]() {
 		stop();
 	});
 
