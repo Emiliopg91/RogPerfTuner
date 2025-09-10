@@ -16,18 +16,21 @@
 #include "../../../../include/clients/tcp/open_rgb/effects/static_effect.hpp"
 #include "../../../../include/events/event_bus.hpp"
 #include "../../../../include/models/hardware/rgb_brightness.hpp"
+#include "../../../../include/utils/file_utils.hpp"
 #include "../../../../include/utils/net_utils.hpp"
 
 void OpenRgbClient::initialize() {
-	logger.info("Configuring UDEV rules");
-	Logger::add_tab();
+	if (!FileUtils::exists(Constants::UDEV_RULES) || !md5SumClient.available() ||
+		md5SumClient.getChecksum(Constants::ORGB_UDEV_PATH) != md5SumClient.getChecksum(Constants::Constants::UDEV_RULES)) {
+		logger.info("Configuring UDEV rules");
+		Logger::add_tab();
 
-	shell.run_command("cp " + Constants::ORGB_UDEV_PATH + " " + Constants::TMP_UDEV_PATH);
-	shell.run_elevated_command("mv " + Constants::TMP_UDEV_PATH + " " + Constants::UDEV_RULES);
-	shell.run_elevated_command("chmod 777 " + Constants::UDEV_RULES);
-	shell.run_elevated_command("udevadm control --reload-rules");
-	shell.run_elevated_command("udevadm trigger");
-	Logger::rem_tab();
+		shell.run_command("cp " + Constants::ORGB_UDEV_PATH + " " + Constants::TMP_UDEV_PATH);
+		shell.run_elevated_command("mv " + Constants::TMP_UDEV_PATH + " " + Constants::UDEV_RULES + " && chmod 777 " + Constants::UDEV_RULES +
+								   " && udevadm control --reload-rules && udevadm trigger");
+
+		Logger::rem_tab();
+	}
 
 	availableEffects.push_back(std::unique_ptr<AbstractEffect>(&BreathingEffect::getInstance(client)));
 	availableEffects.push_back(std::unique_ptr<AbstractEffect>(&DanceFloorEffect::getInstance(client)));
@@ -44,6 +47,9 @@ void OpenRgbClient::initialize() {
 	});
 
 	start();
+}
+
+void OpenRgbClient::configureUdev() {
 }
 
 void OpenRgbClient::start() {

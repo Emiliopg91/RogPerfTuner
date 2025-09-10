@@ -1,6 +1,7 @@
 #pragma once
 
 #include "../../../clients/shell/asusctl_client.hpp"
+#include "../../../clients/shell/md5sum_client.hpp"
 #include "../../../events/event_bus.hpp"
 #include "../../../utils/constants.hpp"
 #include "OpenRGB/Client.hpp"
@@ -31,10 +32,12 @@ class OpenRgbClient {
 	orgb::Client client{Constants::APP_NAME};
 	orgb::DeviceList detectedDevices;
 	std::vector<std::unique_ptr<AbstractEffect>> availableEffects;
+	std::thread udevConfigurer;
 
 	Shell& shell				 = Shell::getInstance();
 	EventBus& eventBus			 = EventBus::getInstance();
 	AsusCtlClient& asusCtlClient = AsusCtlClient::getInstance();
+	Md5SumClient& md5SumClient	 = Md5SumClient::getInstance();
 
 	OpenRgbClient() {
 	}
@@ -43,5 +46,6 @@ class OpenRgbClient {
 	void startOpenRgbClient();
 	void stopOpenRgbProcess();
 	void getAvailableDevices();
+	void configureUdev();
 	void runner();
 };

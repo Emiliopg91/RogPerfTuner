@@ -186,7 +186,7 @@ void HardwareService::setupDeviceLoop() {
 				openRgbService.disableDevice(dev);
 			}
 		} else if (removed.size() > 0 || added.size() > 0) {
-			eventBus.emitDeviceEvent();
+			eventBus.emitUsbAddedRemoved();
 		}
 
 		connectedDevices = current;

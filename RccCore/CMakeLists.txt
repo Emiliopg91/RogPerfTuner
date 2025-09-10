@@ -8,6 +8,7 @@ set(CMAKE_AUTOMOC ON)
 #set(CMAKE_AUTOUIC ON)
 
 if(CMAKE_BUILD_TYPE STREQUAL "Release")
+    add_compile_options(-flto)
     set(CMAKE_INTERPROCEDURAL_OPTIMIZATION TRUE)
 endif()
 

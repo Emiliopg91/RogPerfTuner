@@ -1,5 +1,7 @@
 #include "../../include/services/profile_service.hpp"
 
+#include <thread>
+
 #include "../../include/configuration/configuration.hpp"
 #include "../../include/events/event_bus.hpp"
 #include "../../include/models/performance/cpu_governor.hpp"
@@ -181,9 +183,11 @@ void ProfileService::setTdps(const PerformanceProfile& profile) {
 		logger.info("PL1: " + std::to_string(pl1) + "W");
 		try {
 			pl1SpdClient.setCurrentValue(pl1);
+			std::this_thread::sleep_for(std::chrono::milliseconds(25));
 			if (pl2SpptClient.available()) {
 				auto pl2 = onBattery ? ProfileUtils::batteryIntelPl2Sppt(profile) : ProfileUtils::acIntelPl2Sppt(profile);
 				logger.info("PL2: " + std::to_string(pl2) + "W");
+				std::this_thread::sleep_for(std::chrono::milliseconds(25));
 				pl2SpptClient.setCurrentValue(pl2);
 			}
 		} catch (std::exception e) {
@@ -204,6 +208,7 @@ void ProfileService::setTgp(const PerformanceProfile& profile) {
 				auto nvb = onBattery ? ProfileUtils::batteryNvBoost(profile) : ProfileUtils::acNvBoost(profile);
 				logger.info("Dynamic Boost: " + std::to_string(nvb) + "W");
 				nvBoostClient.setCurrentValue(nvb);
+				std::this_thread::sleep_for(std::chrono::milliseconds(25));
 			} catch (std::exception e) {
 				logger.info("Error setting Nvidia Boost");
 			}
