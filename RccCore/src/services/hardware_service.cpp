@@ -137,7 +137,9 @@ HardwareService::HardwareService() {
 
 	if (uPowerClient.available()) {
 		onBattery = uPowerClient.isOnBattery();
-		uPowerClient.onBatteryChange([this](CallbackParam data) { this->onBatteryEvent(std::any_cast<bool>(data[0])); });
+		uPowerClient.onBatteryChange([this](CallbackParam data) {
+			this->onBatteryEvent(std::any_cast<bool>(data[0]));
+		});
 	}
 
 	if (pmKeyboardBrightnessClient.available()) {
@@ -153,11 +155,13 @@ HardwareService::HardwareService() {
 
 void HardwareService::setupDeviceLoop() {
 	auto& udevClient = LsUsbClient::getInstance();
-	connectedDevices =
-		std::get<0>(udevClient.compare_connected_devs({}, [this](const UsbIdentifier& dev) { return !openRgbService.getDeviceName(dev).empty(); }));
+	connectedDevices = std::get<0>(udevClient.compare_connected_devs({}, [this](const UsbIdentifier& dev) {
+		return !openRgbService.getDeviceName(dev).empty();
+	}));
 	eventBus.on_without_data(Events::UDEV_CLIENT_DEVICE_EVENT, [this, &udevClient]() {
-		auto [current, added, removed] = udevClient.compare_connected_devs(
-			connectedDevices, [this](const UsbIdentifier& dev) { return !openRgbService.getDeviceName(dev).empty(); });
+		auto [current, added, removed] = udevClient.compare_connected_devs(connectedDevices, [this](const UsbIdentifier& dev) {
+			return !openRgbService.getDeviceName(dev).empty();
+		});
 
 		if (added.size() > 0) {
 			logger.info("Added compatible device(s):");

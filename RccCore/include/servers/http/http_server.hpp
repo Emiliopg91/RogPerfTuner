@@ -30,7 +30,8 @@ class HttpServer {
 
 		svr.set_idle_interval(std::chrono::milliseconds(100));
 
-		svr.Get("/ping", [this](const httplib::Request&, httplib::Response&) {});
+		svr.Get("/ping", [this](const httplib::Request&, httplib::Response&) {
+		});
 
 		svr.Get(Constants::URL_PERF_PROF, [this](const httplib::Request&, httplib::Response& res) {
 			json response;
@@ -86,7 +87,9 @@ class HttpServer {
 			std::this_thread::sleep_for(std::chrono::milliseconds(10));
 		}
 
-		eventBus.on_without_data(Events::APPLICATION_STOP, [this]() { stop(); });
+		eventBus.on_without_data(Events::APPLICATION_STOP, [this]() {
+			stop();
+		});
 
 		Logger::rem_tab();
 	}

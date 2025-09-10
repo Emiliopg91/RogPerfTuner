@@ -224,10 +224,14 @@ class DigitalRainEffect : public AbstractEffect {
 		std::vector<std::thread> threads;
 
 		// CPU monitor
-		threads.emplace_back([this] { cpu_thread(); });
+		threads.emplace_back([this] {
+			cpu_thread();
+		});
 
 		for (auto& dev : devices) {
-			threads.emplace_back([this, &dev] { device_thread(dev); });
+			threads.emplace_back([this, &dev] {
+				device_thread(dev);
+			});
 		}
 
 		for (auto& t : threads)

@@ -34,7 +34,9 @@ AbstractWebsocketClient::AbstractWebsocketClient(const std::string& host, const 
 	std::thread([this] {
 		while (true) {
 			std::unique_lock<std::mutex> lock(_queue_mutex);
-			_queue_cv.wait(lock, [this] { return !_message_queue.empty(); });
+			_queue_cv.wait(lock, [this] {
+				return !_message_queue.empty();
+			});
 			std::string msg = _message_queue.front();
 			_message_queue.pop();
 			lock.unlock();
@@ -73,8 +75,8 @@ void AbstractWebsocketClient::handle_message(const std::string& payload) {
 		auto it = _promises.find(msg.id);
 		if (it != _promises.end()) {
 			WSMethodResponse wsmr{msg, ""};
-			it->second.set_value(wsmr);	 // <- usar la referencia directamente
-			_promises.erase(it);		 // opcional: limpiar la promesa ya cumplida
+			it->second.set_value(wsmr);
+			_promises.erase(it);
 		}
 	}
 }

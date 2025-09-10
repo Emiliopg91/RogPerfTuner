@@ -32,7 +32,9 @@ void AbstractEffect::start(const DeviceList& devices, const RgbBrightness& brigh
 	_brightness = brightnessMap(brightness);
 	_is_running = true;
 
-	_thread = std::thread([this, &devices] { this->_thread_main(devices); });
+	_thread = std::thread([this, &devices] {
+		this->_thread_main(devices);
+	});
 }
 
 void AbstractEffect::stop() {

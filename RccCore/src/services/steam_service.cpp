@@ -44,11 +44,15 @@ SteamService::SteamService() {
 
 	installRccDC();
 
-	steamClient.onConnect([this]() { onConnect(); });
+	steamClient.onConnect([this]() {
+		onConnect();
+	});
 
-	steamClient.onDisconnect([this]() { onDisconnect(); });
+	steamClient.onDisconnect([this]() {
+		onDisconnect();
+	});
 
-	steamClient.onGameLaunch([this](std::vector<std::any> data) {
+	steamClient.onGameLaunch([this](CallbackParam data) {
 		auto id	  = static_cast<uint32_t>(std::any_cast<int>(data[0]));
 		auto name = std::any_cast<std::string>(data[1]);
 		auto pid  = std::any_cast<int>(data[2]);
@@ -56,7 +60,7 @@ SteamService::SteamService() {
 		onGameLaunch(id, name, pid);
 	});
 
-	steamClient.onGameStop([this](std::vector<std::any> data) {
+	steamClient.onGameStop([this](CallbackParam data) {
 		auto id	  = static_cast<uint32_t>(std::any_cast<int>(data[0]));
 		auto name = std::any_cast<std::string>(data[1]);
 
@@ -253,7 +257,9 @@ void SteamService::onGameLaunch(unsigned int gid, std::string name, int pid) {
 		shell.run_elevated_command(oss.str(), false);
 		Logger::rem_tab();
 
-		std::thread([this, gid, name, env]() { onFirstGameRun(gid, name, env); }).detach();
+		std::thread([this, gid, name, env]() {
+			onFirstGameRun(gid, name, env);
+		}).detach();
 		;
 	} else if (runningGames.find(gid) == runningGames.end()) {
 		runningGames[gid] = name;

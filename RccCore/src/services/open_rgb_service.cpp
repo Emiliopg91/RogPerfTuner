@@ -19,7 +19,9 @@ OpenRgbService::OpenRgbService() {
 		openRgbClient.applyEffect(effect, brightness);
 	});
 
-	eventBus.on_without_data(Events::HARDWARE_SERVICE_USB_ADDED_REMOVED, [this]() { reload(); });
+	eventBus.on_without_data(Events::HARDWARE_SERVICE_USB_ADDED_REMOVED, [this]() {
+		reload();
+	});
 
 	Logger::rem_tab();
 }

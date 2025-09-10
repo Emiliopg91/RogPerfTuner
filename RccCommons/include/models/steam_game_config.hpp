@@ -1,4 +1,12 @@
-#pragma once
+/**
+ * @file steam_game_config.hpp
+ * @author Emiliopg91 (ojosdeserbio@gmail.com)
+ * @brief
+ * @version 4.0.0
+ * @date 2025-09-10
+ *
+ *
+ */
 
 #include <map>
 #include <nlohmann/json.hpp>

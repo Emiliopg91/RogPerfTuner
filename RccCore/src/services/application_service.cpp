@@ -30,9 +30,14 @@ ApplicationService::ApplicationService() {
 		logger.debug("Menu entry file '" + Constants::APP_DRAW_FILE + "' written successfully");
 	}
 
-	AutoUpdater::getInstance([this]() { applyUpdate(); },
+	AutoUpdater::getInstance(
+		[this]() {
+			applyUpdate();
+		},
 
-							 [this]() -> bool { return steamService.getRunningGames().empty(); });
+		[this]() -> bool {
+			return steamService.getRunningGames().empty();
+		});
 
 	Logger::rem_tab();
 }

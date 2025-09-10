@@ -1,3 +1,12 @@
+/**
+ * @file logger_provider.hpp
+ * @author Emiliopg91 (ojosdeserbio@gmail.com)
+ * @version 4.0.0
+ * @date 2025-09-10
+ *
+ *
+ */
+
 #pragma once
 
 #include <spdlog/sinks/basic_file_sink.h>
@@ -12,8 +21,27 @@
 
 class LoggerProvider {
   public:
+	/**
+	 * @brief Initialize logger provider.
+	 *
+	 * @param fileName
+	 * @param path
+	 */
 	static void initialize(std::string fileName = "", std::string path = "");
+
+	/**
+	 * @brief Get the Logger pointer object
+	 *
+	 * @param name
+	 * @return std::shared_ptr<spdlog::logger>
+	 */
 	static std::shared_ptr<spdlog::logger> getLogger(const std::string& name = "Default");
+
+	/**
+	 * @brief Set the Config Map object
+	 *
+	 * @param configMap
+	 */
 	static void setConfigMap(std::map<std::string, std::string> configMap);
 
   private:

@@ -40,7 +40,9 @@ void OpenRgbClient::initialize() {
 	availableEffects.push_back(std::unique_ptr<AbstractEffect>(&StarryNightEffect::getInstance(client)));
 	availableEffects.push_back(std::unique_ptr<AbstractEffect>(&StaticEffect::getInstance(client)));
 
-	eventBus.on_without_data(Events::APPLICATION_STOP, [this]() { stop(); });
+	eventBus.on_without_data(Events::APPLICATION_STOP, [this]() {
+		stop();
+	});
 
 	start();
 }

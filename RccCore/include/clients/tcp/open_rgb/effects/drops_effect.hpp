@@ -23,7 +23,9 @@ class DropsEffect : public AbstractEffect {
 		int i = 0;
 		for (auto& dev : devices) {
 			_buffer[i].clear();
-			threads.emplace_back([this, &dev, i]() { this->_effect_thread(i, dev); });
+			threads.emplace_back([this, &dev, i]() {
+				this->_effect_thread(i, dev);
+			});
 			i++;
 		}
 

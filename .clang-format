@@ -15,6 +15,7 @@ BreakBeforeBraces: Attach
 IndentCaseLabels: true
 AllowAllArgumentsOnNextLine: false
 AllowShortFunctionsOnASingleLine: None
+AllowShortLambdasOnASingleLine: None
 AccessModifierOffset: -2
 
 # Organizar includes

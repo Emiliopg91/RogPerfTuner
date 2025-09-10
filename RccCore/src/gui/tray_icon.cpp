@@ -48,23 +48,48 @@ void openGameList() {
 }
 
 void TrayIcon::setAuraBrightness(RgbBrightness brightness) {
-	QMetaObject::invokeMethod(&TrayIcon::getInstance(), [=]() { brightnessActions[brightness.toName()]->setChecked(true); }, Qt::QueuedConnection);
+	QMetaObject::invokeMethod(
+		&TrayIcon::getInstance(),
+		[=]() {
+			brightnessActions[brightness.toName()]->setChecked(true);
+		},
+		Qt::QueuedConnection);
 }
 
 void TrayIcon::setAuraEffect(const std::string& effect) {
-	QMetaObject::invokeMethod(&TrayIcon::getInstance(), [=]() { effectActions[effect]->setChecked(true); }, Qt::QueuedConnection);
+	QMetaObject::invokeMethod(
+		&TrayIcon::getInstance(),
+		[=]() {
+			effectActions[effect]->setChecked(true);
+		},
+		Qt::QueuedConnection);
 }
 
 void TrayIcon::setPerformanceProfile(PerformanceProfile profile) {
-	QMetaObject::invokeMethod(&TrayIcon::getInstance(), [=]() { perfProfileActions[profile.toName()]->setChecked(true); }, Qt::QueuedConnection);
+	QMetaObject::invokeMethod(
+		&TrayIcon::getInstance(),
+		[=]() {
+			perfProfileActions[profile.toName()]->setChecked(true);
+		},
+		Qt::QueuedConnection);
 }
 
 void TrayIcon::setBatteryThreshold(BatteryThreshold threshold) {
-	QMetaObject::invokeMethod(&TrayIcon::getInstance(), [=]() { thresholdActions[threshold.toName()]->setChecked(true); }, Qt::QueuedConnection);
+	QMetaObject::invokeMethod(
+		&TrayIcon::getInstance(),
+		[=]() {
+			thresholdActions[threshold.toName()]->setChecked(true);
+		},
+		Qt::QueuedConnection);
 }
 
 void TrayIcon::setProfileMenuEnabled(bool enabled) {
-	QMetaObject::invokeMethod(&TrayIcon::getInstance(), [=]() { profileMenu->setEnabled(enabled); }, Qt::QueuedConnection);
+	QMetaObject::invokeMethod(
+		&TrayIcon::getInstance(),
+		[=]() {
+			profileMenu->setEnabled(enabled);
+		},
+		Qt::QueuedConnection);
 }
 
 // ==============================
@@ -111,7 +136,9 @@ TrayIcon::TrayIcon(QObject* parent) : QObject(parent), tray_icon_(new QSystemTra
 		QAction* act = new QAction((std::to_string(bct.toInt()) + "%").c_str(), chargeGroup);
 		act->setCheckable(true);
 		act->setChecked(bct == hardwareService.getChargeThreshold());
-		QObject::connect(act, &QAction::triggered, [this, bct]() { onBatteryLimitChanged(bct); });
+		QObject::connect(act, &QAction::triggered, [this, bct]() {
+			onBatteryLimitChanged(bct);
+		});
 		chargeLimitMenu->addAction(act);
 		thresholdActions[bct.toName()] = act;
 	}
@@ -141,7 +168,9 @@ TrayIcon::TrayIcon(QObject* parent) : QObject(parent), tray_icon_(new QSystemTra
 		QAction* act = new QAction(item.c_str(), effectGroup);
 		act->setCheckable(true);
 		act->setChecked(item == openRgbService.getCurrentEffect());
-		QObject::connect(act, &QAction::triggered, [this, item]() { onEffectChanged(item); });
+		QObject::connect(act, &QAction::triggered, [this, item]() {
+			onEffectChanged(item);
+		});
 		effectMenu->addAction(act);
 		effectActions[item] = act;
 	}
@@ -159,7 +188,9 @@ TrayIcon::TrayIcon(QObject* parent) : QObject(parent), tray_icon_(new QSystemTra
 		QAction* act = new QAction(translator.translate("label.brightness." + item.toName()).c_str(), brightnessGroup);
 		act->setCheckable(true);
 		act->setChecked(item == openRgbService.getCurrentBrightness());
-		QObject::connect(act, &QAction::triggered, [this, item]() { onBrightnessChanged(item); });
+		QObject::connect(act, &QAction::triggered, [this, item]() {
+			onBrightnessChanged(item);
+		});
 		brightnessMenu->addAction(act);
 		brightnessActions[item.toName()] = act;
 	}
@@ -190,7 +221,9 @@ TrayIcon::TrayIcon(QObject* parent) : QObject(parent), tray_icon_(new QSystemTra
 		QAction* act = new QAction(translator.translate("label.profile." + item.toName()).c_str(), profileGroup);
 		act->setCheckable(true);
 		act->setChecked(item == profileService.getPerformanceProfile());
-		QObject::connect(act, &QAction::triggered, [this, item]() { onPerformanceProfileChanged(item); });
+		QObject::connect(act, &QAction::triggered, [this, item]() {
+			onPerformanceProfileChanged(item);
+		});
 		profileMenu->addAction(act);
 		perfProfileActions[item.toName()] = act;
 	}
@@ -238,11 +271,15 @@ TrayIcon::TrayIcon(QObject* parent) : QObject(parent), tray_icon_(new QSystemTra
 		menu->insertMenu(nullptr, settingsMenu);
 
 		QAction* openSettingsAct = new QAction("Open settings");
-		QObject::connect(openSettingsAct, &QAction::triggered, [this]() { shell.run_command("xdg-open " + Constants::CONFIG_FILE); });
+		QObject::connect(openSettingsAct, &QAction::triggered, [this]() {
+			shell.run_command("xdg-open " + Constants::CONFIG_FILE);
+		});
 		settingsMenu->addAction(openSettingsAct);
 
 		QAction* reloadSettingsAct = new QAction("Reload settings");
-		QObject::connect(reloadSettingsAct, &QAction::triggered, [this]() { configuration.loadConfig(); });
+		QObject::connect(reloadSettingsAct, &QAction::triggered, [this]() {
+			configuration.loadConfig();
+		});
 		settingsMenu->addAction(reloadSettingsAct);
 		// -------------------------
 		// Settings submenu
@@ -254,8 +291,9 @@ TrayIcon::TrayIcon(QObject* parent) : QObject(parent), tray_icon_(new QSystemTra
 		menu->insertMenu(nullptr, logsMenu);
 
 		QAction* openLogsAct = new QAction("Open logs");
-		QObject::connect(openLogsAct, &QAction::triggered,
-						 [this]() { shell.run_command("xdg-open " + Constants::LOG_DIR + "/" + Constants::LOG_FILE_NAME + ".log"); });
+		QObject::connect(openLogsAct, &QAction::triggered, [this]() {
+			shell.run_command("xdg-open " + Constants::LOG_DIR + "/" + Constants::LOG_FILE_NAME + ".log");
+		});
 		logsMenu->addAction(openLogsAct);
 		// -------------------------
 		// Logs submenu
@@ -272,7 +310,9 @@ TrayIcon::TrayIcon(QObject* parent) : QObject(parent), tray_icon_(new QSystemTra
 	// -------------------------
 
 	QAction* openAction = new QAction(translator.translate("open.ui").c_str(), menu);
-	QObject::connect(openAction, &QAction::triggered, [this]() { openMainWindow(); });
+	QObject::connect(openAction, &QAction::triggered, [this]() {
+		openMainWindow();
+	});
 	menu->addAction(openAction);
 
 	// -------------------------
@@ -285,7 +325,9 @@ TrayIcon::TrayIcon(QObject* parent) : QObject(parent), tray_icon_(new QSystemTra
 	// Exit
 	// -------------------------
 	QAction* quitAction = new QAction(translator.translate("close").c_str(), menu);
-	QObject::connect(quitAction, &QAction::triggered, [this]() { applicationService.shutdown(); });
+	QObject::connect(quitAction, &QAction::triggered, [this]() {
+		applicationService.shutdown();
+	});
 	menu->addAction(quitAction);
 	// -------------------------
 	// Exit
@@ -293,19 +335,25 @@ TrayIcon::TrayIcon(QObject* parent) : QObject(parent), tray_icon_(new QSystemTra
 
 	tray_icon_->setContextMenu(menu);
 
-	eventBus.on_with_data(Events::ORGB_SERVICE_ON_BRIGHTNESS,
-						  [this](CallbackParam data) { setAuraBrightness(std::any_cast<RgbBrightness>(data[0])); });
+	eventBus.on_with_data(Events::ORGB_SERVICE_ON_BRIGHTNESS, [this](CallbackParam data) {
+		setAuraBrightness(std::any_cast<RgbBrightness>(data[0]));
+	});
 
-	eventBus.on_with_data(Events::ORGB_SERVICE_ON_EFFECT, [this](CallbackParam data) { setAuraEffect(std::any_cast<std::string>(data[0])); });
+	eventBus.on_with_data(Events::ORGB_SERVICE_ON_EFFECT, [this](CallbackParam data) {
+		setAuraEffect(std::any_cast<std::string>(data[0]));
+	});
 
-	eventBus.on_with_data(Events::PROFILE_SERVICE_ON_PROFILE,
-						  [this](CallbackParam data) { setPerformanceProfile(std::any_cast<PerformanceProfile>(data[0])); });
+	eventBus.on_with_data(Events::PROFILE_SERVICE_ON_PROFILE, [this](CallbackParam data) {
+		setPerformanceProfile(std::any_cast<PerformanceProfile>(data[0]));
+	});
 
-	eventBus.on_with_data(Events::HARDWARE_SERVICE_THRESHOLD_CHANGED,
-						  [this](CallbackParam data) { setBatteryThreshold(std::any_cast<BatteryThreshold>(data[0])); });
+	eventBus.on_with_data(Events::HARDWARE_SERVICE_THRESHOLD_CHANGED, [this](CallbackParam data) {
+		setBatteryThreshold(std::any_cast<BatteryThreshold>(data[0]));
+	});
 
-	eventBus.on_with_data(Events::STEAM_SERVICE_GAME_EVENT,
-						  [this](CallbackParam data) { setProfileMenuEnabled(std::any_cast<size_t>(data[0]) == 0); });
+	eventBus.on_with_data(Events::STEAM_SERVICE_GAME_EVENT, [this](CallbackParam data) {
+		setProfileMenuEnabled(std::any_cast<size_t>(data[0]) == 0);
+	});
 }
 
 void TrayIcon::show() {

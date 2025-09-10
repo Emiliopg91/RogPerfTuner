@@ -65,7 +65,9 @@ class StarryNightEffect : public AbstractEffect {
 	void apply_effect(const DeviceList& devices) override {
 		_threads.clear();
 		for (auto& device : devices) {
-			_threads.emplace_back([this, &device] { _device_effect(device); });
+			_threads.emplace_back([this, &device] {
+				_device_effect(device);
+			});
 		}
 		for (auto& t : _threads) {
 			if (t.joinable())

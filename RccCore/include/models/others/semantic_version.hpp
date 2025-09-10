@@ -12,8 +12,15 @@ struct SemanticVersion {
 	inline static SemanticVersion parse(const std::string& version_str) {
 		// Eliminar espacios al inicio y final
 		std::string v = version_str;
-		v.erase(v.begin(), std::find_if(v.begin(), v.end(), [](unsigned char ch) { return !std::isspace(ch); }));
-		v.erase(std::find_if(v.rbegin(), v.rend(), [](unsigned char ch) { return !std::isspace(ch); }).base(), v.end());
+		v.erase(v.begin(), std::find_if(v.begin(), v.end(), [](unsigned char ch) {
+					return !std::isspace(ch);
+				}));
+		v.erase(std::find_if(v.rbegin(), v.rend(),
+							 [](unsigned char ch) {
+								 return !std::isspace(ch);
+							 })
+					.base(),
+				v.end());
 
 		// Separar por puntos
 		std::istringstream ss(v);
