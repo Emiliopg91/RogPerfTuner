@@ -11,7 +11,7 @@
 
 ApplicationService::ApplicationService() {
 	logger.info("Initializing ApplicationService");
-	logger.add_tab();
+	Logger::add_tab();
 
 	FileUtils::copy(Constants::ASSETS_BIN_DIR, Constants::BIN_DIR);
 	FileUtils::mkdirs(Constants::BIN_APPLICATION_DIR);
@@ -34,7 +34,7 @@ ApplicationService::ApplicationService() {
 
 							 [this]() -> bool { return steamService.getRunningGames().empty(); });
 
-	logger.rem_tab();
+	Logger::rem_tab();
 }
 
 bool ApplicationService::isAutostartEnabled() {
@@ -54,19 +54,19 @@ void ApplicationService::setAutostart(bool enabled) {
 
 void ApplicationService::applyUpdate() {
 	logger.info("Applying update");
-	logger.add_tab();
+	Logger::add_tab();
 	toaster.showToast(translator.translate("applying.update"));
 	shell.run_command("nohup bash -c \"sleep 1 && " + Constants::LAUNCHER_FILE + "\" > /dev/null 2>&1 &");
 	shutdown();
-	logger.rem_tab();
+	Logger::rem_tab();
 }
 
 void ApplicationService::shutdown() {
 	shuttingDown = true;
 	logger.info("Starting application shutdown");
-	logger.add_tab();
+	Logger::add_tab();
 	eventBus.emit_event(Events::APPLICATION_STOP);
-	logger.rem_tab();
+	Logger::rem_tab();
 	logger.info("Shutdown finished");
 	kill(getpid(), SIGTERM);
 }

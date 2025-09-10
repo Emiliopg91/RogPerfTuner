@@ -26,7 +26,7 @@ class HttpServer {
 
 	HttpServer() {
 		logger.info("Initializing HTTP server");
-		logger.add_tab();
+		Logger::add_tab();
 
 		svr.set_idle_interval(std::chrono::milliseconds(100));
 
@@ -88,7 +88,7 @@ class HttpServer {
 
 		eventBus.on_without_data(Events::APPLICATION_STOP, [this]() { stop(); });
 
-		logger.rem_tab();
+		Logger::rem_tab();
 	}
 
   public:
@@ -109,12 +109,12 @@ class HttpServer {
 				return;
 
 			logger.info("Stopping HTTP server");
-			logger.add_tab();
+			Logger::add_tab();
 			svr.stop();
 
 			if (runner.joinable())
 				runner.join();
-			logger.rem_tab();
+			Logger::rem_tab();
 			logger.info("HTTP server stopped");
 		} catch (...) {
 		}

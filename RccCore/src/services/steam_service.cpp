@@ -35,7 +35,7 @@ const std::map<std::string, GameEntry>& SteamService::getGames() {
 
 SteamService::SteamService() {
 	logger.info("Initializing SteamService");
-	logger.add_tab();
+	Logger::add_tab();
 
 	std::this_thread::sleep_for(std::chrono::milliseconds(25));
 	if (steamClient.connected()) {
@@ -63,7 +63,7 @@ SteamService::SteamService() {
 		onGameStop(id, name);
 	});
 
-	logger.rem_tab();
+	Logger::rem_tab();
 }
 
 void getPidsOfHierarchy(const pid_t parentId, std::set<pid_t>& pids) {
@@ -119,7 +119,7 @@ std::map<std::string, std::string> getProcessEnvironMap(pid_t pid) {
 
 void SteamService::onFirstGameRun(unsigned int gid, std::string name, std::map<std::string, std::string> environment) {
 	logger.info("Configuring game");
-	logger.add_tab();
+	Logger::add_tab();
 
 	std::optional<std::string> gpu = std::nullopt;
 	if (hardwareService.getGpus().size() > 0) {
@@ -171,8 +171,8 @@ void SteamService::onFirstGameRun(unsigned int gid, std::string name, std::map<s
 
 	shell.run_command("steam steam://rungameid/" + overlayId);
 
-	logger.rem_tab();
-	logger.rem_tab();
+	Logger::rem_tab();
+	Logger::rem_tab();
 }
 
 bool SteamService::checkIfRequiredInstallation() {
@@ -228,18 +228,18 @@ void SteamService::copyPlugin() {
 
 void SteamService::onGameLaunch(unsigned int gid, std::string name, int pid) {
 	logger.info("Launched '" + name + "' (" + std::to_string(gid) + ") with PID " + std::to_string(pid));
-	logger.add_tab();
+	Logger::add_tab();
 	if (configuration.getConfiguration().games.find(std::to_string(gid)) == configuration.getConfiguration().games.end()) {
 		logger.info("Game not configured");
-		logger.add_tab();
+		Logger::add_tab();
 
 		logger.info("Getting process environment...");
-		logger.add_tab();
+		Logger::add_tab();
 		auto env = getProcessEnvironMap(pid);
-		logger.rem_tab();
+		Logger::rem_tab();
 
 		logger.info("Stopping process...");
-		logger.add_tab();
+		Logger::add_tab();
 		std::set<pid_t> pids;
 		pids.insert(pid);
 		getPidsOfHierarchy(pid, pids);
@@ -251,7 +251,7 @@ void SteamService::onGameLaunch(unsigned int gid, std::string name, int pid) {
 		}
 		std::this_thread::sleep_for(std::chrono::milliseconds(250));
 		shell.run_elevated_command(oss.str(), false);
-		logger.rem_tab();
+		Logger::rem_tab();
 
 		std::thread([this, gid, name, env]() { onFirstGameRun(gid, name, env); }).detach();
 		;
@@ -261,7 +261,7 @@ void SteamService::onGameLaunch(unsigned int gid, std::string name, int pid) {
 
 		eventBus.emit_event(Events::STEAM_SERVICE_GAME_EVENT, {runningGames.size()});
 	}
-	logger.rem_tab();
+	Logger::rem_tab();
 }
 
 void SteamService::onGameStop(unsigned int gid, std::string name) {
@@ -269,9 +269,9 @@ void SteamService::onGameStop(unsigned int gid, std::string name) {
 		logger.info("Stopped '" + name + "' (" + std::to_string(gid) + ")");
 		runningGames.erase(gid);
 		{
-			logger.add_tab();
+			Logger::add_tab();
 			setProfileForGames();
-			logger.rem_tab();
+			Logger::rem_tab();
 
 			eventBus.emit_event(Events::STEAM_SERVICE_GAME_EVENT, {runningGames.size()});
 		}
@@ -292,23 +292,23 @@ void SteamService::setProfileForGames(bool onConnect) {
 
 void SteamService::onConnect(bool onBoot) {
 	logger.info("Connected to Steam");
-	logger.add_tab();
+	Logger::add_tab();
 	if (!onBoot) {
 		setProfileForGames(true);
 	}
 	eventBus.emit_event(Events::STEAM_SERVICE_GAME_EVENT, {runningGames.size()});
-	logger.rem_tab();
+	Logger::rem_tab();
 }
 
 void SteamService::onDisconnect() {
 	logger.info("Disconnected from Steam");
-	logger.add_tab();
+	Logger::add_tab();
 	if (!runningGames.empty()) {
 		profileService.restoreProfile();
 		openRgbService.restoreAura();
 		runningGames.clear();
 	}
-	logger.rem_tab();
+	Logger::rem_tab();
 }
 
 const SteamGameConfig SteamService::getConfiguration(const std::string& gid) {

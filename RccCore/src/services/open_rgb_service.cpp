@@ -8,7 +8,7 @@
 
 OpenRgbService::OpenRgbService() {
 	logger.info("Initializing OpenRgbService");
-	logger.add_tab();
+	Logger::add_tab();
 
 	openRgbClient.initialize();
 
@@ -21,7 +21,7 @@ OpenRgbService::OpenRgbService() {
 
 	eventBus.on_without_data(Events::HARDWARE_SERVICE_USB_ADDED_REMOVED, [this]() { reload(); });
 
-	logger.rem_tab();
+	Logger::rem_tab();
 }
 
 void OpenRgbService::restoreAura() {
@@ -76,18 +76,18 @@ void OpenRgbService::setEffect(const std::string& newEffect, const bool& tempora
 void OpenRgbService::reload() {
 	auto t0 = std::chrono::high_resolution_clock::now();
 	logger.info("Reloading OpenRGB server");
-	logger.add_tab();
+	Logger::add_tab();
 	openRgbClient.stop();
 	openRgbClient.start();
 	applyAura();
 	auto t1 = std::chrono::high_resolution_clock::now();
-	logger.rem_tab();
+	Logger::rem_tab();
 	logger.info("Reloaded after " + std::to_string(std::chrono::duration_cast<std::chrono::milliseconds>(t1 - t0).count()) + " ms");
 }
 
 void OpenRgbService::applyAura(const bool& temporal) {
 	logger.info("Applying aura settings");
-	logger.add_tab();
+	Logger::add_tab();
 	auto t0 = std::chrono::high_resolution_clock::now();
 	openRgbClient.applyEffect(effect, brightness);
 
@@ -98,7 +98,7 @@ void OpenRgbService::applyAura(const bool& temporal) {
 	}
 
 	auto t1 = std::chrono::high_resolution_clock::now();
-	logger.rem_tab();
+	Logger::rem_tab();
 	logger.info("Aura applied after " + std::to_string(std::chrono::duration_cast<std::chrono::milliseconds>(t1 - t0).count()) + " ms");
 }
 

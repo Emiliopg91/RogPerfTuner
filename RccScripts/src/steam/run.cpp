@@ -69,7 +69,7 @@ int run_command(Logger& logger, const std::vector<std::string>& cmd, const std::
 	}
 
 	logger.info(">>> Running command: '" + StringUtils::trim(ss.str()) + "'");
-	logger.add_tab();
+	Logger::add_tab();
 
 	std::string cmd_str = command;
 	cmd_str += " ";
@@ -134,7 +134,7 @@ int run_command(Logger& logger, const std::vector<std::string>& cmd, const std::
 		exit_code = 255;
 	}
 
-	logger.rem_tab();
+	Logger::rem_tab();
 	logger.info("Command finished with exit code " + std::to_string(exit_code));
 
 	return exit_code;
@@ -156,19 +156,19 @@ int main(int argc, char* argv[]) {
 
 	logger.info("===== Started wrapping =====");
 	logger.info(">>> Entorno:");
-	logger.add_tab();
+	Logger::add_tab();
 	for (char** env = environ; *env; ++env) {
 		logger.info(std::string(*env));
 	}
-	logger.rem_tab();
+	Logger::rem_tab();
 
 	std::ostringstream cmdline;
 	for (int i = 1; i < argc; i++)
 		cmdline << argv[i] << " ";
 	logger.info(">>> Command:");
-	logger.add_tab();
+	Logger::add_tab();
 	logger.info(cmdline.str());
-	logger.rem_tab();
+	Logger::rem_tab();
 
 	std::vector<std::string> wrappers;
 	std::string parameters;

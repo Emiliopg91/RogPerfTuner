@@ -41,7 +41,7 @@ int main(int argc, char** argv) {
 	logger.info("###################################################");
 	logger.info("Version " + Constants::APP_VERSION);
 	logger.info("Starting initialization");
-	logger.add_tab();
+	Logger::add_tab();
 
 	logger.info("Creating QT application");
 	QApplication app(argc, argv);
@@ -68,7 +68,7 @@ int main(int argc, char** argv) {
 	TrayIcon::getInstance().show();
 	app.setDesktopFileName(QString::fromStdString(Constants::APP_DRAW_FILE));
 
-	logger.rem_tab();
+	Logger::rem_tab();
 	logger.info("Application ready");
 
 	return app.exec();

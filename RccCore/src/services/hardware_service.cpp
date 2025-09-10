@@ -22,10 +22,10 @@
 
 HardwareService::HardwareService() {
 	logger.info("Initializing HardwareService");
-	logger.add_tab();
+	Logger::add_tab();
 
 	logger.info("Detecting CPU");
-	logger.add_tab();
+	Logger::add_tab();
 	std::string cpuinfo_out = cpuInfoClient.read(5);
 	if (StringUtils::isSubstring("GenuineIntel", cpuinfo_out)) {
 		cpu		   = CpuBrand::Enum::INTEL;
@@ -38,7 +38,7 @@ HardwareService::HardwareService() {
 		}
 	}
 
-	logger.add_tab();
+	Logger::add_tab();
 	if (cpu == CpuBrand::Enum::INTEL) {
 		if (pl1SpdClient.available()) {
 			logger.info("TDP control available");
@@ -47,11 +47,11 @@ HardwareService::HardwareService() {
 			logger.info("Boost control available");
 		}
 	}
-	logger.rem_tab();
-	logger.rem_tab();
+	Logger::rem_tab();
+	Logger::rem_tab();
 
 	logger.info("Detecting GPUs");
-	logger.add_tab();
+	Logger::add_tab();
 	auto detected_gpus = switcherooCtlClient.getGpus();
 	for (auto gpu : detected_gpus) {
 		logger.info(gpu.name);
@@ -99,7 +99,7 @@ HardwareService::HardwareService() {
 			env					   = StringUtils::trim(env);
 			gpus[brand.toString()] = env;
 
-			logger.add_tab();
+			Logger::add_tab();
 			if (brand == GpuBrand::Enum::NVIDIA) {
 				if (nvBoostClient.available()) {
 					logger.info("Dynamic boost control available");
@@ -109,26 +109,26 @@ HardwareService::HardwareService() {
 				}
 			}
 
-			logger.rem_tab();
+			Logger::rem_tab();
 		}
 	}
-	logger.rem_tab();
+	Logger::rem_tab();
 
 	if (ssdSchedulerClient.available()) {
 		logger.info("Getting available SSD schedulers");
-		logger.add_tab();
+		Logger::add_tab();
 		ssd_schedulers = ssdSchedulerClient.get_schedulers();
 		for (auto sched : ssd_schedulers)
 			logger.info(sched.toString());
-		logger.rem_tab();
+		Logger::rem_tab();
 	}
 
 	if (platformClient.available()) {
 		logger.info("Getting battery charge limit");
-		logger.add_tab();
+		Logger::add_tab();
 		charge_limit = platformClient.getBatteryLimit();
 		logger.info(std::to_string(charge_limit.toInt()) + "%");
-		logger.rem_tab();
+		Logger::rem_tab();
 	}
 
 	setupDeviceLoop();
@@ -148,7 +148,7 @@ HardwareService::HardwareService() {
 		});
 	}
 
-	logger.rem_tab();
+	Logger::rem_tab();
 }
 
 void HardwareService::setupDeviceLoop() {
@@ -161,20 +161,20 @@ void HardwareService::setupDeviceLoop() {
 
 		if (added.size() > 0) {
 			logger.info("Added compatible device(s):");
-			logger.add_tab();
+			Logger::add_tab();
 			for (auto dev : added) {
 				logger.info(openRgbService.getDeviceName(dev));
 			}
-			logger.rem_tab();
+			Logger::rem_tab();
 		}
 
 		if (removed.size() > 0) {
 			logger.info("Removed compatible device(s):");
-			logger.add_tab();
+			Logger::add_tab();
 			for (auto dev : removed) {
 				logger.info(openRgbService.getDeviceName(dev));
 			}
-			logger.rem_tab();
+			Logger::rem_tab();
 		}
 
 		if (removed.size() > 0 && added.size() == 0) {
@@ -220,23 +220,26 @@ void HardwareService::onBatteryEvent(const bool& onBat, const bool& muted) {
 			std::string t1 = onBattery ? "un" : "";
 			std::string t2 = !onBattery ? "dis" : "";
 			logger.info("AC " + t1 + "plugged, battery " + t2 + "engaged");
-			logger.add_tab();
+			Logger::add_tab();
 		}
 		eventBus.emit_event(Events::HARDWARE_SERVICE_ON_BATTERY);
 		if (!muted) {
-			logger.rem_tab();
+			Logger::rem_tab();
 		}
 	}
 }
 
 void HardwareService::setPanelOverdrive(const bool& enable) {
 	if (panelOverdriveClient.available()) {
-		logger.info("Setting panel overdrive to {}", enable);
+		logger.info("Panel Overdrive: {}", enable ? "Enabled" : "Disabled");
 		panelOverdriveClient.setCurrentValue(enable);
 	}
 }
 void HardwareService::renice(const pid_t& pid) {
+	logger.info("Renicing process {}", pid);
+	Logger::add_tab();
 	shell.run_elevated_command(fmt::format("renice -n {} -p {} && ionice -c {} -n {} -p {}", CPU_PRIORITY, pid, IO_CLASS, IO_PRIORITY, pid));
+	Logger::rem_tab();
 }
 
 std::map<std::string, std::string> HardwareService::getGpuSelectorEnv(const std::string& gpu) {
