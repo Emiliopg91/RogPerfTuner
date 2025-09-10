@@ -3,9 +3,10 @@
 #include <mutex>
 #include <string>
 
+#include "../../../../../logger/logger.hpp"
 #include "../../../../../models/hardware/rgb_brightness.hpp"
+#include "../../../../../shell/shell.hpp"
 #include "OpenRGB/Client.hpp"
-#include "RccCommons.hpp"
 
 using orgb::Client;
 using orgb::Color;

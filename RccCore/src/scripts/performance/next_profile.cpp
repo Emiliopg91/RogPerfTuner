@@ -1,12 +1,12 @@
 #include <iostream>
 
-#include "RccCommons.hpp"
+#include "../../../include/utils/constants.hpp"
 #include "httplib.h"
 
 int main() {
 	httplib::Client cli("localhost", Constants::HTTP_PORT);
 
-	if (auto res = cli.Get(Constants::URL_INC_BRIGHT)) {
+	if (auto res = cli.Get(Constants::URL_PERF_PROF)) {
 		if (res->status == 200) {
 			std::cout << res->body << std::endl;
 		} else {

@@ -1,5 +1,6 @@
 #pragma once
 
+#include "../../utils/file_utils.hpp"
 #include "abstract/abstract_file_client.hpp"
 
 class BoostControlClient : public AbstractFileClient {

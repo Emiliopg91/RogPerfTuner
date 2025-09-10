@@ -2,7 +2,6 @@
 
 #include "../../../../models/performance/platform_profile.hpp"
 #include "../asus_base_client.hpp"
-#include "RccCommons.hpp"
 
 class FanCurvesClient : public AsusBaseClient {
   public:

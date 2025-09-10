@@ -1,7 +1,7 @@
 #pragma once
 
+#include "../logger/logger.hpp"
 #include "../models/settings/root_config.hpp"
-#include "RccCommons.hpp"
 
 class Configuration {
   public:

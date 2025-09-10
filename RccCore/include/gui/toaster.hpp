@@ -3,6 +3,7 @@
 
 #include "../clients/dbus/linux/notifications_client.hpp"
 #include "../translator/translator.hpp"
+#include "../utils/constants.hpp"
 
 class Toaster {
   public:

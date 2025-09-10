@@ -3,7 +3,8 @@
 #include <stdexcept>
 #include <string>
 
-#include "RccCommons.hpp"
+#include "../../../logger/logger.hpp"
+#include "../../../shell/shell.hpp"
 
 class AbstractFileClient {
   public:

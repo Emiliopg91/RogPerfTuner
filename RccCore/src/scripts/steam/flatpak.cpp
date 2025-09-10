@@ -7,7 +7,8 @@
 #include <sstream>
 #include <string>
 
-#include "RccCommons.hpp"
+#include "../../../include/shell/shell.hpp"
+#include "../../../include/utils/file_utils.hpp"
 
 int main(int argc, char* argv[]) {
 	LoggerProvider::initialize();

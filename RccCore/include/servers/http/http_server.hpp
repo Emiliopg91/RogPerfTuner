@@ -3,11 +3,12 @@
 #include <nlohmann/json.hpp>
 
 #include "../../events/event_bus.hpp"
+#include "../../logger/logger.hpp"
 #include "../../services/hardware_service.hpp"
 #include "../../services/open_rgb_service.hpp"
 #include "../../services/profile_service.hpp"
 #include "../../services/steam_service.hpp"
-#include "RccCommons.hpp"
+#include "../../utils/constants.hpp"
 #include "httplib.h"
 
 using json = nlohmann::json;

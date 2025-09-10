@@ -3,22 +3,23 @@
 #include <sys/wait.h>
 #include <unistd.h>
 
-#include <chrono>
 #include <csignal>
 #include <cstdio>
 #include <cstdlib>
 #include <cstring>
 #include <ctime>
-#include <iomanip>
-#include <iostream>
 #include <map>
 #include <sstream>
 #include <string>
 #include <thread>
 #include <vector>
 
-#include "RccCommons.hpp"
+#include "../../../include/logger/logger.hpp"
+#include "../../../include/models/steam/steam_game_config.hpp"
+#include "../../../include/shell/shell.hpp"
+#include "../../../include/utils/file_utils.hpp"
 #include "httplib.h"
+#include "nlohmann/json.hpp"
 
 void reader_thread(int fd, Logger logger, bool error) {
 	char buffer[4096];

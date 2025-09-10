@@ -4,6 +4,7 @@
 #include "../configuration/configuration.hpp"
 #include "../models/hardware/gpu_brand.hpp"
 #include "../models/steam/mangohud_level.hpp"
+#include "../models/steam/steam_game_config.hpp"
 #include "../models/steam/wine_sync_option.hpp"
 #include "./hardware_service.hpp"
 #include "./open_rgb_service.hpp"

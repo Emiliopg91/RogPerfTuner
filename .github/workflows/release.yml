@@ -38,15 +38,10 @@ jobs:
           cmake --version
           PYTHONUNBUFFERED=1 make release
 
-          folders=("RccCommons" "RccCore" "RccScripts")
-
-          changes=0
-          for folder in "${folders[@]}"; do
-              if [[ -n $(git status --porcelain "$folder") ]]; then
-                  changes=1
-                  break
-              fi
-          done
+            if [[ -n $(git status --porcelain "RccCore") ]]; then
+                changes=1
+                break
+            fi
 
           if [[ $changes -eq 1 ]]; then
               echo "Committing pending files before release..."

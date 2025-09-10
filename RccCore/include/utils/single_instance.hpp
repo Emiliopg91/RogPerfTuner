@@ -1,12 +1,14 @@
 #pragma once
 #include <unistd.h>
 
-#include <RccCommons.hpp>
 #include <csignal>
 #include <filesystem>
 #include <fstream>
 #include <iostream>
 #include <string>
+
+#include "../logger/logger.hpp"
+#include "constants.hpp"
 
 class SingleInstance {
   public:

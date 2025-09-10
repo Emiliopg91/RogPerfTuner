@@ -6,6 +6,9 @@
 #include <fstream>
 #include <iostream>
 
+#include "../../include/utils/constants.hpp"
+#include "../../include/utils/file_utils.hpp"
+
 void Configuration::loadConfig() {
 	if (FileUtils::exists(Constants::CONFIG_FILE)) {
 		logger.debug("Loading settings from '{}'", Constants::CONFIG_FILE);

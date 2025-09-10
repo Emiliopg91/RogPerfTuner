@@ -10,8 +10,8 @@
 #include <unordered_map>
 
 #include "../../../events/event_bus.hpp"
+#include "../../../logger/logger.hpp"
 #include "../../../models/others/websocket_message.hpp"
-#include "RccCommons.hpp"
 
 using json = nlohmann::json;
 

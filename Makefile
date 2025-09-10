@@ -54,9 +54,7 @@ build:
 	@python3 resources/preload/translations.py
 
 	@echo "Formatting code..."
-	@clang-format -i $$(find RccCommons -name '*.cpp' -o -name '*.hpp')
 	@clang-format -i $$(find RccCore -name '*.cpp' -o -name '*.hpp')
-	@clang-format -i $$(find RccScripts -name '*.cpp' -o -name '*.hpp')
 
 	@if [ ! -f "patches/OpenRGB-cppSDK.diff.applied" ]; then \
 		cd submodules/OpenRGB-cppSDK && git apply ../../patches/OpenRGB-cppSDK.diff && touch ../../patches/OpenRGB-cppSDK.diff.applied; \
@@ -65,12 +63,12 @@ build:
 	@cmake --build build -- -j$(NUM_CORES)
 
 	@mkdir assets/bin assets/bin/rgb  assets/bin/performance assets/bin/steam
-	@cp build/RccScripts/NextEffect assets/bin/rgb/nextEffect
-	@cp build/RccScripts/IncBrightness assets/bin/rgb/incBrightness
-	@cp build/RccScripts/DecBrightness assets/bin/rgb/decBrightness
-	@cp build/RccScripts/NextProfile assets/bin/performance/nextProfile
-	@cp build/RccScripts/SteamRunner assets/bin/steam/run
-	@cp build/RccScripts/FlatpakWrapper assets/bin/steam/flatpak
+	@cp build/RccCore/NextEffect assets/bin/rgb/nextEffect
+	@cp build/RccCore/IncBrightness assets/bin/rgb/incBrightness
+	@cp build/RccCore/DecBrightness assets/bin/rgb/decBrightness
+	@cp build/RccCore/NextProfile assets/bin/performance/nextProfile
+	@cp build/RccCore/SteamRunner assets/bin/steam/run
+	@cp build/RccCore/FlatpakWrapper assets/bin/steam/flatpak
 
 build_openrgb:
 	@if [ ! -f "patches/OpenRGB.diff.applied" ]; then \
