@@ -3,8 +3,6 @@
 
 #include <nlohmann/json.hpp>
 
-#include "../../include/translator/translations.hpp"
-
 using json = nlohmann::json;
 
 Translator::Translator() {

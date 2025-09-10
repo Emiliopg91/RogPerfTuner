@@ -1,6 +1,5 @@
 #include "../../include/services/open_rgb_service.hpp"
 
-#include "../../include/clients/dbus/linux/upower_client.hpp"
 #include "../../include/clients/tcp/open_rgb/open_rgb_client.hpp"
 #include "../../include/configuration/configuration.hpp"
 #include "../../include/events/event_bus.hpp"
@@ -14,8 +13,8 @@ OpenRgbService::OpenRgbService() {
 
 	restoreAura();
 
-	eventBus.onBattery([this]() {
-		auto brightness = uPowerClient.isOnBattery() ? RgbBrightness::Enum::OFF : this->brightness;
+	eventBus.onBattery([this](bool onBat) {
+		auto brightness = onBat ? RgbBrightness::Enum::OFF : this->brightness;
 		openRgbClient.applyEffect(effect, brightness);
 	});
 

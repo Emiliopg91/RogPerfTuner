@@ -1,9 +1,9 @@
 #include <map>
 #include <string>
 
-#include "translator.hpp"
+#include "../../include/translator/translator.hpp"
 
-std::map<std::string, std::map<std::string, std::string>> initialTranslations = {
+std::map<std::string, std::map<std::string, std::string>> Translator::initialTranslations = {
 	{"performance",
 	 {
 		 {"en", "Performance"},

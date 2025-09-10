@@ -226,7 +226,7 @@ void HardwareService::onBatteryEvent(const bool& onBat, const bool& muted) {
 			logger.info("AC " + t1 + "plugged, battery " + t2 + "engaged");
 			Logger::add_tab();
 		}
-		eventBus.emitBattery();
+		eventBus.emitBattery(onBat);
 		if (!muted) {
 			Logger::rem_tab();
 		}

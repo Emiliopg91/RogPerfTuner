@@ -111,24 +111,24 @@ MainWindow::MainWindow(QWidget* parent) : QMainWindow(parent), _logger(new Logge
 	setCentralWidget(centralWidget);
 	GuiUtils::centerWindowOnCurrentScreen(this);
 
-	eventBus.onChargeThreshold([this](CallbackParam v) {
-		setBatteryChargeLimit(std::any_cast<BatteryThreshold>(v[0]));
+	eventBus.onChargeThreshold([this](BatteryThreshold threshold) {
+		setBatteryChargeLimit(threshold);
 	});
 
-	eventBus.onRgbBrightness([this](CallbackParam data) {
-		setAuraBrightness(std::any_cast<RgbBrightness>(data[0]));
+	eventBus.onRgbBrightness([this](RgbBrightness brightness) {
+		setAuraBrightness(brightness);
 	});
 
-	eventBus.onRgbEffect([this](CallbackParam data) {
-		setAuraEffect(std::any_cast<std::string>(data[0]));
+	eventBus.onRgbEffect([this](std::string effect) {
+		setAuraEffect(effect);
 	});
 
-	eventBus.onPerformanceProfile([this](CallbackParam data) {
-		setPerformanceProfile(std::any_cast<PerformanceProfile>(data[0]));
+	eventBus.onPerformanceProfile([this](PerformanceProfile profile) {
+		setPerformanceProfile(profile);
 	});
 
-	eventBus.onGameEvent([this](CallbackParam data) {
-		onGameEvent(std::any_cast<int>(data[0]));
+	eventBus.onGameEvent([this](size_t runningGames) {
+		onGameEvent(runningGames);
 	});
 }
 

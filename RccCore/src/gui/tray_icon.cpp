@@ -335,24 +335,24 @@ TrayIcon::TrayIcon(QObject* parent) : QObject(parent), tray_icon_(new QSystemTra
 
 	tray_icon_->setContextMenu(menu);
 
-	eventBus.onRgbBrightness([this](CallbackParam data) {
-		setAuraBrightness(std::any_cast<RgbBrightness>(data[0]));
+	eventBus.onRgbBrightness([this](RgbBrightness brightness) {
+		setAuraBrightness(brightness);
 	});
 
-	eventBus.onRgbEffect([this](CallbackParam data) {
-		setAuraEffect(std::any_cast<std::string>(data[0]));
+	eventBus.onRgbEffect([this](std::string effect) {
+		setAuraEffect(effect);
 	});
 
-	eventBus.onPerformanceProfile([this](CallbackParam data) {
-		setPerformanceProfile(std::any_cast<PerformanceProfile>(data[0]));
+	eventBus.onChargeThreshold([this](BatteryThreshold threshold) {
+		setBatteryThreshold(threshold);
 	});
 
-	eventBus.onChargeThreshold([this](CallbackParam data) {
-		setBatteryThreshold(std::any_cast<BatteryThreshold>(data[0]));
+	eventBus.onPerformanceProfile([this](PerformanceProfile profile) {
+		setPerformanceProfile(profile);
 	});
 
-	eventBus.onGameEvent([this](CallbackParam data) {
-		setProfileMenuEnabled(std::any_cast<size_t>(data[0]) == 0);
+	eventBus.onGameEvent([this](size_t runningGames) {
+		setProfileMenuEnabled(std::any_cast<size_t>(runningGames) == 0);
 	});
 }
 

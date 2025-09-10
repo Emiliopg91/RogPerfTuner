@@ -26,8 +26,8 @@ ProfileService::ProfileService() {
 		platformClient.setPlatformProfileLinkedEpp(true);
 	}
 
-	eventBus.onBattery([this]() {
-		onBattery = uPowerClient.isOnBattery();
+	eventBus.onBattery([this](bool onBat) {
+		onBattery = onBat;
 		if (runningGames == 0) {
 			if (onBattery) {
 				setPerformanceProfile(PerformanceProfile::Enum::QUIET, true, true);
