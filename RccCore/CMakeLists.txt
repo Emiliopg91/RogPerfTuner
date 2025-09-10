@@ -7,17 +7,9 @@ set(CMAKE_AUTOMOC ON)
 #set(CMAKE_AUTORCC ON)
 #set(CMAKE_AUTOUIC ON)
 
-if(NOT CMAKE_BUILD_TYPE)
-    set(CMAKE_BUILD_TYPE Debug CACHE STRING "Choose the type of build." FORCE)
-endif()
-
-message(STATUS "Build type: ${CMAKE_BUILD_TYPE}")
-
 if(CMAKE_BUILD_TYPE STREQUAL "Release")
-    add_compile_options(-O3 -flto -funroll-loops -ftree-vectorize -fomit-frame-pointer -fmerge-all-constants -Wextra -Werror -Wno-unused-result)
+    add_compile_options(-flto)
     set(CMAKE_INTERPROCEDURAL_OPTIMIZATION TRUE)
-elseif(CMAKE_BUILD_TYPE STREQUAL "Debug")
-    add_compile_options(-pg -O0 -Wextra -Werror -Wno-unused-result)
 endif()
 
 # -----------------------------
@@ -32,7 +24,6 @@ find_package(Qt6 REQUIRED COMPONENTS Core DBus Gui Widgets)
 file(GLOB_RECURSE SOURCES
     "${CMAKE_CURRENT_SOURCE_DIR}/src/*.cpp"
 )
-list(FILTER SOURCES EXCLUDE REGEX ".*/src/scripts/.*")
 
 file(GLOB_RECURSE HEADERS
     "${CMAKE_CURRENT_SOURCE_DIR}/include/*.hpp"

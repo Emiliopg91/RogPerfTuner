@@ -9,7 +9,7 @@ class Constants {
   public:
 	inline static const std::string APP_NAME = "RogControlCenter";
 
-	inline const static std::string APP_VERSION = "4.0.9";
+	inline const static std::string APP_VERSION = "4.0.11";
 
 	inline const static std::string PLUGIN_VERSION = "1.2.1 ";
 
