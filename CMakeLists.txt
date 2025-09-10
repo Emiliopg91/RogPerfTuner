@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.16)
 
-project(RogControlCenter VERSION 4.0.10 LANGUAGES CXX)
+project(RogControlCenter VERSION 4.0.11 LANGUAGES CXX)
 
 add_compile_options(-Wno-unqualified-std-cast-call)
 
