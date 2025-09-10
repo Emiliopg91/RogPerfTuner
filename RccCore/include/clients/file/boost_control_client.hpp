@@ -39,6 +39,6 @@ class BoostControlClient : public AbstractFileClient {
 	std::string off;
 
 	BoostControlClient(const std::string& path, const std::string& on, const std::string& off)
-		: AbstractFileClient(path, "CPUInfoClient", true), on(on), off(off) {
+		: AbstractFileClient(path, "BoostControlClient", true), on(on), off(off) {
 	}
 };

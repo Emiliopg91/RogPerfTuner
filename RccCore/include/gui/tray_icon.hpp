@@ -43,11 +43,13 @@ class TrayIcon : public QObject {
 	std::map<std::string, QAction*> brightnessActions;
 	std::map<std::string, QAction*> effectActions;
 	std::map<std::string, QAction*> perfProfileActions;
+	QMenu* profileMenu;
 
 	void setAuraBrightness(RgbBrightness brightness);
 	void setAuraEffect(const std::string& effect);
 	void setPerformanceProfile(PerformanceProfile profile);
 	void setBatteryThreshold(BatteryThreshold threshold);
+	void setProfileMenuEnabled(bool enabled);
 	void openMainWindow();
 	void openSettings();
 	void reloadSettings();

@@ -63,6 +63,10 @@ void TrayIcon::setBatteryThreshold(BatteryThreshold threshold) {
 	QMetaObject::invokeMethod(&TrayIcon::getInstance(), [=]() { thresholdActions[threshold.toName()]->setChecked(true); }, Qt::QueuedConnection);
 }
 
+void TrayIcon::setProfileMenuEnabled(bool enabled) {
+	QMetaObject::invokeMethod(&TrayIcon::getInstance(), [=]() { profileMenu->setEnabled(enabled); }, Qt::QueuedConnection);
+}
+
 // ==============================
 // Implementación de slots
 // ==============================
@@ -178,7 +182,7 @@ TrayIcon::TrayIcon(QObject* parent) : QObject(parent), tray_icon_(new QSystemTra
 	// -------------------------
 	// Profile submenu
 	// -------------------------
-	QMenu* profileMenu		   = new QMenu(("    " + translator.translate("profile")).c_str(), menu);
+	profileMenu				   = new QMenu(("    " + translator.translate("profile")).c_str(), menu);
 	QActionGroup* profileGroup = new QActionGroup(menu);
 	auto items				   = PerformanceProfile::getAll();
 	std::reverse(items.begin(), items.end());
@@ -301,7 +305,7 @@ TrayIcon::TrayIcon(QObject* parent) : QObject(parent), tray_icon_(new QSystemTra
 						  [this](CallbackParam data) { setBatteryThreshold(std::any_cast<BatteryThreshold>(data[0])); });
 
 	eventBus.on_with_data(Events::STEAM_SERVICE_GAME_EVENT,
-						  [this, profileMenu](CallbackParam data) { profileMenu->setEnabled(std::any_cast<size_t>(data[0]) == 0); });
+						  [this](CallbackParam data) { setProfileMenuEnabled(std::any_cast<size_t>(data[0]) == 0); });
 }
 
 void TrayIcon::show() {
