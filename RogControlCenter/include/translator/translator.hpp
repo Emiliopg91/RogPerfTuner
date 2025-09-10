@@ -15,8 +15,8 @@ class Translator {
 
   private:
 	inline static std::string FALLBACK_LANG = "en";
-	static std::map<std::string, std::map<std::string, std::string>> initialTranslations;
-	std::map<std::string, std::string> translations;
+	static std::unordered_map<std::string, std::unordered_map<std::string, std::string>> initialTranslations;
+	std::unordered_map<std::string, std::string> translations;
 
 	Translator();
 	Logger logger{"Translator"};

@@ -80,11 +80,10 @@ class HttpServer {
 
 		runner = std::thread([this] {
 			started = true;
-			logger.info("Server listening on 127.0.0.1:" + std::to_string(Constants::HTTP_PORT));
+			logger.info("Server listening on 127.0.0.1:{}", Constants::HTTP_PORT);
 			svr.listen_after_bind();  // <- entra al bucle
 			logger.info("Server loop exited");
 		});
-
 		while (!started) {
 			std::this_thread::sleep_for(std::chrono::milliseconds(10));
 		}

@@ -69,7 +69,7 @@ int run_command(Logger& logger, const std::vector<std::string>& cmd, const std::
 		ss << arg << " ";
 	}
 
-	logger.info(">>> Running command: '" + StringUtils::trim(ss.str()) + "'");
+	logger.info(">>> Running command: '{}'", StringUtils::trim(ss.str()));
 	Logger::add_tab();
 
 	std::string cmd_str = command;
@@ -84,7 +84,7 @@ int run_command(Logger& logger, const std::vector<std::string>& cmd, const std::
 	int pipe_stderr[2];
 	pipe(pipe_stderr);
 
-	logger.debug("Launching process: " + cmd_str);
+	logger.debug("Launching process {}", cmd_str);
 	pid_t pid = fork();
 	if (pid == -1) {
 		perror("fork");
@@ -107,7 +107,7 @@ int run_command(Logger& logger, const std::vector<std::string>& cmd, const std::
 		_exit(1);
 	}
 
-	logger.debug("Launched with PID " + std::to_string(pid));
+	logger.debug("Launched with PID {}", pid);
 	close(pipe_stdout[1]);
 	close(pipe_stderr[1]);
 
@@ -136,7 +136,7 @@ int run_command(Logger& logger, const std::vector<std::string>& cmd, const std::
 	}
 
 	Logger::rem_tab();
-	logger.info("Command finished with exit code " + std::to_string(exit_code));
+	logger.info("Command finished with exit code {}", exit_code);
 
 	return exit_code;
 }
@@ -159,7 +159,7 @@ int main(int argc, char* argv[]) {
 	logger.info(">>> Entorno:");
 	Logger::add_tab();
 	for (char** env = environ; *env; ++env) {
-		logger.info(std::string(*env));
+		logger.info("{}", std::string(*env));
 	}
 	Logger::rem_tab();
 
@@ -168,7 +168,7 @@ int main(int argc, char* argv[]) {
 		cmdline << argv[i] << " ";
 	logger.info(">>> Command:");
 	Logger::add_tab();
-	logger.info(cmdline.str());
+	logger.info("{}", cmdline.str());
 	Logger::rem_tab();
 
 	std::vector<std::string> wrappers;
@@ -192,12 +192,12 @@ int main(int argc, char* argv[]) {
 
 	auto cmdWhichResult = shell.whichAll(std::string(argv[1]));
 	if (whichResult.empty()) {
-		logger.error("Command " + std::string(argv[1]) + " not found");
+		logger.error("Command {} not found", argv[1]);
 		exit(127);
 	}
 	std::string finalCommandStr = StringUtils::trim(cmdWhichResult[0]);
 
-	logger.info(std::string(argv[1]) + " -> " + finalCommandStr);
+	logger.info("{} -> {}", std::string(argv[1]), finalCommandStr);
 
 	command.push_back(finalCommandStr);
 

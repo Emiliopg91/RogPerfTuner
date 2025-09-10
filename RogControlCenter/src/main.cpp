@@ -37,9 +37,9 @@ int main(int argc, char** argv) {
 	title			  = StringUtils::rightPad(title, 49);
 
 	logger.info("###################################################");
-	logger.info("#" + title + "#");
+	logger.info("#{}#", title);
 	logger.info("###################################################");
-	logger.info("Version " + Constants::APP_VERSION);
+	logger.info("Version {}", Constants::APP_VERSION);
 	logger.info("Starting initialization");
 	Logger::add_tab();
 

@@ -170,7 +170,7 @@ void SteamService::onFirstGameRun(unsigned int gid, std::string name, std::map<s
 	steamClient.setLaunchOptions(gid, WRAPPER_PATH + " %command%");
 	logger.info("Configuration finished");
 
-	logger.info("Relaunching game with SteamOverlayId " + overlayId + "...");
+	logger.info("Relaunching game with SteamOverlayId {}...", overlayId);
 	std::this_thread::sleep_for(std::chrono::milliseconds(250));
 
 	shell.run_command("steam steam://rungameid/" + overlayId);
@@ -231,7 +231,7 @@ void SteamService::copyPlugin() {
 }
 
 void SteamService::onGameLaunch(unsigned int gid, std::string name, int pid) {
-	logger.info("Launched '" + name + "' (" + std::to_string(gid) + ") with PID " + std::to_string(pid));
+	logger.info("Launched '{}' ({}) with PID {}", name, gid, pid);
 	Logger::add_tab();
 	if (configuration.getConfiguration().games.find(std::to_string(gid)) == configuration.getConfiguration().games.end()) {
 		logger.info("Game not configured");
@@ -272,7 +272,7 @@ void SteamService::onGameLaunch(unsigned int gid, std::string name, int pid) {
 
 void SteamService::onGameStop(unsigned int gid, std::string name) {
 	if (runningGames.find(gid) != runningGames.end()) {
-		logger.info("Stopped '" + name + "' (" + std::to_string(gid) + ")");
+		logger.info("Stopped '{}' ({})", name, gid);
 		runningGames.erase(gid);
 		{
 			Logger::add_tab();
@@ -383,7 +383,7 @@ const SteamGameConfig SteamService::getConfiguration(const std::string& gid) {
 			cfg.wrappers.emplace_back(mangohud_which.value());
 		}
 	} else {
-		logger.error("No configuration entry found for " + gid);
+		logger.error("No configuration entry found for {}", gid);
 	}
 
 	return cfg;

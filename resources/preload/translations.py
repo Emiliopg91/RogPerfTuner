@@ -29,7 +29,7 @@ with open(output_file, "w") as out:
     out.write('#include "../../include/translator/translator.hpp"\n\n')
 
     out.write(
-        "std::map<std::string, std::map<std::string, std::string>> Translator::initialTranslations = {\n"
+        "std::map<std::string, std::unordered_map<std::string, std::string>> Translator::initialTranslations = {\n"
     )
     for literal in translations:
         {out.write(f'{{"{literal}", {{\n')}

@@ -17,7 +17,7 @@ ApplicationService::ApplicationService() {
 	FileUtils::mkdirs(Constants::BIN_APPLICATION_DIR);
 
 	FileUtils::writeFileContent(Constants::LAUNCHER_FILE, buildLaunchFile());
-	logger.debug("Launch file '" + Constants::LAUNCHER_FILE + "' written successfully");
+	logger.debug("Launch file '{}' written successfully", Constants::LAUNCHER_FILE);
 
 	FileUtils::copy(Constants::ASSET_ICONS_DIR, Constants::ICONS_DIR);
 
@@ -27,7 +27,7 @@ ApplicationService::ApplicationService() {
 
 	if (!FileUtils::exists(Constants::APP_DRAW_FILE)) {
 		FileUtils::writeFileContent(Constants::APP_DRAW_FILE, buildDesktopFile());
-		logger.debug("Menu entry file '" + Constants::APP_DRAW_FILE + "' written successfully");
+		logger.debug("Menu entry file '{}' written successfully", Constants::APP_DRAW_FILE);
 	}
 
 	AutoUpdater::getInstance(
@@ -49,11 +49,11 @@ void ApplicationService::setAutostart(bool enabled) {
 	if (enabled) {
 		if (!FileUtils::exists(Constants::AUTOSTART_FILE)) {
 			FileUtils::writeFileContent(Constants::AUTOSTART_FILE, buildDesktopFile());
-			logger.info("Autostart file '" + Constants::AUTOSTART_FILE + "' written successfully");
+			logger.info("Autostart file '{}' written successfully", Constants::AUTOSTART_FILE);
 		}
 	} else {
 		FileUtils::remove(Constants::AUTOSTART_FILE);
-		logger.info("Autostart file '" + Constants::AUTOSTART_FILE + "' deleted successfully");
+		logger.info("Autostart file '{}' deleted successfully", Constants::AUTOSTART_FILE);
 	}
 }
 

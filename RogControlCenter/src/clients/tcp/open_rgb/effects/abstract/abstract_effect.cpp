@@ -28,7 +28,7 @@ void AbstractEffect::start(const DeviceList& devices, const RgbBrightness& brigh
 		return;
 	}
 
-	_logger.info("Starting effect '" + getName() + "' with " + StringUtils::toLowerCase(brightness.toName()) + " brightness");
+	_logger.info("Starting effect '{}' with {} brightness", getName(), StringUtils::toLowerCase(brightness.toName()));
 	_brightness = brightnessMap(brightness);
 	_is_running = true;
 

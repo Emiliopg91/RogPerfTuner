@@ -133,12 +133,11 @@ class Logger {
 
 	template <typename... Args>
 	void log(spdlog::level::level_enum level, format_string_t<Args...> fmt, Args&&... args) {
-		std::string padding = "";
+		std::string padding;
 		for (int i = 0; i < tabs; i++) {
-			padding = "  " + padding;
+			padding += "  ";
 		}
-		std::string formatted = fmt::format(fmt, std::forward<Args>(args)...);
-		std::string message	  = fmt::format("{}{}", padding, formatted);
-		logger->log(level, message, std::forward<Args>(args)...);
+		// Formatear todo de una vez
+		logger->log(level, fmt::format("{}{}", padding, fmt::format(fmt, std::forward<Args>(args)...)));
 	}
 };

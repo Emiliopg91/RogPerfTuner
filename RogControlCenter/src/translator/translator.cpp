@@ -6,7 +6,7 @@
 using json = nlohmann::json;
 
 Translator::Translator() {
-	logger.debug("User language: " + currentLang);
+	logger.debug("User language: {}", currentLang);
 
 	try {
 		for (auto& [key, entries] : initialTranslations) {
@@ -15,7 +15,7 @@ Translator::Translator() {
 			if (it != entries.end()) {
 				literal = it->second;
 			} else {
-				logger.warn("Missing translation for '" + key + "'");
+				logger.warn("Missing translation for '{}'", key);
 				auto it = entries.find(FALLBACK_LANG);
 				if (it != entries.end()) {
 					literal = it->second;
@@ -25,9 +25,9 @@ Translator::Translator() {
 		}
 
 		initialTranslations.clear();
-		std::map<std::string, std::map<std::string, std::string>>().swap(initialTranslations);
+		std::unordered_map<std::string, std::unordered_map<std::string, std::string>>().swap(initialTranslations);
 	} catch (const std::exception& e) {
-		logger.error(fmt::format("Error loading translations: {}", e.what()));
+		logger.error("Error loading translations: {}", e.what());
 	}
 }
 
@@ -60,7 +60,7 @@ std::string Translator::translate(const std::string& msg, const std::unordered_m
 		}
 
 	} else {
-		logger.warn("Missing translation for '" + msg + "'");
+		logger.warn("Missing translation for '{}'", msg);
 	}
 
 	return result;

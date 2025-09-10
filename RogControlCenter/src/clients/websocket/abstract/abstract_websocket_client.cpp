@@ -101,7 +101,7 @@ std::vector<std::any> AbstractWebsocketClient::invoke(const std::string& method,
 	_queue_cv.notify_one();
 
 	if (fut.wait_for(std::chrono::milliseconds(timeout_ms)) == std::future_status::timeout) {
-		logger.error("No response for " + method + " after " + std::to_string(timeout_ms) + " ms");
+		logger.error("No response for {} after {} ms", timeout_ms, method);
 		throw std::runtime_error("WebSocketTimeoutError");
 	}
 

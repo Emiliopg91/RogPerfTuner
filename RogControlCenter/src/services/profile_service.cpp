@@ -19,7 +19,7 @@ ProfileService::ProfileService() {
 	if (uPowerClient.available()) {
 		onBattery		 = uPowerClient.isOnBattery();
 		std::string mode = onBattery ? "battery" : "AC";
-		logger.info("Laptop on " + mode + " mode");
+		logger.info("Laptop on {} mode", mode);
 	}
 
 	if (platformClient.available()) {
@@ -52,7 +52,7 @@ void ProfileService::setPerformanceProfile(const PerformanceProfile& profile, co
 	std::string profileName = profile.toName();
 
 	if (profile != currentProfile || force) {
-		logger.info("Setting " + profileName + " profile");
+		logger.info("Setting {} profile", profileName);
 		Logger::add_tab();
 		try {
 			auto t0 = std::chrono::high_resolution_clock::now();
@@ -74,7 +74,7 @@ void ProfileService::setPerformanceProfile(const PerformanceProfile& profile, co
 
 			auto t1 = std::chrono::high_resolution_clock::now();
 			Logger::rem_tab();
-			logger.info("Profile setted after " + std::to_string(std::chrono::duration_cast<std::chrono::milliseconds>(t1 - t0).count()) + " ms");
+			logger.info("Profile setted after {} ms", std::chrono::duration_cast<std::chrono::milliseconds>(t1 - t0).count());
 			std::unordered_map<std::string, std::any> values = {
 				{"profile", StringUtils::toLowerCase(translator.translate("label.profile." + profileName))}};
 			toaster.showToast(translator.translate("profile.applied", values));
@@ -83,7 +83,7 @@ void ProfileService::setPerformanceProfile(const PerformanceProfile& profile, co
 			Logger::rem_tab();
 		}
 	} else {
-		logger.info("Profile " + StringUtils::toLowerCase(profileName) + " already setted");
+		logger.info("Profile {} already setted", StringUtils::toLowerCase(profileName));
 	}
 }
 
@@ -180,13 +180,13 @@ void ProfileService::setTdps(const PerformanceProfile& profile) {
 		Logger::add_tab();
 
 		auto pl1 = onBattery ? ProfileUtils::batteryIntelPl1Spl(profile) : ProfileUtils::acIntelPl1Spl(profile);
-		logger.info("PL1: " + std::to_string(pl1) + "W");
+		logger.info("PL1: {}W", pl1);
 		try {
 			pl1SpdClient.setCurrentValue(pl1);
 			std::this_thread::sleep_for(std::chrono::milliseconds(25));
 			if (pl2SpptClient.available()) {
 				auto pl2 = onBattery ? ProfileUtils::batteryIntelPl2Sppt(profile) : ProfileUtils::acIntelPl2Sppt(profile);
-				logger.info("PL2: " + std::to_string(pl2) + "W");
+				logger.info("PL2: {}W", pl2);
 				std::this_thread::sleep_for(std::chrono::milliseconds(25));
 				pl2SpptClient.setCurrentValue(pl2);
 			}
@@ -206,7 +206,7 @@ void ProfileService::setTgp(const PerformanceProfile& profile) {
 		if (nvBoostClient.available()) {
 			try {
 				auto nvb = onBattery ? ProfileUtils::batteryNvBoost(profile) : ProfileUtils::acNvBoost(profile);
-				logger.info("Dynamic Boost: " + std::to_string(nvb) + "W");
+				logger.info("Dynamic Boost: {}W", nvb);
 				nvBoostClient.setCurrentValue(nvb);
 				std::this_thread::sleep_for(std::chrono::milliseconds(25));
 			} catch (std::exception e) {
@@ -217,7 +217,7 @@ void ProfileService::setTgp(const PerformanceProfile& profile) {
 		if (nvTempClient.available()) {
 			try {
 				auto nvt = onBattery ? ProfileUtils::batteryNvTemp(profile) : ProfileUtils::acNvTemp();
-				logger.info("Throttle temp: " + std::to_string(nvt) + "ºC");
+				logger.info("Throttle temp: {}ºC", nvt);
 				nvTempClient.setCurrentValue(nvt);
 			} catch (std::exception e) {
 				logger.info("Error setting Nvidia TGP");

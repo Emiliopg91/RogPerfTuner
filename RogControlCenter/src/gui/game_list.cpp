@@ -107,7 +107,7 @@ GameList::GameList(QWidget* parent, bool manage_parent) : QDialog(parent), manag
 		}
 		gpuCombo->setCurrentIndex(gpuIndex);
 
-		connect(gpuCombo, QOverload<int>::of(&QComboBox::currentIndexChanged), [=](int) {
+		connect(gpuCombo, QOverload<int>::of(&QComboBox::currentIndexChanged), [=, this](int) {
 			std::string str				  = gpuCombo->currentData().toString().toStdString();
 			std::optional<GpuBrand> brand = std::nullopt;
 			if (!str.empty())
@@ -124,7 +124,7 @@ GameList::GameList(QWidget* parent, bool manage_parent) : QDialog(parent), manag
 		sdCombo->addItem(QString::fromStdString(translator.translate("label.steamdeck.yes")), true);
 		sdCombo->setCurrentIndex(steamService.isSteamDeck(appid) ? 1 : 0);
 
-		connect(sdCombo, QOverload<int>::of(&QComboBox::currentIndexChanged), [=](int) {
+		connect(sdCombo, QOverload<int>::of(&QComboBox::currentIndexChanged), [=, this](int) {
 			steamService.setSteamDeck(appid, sdCombo->currentData().toBool());
 		});
 		table->setCellWidget(row, 2, sdCombo);
@@ -141,7 +141,7 @@ GameList::GameList(QWidget* parent, bool manage_parent) : QDialog(parent), manag
 					metricsCombo->setCurrentIndex(level.toInt());
 			}
 
-			connect(metricsCombo, QOverload<int>::of(&QComboBox::currentIndexChanged), [=](int) {
+			connect(metricsCombo, QOverload<int>::of(&QComboBox::currentIndexChanged), [=, this](int) {
 				steamService.setMetricsLevel(appid, MangoHudLevel::fromInt(metricsCombo->currentData().toInt()));
 			});
 			table->setCellWidget(row, col++, metricsCombo);
@@ -159,7 +159,7 @@ GameList::GameList(QWidget* parent, bool manage_parent) : QDialog(parent), manag
 			i++;
 		}
 		syncCombo->setEnabled(!isRunning && steamService.isProton(appid));
-		connect(syncCombo, QOverload<int>::of(&QComboBox::currentIndexChanged), [=](int) {
+		connect(syncCombo, QOverload<int>::of(&QComboBox::currentIndexChanged), [=, this](int) {
 			steamService.setWineSync(appid, syncCombo->currentData().toString().toStdString());
 		});
 		table->setCellWidget(row, col++, syncCombo);
@@ -167,7 +167,7 @@ GameList::GameList(QWidget* parent, bool manage_parent) : QDialog(parent), manag
 		// --- Environment ---
 		QLineEdit* envInput = new QLineEdit(QString::fromStdString(steamService.getEnvironment(appid)));
 		envInput->setEnabled(!isRunning);
-		connect(envInput, &QLineEdit::textChanged, [=](const QString& text) {
+		connect(envInput, &QLineEdit::textChanged, [=, this](const QString& text) {
 			steamService.setEnvironment(appid, text.toStdString());
 		});
 		table->setCellWidget(row, col++, envInput);
@@ -175,7 +175,7 @@ GameList::GameList(QWidget* parent, bool manage_parent) : QDialog(parent), manag
 		// --- Parameters ---
 		QLineEdit* paramsInput = new QLineEdit(QString::fromStdString(steamService.getParameters(appid)));
 		paramsInput->setEnabled(!isRunning);
-		connect(paramsInput, &QLineEdit::textChanged, [=](const QString& text) {
+		connect(paramsInput, &QLineEdit::textChanged, [=, this](const QString& text) {
 			steamService.setParameters(appid, text.toStdString());
 		});
 		table->setCellWidget(row, col++, paramsInput);

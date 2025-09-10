@@ -28,7 +28,7 @@ void Configuration::loadConfig() {
 
 			LoggerProvider::setConfigMap(cfg.logger);
 		} catch (const std::exception& e) {
-			logger.error(fmt::format("Error loading settings: {}", e.what()));
+			logger.error("Error loading settings: {}", e.what());
 		}
 	} else {
 		logger.debug("Settings file not found, creating new");

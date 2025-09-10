@@ -70,7 +70,7 @@ class AutoUpdater {
 		auto res = cli.Get(url.c_str());
 
 		if (!res || res->status != 200) {
-			logger.error("Error getting latest release: " + std::to_string(res ? res->status : 0));
+			logger.error("Error getting latest release: {}", res ? res->status : 0);
 			return Asset("", 0);
 		}
 
@@ -88,7 +88,7 @@ class AutoUpdater {
 				if (name.size() >= 9 && name.substr(name.size() - 9) == ".AppImage") {
 					std::string url = asset["browser_download_url"];
 					size_t size		= asset["size"];
-					logger.info("Update found: " + name + " (" + std::to_string(size) + " bytes)");
+					logger.info("Update found: {}({} bytes)", name, std::to_string(size));
 					return Asset(url, size);
 				}
 			}
@@ -96,7 +96,7 @@ class AutoUpdater {
 			logger.info("No AppImage asset found in latest release");
 			return Asset("", 0);
 		} catch (const std::exception& e) {
-			logger.error(std::string("JSON parse error: ") + e.what());
+			logger.error("JSON parse error: {}", e.what());
 			return Asset("", 0);
 		}
 	}
@@ -108,7 +108,7 @@ class AutoUpdater {
 		std::regex url_regex(R"(https://([^/]+)(/.+))");
 		std::smatch match;
 		if (!std::regex_match(asset.url, match, url_regex)) {
-			logger.error("Invalid URL: " + asset.url);
+			logger.error("Invalid URL: {}", asset.url);
 			return;
 		}
 
@@ -121,7 +121,7 @@ class AutoUpdater {
 
 		auto res = cli.Get(path.c_str());
 		if (!res || res->status != 200) {
-			logger.error("Failed to download file, HTTP status: " + std::to_string(res ? res->status : 0));
+			logger.error("Failed to download file, HTTP status: {}", res ? res->status : 0);
 			return;
 		}
 
@@ -140,7 +140,7 @@ class AutoUpdater {
 			FileUtils::move(Constants::UPDATE_TMP_FILE, Constants::UPDATE_FILE);
 			logger.info("File copied to update folder");
 		} catch (const std::exception& e) {
-			logger.error("Error copying file: " + std::string(e.what()));
+			logger.error("Error copying file: {}", e.what());
 		}
 	}
 

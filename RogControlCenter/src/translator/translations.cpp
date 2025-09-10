@@ -3,7 +3,7 @@
 
 #include "../../include/translator/translator.hpp"
 
-std::map<std::string, std::map<std::string, std::string>> Translator::initialTranslations = {
+std::unordered_map<std::string, std::unordered_map<std::string, std::string>> Translator::initialTranslations = {
 	{"performance",
 	 {
 		 {"en", "Performance"},

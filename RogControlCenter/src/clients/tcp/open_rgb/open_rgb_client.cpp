@@ -124,7 +124,7 @@ void OpenRgbClient::runner() {
 
 	pid			  = shell.launch_process(Constants::ORGB_PATH.c_str(), argv.data(), env.data(), Constants::LOG_ORGB_FILE);
 	int exit_code = shell.wait_for(pid);
-	logger.info("Command finished with exit code " + std::to_string(exit_code));
+	logger.info("Command finished with exit code {}", exit_code);
 }
 
 void OpenRgbClient::startOpenRgbClient() {
@@ -143,7 +143,7 @@ void OpenRgbClient::getAvailableDevices() {
 	for (auto& dev : detectedDevices) {
 		const orgb::Mode* directMode = dev.findMode("Direct");
 		if (directMode) {
-			logger.info(dev.name);
+			logger.info("{}", dev.name);
 			client.changeMode(dev, *directMode);
 			client.setDeviceColor(dev, orgb::Color::Black);
 		}

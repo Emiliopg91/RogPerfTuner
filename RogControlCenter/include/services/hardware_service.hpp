@@ -13,6 +13,7 @@
 #include "../clients/file/boost_control_client.hpp"
 #include "../clients/file/cpuinfo_client.hpp"
 #include "../clients/file/ssd_scheduler_client.hpp"
+#include "../clients/shell/lsusb_client.hpp"
 #include "../clients/shell/switcherooctl_client.hpp"
 #include "../events/event_bus.hpp"
 #include "../gui/toaster.hpp"
@@ -49,6 +50,7 @@ class HardwareService {
 
 	void setupDeviceLoop();
 	void onBatteryEvent(const bool& onBattery, const bool& muted = false);
+	void onDeviceEvent();
 
 	Logger logger{"HardwareService"};
 	std::mutex actionMutex;
@@ -70,6 +72,7 @@ class HardwareService {
 	SwitcherooCtlClient& switcherooCtlClient		 = SwitcherooCtlClient::getInstance();
 	PanelOverdriveClient& panelOverdriveClient		 = PanelOverdriveClient::getInstance();
 	PMKeyboardBrightness& pmKeyboardBrightnessClient = PMKeyboardBrightness::getInstance();
+	LsUsbClient& udevClient							 = LsUsbClient::getInstance();
 
 	BatteryThreshold charge_limit = BatteryThreshold::Enum::CT_100;
 	CpuBrand cpu				  = CpuBrand::Enum::INTEL;

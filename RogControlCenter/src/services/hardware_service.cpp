@@ -34,7 +34,7 @@ HardwareService::HardwareService() {
 		auto pos   = line.find(":");
 		if (pos != std::string::npos) {
 			line = line.substr(pos + 2);
-			logger.info(line);
+			logger.info("{}", line);
 		}
 	}
 
@@ -54,7 +54,7 @@ HardwareService::HardwareService() {
 	Logger::add_tab();
 	auto detected_gpus = switcherooCtlClient.getGpus();
 	for (auto gpu : detected_gpus) {
-		logger.info(gpu.name);
+		logger.info("{}", gpu.name);
 		if (!gpu.default_flag) {
 			auto brand = static_cast<GpuBrand>(GpuBrand::fromString(StringUtils::toLowerCase(StringUtils::split(gpu.name, ' ')[0])));
 			std::string env;
@@ -119,7 +119,7 @@ HardwareService::HardwareService() {
 		Logger::add_tab();
 		ssd_schedulers = ssdSchedulerClient.get_schedulers();
 		for (auto sched : ssd_schedulers)
-			logger.info(sched.toString());
+			logger.info("{}", sched.toString());
 		Logger::rem_tab();
 	}
 
@@ -127,7 +127,7 @@ HardwareService::HardwareService() {
 		logger.info("Getting battery charge limit");
 		Logger::add_tab();
 		charge_limit = platformClient.getBatteryLimit();
-		logger.info(std::to_string(charge_limit.toInt()) + "%");
+		logger.info("{} %", charge_limit.toInt());
 		Logger::rem_tab();
 	}
 
@@ -154,43 +154,46 @@ HardwareService::HardwareService() {
 }
 
 void HardwareService::setupDeviceLoop() {
-	auto& udevClient = LsUsbClient::getInstance();
 	connectedDevices = std::get<0>(udevClient.compare_connected_devs({}, [this](const UsbIdentifier& dev) {
 		return !openRgbService.getDeviceName(dev).empty();
 	}));
-	eventBus.onDeviceEvent([this, &udevClient]() {
-		auto [current, added, removed] = udevClient.compare_connected_devs(connectedDevices, [this](const UsbIdentifier& dev) {
-			return !openRgbService.getDeviceName(dev).empty();
-		});
-
-		if (added.size() > 0) {
-			logger.info("Added compatible device(s):");
-			Logger::add_tab();
-			for (auto dev : added) {
-				logger.info(openRgbService.getDeviceName(dev));
-			}
-			Logger::rem_tab();
-		}
-
-		if (removed.size() > 0) {
-			logger.info("Removed compatible device(s):");
-			Logger::add_tab();
-			for (auto dev : removed) {
-				logger.info(openRgbService.getDeviceName(dev));
-			}
-			Logger::rem_tab();
-		}
-
-		if (removed.size() > 0 && added.size() == 0) {
-			for (auto dev : removed) {
-				openRgbService.disableDevice(dev);
-			}
-		} else if (removed.size() > 0 || added.size() > 0) {
-			eventBus.emitUsbAddedRemoved();
-		}
-
-		connectedDevices = current;
+	eventBus.onDeviceEvent([this]() {
+		onDeviceEvent();
 	});
+}
+
+void HardwareService::onDeviceEvent() {
+	auto [current, added, removed] = udevClient.compare_connected_devs(connectedDevices, [this](const UsbIdentifier& dev) {
+		return !openRgbService.getDeviceName(dev).empty();
+	});
+
+	if (added.size() > 0) {
+		logger.info("Added compatible device(s):");
+		Logger::add_tab();
+		for (auto dev : added) {
+			logger.info("{}", openRgbService.getDeviceName(dev));
+		}
+		Logger::rem_tab();
+	}
+
+	if (removed.size() > 0) {
+		logger.info("Removed compatible device(s):");
+		Logger::add_tab();
+		for (auto dev : removed) {
+			logger.info("{}", openRgbService.getDeviceName(dev));
+		}
+		Logger::rem_tab();
+	}
+
+	if (removed.size() > 0 && added.size() == 0) {
+		for (auto dev : removed) {
+			openRgbService.disableDevice(dev);
+		}
+	} else if (removed.size() > 0 || added.size() > 0) {
+		eventBus.emitUsbAddedRemoved();
+	}
+
+	connectedDevices = current;
 }
 
 BatteryThreshold HardwareService::getChargeThreshold() {
@@ -200,13 +203,13 @@ BatteryThreshold HardwareService::getChargeThreshold() {
 void HardwareService::setChargeThreshold(const BatteryThreshold& threshold) {
 	std::lock_guard<std::mutex> lock(actionMutex);
 	if (charge_limit != threshold) {
-		logger.info("Setting charge limit to " + std::to_string(threshold.toInt()) + "%");
+		logger.info("Setting charge limit to {}%", threshold.toInt());
 		auto t0 = std::chrono::high_resolution_clock::now();
 		platformClient.setBatteryLimit(threshold);
 		auto t1 = std::chrono::high_resolution_clock::now();
 
 		charge_limit = threshold;
-		logger.info("Charge limit setted after " + std::to_string(std::chrono::duration_cast<std::chrono::milliseconds>(t1 - t0).count()) + " ms");
+		logger.info("Charge limit setted after {} ms", std::chrono::duration_cast<std::chrono::milliseconds>(t1 - t0).count());
 
 		std::unordered_map<std::string, std::any> replacements = {{"value", threshold.toInt()}};
 		toaster.showToast(translator.translate("applied.battery.threshold", replacements));
@@ -223,7 +226,7 @@ void HardwareService::onBatteryEvent(const bool& onBat, const bool& muted) {
 		if (!muted) {
 			std::string t1 = onBattery ? "un" : "";
 			std::string t2 = !onBattery ? "dis" : "";
-			logger.info("AC " + t1 + "plugged, battery " + t2 + "engaged");
+			logger.info("AC {}plugged, battery {}engaged", t1, t2);
 			Logger::add_tab();
 		}
 		eventBus.emitBattery(onBat);

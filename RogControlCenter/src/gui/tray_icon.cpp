@@ -50,7 +50,7 @@ void openGameList() {
 void TrayIcon::setAuraBrightness(RgbBrightness brightness) {
 	QMetaObject::invokeMethod(
 		&TrayIcon::getInstance(),
-		[=]() {
+		[=, this]() {
 			brightnessActions[brightness.toName()]->setChecked(true);
 		},
 		Qt::QueuedConnection);
@@ -59,7 +59,7 @@ void TrayIcon::setAuraBrightness(RgbBrightness brightness) {
 void TrayIcon::setAuraEffect(const std::string& effect) {
 	QMetaObject::invokeMethod(
 		&TrayIcon::getInstance(),
-		[=]() {
+		[=, this]() {
 			effectActions[effect]->setChecked(true);
 		},
 		Qt::QueuedConnection);
@@ -68,7 +68,7 @@ void TrayIcon::setAuraEffect(const std::string& effect) {
 void TrayIcon::setPerformanceProfile(PerformanceProfile profile) {
 	QMetaObject::invokeMethod(
 		&TrayIcon::getInstance(),
-		[=]() {
+		[=, this]() {
 			perfProfileActions[profile.toName()]->setChecked(true);
 		},
 		Qt::QueuedConnection);
@@ -77,7 +77,7 @@ void TrayIcon::setPerformanceProfile(PerformanceProfile profile) {
 void TrayIcon::setBatteryThreshold(BatteryThreshold threshold) {
 	QMetaObject::invokeMethod(
 		&TrayIcon::getInstance(),
-		[=]() {
+		[=, this]() {
 			thresholdActions[threshold.toName()]->setChecked(true);
 		},
 		Qt::QueuedConnection);
@@ -86,7 +86,7 @@ void TrayIcon::setBatteryThreshold(BatteryThreshold threshold) {
 void TrayIcon::setProfileMenuEnabled(bool enabled) {
 	QMetaObject::invokeMethod(
 		&TrayIcon::getInstance(),
-		[=]() {
+		[=, this]() {
 			profileMenu->setEnabled(enabled);
 		},
 		Qt::QueuedConnection);
