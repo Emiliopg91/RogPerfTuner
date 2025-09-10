@@ -54,7 +54,7 @@ build:
 	@python3 resources/preload/translations.py
 
 	@echo "Formatting code..."
-	@clang-format -i $$(find RccCore -name '*.cpp' -o -name '*.hpp')
+	@clang-format -i $$(find RogControlCenter -name '*.cpp' -o -name '*.hpp')
 
 	@if [ ! -f "patches/OpenRGB-cppSDK.diff.applied" ]; then \
 		cd submodules/OpenRGB-cppSDK && git apply ../../patches/OpenRGB-cppSDK.diff && touch ../../patches/OpenRGB-cppSDK.diff.applied; \
@@ -63,12 +63,12 @@ build:
 	@cmake --build build -- -j$(NUM_CORES)
 
 	@mkdir assets/bin assets/bin/rgb  assets/bin/performance assets/bin/steam
-	@cp build/RccCore/NextEffect assets/bin/rgb/nextEffect
-	@cp build/RccCore/IncBrightness assets/bin/rgb/incBrightness
-	@cp build/RccCore/DecBrightness assets/bin/rgb/decBrightness
-	@cp build/RccCore/NextProfile assets/bin/performance/nextProfile
-	@cp build/RccCore/SteamRunner assets/bin/steam/run
-	@cp build/RccCore/FlatpakWrapper assets/bin/steam/flatpak
+	@cp build/RogControlCenter/NextEffect assets/bin/rgb/nextEffect
+	@cp build/RogControlCenter/IncBrightness assets/bin/rgb/incBrightness
+	@cp build/RogControlCenter/DecBrightness assets/bin/rgb/decBrightness
+	@cp build/RogControlCenter/NextProfile assets/bin/performance/nextProfile
+	@cp build/RogControlCenter/SteamRunner assets/bin/steam/run
+	@cp build/RogControlCenter/FlatpakWrapper assets/bin/steam/flatpak
 
 build_openrgb:
 	@if [ ! -f "patches/OpenRGB.diff.applied" ]; then \
@@ -95,7 +95,7 @@ package:
 	@echo "####################### Generating Dist folder ########################"
 	@echo "#######################################################################"
 	@mkdir dist dist/RogControlCenter
-	@cp ./build/RccCore/RogControlCenter dist/RogControlCenter
+	@cp ./build/RogControlCenter/RogControlCenter dist/RogControlCenter
 	@cp -r assets dist/RogControlCenter
 
 	@echo "#######################################################################"
@@ -126,9 +126,9 @@ build_debug:
 
 run: build_debug
 	@touch /tmp/fake.AppImage
-	@echo "Running 'APPIMAGE=/tmp/fake.AppImage RCC_ASSETS_DIR=$(MAKEFILE_DIR)assets ./build/RccCore/RogControlCenter'"
+	@echo "Running 'APPIMAGE=/tmp/fake.AppImage RCC_ASSETS_DIR=$(MAKEFILE_DIR)assets ./build/RogControlCenter/RogControlCenter'"
 	@echo ""
-	@APPIMAGE=/tmp/fake.AppImage RCC_MODE=DEV RCC_ASSETS_DIR=$(MAKEFILE_DIR)assets ./build/RccCore/RogControlCenter
+	@APPIMAGE=/tmp/fake.AppImage RCC_MODE=DEV RCC_ASSETS_DIR=$(MAKEFILE_DIR)assets ./build/RogControlCenter/RogControlCenter
 
 increase_version:
 	@awk '{if ($$0 ~ /project\(.*VERSION/) {match($$0, /([0-9]+)\.([0-9]+)\.([0-9]+)/, v); patch = v[3] + 1; sub(/[0-9]+\.[0-9]+\.[0-9]+/, v[1] "." v[2] "." patch);} print}' CMakeLists.txt > CMakeLists.txt.tmp && mv CMakeLists.txt.tmp CMakeLists.txt

@@ -5,7 +5,7 @@
             "name": "Debug MiProyecto",
             "type": "cppdbg",
             "request": "launch",
-            "program": "${workspaceFolder}/build/RccCore/RogControlCenter",
+            "program": "${workspaceFolder}/build/RogControlCenter/RogControlCenter",
             "args": [],
             "stopAtEntry": false,
             "cwd": "${workspaceFolder}",
@@ -15,8 +15,14 @@
             "externalConsole": false,
             "console": "integratedTerminal",
             "environment": [
-                { "name": "APPIMAGE", "value": "/tmp/fake.AppImage" },
-                { "name": "RCC_ASSETS_DIR", "value": "${workspaceFolder}/assets" }
+                {
+                    "name": "APPIMAGE",
+                    "value": "/tmp/fake.AppImage"
+                },
+                {
+                    "name": "RCC_ASSETS_DIR",
+                    "value": "${workspaceFolder}/assets"
+                }
             ]
         }
     ]

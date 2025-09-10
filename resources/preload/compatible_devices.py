@@ -8,7 +8,7 @@ input_file = os.path.abspath(
 )
 output_file = os.path.abspath(
     os.path.dirname(__file__)
-    + "/../../RccCore/include/clients/tcp/open_rgb/compatible_devices.hpp"
+    + "/../../RogControlCenter/include/clients/tcp/open_rgb/compatible_devices.hpp"
 )
 
 print(f"Preloading compatibles devices from {input_file}")

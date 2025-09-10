@@ -19,7 +19,7 @@ debug_file = os.path.abspath(os.path.dirname(__file__) + "/../../.Debug")
 release_file = os.path.abspath(os.path.dirname(__file__) + "/../../.Release")
 
 constants_file = os.path.abspath(
-    os.path.dirname(__file__) + "/../../RccCommons/include/utils/constants.hpp"
+    os.path.dirname(__file__) + "/../../RogControlCenter/include/utils/constants.hpp"
 )
 constants_time = os.path.getmtime(constants_file)
 

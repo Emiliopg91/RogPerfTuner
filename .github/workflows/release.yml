@@ -38,7 +38,7 @@ jobs:
           cmake --version
           PYTHONUNBUFFERED=1 make release
 
-            if [[ -n $(git status --porcelain "RccCore") ]]; then
+            if [[ -n $(git status --porcelain "RogControlCenter") ]]; then
                 changes=1
                 break
             fi

@@ -25,4 +25,4 @@ add_subdirectory(submodules/spdlog)
 
 add_subdirectory(submodules/OpenRGB-cppSDK)
 
-add_subdirectory(RccCore)
+add_subdirectory(RogControlCenter)
