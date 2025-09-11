@@ -42,7 +42,7 @@ target_link_libraries(RogControlCenter PRIVATE
     Qt6::Gui
     Qt6::Widgets
     Qt6::DBus
-    spdlog::spdlog_header_only 
+    spdlog::spdlog 
     nlohmann_json::nlohmann_json
     httplib::httplib
     ixwebsocket::ixwebsocket
@@ -102,7 +102,7 @@ target_include_directories(SteamRunner PRIVATE ${LIBSECRET_INCLUDE_DIRS})
 target_link_libraries(SteamRunner PRIVATE 
     httplib::httplib
     nlohmann_json::nlohmann_json
-    spdlog::spdlog_header_only 
+    spdlog::spdlog 
 )
 
 add_executable(FlatpakWrapper ${CMAKE_CURRENT_SOURCE_DIR}/src/scripts/steam/flatpak.cpp ${SOURCES_SHELL} ${SOURCES_LOGGER})
@@ -110,5 +110,5 @@ target_include_directories(FlatpakWrapper PRIVATE ${LIBSECRET_INCLUDE_DIRS})
 target_link_libraries(FlatpakWrapper PRIVATE 
     httplib::httplib
     nlohmann_json::nlohmann_json
-    spdlog::spdlog_header_only 
+    spdlog::spdlog 
 )

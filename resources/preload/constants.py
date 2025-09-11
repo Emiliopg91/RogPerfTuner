@@ -34,7 +34,7 @@ name, version = match.groups()
 with open(plugin_file, "r", encoding="utf-8") as f:
     plugin = json.load(f)
 
-plugin_version = plugin["version"]
+plugin_version = plugin["version"].strip()
 
 if not os.path.exists(version_file) or cmake_time > os.path.getmtime(version_file):
     with open(version_file, "w", encoding="utf-8") as out:

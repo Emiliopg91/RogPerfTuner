@@ -3,27 +3,17 @@
     "configurations": [
         {
             "name": "Debug MiProyecto",
-            "type": "cppdbg",
+            "type": "lldb",
             "request": "launch",
             "program": "${workspaceFolder}/build/RogControlCenter/RogControlCenter",
             "args": [],
-            "stopAtEntry": false,
             "cwd": "${workspaceFolder}",
-            "MIMode": "gdb",
-            "miDebuggerPath": "/usr/bin/gdb",
             "preLaunchTask": "CMake Build",
-            "externalConsole": false,
             "console": "integratedTerminal",
-            "environment": [
-                {
-                    "name": "APPIMAGE",
-                    "value": "/tmp/fake.AppImage"
-                },
-                {
-                    "name": "RCC_ASSETS_DIR",
-                    "value": "${workspaceFolder}/assets"
-                }
-            ]
+            "env": {
+                "APPIMAGE": "/tmp/fake.AppImage",
+                "RCC_ASSETS_DIR": "${workspaceFolder}/assets"
+            }
         }
     ]
 }

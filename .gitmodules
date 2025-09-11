@@ -19,3 +19,6 @@
 [submodule "submodules/ixwebsocket"]
 	path = submodules/ixwebsocket
 	url = https://github.com/Emiliopg91/machinezone-IXWebSocket
+[submodule "submodules/sdbus-cpp"]
+	path = submodules/sdbus-cpp
+	url = https://github.com/Emiliopg91/Kistler-Group-sdbus-cpp-fork
