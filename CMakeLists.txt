@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.16)
 
-project(RogControlCenter VERSION 4.0.12 LANGUAGES CXX)
+project(RogControlCenter VERSION 4.0.13 LANGUAGES CXX)
 
 message(STATUS "Build type: ${CMAKE_BUILD_TYPE}")
 if(NOT CMAKE_BUILD_TYPE)
