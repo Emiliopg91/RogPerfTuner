@@ -3,12 +3,8 @@ cmake_minimum_required(VERSION 3.16)
 set(CMAKE_CXX_STANDARD 23)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
-set(CMAKE_AUTOMOC ON)
-#set(CMAKE_AUTORCC ON)
-#set(CMAKE_AUTOUIC ON)
-
 if(CMAKE_BUILD_TYPE STREQUAL "Release")
-    add_compile_options(-flto)
+    add_compile_options(-flto=full)
     set(CMAKE_INTERPROCEDURAL_OPTIMIZATION TRUE)
 endif()
 
@@ -36,6 +32,7 @@ file(GLOB_RECURSE HEADERS_RCC
 )
 
 add_executable(RogControlCenter ${SOURCES_RCC} ${HEADERS_RCC})
+set_target_properties(RogControlCenter PROPERTIES AUTOMOC ON)
 target_include_directories(RogControlCenter PRIVATE ${LIBSECRET_INCLUDE_DIRS})
 target_link_libraries(RogControlCenter PRIVATE 
     Qt6::Core
