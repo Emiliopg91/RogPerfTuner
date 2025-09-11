@@ -57,7 +57,7 @@ jobs:
 
       - name: Compile
         run: |
-          make build_rccdc
+          PYTHONUNBUFFERED=1 make build_rccdc
 
       - name: Upload OpenRGB
         uses: actions/upload-artifact@v4
