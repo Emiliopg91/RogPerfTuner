@@ -11,6 +11,17 @@ jobs:
     outputs:
       version: ${{ steps.get_version.outputs.version }}
     steps:
+      - name: Checkout repository without submodules
+        uses: actions/checkout@v4
+        with:
+          submodules: false
+          fetch-depth: 0
+
+      - name: Initialize submodule
+        run: |
+          git submodule init submodules/OpenRGB
+          git submodule update --remote submodules/OpenRGB
+          
       - name: Install dependencies
         run: |
           sudo apt-get update
@@ -32,8 +43,13 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
         with:
-          submodules: recursive
+          submodules: false
           fetch-depth: 0
+
+      - name: Initialize submodule
+        run: |
+          git submodule init submodules/RccDeckyCompanion
+          git submodule update --remote submodules/RccDeckyCompanion
 
       - name: Install dependencies
         run: |
