@@ -1,15 +1,22 @@
 diff --git a/Dockerfile b/Dockerfile
-index b0a17604..bbfae110 100644
+index b0a17604..e75875d9 100644
 --- a/Dockerfile
 +++ b/Dockerfile
-@@ -1,4 +1,3 @@
+@@ -1,10 +1,9 @@
 -# Use a base image with the required development tools
  FROM ubuntu:22.04
-
+ 
  ARG DEBIAN_FRONTEND=noninteractive
+ 
+ # Install essential packages and dependencies
+-RUN apt-get update && apt-get install -y \
++RUN apt-get update && apt-get install --no-install-recommends -y \
+     git \
+     build-essential \
+     qtcreator \
 @@ -20,7 +19,8 @@ RUN apt-get update && apt-get install -y \
      && rm -rf /var/lib/apt/lists/*
-
+ 
  # Set the default command to clone, build, and copy the binary
 -CMD ["/bin/bash", "-c", "\
 +CMD bash -c "\
@@ -19,21 +26,19 @@ index b0a17604..bbfae110 100644
 -    make -j$(nproc)"]
 +    make -j$(nproc)"
 diff --git a/OpenRGB.pro b/OpenRGB.pro
-index 3d938d61..b8804a6e 100644
+index 3d938d61..46a92cef 100644
 --- a/OpenRGB.pro
 +++ b/OpenRGB.pro
-@@ -524,8 +524,9 @@ contains(QMAKE_PLATFORM, linux) {
-
+@@ -524,7 +524,8 @@ contains(QMAKE_PLATFORM, linux) {
+ 
      QT += dbus
-
+ 
 -    QMAKE_CXXFLAGS += -Wno-implicit-fallthrough -Wno-psabi
--
 +    QMAKE_CXXFLAGS += -Wno-implicit-fallthrough -Wno-psabi -Wno-unused-parameter -Wno-sign-compare -Wno-unused-variable -Wno-unused-result -Wno-class-memaccess -O3 -flto=auto
 +    QMAKE_LFLAGS += -flto=auto
-+
+ 
      #-------------------------------------------------------------------------------------------#
      # Determine which hidapi to use based on availability                                       #
-     #   Prefer hidraw backend, then libusb                                                      #
 diff --git a/build.sh b/build.sh
 index ebc7370d..cb3ae6b3 100755
 --- a/build.sh
@@ -57,7 +62,7 @@ index 632b2e08..3cf47262 100644
 +	QueryInterfaceOpaque(query_interface, id, (void **)&function_pointer);
      ////Log::write("%s querying interface '0x%08x' '%s'", result ? "success" : "failure", id, function_name);
  }
-
+ 
 diff --git a/scsiapi/scsiapi_linux.c b/scsiapi/scsiapi_linux.c
 index cd226104..835c76b6 100644
 --- a/scsiapi/scsiapi_linux.c
@@ -69,7 +74,7 @@ index cd226104..835c76b6 100644
 -        read(sg_model_fd, sg_model_buf, 512);
 +        ssize_t ret1 = read(sg_model_fd, sg_model_buf, 512);
          close(sg_model_fd);
-
+ 
          for(unsigned int i = 0; i < strlen(sg_model_buf); i++)
 @@ -96,7 +96,7 @@ struct scsi_device_info * scsi_enumerate(const char * vendor, const char * produ
          /*-------------------------------------------------*\
@@ -78,5 +83,5 @@ index cd226104..835c76b6 100644
 -        read(sg_vendor_fd, sg_vendor_buf, 512);
 +        ssize_t ret2 = read(sg_vendor_fd, sg_vendor_buf, 512);
          close(sg_vendor_fd);
-
+ 
          for(unsigned int i = 0; i < strlen(sg_vendor_buf); i++)
