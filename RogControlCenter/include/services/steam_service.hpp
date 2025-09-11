@@ -14,7 +14,7 @@ class SteamService {
   private:
 	inline static std::string WRAPPER_PATH = Constants::BIN_DIR + "/steam/run";
 	Logger logger{"SteamService"};
-	std::map<unsigned int, std::string> runningGames;
+	std::unordered_map<unsigned int, std::string> runningGames;
 	bool rccdcEnabled = false;
 	std::thread installer;
 
@@ -31,7 +31,7 @@ class SteamService {
 	void onConnect(bool onBoot = false);
 	void onDisconnect();
 	void onGameLaunch(unsigned int gid, std::string name, int pid);
-	void onFirstGameRun(unsigned int gid, std::string name, std::map<std::string, std::string> env);
+	void onFirstGameRun(unsigned int gid, std::string name, std::unordered_map<std::string, std::string> env);
 	void onGameStop(unsigned int gid, std::string name);
 	void setProfileForGames(bool onConnect = false);
 	void installRccDC();
@@ -44,8 +44,8 @@ class SteamService {
 		return instance;
 	}
 
-	const std::map<unsigned int, std::string>& getRunningGames() const;
-	const std::map<std::string, GameEntry>& getGames();
+	const std::unordered_map<unsigned int, std::string>& getRunningGames() const;
+	const std::unordered_map<std::string, GameEntry>& getGames();
 
 	bool isRunning(const unsigned int& appid) const;
 	bool metricsEnabled();

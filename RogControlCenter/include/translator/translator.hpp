@@ -2,7 +2,8 @@
 
 #include <any>
 
-#include "../logger//logger.hpp"
+#include "../logger/logger.hpp"
+#include "../models/others/translation_entry.hpp"
 
 class Translator {
   public:
@@ -15,7 +16,7 @@ class Translator {
 
   private:
 	inline static std::string FALLBACK_LANG = "en";
-	static std::unordered_map<std::string, std::unordered_map<std::string, std::string>> initialTranslations;
+	static std::vector<TranslationEntry> initialTranslations;
 	std::unordered_map<std::string, std::string> translations;
 
 	Translator();

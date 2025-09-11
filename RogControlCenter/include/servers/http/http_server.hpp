@@ -109,15 +109,17 @@ class HttpServer {
 		try {
 			static std::atomic<bool> stopping{false};
 			bool expected = false;
-			if (!stopping.compare_exchange_strong(expected, true))
+			if (!stopping.compare_exchange_strong(expected, true)) {
 				return;
+			}
 
 			logger.info("Stopping HTTP server");
 			Logger::add_tab();
 			svr.stop();
 
-			if (runner.joinable())
+			if (runner.joinable()) {
 				runner.join();
+			}
 			Logger::rem_tab();
 			logger.info("HTTP server stopped");
 		} catch (...) {

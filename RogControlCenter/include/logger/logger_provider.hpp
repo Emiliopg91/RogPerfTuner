@@ -42,7 +42,7 @@ class LoggerProvider {
 	 *
 	 * @param configMap
 	 */
-	static void setConfigMap(std::map<std::string, std::string> configMap);
+	static void setConfigMap(std::unordered_map<std::string, std::string> configMap);
 
   private:
 	inline static std::shared_ptr<spdlog::sinks::stdout_color_sink_mt> console_sink{};
@@ -50,5 +50,5 @@ class LoggerProvider {
 	inline static std::unordered_map<std::string, std::shared_ptr<spdlog::logger>> loggers{};
 
 	inline static spdlog::level::level_enum defaultLevel;
-	static std::map<std::string, std::string> configMap;
+	static std::unordered_map<std::string, std::string> configMap;
 };

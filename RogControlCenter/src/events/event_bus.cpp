@@ -25,8 +25,9 @@ void EventBus::emit_event(const std::string& event) {
 	{
 		std::lock_guard<std::mutex> lock(mtx);
 		auto it = no_params_listeners.find(event);
-		if (it == no_params_listeners.end())
+		if (it == no_params_listeners.end()) {
 			return;
+		}
 		to_call = it->second;
 	}
 
@@ -65,8 +66,9 @@ void EventBus::emit_event(const std::string& event, const std::vector<std::any>&
 	{
 		std::lock_guard<std::mutex> lock(mtx);
 		auto it = with_params_listeners.find(event);
-		if (it == with_params_listeners.end())
+		if (it == with_params_listeners.end()) {
 			return;
+		}
 
 		to_call = it->second;
 	}
@@ -138,11 +140,20 @@ void EventBus::emitGameEvent(const size_t& runningGames) {
 	this->emit_event(STEAM_SERVICE_GAME_EVENT, {runningGames});
 }
 
-void EventBus::onUsbAddedRemoved(Callback&& callback) {
-	this->on_without_data(HARDWARE_SERVICE_USB_ADDED_REMOVED, callback);
+void EventBus::onUsbAdded(Callback&& callback) {
+	this->on_without_data(HARDWARE_SERVICE_USB_ADDED, callback);
 }
-void EventBus::emitUsbAddedRemoved() {
-	this->emit_event(HARDWARE_SERVICE_USB_ADDED_REMOVED);
+void EventBus::emitUsbAdded() {
+	this->emit_event(HARDWARE_SERVICE_USB_ADDED);
+}
+
+void EventBus::onUsbRemoved(std::function<void(std::vector<UsbIdentifier>)>&& callback) {
+	this->on_with_data(PROFILE_SERVICE_ON_PROFILE, [cb = std::move(callback)](CallbackParam data) {
+		cb(std::any_cast<std::vector<UsbIdentifier>>(data[0]));
+	});
+}
+void EventBus::emitUsbRemoved(const std::vector<UsbIdentifier>& devices) {
+	this->emit_event(HARDWARE_SERVICE_USB_REMOVED, {devices});
 }
 
 void EventBus::onBattery(std::function<void(bool)>&& callback) {

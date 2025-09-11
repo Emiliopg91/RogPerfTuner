@@ -15,12 +15,15 @@ class ProfileUtils {
 	inline static int acIntelPl1Spl(PerformanceProfile profile) {
 		auto& client = Pl1SpdClient::getInstance();
 
-		if (profile == PerformanceProfile::Enum::PERFORMANCE)
+		if (profile == PerformanceProfile::Enum::PERFORMANCE) {
 			return client.getMaxValue();
-		if (profile == PerformanceProfile::Enum::BALANCED)
+		}
+		if (profile == PerformanceProfile::Enum::BALANCED) {
 			return client.getMaxValue() * 0.6;
-		if (profile == PerformanceProfile::Enum::QUIET)
+		}
+		if (profile == PerformanceProfile::Enum::QUIET) {
 			return client.getMaxValue() * 0.4;
+		}
 
 		return client.getCurrentValue();
 	}
@@ -34,15 +37,19 @@ class ProfileUtils {
 	inline static int acIntelPl2Sppt(PerformanceProfile profile) {
 		auto& client = Pl2SpptClient::getInstance();
 
-		if (!acBoost())
+		if (!acBoost()) {
 			return acIntelPl1Spl(profile);
+		}
 
-		if (profile == PerformanceProfile::Enum::PERFORMANCE)
+		if (profile == PerformanceProfile::Enum::PERFORMANCE) {
 			return client.getMaxValue();
-		if (profile == PerformanceProfile::Enum::BALANCED)
+		}
+		if (profile == PerformanceProfile::Enum::BALANCED) {
 			return client.getMaxValue() * 0.8;	// modificar
-		if (profile == PerformanceProfile::Enum::QUIET)
+		}
+		if (profile == PerformanceProfile::Enum::QUIET) {
 			return client.getMaxValue() * 0.6;	// modificar
+		}
 
 		return client.getCurrentValue();
 	}
@@ -56,12 +63,15 @@ class ProfileUtils {
 	inline static int acNvBoost(PerformanceProfile profile) {
 		auto& client = NvBoostClient::getInstance();
 
-		if (profile == PerformanceProfile::Enum::PERFORMANCE)
+		if (profile == PerformanceProfile::Enum::PERFORMANCE) {
 			return client.getMaxValue();
-		if (profile == PerformanceProfile::Enum::BALANCED)
+		}
+		if (profile == PerformanceProfile::Enum::BALANCED) {
 			return (client.getMaxValue() + client.getMinValue()) / 2;
-		if (profile == PerformanceProfile::Enum::QUIET)
+		}
+		if (profile == PerformanceProfile::Enum::QUIET) {
 			return client.getMinValue();
+		}
 
 		return client.getCurrentValue();
 	}
@@ -79,23 +89,29 @@ class ProfileUtils {
 	inline static int batteryNvTemp(PerformanceProfile profile) {
 		auto& client = NvTempClient::getInstance();
 
-		if (profile == PerformanceProfile::Enum::PERFORMANCE)
+		if (profile == PerformanceProfile::Enum::PERFORMANCE) {
 			return client.getMaxValue();
-		if (profile == PerformanceProfile::Enum::BALANCED)
+		}
+		if (profile == PerformanceProfile::Enum::BALANCED) {
 			return (client.getMaxValue() + client.getMinValue()) / 2;
-		if (profile == PerformanceProfile::Enum::QUIET)
+		}
+		if (profile == PerformanceProfile::Enum::QUIET) {
 			return client.getMinValue();
+		}
 
 		return client.getCurrentValue();
 	}
 
 	inline static PerformanceProfile nextPerformanceProfile(PerformanceProfile profile) {
-		if (profile == PerformanceProfile::Enum::PERFORMANCE)
+		if (profile == PerformanceProfile::Enum::PERFORMANCE) {
 			return PerformanceProfile::Enum::QUIET;
-		if (profile == PerformanceProfile::Enum::BALANCED)
+		}
+		if (profile == PerformanceProfile::Enum::BALANCED) {
 			return PerformanceProfile::Enum::PERFORMANCE;
-		if (profile == PerformanceProfile::Enum::QUIET)
+		}
+		if (profile == PerformanceProfile::Enum::QUIET) {
 			return PerformanceProfile::Enum::BALANCED;
+		}
 		return profile;
 	}
 
@@ -107,8 +123,9 @@ class ProfileUtils {
 	}
 
 	inline static CpuGovernor acGovernor(PerformanceProfile profile) {
-		if (profile == PerformanceProfile::Enum::PERFORMANCE)
+		if (profile == PerformanceProfile::Enum::PERFORMANCE) {
 			return CpuGovernor::Enum::PERFORMANCE;
+		}
 		return CpuGovernor::Enum::POWERSAVE;
 	}
 
@@ -117,36 +134,41 @@ class ProfileUtils {
 	}
 
 	inline static PerformanceProfile getGreater(PerformanceProfile profile, const PerformanceProfile& other) {
-		if (profile == PerformanceProfile::Enum::PERFORMANCE || other == PerformanceProfile::Enum::PERFORMANCE)
+		if (profile == PerformanceProfile::Enum::PERFORMANCE || other == PerformanceProfile::Enum::PERFORMANCE) {
 			return PerformanceProfile::Enum::PERFORMANCE;
-		if (profile == PerformanceProfile::Enum::BALANCED || other == PerformanceProfile::Enum::BALANCED)
+		}
+		if (profile == PerformanceProfile::Enum::BALANCED || other == PerformanceProfile::Enum::BALANCED) {
 			return PerformanceProfile::Enum::BALANCED;
+		}
 		return PerformanceProfile::Enum::QUIET;
 	}
 
 	inline static PlatformProfile platformProfile(PerformanceProfile profile) {
-		if (profile == PerformanceProfile::Enum::QUIET)
+		if (profile == PerformanceProfile::Enum::QUIET) {
 			return PlatformProfile::Enum::LOW_POWER;
-		else if (profile == PerformanceProfile::Enum::BALANCED)
+		} else if (profile == PerformanceProfile::Enum::BALANCED) {
 			return PlatformProfile::Enum::BALANCED;
-		else
+		} else {
 			return PlatformProfile::Enum::PERFORMANCE;
+		}
 	}
 
 	inline static PowerProfile powerProfile(PerformanceProfile profile) {
-		if (profile == PerformanceProfile::Enum::QUIET)
+		if (profile == PerformanceProfile::Enum::QUIET) {
 			return PowerProfile::Enum::POWERSAVER;
-		else if (profile == PerformanceProfile::Enum::BALANCED)
+		} else if (profile == PerformanceProfile::Enum::BALANCED) {
 			return PowerProfile::Enum::BALANCED;
-		else
+		} else {
 			return PowerProfile::Enum::PERFORMANCE;
+		}
 	}
 
 	inline static SsdScheduler ssdQueueScheduler(PerformanceProfile profile) {
-		if (profile == PerformanceProfile::Enum::QUIET)
+		if (profile == PerformanceProfile::Enum::QUIET) {
 			return SsdScheduler::Enum::NOOP;
-		else
+		} else {
 			return SsdScheduler::Enum::MQ_DEADLINE;
+		}
 	}
 
   private:

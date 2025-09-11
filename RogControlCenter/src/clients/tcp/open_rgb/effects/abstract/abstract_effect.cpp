@@ -6,19 +6,23 @@
 #include "../../../../../../include/models/hardware/rgb_brightness.hpp"
 
 double AbstractEffect::brightnessMap(const RgbBrightness& b) {
-	if (b == RgbBrightness::Enum::LOW)
+	if (b == RgbBrightness::Enum::LOW) {
 		return 0.25;
-	if (b == RgbBrightness::Enum::MEDIUM)
+	}
+	if (b == RgbBrightness::Enum::MEDIUM) {
 		return 0.5;
-	if (b == RgbBrightness::Enum::HIGH)
+	}
+	if (b == RgbBrightness::Enum::HIGH) {
 		return 0.75;
+	}
 
 	return 1;
 }
 
 void AbstractEffect::start(const DeviceList& devices, const RgbBrightness& brightness) {
-	if (_is_running)
+	if (_is_running) {
 		stop();
+	}
 
 	if (brightness == RgbBrightness::Enum::OFF) {
 		_logger.info("Turning off RGB");
@@ -41,8 +45,9 @@ void AbstractEffect::stop() {
 	if (_is_running) {
 		_logger.info("Stopping effect");
 		_is_running = false;
-		if (_thread.joinable())
+		if (_thread.joinable()) {
 			_thread.join();
+		}
 	}
 }
 

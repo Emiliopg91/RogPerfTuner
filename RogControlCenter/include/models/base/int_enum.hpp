@@ -23,9 +23,11 @@ class IntEnum {
 	}
 
 	std::string toName() const {
-		for (size_t i = 0; i < N; ++i)
-			if (Derived::metaTable()[i].val == static_cast<int>(value))
+		for (size_t i = 0; i < N; ++i) {
+			if (Derived::metaTable()[i].val == static_cast<int>(value)) {
 				return Derived::metaTable()[i].name;
+			}
+		}
 		return "UNKNOWN";
 	}
 
@@ -42,9 +44,11 @@ class IntEnum {
 	}
 
 	static Enum fromInt(int v) {
-		for (size_t i = 0; i < N; ++i)
-			if (Derived::metaTable()[i].val == v)
+		for (size_t i = 0; i < N; ++i) {
+			if (Derived::metaTable()[i].val == v) {
 				return Derived::metaTable()[i].e;
+			}
+		}
 		throw std::invalid_argument("Unknown value: " + std::to_string(v));
 	}
 
@@ -52,8 +56,9 @@ class IntEnum {
 		std::vector<Enum> all;
 
 		const auto& table = Derived::metaTable();
-		for (size_t i = 0; i < N; ++i)
+		for (size_t i = 0; i < N; ++i) {
 			all.push_back(table[i].e);
+		}
 
 		return all;
 	}

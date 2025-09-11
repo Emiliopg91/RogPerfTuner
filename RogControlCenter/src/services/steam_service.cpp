@@ -19,17 +19,19 @@ bool SteamService::metricsEnabled() {
 }
 
 bool SteamService::isRunning(const unsigned int& appid) const {
-	for (const auto& [key, val] : runningGames)
-		if (key == appid)
+	for (const auto& [key, val] : runningGames) {
+		if (key == appid) {
 			return true;
+		}
+	}
 	return false;
 }
 
-const std::map<unsigned int, std::string>& SteamService::getRunningGames() const {
+const std::unordered_map<unsigned int, std::string>& SteamService::getRunningGames() const {
 	return runningGames;
 }
 
-const std::map<std::string, GameEntry>& SteamService::getGames() {
+const std::unordered_map<std::string, GameEntry>& SteamService::getGames() {
 	return configuration.getConfiguration().games;
 }
 
@@ -92,8 +94,8 @@ void getPidsOfHierarchy(const pid_t parentId, std::set<pid_t>& pids) {
 	}
 }
 
-std::map<std::string, std::string> getProcessEnvironMap(pid_t pid) {
-	std::map<std::string, std::string> env_map;
+std::unordered_map<std::string, std::string> getProcessEnvironMap(pid_t pid) {
+	std::unordered_map<std::string, std::string> env_map;
 	std::string path = "/proc/" + std::to_string(pid) + "/environ";
 	std::ifstream file(path, std::ios::in | std::ios::binary);
 
@@ -106,8 +108,9 @@ std::map<std::string, std::string> getProcessEnvironMap(pid_t pid) {
 	size_t start = 0;
 	while (start < buffer.size()) {
 		size_t end = buffer.find('\0', start);
-		if (end == std::string::npos)
+		if (end == std::string::npos) {
 			break;
+		}
 		std::string entry = buffer.substr(start, end - start);
 		size_t eq_pos	  = entry.find('=');
 		if (eq_pos != std::string::npos) {
@@ -121,7 +124,7 @@ std::map<std::string, std::string> getProcessEnvironMap(pid_t pid) {
 	return env_map;
 }
 
-void SteamService::onFirstGameRun(unsigned int gid, std::string name, std::map<std::string, std::string> environment) {
+void SteamService::onFirstGameRun(unsigned int gid, std::string name, std::unordered_map<std::string, std::string> environment) {
 	logger.info("Configuring game");
 	Logger::add_tab();
 
@@ -340,7 +343,7 @@ const SteamGameConfig SteamService::getConfiguration(const std::string& gid) {
 		if (gameEntry.env.has_value()) {
 			std::istringstream ss(gameEntry.env.value());
 			std::string token;
-			std::map<std::string, std::string> env_vars;
+			std::unordered_map<std::string, std::string> env_vars;
 
 			while (ss >> token) {
 				auto pos = token.find('=');
@@ -394,10 +397,11 @@ const std::optional<GpuBrand> SteamService::getPreferedGpu(const unsigned int& g
 }
 
 void SteamService::setPreferedGpu(const unsigned int& gid, const std::optional<GpuBrand>& gpu) {
-	if (gpu.has_value())
+	if (gpu.has_value()) {
 		configuration.getConfiguration().games[std::to_string(gid)].gpu = gpu.value().toString();
-	else
+	} else {
 		configuration.getConfiguration().games[std::to_string(gid)].gpu = std::nullopt;
+	}
 
 	configuration.saveConfig();
 }

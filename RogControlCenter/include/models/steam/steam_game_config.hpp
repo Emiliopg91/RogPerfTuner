@@ -14,7 +14,7 @@
 #include <vector>
 
 struct SteamGameConfig {
-	std::map<std::string, std::string> environment;
+	std::unordered_map<std::string, std::string> environment;
 	std::vector<std::string> wrappers;
 	std::string parameters;
 };

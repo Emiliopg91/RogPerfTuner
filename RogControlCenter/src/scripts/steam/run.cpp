@@ -31,10 +31,11 @@ void reader_thread(int fd, Logger logger, bool error) {
 		std::stringstream ss(chunk);
 		std::string line;
 		while (std::getline(ss, line)) {
-			if (error)
+			if (error) {
 				logger.error("[STDERR] {}", line);
-			else
+			} else {
 				logger.info("[STDOUT] {}", line);
+			}
 		}
 	}
 }
@@ -61,8 +62,9 @@ int run_command(Logger& logger, const std::vector<std::string>& cmd, const std::
 
 	char* command = argv[0];
 	std::vector<char*> argp;
-	for (size_t i = 1; i < argv.size(); i++)
+	for (size_t i = 1; i < argv.size(); i++) {
 		argp.push_back(argv[i]);
+	}
 
 	std::ostringstream ss;
 	for (auto& arg : argv) {
@@ -164,8 +166,9 @@ int main(int argc, char* argv[]) {
 	Logger::rem_tab();
 
 	std::ostringstream cmdline;
-	for (int i = 1; i < argc; i++)
+	for (int i = 1; i < argc; i++) {
 		cmdline << argv[i] << " ";
+	}
 	logger.info(">>> Command:");
 	Logger::add_tab();
 	logger.info("{}", cmdline.str());
@@ -201,8 +204,9 @@ int main(int argc, char* argv[]) {
 
 	command.push_back(finalCommandStr);
 
-	for (int i = 2; i < argc; i++)
+	for (int i = 2; i < argc; i++) {
 		command.push_back(argv[i]);
+	}
 
 	httplib::Client cli("localhost", Constants::HTTP_PORT);
 

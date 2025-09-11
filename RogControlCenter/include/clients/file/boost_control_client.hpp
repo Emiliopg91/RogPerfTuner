@@ -12,7 +12,7 @@ class BoostControlClient : public AbstractFileClient {
 		static std::string off;
 
 		if (!initialized) {
-			std::vector<std::map<std::string, std::string>> BOOST_CONTROLS = {
+			std::vector<std::unordered_map<std::string, std::string>> BOOST_CONTROLS = {
 				{{"path", "/sys/devices/system/cpu/intel_pstate/no_turbo"}, {"on", "0"}, {"off", "1"}},
 				{{"path", "/sys/devices/system/cpu/cpufreq/boost"}, {"on", "1"}, {"off", "0"}}};
 

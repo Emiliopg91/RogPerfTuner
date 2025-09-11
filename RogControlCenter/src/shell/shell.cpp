@@ -41,8 +41,9 @@ Shell::BashSession Shell::start_bash(const std::vector<std::string>& args, const
 		close(err_pipe[0]);
 
 		std::vector<char*> argv_exec;
-		for (auto& arg : args)
+		for (auto& arg : args) {
 			argv_exec.push_back(const_cast<char*>(arg.c_str()));
+		}
 		argv_exec.push_back(nullptr);
 
 		execvp(argv_exec[0], argv_exec.data());
@@ -67,14 +68,18 @@ Shell::BashSession Shell::start_bash(const std::vector<std::string>& args, const
 }
 
 void Shell::close_bash(BashSession& session) {
-	if (session.stdin_fd > 0)
+	if (session.stdin_fd > 0) {
 		close(session.stdin_fd);
-	if (session.stdout_fd > 0)
+	}
+	if (session.stdout_fd > 0) {
 		close(session.stdout_fd);
-	if (session.stderr_fd > 0)
+	}
+	if (session.stderr_fd > 0) {
 		close(session.stderr_fd);
-	if (session.pid > 0)
+	}
+	if (session.pid > 0) {
 		kill(session.pid, SIGTERM);
+	}
 }
 
 CommandResult Shell::send_command(BashSession& session, const std::string& cmd, bool check) {
@@ -120,28 +125,32 @@ CommandResult Shell::send_command(BashSession& session, const std::string& cmd, 
 
 		if (FD_ISSET(session.stderr_fd, &readfds)) {
 			ssize_t n = read(session.stderr_fd, buf, sizeof(buf));
-			if (n > 0)
+			if (n > 0) {
 				err.append(buf, n);
+			}
 		}
 	}
 	logger.debug("Command finished with code '{}'", exit_code);
 
-	if (check && exit_code != 0)
+	if (check && exit_code != 0) {
 		throw std::runtime_error("Command '" + cmd + "' finished with code " + std::to_string(exit_code));
+	}
 
 	return {exit_code, out, err};
 }
 
 Shell::Shell(const std::string& sudo_password) : logger(Logger("Shell")) {
 	normal_bash = start_bash({"bash"});
-	if (!sudo_password.empty())
+	if (!sudo_password.empty()) {
 		elevated_bash = start_bash({"sudo", "-kS", "bash"}, sudo_password + "\n");
+	}
 }
 
 Shell::~Shell() {
 	close_bash(normal_bash);
-	if (elevated_bash.has_value())
+	if (elevated_bash.has_value()) {
 		close_bash(elevated_bash.value());
+	}
 }
 
 CommandResult Shell::run_command(const std::string& cmd, bool check) {
@@ -149,8 +158,9 @@ CommandResult Shell::run_command(const std::string& cmd, bool check) {
 }
 
 CommandResult Shell::run_elevated_command(const std::string& cmd, bool check) {
-	if (!elevated_bash.has_value())
+	if (!elevated_bash.has_value()) {
 		throw new std::runtime_error("No elevated command available");
+	}
 	return send_command(elevated_bash.value(), cmd, check);
 }
 
@@ -218,8 +228,9 @@ uint8_t Shell::wait_for(pid_t pid) {
 
 std::optional<std::string> Shell::which(std::string cmd) {
 	auto tmp = whichAll(cmd);
-	if (!tmp.empty())
+	if (!tmp.empty()) {
 		return std::move(tmp[0]);
+	}
 	return std::nullopt;
 }
 
@@ -238,8 +249,9 @@ std::vector<std::string> Shell::whichAll(std::string cmd) {
 		std::string line;
 		while (std::getline(ss, line)) {
 			line = StringUtils::trim(line);
-			if (!line.empty())
+			if (!line.empty()) {
 				all.push_back(line);
+			}
 		}
 		whichCache[cmd] = all;
 	}

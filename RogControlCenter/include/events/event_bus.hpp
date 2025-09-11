@@ -10,6 +10,7 @@
 
 #include "../models/hardware/battery_charge_threshold.hpp"
 #include "../models/hardware/rgb_brightness.hpp"
+#include "../models/hardware/usb_identifier.hpp"
 #include "../models/performance/performance_profile.hpp"
 
 typedef std::vector<std::any> CallbackParam;
@@ -54,15 +55,19 @@ class EventBus {
 	void onGameEvent(std::function<void(size_t)>&& callback);
 	void emitGameEvent(const size_t& runningGames);
 
-	void onUsbAddedRemoved(Callback&& callback);
-	void emitUsbAddedRemoved();
+	void onUsbAdded(Callback&& callback);
+	void emitUsbAdded();
+
+	void onUsbRemoved(std::function<void(std::vector<UsbIdentifier>)>&& callback);
+	void emitUsbRemoved(const std::vector<UsbIdentifier>&);
 
 	void onBattery(std::function<void(bool)>&& callback);
 	void emitBattery(const bool& onBattery);
 
 	inline const static constexpr std::string_view APPLICATION_STOP					  = "APPLICATION_STOP";
 	inline const static constexpr std::string_view UDEV_CLIENT_DEVICE_EVENT			  = "UDEV_CLIENT_DEVICE_EVENT";
-	inline const static constexpr std::string_view HARDWARE_SERVICE_USB_ADDED_REMOVED = "HARDWARE_SERVICE_USB_ADDED_REMOVED";
+	inline const static constexpr std::string_view HARDWARE_SERVICE_USB_REMOVED		  = "HARDWARE_SERVICE_USB_REMOVED";
+	inline const static constexpr std::string_view HARDWARE_SERVICE_USB_ADDED		  = "HARDWARE_SERVICE_USB_ADDED";
 	inline const static constexpr std::string_view HARDWARE_SERVICE_ON_BATTERY		  = "HARDWARE_SERVICE_ON_BATTERY";
 	inline const static constexpr std::string_view HARDWARE_SERVICE_THRESHOLD_CHANGED = "HARDWARE_SERVICE_THRESHOLD_CHANGED";
 	inline const static constexpr std::string_view ORGB_SERVICE_ON_BRIGHTNESS		  = "ORGB_SERVICE_ON_BRIGHTNESS";

@@ -16,16 +16,18 @@ AbstractDbusClient::AbstractDbusClient(bool systemBus, const QString& service, c
 	  iface_(nullptr),
 	  available_(false) {
 	if (!bus_.isConnected()) {
-		if (required)
+		if (required) {
 			throw std::runtime_error("Failed to connect to D-Bus");
+		}
 		return;
 	}
 
 	iface_	   = new QDBusInterface(serviceName_, objectPath_, interfaceName_, bus_, this);
 	available_ = iface_->isValid();
 	if (!available_) {
-		if (required)
+		if (required) {
 			throw std::runtime_error("Failed to create D-Bus interface: " + serviceName_.toStdString());
+		}
 	}
 
 	// === Conectar la señal de cambios de propiedades ===
@@ -46,6 +48,7 @@ bool AbstractDbusClient::available() const {
 }
 
 void AbstractDbusClient::checkAvailable() const {
-	if (!available_)
+	if (!available_) {
 		throw std::runtime_error("D-Bus service not available: " + serviceName_.toStdString());
+	}
 }

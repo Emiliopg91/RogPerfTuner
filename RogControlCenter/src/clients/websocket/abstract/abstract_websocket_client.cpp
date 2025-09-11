@@ -82,8 +82,9 @@ void AbstractWebsocketClient::handle_message(const std::string& payload) {
 }
 
 std::vector<std::any> AbstractWebsocketClient::invoke(const std::string& method, const std::vector<std::any>& args, const int& timeout_ms) {
-	if (!_connected)
+	if (!_connected) {
 		throw std::runtime_error("No connection to server");
+	}
 
 	WebsocketMessage message{"REQUEST", method, args, StringUtils::generateUUIDv4()};
 
@@ -107,8 +108,9 @@ std::vector<std::any> AbstractWebsocketClient::invoke(const std::string& method,
 
 	WSMethodResponse resp = fut.get();
 
-	if (!resp.error.empty())
+	if (!resp.error.empty()) {
 		throw std::runtime_error("WebSocketInvocationError: " + resp.error);
+	}
 
 	return resp.data.data;
 }

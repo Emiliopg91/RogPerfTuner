@@ -75,9 +75,8 @@ void ProfileService::setPerformanceProfile(const PerformanceProfile& profile, co
 			auto t1 = std::chrono::high_resolution_clock::now();
 			Logger::rem_tab();
 			logger.info("Profile setted after {} ms", std::chrono::duration_cast<std::chrono::milliseconds>(t1 - t0).count());
-			std::unordered_map<std::string, std::any> values = {
-				{"profile", StringUtils::toLowerCase(translator.translate("label.profile." + profileName))}};
-			toaster.showToast(translator.translate("profile.applied", values));
+			toaster.showToast(translator.translate("profile.applied",
+												   {{"profile", StringUtils::toLowerCase(translator.translate("label.profile." + profileName))}}));
 			eventBus.emitPerformanceProfile(profile);
 		} catch (std::exception e) {
 			Logger::rem_tab();

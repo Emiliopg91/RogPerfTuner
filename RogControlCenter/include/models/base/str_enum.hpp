@@ -17,17 +17,21 @@ class StrEnum {
 
 	std::string toString() const {
 		const auto& table = Derived::metaTable();
-		for (size_t i = 0; i < N; ++i)
-			if (table[i].e == value)
+		for (size_t i = 0; i < N; ++i) {
+			if (table[i].e == value) {
 				return table[i].val;
+			}
+		}
 		return "UNKNOWN";
 	}
 
 	std::string toName() const {
 		const auto& table = Derived::metaTable();
-		for (size_t i = 0; i < N; ++i)
-			if (table[i].e == value)
+		for (size_t i = 0; i < N; ++i) {
+			if (table[i].e == value) {
 				return table[i].name;
+			}
+		}
 		return "UNKNOWN";
 	}
 
@@ -45,9 +49,11 @@ class StrEnum {
 
 	const static Enum& fromString(const std::string& v) {
 		const auto& table = Derived::metaTable();
-		for (size_t i = 0; i < N; ++i)
-			if (table[i].val == v)
+		for (size_t i = 0; i < N; ++i) {
+			if (table[i].val == v) {
 				return table[i].e;
+			}
+		}
 		throw std::invalid_argument("Unknown value: " + v);
 	}
 
@@ -55,8 +61,9 @@ class StrEnum {
 		std::vector<Enum> all;
 
 		const auto& table = Derived::metaTable();
-		for (size_t i = 0; i < N; ++i)
+		for (size_t i = 0; i < N; ++i) {
 			all.push_back(table[i].e);
+		}
 
 		return all;
 	}

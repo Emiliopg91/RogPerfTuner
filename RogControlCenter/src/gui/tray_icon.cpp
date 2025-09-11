@@ -19,8 +19,9 @@
 #include "../../include/translator/translator.hpp"
 
 void TrayIcon::openMainWindow() {
-	if (!MainWindow::INSTANCE)
+	if (!MainWindow::INSTANCE) {
 		MainWindow::INSTANCE = new MainWindow();
+	}
 
 	MainWindow::INSTANCE->show();
 }
@@ -39,10 +40,11 @@ void TrayIcon::openLogs() {
 
 void openGameList() {
 	if (!GameList::INSTANCE) {
-		if (MainWindow::INSTANCE)
+		if (MainWindow::INSTANCE) {
 			GameList::INSTANCE = new GameList(MainWindow::INSTANCE);
-		else
+		} else {
 			GameList::INSTANCE = new GameList();
+		}
 	}
 	GameList::INSTANCE->show();
 }
@@ -240,10 +242,11 @@ TrayIcon::TrayIcon(QObject* parent) : QObject(parent), tray_icon_(new QSystemTra
 	QAction* act = new QAction((translator.translate("label.game.configure") + "...").c_str());
 	QObject::connect(act, &QAction::triggered, []() {
 		if (!GameList::INSTANCE) {
-			if (MainWindow::INSTANCE)
+			if (MainWindow::INSTANCE) {
 				GameList::INSTANCE = new GameList(MainWindow::INSTANCE);
-			else
+			} else {
 				GameList::INSTANCE = new GameList();
+			}
 		}
 		GameList::INSTANCE->show();
 	});

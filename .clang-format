@@ -30,3 +30,6 @@ SpacesInAngles: false
 AlignOperands: true
 AlignConsecutiveAssignments: true
 AlignConsecutiveDeclarations: false
+
+AlwaysBreakBeforeMultilineStrings: false
+InsertBraces: true

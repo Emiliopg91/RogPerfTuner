@@ -33,8 +33,9 @@ class StarryNightEffect : public AbstractEffect {
 			for (size_t i = 0; i < leds.size(); ++i) {
 				steps[i]	  = std::max(0, steps[i] - 1);
 				new_colors[i] = leds[i] * (static_cast<double>(steps[i]) / _max_steps);
-				if (steps[i] > 0)
+				if (steps[i] > 0) {
 					active_count++;
+				}
 			}
 
 			double active_ratio = static_cast<double>(active_count) / leds.size();
@@ -70,8 +71,9 @@ class StarryNightEffect : public AbstractEffect {
 			});
 		}
 		for (auto& t : _threads) {
-			if (t.joinable())
+			if (t.joinable()) {
 				t.join();
+			}
 		}
 	}
 };

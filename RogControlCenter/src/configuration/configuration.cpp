@@ -44,8 +44,9 @@ void Configuration::loadConfig() {
 }
 
 void Configuration::saveConfig() {
-	if (!config.has_value())
+	if (!config.has_value()) {
 		return;
+	}
 
 	try {
 		std::ofstream f(Constants::CONFIG_FILE);

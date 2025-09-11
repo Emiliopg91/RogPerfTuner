@@ -64,8 +64,9 @@ MainWindow::MainWindow(QWidget* parent) : QMainWindow(parent), _logger(new Logge
 	_effectDropdown = new QComboBox();
 	_effectDropdown->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Preferred);
 	auto effects = openRgbService.getAvailableEffects();
-	for (const auto effect : effects)
+	for (const auto effect : effects) {
 		_effectDropdown->addItem(QString::fromStdString(effect), QString::fromStdString(effect));
+	}
 
 	auto it = std::find(effects.begin(), effects.end(), openRgbService.getCurrentEffect());
 	_effectDropdown->setCurrentIndex(std::distance(effects.begin(), it));
@@ -93,8 +94,9 @@ MainWindow::MainWindow(QWidget* parent) : QMainWindow(parent), _logger(new Logge
 	_thresholdDropdown = new QComboBox();
 	_thresholdDropdown->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Preferred);
 	auto thresholds = BatteryThreshold::getAll();
-	for (BatteryThreshold t : thresholds)
+	for (BatteryThreshold t : thresholds) {
 		_thresholdDropdown->addItem(QString::number(t.toInt()) + "%", t.toInt());
+	}
 	connect(_thresholdDropdown, QOverload<int>::of(&QComboBox::currentIndexChanged), this, &MainWindow::onBatteryLimitChanged);
 	setBatteryChargeLimit(hardwareService.getChargeThreshold());
 	settingsLayout->addRow(new QLabel(QString::fromStdString(translator.translate("charge.threshold") + ":")), _thresholdDropdown);

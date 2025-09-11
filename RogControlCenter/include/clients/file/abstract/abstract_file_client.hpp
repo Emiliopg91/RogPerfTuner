@@ -9,8 +9,9 @@
 class AbstractFileClient {
   public:
 	std::string read(const int& head = 0, const int& tail = 0) {
-		if (!available_)
+		if (!available_) {
 			throw std::runtime_error(fmt::format("File {} doesn't exist", path_));
+		}
 
 		std::string cmd = "cat " + path_;
 		if (head > 0) {
@@ -20,18 +21,20 @@ class AbstractFileClient {
 			cmd += " | tail -n" + std::to_string(tail);
 		}
 
-		if (sudo_)
+		if (sudo_) {
 			return shell.run_elevated_command(cmd).stdout_str;
-		else
+		} else {
 			return shell.run_command(cmd).stdout_str;
+		}
 	}
 
 	void write(const std::string& content) {
 		std::string cmd = "echo '" + content + "' | tee " + path_;
-		if (sudo_)
+		if (sudo_) {
 			shell.run_elevated_command(cmd);
-		else
+		} else {
 			shell.run_command(cmd);
+		}
 	}
 
 	bool available() {
@@ -44,8 +47,9 @@ class AbstractFileClient {
 		logger_	   = Logger{name};
 		available_ = shell.run_command("ls " + path).exit_code == 0;
 		if (!available_) {
-			if (required)
+			if (required) {
 				throw std::runtime_error(fmt::format("File {} doesn't exist", path_));
+			}
 
 			logger_.error("File {} doesn't exist", path_);
 		}

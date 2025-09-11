@@ -18,8 +18,9 @@ class Debouncer {
 
 		// Cancelar hilo anterior
 		stop = true;
-		if (worker.joinable())
+		if (worker.joinable()) {
 			worker.join();
+		}
 		stop = false;
 
 		// Capturamos los argumentos por copia
@@ -37,8 +38,9 @@ class Debouncer {
 
 	~Debouncer() {
 		stop = true;
-		if (worker.joinable())
+		if (worker.joinable()) {
 			worker.join();
+		}
 	}
 
   private:

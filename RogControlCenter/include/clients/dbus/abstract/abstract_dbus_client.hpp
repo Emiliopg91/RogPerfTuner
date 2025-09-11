@@ -40,11 +40,13 @@ class AbstractDbusClient : public QObject {
 
 		QDBusMessage reply = bus_.call(m);
 
-		if (reply.type() == QDBusMessage::ErrorMessage)
+		if (reply.type() == QDBusMessage::ErrorMessage) {
 			throw std::runtime_error(("DBus Call error: " + reply.errorMessage()).toStdString());
+		}
 
-		if (!reply.arguments().isEmpty())
+		if (!reply.arguments().isEmpty()) {
 			return reply.arguments().first().value<Ret>();
+		}
 
 		return Ret{};
 	}
@@ -63,8 +65,9 @@ class AbstractDbusClient : public QObject {
 
 		QDBusMessage reply = bus_.call(msg);
 
-		if (reply.type() == QDBusMessage::ErrorMessage)
+		if (reply.type() == QDBusMessage::ErrorMessage) {
 			throw std::runtime_error(("DBus Set error: " + reply.errorMessage()).toStdString());
+		}
 	}
 
 	template <typename T>
@@ -77,11 +80,13 @@ class AbstractDbusClient : public QObject {
 
 		QDBusMessage reply = bus_.call(m);
 
-		if (reply.type() == QDBusMessage::ErrorMessage)
+		if (reply.type() == QDBusMessage::ErrorMessage) {
 			throw std::runtime_error(("DBus Get error: " + reply.errorMessage()).toStdString());
+		}
 
-		if (!reply.arguments().isEmpty())
+		if (!reply.arguments().isEmpty()) {
 			return reply.arguments().first().value<QDBusVariant>().variant().value<T>();
+		}
 
 		throw std::runtime_error(("DBus Get returned no value for property: " + prop.toStdString()));
 	}
@@ -94,8 +99,9 @@ class AbstractDbusClient : public QObject {
 	void onSignal(const QString& signalName, Callback&& callback) {
 		bool ok = bus_.connect(serviceName_, objectPath_, interfaceName_, signalName, this, SLOT(onDbusSignal(QDBusMessage)));
 
-		if (!ok)
+		if (!ok) {
 			throw std::runtime_error("Couldn't connect to signal: " + signalName.toStdString());
+		}
 
 		// Registra el callback en EventBus
 		eventBus.on_without_data("dbus." + interfaceName_.toStdString() + ".signal." + signalName.toStdString(), std::forward<Callback>(callback));
@@ -103,8 +109,9 @@ class AbstractDbusClient : public QObject {
 
   private slots:
 	void onPropertiesChanged(const QString& iface, const QVariantMap& changedProps, const QStringList& invalidatedProps) {
-		if (iface != interfaceName_)
+		if (iface != interfaceName_) {
 			return;
+		}
 
 		Q_UNUSED(invalidatedProps)
 

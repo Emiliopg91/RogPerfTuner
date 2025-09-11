@@ -35,9 +35,9 @@ class HardwareService {
 	void setChargeThreshold(const BatteryThreshold& threshold);
 	void setPanelOverdrive(const bool&);
 	void renice(const pid_t&);
-	std::map<std::string, std::string> getGpuSelectorEnv(const std::string&);
+	std::unordered_map<std::string, std::string> getGpuSelectorEnv(const std::string&);
 
-	std::map<std::string, std::string> getGpus() {
+	std::unordered_map<std::string, std::string> getGpus() {
 		return gpus;
 	}
 
@@ -76,7 +76,7 @@ class HardwareService {
 
 	BatteryThreshold charge_limit = BatteryThreshold::Enum::CT_100;
 	CpuBrand cpu				  = CpuBrand::Enum::INTEL;
-	std::map<std::string, std::string> gpus;
+	std::unordered_map<std::string, std::string> gpus;
 	std::vector<SsdScheduler> ssd_schedulers;
 	std::vector<UsbIdentifier> connectedDevices;
 	bool onBattery			  = true;

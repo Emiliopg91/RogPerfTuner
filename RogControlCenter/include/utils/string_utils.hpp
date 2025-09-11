@@ -155,8 +155,9 @@ class StringUtils {
 	 * @return std::string
 	 */
 	static inline std::string capitalize(const std::string& input) {
-		if (input.empty())
+		if (input.empty()) {
 			return input;
+		}
 
 		std::string result = input;
 		result[0]		   = std::toupper(static_cast<unsigned char>(result[0]));

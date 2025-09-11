@@ -15,8 +15,9 @@ inline std::ostream& operator<<(std::ostream& os, const GPUInfo& gpu) {
 	os << "Environment: [";
 	for (size_t i = 0; i < gpu.environment.size(); ++i) {
 		os << gpu.environment[i];
-		if (i != gpu.environment.size() - 1)
+		if (i != gpu.environment.size() - 1) {
 			os << ", ";
+		}
 	}
 	os << "]\n";
 	return os;

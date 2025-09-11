@@ -102,8 +102,9 @@ class FileUtils {
 	 */
 	inline static std::string dirname(const std::string& file) {
 		std::filesystem::path p = file;
-		if (p.has_parent_path())
+		if (p.has_parent_path()) {
 			return p.parent_path().string();
+		}
 		return ".";
 	}
 
@@ -223,8 +224,9 @@ class FileUtils {
 	 * @param mode
 	 */
 	inline static void chmodRecursive(const std::filesystem::path& path, mode_t mode) {
-		if (!std::filesystem::exists(path))
+		if (!std::filesystem::exists(path)) {
 			return;
+		}
 
 		if (chmod(path.c_str(), mode) != 0) {
 			perror(("chmod failed on " + path.string()).c_str());

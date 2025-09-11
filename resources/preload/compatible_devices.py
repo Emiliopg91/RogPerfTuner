@@ -21,14 +21,22 @@ if os.path.exists(output_file):
         print("    Preload up to date")
         sys.exit(0)
 
-# Regex para extraer vendor, product y nombre
+print("Clean up of rules file")
+lines=[]
+with open(input_file) as f:
+    for line in f:
+        if len(line.strip())>0 and not line.startswith("#") and ( not line.startswith("SUBSYSTEMS==") or "ATTRS{idVendor}==\"0b05\"" in line):
+            lines.append(line.strip())
+
+with open(input_file,"w") as f:
+    f.write("\n".join(lines))
+
 regex = re.compile(
     r'SUBSYSTEMS==".*?", ATTRS\{idVendor\}=="([0-9a-fA-F]+)", ATTRS\{idProduct\}=="([0-9a-fA-F]+)".*?TAG\+="([a-zA-Z0-9_]+)"'
 )
 
-devices = []
+devices=[]
 
-# Leer y parsear el fichero
 with open(input_file) as f:
     for line in f:
         line = line.replace(', TAG+="uaccess"', "")
@@ -38,49 +46,17 @@ with open(input_file) as f:
             name = name.replace("_", " ")
             devices.append((vendor_id, product_id, name))
 
-devices = [(v, p, n) for v, p, n in devices if v == "0b05"]
-devices.sort(key=lambda x: x[2])
-
-constants: dict[str, str] = {}
-
-for dev in devices:
-    base_name = dev[2].upper().replace(" ", "_")
-    name = base_name
-
-    it = 1
-    while name in constants.keys():
-        name = base_name + f"_{it}"
-        it = it + 1
-    constants[name] = f'UsbIdentifier{{"{dev[0]}", "{dev[1]}", "{dev[2]}"}}'
-
 with open(output_file, "w") as out:
     out.write("#pragma once\n\n")
 
     out.write("#include <array>\n")
-    out.write("#include <map>\n")
-    out.write("#include <string>\n")
-    out.write("#include <string_view>\n\n")
 
     out.write('#include "../../../models/hardware/usb_identifier.hpp"\n\n')
 
-    for c in constants:
-        out.write(f"const auto {c} = {constants[c]};\n")
-    out.write("\n")
-
     out.write(
-        f"using CompatibleDeviceArray = std::array<UsbIdentifier, {len(devices)}>;\n"
+        f"using CompatibleDeviceArray = std::array<UsbIdentifierView, {len(devices)}>;\n"
     )
-    out.write("const CompatibleDeviceArray compatibleDevices = {\n")
-    for c in constants:
-        out.write(f"    {c},\n")
-    out.write("};\n\n")
-
-    out.write("using CompatibleDeviceNameMap = std::map<std::string, std::string>;\n")
-    out.write("const CompatibleDeviceNameMap compatibleDeviceNameMap = {\n")
-    for c in constants:
-        out.write(
-            f'    {{std::string({c}.id_vendor)+":"+std::string({c}.id_product), std::string({c}.name)}},\n'
-        )
-    out.write("};\n")
-
-print(f"    Preloaded {len(devices)} devices in {output_file}")
+    out.write("const constexpr CompatibleDeviceArray compatibleDevices = {{\n")
+    for c in devices:
+        out.write(f"    {{\"{c[0]}\",\"{c[1]}\",\"{c[2]}\"}},\n")
+    out.write("}};\n\n")

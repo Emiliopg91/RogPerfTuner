@@ -18,8 +18,14 @@ OpenRgbService::OpenRgbService() {
 		openRgbClient.applyEffect(effect, brightness);
 	});
 
-	eventBus.onUsbAddedRemoved([this]() {
+	eventBus.onUsbAdded([this]() {
 		reload();
+	});
+
+	eventBus.onUsbRemoved([this](std::vector<UsbIdentifier> rem) {
+		for (auto dev : rem) {
+			disableDevice(dev);
+		}
 	});
 
 	Logger::rem_tab();
@@ -33,10 +39,10 @@ void OpenRgbService::restoreAura() {
 }
 
 std::string OpenRgbService::getDeviceName(const UsbIdentifier& identifier) {
-	std::string key = std::string(identifier.id_vendor) + ":" + std::string(identifier.id_product);
-	auto it			= compatibleDeviceNameMap.find(key);
-	if (it != compatibleDeviceNameMap.end()) {
-		return it->second;
+	for (auto dev : compatibleDevices) {
+		if (identifier == dev) {
+			return std::string(dev.name);
+		}
 	}
 
 	return "";
@@ -104,6 +110,7 @@ void OpenRgbService::applyAura(const bool& temporal) {
 }
 
 void OpenRgbService::disableDevice(const UsbIdentifier& identifier) {
+	logger.info("Disabling {}", getDeviceName(identifier));
 	openRgbClient.disableDevice(getDeviceName(identifier));
 }
 
@@ -123,8 +130,9 @@ std::string OpenRgbService::nextEffect() {
 	auto list = getAvailableEffects();
 	auto it	  = std::find(list.begin(), list.end(), effect);
 	++it;
-	if (it == list.end())
+	if (it == list.end()) {
 		it = list.begin();
+	}
 	auto next = *it;
 	setEffect(next);
 	return next;

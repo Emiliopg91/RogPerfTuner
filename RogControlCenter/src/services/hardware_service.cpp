@@ -59,16 +59,19 @@ HardwareService::HardwareService() {
 			auto brand = static_cast<GpuBrand>(GpuBrand::fromString(StringUtils::toLowerCase(StringUtils::split(gpu.name, ' ')[0])));
 			std::string env;
 			if (!gpu.environment.empty()) {
-				for (auto gpu_env : gpu.environment)
+				for (auto gpu_env : gpu.environment) {
 					env = env + gpu_env + " ";
+				}
 			}
 
-			if (FileUtils::exists(Constants::LIB_VK_DIR))
+			if (FileUtils::exists(Constants::LIB_VK_DIR)) {
 				FileUtils::remove(Constants::LIB_VK_DIR);
+			}
 			FileUtils::mkdirs(Constants::LIB_VK_DIR);
 
-			if (FileUtils::exists(Constants::LIB_OCL_DIR))
+			if (FileUtils::exists(Constants::LIB_OCL_DIR)) {
 				FileUtils::remove(Constants::LIB_OCL_DIR);
+			}
 			FileUtils::mkdirs(Constants::LIB_OCL_DIR);
 
 			std::vector<std::string> vkIcd;
@@ -84,8 +87,9 @@ HardwareService::HardwareService() {
 				std::ostringstream oss;
 
 				for (size_t i = 0; i < vkIcd.size(); ++i) {
-					if (i > 0)
+					if (i > 0) {
 						oss << ":";
+					}
 					oss << vkIcd[i];
 				}
 
@@ -118,8 +122,9 @@ HardwareService::HardwareService() {
 		logger.info("Getting available SSD schedulers");
 		Logger::add_tab();
 		ssd_schedulers = ssdSchedulerClient.get_schedulers();
-		for (auto sched : ssd_schedulers)
+		for (auto sched : ssd_schedulers) {
 			logger.info("{}", sched.toString());
+		}
 		Logger::rem_tab();
 	}
 
@@ -185,12 +190,10 @@ void HardwareService::onDeviceEvent() {
 		Logger::rem_tab();
 	}
 
-	if (removed.size() > 0 && added.size() == 0) {
-		for (auto dev : removed) {
-			openRgbService.disableDevice(dev);
-		}
-	} else if (removed.size() > 0 || added.size() > 0) {
-		eventBus.emitUsbAddedRemoved();
+	if (added.size() > 0) {
+		eventBus.emitUsbAdded();
+	} else if (removed.size() > 0) {
+		eventBus.emitUsbRemoved(removed);
 	}
 
 	connectedDevices = current;
@@ -211,8 +214,7 @@ void HardwareService::setChargeThreshold(const BatteryThreshold& threshold) {
 		charge_limit = threshold;
 		logger.info("Charge limit setted after {} ms", std::chrono::duration_cast<std::chrono::milliseconds>(t1 - t0).count());
 
-		std::unordered_map<std::string, std::any> replacements = {{"value", threshold.toInt()}};
-		toaster.showToast(translator.translate("applied.battery.threshold", replacements));
+		toaster.showToast(translator.translate("applied.battery.threshold", {{"value", std::to_string(threshold.toInt())}}));
 		eventBus.emitChargeThreshold(threshold);
 	}
 }
@@ -249,8 +251,8 @@ void HardwareService::renice(const pid_t& pid) {
 	Logger::rem_tab();
 }
 
-std::map<std::string, std::string> HardwareService::getGpuSelectorEnv(const std::string& gpu) {
-	std::map<std::string, std::string> env;
+std::unordered_map<std::string, std::string> HardwareService::getGpuSelectorEnv(const std::string& gpu) {
+	std::unordered_map<std::string, std::string> env;
 
 	auto it = gpus.find(gpu);
 	if (it != gpus.end()) {
@@ -258,7 +260,7 @@ std::map<std::string, std::string> HardwareService::getGpuSelectorEnv(const std:
 
 		std::istringstream ss(gpuEnv);
 		std::string token;
-		std::map<std::string, std::string> env_vars;
+		std::unordered_map<std::string, std::string> env_vars;
 
 		while (ss >> token) {
 			auto pos = token.find('=');

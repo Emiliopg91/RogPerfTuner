@@ -84,17 +84,19 @@ class DigitalRainEffect : public AbstractEffect {
 				for (size_t r = 0; r < zone.matrix_height; ++r) {
 					std::vector<LedStatus> row;
 					for (size_t c = 0; c < zone.matrix_width; ++c) {
-						if (zone.matrix_values[(r * zone.matrix_width) + c] != INVALID_LED)
+						if (zone.matrix_values[(r * zone.matrix_width) + c] != INVALID_LED) {
 							row.push_back(LedStatus{offset + static_cast<int>(zone.matrix_values[(r * zone.matrix_width) + c])});
-						else
+						} else {
 							row.push_back(LedStatus{INVALID_LED});
+						}
 					}
 					mat_def.push_back(row);
 				}
 			} else {
 				std::vector<LedStatus> row;
-				for (size_t l = 0; l < zone.leds_count; ++l)
+				for (size_t l = 0; l < zone.leds_count; ++l) {
 					row.push_back(LedStatus{static_cast<unsigned int>(offset + l)});
+				}
 				mat_def.push_back(row);
 			}
 			offset += static_cast<int>(zone.leds_count);
@@ -103,9 +105,11 @@ class DigitalRainEffect : public AbstractEffect {
 
 		if (dev.type == orgb::DeviceType::Mouse) {
 			offset -= last_leds;
-			for (auto& row : mat_def)
-				for (auto& led : row)
+			for (auto& row : mat_def) {
+				for (auto& led : row) {
 					led.pos_idx = led.pos_idx - offset;
+				}
+			}
 		}
 
 		return mat_def;
@@ -115,10 +119,11 @@ class DigitalRainEffect : public AbstractEffect {
 		for (int r = static_cast<int>(zone_status.size()) - 1; r >= 0; --r) {
 			for (size_t c = 0; c < zone_status[r].size(); ++c) {
 				if (r == 0) {
-					if (zone_status[r][c].cur_val > 0)
+					if (zone_status[r][c].cur_val > 0) {
 						zone_status[r][c].cur_val--;
-					else if (zone_status[r][c].cur_val < 0)
+					} else if (zone_status[r][c].cur_val < 0) {
 						zone_status[r][c].cur_val++;
+					}
 				} else {
 					int pos					  = zone_status[r][c].pos_idx;
 					zone_status[r][c]		  = zone_status[r - 1][c].clone();
@@ -129,16 +134,19 @@ class DigitalRainEffect : public AbstractEffect {
 	}
 
 	static bool _is_matrix_column_available(const std::vector<std::vector<LedStatus>>& zone_status, std::size_t height, std::size_t column) {
-		if (zone_status.empty() || zone_status[0].empty())
+		if (zone_status.empty() || zone_status[0].empty()) {
 			return false;
+		}
 
 		const std::size_t max_rows = std::min<std::size_t>(3, height);
 		for (std::size_t r = 0; r < max_rows; ++r) {
-			if (column >= zone_status[r].size())
+			if (column >= zone_status[r].size()) {
 				return false;  // fuera de rango -> no disponible
-			if (zone_status[r][column].cur_val != 0)
+			}
+			if (zone_status[r][column].cur_val != 0) {
 				return false;  // hay algo encendido
 							   // Nota: No comprobamos pos_idx aquí; puede ser -1 en columnas huecas de la matriz
+			}
 		}
 		return true;
 	}
@@ -167,12 +175,13 @@ class DigitalRainEffect : public AbstractEffect {
 		for (auto& row : zone_status) {
 			for (auto& led : row) {
 				if (led.pos_idx < static_cast<unsigned int>(dev_size)) {
-					if (led.cur_val >= led.max_val)
+					if (led.cur_val >= led.max_val) {
 						colors[led.pos_idx] = Color::White;
-					else if (led.cur_val >= int(2 * led.max_val / 3))
+					} else if (led.cur_val >= int(2 * led.max_val / 3)) {
 						colors[led.pos_idx] = Color::Green;
-					else
+					} else {
 						colors[led.pos_idx] = Color::Green * _sin_array[std::floor(led.cur_val * (_max_count / static_cast<double>(_max_count)))];
+					}
 				}
 			}
 		}
@@ -234,7 +243,8 @@ class DigitalRainEffect : public AbstractEffect {
 			});
 		}
 
-		for (auto& t : threads)
+		for (auto& t : threads) {
 			t.join();
+		}
 	}
 };

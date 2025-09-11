@@ -24,7 +24,7 @@ class OpenRgbClient {
 	void disableDevice(const std::string&);
 
   private:
-	std::map<std::string, std::string> compatibleDeviceNames;
+	std::unordered_map<std::string, std::string> compatibleDeviceNames;
 	std::thread runnerThread;
 	Logger logger{"OpenRgbClient"};
 	int port  = 0;

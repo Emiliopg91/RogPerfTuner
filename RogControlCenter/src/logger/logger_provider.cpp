@@ -25,15 +25,18 @@ static std::string format_file_time(std::filesystem::file_time_type ftime) {
 static void rotate_log(const std::string& fileName, const std::filesystem::path& logDir, const std::filesystem::path& oldDir) {
 	namespace fs = std::filesystem;
 
-	if (!FileUtils::exists(logDir))
+	if (!FileUtils::exists(logDir)) {
 		return;
+	}
 
 	for (auto& entry : fs::directory_iterator(logDir)) {
-		if (!entry.is_regular_file())
+		if (!entry.is_regular_file()) {
 			continue;
+		}
 		auto path = entry.path();
-		if (path.extension() != ".log")
+		if (path.extension() != ".log") {
 			continue;
+		}
 
 		if (path.filename() == fileName + ".log") {
 			auto ftime	 = FileUtils::getMTime(path);
@@ -44,12 +47,14 @@ static void rotate_log(const std::string& fileName, const std::filesystem::path&
 		}
 	}
 
-	if (!fs::exists(oldDir))
+	if (!fs::exists(oldDir)) {
 		return;
+	}
 	std::vector<fs::directory_entry> currents;
 	for (auto& entry : fs::directory_iterator(oldDir)) {
-		if (!entry.is_regular_file())
+		if (!entry.is_regular_file()) {
 			continue;
+		}
 		if (entry.path().filename().string().rfind(fileName + ".", 0) == 0 && entry.path().extension() == ".log") {
 			currents.push_back(entry);
 		}
@@ -64,7 +69,7 @@ static void rotate_log(const std::string& fileName, const std::filesystem::path&
 	}
 }
 
-std::map<std::string, std::string> LoggerProvider::configMap{};
+std::unordered_map<std::string, std::string> LoggerProvider::configMap{};
 void LoggerProvider::initialize(std::string fileName, std::string path) {
 	console_sink = std::make_shared<spdlog::sinks::stdout_color_sink_mt>();
 	console_sink->set_pattern("%^[%Y-%m-%d %H:%M:%S.%e] [%-7l] [%n] %v%$");
@@ -101,8 +106,9 @@ void LoggerProvider::initialize(std::string fileName, std::string path) {
 
 std::shared_ptr<spdlog::logger> LoggerProvider::getLogger(const std::string& name) {
 	auto it = loggers.find(name);
-	if (it != loggers.end())
+	if (it != loggers.end()) {
 		return it->second;
+	}
 
 	std::string display_name = name;
 
@@ -131,7 +137,7 @@ std::shared_ptr<spdlog::logger> LoggerProvider::getLogger(const std::string& nam
 	return logger;
 }
 
-void LoggerProvider::setConfigMap(std::map<std::string, std::string> configMap) {
+void LoggerProvider::setConfigMap(std::unordered_map<std::string, std::string> configMap) {
 	LoggerProvider::configMap = configMap;
 
 	for (const auto& [key, loggerPtr] : LoggerProvider::loggers) {

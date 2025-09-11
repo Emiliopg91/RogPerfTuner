@@ -27,12 +27,15 @@ struct SemanticVersion {
 		std::string token;
 		SemanticVersion semver{0, 0, 0};
 
-		if (std::getline(ss, token, '.'))
+		if (std::getline(ss, token, '.')) {
 			semver.major = std::stoi(token);
-		if (std::getline(ss, token, '.'))
+		}
+		if (std::getline(ss, token, '.')) {
 			semver.minor = std::stoi(token);
-		if (std::getline(ss, token, '.'))
+		}
+		if (std::getline(ss, token, '.')) {
 			semver.patch = std::stoi(token);
+		}
 
 		return semver;
 	}
@@ -46,10 +49,12 @@ struct SemanticVersion {
 	}
 
 	bool operator<(const SemanticVersion& other) const {
-		if (major != other.major)
+		if (major != other.major) {
 			return major < other.major;
-		if (minor != other.minor)
+		}
+		if (minor != other.minor) {
 			return minor < other.minor;
+		}
 		return patch < other.patch;
 	}
 

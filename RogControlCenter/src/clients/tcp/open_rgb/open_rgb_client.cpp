@@ -111,15 +111,17 @@ void OpenRgbClient::runner() {
 	std::vector<std::string> argsStr = {"--server-host", "localhost", "--server-port", std::to_string(port), "-v"};
 	std::vector<char*> argv;
 	argv.push_back(const_cast<char*>(Constants::ORGB_PATH.c_str()));
-	for (auto& s : argsStr)
+	for (auto& s : argsStr) {
 		argv.push_back(const_cast<char*>(s.c_str()));
+	}
 	argv.push_back(nullptr);
 
 	std::vector<std::string> envStrings = shell.copyEnviron();
 	envStrings.push_back("LD_LIBRARY_PATH=");
 	std::vector<char*> env;
-	for (auto& s : envStrings)
+	for (auto& s : envStrings) {
 		env.push_back(s.data());
+	}
 	env.push_back(nullptr);
 
 	pid			  = shell.launch_process(Constants::ORGB_PATH.c_str(), argv.data(), env.data(), Constants::LOG_ORGB_FILE);
@@ -173,7 +175,8 @@ void OpenRgbClient::applyEffect(const std::string& effectName, const RgbBrightne
 
 void OpenRgbClient::disableDevice(const std::string& devName) {
 	for (auto& dev : detectedDevices.devices()) {
-		if (dev->name == devName)
+		if (dev->name == devName) {
 			dev->enabled = false;
+		}
 	}
 }

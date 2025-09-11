@@ -12,8 +12,9 @@
 #include "../../include/translator/translator.hpp"
 
 bool PasswordDialog::showDialog() {
-	if (exec() == QDialog::Accepted)
+	if (exec() == QDialog::Accepted) {
 		return true;
+	}
 
 	QMessageBox::information(nullptr, "Canceled", QString::fromStdString(translator.translate("user.canceled.operation")));
 	exit(EXIT_FAILURE);
@@ -63,15 +64,17 @@ bool PasswordDialog::checkPassword(const QString& password) {
 
 	process.start("sudo", args);
 
-	if (!process.waitForStarted())
+	if (!process.waitForStarted()) {
 		return false;
+	}
 
 	// enviar contraseña
 	process.write((password + "\n").toUtf8());
 	process.closeWriteChannel();
 
-	if (!process.waitForFinished())
+	if (!process.waitForFinished()) {
 		return false;
+	}
 
 	QByteArray stdoutData = process.readAllStandardOutput();
 	QByteArray stderrData = process.readAllStandardError();

@@ -18,8 +18,9 @@ class RainbowWave : public AbstractEffect {
 		for (auto& dev : devices) {
 			for (auto& zone : dev.zones) {
 				size_t zone_len = (zone.type == orgb::ZoneType::Matrix) ? zone.matrix_width : zone.leds_count;
-				if (zone_len > longest_zone)
+				if (zone_len > longest_zone) {
 					longest_zone = zone_len;
+				}
 			}
 		}
 

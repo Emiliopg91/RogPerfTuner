@@ -36,20 +36,23 @@ inline void to_json(json& j, const GameEntry& g) {
 
 inline void from_json(const json& j, GameEntry& g) {
 	// Manejo de opcionales
-	if (j.contains("args") && !j.at("args").is_null())
+	if (j.contains("args") && !j.at("args").is_null()) {
 		g.args = j.at("args").get<std::string>();
-	else
+	} else {
 		g.args = std::nullopt;
+	}
 
-	if (j.contains("env") && !j.at("env").is_null())
+	if (j.contains("env") && !j.at("env").is_null()) {
 		g.env = j.at("env").get<std::string>();
-	else
+	} else {
 		g.env = std::nullopt;
+	}
 
-	if (j.contains("gpu") && !j.at("gpu").is_null())
+	if (j.contains("gpu") && !j.at("gpu").is_null()) {
 		g.gpu = j.at("gpu").get<std::string>();
-	else
+	} else {
 		g.gpu = std::nullopt;
+	}
 
 	// Campos obligatorios (sin optional)
 	g.metrics_level = MangoHudLevel::fromInt(j.at("metrics_level").get<int>());

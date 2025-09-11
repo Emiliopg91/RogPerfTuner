@@ -24,8 +24,9 @@ class LsUsbClient {
 
 	LsUsbClient() {
 		udev = udev_new();
-		if (!udev)
+		if (!udev) {
 			throw std::runtime_error("Couldn't initialize udev client");
+		}
 
 		mon = udev_monitor_new_from_netlink(udev, "udev");
 		udev_monitor_filter_add_match_subsystem_devtype(mon, "usb", "usb_device");
@@ -90,8 +91,9 @@ class LsUsbClient {
 				if (vendor && product) {
 					UsbIdentifier usb_dev{vendor, product, product_name ? product_name : "Unknown USB device"};
 
-					if (!dev_filter || dev_filter(usb_dev))
+					if (!dev_filter || dev_filter(usb_dev)) {
 						devices.push_back(usb_dev);
+					}
 				}
 			}
 			udev_device_unref(dev);
@@ -119,8 +121,9 @@ class LsUsbClient {
 					break;
 				}
 			}
-			if (!found)
+			if (!found) {
 				added.push_back(dev1);
+			}
 		}
 
 		// Detectar eliminados
@@ -132,8 +135,9 @@ class LsUsbClient {
 					break;
 				}
 			}
-			if (!found)
+			if (!found) {
 				removed.push_back(dev1);
+			}
 		}
 
 		return {current_usb, added, removed};

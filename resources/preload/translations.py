@@ -29,13 +29,17 @@ with open(output_file, "w") as out:
     out.write('#include "../../include/translator/translator.hpp"\n\n')
 
     out.write(
-        "std::map<std::string, std::unordered_map<std::string, std::string>> Translator::initialTranslations = {\n"
+        "std::vector<TranslationEntry> Translator::initialTranslations = {\n"
     )
-    for literal in translations:
-        {out.write(f'{{"{literal}", {{\n')}
-        for lang in translations[literal]:
-            out.write(f'{{"{lang}", "{translations[literal][lang]}"}},\n')
-        {out.write("}},\n")}
+    for entry in translations:
+        dec = f"{{ \"{entry}\","
+        for lang in ["en","es"]:
+            tr = ""
+            if lang in translations[entry]:
+                tr = translations[entry][lang]
+            dec = dec + f"\"{tr}\","
+        dec = dec+"},\n"
+        out.write(dec)
     out.write("};")
 
 

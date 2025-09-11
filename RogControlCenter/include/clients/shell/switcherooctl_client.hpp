@@ -32,8 +32,9 @@ class SwitcherooCtlClient : AbstractCmdClient {
 			line.erase(0, line.find_first_not_of(" \t"));
 			line.erase(line.find_last_not_of(" \t") + 1);
 
-			if (line.empty())
+			if (line.empty()) {
 				continue;
+			}
 
 			if (line.rfind("Device:", 0) == 0) {
 				if (in_device_block) {

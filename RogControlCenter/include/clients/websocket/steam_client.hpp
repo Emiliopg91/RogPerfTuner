@@ -34,7 +34,7 @@ class SteamClient : public AbstractWebsocketClient {
 
 		auto invResult = invoke("get_apps_details", converted);
 
-		auto map = (std::any_cast<json>(invResult[0])).get<std::map<std::string, SteamGameDetails>>();
+		auto map = (std::any_cast<json>(invResult[0])).get<std::unordered_map<std::string, SteamGameDetails>>();
 		for (const auto& [key, val] : map) {
 			result.emplace_back(val);
 		}

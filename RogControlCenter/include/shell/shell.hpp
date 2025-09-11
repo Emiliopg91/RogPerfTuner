@@ -112,5 +112,5 @@ class Shell {
 	CommandResult send_command(BashSession& session, const std::string& cmd, bool check);
 	std::mutex mtx;
 	std::mutex which_mtx;
-	std::map<std::string, std::vector<std::string>> whichCache;
+	std::unordered_map<std::string, std::vector<std::string>> whichCache;
 };

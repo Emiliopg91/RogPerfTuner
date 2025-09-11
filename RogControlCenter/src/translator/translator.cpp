@@ -2,6 +2,7 @@
 #include "../../include/translator/translator.hpp"
 
 #include <nlohmann/json.hpp>
+#include <optional>
 
 using json = nlohmann::json;
 
@@ -9,23 +10,17 @@ Translator::Translator() {
 	logger.debug("User language: {}", currentLang);
 
 	try {
-		for (auto& [key, entries] : initialTranslations) {
-			std::string literal = "";
-			auto it				= entries.find(currentLang);
-			if (it != entries.end()) {
-				literal = it->second;
-			} else {
-				logger.warn("Missing translation for '{}'", key);
-				auto it = entries.find(FALLBACK_LANG);
-				if (it != entries.end()) {
-					literal = it->second;
-				}
+		std::optional<std::string> val = std::nullopt;
+		for (auto entry : initialTranslations) {
+			if (currentLang == "es") {
+				val = entry.es;
 			}
-			translations[key] = literal;
+
+			translations[entry.key] = val.value_or(entry.en);
 		}
 
 		initialTranslations.clear();
-		std::unordered_map<std::string, std::unordered_map<std::string, std::string>>().swap(initialTranslations);
+		initialTranslations.shrink_to_fit();
 	} catch (const std::exception& e) {
 		logger.error("Error loading translations: {}", e.what());
 	}

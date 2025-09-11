@@ -14,8 +14,9 @@ class Configuration {
 	void loadConfig();
 
 	RootConfig& getConfiguration() {
-		if (!config.has_value())
+		if (!config.has_value()) {
 			config = RootConfig{};
+		}
 		return config.value();
 	}
 

@@ -23,10 +23,11 @@ class BreathingEffect : public AbstractEffect {
 
 			offset = (offset + 1) % _step_count;
 
-			if (offset > 0)
+			if (offset > 0) {
 				_sleep(_frequency);
-			else
+			} else {
 				_sleep(_pause_time);
+			}
 		}
 	}
 

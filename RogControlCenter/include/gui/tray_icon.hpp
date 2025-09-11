@@ -39,10 +39,10 @@ class TrayIcon : public QObject {
 	QSystemTrayIcon* tray_icon_;
 	QMenu* tray_menu_;
 
-	std::map<std::string, QAction*> thresholdActions;
-	std::map<std::string, QAction*> brightnessActions;
-	std::map<std::string, QAction*> effectActions;
-	std::map<std::string, QAction*> perfProfileActions;
+	std::unordered_map<std::string, QAction*> thresholdActions;
+	std::unordered_map<std::string, QAction*> brightnessActions;
+	std::unordered_map<std::string, QAction*> effectActions;
+	std::unordered_map<std::string, QAction*> perfProfileActions;
 	QMenu* profileMenu;
 
 	void setAuraBrightness(RgbBrightness brightness);

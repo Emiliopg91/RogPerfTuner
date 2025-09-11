@@ -163,8 +163,9 @@ class AutoUpdater {
 				download_update(asset);
 				if (!Constants::DEV_MODE) {
 					copy_file();
-					if (restart_method)
+					if (restart_method) {
 						restart_method();
+					}
 				}
 			}
 		}
@@ -172,8 +173,9 @@ class AutoUpdater {
 
 	AutoUpdater(Callback restart_method_, std::function<bool()> perform_update_check_ = nullptr)
 		: restart_method(restart_method_), perform_update_check(perform_update_check_) {
-		if (Constants::APPIMAGE_FILE.empty())
+		if (Constants::APPIMAGE_FILE.empty()) {
 			logger.warn("Auto update is only available for AppImage version");
+		}
 
 		if (!Constants::APPIMAGE_FILE.empty()) {
 			std::thread(&AutoUpdater::check_task, this).detach();
