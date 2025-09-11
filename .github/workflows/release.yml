@@ -63,7 +63,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: OpenRGB
-          path: assets/RCCDeckyCompanion
+          path: assets/RccDeckyCompanion
 
   compile_and_release:
     runs-on: ubuntu-latest
