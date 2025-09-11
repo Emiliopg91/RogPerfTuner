@@ -6,8 +6,54 @@ on:
       - main
 
 jobs:
+  compile_orgb:
+    runs-on: ubuntu-latest
+    outputs:
+      version: ${{ steps.get_version.outputs.version }}
+    steps:
+      - name: Install dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y libfuse2
+
+      - name: Compile
+        run: |
+          make build_rogcontrolcenter
+
+      - name: Upload OpenRGB
+        uses: actions/upload-artifact@v4
+        with:
+          name: OpenRGB
+          path: assets/OpenRGB
+
+  compile_rccdc:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          submodules: recursive
+          fetch-depth: 0
+
+      - name: Install dependencies
+        run: |
+          npm i -g pnpm@8.5.1 shx@0.3.4
+
+      - name: Compile
+        run: |
+          make build_rccdc
+
+      - name: Upload OpenRGB
+        uses: actions/upload-artifact@v4
+        with:
+          name: OpenRGB
+          path: assets/RCCDeckyCompanion
+
   compile_and_release:
     runs-on: ubuntu-latest
+    needs:
+      - compile_orgb
+      - compile_rccdc
     outputs:
       version: ${{ steps.get_version.outputs.version }}
     steps:
@@ -22,20 +68,25 @@ jobs:
           git config user.name "GitHub Actions"
           git config user.email "actions@github.com"
 
-      - name: Install Python
-        uses: actions/setup-python@v5
-        with:
-          python-version: "3.13"
-
       - name: Install dependencies
         run: |
           sudo apt-get update
           sudo apt-get install --no-install-recommends -y libfuse2 qt6-base-dev qt6-tools-dev qt6-tools-dev-tools build-essential cmake libsecret-1-dev libzstd-dev pkg-config libudev-dev clang clang-format zsync
-          npm i -g pnpm@8.5.1 shx@0.3.4
+
+      - name: Download OpenRGB artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: OpenRGB
+          path: assets/OpenRGB
+
+      - name: Download RccDeckyCompanion artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: RccDeckyCompanion
+          path: assets/RccDeckyCompanion
 
       - name: Compile
         run: |
-          cmake --version
           PYTHONUNBUFFERED=1 make release
 
             if [[ -n $(git status --porcelain "RogControlCenter") ]]; then
