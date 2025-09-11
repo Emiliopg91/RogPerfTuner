@@ -103,7 +103,7 @@ jobs:
 
       - name: Compile
         run: |
-          PYTHONUNBUFFERED=1 make release
+          make release
 
             if [[ -n $(git status --porcelain "RogControlCenter") ]]; then
                 changes=1

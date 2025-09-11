@@ -87,6 +87,7 @@ build_rccdc:
 		echo "#######################################################################" && \
 		echo "#################### Compiling RccDeckyCompanion ######################" && \
 		echo "#######################################################################" && \
+		export PYTHONUNBUFFERED=1 \
 	    cd submodules/RccDeckyCompanion && ./cli/decky.py build && cp -r out/RccDeckyCompanion ../../assets/RccDeckyCompanion; \
 	fi
 
