@@ -35,6 +35,9 @@ void OpenRgbService::restoreAura() {
 	effect	   = configuration.getConfiguration().open_rgb.last_effect.value_or("Static");
 	brightness = configuration.getConfiguration().open_rgb.brightness;
 
+	eventBus.emitRgbEffect(effect);
+	eventBus.emitRgbBrightness(brightness);
+
 	applyAura();
 }
 
