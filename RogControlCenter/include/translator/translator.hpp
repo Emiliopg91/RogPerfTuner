@@ -388,14 +388,14 @@ class Translator {
 			"Guardar y ejecutar",
 		},
 		{
-			"configuration.skipped",
-			"Configuration skipped",
-			"Configuración omitida",
+			"confirmation.required",
+			"Confirmation required",
+			"Confirmación necesaria",
 		},
 		{
-			"running.default",
-			"Game will launch with default configuration",
-			"El juego se lanzará con la configuración por defecto",
+			"run.with.default.config",
+			"Launch game with default configuration?",
+			"¿Lanzar juego con la configuración por defecto?",
 		},
 	}};
 

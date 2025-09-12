@@ -279,12 +279,12 @@
     "en": "Save and launch",
     "es": "Guardar y ejecutar"
   },
-  "configuration.skipped": {
-    "en": "Configuration skipped",
-    "es": "Configuración omitida"
+  "confirmation.required": {
+    "en": "Confirmation required",
+    "es": "Confirmación necesaria"
   },
-  "running.default": {
-    "en": "Game will launch with default configuration",
-    "es": "El juego se lanzará con la configuración por defecto"
+  "run.with.default.config": {
+    "en": "Launch game with default configuration?",
+    "es": "¿Lanzar juego con la configuración por defecto?"
   }
 }

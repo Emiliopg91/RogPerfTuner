@@ -51,4 +51,7 @@ class GameConfigDialog : public QDialog {
 	HardwareService& hardwareService = HardwareService::getInstance();
 	SteamService& steamService		 = SteamService::getInstance();
 	Shell& shell					 = Shell::getInstance();
+
+  protected:
+	void closeEvent(QCloseEvent*);
 };

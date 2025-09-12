@@ -12,10 +12,7 @@
 #include <optional>
 
 void GameConfigDialog::showDialog() {
-	if (exec() != QDialog::Accepted) {
-		QMessageBox::information(nullptr, QString::fromStdString(translator.translate("configuration.skipped")),
-								 QString::fromStdString(translator.translate("running.default")));
-	}
+	exec();
 
 	logger.info("Configuration finished");
 
@@ -28,19 +25,42 @@ void GameConfigDialog::showDialog() {
 	Logger::rem_tab();
 }
 
+void GameConfigDialog::closeEvent(QCloseEvent* event) {
+	QMessageBox::StandardButton reply =
+		QMessageBox::question(this, QString::fromStdString(translator.translate("confirmation.required")),
+							  QString::fromStdString(translator.translate("run.with.default.config")), QMessageBox::Yes | QMessageBox::No);
+
+	if (reply == QMessageBox::Yes) {
+		logger.info("Game will launch with default configuration");
+		event->accept();
+	} else {
+		event->ignore();
+	}
+}
+
 GameConfigDialog::GameConfigDialog(Logger logger, unsigned int gid, QWidget* parent) : QDialog(parent), gid(gid), logger(logger) {
 	setWindowTitle(QString::fromStdString(translator.translate("config.for.game", {{"game", ""}})));
-	setFixedWidth(400);
-	setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Minimum);
-	adjustSize();
-	setMaximumHeight(height());
+	setFixedSize(400, 300);
 
 	gameEntry = configuration.getConfiguration().games[std::to_string(gid)];
 
 	windowLayout = new QFormLayout();
 	windowLayout->setAlignment(Qt::AlignTop);
 
-	group  = new QGroupBox(QString::fromStdString(gameEntry.name));
+	QLabel* titleLabel = new QLabel(QString::fromStdString(gameEntry.name));
+	QFont titleFont	   = titleLabel->font();
+	titleFont.setPointSize(titleFont.pointSize() + 2);
+	titleFont.setBold(true);
+	titleLabel->setFont(titleFont);
+
+	titleLabel->setAlignment(Qt::AlignCenter);
+
+	QHBoxLayout* titleLayout = new QHBoxLayout();
+	titleLayout->addWidget(titleLabel);
+	windowLayout->addRow(titleLayout);
+
+	// --- Grupo (sin título)
+	group  = new QGroupBox();
 	layout = new QFormLayout();
 
 	int index, i;
@@ -73,38 +93,36 @@ GameConfigDialog::GameConfigDialog(Logger logger, unsigned int gid, QWidget* par
 	layout->addRow(new QLabel(QString::fromStdString(translator.translate("used.steamdeck") + ":")), modeCombo);
 
 	// --- Metrics ---
-	if (steamService.metricsEnabled()) {
-		metricsCombo = new NoScrollComboBox();
-		metricsCombo->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Preferred);
-		auto items = MangoHudLevel::getAll();
-		for (MangoHudLevel level : items) {
-			metricsCombo->addItem(QString::fromStdString(translator.translate("label.level." + std::to_string(level.toInt()))), level.toInt());
-			if (level == gameEntry.metrics_level) {
-				metricsCombo->setCurrentIndex(level.toInt());
-			}
+	metricsCombo = new NoScrollComboBox();
+	metricsCombo->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Preferred);
+	auto items = MangoHudLevel::getAll();
+	for (MangoHudLevel level : items) {
+		metricsCombo->addItem(QString::fromStdString(translator.translate("label.level." + std::to_string(level.toInt()))), level.toInt());
+		if (level == gameEntry.metrics_level) {
+			metricsCombo->setCurrentIndex(level.toInt());
 		}
-		layout->addRow(new QLabel(QString::fromStdString(translator.translate("metrics") + ":")), metricsCombo);
 	}
+	metricsCombo->setEnabled(steamService.metricsEnabled());
+	layout->addRow(new QLabel(QString::fromStdString(translator.translate("metrics") + ":")), metricsCombo);
 
-	if (gameEntry.proton) {
-		// --- Wine Sync ---
+	// --- Wine Sync ---
 
-		i = 0;
+	i = 0;
 
-		wineSyncCombo = new NoScrollComboBox();
-		wineSyncCombo->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Preferred);
-		auto items = WineSyncOption::getAll();
-		for (WineSyncOption opt : items) {
-			wineSyncCombo->addItem(QString::fromStdString(translator.translate("label.winesync." + opt.toString())),
-								   QString::fromStdString(opt.toString()));
-			if (opt == gameEntry.sync) {
-				wineSyncCombo->setCurrentIndex(i);
-			}
-
-			i++;
+	wineSyncCombo = new NoScrollComboBox();
+	wineSyncCombo->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Preferred);
+	auto items2 = WineSyncOption::getAll();
+	for (WineSyncOption opt : items2) {
+		wineSyncCombo->addItem(QString::fromStdString(translator.translate("label.winesync." + opt.toString())),
+							   QString::fromStdString(opt.toString()));
+		if (opt == gameEntry.sync) {
+			wineSyncCombo->setCurrentIndex(i);
 		}
-		layout->addRow(new QLabel(QString::fromStdString(translator.translate("winesync") + ":")), wineSyncCombo);
+
+		i++;
 	}
+	wineSyncCombo->setEnabled(gameEntry.proton);
+	layout->addRow(new QLabel(QString::fromStdString(translator.translate("winesync") + ":")), wineSyncCombo);
 
 	// --- Environment ---
 	envInput = new QLineEdit(QString::fromStdString(gameEntry.env.value_or("")));
