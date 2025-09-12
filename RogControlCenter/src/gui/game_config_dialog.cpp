@@ -38,7 +38,7 @@ void GameConfigDialog::closeEvent(QCloseEvent* event) {
 	}
 }
 
-GameConfigDialog::GameConfigDialog(Logger logger, unsigned int gid, QWidget* parent) : QDialog(parent), gid(gid), logger(logger) {
+GameConfigDialog::GameConfigDialog(unsigned int gid, QWidget* parent) : QDialog(parent), gid(gid) {
 	setWindowTitle(QString::fromStdString(translator.translate("config.for.game", {{"game", ""}})));
 	setFixedSize(400, 300);
 

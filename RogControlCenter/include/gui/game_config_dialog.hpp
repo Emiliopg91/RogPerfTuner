@@ -22,7 +22,7 @@ class GameConfigDialog : public QDialog {
 
   public:
 	void showDialog();
-	GameConfigDialog(Logger logger, unsigned int gid, QWidget* parent = nullptr);
+	GameConfigDialog(unsigned int gid, QWidget* parent = nullptr);
 
   private:
 	void onAccept();
@@ -44,7 +44,7 @@ class GameConfigDialog : public QDialog {
 
 	unsigned int gid;
 	GameEntry gameEntry;
-	Logger logger;
+	Logger logger{"GameConfigDialog"};
 
 	Translator& translator			 = Translator::getInstance();
 	Configuration& configuration	 = Configuration::getInstance();

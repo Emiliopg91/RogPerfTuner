@@ -167,7 +167,7 @@ void SteamService::onFirstGameRun(unsigned int gid, std::string name, std::unord
 	QMetaObject::invokeMethod(
 		qApp,
 		[this, gid]() {
-			GameConfigDialog dialog(logger, gid, nullptr);
+			GameConfigDialog dialog(gid, nullptr);
 			dialog.showDialog();
 		},
 		Qt::QueuedConnection);
