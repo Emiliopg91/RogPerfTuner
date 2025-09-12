@@ -286,5 +286,17 @@
   "run.with.default.config": {
     "en": "Launch game with default configuration?",
     "es": "¿Lanzar juego con la configuración por defecto?"
+  },
+  "configuration": {
+    "en": "Configuration",
+    "es": "Configuración"
+  },
+  "edit": {
+    "en": "Edit",
+    "es": "Editar"
+  },
+  "save": {
+    "en": "Save",
+    "es": "Guardar"
   }
 }

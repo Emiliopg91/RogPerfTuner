@@ -10,7 +10,6 @@
 #include "../../include/configuration/configuration.hpp"
 #include "../../include/events/event_bus.hpp"
 #include "../../include/gui/game_config_dialog.hpp"
-#include "../../include/models/hardware/gpu_brand.hpp"
 #include "../../include/models/others/semantic_version.hpp"
 #include "../../include/models/steam/steam_game_details.hpp"
 #include "../../include/services/hardware_service.hpp"
@@ -167,7 +166,7 @@ void SteamService::onFirstGameRun(unsigned int gid, std::string name, std::unord
 	QMetaObject::invokeMethod(
 		qApp,
 		[this, gid]() {
-			GameConfigDialog dialog(gid, nullptr);
+			GameConfigDialog dialog(gid, true);
 			dialog.showDialog();
 		},
 		Qt::QueuedConnection);
@@ -382,67 +381,4 @@ const SteamGameConfig SteamService::getConfiguration(const std::string& gid) {
 	}
 
 	return cfg;
-}
-
-const std::optional<GpuBrand> SteamService::getPreferedGpu(const unsigned int& gid) {
-	return configuration.getConfiguration().games[std::to_string(gid)].gpu;
-}
-
-void SteamService::setPreferedGpu(const unsigned int& gid, const std::optional<GpuBrand>& gpu) {
-	if (gpu.has_value()) {
-		configuration.getConfiguration().games[std::to_string(gid)].gpu = gpu.value().toString();
-	} else {
-		configuration.getConfiguration().games[std::to_string(gid)].gpu = std::nullopt;
-	}
-
-	configuration.saveConfig();
-}
-
-bool SteamService::isSteamDeck(const unsigned int& gid) {
-	return configuration.getConfiguration().games[std::to_string(gid)].steamdeck;
-}
-
-void SteamService::setSteamDeck(const unsigned int& gid, const bool& value) {
-	configuration.getConfiguration().games[std::to_string(gid)].steamdeck = value;
-	configuration.saveConfig();
-}
-
-const MangoHudLevel SteamService::getMetricsLevel(const unsigned int& gid) {
-	return configuration.getConfiguration().games[std::to_string(gid)].metrics_level;
-}
-
-void SteamService::setMetricsLevel(const unsigned int& gid, const MangoHudLevel& level) {
-	configuration.getConfiguration().games[std::to_string(gid)].metrics_level = level;
-	configuration.saveConfig();
-}
-
-const WineSyncOption SteamService::getWineSync(const unsigned int& gid) {
-	return configuration.getConfiguration().games[std::to_string(gid)].sync;
-}
-
-void SteamService::setWineSync(const unsigned int& gid, const WineSyncOption& level) {
-	configuration.getConfiguration().games[std::to_string(gid)].sync = level;
-	configuration.saveConfig();
-}
-
-bool SteamService::isProton(const unsigned int& gid) {
-	return configuration.getConfiguration().games[std::to_string(gid)].proton;
-}
-
-const std::string SteamService::getEnvironment(const unsigned int& gid) {
-	return configuration.getConfiguration().games[std::to_string(gid)].env.value_or("");
-}
-
-void SteamService::setEnvironment(const unsigned int& gid, const std::string& env) {
-	configuration.getConfiguration().games[std::to_string(gid)].env = env;
-	configuration.saveConfig();
-}
-
-const std::string SteamService::getParameters(const unsigned int& gid) {
-	return configuration.getConfiguration().games[std::to_string(gid)].args.value_or("");
-}
-
-void SteamService::setParameters(const unsigned int& gid, const std::string& args) {
-	configuration.getConfiguration().games[std::to_string(gid)].args = args;
-	configuration.saveConfig();
 }

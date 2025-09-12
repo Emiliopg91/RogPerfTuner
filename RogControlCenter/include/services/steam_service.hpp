@@ -2,10 +2,7 @@
 
 #include "../clients/websocket/steam_client.hpp"
 #include "../configuration/configuration.hpp"
-#include "../models/hardware/gpu_brand.hpp"
-#include "../models/steam/mangohud_level.hpp"
 #include "../models/steam/steam_game_config.hpp"
-#include "../models/steam/wine_sync_option.hpp"
 #include "./hardware_service.hpp"
 #include "./open_rgb_service.hpp"
 #include "./profile_service.hpp"
@@ -50,24 +47,4 @@ class SteamService {
 	bool isRunning(const unsigned int& appid) const;
 	bool metricsEnabled();
 	const SteamGameConfig getConfiguration(const std::string& gid);
-
-	const std::optional<GpuBrand> getPreferedGpu(const unsigned int& gid);
-	void setPreferedGpu(const unsigned int& gid, const std::optional<GpuBrand>& gpu);
-
-	bool isSteamDeck(const unsigned int& gid);
-	void setSteamDeck(const unsigned int& gid, const bool& value);
-
-	const MangoHudLevel getMetricsLevel(const unsigned int& gid);
-	void setMetricsLevel(const unsigned int& gid, const MangoHudLevel& level);
-
-	const WineSyncOption getWineSync(const unsigned int& gid);
-	void setWineSync(const unsigned int& gid, const WineSyncOption& level);
-
-	bool isProton(const unsigned int& gid);
-
-	const std::string getEnvironment(const unsigned int& gid);
-	void setEnvironment(const unsigned int& gid, const std::string& env);
-
-	const std::string getParameters(const unsigned int& gid);
-	void setParameters(const unsigned int& gid, const std::string& env);
 };

@@ -1,20 +1,7 @@
 #pragma once
 
-#include <QCloseEvent>
-#include <QColor>
-#include <QComboBox>
 #include <QDialog>
-#include <QHeaderView>
-#include <QIcon>
-#include <QLineEdit>
-#include <QPixmap>
-#include <QScrollArea>
-#include <QString>
-#include <QTableWidget>
-#include <QVBoxLayout>
-#include <QWidget>
 
-#include "../services/hardware_service.hpp"
 #include "../services/steam_service.hpp"
 #include "../translator/translator.hpp"
 
@@ -32,7 +19,6 @@ class GameList : public QDialog {
 	QWidget* parentWidget = nullptr;
 	bool manageParent	  = false;
 
-	HardwareService& hardwareService = HardwareService::getInstance();
-	SteamService& steamService		 = SteamService::getInstance();
-	Translator& translator			 = Translator::getInstance();
+	Translator& translator	   = Translator::getInstance();
+	SteamService& steamService = SteamService::getInstance();
 };

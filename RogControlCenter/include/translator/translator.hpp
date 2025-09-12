@@ -36,7 +36,7 @@ class Translator {
 
 	inline static Language FALLBACK_LANG = Language::Enum::EN;
 	// Begin translations
-	inline static const constexpr std::array<TranslationEntry, 72> initialTranslations = {{
+	inline static const constexpr std::array<TranslationEntry, 75> initialTranslations = {{
 		{
 			"performance",
 			"Performance",
@@ -396,6 +396,21 @@ class Translator {
 			"run.with.default.config",
 			"Launch game with default configuration?",
 			"¿Lanzar juego con la configuración por defecto?",
+		},
+		{
+			"configuration",
+			"Configuration",
+			"Configuración",
+		},
+		{
+			"edit",
+			"Edit",
+			"Editar",
+		},
+		{
+			"save",
+			"Save",
+			"Guardar",
 		},
 	}};
 

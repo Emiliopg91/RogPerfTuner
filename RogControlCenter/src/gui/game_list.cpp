@@ -8,19 +8,15 @@
 #include <QIcon>
 #include <QLineEdit>
 #include <QPixmap>
+#include <QPushButton>
 #include <QScrollArea>
 #include <QString>
 #include <QTableWidget>
 #include <QVBoxLayout>
 #include <QWidget>
 
-#include "../../include/models/hardware/gpu_brand.hpp"
-#include "../../include/models/steam/mangohud_level.hpp"
-#include "../../include/models/steam/wine_sync_option.hpp"
-#include "../../include/services/hardware_service.hpp"
-#include "../../include/services/steam_service.hpp"	 // tu clase equivalente
-#include "../../include/translator/translator.hpp"
-#include "../../include/utils/gui_utils.hpp"
+#include "../../include/gui/game_config_dialog.hpp"
+#include "../../include/utils/constants.hpp"
 
 GameList::GameList(QWidget* parent, bool manage_parent) : QDialog(parent), manageParent(manage_parent), parentWidget(parent) {
 	if (!INSTANCE) {
@@ -28,7 +24,7 @@ GameList::GameList(QWidget* parent, bool manage_parent) : QDialog(parent), manag
 	}
 
 	setWindowTitle(QString::fromStdString(translator.translate("game.performance.configuration")));
-	setFixedSize(1000, 600);
+	setFixedSize(500, 600);
 	setWindowIcon(QIcon(QString::fromStdString(Constants::ICON_45_FILE)));
 	setAttribute(Qt::WA_DeleteOnClose);
 	setWindowFlags(windowFlags() & ~Qt::WindowContextHelpButtonHint);
@@ -55,14 +51,7 @@ GameList::GameList(QWidget* parent, bool manage_parent) : QDialog(parent), manag
 
 	QStringList columns;
 	columns << QString::fromStdString(translator.translate("game.title"));
-	columns << QString::fromStdString(translator.translate("used.gpu"));
-	columns << QString::fromStdString(translator.translate("used.steamdeck"));
-	if (metricsEnabled) {
-		columns << QString::fromStdString(translator.translate("metrics"));
-	}
-	columns << QString::fromStdString(translator.translate("winesync"));
-	columns << QString::fromStdString(translator.translate("environment"));
-	columns << QString::fromStdString(translator.translate("params"));
+	columns << QString::fromStdString(translator.translate("configuration"));
 
 	QTableWidget* table = new QTableWidget(appIds.size(), columns.size());
 	table->setSizeAdjustPolicy(QAbstractScrollArea::AdjustToContents);
@@ -99,97 +88,15 @@ GameList::GameList(QWidget* parent, bool manage_parent) : QDialog(parent), manag
 		}
 
 		table->setItem(row, 0, item);
-		// --- GPU ---
-		NoScrollComboBox* gpuCombo = new NoScrollComboBox();
-		gpuCombo->setEnabled(!isRunning);
-		gpuCombo->addItem(QString::fromStdString(translator.translate("label.dgpu.auto")), QString::fromStdString(""));
-		int gpuIndex = 0;
-		auto gpus	 = hardwareService.getGpus();
-		int i		 = 0;
-		for (const auto& [key, val] : gpus) {
-			gpuCombo->addItem(QString::fromStdString(StringUtils::capitalize(key)), QString::fromStdString(key));
-			if (steamService.getPreferedGpu(appid).has_value() && key == steamService.getPreferedGpu(appid).value().toString()) {
-				gpuIndex = i + 1;
-			}
-			i++;
-		}
-		gpuCombo->setCurrentIndex(gpuIndex);
 
-		connect(gpuCombo, QOverload<int>::of(&QComboBox::currentIndexChanged), [=, this](int) {
-			std::string str				  = gpuCombo->currentData().toString().toStdString();
-			std::optional<GpuBrand> brand = std::nullopt;
-			if (!str.empty()) {
-				brand = GpuBrand::fromString(str);
-			}
-
-			steamService.setPreferedGpu(appid, brand);
+		QPushButton* btn = new QPushButton(QString::fromStdString(translator.translate("edit")));
+		btn->setProperty("appid", QVariant::fromValue<qulonglong>(appid));
+		connect(btn, &QPushButton::clicked, this, [this, btn]() {
+			unsigned int gid = btn->property("appid").toULongLong();
+			GameConfigDialog(gid, false, this).showDialog();
 		});
-		table->setCellWidget(row, 1, gpuCombo);
 
-		// --- Steamdeck ---
-		NoScrollComboBox* sdCombo = new NoScrollComboBox();
-		sdCombo->setEnabled(!isRunning);
-		sdCombo->addItem(QString::fromStdString(translator.translate("label.steamdeck.no")), false);
-		sdCombo->addItem(QString::fromStdString(translator.translate("label.steamdeck.yes")), true);
-		sdCombo->setCurrentIndex(steamService.isSteamDeck(appid) ? 1 : 0);
-
-		connect(sdCombo, QOverload<int>::of(&QComboBox::currentIndexChanged), [=, this](int) {
-			steamService.setSteamDeck(appid, sdCombo->currentData().toBool());
-		});
-		table->setCellWidget(row, 2, sdCombo);
-
-		// --- Metrics ---
-		int col = 3;
-		if (steamService.metricsEnabled()) {
-			NoScrollComboBox* metricsCombo = new NoScrollComboBox();
-			metricsCombo->setEnabled(!isRunning);
-			auto items = MangoHudLevel::getAll();
-			for (MangoHudLevel level : items) {
-				metricsCombo->addItem(QString::fromStdString(translator.translate("label.level." + std::to_string(level.toInt()))), level.toInt());
-				if (level == steamService.getMetricsLevel(appid)) {
-					metricsCombo->setCurrentIndex(level.toInt());
-				}
-			}
-
-			connect(metricsCombo, QOverload<int>::of(&QComboBox::currentIndexChanged), [=, this](int) {
-				steamService.setMetricsLevel(appid, MangoHudLevel::fromInt(metricsCombo->currentData().toInt()));
-			});
-			table->setCellWidget(row, col++, metricsCombo);
-		}
-
-		// --- WineSync ---
-		NoScrollComboBox* syncCombo = new NoScrollComboBox();
-		auto items					= WineSyncOption::getAll();
-		i							= 0;
-		for (WineSyncOption opt : items) {
-			syncCombo->addItem(QString::fromStdString(translator.translate("label.winesync." + opt.toString())),
-							   QString::fromStdString(opt.toString()));
-			if (opt == steamService.getWineSync(appid)) {
-				syncCombo->setCurrentIndex(i);
-			}
-			i++;
-		}
-		syncCombo->setEnabled(!isRunning && steamService.isProton(appid));
-		connect(syncCombo, QOverload<int>::of(&QComboBox::currentIndexChanged), [=, this](int) {
-			steamService.setWineSync(appid, syncCombo->currentData().toString().toStdString());
-		});
-		table->setCellWidget(row, col++, syncCombo);
-
-		// --- Environment ---
-		QLineEdit* envInput = new QLineEdit(QString::fromStdString(steamService.getEnvironment(appid)));
-		envInput->setEnabled(!isRunning);
-		connect(envInput, &QLineEdit::textChanged, [=, this](const QString& text) {
-			steamService.setEnvironment(appid, text.toStdString());
-		});
-		table->setCellWidget(row, col++, envInput);
-
-		// --- Parameters ---
-		QLineEdit* paramsInput = new QLineEdit(QString::fromStdString(steamService.getParameters(appid)));
-		paramsInput->setEnabled(!isRunning);
-		connect(paramsInput, &QLineEdit::textChanged, [=, this](const QString& text) {
-			steamService.setParameters(appid, text.toStdString());
-		});
-		table->setCellWidget(row, col++, paramsInput);
+		table->setCellWidget(row, 1, btn);
 
 		row++;
 	}

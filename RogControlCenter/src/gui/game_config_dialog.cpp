@@ -11,34 +11,7 @@
 #include <QVBoxLayout>
 #include <optional>
 
-void GameConfigDialog::showDialog() {
-	exec();
-
-	logger.info("Configuration finished");
-
-	logger.info("Relaunching game with SteamOverlayId {}...", gameEntry.overlayId);
-	std::this_thread::sleep_for(std::chrono::milliseconds(250));
-
-	shell.run_command("steam steam://rungameid/" + gameEntry.overlayId);
-
-	Logger::rem_tab();
-	Logger::rem_tab();
-}
-
-void GameConfigDialog::closeEvent(QCloseEvent* event) {
-	QMessageBox::StandardButton reply =
-		QMessageBox::question(this, QString::fromStdString(translator.translate("confirmation.required")),
-							  QString::fromStdString(translator.translate("run.with.default.config")), QMessageBox::Yes | QMessageBox::No);
-
-	if (reply == QMessageBox::Yes) {
-		logger.info("Game will launch with default configuration");
-		event->accept();
-	} else {
-		event->ignore();
-	}
-}
-
-GameConfigDialog::GameConfigDialog(unsigned int gid, QWidget* parent) : QDialog(parent), gid(gid) {
+GameConfigDialog::GameConfigDialog(unsigned int gid, bool runAfterSave, QWidget* parent) : QDialog(parent), gid(gid), runAfterSave(runAfterSave) {
 	setWindowTitle(QString::fromStdString(translator.translate("config.for.game", {{"game", ""}})));
 	setFixedSize(400, 300);
 
@@ -133,7 +106,7 @@ GameConfigDialog::GameConfigDialog(unsigned int gid, QWidget* parent) : QDialog(
 	layout->addRow(new QLabel(QString::fromStdString(translator.translate("params") + ":")), paramsInput);
 
 	// --- Save button ---
-	save_button_ = new QPushButton(QString::fromStdString(translator.translate("save.and.run")));
+	save_button_ = new QPushButton(QString::fromStdString(translator.translate(runAfterSave ? "save.and.run" : "save")));
 	save_button_->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
 	layout->addRow(save_button_);
 	connect(save_button_, &QPushButton::clicked, this, &GameConfigDialog::onAccept);
@@ -144,6 +117,7 @@ GameConfigDialog::GameConfigDialog(unsigned int gid, QWidget* parent) : QDialog(
 }
 
 void GameConfigDialog::onAccept() {
+	logger.info("Saving configuration for '{}' ({})", gameEntry.name, gid);
 	std::optional<std::string> gpu = gpuCombo->currentData().toString().toStdString();
 	if (gpu.value().empty()) {
 		gpu = std::nullopt;
@@ -170,4 +144,37 @@ void GameConfigDialog::onAccept() {
 	configuration.saveConfig();
 
 	accept();
+}
+
+void GameConfigDialog::showDialog() {
+	exec();
+
+	if (runAfterSave) {
+		logger.info("Configuration finished");
+
+		logger.info("Relaunching game with SteamOverlayId {}...", gameEntry.overlayId);
+		std::this_thread::sleep_for(std::chrono::milliseconds(250));
+
+		shell.run_command("steam steam://rungameid/" + gameEntry.overlayId);
+
+		Logger::rem_tab();
+		Logger::rem_tab();
+	} else {
+		logger.info("Configuration saved");
+	}
+}
+
+void GameConfigDialog::closeEvent(QCloseEvent* event) {
+	if (runAfterSave) {
+		QMessageBox::StandardButton reply =
+			QMessageBox::question(this, QString::fromStdString(translator.translate("confirmation.required")),
+								  QString::fromStdString(translator.translate("run.with.default.config")), QMessageBox::Yes | QMessageBox::No);
+
+		if (reply == QMessageBox::Yes) {
+			logger.info("Game will launch with default configuration");
+			event->accept();
+		} else {
+			event->ignore();
+		}
+	}
 }
