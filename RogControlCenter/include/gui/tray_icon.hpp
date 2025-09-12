@@ -4,7 +4,6 @@
 #include <QMenu>
 #include <QObject>
 #include <QSystemTrayIcon>
-#include <map>
 
 #include "../configuration/configuration.hpp"
 #include "../events/event_bus.hpp"

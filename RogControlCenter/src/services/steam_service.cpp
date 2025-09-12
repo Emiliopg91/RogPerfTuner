@@ -1,11 +1,15 @@
 #include "../../include/services/steam_service.hpp"
 
+#include <chrono>
 #include <iostream>
+#include <optional>
 #include <set>
 #include <sstream>
+#include <thread>
 
 #include "../../include/configuration/configuration.hpp"
 #include "../../include/events/event_bus.hpp"
+#include "../../include/gui/game_config_dialog.hpp"
 #include "../../include/models/hardware/gpu_brand.hpp"
 #include "../../include/models/others/semantic_version.hpp"
 #include "../../include/models/steam/steam_game_details.hpp"
@@ -128,18 +132,6 @@ void SteamService::onFirstGameRun(unsigned int gid, std::string name, std::unord
 	logger.info("Configuring game");
 	Logger::add_tab();
 
-	std::optional<std::string> gpu = std::nullopt;
-	if (hardwareService.getGpus().size() > 0) {
-		auto items = GpuBrand::getAll();
-		auto gpus  = hardwareService.getGpus();
-		for (GpuBrand g : GpuBrand::getAll()) {
-			if (gpus.find(g.toString()) != gpus.end()) {
-				gpu = g.toString();
-				break;
-			}
-		}
-	}
-
 	auto proton = environment.find("STEAM_COMPAT_PROTON") != environment.end();
 
 	SteamGameDetails details = steamClient.getAppsDetails({gid})[0];
@@ -166,20 +158,19 @@ void SteamService::onFirstGameRun(unsigned int gid, std::string name, std::unord
 
 	auto overlayId = environment.find("SteamOverlayGameId")->second;
 
-	GameEntry entry{args, env, gpu, MangoHudLevel::Enum::NO_DISPLAY, name, overlayId, proton, false, WineSyncOption::Enum::AUTO};
+	GameEntry entry{args, env, std::nullopt, MangoHudLevel::Enum::NO_DISPLAY, name, overlayId, proton, false, WineSyncOption::Enum::AUTO};
 	configuration.getConfiguration().games[std::to_string(gid)] = entry;
 	configuration.saveConfig();
 
 	steamClient.setLaunchOptions(gid, WRAPPER_PATH + " %command%");
-	logger.info("Configuration finished");
 
-	logger.info("Relaunching game with SteamOverlayId {}...", overlayId);
-	std::this_thread::sleep_for(std::chrono::milliseconds(250));
-
-	shell.run_command("steam steam://rungameid/" + overlayId);
-
-	Logger::rem_tab();
-	Logger::rem_tab();
+	QMetaObject::invokeMethod(
+		qApp,
+		[this, gid]() {
+			GameConfigDialog dialog(logger, gid, nullptr);
+			dialog.showDialog();
+		},
+		Qt::QueuedConnection);
 }
 
 bool SteamService::checkIfRequiredInstallation() {
@@ -246,6 +237,7 @@ void SteamService::onGameLaunch(unsigned int gid, std::string name, int pid) {
 		Logger::rem_tab();
 
 		logger.info("Stopping process...");
+		std::this_thread::sleep_for(std::chrono::milliseconds(500));
 		Logger::add_tab();
 		std::set<pid_t> pids;
 		pids.insert(pid);

@@ -9,11 +9,11 @@ class Constants {
   public:
 	inline static const std::string APP_NAME = "RogControlCenter";
 
-	inline const static std::string APP_VERSION = "4.0.14";
+	inline const static std::string APP_VERSION = "4.0.15";
 
 	inline const static std::string PLUGIN_VERSION = "1.2.1";
 
-	inline const static bool DEV_MODE = false;
+	inline const static bool DEV_MODE = true;
 
 	inline static const std::string HOME_DIR = std::getenv("HOME");
 

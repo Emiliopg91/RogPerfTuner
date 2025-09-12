@@ -270,5 +270,21 @@
   "settings": {
     "en": "Settings",
     "es": "Configuración"
+  },
+  "config.for.game": {
+    "en": "Game configuration",
+    "es": "Configuración de juego"
+  },
+  "save.and.run": {
+    "en": "Save and launch",
+    "es": "Guardar y ejecutar"
+  },
+  "configuration.skipped": {
+    "en": "Configuration skipped",
+    "es": "Configuración omitida"
+  },
+  "running.default": {
+    "en": "Game will launch with default configuration",
+    "es": "El juego se lanzará con la configuración por defecto"
   }
 }
