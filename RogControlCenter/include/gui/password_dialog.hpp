@@ -33,6 +33,6 @@ class PasswordDialog : public QDialog {
 	QPushButton* ok_button_;
 	QPushButton* cancel_button_;
 
-	Translator& translator		= Translator::getInstance();
-	Configuration configuration = Configuration::getInstance();
+	Translator& translator		 = Translator::getInstance();
+	Configuration& configuration = Configuration::getInstance();
 };

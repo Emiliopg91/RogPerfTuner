@@ -107,7 +107,7 @@ class DigitalRainEffect : public AbstractEffect {
 			offset -= last_leds;
 			for (auto& row : mat_def) {
 				for (auto& led : row) {
-					led.pos_idx = led.pos_idx - offset;
+					led.pos_idx = offset - led.pos_idx;
 				}
 			}
 		}

@@ -42,7 +42,7 @@ class OpenRgbService {
 
 	UPowerClient& uPowerClient	 = UPowerClient::getInstance();
 	OpenRgbClient& openRgbClient = OpenRgbClient::getInstance();
-	Configuration configuration	 = Configuration::getInstance();
+	Configuration& configuration = Configuration::getInstance();
 	EventBus& eventBus			 = EventBus::getInstance();
 
 	void applyAura(const bool& temporal = false);

@@ -34,7 +34,7 @@ index 3d938d61..46a92cef 100644
      QT += dbus
  
 -    QMAKE_CXXFLAGS += -Wno-implicit-fallthrough -Wno-psabi
-+    QMAKE_CXXFLAGS += -Wno-implicit-fallthrough -Wno-psabi -Wno-unused-parameter -Wno-sign-compare -Wno-unused-variable -Wno-unused-result -Wno-class-memaccess -O3 -flto=auto
++    QMAKE_CXXFLAGS += -Wno-implicit-fallthrough -Wno-psabi -Wno-unused-parameter -Wno-sign-compare -Wno-unused-variable -Wno-unused-result -Wno-class-memaccess -flto=auto
 +    QMAKE_LFLAGS += -flto=auto
  
      #-------------------------------------------------------------------------------------------#

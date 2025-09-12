@@ -213,7 +213,7 @@ void SteamService::installRccDC() {
 			logger.warn("No Decky installation found, skipping plugin installation");
 			rccdcEnabled = false;
 		}
-	} catch (std::exception e) {
+	} catch (std::exception& e) {
 		logger.error("Error while installing RCCDeckyCompanion plugin: {}", e.what());
 	}
 }

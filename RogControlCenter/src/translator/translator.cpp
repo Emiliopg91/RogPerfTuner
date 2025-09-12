@@ -7,31 +7,21 @@
 using json = nlohmann::json;
 
 Translator::Translator() {
-	logger.debug("User language: {}", currentLang);
-
-	try {
-		std::optional<std::string> val = std::nullopt;
-		for (auto entry : initialTranslations) {
-			if (currentLang == "es") {
-				val = entry.es;
-			}
-
-			translations[entry.key] = val.value_or(entry.en);
-		}
-
-		initialTranslations.clear();
-		initialTranslations.shrink_to_fit();
-	} catch (const std::exception& e) {
-		logger.error("Error loading translations: {}", e.what());
-	}
+	logger.debug("User language: {}", currentLang.toString());
 }
 
 std::string Translator::translate(const std::string& msg, const std::unordered_map<std::string, std::any>& replacement) {
-	std::string result = msg;
+	std::optional<std::string_view> translation = std::nullopt;
 
-	auto it = translations.find(msg);
-	if (it != translations.end()) {
-		result = it->second;
+	for (auto entry : initialTranslations) {
+		if (entry.key == msg) {
+			translation = entry.getTranslation(currentLang);
+			break;
+		}
+	}
+
+	if (translation.has_value()) {
+		auto result = std::string(translation.value());
 
 		for (const auto& [key, value] : replacement) {
 			std::string placeholder = "{" + key + "}";
@@ -54,9 +44,9 @@ std::string Translator::translate(const std::string& msg, const std::unordered_m
 			}
 		}
 
+		return result;
 	} else {
 		logger.warn("Missing translation for '{}'", msg);
+		return msg;
 	}
-
-	return result;
 }

@@ -89,7 +89,7 @@ int run_command(Logger& logger, const std::vector<std::string>& cmd, const std::
 	logger.debug("Launching process {}", cmd_str);
 	pid_t pid = fork();
 	if (pid == -1) {
-		perror("fork");
+		logger.error("Error on process launch: {}", std::strerror(errno));
 		return -1;
 	}
 
@@ -105,7 +105,7 @@ int run_command(Logger& logger, const std::vector<std::string>& cmd, const std::
 		close(pipe_stderr[1]);
 
 		execvp(argv[0], argv.data());
-		perror("execve");
+		logger.error("Error on process launch: {}", std::strerror(errno));
 		_exit(1);
 	}
 
@@ -240,7 +240,7 @@ int main(int argc, char* argv[]) {
 		} else {
 			logger.warn("No AppId provided");
 		}
-	} catch (std::exception e) {
+	} catch (std::exception& e) {
 		logger.error("Error requesting configuration {}", e.what());
 	}
 
@@ -250,7 +250,7 @@ int main(int argc, char* argv[]) {
 		if (!res || res->status != 200) {
 			logger.error("Error on renice request");
 		}
-	} catch (std::exception e) {
+	} catch (std::exception& e) {
 		logger.error("Error requesting renice {}", e.what());
 	}
 

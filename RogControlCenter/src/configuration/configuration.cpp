@@ -48,6 +48,8 @@ void Configuration::saveConfig() {
 		return;
 	}
 
+	logger.debug("Configuration saved");
+
 	try {
 		std::ofstream f(Constants::CONFIG_FILE);
 		if (!f) {

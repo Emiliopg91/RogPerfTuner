@@ -20,7 +20,7 @@ class SteamService {
 
 	Shell& shell					 = Shell::getInstance();
 	EventBus& eventBus				 = EventBus::getInstance();
-	Configuration configuration		 = Configuration::getInstance();
+	Configuration& configuration	 = Configuration::getInstance();
 	ProfileService& profileService	 = ProfileService::getInstance();
 	OpenRgbService& openRgbService	 = OpenRgbService::getInstance();
 	HardwareService& hardwareService = HardwareService::getInstance();

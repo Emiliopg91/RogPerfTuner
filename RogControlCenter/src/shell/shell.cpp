@@ -18,13 +18,13 @@ void set_nonblocking(int fd) {
 Shell::BashSession Shell::start_bash(const std::vector<std::string>& args, const std::string& initial_input) {
 	int in_pipe[2], out_pipe[2], err_pipe[2];
 	if (pipe(in_pipe) || pipe(out_pipe) || pipe(err_pipe)) {
-		perror("pipe");
+		logger.error("Error creating process pipe: {}", std::strerror(errno));
 		exit(1);
 	}
 
 	pid_t pid = fork();
 	if (pid == -1) {
-		perror("fork");
+		logger.error("Error on process launch: {}", std::strerror(errno));
 		exit(1);
 	}
 
@@ -47,7 +47,7 @@ Shell::BashSession Shell::start_bash(const std::vector<std::string>& args, const
 		argv_exec.push_back(nullptr);
 
 		execvp(argv_exec[0], argv_exec.data());
-		perror("execvp");
+		logger.error("Error on process launch: {}", std::strerror(errno));
 		_exit(127);
 	}
 
@@ -102,7 +102,7 @@ CommandResult Shell::send_command(BashSession& session, const std::string& cmd, 
 		int maxfd = std::max(session.stdout_fd, session.stderr_fd) + 1;
 
 		if (select(maxfd, &readfds, nullptr, nullptr, nullptr) == -1) {
-			perror("select");
+			logger.error("Error waiting for file descriptors: {}", std::strerror(errno));
 			break;
 		}
 
@@ -183,7 +183,7 @@ pid_t Shell::launch_process(const char* command, char* const argv[], char* const
 	logger.debug("Launching process: {}", cmd_str);
 	pid_t pid = fork();
 	if (pid == -1) {
-		perror("fork");
+		logger.error("Error on process launch: {}", std::strerror(errno));
 		return -1;
 	}
 
@@ -191,18 +191,18 @@ pid_t Shell::launch_process(const char* command, char* const argv[], char* const
 		if (outFile.size() > 0) {
 			int fd = open(outFile.c_str(), O_WRONLY | O_CREAT | O_APPEND, 0644);
 			if (dup2(fd, STDOUT_FILENO) < 0) {
-				perror("dup2 stdout");
+				logger.error("Error redirecting stdout: {}", std::strerror(errno));
 				exit(EXIT_FAILURE);
 			}
 			if (dup2(fd, STDERR_FILENO) < 0) {
-				perror("dup2 stderr");
+				logger.error("Error redirecting stderr: {}", std::strerror(errno));
 				exit(EXIT_FAILURE);
 			}
 			close(fd);	// ya no necesitamos fd original
 		}
 		prctl(PR_SET_PDEATHSIG, SIGTERM);
 		execve(command, argv, env);
-		perror("execve");
+		logger.error("Error on process launch: {}", std::strerror(errno));
 		_exit(1);
 	}
 

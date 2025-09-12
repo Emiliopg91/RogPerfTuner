@@ -78,7 +78,7 @@ void ProfileService::setPerformanceProfile(const PerformanceProfile& profile, co
 			toaster.showToast(translator.translate("profile.applied",
 												   {{"profile", StringUtils::toLowerCase(translator.translate("label.profile." + profileName))}}));
 			eventBus.emitPerformanceProfile(profile);
-		} catch (std::exception e) {
+		} catch (std::exception& e) {
 			Logger::rem_tab();
 		}
 	} else {
@@ -94,7 +94,7 @@ void ProfileService::setPlatformProfile(const PerformanceProfile& profile) {
 		try {
 			platformClient.setPlatformProfile(platformProfile);
 			platformClient.setEnablePptGroup(true);
-		} catch (std::exception e) {
+		} catch (std::exception& e) {
 			logger.error("Error while setting platform profile: {}", e.what());
 		}
 		Logger::rem_tab();
@@ -110,8 +110,8 @@ void ProfileService::setFanCurves(const PerformanceProfile& profile) {
 			fanCurvesClient.resetProfileCurve(platformProfile);
 			fanCurvesClient.setCurveToDefaults(platformProfile);
 			fanCurvesClient.setFanCurveEnabled(platformProfile);
-		} catch (std::exception e) {
-			logger.error("Error while setting fan curve: {}", std::string(e.what()));
+		} catch (std::exception& e) {
+			logger.error("Error while setting fan curve: {}", e.what());
 		}
 		Logger::rem_tab();
 	}
@@ -124,8 +124,8 @@ void ProfileService::setBoost(const PerformanceProfile&) {
 		Logger::add_tab();
 		try {
 			boostControlClient.set_boost(enabled);
-		} catch (std::exception e) {
-			logger.error("Error while setting CPU boost: {}", std::string(e.what()));
+		} catch (std::exception& e) {
+			logger.error("Error while setting CPU boost: {}", e.what());
 		}
 		Logger::rem_tab();
 	}
@@ -138,8 +138,8 @@ void ProfileService::setSsdScheduler(const PerformanceProfile& profile) {
 		Logger::add_tab();
 		try {
 			ssdSchedulerClient.setScheduler(ssdScheduler);
-		} catch (std::exception e) {
-			logger.error("Error while setting SSD scheduler: {}", std::string(e.what()));
+		} catch (std::exception& e) {
+			logger.error("Error while setting SSD scheduler: {}", e.what());
 		}
 		Logger::rem_tab();
 	}
@@ -152,8 +152,8 @@ void ProfileService::setCpuGovernor(const PerformanceProfile& profile) {
 		Logger::add_tab();
 		try {
 			cpuPowerClient.setGovernor(cpuGovernor);
-		} catch (std::exception e) {
-			logger.error("Error while setting CPU governor: {}", std::string(e.what()));
+		} catch (std::exception& e) {
+			logger.error("Error while setting CPU governor: {}", e.what());
 		}
 		Logger::rem_tab();
 	}
@@ -166,8 +166,8 @@ void ProfileService::setPowerProfile(const PerformanceProfile& profile) {
 		Logger::add_tab();
 		try {
 			powerProfileClient.setPowerProfile(powerProfile);
-		} catch (std::exception e) {
-			logger.error("Error while setting power profile: {}", std::string(e.what()));
+		} catch (std::exception& e) {
+			logger.error("Error while setting power profile: {}", e.what());
 		}
 		Logger::rem_tab();
 	}
@@ -189,7 +189,7 @@ void ProfileService::setTdps(const PerformanceProfile& profile) {
 				std::this_thread::sleep_for(std::chrono::milliseconds(25));
 				pl2SpptClient.setCurrentValue(pl2);
 			}
-		} catch (std::exception e) {
+		} catch (std::exception& e) {
 			logger.info("Error setting CPU TDPs");
 		}
 
@@ -208,7 +208,7 @@ void ProfileService::setTgp(const PerformanceProfile& profile) {
 				logger.info("Dynamic Boost: {}W", nvb);
 				nvBoostClient.setCurrentValue(nvb);
 				std::this_thread::sleep_for(std::chrono::milliseconds(25));
-			} catch (std::exception e) {
+			} catch (std::exception& e) {
 				logger.info("Error setting Nvidia Boost");
 			}
 		}
@@ -218,7 +218,7 @@ void ProfileService::setTgp(const PerformanceProfile& profile) {
 				auto nvt = onBattery ? ProfileUtils::batteryNvTemp(profile) : ProfileUtils::acNvTemp();
 				logger.info("Throttle temp: {}ºC", nvt);
 				nvTempClient.setCurrentValue(nvt);
-			} catch (std::exception e) {
+			} catch (std::exception& e) {
 				logger.info("Error setting Nvidia TGP");
 			}
 		}

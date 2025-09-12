@@ -2,6 +2,8 @@
 
 #include <sys/stat.h>
 
+#include <cstring>
+#include <exception>
 #include <filesystem>
 #include <fstream>
 #include <iostream>
@@ -229,13 +231,13 @@ class FileUtils {
 		}
 
 		if (chmod(path.c_str(), mode) != 0) {
-			perror(("chmod failed on " + path.string()).c_str());
+			throw new std::runtime_error("chmod failed on " + path.string() + ": " + std::strerror(errno));
 		}
 
 		if (std::filesystem::is_directory(path)) {
 			for (const auto& entry : std::filesystem::recursive_directory_iterator(path)) {
 				if (chmod(entry.path().c_str(), mode) != 0) {
-					perror(("chmod failed on " + entry.path().string()).c_str());
+					throw new std::runtime_error("chmod failed on " + path.string() + ": " + std::strerror(errno));
 				}
 			}
 		}

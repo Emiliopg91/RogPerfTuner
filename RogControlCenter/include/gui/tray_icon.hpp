@@ -55,12 +55,12 @@ class TrayIcon : public QObject {
 	void reloadSettings();
 	void openLogs();
 
-	Shell& shell						  = Shell::getInstance();
-	EventBus& eventBus					  = EventBus::getInstance();
-	ProfileService& profileService		  = ProfileService::getInstance();
-	OpenRgbService& openRgbService		  = OpenRgbService::getInstance();
-	HardwareService& hardwareService	  = HardwareService::getInstance();
-	ApplicationService applicationService = ApplicationService::getInstance();
-	Translator& translator				  = Translator::getInstance();
-	Configuration configuration			  = Configuration::getInstance();
+	Shell& shell						   = Shell::getInstance();
+	EventBus& eventBus					   = EventBus::getInstance();
+	ProfileService& profileService		   = ProfileService::getInstance();
+	OpenRgbService& openRgbService		   = OpenRgbService::getInstance();
+	HardwareService& hardwareService	   = HardwareService::getInstance();
+	ApplicationService& applicationService = ApplicationService::getInstance();
+	Translator& translator				   = Translator::getInstance();
+	Configuration& configuration		   = Configuration::getInstance();
 };

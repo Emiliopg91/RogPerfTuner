@@ -50,7 +50,7 @@ int main(int argc, char** argv) {
 
 	Toaster::getInstance().showToast(Translator::getInstance().translate("initializing"));
 
-	Configuration configuration = Configuration::getInstance();
+	Configuration& configuration = Configuration::getInstance();
 	if (configuration.getPassword().length() == 0) {
 		PasswordDialog::getInstance().showDialog();
 	}

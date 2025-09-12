@@ -54,7 +54,7 @@ class ProfileService {
 	CpuPowerClient& cpuPowerClient		   = CpuPowerClient::getInstance();
 	BoostControlClient& boostControlClient = BoostControlClient::getInstance();
 	EventBus& eventBus					   = EventBus::getInstance();
-	Configuration configuration			   = Configuration::getInstance();
+	Configuration& configuration		   = Configuration::getInstance();
 	Translator& translator				   = Translator::getInstance();
 
 	void setPlatformProfile(const PerformanceProfile& profile);
