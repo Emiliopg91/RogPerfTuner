@@ -54,13 +54,15 @@ GameList::GameList(QWidget* parent, bool manage_parent) : QDialog(parent), manag
 	auto metricsEnabled = steamService.metricsEnabled();
 
 	QStringList columns;
-	columns << QString::fromStdString(translator.translate("game.title")) << QString::fromStdString(translator.translate("used.gpu"))
-			<< QString::fromStdString(translator.translate("used.steamdeck"));
+	columns << QString::fromStdString(translator.translate("game.title"));
+	columns << QString::fromStdString(translator.translate("used.gpu"));
+	columns << QString::fromStdString(translator.translate("used.steamdeck"));
 	if (metricsEnabled) {
 		columns << QString::fromStdString(translator.translate("metrics"));
 	}
-	columns << QString::fromStdString(translator.translate("winesync")) << QString::fromStdString(translator.translate("environment"))
-			<< QString::fromStdString(translator.translate("params"));
+	columns << QString::fromStdString(translator.translate("winesync"));
+	columns << QString::fromStdString(translator.translate("environment"));
+	columns << QString::fromStdString(translator.translate("params"));
 
 	QTableWidget* table = new QTableWidget(appIds.size(), columns.size());
 	table->setSizeAdjustPolicy(QAbstractScrollArea::AdjustToContents);
