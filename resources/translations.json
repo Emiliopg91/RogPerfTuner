@@ -298,5 +298,9 @@
   "save": {
     "en": "Save",
     "es": "Guardar"
+  },
+  "wrappers": {
+    "en": "Wrappers",
+    "es": "Wrappers"
   }
 }

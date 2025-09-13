@@ -136,28 +136,49 @@ void SteamService::onFirstGameRun(unsigned int gid, std::string name, std::unord
 	SteamGameDetails details = steamClient.getAppsDetails({gid})[0];
 	auto launch_opts		 = details.launch_opts;
 
-	std::string env, args;
+	std::string env, args, wrappers;
 
 	const std::string marker = "%command%";
 
 	size_t pos = launch_opts.find(marker);
 	if (pos != std::string::npos) {
 		env = launch_opts.substr(0, pos);
-
 		env.erase(0, env.find_first_not_of(" \t\n\r"));
 		env.erase(env.find_last_not_of(" \t\n\r") + 1);
-
 		launch_opts = launch_opts.substr(pos + marker.size());
 		launch_opts.erase(0, launch_opts.find_first_not_of(" \t\n\r"));
 		launch_opts.erase(launch_opts.find_last_not_of(" \t\n\r") + 1);
 	}
+
 	if (!launch_opts.empty()) {
 		args = launch_opts;
 	}
 
+	{
+		std::istringstream iss(env);
+		std::string token;
+		std::string pure_env;
+
+		while (iss >> token) {
+			if (token.find('=') != std::string::npos) {
+				if (!pure_env.empty()) {
+					pure_env += " ";
+				}
+				pure_env += token;
+			} else {
+				if (!wrappers.empty()) {
+					wrappers += " ";
+				}
+				wrappers += token;
+			}
+		}
+
+		env = pure_env;
+	}
+
 	auto overlayId = environment.find("SteamOverlayGameId")->second;
 
-	GameEntry entry{args, env, std::nullopt, MangoHudLevel::Enum::NO_DISPLAY, name, overlayId, proton, false, WineSyncOption::Enum::AUTO};
+	GameEntry entry{args, env, std::nullopt, MangoHudLevel::Enum::NO_DISPLAY, name, overlayId, proton, false, WineSyncOption::Enum::AUTO, wrappers};
 	configuration.getConfiguration().games[std::to_string(gid)] = entry;
 	configuration.saveConfig();
 
@@ -375,6 +396,13 @@ const SteamGameConfig SteamService::getConfiguration(const std::string& gid) {
 			cfg.environment["MANGOHUD_DLSYM"]  = "1";
 			cfg.environment["MANGOHUD"]		   = "1";
 			cfg.wrappers.emplace_back(mangohud_which.value());
+		}
+
+		if (gameEntry.wrappers.has_value()) {
+			auto wraps = StringUtils::split(gameEntry.wrappers.value(), ' ');
+			for (auto wrap : wraps) {
+				cfg.wrappers.emplace_back(wrap);
+			}
 		}
 	} else {
 		logger.error("No configuration entry found for {}", gid);

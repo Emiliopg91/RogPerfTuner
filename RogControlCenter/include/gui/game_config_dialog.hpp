@@ -38,6 +38,7 @@ class GameConfigDialog : public QDialog {
 	NoScrollComboBox* metricsCombo;
 	NoScrollComboBox* wineSyncCombo;
 	QLineEdit* envInput;
+	QLineEdit* wrappersInput;
 	QLineEdit* paramsInput;
 
 	QPushButton* save_button_;

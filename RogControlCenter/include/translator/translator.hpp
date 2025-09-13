@@ -36,7 +36,7 @@ class Translator {
 
 	inline static Language FALLBACK_LANG = Language::Enum::EN;
 	// Begin translations
-	inline static const constexpr std::array<TranslationEntry, 75> initialTranslations = {{
+	inline static const constexpr std::array<TranslationEntry, 76> initialTranslations = {{
 		{
 			"performance",
 			"Performance",
@@ -411,6 +411,11 @@ class Translator {
 			"save",
 			"Save",
 			"Guardar",
+		},
+		{
+			"wrappers",
+			"Wrappers",
+			"Wrappers",
 		},
 	}};
 

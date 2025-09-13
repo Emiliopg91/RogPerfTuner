@@ -14,17 +14,27 @@ struct GameEntry {
 	MangoHudLevel metrics_level		= MangoHudLevel::Enum::NO_DISPLAY;
 	std::string name;
 	std::string overlayId;
-	bool proton			= true;
-	bool steamdeck		= false;
-	WineSyncOption sync = WineSyncOption::Enum::AUTO;
+	bool proton							= true;
+	bool steamdeck						= false;
+	WineSyncOption sync					= WineSyncOption::Enum::AUTO;
+	std::optional<std::string> wrappers = std::nullopt;
 };
 
 inline void to_json(json& j, const GameEntry& g) {
 	j = json{};
 
-	j["args"] = g.args ? json(*g.args) : json(nullptr);
-	j["env"]  = g.env ? json(*g.env) : json(nullptr);
-	j["gpu"]  = g.gpu ? json(*g.gpu) : json(nullptr);
+	if (!g.args.value_or("").empty()) {
+		j["args"] = json(*g.args);
+	}
+	if (!g.env.value_or("").empty()) {
+		j["env"] = json(*g.env);
+	}
+	if (!g.wrappers.value_or("").empty()) {
+		j["wrappers"] = json(*g.wrappers);
+	}
+	if (!g.gpu.value_or("").empty()) {
+		j["gpu"] = json(*g.gpu);
+	}
 
 	j["metrics"]   = g.metrics_level.toInt();
 	j["name"]	   = g.name;
@@ -46,6 +56,12 @@ inline void from_json(const json& j, GameEntry& g) {
 		g.env = j.at("env").get<std::string>();
 	} else {
 		g.env = std::nullopt;
+	}
+
+	if (j.contains("wrappers") && !j.at("wrappers").is_null()) {
+		g.wrappers = j.at("wrappers").get<std::string>();
+	} else {
+		g.wrappers = std::nullopt;
 	}
 
 	if (j.contains("gpu") && !j.at("gpu").is_null()) {

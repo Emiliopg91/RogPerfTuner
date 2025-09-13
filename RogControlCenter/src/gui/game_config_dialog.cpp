@@ -101,6 +101,10 @@ GameConfigDialog::GameConfigDialog(unsigned int gid, bool runAfterSave, QWidget*
 	envInput = new QLineEdit(QString::fromStdString(gameEntry.env.value_or("")));
 	layout->addRow(new QLabel(QString::fromStdString(translator.translate("environment") + ":")), envInput);
 
+	// --- Wrappers ---
+	wrappersInput = new QLineEdit(QString::fromStdString(gameEntry.wrappers.value_or("")));
+	layout->addRow(new QLabel(QString::fromStdString(translator.translate("wrappers") + ":")), wrappersInput);
+
 	// --- Parameters ---
 	paramsInput = new QLineEdit(QString::fromStdString(gameEntry.args.value_or("")));
 	layout->addRow(new QLabel(QString::fromStdString(translator.translate("params") + ":")), paramsInput);
@@ -135,6 +139,7 @@ void GameConfigDialog::onAccept() {
 
 	gameEntry.args			= paramsInput->text().toStdString();
 	gameEntry.env			= envInput->text().toStdString();
+	gameEntry.wrappers		= wrappersInput->text().toStdString();
 	gameEntry.gpu			= gpu;
 	gameEntry.metrics_level = level.toInt();
 	gameEntry.steamdeck		= modeCombo->currentData().toBool();
