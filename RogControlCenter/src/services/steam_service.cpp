@@ -129,7 +129,7 @@ void SteamService::onFirstGameRun(unsigned int gid, std::string name) {
 					std::nullopt,
 					MangoHudLevel::Enum::NO_DISPLAY,
 					name,
-					details.is_shortcut ? encodeAppId(gid) : std::to_string(gid),
+					details.is_shortcut ? std::optional<std::string>{encodeAppId(gid)} : std::nullopt,
 					!details.compat_tool.empty(),
 					false,
 					WineSyncOption::Enum::AUTO,

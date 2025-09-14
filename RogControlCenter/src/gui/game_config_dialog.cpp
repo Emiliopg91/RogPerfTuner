@@ -157,10 +157,10 @@ void GameConfigDialog::showDialog() {
 	if (runAfterSave) {
 		logger.info("Configuration finished");
 
-		logger.info("Relaunching game with SteamOverlayId {}...", gameEntry.overlayId);
+		logger.info("Relaunching game with SteamOverlayId {}...", gameEntry.overlayId.value_or(std::to_string(gid)));
 		std::this_thread::sleep_for(std::chrono::milliseconds(250));
 
-		shell.run_command("steam steam://rungameid/" + gameEntry.overlayId);
+		shell.run_command("steam steam://rungameid/" + gameEntry.overlayId.value_or(std::to_string(gid)));
 
 		Logger::rem_tab();
 		Logger::rem_tab();

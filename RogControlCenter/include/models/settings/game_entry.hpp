@@ -13,7 +13,7 @@ struct GameEntry {
 	std::optional<std::string> gpu	= std::nullopt;
 	MangoHudLevel metrics_level		= MangoHudLevel::Enum::NO_DISPLAY;
 	std::string name;
-	std::string overlayId;
+	std::optional<std::string> overlayId;
 	bool proton							= true;
 	bool steamdeck						= false;
 	WineSyncOption sync					= WineSyncOption::Enum::AUTO;
@@ -35,10 +35,12 @@ inline void to_json(json& j, const GameEntry& g) {
 	if (!g.gpu.value_or("").empty()) {
 		j["gpu"] = json(*g.gpu);
 	}
+	if (!g.overlayId.value_or("").empty()) {
+		j["overlayId"] = json(*g.overlayId);
+	}
 
 	j["metrics"]   = g.metrics_level.toInt();
 	j["name"]	   = g.name;
-	j["overlayId"] = g.overlayId;
 	j["proton"]	   = g.proton;
 	j["steamdeck"] = g.steamdeck;
 	j["sync"]	   = g.sync.toString();
@@ -64,6 +66,12 @@ inline void from_json(const json& j, GameEntry& g) {
 		g.wrappers = std::nullopt;
 	}
 
+	if (j.contains("overlayId") && !j.at("overlayId").is_null()) {
+		g.overlayId = j.at("overlayId").get<std::string>();
+	} else {
+		g.overlayId = std::nullopt;
+	}
+
 	if (j.contains("gpu") && !j.at("gpu").is_null()) {
 		g.gpu = j.at("gpu").get<std::string>();
 	} else {
@@ -78,7 +86,6 @@ inline void from_json(const json& j, GameEntry& g) {
 
 	// Campos obligatorios (sin optional)
 	g.name		= j.at("name").get<std::string>();
-	g.overlayId = j.at("overlayId").get<std::string>();
 	g.proton	= j.at("proton").get<bool>();
 	g.steamdeck = j.at("steamdeck").get<bool>();
 	g.sync		= WineSyncOption::fromString(j.at("sync").get<std::string>());
