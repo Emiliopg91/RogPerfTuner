@@ -9,7 +9,6 @@
 
 class SteamService {
   private:
-	inline static std::string WRAPPER_PATH = Constants::BIN_DIR + "/steam/run";
 	Logger logger{"SteamService"};
 	std::unordered_map<unsigned int, std::string> runningGames;
 	bool rccdcEnabled = false;
@@ -48,4 +47,6 @@ class SteamService {
 	bool isRunning(const unsigned int& appid) const;
 	bool metricsEnabled();
 	const SteamGameConfig getConfiguration(const std::string& gid);
+	void saveGameConfig(uint gid, const GameEntry& entry);
+	void launchGame(const std::string& id);
 };

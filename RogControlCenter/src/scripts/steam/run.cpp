@@ -246,7 +246,7 @@ int main(int argc, char* argv[]) {
 
 	try {
 		logger.info("Requesting renice");
-		auto res = cli.Get(Constants::URL_RENICE + "?pid=" + std::to_string(getpid()));
+		auto res = cli.Get(Constants::URL_RENICE + "?pid=" + std::to_string(Constants::PID));
 		if (!res || res->status != 200) {
 			logger.error("Error on renice request");
 		}

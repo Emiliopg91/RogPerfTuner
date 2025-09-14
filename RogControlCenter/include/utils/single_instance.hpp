@@ -35,7 +35,7 @@ class SingleInstance {
 		}
 
 		std::ofstream out(Constants::LOCK_FILE);
-		out << getpid();
+		out << Constants::PID;
 		out.close();
 	}
 

@@ -11,6 +11,8 @@ class Constants {
 
 	inline const static std::string APP_VERSION = "4.1.2";
 
+	inline const static pid_t PID = getpid();
+
 	inline const static std::string PLUGIN_VERSION = "1.2.2";
 
 	inline const static bool DEV_MODE = true;
@@ -34,10 +36,10 @@ class Constants {
 	}();
 
 	inline static const std::string USR_SHARE_OCL_DIR = "/etc/OpenCL/vendors/";
-	inline static const std::string LOCK_FILE		  = "/tmp/RogControlCenter.lock";
 	inline static const std::string UDEV_RULES		  = "/usr/lib/udev/rules.d/60-openrgb.rules";
 	inline static const std::string USR_SHARE_VK_DIR  = "/usr/share/vulkan/icd.d/";
 	inline static const std::string TMP_UDEV_PATH	  = "/tmp/60-openrgb.rules";
+	inline static const std::string LOCK_FILE		  = "/tmp/RogControlCenter.lock";
 
 	inline static const std::string ASSETS_BIN_DIR	 = ASSETS_DIR + "/bin";
 	inline static const std::string ASSET_ICONS_DIR	 = ASSETS_DIR + "/icons";
@@ -52,6 +54,7 @@ class Constants {
 	inline static const std::string BIN_DIR				= HOME_DIR + "/.RogControlCenter/bin";
 	inline static const std::string BIN_APPLICATION_DIR = HOME_DIR + "/.RogControlCenter/bin/application";
 	inline static const std::string LAUNCHER_FILE		= HOME_DIR + "/.RogControlCenter/bin/application/launcher.sh";
+	inline static const std::string WRAPPER_PATH		= HOME_DIR + "/.RogControlCenter/bin" + "/steam/run";
 	inline static const std::string CONFIG_DIR			= HOME_DIR + "/.RogControlCenter/config";
 	inline static const std::string CONFIG_FILE			= HOME_DIR + "/.RogControlCenter/config/config.json";
 	inline static const std::string ICONS_DIR			= HOME_DIR + "/.RogControlCenter/icons";
@@ -75,12 +78,12 @@ class Constants {
 	inline static const std::string LOG_FILE_NAME		 = "RogControlCenter";
 	inline static const std::string LOG_RUNNER_FILE_NAME = "Runner";
 
-	inline static const std::string URL_PERF_PROF  = "/performance/profile/next";
-	inline static const std::string URL_INC_BRIGHT = "/rgb/brightness/increase";
-	inline static const std::string URL_DEC_BRIGHT = "/rgb/brightness/decrease";
-	inline static const std::string URL_NEXT_EFF   = "/rgb/effect/next";
-	inline static const std::string URL_RENICE	   = "/performance/renice";
 	inline static const std::string URL_GAME_CFG   = "/game/config";
+	inline static const std::string URL_PERF_PROF  = "/performance/profile/next";
+	inline static const std::string URL_RENICE	   = "/performance/renice";
+	inline static const std::string URL_DEC_BRIGHT = "/rgb/brightness/decrease";
+	inline static const std::string URL_INC_BRIGHT = "/rgb/brightness/increase";
+	inline static const std::string URL_NEXT_EFF   = "/rgb/effect/next";
 
 	inline static const int HTTP_PORT = 18157;
 	inline static const int WS_PORT	  = HTTP_PORT + 1;
