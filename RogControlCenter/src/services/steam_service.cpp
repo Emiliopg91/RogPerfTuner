@@ -2,9 +2,7 @@
 
 #include <chrono>
 #include <csignal>
-#include <iostream>
 #include <optional>
-#include <set>
 #include <sstream>
 #include <string>
 #include <thread>
@@ -207,14 +205,21 @@ void SteamService::onGameLaunch(unsigned int gid, std::string name, int pid) {
 		Logger::add_tab();
 
 		logger.info("Stopping process...");
-		for (int i = 0; i < 5; i++) {
-			std::this_thread::sleep_for(std::chrono::milliseconds(100));
-			shell.run_elevated_command("pstree -p " + std::to_string(pid) + " | grep -o '([0-9]\\+)' | grep -o '[0-9]\\+' | xargs kill -" +
-									   std::to_string(SIGSTOP));
-		}
-		std::this_thread::sleep_for(std::chrono::milliseconds(250));
-		shell.run_elevated_command("pstree -p " + std::to_string(pid) + " | grep -o '([0-9]\\+)' | grep -o '[0-9]\\+' | xargs kill -" +
-								   std::to_string(SIGKILL));
+
+		const std::string stopCmd =
+			"pstree -p " + std::to_string(pid) + " | grep -o '([0-9]\\+)' | grep -o '[0-9]\\+' | tee >(xargs  kill -19 2>/dev/null) | wc -l";
+		const std::string killCmd =
+			"pstree -p " + std::to_string(pid) + " | grep -o '([0-9]\\+)' | grep -o '[0-9]\\+' | tee >(xargs  kill -9 2>/dev/null) | wc -l";
+
+		uint signaled	 = 0;
+		uint newSignaled = 0;
+		do {
+			signaled	= newSignaled;
+			newSignaled = static_cast<uint>(std::stoul(StringUtils::trim(shell.run_elevated_command(stopCmd).stdout_str)));
+
+			std::this_thread::sleep_for(std::chrono::milliseconds(25));
+		} while (signaled < newSignaled);
+		logger.info("Killed {} processes", static_cast<uint>(std::stoul(StringUtils::trim(shell.run_elevated_command(killCmd).stdout_str))));
 
 		Logger::rem_tab();
 
