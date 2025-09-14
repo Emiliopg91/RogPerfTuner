@@ -1,10 +1,12 @@
 #include "../../include/services/steam_service.hpp"
 
 #include <chrono>
+#include <csignal>
 #include <iostream>
 #include <optional>
 #include <set>
 #include <sstream>
+#include <string>
 #include <thread>
 
 #include "../../include/configuration/configuration.hpp"
@@ -75,63 +77,9 @@ SteamService::SteamService() {
 	Logger::rem_tab();
 }
 
-void getPidsOfHierarchy(const pid_t parentId, std::set<pid_t>& pids) {
-	for (auto& entry : std::filesystem::directory_iterator("/proc")) {
-		std::string filename = entry.path().filename();
-		if (entry.is_directory() && std::all_of(filename.begin(), filename.end(), ::isdigit)) {
-			auto pid = std::stoi(filename);
-			if (pids.find(pid) == pids.end()) {
-				std::ifstream statFile("/proc/" + filename + "/stat");
-				if (statFile.is_open()) {
-					int pid_read, ppid;
-					std::string comm, state;
-					statFile >> pid_read >> comm >> state >> ppid;
-
-					if (ppid == parentId) {
-						pids.insert(pid);
-						getPidsOfHierarchy(pid, pids);
-					}
-				}
-			}
-		}
-	}
-}
-
-std::unordered_map<std::string, std::string> getProcessEnvironMap(pid_t pid) {
-	std::unordered_map<std::string, std::string> env_map;
-	std::string path = "/proc/" + std::to_string(pid) + "/environ";
-	std::ifstream file(path, std::ios::in | std::ios::binary);
-
-	if (!file.is_open()) {
-		throw std::runtime_error("No se pudo abrir " + path);
-	}
-
-	std::string buffer((std::istreambuf_iterator<char>(file)), std::istreambuf_iterator<char>());
-
-	size_t start = 0;
-	while (start < buffer.size()) {
-		size_t end = buffer.find('\0', start);
-		if (end == std::string::npos) {
-			break;
-		}
-		std::string entry = buffer.substr(start, end - start);
-		size_t eq_pos	  = entry.find('=');
-		if (eq_pos != std::string::npos) {
-			std::string key	  = entry.substr(0, eq_pos);
-			std::string value = entry.substr(eq_pos + 1);
-			env_map[key]	  = value;
-		}
-		start = end + 1;
-	}
-
-	return env_map;
-}
-
-void SteamService::onFirstGameRun(unsigned int gid, std::string name, std::unordered_map<std::string, std::string> environment) {
+void SteamService::onFirstGameRun(unsigned int gid, std::string name) {
 	logger.info("Configuring game");
 	Logger::add_tab();
-
-	auto proton = environment.find("STEAM_COMPAT_PROTON") != environment.end();
 
 	SteamGameDetails details = steamClient.getAppsDetails({gid})[0];
 	auto launch_opts		 = details.launch_opts;
@@ -176,9 +124,16 @@ void SteamService::onFirstGameRun(unsigned int gid, std::string name, std::unord
 		env = pure_env;
 	}
 
-	auto overlayId = environment.find("SteamOverlayGameId")->second;
-
-	GameEntry entry{args, env, std::nullopt, MangoHudLevel::Enum::NO_DISPLAY, name, overlayId, proton, false, WineSyncOption::Enum::AUTO, wrappers};
+	GameEntry entry{args,
+					env,
+					std::nullopt,
+					MangoHudLevel::Enum::NO_DISPLAY,
+					name,
+					details.is_shortcut ? encodeAppId(gid) : std::to_string(gid),
+					!details.compat_tool.empty(),
+					false,
+					WineSyncOption::Enum::AUTO,
+					wrappers};
 	configuration.getConfiguration().games[std::to_string(gid)] = entry;
 	configuration.saveConfig();
 
@@ -194,7 +149,7 @@ void SteamService::onFirstGameRun(unsigned int gid, std::string name, std::unord
 }
 
 bool SteamService::checkIfRequiredInstallation() {
-	std::ifstream fileRunning(Constants::RCCDC_ASSET_PATH + "/package.json");
+	std::ifstream fileRunning(Constants::RCCDC_PACKAGE_FILE);
 
 	nlohmann::json jR;
 	fileRunning >> jR;
@@ -251,31 +206,21 @@ void SteamService::onGameLaunch(unsigned int gid, std::string name, int pid) {
 		logger.info("Game not configured");
 		Logger::add_tab();
 
-		logger.info("Getting process environment...");
-		Logger::add_tab();
-		auto env = getProcessEnvironMap(pid);
-		Logger::rem_tab();
-
 		logger.info("Stopping process...");
-		std::this_thread::sleep_for(std::chrono::milliseconds(500));
-		Logger::add_tab();
-		std::set<pid_t> pids;
-		pids.insert(pid);
-		getPidsOfHierarchy(pid, pids);
-
-		std::ostringstream oss;
-		oss << "kill -9";
-		for (pid_t pid : pids) {
-			oss << " " << pid;
+		for (int i = 0; i < 5; i++) {
+			std::this_thread::sleep_for(std::chrono::milliseconds(100));
+			shell.run_elevated_command("pstree -p " + std::to_string(pid) + " | grep -o '([0-9]\\+)' | grep -o '[0-9]\\+' | xargs kill -" +
+									   std::to_string(SIGSTOP));
 		}
 		std::this_thread::sleep_for(std::chrono::milliseconds(250));
-		shell.run_elevated_command(oss.str(), false);
+		shell.run_elevated_command("pstree -p " + std::to_string(pid) + " | grep -o '([0-9]\\+)' | grep -o '[0-9]\\+' | xargs kill -" +
+								   std::to_string(SIGKILL));
+
 		Logger::rem_tab();
 
-		std::thread([this, gid, name, env]() {
-			onFirstGameRun(gid, name, env);
+		std::thread([this, gid, name]() {
+			onFirstGameRun(gid, name);
 		}).detach();
-		;
 	} else if (runningGames.find(gid) == runningGames.end()) {
 		runningGames[gid] = name;
 		setProfileForGames();
@@ -409,4 +354,8 @@ const SteamGameConfig SteamService::getConfiguration(const std::string& gid) {
 	}
 
 	return cfg;
+}
+
+std::string SteamService::encodeAppId(uint32_t appid) {
+	return std::to_string((static_cast<uint64_t>(appid) << 32) | 0x02000000ULL);
 }

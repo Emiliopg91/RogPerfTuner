@@ -28,12 +28,13 @@ class SteamService {
 	void onConnect(bool onBoot = false);
 	void onDisconnect();
 	void onGameLaunch(unsigned int gid, std::string name, int pid);
-	void onFirstGameRun(unsigned int gid, std::string name, std::unordered_map<std::string, std::string> env);
+	void onFirstGameRun(unsigned int gid, std::string name);
 	void onGameStop(unsigned int gid, std::string name);
 	void setProfileForGames(bool onConnect = false);
 	void installRccDC();
 	void copyPlugin();
 	bool checkIfRequiredInstallation();
+	std::string encodeAppId(uint32_t appid);
 
   public:
 	static SteamService& getInstance() {

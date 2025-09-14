@@ -11,7 +11,7 @@ class Constants {
 
 	inline const static std::string APP_VERSION = "4.1.1";
 
-	inline const static std::string PLUGIN_VERSION = "1.2.1";
+	inline const static std::string PLUGIN_VERSION = "1.2.2";
 
 	inline const static bool DEV_MODE = true;
 
@@ -69,6 +69,7 @@ class Constants {
 	inline static const std::string UPDATE_TMP_FILE		= HOME_DIR + "/.RogControlCenter/update/RogControlCenter.AppImage.tmp";
 	inline static const std::string PLUGINS_FOLDER		= HOME_DIR + "/homebrew/plugins";
 	inline static const std::string RCCDC_PATH			= HOME_DIR + "/homebrew/plugins/RCCDeckyCompanion";
+	inline static const std::string RCCDC_PACKAGE_FILE	= HOME_DIR + "/homebrew/plugins/RCCDeckyCompanion/package.json";
 	inline static const std::string DECKY_SERVICE_PATH	= HOME_DIR + "/homebrew/services/PluginLoader";
 
 	inline static const std::string LOG_FILE_NAME		 = "RogControlCenter";
