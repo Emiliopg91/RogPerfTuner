@@ -13,7 +13,7 @@ class Constants {
 
 	inline const static std::string PLUGIN_VERSION = "1.2.2";
 
-	inline const static bool DEV_MODE = true;
+	inline const static bool DEV_MODE = false;
 
 	inline static const std::string HOME_DIR = std::getenv("HOME");
 
