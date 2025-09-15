@@ -8,7 +8,6 @@
 #include <cstdlib>
 #include <cstring>
 #include <ctime>
-#include <map>
 #include <sstream>
 #include <string>
 #include <thread>
@@ -17,6 +16,7 @@
 #include "../../../include/logger/logger.hpp"
 #include "../../../include/models/steam/steam_game_config.hpp"
 #include "../../../include/shell/shell.hpp"
+#include "../../../include/utils/constants.hpp"
 #include "../../../include/utils/file_utils.hpp"
 #include "httplib.h"
 #include "nlohmann/json.hpp"

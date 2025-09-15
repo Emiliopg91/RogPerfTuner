@@ -10,12 +10,12 @@
 #include <QVBoxLayout>
 
 #include "../configuration/configuration.hpp"
+#include "../gui/no_scroll_combo_box.hpp"
 #include "../logger/logger.hpp"
 #include "../services/hardware_service.hpp"
 #include "../services/steam_service.hpp"
 #include "../shell/shell.hpp"
 #include "../translator/translator.hpp"
-#include "../utils/gui_utils.hpp"
 
 class GameConfigDialog : public QDialog {
 	Q_OBJECT
