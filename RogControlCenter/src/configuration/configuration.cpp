@@ -6,6 +6,7 @@
 #include <fstream>
 #include <iostream>
 
+#include "../../include/logger/logger_provider.hpp"
 #include "../../include/utils/constants.hpp"
 #include "../../include/utils/file_utils.hpp"
 
@@ -123,4 +124,15 @@ void Configuration::setPassword(const std::string& pss) {
 		g_error_free(error);
 		throw new std::runtime_error(msg);
 	}
+}
+
+RootConfig& Configuration::getConfiguration() {
+	if (!config.has_value()) {
+		config = RootConfig{};
+	}
+	return config.value();
+}
+
+Configuration::Configuration() {
+	loadConfig();
 }

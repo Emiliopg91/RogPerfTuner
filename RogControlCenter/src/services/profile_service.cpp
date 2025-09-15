@@ -7,8 +7,7 @@
 #include "../../include/models/performance/cpu_governor.hpp"
 #include "../../include/models/performance/power_profile.hpp"
 #include "../../include/models/performance/ssd_scheduler.hpp"
-#include "../../include/translator/translator.hpp"
-#include "../../include/utils/profile_utils.hpp"
+#include "../../include/utils/string_utils.hpp"
 
 ProfileService::ProfileService() {
 	logger.info("Initializing ProfileService");
@@ -88,7 +87,7 @@ void ProfileService::setPerformanceProfile(const PerformanceProfile& profile, co
 
 void ProfileService::setPlatformProfile(const PerformanceProfile& profile) {
 	if (platformClient.available()) {
-		auto platformProfile = ProfileUtils::platformProfile(profile);
+		auto platformProfile = getPlatformProfile(profile);
 		logger.info("Platform profile: {}", platformProfile.toName());
 		Logger::add_tab();
 		try {
@@ -103,7 +102,7 @@ void ProfileService::setPlatformProfile(const PerformanceProfile& profile) {
 
 void ProfileService::setFanCurves(const PerformanceProfile& profile) {
 	if (fanCurvesClient.available()) {
-		auto platformProfile = ProfileUtils::platformProfile(profile);
+		auto platformProfile = getPlatformProfile(profile);
 		logger.info("Fan profile: {}", platformProfile.toName());
 		Logger::add_tab();
 		try {
@@ -119,7 +118,7 @@ void ProfileService::setFanCurves(const PerformanceProfile& profile) {
 
 void ProfileService::setBoost(const PerformanceProfile&) {
 	if (boostControlClient.available()) {
-		bool enabled = onBattery ? ProfileUtils::batteryBoost() : ProfileUtils::acBoost();
+		bool enabled = onBattery ? batteryBoost() : acBoost();
 		logger.info("CPU boost: {}", enabled ? "ON" : "OFF");
 		Logger::add_tab();
 		try {
@@ -133,7 +132,7 @@ void ProfileService::setBoost(const PerformanceProfile&) {
 
 void ProfileService::setSsdScheduler(const PerformanceProfile& profile) {
 	if (ssdSchedulerClient.available()) {
-		SsdScheduler ssdScheduler = ProfileUtils::ssdQueueScheduler(profile);
+		SsdScheduler ssdScheduler = ssdQueueScheduler(profile);
 		logger.info("SSD scheduler: {}", ssdScheduler.toName());
 		Logger::add_tab();
 		try {
@@ -147,7 +146,7 @@ void ProfileService::setSsdScheduler(const PerformanceProfile& profile) {
 
 void ProfileService::setCpuGovernor(const PerformanceProfile& profile) {
 	if (cpuPowerClient.available()) {
-		CpuGovernor cpuGovernor = onBattery ? ProfileUtils::batteryGovernor() : ProfileUtils::acGovernor(profile);
+		CpuGovernor cpuGovernor = onBattery ? batteryGovernor() : acGovernor(profile);
 		logger.info("CPU governor: {}", cpuGovernor.toName());
 		Logger::add_tab();
 		try {
@@ -161,7 +160,7 @@ void ProfileService::setCpuGovernor(const PerformanceProfile& profile) {
 
 void ProfileService::setPowerProfile(const PerformanceProfile& profile) {
 	if (powerProfileClient.available()) {
-		PowerProfile powerProfile = ProfileUtils::powerProfile(profile);
+		PowerProfile powerProfile = getPowerProfile(profile);
 		logger.info("Power profile: {}", powerProfile.toName());
 		Logger::add_tab();
 		try {
@@ -178,13 +177,13 @@ void ProfileService::setTdps(const PerformanceProfile& profile) {
 		logger.info("TDP values");
 		Logger::add_tab();
 
-		auto pl1 = onBattery ? ProfileUtils::batteryIntelPl1Spl(profile) : ProfileUtils::acIntelPl1Spl(profile);
+		auto pl1 = onBattery ? batteryIntelPl1Spl(profile) : acIntelPl1Spl(profile);
 		logger.info("PL1: {}W", pl1);
 		try {
 			pl1SpdClient.setCurrentValue(pl1);
 			std::this_thread::sleep_for(std::chrono::milliseconds(25));
 			if (pl2SpptClient.available()) {
-				auto pl2 = onBattery ? ProfileUtils::batteryIntelPl2Sppt(profile) : ProfileUtils::acIntelPl2Sppt(profile);
+				auto pl2 = onBattery ? batteryIntelPl2Sppt(profile) : acIntelPl2Sppt(profile);
 				logger.info("PL2: {}W", pl2);
 				std::this_thread::sleep_for(std::chrono::milliseconds(25));
 				pl2SpptClient.setCurrentValue(pl2);
@@ -204,7 +203,7 @@ void ProfileService::setTgp(const PerformanceProfile& profile) {
 
 		if (nvBoostClient.available()) {
 			try {
-				auto nvb = onBattery ? ProfileUtils::batteryNvBoost(profile) : ProfileUtils::acNvBoost(profile);
+				auto nvb = onBattery ? batteryNvBoost(profile) : acNvBoost(profile);
 				logger.info("Dynamic Boost: {}W", nvb);
 				nvBoostClient.setCurrentValue(nvb);
 				std::this_thread::sleep_for(std::chrono::milliseconds(25));
@@ -215,7 +214,7 @@ void ProfileService::setTgp(const PerformanceProfile& profile) {
 
 		if (nvTempClient.available()) {
 			try {
-				auto nvt = onBattery ? ProfileUtils::batteryNvTemp(profile) : ProfileUtils::acNvTemp();
+				auto nvt = onBattery ? batteryNvTemp(profile) : acNvTemp();
 				logger.info("Throttle temp: {}ºC", nvt);
 				nvTempClient.setCurrentValue(nvt);
 			} catch (std::exception& e) {
@@ -232,7 +231,170 @@ void ProfileService::restoreProfile() {
 }
 
 PerformanceProfile ProfileService::nextPerformanceProfile() {
-	auto nextProfile = ProfileUtils::nextPerformanceProfile(currentProfile);
+	auto nextProfile = nextPerformanceProfile(currentProfile);
 	setPerformanceProfile(nextProfile);
 	return nextProfile;
+}
+
+int ProfileService::acIntelPl1Spl(PerformanceProfile profile) {
+	auto& client = Pl1SpdClient::getInstance();
+
+	if (profile == PerformanceProfile::Enum::PERFORMANCE) {
+		return client.getMaxValue();
+	}
+	if (profile == PerformanceProfile::Enum::BALANCED) {
+		return client.getMaxValue() * 0.6;
+	}
+	if (profile == PerformanceProfile::Enum::QUIET) {
+		return client.getMaxValue() * 0.4;
+	}
+
+	return client.getCurrentValue();
+}
+
+int ProfileService::batteryIntelPl1Spl(PerformanceProfile profile) {
+	int acVal	 = acIntelPl1Spl(profile);
+	auto& client = Pl1SpdClient::getInstance();
+	return acTdpToBatteryTdp(acIntelPl1Spl(profile), client.getMinValue());
+}
+
+int ProfileService::acIntelPl2Sppt(PerformanceProfile profile) {
+	auto& client = Pl2SpptClient::getInstance();
+
+	if (!acBoost()) {
+		return acIntelPl1Spl(profile);
+	}
+
+	if (profile == PerformanceProfile::Enum::PERFORMANCE) {
+		return client.getMaxValue();
+	}
+	if (profile == PerformanceProfile::Enum::BALANCED) {
+		return client.getMaxValue() * 0.8;	// modificar
+	}
+	if (profile == PerformanceProfile::Enum::QUIET) {
+		return client.getMaxValue() * 0.6;	// modificar
+	}
+
+	return client.getCurrentValue();
+}
+
+int ProfileService::batteryIntelPl2Sppt(PerformanceProfile profile) {
+	int acVal	 = acIntelPl2Sppt(profile);
+	auto& client = Pl2SpptClient::getInstance();
+	return acTdpToBatteryTdp(acIntelPl2Sppt(profile), client.getMinValue());
+}
+
+int ProfileService::acNvBoost(PerformanceProfile profile) {
+	auto& client = NvBoostClient::getInstance();
+
+	if (profile == PerformanceProfile::Enum::PERFORMANCE) {
+		return client.getMaxValue();
+	}
+	if (profile == PerformanceProfile::Enum::BALANCED) {
+		return (client.getMaxValue() + client.getMinValue()) / 2;
+	}
+	if (profile == PerformanceProfile::Enum::QUIET) {
+		return client.getMinValue();
+	}
+
+	return client.getCurrentValue();
+}
+
+int ProfileService::batteryNvBoost(PerformanceProfile profile) {
+	auto& client = NvBoostClient::getInstance();
+	return acTdpToBatteryTdp(acNvBoost(profile), client.getMinValue());
+}
+
+int ProfileService::acNvTemp() {
+	auto& client = NvTempClient::getInstance();
+	return client.getMaxValue();
+}
+
+int ProfileService::batteryNvTemp(PerformanceProfile profile) {
+	auto& client = NvTempClient::getInstance();
+
+	if (profile == PerformanceProfile::Enum::PERFORMANCE) {
+		return client.getMaxValue();
+	}
+	if (profile == PerformanceProfile::Enum::BALANCED) {
+		return (client.getMaxValue() + client.getMinValue()) / 2;
+	}
+	if (profile == PerformanceProfile::Enum::QUIET) {
+		return client.getMinValue();
+	}
+
+	return client.getCurrentValue();
+}
+
+PerformanceProfile ProfileService::nextPerformanceProfile(PerformanceProfile profile) {
+	if (profile == PerformanceProfile::Enum::PERFORMANCE) {
+		return PerformanceProfile::Enum::QUIET;
+	}
+	if (profile == PerformanceProfile::Enum::BALANCED) {
+		return PerformanceProfile::Enum::PERFORMANCE;
+	}
+	if (profile == PerformanceProfile::Enum::QUIET) {
+		return PerformanceProfile::Enum::BALANCED;
+	}
+	return profile;
+}
+
+bool ProfileService::acBoost() {
+	return true;
+}
+bool ProfileService::batteryBoost() {
+	return false;
+}
+
+CpuGovernor ProfileService::acGovernor(PerformanceProfile profile) {
+	if (profile == PerformanceProfile::Enum::PERFORMANCE) {
+		return CpuGovernor::Enum::PERFORMANCE;
+	}
+	return CpuGovernor::Enum::POWERSAVE;
+}
+
+CpuGovernor ProfileService::batteryGovernor() {
+	return CpuGovernor::Enum::POWERSAVE;
+}
+
+PerformanceProfile ProfileService::getGreater(PerformanceProfile profile, const PerformanceProfile& other) {
+	if (profile == PerformanceProfile::Enum::PERFORMANCE || other == PerformanceProfile::Enum::PERFORMANCE) {
+		return PerformanceProfile::Enum::PERFORMANCE;
+	}
+	if (profile == PerformanceProfile::Enum::BALANCED || other == PerformanceProfile::Enum::BALANCED) {
+		return PerformanceProfile::Enum::BALANCED;
+	}
+	return PerformanceProfile::Enum::QUIET;
+}
+
+PlatformProfile ProfileService::getPlatformProfile(PerformanceProfile profile) {
+	if (profile == PerformanceProfile::Enum::QUIET) {
+		return PlatformProfile::Enum::LOW_POWER;
+	} else if (profile == PerformanceProfile::Enum::BALANCED) {
+		return PlatformProfile::Enum::BALANCED;
+	} else {
+		return PlatformProfile::Enum::PERFORMANCE;
+	}
+}
+
+PowerProfile ProfileService::getPowerProfile(PerformanceProfile profile) {
+	if (profile == PerformanceProfile::Enum::QUIET) {
+		return PowerProfile::Enum::POWERSAVER;
+	} else if (profile == PerformanceProfile::Enum::BALANCED) {
+		return PowerProfile::Enum::BALANCED;
+	} else {
+		return PowerProfile::Enum::PERFORMANCE;
+	}
+}
+
+SsdScheduler ProfileService::ssdQueueScheduler(PerformanceProfile profile) {
+	if (profile == PerformanceProfile::Enum::QUIET) {
+		return SsdScheduler::Enum::NOOP;
+	} else {
+		return SsdScheduler::Enum::MQ_DEADLINE;
+	}
+}
+
+int ProfileService::acTdpToBatteryTdp(int tdp, int minTdp) {
+	return std::max(minTdp, static_cast<int>(std::round(tdp * 0.6)));
 }

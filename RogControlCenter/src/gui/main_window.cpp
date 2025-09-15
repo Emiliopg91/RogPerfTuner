@@ -1,17 +1,13 @@
-
 #include "../../include/gui/main_window.hpp"
 
+#include <QApplication>
+#include <QFormLayout>
+#include <QGroupBox>
+#include <QLabel>
+#include <QVBoxLayout>
 #include <algorithm>
 
-#include "../../include/events/event_bus.hpp"
 #include "../../include/gui/game_list.hpp"
-#include "../../include/services/application_service.hpp"
-#include "../../include/services/hardware_service.hpp"
-#include "../../include/services/open_rgb_service.hpp"
-#include "../../include/services/profile_service.hpp"
-#include "../../include/services/steam_service.hpp"
-#include "../../include/translator/translator.hpp"
-#include "../../include/utils/gui_utils.hpp"
 
 MainWindow::MainWindow(QWidget* parent) : QMainWindow(parent), _logger(new Logger()) {
 	setWindowTitle(QString::fromStdString(Constants::APP_NAME + " v" + Constants::APP_VERSION));
@@ -111,7 +107,13 @@ MainWindow::MainWindow(QWidget* parent) : QMainWindow(parent), _logger(new Logge
 	mainLayout->addWidget(settingsGroup);
 
 	setCentralWidget(centralWidget);
-	GuiUtils::centerWindowOnCurrentScreen(this);
+	QScreen* screen = QApplication::screenAt(QCursor::pos());
+	if (screen) {
+		QRect screenGeometry = screen->availableGeometry();
+		int x				 = (screenGeometry.width() - width()) / 2 + screenGeometry.x();
+		int y				 = (screenGeometry.height() - height()) / 2 + screenGeometry.y();
+		move(x, y);
+	}
 
 	eventBus.onChargeThreshold([this](BatteryThreshold threshold) {
 		setBatteryChargeLimit(threshold);

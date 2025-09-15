@@ -1,22 +1,10 @@
 #include "../../include/gui/tray_icon.hpp"
 
-#include <QAction>
 #include <QActionGroup>
-#include <QApplication>
 #include <QMenu>
 
-#include "../../include/configuration/configuration.hpp"
-#include "../../include/events/event_bus.hpp"
 #include "../../include/gui/game_list.hpp"
 #include "../../include/gui/main_window.hpp"
-#include "../../include/models/hardware/battery_charge_threshold.hpp"
-#include "../../include/models/hardware/rgb_brightness.hpp"
-#include "../../include/models/performance/performance_profile.hpp"
-#include "../../include/services/application_service.hpp"
-#include "../../include/services/hardware_service.hpp"
-#include "../../include/services/open_rgb_service.hpp"
-#include "../../include/services/profile_service.hpp"
-#include "../../include/translator/translator.hpp"
 
 void TrayIcon::openMainWindow() {
 	if (!MainWindow::INSTANCE) {

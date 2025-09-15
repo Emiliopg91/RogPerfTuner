@@ -11,19 +11,15 @@
 #include "../models/hardware/battery_charge_threshold.hpp"
 #include "../models/hardware/rgb_brightness.hpp"
 #include "../models/hardware/usb_identifier.hpp"
+#include "../models/others/singleton.hpp"
 #include "../models/performance/performance_profile.hpp"
 
 typedef std::vector<std::any> CallbackParam;
 typedef std::function<void(CallbackParam)> CallbackWithParams;
 typedef std::function<void()> Callback;
 
-class EventBus {
+class EventBus : public Singleton<EventBus> {
   public:
-	static EventBus& getInstance() {
-		static EventBus instance;
-		return instance;
-	}
-
 	void on_without_data(const std::string_view& event, Callback callback);
 	void on_without_data(const std::string& event, Callback callback);
 	void emit_event(const std::string_view& event);
@@ -83,4 +79,6 @@ class EventBus {
 	std::unordered_map<std::string, std::vector<Callback>> no_params_listeners;
 	std::unordered_map<std::string, std::vector<CallbackWithParams>> with_params_listeners;
 	std::mutex mtx;
+
+	friend class Singleton<EventBus>;
 };

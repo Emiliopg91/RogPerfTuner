@@ -16,8 +16,10 @@ ApplicationService::ApplicationService() {
 	FileUtils::copy(Constants::ASSETS_BIN_DIR, Constants::BIN_DIR);
 	FileUtils::mkdirs(Constants::BIN_APPLICATION_DIR);
 
-	FileUtils::writeFileContent(Constants::LAUNCHER_FILE, buildLaunchFile());
-	logger.debug("Launch file '{}' written successfully", Constants::LAUNCHER_FILE);
+	if (!Constants::DEV_MODE) {
+		FileUtils::writeFileContent(Constants::LAUNCHER_FILE, buildLaunchFile());
+		logger.debug("Launch file '{}' written successfully", Constants::LAUNCHER_FILE);
+	}
 
 	FileUtils::copy(Constants::ASSET_ICONS_DIR, Constants::ICONS_DIR);
 
@@ -30,7 +32,7 @@ ApplicationService::ApplicationService() {
 		logger.debug("Menu entry file '{}' written successfully", Constants::APP_DRAW_FILE);
 	}
 
-	AutoUpdater::getInstance(
+	AutoUpdater::init(
 		[this]() {
 			applyUpdate();
 		},
@@ -73,5 +75,5 @@ void ApplicationService::shutdown() {
 	eventBus.emitApplicationStop();
 	Logger::rem_tab();
 	logger.info("Shutdown finished");
-	kill(getpid(), SIGTERM);
+	kill(Constants::PID, SIGTERM);
 }

@@ -1,19 +1,14 @@
 #pragma once
 
+#include "../../models/others/singleton.hpp"
 #include "./abstract/abstract_cmd_client.hpp"
 
-class AsusCtlClient : public AbstractCmdClient {
+class AsusCtlClient : public AbstractCmdClient, public Singleton<AsusCtlClient> {
   private:
 	AsusCtlClient() : AbstractCmdClient("asusctl", "AsusCtlClient") {
 	}
+	friend class Singleton<AsusCtlClient>;
 
   public:
-	static AsusCtlClient& getInstance() {
-		static AsusCtlClient instance;
-		return instance;
-	}
-
-	void turnOffAura() {
-		run_command("aura static -c 000000", true, false);
-	}
+	void turnOffAura();
 };

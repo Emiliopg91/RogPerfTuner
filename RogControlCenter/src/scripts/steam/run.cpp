@@ -8,16 +8,18 @@
 #include <cstdlib>
 #include <cstring>
 #include <ctime>
-#include <map>
 #include <sstream>
 #include <string>
 #include <thread>
 #include <vector>
 
 #include "../../../include/logger/logger.hpp"
+#include "../../../include/logger/logger_provider.hpp"
 #include "../../../include/models/steam/steam_game_config.hpp"
 #include "../../../include/shell/shell.hpp"
+#include "../../../include/utils/constants.hpp"
 #include "../../../include/utils/file_utils.hpp"
+#include "../../../include/utils/string_utils.hpp"
 #include "httplib.h"
 #include "nlohmann/json.hpp"
 
@@ -246,7 +248,7 @@ int main(int argc, char* argv[]) {
 
 	try {
 		logger.info("Requesting renice");
-		auto res = cli.Get(Constants::URL_RENICE + "?pid=" + std::to_string(getpid()));
+		auto res = cli.Get(Constants::URL_RENICE + "?pid=" + std::to_string(Constants::PID));
 		if (!res || res->status != 200) {
 			logger.error("Error on renice request");
 		}

@@ -9,13 +9,8 @@
 #include "../models/hardware/rgb_brightness.hpp"
 #include "../models/hardware/usb_identifier.hpp"
 
-class OpenRgbService {
+class OpenRgbService : public Singleton<OpenRgbService> {
   public:
-	static OpenRgbService& getInstance() {
-		static OpenRgbService instance;
-		return instance;
-	}
-
 	std::string getDeviceName(const UsbIdentifier&);
 	std::vector<std::string> getAvailableEffects();
 	std::string getCurrentEffect();
@@ -31,6 +26,7 @@ class OpenRgbService {
 	std::string nextEffect();
 
   private:
+	friend class Singleton<OpenRgbService>;
 	OpenRgbService();
 
 	Logger logger{"OpenRgbService"};

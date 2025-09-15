@@ -1,11 +1,7 @@
 #pragma once
 
-#include <algorithm>
-#include <array>
-#include <cctype>
-#include <iomanip>
-#include <random>
 #include <string>
+#include <vector>
 
 class StringUtils {
   public:
@@ -15,13 +11,7 @@ class StringUtils {
 	 * @param s
 	 * @return std::string
 	 */
-	static inline std::string ltrim(const std::string& s) {
-		std::string result = s;
-		result.erase(result.begin(), std::find_if(result.begin(), result.end(), [](unsigned char ch) {
-						 return !std::isspace(ch);
-					 }));
-		return result;
-	}
+	static std::string ltrim(const std::string& s);
 
 	/**
 	 * @brief Right trim
@@ -29,16 +19,7 @@ class StringUtils {
 	 * @param s
 	 * @return std::string
 	 */
-	static inline std::string rtrim(const std::string& s) {
-		std::string result = s;
-		result.erase(std::find_if(result.rbegin(), result.rend(),
-								  [](unsigned char ch) {
-									  return !std::isspace(ch);
-								  })
-						 .base(),
-					 result.end());
-		return result;
-	}
+	static std::string rtrim(const std::string& s);
 
 	/**
 	 * @brief Both sides trim
@@ -46,9 +27,7 @@ class StringUtils {
 	 * @param s
 	 * @return std::string
 	 */
-	static inline std::string trim(const std::string& s) {
-		return ltrim(rtrim(s));
-	}
+	static std::string trim(const std::string& s);
 
 	/**
 	 * @brief To lower case
@@ -56,13 +35,7 @@ class StringUtils {
 	 * @param s
 	 * @return std::string
 	 */
-	static inline std::string toLowerCase(const std::string& s) {
-		std::string result = s;
-		std::transform(result.begin(), result.end(), result.begin(), [](unsigned char c) {
-			return std::tolower(c);
-		});
-		return result;
-	}
+	static std::string toLowerCase(const std::string& s);
 
 	/**
 	 * @brief To upper case
@@ -70,36 +43,14 @@ class StringUtils {
 	 * @param s
 	 * @return std::string
 	 */
-	static inline std::string toUpperCase(const std::string& s) {
-		std::string result = s;
-		std::transform(result.begin(), result.end(), result.begin(), [](unsigned char c) {
-			return std::toupper(c);
-		});
-		return result;
-	}
+	static std::string toUpperCase(const std::string& s);
 
 	/**
 	 * @brief Generate random UUIDv4
 	 *
 	 * @return std::string
 	 */
-	static inline std::string generateUUIDv4() {
-		std::random_device rd;
-		std::mt19937 gen(rd());
-		std::uniform_int_distribution<uint32_t> dis(0, 0xFFFFFFFF);
-
-		std::array<uint32_t, 4> data = {dis(gen), dis(gen), dis(gen), dis(gen)};
-
-		// Poner versión (4) y variante (8, 9, A, B)
-		data[1] = (data[1] & 0xFFFF0FFF) | 0x00004000;	// versión 4
-		data[2] = (data[2] & 0x3FFFFFFF) | 0x80000000;	// variante 10xx
-
-		std::ostringstream oss;
-		oss << std::hex << std::setfill('0') << std::setw(8) << data[0] << "-" << std::setw(4) << (data[1] >> 16) << "-" << std::setw(4)
-			<< (data[1] & 0xFFFF) << "-" << std::setw(4) << (data[2] >> 16) << "-" << std::setw(4) << (data[2] & 0xFFFF) << std::setw(8) << data[3];
-
-		return oss.str();
-	}
+	static std::string generateUUIDv4();
 
 	/**
 	 * @brief Search for substring
@@ -108,9 +59,7 @@ class StringUtils {
 	 * @param haystack
 	 * @return bool
 	 */
-	static inline bool isSubstring(std::string needle, std::string haystack) {
-		return haystack.find(needle) != std::string::npos;
-	}
+	static bool isSubstring(std::string needle, std::string haystack);
 
 	/**
 	 * @brief Split lines into string vector
@@ -118,16 +67,7 @@ class StringUtils {
 	 * @param text
 	 * @return std::vector<std::string>
 	 */
-	static inline std::vector<std::string> splitLines(const std::string& text) {
-		std::vector<std::string> lines;
-		std::istringstream stream(text);
-		std::string line;
-
-		while (std::getline(stream, line)) {
-			lines.push_back(line);
-		}
-		return lines;
-	}
+	static std::vector<std::string> splitLines(const std::string& text);
 
 	/**
 	 * @brief Split string by separator
@@ -136,17 +76,7 @@ class StringUtils {
 	 * @param delimiter
 	 * @return std::vector<std::string>
 	 */
-	static inline std::vector<std::string> split(const std::string& s, char delimiter) {
-		std::vector<std::string> tokens;
-		std::stringstream ss(s);
-		std::string item;
-
-		while (std::getline(ss, item, delimiter)) {
-			tokens.push_back(item);
-		}
-
-		return tokens;
-	}
+	static std::vector<std::string> split(const std::string& s, char delimiter);
 
 	/**
 	 * @brief Capitalize string (first character to upper case)
@@ -154,18 +84,7 @@ class StringUtils {
 	 * @param input
 	 * @return std::string
 	 */
-	static inline std::string capitalize(const std::string& input) {
-		if (input.empty()) {
-			return input;
-		}
-
-		std::string result = input;
-		result[0]		   = std::toupper(static_cast<unsigned char>(result[0]));
-		std::transform(result.begin() + 1, result.end(), result.begin() + 1, [](unsigned char c) {
-			return std::tolower(c);
-		});
-		return result;
-	}
+	static std::string capitalize(const std::string& input);
 
 	/**
 	 * @brief Apply left padding
@@ -175,12 +94,7 @@ class StringUtils {
 	 * @param padChar
 	 * @return std::string
 	 */
-	static inline std::string leftPad(const std::string& input, size_t totalLength, char padChar = ' ') {
-		if (input.size() >= totalLength) {
-			return input;  // no necesita padding
-		}
-		return std::string(totalLength - input.size(), padChar) + input;
-	}
+	static std::string leftPad(const std::string& input, size_t totalLength, char padChar = ' ');
 
 	/**
 	 * @brief Apply right padding
@@ -190,10 +104,5 @@ class StringUtils {
 	 * @param padChar
 	 * @return std::string
 	 */
-	static inline std::string rightPad(const std::string& input, size_t totalLength, char padChar = ' ') {
-		if (input.size() >= totalLength) {
-			return input;  // no necesita padding
-		}
-		return input + std::string(totalLength - input.size(), padChar);
-	}
+	static std::string rightPad(const std::string& input, size_t totalLength, char padChar = ' ');
 };

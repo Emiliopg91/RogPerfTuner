@@ -2,9 +2,8 @@
 
 #include <chrono>
 #include <csignal>
-#include <iostream>
+#include <fstream>
 #include <optional>
-#include <set>
 #include <sstream>
 #include <string>
 #include <thread>
@@ -17,6 +16,7 @@
 #include "../../include/services/hardware_service.hpp"
 #include "../../include/services/open_rgb_service.hpp"
 #include "../../include/services/profile_service.hpp"
+#include "../../include/utils/string_utils.hpp"
 
 bool SteamService::metricsEnabled() {
 	auto mangohud_which = shell.which("mangohud");
@@ -114,10 +114,12 @@ void SteamService::onFirstGameRun(unsigned int gid, std::string name) {
 				}
 				pure_env += token;
 			} else {
-				if (!wrappers.empty()) {
-					wrappers += " ";
+				if (token != Constants::WRAPPER_PATH) {
+					if (!wrappers.empty()) {
+						wrappers += " ";
+					}
+					wrappers += token;
 				}
-				wrappers += token;
 			}
 		}
 
@@ -137,7 +139,7 @@ void SteamService::onFirstGameRun(unsigned int gid, std::string name) {
 	configuration.getConfiguration().games[std::to_string(gid)] = entry;
 	configuration.saveConfig();
 
-	steamClient.setLaunchOptions(gid, WRAPPER_PATH + " %command%");
+	steamClient.setLaunchOptions(gid, Constants::WRAPPER_PATH + " %command%");
 
 	QMetaObject::invokeMethod(
 		qApp,
@@ -146,6 +148,28 @@ void SteamService::onFirstGameRun(unsigned int gid, std::string name) {
 			dialog.showDialog();
 		},
 		Qt::QueuedConnection);
+
+	Logger::rem_tab();
+	Logger::rem_tab();
+}
+
+void SteamService::saveGameConfig(uint gid, const GameEntry& entry) {
+	logger.info("Saving configuration for '{}' ({})", entry.name, gid);
+	Logger::add_tab();
+
+	configuration.getConfiguration().games[std::to_string(gid)] = entry;
+	configuration.saveConfig();
+
+	Logger::rem_tab();
+}
+
+void SteamService::launchGame(const std::string& id) {
+	logger.info("Launching game with id {}...", id);
+	Logger::add_tab();
+
+	shell.run_command("steam steam://rungameid/" + id);
+
+	Logger::rem_tab();
 }
 
 bool SteamService::checkIfRequiredInstallation() {
@@ -165,11 +189,17 @@ void SteamService::installRccDC() {
 		if (FileUtils::exists(Constants::DECKY_SERVICE_PATH)) {
 			if (!FileUtils::exists(Constants::RCCDC_PATH)) {
 				logger.info("Installing plugin for first time");
+				Logger::add_tab();
+				installPipDeps();
 				copyPlugin();
+				Logger::rem_tab();
 			} else {
 				if (checkIfRequiredInstallation()) {
 					logger.info("Updating Decky plugin");
+					Logger::add_tab();
+					installPipDeps();
 					copyPlugin();
+					Logger::rem_tab();
 				} else {
 					logger.info("Plugin up to date");
 				}
@@ -185,6 +215,8 @@ void SteamService::installRccDC() {
 }
 
 void SteamService::copyPlugin() {
+	logger.info("Copying plugin");
+	Logger::add_tab();
 	installer = std::thread([this]() {
 		FileUtils::copy(Constants::RCCDC_ASSET_PATH, Constants::USER_PLUGIN_DIR);
 
@@ -197,6 +229,14 @@ void SteamService::copyPlugin() {
 			shell.run_elevated_command(cmd);
 		}
 	});
+	Logger::rem_tab();
+}
+
+void SteamService::installPipDeps() {
+	logger.info("Installing PIP dependencies {}", Constants::RCCDC_REQUIRED_PIP);
+	Logger::add_tab();
+	pipClient.installPackage(Constants::RCCDC_REQUIRED_PIP);
+	Logger::rem_tab();
 }
 
 void SteamService::onGameLaunch(unsigned int gid, std::string name, int pid) {
@@ -207,14 +247,23 @@ void SteamService::onGameLaunch(unsigned int gid, std::string name, int pid) {
 		Logger::add_tab();
 
 		logger.info("Stopping process...");
-		for (int i = 0; i < 5; i++) {
+
+		const std::string stopCmd =
+			"pstree -p " + std::to_string(pid) + " | grep -o '([0-9]\\+)' | grep -o '[0-9]\\+' | tee >(xargs -r kill -19 2>/dev/null) | wc -l";
+		const std::string killCmd =
+			"pstree -p " + std::to_string(pid) + " | grep -o '([0-9]\\+)' | grep -o '[0-9]\\+' | tee >(xargs -r kill -9 2>/dev/null) | wc -l";
+
+		uint signaled	 = 0;
+		uint newSignaled = 0;
+		do {
+			signaled	= newSignaled;
+			newSignaled = static_cast<uint>(std::stoul(StringUtils::trim(shell.run_elevated_command(stopCmd).stdout_str)));
+
+			logger.debug("Stopped {} processes, before {}", newSignaled, signaled);
+
 			std::this_thread::sleep_for(std::chrono::milliseconds(100));
-			shell.run_elevated_command("pstree -p " + std::to_string(pid) + " | grep -o '([0-9]\\+)' | grep -o '[0-9]\\+' | xargs kill -" +
-									   std::to_string(SIGSTOP));
-		}
-		std::this_thread::sleep_for(std::chrono::milliseconds(250));
-		shell.run_elevated_command("pstree -p " + std::to_string(pid) + " | grep -o '([0-9]\\+)' | grep -o '[0-9]\\+' | xargs kill -" +
-								   std::to_string(SIGKILL));
+		} while (signaled < newSignaled);
+		logger.debug("Killed {} processes", static_cast<uint>(std::stoul(StringUtils::trim(shell.run_elevated_command(killCmd).stdout_str))));
 
 		Logger::rem_tab();
 
@@ -237,9 +286,9 @@ void SteamService::onGameStop(unsigned int gid, std::string name) {
 		{
 			Logger::add_tab();
 			setProfileForGames();
-			Logger::rem_tab();
 
 			eventBus.emitGameEvent(runningGames.size());
+			Logger::rem_tab();
 		}
 	}
 }

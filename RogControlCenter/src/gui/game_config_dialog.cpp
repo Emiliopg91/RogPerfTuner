@@ -1,17 +1,15 @@
 #include "../../include/gui/game_config_dialog.hpp"
 
-#include <qcontainerfwd.h>
-
-#include <QDialog>
 #include <QLabel>
 #include <QLineEdit>
 #include <QMessageBox>
-#include <QProcess>
 #include <QPushButton>
-#include <QVBoxLayout>
 #include <optional>
 
+#include "../../include/utils/string_utils.hpp"
+
 GameConfigDialog::GameConfigDialog(unsigned int gid, bool runAfterSave, QWidget* parent) : QDialog(parent), gid(gid), runAfterSave(runAfterSave) {
+	Logger::add_tab();
 	setWindowTitle(QString::fromStdString(translator.translate("config.for.game", {{"game", ""}})));
 	setFixedSize(400, 300);
 
@@ -121,7 +119,7 @@ GameConfigDialog::GameConfigDialog(unsigned int gid, bool runAfterSave, QWidget*
 }
 
 void GameConfigDialog::onAccept() {
-	logger.info("Saving configuration for '{}' ({})", gameEntry.name, gid);
+	logger.info("Accepted configuration");
 	std::optional<std::string> gpu = gpuCombo->currentData().toString().toStdString();
 	if (gpu.value().empty()) {
 		gpu = std::nullopt;
@@ -145,8 +143,7 @@ void GameConfigDialog::onAccept() {
 	gameEntry.steamdeck		= modeCombo->currentData().toBool();
 	gameEntry.sync			= sync.toString();
 
-	configuration.getConfiguration().games[std::to_string(gid)] = gameEntry;
-	configuration.saveConfig();
+	steamService.saveGameConfig(gid, gameEntry);
 
 	accept();
 }
@@ -155,17 +152,7 @@ void GameConfigDialog::showDialog() {
 	exec();
 
 	if (runAfterSave) {
-		logger.info("Configuration finished");
-
-		logger.info("Relaunching game with SteamOverlayId {}...", gameEntry.overlayId.value_or(std::to_string(gid)));
-		std::this_thread::sleep_for(std::chrono::milliseconds(250));
-
-		shell.run_command("steam steam://rungameid/" + gameEntry.overlayId.value_or(std::to_string(gid)));
-
-		Logger::rem_tab();
-		Logger::rem_tab();
-	} else {
-		logger.info("Configuration saved");
+		steamService.launchGame(gameEntry.overlayId.value_or(std::to_string(gid)));
 	}
 }
 

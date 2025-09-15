@@ -19,6 +19,7 @@
 #include "../../include/models/hardware/gpu_brand.hpp"
 #include "../../include/services/open_rgb_service.hpp"
 #include "../../include/translator/translator.hpp"
+#include "../../include/utils/string_utils.hpp"
 
 HardwareService::HardwareService() {
 	logger.info("Initializing HardwareService");

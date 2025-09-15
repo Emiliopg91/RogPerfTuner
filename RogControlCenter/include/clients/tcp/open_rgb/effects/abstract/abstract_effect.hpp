@@ -5,7 +5,6 @@
 
 #include "../../../../../logger/logger.hpp"
 #include "../../../../../models/hardware/rgb_brightness.hpp"
-#include "../../../../../shell/shell.hpp"
 #include "OpenRGB/Client.hpp"
 
 using orgb::Client;
@@ -32,20 +31,17 @@ class AbstractEffect {
 	static double brightnessMap(const RgbBrightness& b);
 
   public:
-	AbstractEffect(Client& client, const std::string& name) : _name(name), _client(client) {
-	}
+	AbstractEffect(Client& client, const std::string& name);
 
 	virtual ~AbstractEffect() {
 		stop();
 	}
 
+	const std::string getName();
+
 	void start(const DeviceList& devices, const RgbBrightness& brightness);
 
 	void stop();
-
-	const std::string getName() {
-		return _name;
-	}
 
   protected:
 	void _sleep(const double& seconds);
@@ -54,8 +50,5 @@ class AbstractEffect {
 	virtual void apply_effect(const DeviceList& devices) = 0;
 
   private:
-	void _thread_main(const DeviceList& devices) {
-		apply_effect(devices);
-		_logger.info("Effect finished");
-	}
+	void _thread_main(const DeviceList& devices);
 };

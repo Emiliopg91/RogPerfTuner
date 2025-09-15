@@ -32,15 +32,15 @@ void OpenRgbClient::initialize() {
 		Logger::rem_tab();
 	}
 
-	availableEffects.push_back(std::unique_ptr<AbstractEffect>(&BreathingEffect::getInstance(client)));
-	availableEffects.push_back(std::unique_ptr<AbstractEffect>(&DanceFloorEffect::getInstance(client)));
-	availableEffects.push_back(std::unique_ptr<AbstractEffect>(&DigitalRainEffect::getInstance(client)));
-	availableEffects.push_back(std::unique_ptr<AbstractEffect>(&DropsEffect::getInstance(client)));
-	availableEffects.push_back(std::unique_ptr<AbstractEffect>(&GamingEffect::getInstance(client)));
-	availableEffects.push_back(std::unique_ptr<AbstractEffect>(&RainbowWave::getInstance(client)));
-	availableEffects.push_back(std::unique_ptr<AbstractEffect>(&SpectrumCycleEffect::getInstance(client)));
-	availableEffects.push_back(std::unique_ptr<AbstractEffect>(&StarryNightEffect::getInstance(client)));
-	availableEffects.push_back(std::unique_ptr<AbstractEffect>(&StaticEffect::getInstance(client)));
+	availableEffects.push_back(std::unique_ptr<AbstractEffect>(&BreathingEffect::init(client)));
+	availableEffects.push_back(std::unique_ptr<AbstractEffect>(&DanceFloorEffect::init(client)));
+	availableEffects.push_back(std::unique_ptr<AbstractEffect>(&DigitalRainEffect::init(client)));
+	availableEffects.push_back(std::unique_ptr<AbstractEffect>(&DropsEffect::init(client)));
+	availableEffects.push_back(std::unique_ptr<AbstractEffect>(&GamingEffect::init(client)));
+	availableEffects.push_back(std::unique_ptr<AbstractEffect>(&RainbowWave::init(client)));
+	availableEffects.push_back(std::unique_ptr<AbstractEffect>(&SpectrumCycleEffect::init(client)));
+	availableEffects.push_back(std::unique_ptr<AbstractEffect>(&StarryNightEffect::init(client)));
+	availableEffects.push_back(std::unique_ptr<AbstractEffect>(&StaticEffect::init(client)));
 
 	eventBus.onApplicationStop([this]() {
 		stop();

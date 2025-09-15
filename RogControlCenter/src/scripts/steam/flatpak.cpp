@@ -7,6 +7,7 @@
 #include <sstream>
 #include <string>
 
+#include "../../../include/logger/logger_provider.hpp"
 #include "../../../include/shell/shell.hpp"
 #include "../../../include/utils/file_utils.hpp"
 

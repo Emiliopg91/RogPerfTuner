@@ -1,30 +1,17 @@
 #pragma once
 
+#include "../../../models/others/singleton.hpp"
 #include "../abstract/abstract_dbus_client.hpp"
 
-class PMKeyboardBrightness : public AbstractDbusClient {
+class PMKeyboardBrightness : public AbstractDbusClient, public Singleton<PMKeyboardBrightness> {
   public:
-	static PMKeyboardBrightness& getInstance() {
-		static PMKeyboardBrightness instance;
-		return instance;
-	}
+	int getKeyboardBrightness();
 
-	int getKeyboardBrightness() {
-		return call<int>("keyboardBrightness");
-	}
+	void setKeyboardBrightnessSilent(const int& brightness);
 
-	void setKeyboardBrightnessSilent(const int& brightness) {
-		call("setKeyboardBrightnessSilent", {brightness});
-	}
-
-	template <typename Callback>
-	void onBrightnessChange(const Callback&& callback) {
-		this->onSignal("keyboardBrightnessChanged", callback);
-	}
+	void onBrightnessChange(Callback&& callback);
 
   private:
-	PMKeyboardBrightness()
-		: AbstractDbusClient(false, "org.kde.Solid.PowerManagement", "/org/kde/Solid/PowerManagement/Actions/KeyboardBrightnessControl",
-							 "org.kde.Solid.PowerManagement.Actions.KeyboardBrightnessControl", false) {
-	}
+	friend class Singleton<PMKeyboardBrightness>;
+	PMKeyboardBrightness();
 };

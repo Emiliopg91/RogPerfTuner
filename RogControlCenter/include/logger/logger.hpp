@@ -8,8 +8,7 @@
  */
 #pragma once
 
-#include "../utils/string_utils.hpp"
-#include "logger_provider.hpp"
+#include <spdlog/spdlog.h>
 
 template <typename... Args>
 using format_string_t = fmt::format_string<Args...>;
@@ -21,28 +20,21 @@ class Logger {
 	 *
 	 * @param levelStr
 	 */
-	void setLevel(std::string levelStr) {
-		setLevel(spdlog::level::from_str(StringUtils::toLowerCase(levelStr)));
-	}
+	void setLevel(std::string levelStr);
 
 	/**
 	 * @brief Set the Level object
 	 *
 	 * @param level
 	 */
-	void setLevel(spdlog::level::level_enum level) {
-		logger->set_level(level);
-		logger->flush_on(level);
-	}
+	void setLevel(spdlog::level::level_enum level);
 
 	/**
 	 * @brief Construct a new Logger object
 	 *
 	 * @param name
 	 */
-	Logger(std::string name = "Default") {
-		logger = LoggerProvider::getLogger(name);
-	}
+	Logger(std::string name = "Default");
 
 	/**
 	 * @brief Send trace log line
@@ -116,15 +108,9 @@ class Logger {
 		log(spdlog::level::critical, fmt, std::forward<Args>(args)...);
 	}
 
-	inline static void add_tab() {
-		std::lock_guard<std::mutex> lock(mutex);
-		tabs += 1;
-	}
+	static void add_tab();
 
-	inline static void rem_tab() {
-		std::lock_guard<std::mutex> lock(mutex);
-		tabs -= 1;
-	}
+	static void rem_tab();
 
   private:
 	inline static int tabs = 0;

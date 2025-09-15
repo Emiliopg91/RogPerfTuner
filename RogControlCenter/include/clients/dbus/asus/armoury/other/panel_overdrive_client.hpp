@@ -1,14 +1,10 @@
 #pragma once
 
+#include "../../../../../models/others/singleton.hpp"
 #include "../armoury_base_client.hpp"
 
-class PanelOverdriveClient : public ArmouryBaseClient {
-  public:
-	static PanelOverdriveClient& getInstance() {
-		static PanelOverdriveClient instance;
-		return instance;
-	}
-
-	PanelOverdriveClient() : ArmouryBaseClient("panel_overdrive", false) {
-	}
+class PanelOverdriveClient : public ArmouryBaseClient, public Singleton<PanelOverdriveClient> {
+  private:
+	PanelOverdriveClient();
+	friend class Singleton<PanelOverdriveClient>;
 };

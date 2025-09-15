@@ -1,24 +1,15 @@
 #pragma once
 
+#include "../../../models/others/singleton.hpp"
 #include "../abstract/abstract_dbus_client.hpp"
 
-class UPowerClient : public AbstractDbusClient {
+class UPowerClient : public AbstractDbusClient, public Singleton<UPowerClient> {
   public:
-	static UPowerClient& getInstance() {
-		static UPowerClient instance;
-		return instance;
-	}
+	bool isOnBattery();
 
-	bool isOnBattery() {
-		return this->getProperty<bool>(QString("OnBattery"));
-	}
-
-	void onBatteryChange(CallbackWithParams&& callback) {
-		this->onPropertyChange("OnBattery", std::move(callback));
-	}
+	void onBatteryChange(CallbackWithParams&& callback);
 
   private:
-	UPowerClient()
-		: AbstractDbusClient(true, QString("org.freedesktop.UPower"), QString("/org/freedesktop/UPower"), QString("org.freedesktop.UPower"), true) {
-	}
+	friend class Singleton<UPowerClient>;
+	UPowerClient();
 };

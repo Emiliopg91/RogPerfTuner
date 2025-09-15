@@ -3,25 +3,19 @@
 #include <QDialog>
 #include <QLabel>
 #include <QLineEdit>
-#include <QMessageBox>
 #include <QPushButton>
-#include <QVBoxLayout>
 
 #include "../configuration/configuration.hpp"
 #include "../translator/translator.hpp"
 
-class PasswordDialog : public QDialog {
+class PasswordDialog : public QDialog, public Singleton<PasswordDialog> {
 	Q_OBJECT
 
   public:
-	static PasswordDialog& getInstance() {
-		static PasswordDialog instance;
-		return instance;
-	}
-
 	bool showDialog();
 
   private:
+	friend class Singleton<PasswordDialog>;
 	PasswordDialog(QWidget* parent = nullptr);
 
 	void onAccept();

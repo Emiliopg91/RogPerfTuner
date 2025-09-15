@@ -1,19 +1,10 @@
 #include "../../include/gui/game_list.hpp"
 
-#include <QCloseEvent>
-#include <QColor>
-#include <QComboBox>
-#include <QDialog>
 #include <QHeaderView>
-#include <QIcon>
-#include <QLineEdit>
-#include <QPixmap>
 #include <QPushButton>
 #include <QScrollArea>
 #include <QString>
 #include <QTableWidget>
-#include <QVBoxLayout>
-#include <QWidget>
 
 #include "../../include/gui/game_config_dialog.hpp"
 #include "../../include/utils/constants.hpp"

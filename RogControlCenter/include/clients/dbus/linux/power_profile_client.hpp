@@ -1,26 +1,16 @@
 #pragma once
 
+#include "../../../models/others/singleton.hpp"
 #include "../../../models/performance/power_profile.hpp"
 #include "../abstract/abstract_dbus_client.hpp"
 
-class PowerProfileClient : public AbstractDbusClient {
+class PowerProfileClient : public AbstractDbusClient, public Singleton<PowerProfileClient> {
   public:
-	static PowerProfileClient& getInstance() {
-		static PowerProfileClient instance;
-		return instance;
-	}
+	const PowerProfile getPowerProfile();
 
-	const PowerProfile getPowerProfile() {
-		return PowerProfile::fromString(this->getProperty<QString>(QString("ActiveProfile")).toStdString());
-	}
-
-	void setPowerProfile(const PowerProfile& val) {
-		this->setProperty<QString>(QString("ActiveProfile"), QString::fromStdString(val.toString()));
-	}
+	void setPowerProfile(const PowerProfile& val);
 
   private:
-	PowerProfileClient()
-		: AbstractDbusClient(true, QString("net.hadess.PowerProfiles"), QString("/net/hadess/PowerProfiles"), QString("net.hadess.PowerProfiles"),
-							 true) {
-	}
+	friend class Singleton<PowerProfileClient>;
+	PowerProfileClient();
 };

@@ -3,17 +3,8 @@
 #include <QCheckBox>
 #include <QCloseEvent>
 #include <QComboBox>
-#include <QFormLayout>
-#include <QGroupBox>
-#include <QIcon>
-#include <QLabel>
 #include <QMainWindow>
-#include <QPixmap>
 #include <QPushButton>
-#include <QString>
-#include <QVBoxLayout>
-#include <QVariant>
-#include <QWidget>
 
 #include "../events/event_bus.hpp"
 #include "../models/hardware/battery_charge_threshold.hpp"
@@ -62,13 +53,13 @@ class MainWindow : public QMainWindow {
   private:
 	Logger* _logger;
 
-	EventBus& eventBus					  = EventBus::getInstance();
-	ProfileService& profileService		  = ProfileService::getInstance();
-	OpenRgbService& openRgbService		  = OpenRgbService::getInstance();
-	HardwareService& hardwareService	  = HardwareService::getInstance();
-	SteamService& steamService			  = SteamService::getInstance();
-	Translator& translator				  = Translator::getInstance();
-	ApplicationService applicationService = ApplicationService::getInstance();
+	EventBus& eventBus					   = EventBus::getInstance();
+	ProfileService& profileService		   = ProfileService::getInstance();
+	OpenRgbService& openRgbService		   = OpenRgbService::getInstance();
+	HardwareService& hardwareService	   = HardwareService::getInstance();
+	SteamService& steamService			   = SteamService::getInstance();
+	Translator& translator				   = Translator::getInstance();
+	ApplicationService& applicationService = ApplicationService::getInstance();
 
 	QComboBox* _profileDropdown;
 	QPushButton* _gameProfileButton;

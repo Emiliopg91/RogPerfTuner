@@ -2,6 +2,7 @@
 
 #include <QApplication>
 
+#include "..//include/logger/logger_provider.hpp"
 #include "../include/configuration/configuration.hpp"
 #include "../include/gui/password_dialog.hpp"
 #include "../include/gui/toaster.hpp"
@@ -15,12 +16,33 @@
 #include "../include/translator/translator.hpp"
 #include "../include/utils/constants.hpp"
 #include "../include/utils/single_instance.hpp"
+#include "../include/utils/string_utils.hpp"
+
+void terminateHandler() {
+	std::cerr << "Unhandled exception detected\n";
+
+	std::exception_ptr exptr = std::current_exception();
+	if (exptr) {
+		try {
+			std::rethrow_exception(exptr);
+		} catch (const std::exception& e) {
+			std::cerr << "Exception type: " << typeid(e).name() << ", message: " << e.what() << "\n";
+		} catch (...) {
+		}
+	} else {
+		std::cerr << "Could not get exception information.\n";
+	}
+
+	std::abort();
+}
 
 int main(int argc, char** argv) {
+	std::set_terminate(terminateHandler);
+
 	std::strncpy(argv[0], (Constants::APP_NAME + " v" + Constants::APP_VERSION).c_str(), std::strlen(argv[0]));
 	argv[0][std::strlen(argv[0])] = '\0';
 
-	std::cout << "Running application with PID " << getpid() << std::endl;
+	std::cout << "Running application with PID " << Constants::PID << std::endl;
 
 	SingleInstance::getInstance().acquire();
 
@@ -55,7 +77,7 @@ int main(int argc, char** argv) {
 		PasswordDialog::getInstance().showDialog();
 	}
 
-	Shell::getInstance(configuration.getPassword());
+	Shell::init(configuration.getPassword());
 
 	OpenRgbService::getInstance();
 	HardwareService::getInstance();

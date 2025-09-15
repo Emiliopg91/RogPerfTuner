@@ -1,28 +1,18 @@
 #pragma once
 
+#include "../../../../models/others/singleton.hpp"
 #include "../../../../models/performance/platform_profile.hpp"
 #include "../asus_base_client.hpp"
 
-class FanCurvesClient : public AsusBaseClient {
+class FanCurvesClient : public AsusBaseClient, public Singleton<FanCurvesClient> {
   public:
-	static FanCurvesClient& getInstance() {
-		static FanCurvesClient instance;
-		return instance;
-	}
+	void resetProfileCurve(PlatformProfile profile);
 
-	void resetProfileCurve(PlatformProfile profile) {
-		call("ResetPowerProfile", {static_cast<uint>(profile.toInt())});
-	}
+	void setCurveToDefaults(PlatformProfile profile);
 
-	void setCurveToDefaults(PlatformProfile profile) {
-		call("SetCurvesToDefaults", {static_cast<uint>(profile.toInt())});
-	}
-
-	void setFanCurveEnabled(PlatformProfile profile) {
-		call("SetFanCurvesEnabled", {static_cast<uint>(profile.toInt()), true});
-	}
+	void setFanCurveEnabled(PlatformProfile profile);
 
   private:
-	FanCurvesClient() : AsusBaseClient("FanCurves") {
-	}
+	FanCurvesClient();
+	friend class Singleton<FanCurvesClient>;
 };

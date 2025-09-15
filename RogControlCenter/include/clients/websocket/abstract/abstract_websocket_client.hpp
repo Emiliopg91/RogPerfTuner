@@ -13,8 +13,6 @@
 #include "../../../logger/logger.hpp"
 #include "../../../models/others/websocket_message.hpp"
 
-using json = nlohmann::json;
-
 struct WSMethodResponse {
 	WebsocketMessage data;
 	std::string error;
@@ -26,28 +24,16 @@ class AbstractWebsocketClient {
 
 	std::vector<std::any> invoke(const std::string& method, const std::vector<std::any>& args, const int& timeout_ms = 3000);
 
-	void onConnect(Callback&& callback) {
-		on_without_params("connect", std::move(callback));
-	}
+	void onConnect(Callback&& callback);
 
-	void onDisconnect(Callback&& callback) {
-		on_without_params("disconnect", std::move(callback));
-	}
+	void onDisconnect(Callback&& callback);
 
-	bool connected() {
-		return _connected;
-	}
+	bool connected();
 
   protected:
-	void on_without_params(const std::string& name, Callback&& callback) {
-		auto eventName = "ws." + _name + ".event." + name;
-		eventBus.on_without_data(eventName, callback);
-	}
+	void on_without_params(const std::string& name, Callback&& callback);
 
-	void on_with_params(const std::string& name, CallbackWithParams&& callback) {
-		auto eventName = "ws." + _name + ".event." + name;
-		eventBus.on_with_data(eventName, std::move(callback));
-	}
+	void on_with_params(const std::string& name, CallbackWithParams&& callback);
 
   private:
 	ix::WebSocket _ws;

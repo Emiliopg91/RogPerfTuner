@@ -1,32 +1,22 @@
 #pragma once
 
 #include "../logger/logger.hpp"
+#include "../models/others/singleton.hpp"
 #include "../models/settings/root_config.hpp"
 
-class Configuration {
+class Configuration : public Singleton<Configuration> {
   public:
-	static Configuration& getInstance() {
-		static Configuration instance;
-		return instance;
-	}
-
 	void saveConfig();
 	void loadConfig();
 
-	RootConfig& getConfiguration() {
-		if (!config.has_value()) {
-			config = RootConfig{};
-		}
-		return config.value();
-	}
+	RootConfig& getConfiguration();
 
 	std::string getPassword();
 	void setPassword(const std::string& pss);
 
   private:
-	Configuration() {
-		loadConfig();
-	}
+	Configuration();
 	std::optional<RootConfig> config = std::nullopt;
 	Logger logger{"Configuration"};
+	friend class Singleton<Configuration>;
 };
