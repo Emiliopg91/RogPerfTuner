@@ -16,7 +16,5 @@ class CpuPowerClient : public AbstractCmdClient {
 		return instance;
 	}
 
-	void setGovernor(const CpuGovernor& governor) {
-		run_command("frequency-set -g " + governor.toString(), true, true);
-	}
+	void setGovernor(const CpuGovernor& governor);
 };

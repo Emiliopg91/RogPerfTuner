@@ -72,3 +72,15 @@ void AbstractEffect::_set_colors(Device& dev, const std::vector<orgb::Color>& co
 		}
 	}
 }
+
+void AbstractEffect::_thread_main(const DeviceList& devices) {
+	apply_effect(devices);
+	_logger.info("Effect finished");
+}
+
+AbstractEffect::AbstractEffect(Client& client, const std::string& name) : _name(name), _client(client) {
+}
+
+const std::string AbstractEffect::getName() {
+	return _name;
+}

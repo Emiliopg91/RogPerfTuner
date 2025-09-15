@@ -9,6 +9,5 @@ class NvTempClient : public ArmouryBaseClient {
 		return instance;
 	}
 
-	NvTempClient() : ArmouryBaseClient("nv_temp_target", false) {
-	}
+	NvTempClient();
 };

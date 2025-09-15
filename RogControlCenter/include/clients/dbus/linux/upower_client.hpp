@@ -9,16 +9,10 @@ class UPowerClient : public AbstractDbusClient {
 		return instance;
 	}
 
-	bool isOnBattery() {
-		return this->getProperty<bool>(QString("OnBattery"));
-	}
+	bool isOnBattery();
 
-	void onBatteryChange(CallbackWithParams&& callback) {
-		this->onPropertyChange("OnBattery", std::move(callback));
-	}
+	void onBatteryChange(CallbackWithParams&& callback);
 
   private:
-	UPowerClient()
-		: AbstractDbusClient(true, QString("org.freedesktop.UPower"), QString("/org/freedesktop/UPower"), QString("org.freedesktop.UPower"), true) {
-	}
+	UPowerClient();
 };

@@ -9,6 +9,5 @@ class NvBoostClient : public ArmouryBaseClient {
 		return instance;
 	}
 
-	NvBoostClient() : ArmouryBaseClient("nv_dynamic_boost", false) {
-	}
+	NvBoostClient();
 };

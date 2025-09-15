@@ -124,3 +124,14 @@ void Configuration::setPassword(const std::string& pss) {
 		throw new std::runtime_error(msg);
 	}
 }
+
+RootConfig& Configuration::getConfiguration() {
+	if (!config.has_value()) {
+		config = RootConfig{};
+	}
+	return config.value();
+}
+
+Configuration::Configuration() {
+	loadConfig();
+}

@@ -13,7 +13,5 @@ class AsusCtlClient : public AbstractCmdClient {
 		return instance;
 	}
 
-	void turnOffAura() {
-		run_command("aura static -c 000000", true, false);
-	}
+	void turnOffAura();
 };

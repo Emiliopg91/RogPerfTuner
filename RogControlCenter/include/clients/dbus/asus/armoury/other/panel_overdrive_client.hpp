@@ -9,6 +9,5 @@ class PanelOverdriveClient : public ArmouryBaseClient {
 		return instance;
 	}
 
-	PanelOverdriveClient() : ArmouryBaseClient("panel_overdrive", false) {
-	}
+	PanelOverdriveClient();
 };

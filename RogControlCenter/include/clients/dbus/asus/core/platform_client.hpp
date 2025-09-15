@@ -11,55 +11,30 @@ class PlatformClient : public AsusBaseClient {
 		return instance;
 	}
 
-	BatteryThreshold getBatteryLimit() {
-		return BatteryThreshold::fromInt(this->getProperty<int>(QString("ChargeControlEndThreshold")));
-	}
+	BatteryThreshold getBatteryLimit();
 
-	void setBatteryLimit(BatteryThreshold val) {
-		this->setProperty<unsigned char>(QString("ChargeControlEndThreshold"), static_cast<unsigned char>(val.toInt()));
-	}
+	void setBatteryLimit(BatteryThreshold val);
 
-	PlatformProfile getPlatformProfile() {
-		return PlatformProfile::fromInt(this->getProperty<int>(QString("PlatformProfile")));
-	}
+	PlatformProfile getPlatformProfile();
 
-	void setPlatformProfile(PlatformProfile val) {
-		this->setProperty<unsigned int>(QString("PlatformProfile"), static_cast<unsigned int>(val.toInt()));
-	}
+	void setPlatformProfile(PlatformProfile val);
 
-	bool getEnablePptGroup() {
-		return this->getProperty<bool>(QString("EnablePptGroup"));
-	}
+	bool getEnablePptGroup();
 
-	void setEnablePptGroup(bool enable) {
-		this->setProperty<bool>(QString("EnablePptGroup"), enable);
-	}
+	void setEnablePptGroup(bool enable);
 
-	bool getPlatformProfileLinkedEpp() {
-		return this->getProperty<bool>(QString("PlatformProfileLinkedEpp"));
-	}
+	bool getPlatformProfileLinkedEpp();
 
-	void setPlatformProfileLinkedEpp(bool enable) {
-		this->setProperty<bool>(QString("PlatformProfileLinkedEpp"), enable);
-	}
+	void setPlatformProfileLinkedEpp(bool enable);
 
-	bool getChangePlatformProfileOnBattery() {
-		return this->getProperty<bool>(QString("ChangePlatformProfileOnBattery"));
-	}
+	bool getChangePlatformProfileOnBattery();
 
-	void setChangePlatformProfileOnBattery(bool enable) {
-		this->setProperty<bool>(QString("ChangePlatformProfileOnBattery"), enable);
-	}
+	void setChangePlatformProfileOnBattery(bool enable);
 
-	bool getChangePlatformProfileOnAc() {
-		return this->getProperty<bool>(QString("ChangePlatformProfileOnAc"));
-	}
+	bool getChangePlatformProfileOnAc();
 
-	void setChangePlatformProfileOnAc(bool enable) {
-		this->setProperty<bool>(QString("ChangePlatformProfileOnAc"), enable);
-	}
+	void setChangePlatformProfileOnAc(bool enable);
 
   private:
-	PlatformClient() : AsusBaseClient("Platform") {
-	}
+	PlatformClient();
 };

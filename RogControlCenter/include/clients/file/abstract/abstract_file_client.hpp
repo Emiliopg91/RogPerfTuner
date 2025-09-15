@@ -1,6 +1,5 @@
 #pragma once
 
-#include <stdexcept>
 #include <string>
 
 #include "../../../logger/logger.hpp"
@@ -8,52 +7,14 @@
 
 class AbstractFileClient {
   public:
-	std::string read(const int& head = 0, const int& tail = 0) {
-		if (!available_) {
-			throw std::runtime_error(fmt::format("File {} doesn't exist", path_));
-		}
+	std::string read(const int& head = 0, const int& tail = 0);
 
-		std::string cmd = "cat " + path_;
-		if (head > 0) {
-			cmd += " | head -n" + std::to_string(head);
-		}
-		if (tail > 0) {
-			cmd += " | tail -n" + std::to_string(tail);
-		}
+	void write(const std::string& content);
 
-		if (sudo_) {
-			return shell.run_elevated_command(cmd).stdout_str;
-		} else {
-			return shell.run_command(cmd).stdout_str;
-		}
-	}
-
-	void write(const std::string& content) {
-		std::string cmd = "echo '" + content + "' | tee " + path_;
-		if (sudo_) {
-			shell.run_elevated_command(cmd);
-		} else {
-			shell.run_command(cmd);
-		}
-	}
-
-	bool available() {
-		return available_;
-	}
+	bool available();
 
   protected:
-	AbstractFileClient(const std::string& path, const std::string& name, const bool& sudo = false, const bool& required = true)
-		: path_(path), sudo_(sudo) {
-		logger_	   = Logger{name};
-		available_ = shell.run_command("ls " + path).exit_code == 0;
-		if (!available_) {
-			if (required) {
-				throw std::runtime_error(fmt::format("File {} doesn't exist", path_));
-			}
-
-			logger_.error("File {} doesn't exist", path_);
-		}
-	}
+	AbstractFileClient(const std::string& path, const std::string& name, const bool& sudo = false, const bool& required = true);
 
   private:
 	std::string path_;

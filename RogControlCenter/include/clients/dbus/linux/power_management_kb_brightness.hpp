@@ -9,22 +9,12 @@ class PMKeyboardBrightness : public AbstractDbusClient {
 		return instance;
 	}
 
-	int getKeyboardBrightness() {
-		return call<int>("keyboardBrightness");
-	}
+	int getKeyboardBrightness();
 
-	void setKeyboardBrightnessSilent(const int& brightness) {
-		call("setKeyboardBrightnessSilent", {brightness});
-	}
+	void setKeyboardBrightnessSilent(const int& brightness);
 
-	template <typename Callback>
-	void onBrightnessChange(const Callback&& callback) {
-		this->onSignal("keyboardBrightnessChanged", callback);
-	}
+	void onBrightnessChange(Callback&& callback);
 
   private:
-	PMKeyboardBrightness()
-		: AbstractDbusClient(false, "org.kde.Solid.PowerManagement", "/org/kde/Solid/PowerManagement/Actions/KeyboardBrightnessControl",
-							 "org.kde.Solid.PowerManagement.Actions.KeyboardBrightnessControl", false) {
-	}
+	PMKeyboardBrightness();
 };

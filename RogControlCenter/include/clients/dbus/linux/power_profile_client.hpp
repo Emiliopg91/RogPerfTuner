@@ -10,17 +10,10 @@ class PowerProfileClient : public AbstractDbusClient {
 		return instance;
 	}
 
-	const PowerProfile getPowerProfile() {
-		return PowerProfile::fromString(this->getProperty<QString>(QString("ActiveProfile")).toStdString());
-	}
+	const PowerProfile getPowerProfile();
 
-	void setPowerProfile(const PowerProfile& val) {
-		this->setProperty<QString>(QString("ActiveProfile"), QString::fromStdString(val.toString()));
-	}
+	void setPowerProfile(const PowerProfile& val);
 
   private:
-	PowerProfileClient()
-		: AbstractDbusClient(true, QString("net.hadess.PowerProfiles"), QString("/net/hadess/PowerProfiles"), QString("net.hadess.PowerProfiles"),
-							 true) {
-	}
+	PowerProfileClient();
 };

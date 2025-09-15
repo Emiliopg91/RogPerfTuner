@@ -91,85 +91,12 @@ class AbstractDbusClient : public QObject {
 		throw std::runtime_error(("DBus Get returned no value for property: " + prop.toStdString()));
 	}
 
-	void onPropertyChange(const std::string& propName, CallbackWithParams&& callback) {
-		eventBus.on_with_data("dbus." + interfaceName_.toStdString() + ".property." + propName, std::forward<CallbackWithParams>(callback));
-	}
+	void onSignal(const QString& signalName, Callback&& callback);
 
-	template <typename Callback>
-	void onSignal(const QString& signalName, Callback&& callback) {
-		bool ok = bus_.connect(serviceName_, objectPath_, interfaceName_, signalName, this, SLOT(onDbusSignal(QDBusMessage)));
-
-		if (!ok) {
-			throw std::runtime_error("Couldn't connect to signal: " + signalName.toStdString());
-		}
-
-		// Registra el callback en EventBus
-		eventBus.on_without_data("dbus." + interfaceName_.toStdString() + ".signal." + signalName.toStdString(), std::forward<Callback>(callback));
-	}
+	void onPropertyChange(const std::string& propName, CallbackWithParams&& callback);
 
   private slots:
-	void onPropertiesChanged(const QString& iface, const QVariantMap& changedProps, const QStringList& invalidatedProps) {
-		if (iface != interfaceName_) {
-			return;
-		}
+	void onPropertiesChanged(const QString& iface, const QVariantMap& changedProps, const QStringList& invalidatedProps);
 
-		Q_UNUSED(invalidatedProps)
-
-		for (auto it = changedProps.constBegin(); it != changedProps.constEnd(); ++it) {
-			const QString& propName	 = it.key();
-			const QVariant& newValue = it.value();
-
-			std::string eventName = "dbus." + interfaceName_.toStdString() + ".property." + propName.toStdString();
-			auto type			  = newValue.metaType().id();
-
-			if (type == QMetaType::Int) {
-				int val = newValue.toInt();
-				eventBus.emit_event(eventName, {val});
-			} else if (type == QMetaType::UInt) {
-				uint val = newValue.toUInt();
-				eventBus.emit_event(eventName, {val});
-			} else if (type == QMetaType::LongLong) {
-				qint64 val = newValue.toLongLong();
-				eventBus.emit_event(eventName, {val});
-			} else if (type == QMetaType::ULongLong) {
-				quint64 val = newValue.toULongLong();
-				eventBus.emit_event(eventName, {val});
-			} else if (type == QMetaType::Double) {
-				double val = newValue.toDouble();
-				eventBus.emit_event(eventName, {val});
-			} else if (type == QMetaType::Bool) {
-				bool val = newValue.toBool();
-				eventBus.emit_event(eventName, {val});
-			} else if (type == QMetaType::QChar) {
-				QChar val = newValue.toChar();
-				eventBus.emit_event(eventName, {val});
-			} else if (type == QMetaType::QString) {
-				QString val = newValue.toString();
-				eventBus.emit_event(eventName, {val});
-			} else if (type == QMetaType::QStringList) {
-				QStringList val = newValue.toStringList();
-				eventBus.emit_event(eventName, {val});
-			} else if (type == QMetaType::QVariantList) {
-				QVariantList val = newValue.toList();
-				eventBus.emit_event(eventName, {val});
-			} else if (type == QMetaType::QVariantMap) {
-				QVariantMap val = newValue.toMap();
-				eventBus.emit_event(eventName, {val});
-			} else if (type == QMetaType::QVariantHash) {
-				QVariantHash val = newValue.toHash();
-				eventBus.emit_event(eventName, {val});
-			} else {
-				QString val = newValue.toString();
-				eventBus.emit_event(eventName, {val});
-			}
-		}
-	}
-
-	void onDbusSignal(const QDBusMessage& msg) {
-		// Nombre de la signal
-		std::string signalName = msg.member().toStdString();
-
-		// Para cualquier otra signal, solo reemitimos el nombre
-		eventBus.emit_event("dbus." + interfaceName_.toStdString() + ".signal." + signalName);
-	}
+	void onDbusSignal(const QDBusMessage& msg);
 };

@@ -10,19 +10,12 @@ class FanCurvesClient : public AsusBaseClient {
 		return instance;
 	}
 
-	void resetProfileCurve(PlatformProfile profile) {
-		call("ResetPowerProfile", {static_cast<uint>(profile.toInt())});
-	}
+	void resetProfileCurve(PlatformProfile profile);
 
-	void setCurveToDefaults(PlatformProfile profile) {
-		call("SetCurvesToDefaults", {static_cast<uint>(profile.toInt())});
-	}
+	void setCurveToDefaults(PlatformProfile profile);
 
-	void setFanCurveEnabled(PlatformProfile profile) {
-		call("SetFanCurvesEnabled", {static_cast<uint>(profile.toInt()), true});
-	}
+	void setFanCurveEnabled(PlatformProfile profile);
 
   private:
-	FanCurvesClient() : AsusBaseClient("FanCurves") {
-	}
+	FanCurvesClient();
 };

@@ -114,3 +114,25 @@ std::vector<std::any> AbstractWebsocketClient::invoke(const std::string& method,
 
 	return resp.data.data;
 }
+
+void AbstractWebsocketClient::onConnect(Callback&& callback) {
+	on_without_params("connect", std::move(callback));
+}
+
+void AbstractWebsocketClient::onDisconnect(Callback&& callback) {
+	on_without_params("disconnect", std::move(callback));
+}
+
+bool AbstractWebsocketClient::connected() {
+	return _connected;
+}
+
+void AbstractWebsocketClient::on_without_params(const std::string& name, Callback&& callback) {
+	auto eventName = "ws." + _name + ".event." + name;
+	eventBus.on_without_data(eventName, callback);
+}
+
+void AbstractWebsocketClient::on_with_params(const std::string& name, CallbackWithParams&& callback) {
+	auto eventName = "ws." + _name + ".event." + name;
+	eventBus.on_with_data(eventName, std::move(callback));
+}

@@ -31,15 +31,11 @@ class BoostControlClient : public AbstractFileClient {
 		return instance;
 	}
 
-	void set_boost(bool& enabled) {
-		write(enabled ? on : off);
-	}
+	void set_boost(bool& enabled);
 
   private:
 	std::string on;
 	std::string off;
 
-	BoostControlClient(const std::string& path, const std::string& on, const std::string& off)
-		: AbstractFileClient(path, "BoostControlClient", true), on(on), off(off) {
-	}
+	BoostControlClient(const std::string& path, const std::string& on, const std::string& off);
 };

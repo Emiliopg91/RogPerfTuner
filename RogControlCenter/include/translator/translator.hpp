@@ -17,24 +17,10 @@ class Translator {
   private:
 	Translator();
 	Logger logger{"Translator"};
-	Language currentLang = []() -> Language {
-		const char* lang = std::getenv("LC_MESSAGES");
-		if (!lang || std::string(lang).empty()) {
-			lang = std::getenv("LANG");
-		}
-		if (!lang || std::string(lang).empty()) {
-			return FALLBACK_LANG;
-		}
-		std::string langStr(lang);
-
-		auto pos = langStr.find('_');
-		if (pos != std::string::npos) {
-			langStr = langStr.substr(0, pos);
-		}
-		return Language::fromString(langStr);
-	}();
+	Language currentLang = Language::Enum::EN;
 
 	inline static Language FALLBACK_LANG = Language::Enum::EN;
+
 	// Begin translations
 	inline static const constexpr std::array<TranslationEntry, 76> initialTranslations = {{
 		{

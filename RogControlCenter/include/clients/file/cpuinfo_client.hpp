@@ -10,6 +10,5 @@ class CPUInfoClient : public AbstractFileClient {
 	}
 
   private:
-	CPUInfoClient() : AbstractFileClient("/proc/cpuinfo", "CPUInfoClient") {
-	}
+	CPUInfoClient();
 };

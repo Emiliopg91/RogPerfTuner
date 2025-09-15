@@ -15,7 +15,5 @@ class Md5SumClient : public AbstractCmdClient {
 		return instance;
 	}
 
-	std::string getChecksum(const std::string& file) {
-		return StringUtils::split(run_command(file, true).stdout_str, ' ')[0];
-	}
+	std::string getChecksum(const std::string& file);
 };

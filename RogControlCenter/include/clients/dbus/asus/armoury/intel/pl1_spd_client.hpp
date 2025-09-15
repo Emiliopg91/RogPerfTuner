@@ -9,6 +9,5 @@ class Pl1SpdClient : public ArmouryBaseClient {
 		return instance;
 	}
 
-	Pl1SpdClient() : ArmouryBaseClient("ppt_pl1_spl", false) {
-	}
+	Pl1SpdClient();
 };

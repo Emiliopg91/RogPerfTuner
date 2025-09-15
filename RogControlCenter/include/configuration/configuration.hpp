@@ -13,20 +13,13 @@ class Configuration {
 	void saveConfig();
 	void loadConfig();
 
-	RootConfig& getConfiguration() {
-		if (!config.has_value()) {
-			config = RootConfig{};
-		}
-		return config.value();
-	}
+	RootConfig& getConfiguration();
 
 	std::string getPassword();
 	void setPassword(const std::string& pss);
 
   private:
-	Configuration() {
-		loadConfig();
-	}
+	Configuration();
 	std::optional<RootConfig> config = std::nullopt;
 	Logger logger{"Configuration"};
 };
