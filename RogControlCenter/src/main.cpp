@@ -2,6 +2,7 @@
 
 #include <QApplication>
 
+#include "..//include/logger/logger_provider.hpp"
 #include "../include/configuration/configuration.hpp"
 #include "../include/gui/password_dialog.hpp"
 #include "../include/gui/toaster.hpp"
@@ -15,6 +16,7 @@
 #include "../include/translator/translator.hpp"
 #include "../include/utils/constants.hpp"
 #include "../include/utils/single_instance.hpp"
+#include "../include/utils/string_utils.hpp"
 
 void terminateHandler() {
 	std::cerr << "Unhandled exception detected\n";

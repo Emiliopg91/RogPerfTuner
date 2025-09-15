@@ -8,6 +8,8 @@
 #include <algorithm>
 #include <cstring>
 
+#include "../../include/utils/string_utils.hpp"
+
 namespace {
 void set_nonblocking(int fd) {
 	int flags = fcntl(fd, F_GETFL, 0);

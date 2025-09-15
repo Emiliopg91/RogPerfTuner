@@ -14,10 +14,12 @@
 #include <vector>
 
 #include "../../../include/logger/logger.hpp"
+#include "../../../include/logger/logger_provider.hpp"
 #include "../../../include/models/steam/steam_game_config.hpp"
 #include "../../../include/shell/shell.hpp"
 #include "../../../include/utils/constants.hpp"
 #include "../../../include/utils/file_utils.hpp"
+#include "../../../include/utils/string_utils.hpp"
 #include "httplib.h"
 #include "nlohmann/json.hpp"
 

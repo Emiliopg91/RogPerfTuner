@@ -16,6 +16,7 @@
 #include "../../include/services/hardware_service.hpp"
 #include "../../include/services/open_rgb_service.hpp"
 #include "../../include/services/profile_service.hpp"
+#include "../../include/utils/string_utils.hpp"
 
 bool SteamService::metricsEnabled() {
 	auto mangohud_which = shell.which("mangohud");

@@ -11,6 +11,8 @@
 #include <QVBoxLayout>
 #include <optional>
 
+#include "../../include/utils/string_utils.hpp"
+
 GameConfigDialog::GameConfigDialog(unsigned int gid, bool runAfterSave, QWidget* parent) : QDialog(parent), gid(gid), runAfterSave(runAfterSave) {
 	Logger::add_tab();
 	setWindowTitle(QString::fromStdString(translator.translate("config.for.game", {{"game", ""}})));

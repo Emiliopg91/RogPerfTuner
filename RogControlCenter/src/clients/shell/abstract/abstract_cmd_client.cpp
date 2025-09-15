@@ -3,6 +3,8 @@
 #include <cstdlib>
 #include <stdexcept>
 
+#include "../../../../include/utils/string_utils.hpp"
+
 AbstractCmdClient::AbstractCmdClient(const std::string& command, const std::string& name, const bool& required)
 	: command_(command), available_(true) {
 	logger_ = Logger{name};

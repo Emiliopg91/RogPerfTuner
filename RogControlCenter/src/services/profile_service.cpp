@@ -7,8 +7,8 @@
 #include "../../include/models/performance/cpu_governor.hpp"
 #include "../../include/models/performance/power_profile.hpp"
 #include "../../include/models/performance/ssd_scheduler.hpp"
-#include "../../include/translator/translator.hpp"
 #include "../../include/utils/profile_utils.hpp"
+#include "../../include/utils/string_utils.hpp"
 
 ProfileService::ProfileService() {
 	logger.info("Initializing ProfileService");

@@ -4,6 +4,7 @@
 #include <thread>
 
 #include "../../../../../../include/models/hardware/rgb_brightness.hpp"
+#include "../../../../../../include/utils/string_utils.hpp"
 
 double AbstractEffect::brightnessMap(const RgbBrightness& b) {
 	if (b == RgbBrightness::Enum::LOW) {

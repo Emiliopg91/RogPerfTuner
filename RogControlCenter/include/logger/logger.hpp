@@ -8,8 +8,7 @@
  */
 #pragma once
 
-#include "../utils/string_utils.hpp"
-#include "logger_provider.hpp"
+#include <spdlog/spdlog.h>
 
 template <typename... Args>
 using format_string_t = fmt::format_string<Args...>;

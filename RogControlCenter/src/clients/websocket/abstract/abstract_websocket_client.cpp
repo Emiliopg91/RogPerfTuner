@@ -12,6 +12,7 @@
 
 #include "../../../../include/events/event_bus.hpp"
 #include "../../../../include/models/others/websocket_message.hpp"
+#include "../../../../include/utils/string_utils.hpp"
 
 using json = nlohmann::json;
 

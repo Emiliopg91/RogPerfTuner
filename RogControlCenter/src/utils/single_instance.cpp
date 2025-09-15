@@ -6,6 +6,7 @@
 #include <iostream>
 
 #include "../../include/utils/constants.hpp"
+#include "../../include/utils/string_utils.hpp"
 
 void SingleInstance::acquire() {
 	namespace fs = std::filesystem;

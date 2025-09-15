@@ -1,7 +1,8 @@
 #include "../../include/logger/logger_provider.hpp"
 
+#include <spdlog/async.h>
+#include <spdlog/async_logger.h>
 #include <spdlog/fmt/ostr.h>
-#include <spdlog/logger.h>
 
 #include <filesystem>
 
@@ -70,6 +71,7 @@ static void rotate_log(const std::string& fileName, const std::filesystem::path&
 }
 
 std::unordered_map<std::string, std::string> LoggerProvider::configMap{};
+
 void LoggerProvider::initialize(std::string fileName, std::string path) {
 	console_sink = std::make_shared<spdlog::sinks::stdout_color_sink_mt>();
 	console_sink->set_pattern("%^[%Y-%m-%d %H:%M:%S.%e] [%-7l] [%n] %v%$");
@@ -86,12 +88,18 @@ void LoggerProvider::initialize(std::string fileName, std::string path) {
 		rotate_log(fileName, dirPath, dirPath2);
 
 		file_sink = std::make_shared<spdlog::sinks::basic_file_sink_mt>(path + "/" + fileName + ".log", true);
-
 		file_sink.value()->set_pattern("[%Y-%m-%d %H:%M:%S.%e] [%-7l] [%n] %v");
+
 		sinkList = spdlog::sinks_init_list{console_sink, file_sink.value()};
 	}
 
-	auto main_logger = std::make_shared<spdlog::logger>("Default", sinkList);
+	// inicializa la cola asíncrona (tamaño 8192, 1 thread de background)
+	spdlog::init_thread_pool(8192, 1);
+
+	// crea logger asíncrono
+	auto main_logger = std::make_shared<spdlog::async_logger>("Default", sinkList.begin(), sinkList.end(), spdlog::thread_pool(),
+															  spdlog::async_overflow_policy::block	// o .overrun_oldest
+	);
 
 	defaultLevel = spdlog::level::info;
 	if (getenv("RCC_LOG_LEVEL")) {
@@ -122,7 +130,8 @@ std::shared_ptr<spdlog::logger> LoggerProvider::getLogger(const std::string& nam
 	if (file_sink.has_value()) {
 		sinkList = spdlog::sinks_init_list{console_sink, file_sink.value()};
 	}
-	auto logger = std::make_shared<spdlog::logger>(display_name, sinkList);
+	auto logger = std::make_shared<spdlog::async_logger>(display_name, sinkList.begin(), sinkList.end(), spdlog::thread_pool(),
+														 spdlog::async_overflow_policy::block);
 
 	auto level = defaultLevel;
 	auto it2   = LoggerProvider::configMap.find(name);
