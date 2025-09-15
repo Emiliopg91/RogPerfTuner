@@ -9,17 +9,8 @@ class StaticEffect : public AbstractEffect {
 		return instance;
 	}
 
-	void apply_effect(const DeviceList& devices) {
-		for (auto& dev : devices) {
-			std::vector<Color> colors(dev.leds.size(), Color::Red);
-			_set_colors(dev, colors);
-		}
-		while (_is_running) {
-			_sleep(1.0);
-		}
-	}
+	void apply_effect(const DeviceList& devices);
 
   private:
-	StaticEffect(Client& client) : AbstractEffect(client, "Static") {
-	}
+	StaticEffect(Client& client);
 };

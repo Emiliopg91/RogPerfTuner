@@ -5,7 +5,6 @@
 
 #include "../../../../../logger/logger.hpp"
 #include "../../../../../models/hardware/rgb_brightness.hpp"
-#include "../../../../../shell/shell.hpp"
 #include "OpenRGB/Client.hpp"
 
 using orgb::Client;
