@@ -83,3 +83,5 @@ const std::string Constants::URL_NEXT_EFF	= "/rgb/effect/next";
 
 const int Constants::HTTP_PORT = 18157;
 const int Constants::WS_PORT   = HTTP_PORT + 1;
+
+const std::string Constants::RCCDC_REQUIRED_PIP = "websockets dataclasses-json asyncio";

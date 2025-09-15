@@ -3,10 +3,12 @@
 #include <random>
 #include <vector>
 
+#include "../../../../models/others/singleton.hpp"
 #include "abstract/abstract_effect.hpp"
 
-class DanceFloorEffect : public AbstractEffect {
+class DanceFloorEffect : public AbstractEffect, public Singleton<DanceFloorEffect> {
   private:
+	friend class Singleton<DanceFloorEffect>;
 	std::mt19937 _rng;
 
 	Color _get_random_color();
@@ -14,10 +16,6 @@ class DanceFloorEffect : public AbstractEffect {
 	std::vector<Color> _get_random_colors(size_t length);
 
   public:
-	static DanceFloorEffect& getInstance(Client& client) {
-		static DanceFloorEffect instance{client};
-		return instance;
-	}
 	DanceFloorEffect(Client& client);
 
   protected:

@@ -3,18 +3,15 @@
 #include <any>
 
 #include "../logger/logger.hpp"
+#include "../models/others/singleton.hpp"
 #include "../models/translator/translation_entry.hpp"
 
-class Translator {
+class Translator : public Singleton<Translator> {
   public:
-	static Translator& getInstance() {
-		static Translator instance;
-		return instance;
-	}
-
 	std::string translate(const std::string& msg, const std::unordered_map<std::string, std::any>& replacement = {});
 
   private:
+	friend class Singleton<Translator>;
 	Translator();
 	Logger logger{"Translator"};
 	Language currentLang = Language::Enum::EN;

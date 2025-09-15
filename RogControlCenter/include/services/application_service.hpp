@@ -6,19 +6,15 @@
 #include "../services/steam_service.hpp"
 #include "../translator/translator.hpp"
 
-class ApplicationService {
+class ApplicationService : public Singleton<ApplicationService> {
   public:
-	static ApplicationService& getInstance() {
-		static ApplicationService instance;
-		return instance;
-	}
-
 	void applyUpdate();
 	void shutdown();
 	bool isAutostartEnabled();
 	void setAutostart(bool enabled);
 
   private:
+	friend class Singleton<ApplicationService>;
 	Logger logger{"ApplicationService"};
 	bool rccdcEnabled = false;
 	bool shuttingDown = false;

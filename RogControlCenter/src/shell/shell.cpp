@@ -142,10 +142,22 @@ CommandResult Shell::send_command(BashSession& session, const std::string& cmd, 
 }
 
 Shell::Shell(const std::string& sudo_password) : logger(Logger("Shell")) {
+	logger.info("Initializing shells");
+	Logger::add_tab();
+
+	logger.info("Initializing standard");
+	Logger::add_tab();
 	normal_bash = start_bash({"bash"});
+	Logger::rem_tab();
+
 	if (!sudo_password.empty()) {
+		logger.info("Initializing admin");
+		Logger::add_tab();
 		elevated_bash = start_bash({"sudo", "-kS", "bash"}, sudo_password + "\n");
+		Logger::rem_tab();
 	}
+
+	Logger::rem_tab();
 }
 
 Shell::~Shell() {

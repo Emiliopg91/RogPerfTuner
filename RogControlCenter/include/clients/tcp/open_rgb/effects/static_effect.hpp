@@ -1,16 +1,13 @@
 #pragma once
 
+#include "../../../../models/others/singleton.hpp"
 #include "abstract/abstract_effect.hpp"
 
-class StaticEffect : public AbstractEffect {
+class StaticEffect : public AbstractEffect, public Singleton<StaticEffect> {
   public:
-	static StaticEffect& getInstance(Client& client) {
-		static StaticEffect instance{client};
-		return instance;
-	}
-
 	void apply_effect(const DeviceList& devices);
 
   private:
+	friend class Singleton<StaticEffect>;
 	StaticEffect(Client& client);
 };

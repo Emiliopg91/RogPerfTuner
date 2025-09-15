@@ -1,15 +1,11 @@
 #pragma once
 
 #include "../logger/logger.hpp"
+#include "../models/others/singleton.hpp"
 #include "../models/settings/root_config.hpp"
 
-class Configuration {
+class Configuration : public Singleton<Configuration> {
   public:
-	static Configuration& getInstance() {
-		static Configuration instance;
-		return instance;
-	}
-
 	void saveConfig();
 	void loadConfig();
 
@@ -22,4 +18,5 @@ class Configuration {
 	Configuration();
 	std::optional<RootConfig> config = std::nullopt;
 	Logger logger{"Configuration"};
+	friend class Singleton<Configuration>;
 };

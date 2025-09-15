@@ -24,13 +24,8 @@
 #include "../services/open_rgb_service.hpp"
 #include "../translator/translator.hpp"
 
-class HardwareService {
+class HardwareService : public Singleton<HardwareService> {
   public:
-	static HardwareService& getInstance() {
-		static HardwareService instance;
-		return instance;
-	}
-
 	BatteryThreshold getChargeThreshold();
 	void setChargeThreshold(const BatteryThreshold& threshold);
 	void setPanelOverdrive(const bool&);
@@ -42,6 +37,7 @@ class HardwareService {
 	}
 
   private:
+	friend class Singleton<HardwareService>;
 	HardwareService();
 
 	inline static int8_t CPU_PRIORITY = -17;

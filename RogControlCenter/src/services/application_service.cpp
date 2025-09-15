@@ -32,7 +32,7 @@ ApplicationService::ApplicationService() {
 		logger.debug("Menu entry file '{}' written successfully", Constants::APP_DRAW_FILE);
 	}
 
-	AutoUpdater::getInstance(
+	AutoUpdater::init(
 		[this]() {
 			applyUpdate();
 		},

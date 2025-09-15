@@ -73,4 +73,6 @@ class Constants {
 
 	static const int HTTP_PORT;
 	static const int WS_PORT;
+
+	static const std::string RCCDC_REQUIRED_PIP;
 };

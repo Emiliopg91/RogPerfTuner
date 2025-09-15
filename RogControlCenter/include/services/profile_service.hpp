@@ -19,13 +19,8 @@
 #include "../models/performance/performance_profile.hpp"
 #include "../translator/translator.hpp"
 
-class ProfileService {
+class ProfileService : public Singleton<ProfileService> {
   public:
-	static ProfileService& getInstance() {
-		static ProfileService instance;
-		return instance;
-	}
-
 	PerformanceProfile getPerformanceProfile();
 	void setPerformanceProfile(const PerformanceProfile& profile, const bool& temporal = false, const bool& force = false);
 	void restoreProfile();
@@ -33,6 +28,7 @@ class ProfileService {
 	PerformanceProfile nextPerformanceProfile();
 
   private:
+	friend class Singleton<ProfileService>;
 	ProfileService();
 
 	Logger logger{"ProfileService"};

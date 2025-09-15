@@ -1,18 +1,15 @@
 #pragma once
 
+#include "../../../models/others/singleton.hpp"
 #include "../abstract/abstract_dbus_client.hpp"
 
-class UPowerClient : public AbstractDbusClient {
+class UPowerClient : public AbstractDbusClient, public Singleton<UPowerClient> {
   public:
-	static UPowerClient& getInstance() {
-		static UPowerClient instance;
-		return instance;
-	}
-
 	bool isOnBattery();
 
 	void onBatteryChange(CallbackWithParams&& callback);
 
   private:
+	friend class Singleton<UPowerClient>;
 	UPowerClient();
 };

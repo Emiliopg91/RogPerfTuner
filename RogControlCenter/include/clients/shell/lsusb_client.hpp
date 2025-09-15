@@ -10,8 +10,9 @@
 
 #include "../../events/event_bus.hpp"
 #include "../../models/hardware/usb_identifier.hpp"
+#include "../../models/others/singleton.hpp"
 
-class LsUsbClient {
+class LsUsbClient : public Singleton<LsUsbClient> {
   private:
 	struct udev* udev;
 	struct udev_monitor* mon;
@@ -21,13 +22,9 @@ class LsUsbClient {
 	EventBus& eventBus = EventBus::getInstance();
 
 	LsUsbClient();
+	friend class Singleton<LsUsbClient>;
 
   public:
-	static LsUsbClient& getInstance() {
-		static LsUsbClient instance;
-		return instance;
-	}
-
 	~LsUsbClient();
 
 	const std::vector<UsbIdentifier> get_usb_dev(const std::function<bool(const UsbIdentifier&)>& dev_filter = nullptr);

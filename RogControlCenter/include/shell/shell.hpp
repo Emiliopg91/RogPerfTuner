@@ -16,20 +16,10 @@
 
 #include "../logger/logger.hpp"
 #include "../models/others/command_result.hpp"
+#include "../models/others/singleton.hpp"
 
-class Shell {
+class Shell : public Singleton<Shell> {
   public:
-	/**
-	 * @brief Get the Instance object
-	 *
-	 * @param sudo_password
-	 * @return Shell&
-	 */
-	static Shell& getInstance(const std::string& sudo_password = "") {
-		static Shell instance(sudo_password);
-		return instance;
-	}
-
 	~Shell();
 
 	/**
@@ -93,7 +83,8 @@ class Shell {
 	std::vector<std::string> whichAll(std::string cmd);
 
   private:
-	Shell(const std::string& sudo_password);
+	friend class Singleton<Shell>;
+	Shell(const std::string& sudo_password = "");
 
 	struct BashSession {
 		int stdin_fd;

@@ -10,7 +10,7 @@
 #include "../../services/steam_service.hpp"
 #include "httplib.h"
 
-class HttpServer {
+class HttpServer : public Singleton<HttpServer> {
   private:
 	httplib::Server svr;
 	std::thread runner;
@@ -24,13 +24,9 @@ class HttpServer {
 	SteamService& steamService		 = SteamService::getInstance();
 
 	HttpServer();
+	friend class Singleton<HttpServer>;
 
   public:
-	static HttpServer& getInstance() {
-		static HttpServer instance;
-		return instance;
-	}
-
 	~HttpServer();
 
 	void stop();

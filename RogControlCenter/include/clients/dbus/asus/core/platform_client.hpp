@@ -1,16 +1,12 @@
 #pragma once
 
 #include "../../../../models/hardware/battery_charge_threshold.hpp"
+#include "../../../../models/others/singleton.hpp"
 #include "../../../../models/performance/platform_profile.hpp"
 #include "../asus_base_client.hpp"
 
-class PlatformClient : public AsusBaseClient {
+class PlatformClient : public AsusBaseClient, public Singleton<PlatformClient> {
   public:
-	static PlatformClient& getInstance() {
-		static PlatformClient instance;
-		return instance;
-	}
-
 	BatteryThreshold getBatteryLimit();
 
 	void setBatteryLimit(BatteryThreshold val);
@@ -36,5 +32,6 @@ class PlatformClient : public AsusBaseClient {
 	void setChangePlatformProfileOnAc(bool enable);
 
   private:
+	friend class Singleton<PlatformClient>;
 	PlatformClient();
 };

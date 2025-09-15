@@ -1,17 +1,14 @@
 #pragma once
 
+#include "../../../../models/others/singleton.hpp"
 #include "abstract/abstract_effect.hpp"
 
-class BreathingEffect : public AbstractEffect {
+class BreathingEffect : public AbstractEffect, public Singleton<BreathingEffect> {
   public:
-	static BreathingEffect& getInstance(Client& client) {
-		static BreathingEffect instance{client};
-		return instance;
-	}
-
 	void apply_effect(const DeviceList& devices);
 
   private:
+	friend class Singleton<BreathingEffect>;
 	BreathingEffect(Client& client);
 
 	double _total_time;

@@ -4,18 +4,15 @@
 #include <vector>
 
 #include "../../models/hardware/gpu_info.hpp"
+#include "../../models/others/singleton.hpp"
 #include "abstract/abstract_cmd_client.hpp"
 
-class SwitcherooCtlClient : AbstractCmdClient {
+class SwitcherooCtlClient : AbstractCmdClient, public Singleton<SwitcherooCtlClient> {
   private:
 	SwitcherooCtlClient() : AbstractCmdClient("switcherooctl", "SwitcherooCtlClient") {
 	}
+	friend class Singleton<SwitcherooCtlClient>;
 
   public:
-	static SwitcherooCtlClient& getInstance() {
-		static SwitcherooCtlClient instance;
-		return instance;
-	}
-
 	const std::vector<GPUInfo> getGpus();
 };

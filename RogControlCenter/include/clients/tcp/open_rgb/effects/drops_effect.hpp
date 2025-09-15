@@ -4,18 +4,15 @@
 #include <vector>
 
 #include "../../../../models/others/led_task.hpp"
+#include "../../../../models/others/singleton.hpp"
 #include "abstract/abstract_effect.hpp"
 
-class DropsEffect : public AbstractEffect {
+class DropsEffect : public AbstractEffect, public Singleton<DropsEffect> {
   public:
-	static DropsEffect& getInstance(Client& client) {
-		static DropsEffect instance(client);
-		return instance;
-	}
-
 	void apply_effect(const DeviceList& devices);
 
   private:
+	friend class Singleton<DropsEffect>;
 	DropsEffect(Client& client);
 
 	void _effect_thread(size_t dev_index, Device& dev);

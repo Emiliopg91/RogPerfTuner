@@ -189,11 +189,17 @@ void SteamService::installRccDC() {
 		if (FileUtils::exists(Constants::DECKY_SERVICE_PATH)) {
 			if (!FileUtils::exists(Constants::RCCDC_PATH)) {
 				logger.info("Installing plugin for first time");
+				Logger::add_tab();
+				installPipDeps();
 				copyPlugin();
+				Logger::rem_tab();
 			} else {
 				if (checkIfRequiredInstallation()) {
 					logger.info("Updating Decky plugin");
+					Logger::add_tab();
+					installPipDeps();
 					copyPlugin();
+					Logger::rem_tab();
 				} else {
 					logger.info("Plugin up to date");
 				}
@@ -209,6 +215,8 @@ void SteamService::installRccDC() {
 }
 
 void SteamService::copyPlugin() {
+	logger.info("Copying plugin");
+	Logger::add_tab();
 	installer = std::thread([this]() {
 		FileUtils::copy(Constants::RCCDC_ASSET_PATH, Constants::USER_PLUGIN_DIR);
 
@@ -221,6 +229,14 @@ void SteamService::copyPlugin() {
 			shell.run_elevated_command(cmd);
 		}
 	});
+	Logger::rem_tab();
+}
+
+void SteamService::installPipDeps() {
+	logger.info("Installing PIP dependencies {}", Constants::RCCDC_REQUIRED_PIP);
+	Logger::add_tab();
+	pipClient.installPackage(Constants::RCCDC_REQUIRED_PIP);
+	Logger::rem_tab();
 }
 
 void SteamService::onGameLaunch(unsigned int gid, std::string name, int pid) {

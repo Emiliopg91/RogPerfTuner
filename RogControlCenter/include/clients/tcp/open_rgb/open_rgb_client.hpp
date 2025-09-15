@@ -8,13 +8,8 @@
 #include "compatible_devices.hpp"
 #include "effects/abstract/abstract_effect.hpp"
 
-class OpenRgbClient {
+class OpenRgbClient : public Singleton<OpenRgbClient> {
   public:
-	static OpenRgbClient& getInstance() {
-		static OpenRgbClient instance;
-		return instance;
-	}
-
 	const CompatibleDeviceArray getCompatibleDevices();
 	const std::vector<std::string> getAvailableEffects();
 	void applyEffect(const std::string& effect, const RgbBrightness& brightness);
@@ -24,6 +19,7 @@ class OpenRgbClient {
 	void disableDevice(const std::string&);
 
   private:
+	friend class Singleton<OpenRgbClient>;
 	std::unordered_map<std::string, std::string> compatibleDeviceNames;
 	std::thread runnerThread;
 	Logger logger{"OpenRgbClient"};

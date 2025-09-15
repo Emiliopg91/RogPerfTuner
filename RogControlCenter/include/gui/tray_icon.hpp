@@ -15,15 +15,10 @@
 #include "../services/profile_service.hpp"
 #include "../translator/translator.hpp"
 
-class TrayIcon : public QObject {
+class TrayIcon : public QObject, public Singleton<TrayIcon> {
 	Q_OBJECT
 
   public:
-	inline static TrayIcon& getInstance() {
-		static TrayIcon instance;
-		return instance;
-	}
-
 	explicit TrayIcon(QObject* parent = nullptr);
 	void show();
 
@@ -34,6 +29,7 @@ class TrayIcon : public QObject {
 	void onBrightnessChanged(RgbBrightness brightness);
 
   private:
+	friend class Singleton<TrayIcon>;
 	QSystemTrayIcon* tray_icon_;
 	QMenu* tray_menu_;
 

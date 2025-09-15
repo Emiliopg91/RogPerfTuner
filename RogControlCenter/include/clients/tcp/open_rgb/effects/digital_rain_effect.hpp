@@ -3,11 +3,12 @@
 #include <random>
 #include <vector>
 
-#include "../../../../../include/models/performance/cpu_usage.hpp"
 #include "../../../../models/others/led_status.hpp"
+#include "../../../../models/others/singleton.hpp"
+#include "../../../../models/performance/cpu_usage.hpp"
 #include "abstract/abstract_effect.hpp"
 
-class DigitalRainEffect : public AbstractEffect {
+class DigitalRainEffect : public AbstractEffect, public Singleton<DigitalRainEffect> {
   private:
 	int _max_count	 = 15;
 	double _cpu		 = 0.0;
@@ -32,13 +33,9 @@ class DigitalRainEffect : public AbstractEffect {
 	CPUUsage readCPU();
 
 	double getCPUUsagePercent();
+	friend class Singleton<DigitalRainEffect>;
 
   public:
-	static DigitalRainEffect& getInstance(Client& client) {
-		static DigitalRainEffect instance{client};
-		return instance;
-	}
-
 	DigitalRainEffect(Client& client);
 
   protected:

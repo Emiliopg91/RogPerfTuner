@@ -1,16 +1,13 @@
 #pragma once
 
+#include "../../../../models/others/singleton.hpp"
 #include "abstract/abstract_effect.hpp"
 
-class RainbowWave : public AbstractEffect {
+class RainbowWave : public AbstractEffect, public Singleton<RainbowWave> {
   public:
-	static RainbowWave& getInstance(Client& client) {
-		static RainbowWave instance{client};
-		return instance;
-	}
-
 	void apply_effect(const DeviceList& devices);
 
   private:
+	friend class Singleton<RainbowWave>;
 	RainbowWave(Client& client);
 };

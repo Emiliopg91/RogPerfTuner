@@ -1,14 +1,10 @@
 #pragma once
 
+#include "../../../models/others/singleton.hpp"
 #include "../abstract/abstract_dbus_client.hpp"
 
-class PMKeyboardBrightness : public AbstractDbusClient {
+class PMKeyboardBrightness : public AbstractDbusClient, public Singleton<PMKeyboardBrightness> {
   public:
-	static PMKeyboardBrightness& getInstance() {
-		static PMKeyboardBrightness instance;
-		return instance;
-	}
-
 	int getKeyboardBrightness();
 
 	void setKeyboardBrightnessSilent(const int& brightness);
@@ -16,5 +12,6 @@ class PMKeyboardBrightness : public AbstractDbusClient {
 	void onBrightnessChange(Callback&& callback);
 
   private:
+	friend class Singleton<PMKeyboardBrightness>;
 	PMKeyboardBrightness();
 };

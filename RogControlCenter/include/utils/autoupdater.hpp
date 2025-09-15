@@ -4,6 +4,7 @@
 #include <string>
 
 #include "../logger/logger.hpp"
+#include "../models/others/singleton.hpp"
 #include "../utils/constants.hpp"
 
 struct Asset {
@@ -14,8 +15,9 @@ struct Asset {
 	}
 };
 
-class AutoUpdater {
+class AutoUpdater : public Singleton<AutoUpdater> {
   private:
+	friend class Singleton<AutoUpdater>;
 	typedef std::function<void()> Callback;
 
 	Logger logger{"AutoUpdater"};
@@ -35,10 +37,4 @@ class AutoUpdater {
 	void check_task();
 
 	AutoUpdater(Callback restart_method_, std::function<bool()> perform_update_check_ = nullptr);
-
-  public:
-	static AutoUpdater& getInstance(Callback restart_method_, std::function<bool()> perform_update_check_ = nullptr) {
-		static AutoUpdater instance(restart_method_, perform_update_check_);
-		return instance;
-	}
 };

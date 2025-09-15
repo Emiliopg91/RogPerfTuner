@@ -1,17 +1,14 @@
 #pragma once
 
 #include "../logger/logger.hpp"
+#include "../models/others/singleton.hpp"
 
-class SingleInstance {
+class SingleInstance : public Singleton<SingleInstance> {
   public:
-	static SingleInstance& getInstance() {
-		static SingleInstance instance;
-		return instance;
-	}
-
 	void acquire();
 
   private:
+	friend class Singleton<SingleInstance>;
 	SingleInstance() {
 	}
 	Logger logger{"SingleInstance"};

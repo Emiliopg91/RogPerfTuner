@@ -1,5 +1,6 @@
 #pragma once
 
+#include "../clients/shell/pip_client.hpp"
 #include "../clients/websocket/steam_client.hpp"
 #include "../configuration/configuration.hpp"
 #include "../models/steam/steam_game_config.hpp"
@@ -7,8 +8,9 @@
 #include "./open_rgb_service.hpp"
 #include "./profile_service.hpp"
 
-class SteamService {
+class SteamService : public Singleton<SteamService> {
   private:
+	friend class Singleton<SteamService>;
 	Logger logger{"SteamService"};
 	std::unordered_map<unsigned int, std::string> runningGames;
 	bool rccdcEnabled = false;
@@ -21,6 +23,7 @@ class SteamService {
 	OpenRgbService& openRgbService	 = OpenRgbService::getInstance();
 	HardwareService& hardwareService = HardwareService::getInstance();
 	SteamClient& steamClient		 = SteamClient::getInstance();
+	PipClient& pipClient			 = PipClient::getInstance();
 
 	SteamService();
 
@@ -32,15 +35,11 @@ class SteamService {
 	void setProfileForGames(bool onConnect = false);
 	void installRccDC();
 	void copyPlugin();
+	void installPipDeps();
 	bool checkIfRequiredInstallation();
 	std::string encodeAppId(uint32_t appid);
 
   public:
-	static SteamService& getInstance() {
-		static SteamService instance;
-		return instance;
-	}
-
 	const std::unordered_map<unsigned int, std::string>& getRunningGames() const;
 	const std::unordered_map<std::string, GameEntry>& getGames();
 

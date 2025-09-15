@@ -77,7 +77,7 @@ int main(int argc, char** argv) {
 		PasswordDialog::getInstance().showDialog();
 	}
 
-	Shell::getInstance(configuration.getPassword());
+	Shell::init(configuration.getPassword());
 
 	OpenRgbService::getInstance();
 	HardwareService::getInstance();
