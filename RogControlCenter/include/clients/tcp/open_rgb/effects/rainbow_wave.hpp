@@ -1,8 +1,5 @@
 #pragma once
 
-#include <cmath>
-#include <vector>
-
 #include "abstract/abstract_effect.hpp"
 
 class RainbowWave : public AbstractEffect {

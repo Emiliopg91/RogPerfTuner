@@ -65,4 +65,23 @@ class ProfileService {
 	void setPowerProfile(const PerformanceProfile& profile);
 	void setTdps(const PerformanceProfile& profile);
 	void setTgp(const PerformanceProfile& profile);
+
+	int acIntelPl1Spl(PerformanceProfile profile);
+	int batteryIntelPl1Spl(PerformanceProfile profile);
+	int acIntelPl2Sppt(PerformanceProfile profile);
+	int batteryIntelPl2Sppt(PerformanceProfile profile);
+	int acNvBoost(PerformanceProfile profile);
+	int batteryNvBoost(PerformanceProfile profile);
+	int acNvTemp();
+	int batteryNvTemp(PerformanceProfile profile);
+	bool acBoost();
+	bool batteryBoost();
+	PerformanceProfile nextPerformanceProfile(PerformanceProfile profile);
+	CpuGovernor acGovernor(PerformanceProfile profile);
+	CpuGovernor batteryGovernor();
+	PerformanceProfile getGreater(PerformanceProfile profile, const PerformanceProfile& other);
+	PlatformProfile getPlatformProfile(PerformanceProfile profile);
+	PowerProfile getPowerProfile(PerformanceProfile profile);
+	SsdScheduler ssdQueueScheduler(PerformanceProfile profile);
+	int acTdpToBatteryTdp(int tdp, int minTdp);
 };

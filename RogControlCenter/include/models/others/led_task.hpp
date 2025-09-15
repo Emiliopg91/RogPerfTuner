@@ -1,5 +1,8 @@
 #pragma once
-#include "OpenRGB/Client.hpp"
+
+#include <cstddef>
+
+#include "OpenRGB/Color.hpp"
 
 struct LedTask {
 	size_t index;
