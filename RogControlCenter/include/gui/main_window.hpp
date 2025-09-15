@@ -3,17 +3,8 @@
 #include <QCheckBox>
 #include <QCloseEvent>
 #include <QComboBox>
-#include <QFormLayout>
-#include <QGroupBox>
-#include <QIcon>
-#include <QLabel>
 #include <QMainWindow>
-#include <QPixmap>
 #include <QPushButton>
-#include <QString>
-#include <QVBoxLayout>
-#include <QVariant>
-#include <QWidget>
 
 #include "../events/event_bus.hpp"
 #include "../models/hardware/battery_charge_threshold.hpp"

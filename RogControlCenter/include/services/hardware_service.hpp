@@ -45,7 +45,7 @@ class HardwareService {
 	HardwareService();
 
 	inline static int8_t CPU_PRIORITY = -17;
-	inline static uint8_t IO_PRIORITY = floor((CPU_PRIORITY + 20) / 5);
+	inline static uint8_t IO_PRIORITY = (CPU_PRIORITY + 20) / 5;
 	inline static uint8_t IO_CLASS	  = 2;
 
 	void setupDeviceLoop();
@@ -74,14 +74,14 @@ class HardwareService {
 	PMKeyboardBrightness& pmKeyboardBrightnessClient = PMKeyboardBrightness::getInstance();
 	LsUsbClient& udevClient							 = LsUsbClient::getInstance();
 
-	BatteryThreshold charge_limit = BatteryThreshold::Enum::CT_100;
-	CpuBrand cpu				  = CpuBrand::Enum::INTEL;
 	std::unordered_map<std::string, std::string> gpus;
 	std::vector<SsdScheduler> ssd_schedulers;
 	std::vector<UsbIdentifier> connectedDevices;
-	bool onBattery			  = true;
-	unsigned int runningGames = 0;
 
+	bool onBattery										= true;
+	unsigned int runningGames							= 0;
+	BatteryThreshold charge_limit						= BatteryThreshold::Enum::CT_100;
+	CpuBrand cpu										= CpuBrand::Enum::INTEL;
 	inline static std::vector<std::string> VK_ICD_JSONS = {"/usr/share/vulkan/icd.d/{gpu.value}_icd.json",
 														   "/usr/share/vulkan/icd.d/{gpu.value}_icd.i686.json",
 														   "/usr/share/vulkan/icd.d/{gpu.value}_icd.x86_64.json"};

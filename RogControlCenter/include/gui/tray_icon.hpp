@@ -1,7 +1,6 @@
 #pragma once
 
 #include <QAction>
-#include <QMenu>
 #include <QObject>
 #include <QSystemTrayIcon>
 

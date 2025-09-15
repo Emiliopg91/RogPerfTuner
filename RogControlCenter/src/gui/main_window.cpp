@@ -1,16 +1,13 @@
 #include "../../include/gui/main_window.hpp"
 
 #include <QApplication>
+#include <QFormLayout>
+#include <QGroupBox>
+#include <QLabel>
+#include <QVBoxLayout>
 #include <algorithm>
 
-#include "../../include/events/event_bus.hpp"
 #include "../../include/gui/game_list.hpp"
-#include "../../include/services/application_service.hpp"
-#include "../../include/services/hardware_service.hpp"
-#include "../../include/services/open_rgb_service.hpp"
-#include "../../include/services/profile_service.hpp"
-#include "../../include/services/steam_service.hpp"
-#include "../../include/translator/translator.hpp"
 
 MainWindow::MainWindow(QWidget* parent) : QMainWindow(parent), _logger(new Logger()) {
 	setWindowTitle(QString::fromStdString(Constants::APP_NAME + " v" + Constants::APP_VERSION));

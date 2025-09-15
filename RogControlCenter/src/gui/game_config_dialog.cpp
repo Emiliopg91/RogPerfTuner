@@ -1,14 +1,9 @@
 #include "../../include/gui/game_config_dialog.hpp"
 
-#include <qcontainerfwd.h>
-
-#include <QDialog>
 #include <QLabel>
 #include <QLineEdit>
 #include <QMessageBox>
-#include <QProcess>
 #include <QPushButton>
-#include <QVBoxLayout>
 #include <optional>
 
 #include "../../include/utils/string_utils.hpp"

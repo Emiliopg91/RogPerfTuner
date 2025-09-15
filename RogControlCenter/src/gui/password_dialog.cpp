@@ -1,11 +1,7 @@
 #include "../../include/gui/password_dialog.hpp"
 
-#include <QDialog>
-#include <QLabel>
-#include <QLineEdit>
 #include <QMessageBox>
 #include <QProcess>
-#include <QPushButton>
 #include <QVBoxLayout>
 
 #include "../../include/configuration/configuration.hpp"

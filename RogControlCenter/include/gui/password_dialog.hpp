@@ -3,9 +3,7 @@
 #include <QDialog>
 #include <QLabel>
 #include <QLineEdit>
-#include <QMessageBox>
 #include <QPushButton>
-#include <QVBoxLayout>
 
 #include "../configuration/configuration.hpp"
 #include "../translator/translator.hpp"

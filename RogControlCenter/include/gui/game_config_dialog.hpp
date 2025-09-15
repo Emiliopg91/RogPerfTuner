@@ -3,11 +3,6 @@
 #include <QDialog>
 #include <QFormLayout>
 #include <QGroupBox>
-#include <QLabel>
-#include <QLineEdit>
-#include <QMessageBox>
-#include <QPushButton>
-#include <QVBoxLayout>
 
 #include "../configuration/configuration.hpp"
 #include "../gui/no_scroll_combo_box.hpp"
