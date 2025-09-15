@@ -84,9 +84,13 @@ void Shell::close_bash(BashSession& session) {
 	}
 }
 
-CommandResult Shell::send_command(BashSession& session, const std::string& cmd, bool check) {
+CommandResult Shell::send_command(BashSession& session, bool elevated, const std::string& cmd, bool check) {
 	std::lock_guard<std::mutex> lock(mtx);
-	logger.debug("Running command '{}'", cmd);
+	if (elevated) {
+		logger.debug("Running admin command '{}'", cmd);
+	} else {
+		logger.debug("Running command '{}'", cmd);
+	}
 	std::string marker	 = "__END__";
 	std::string full_cmd = cmd + "\necho " + marker + "$?\n";
 	write(session.stdin_fd, full_cmd.c_str(), full_cmd.size());
@@ -168,14 +172,14 @@ Shell::~Shell() {
 }
 
 CommandResult Shell::run_command(const std::string& cmd, bool check) {
-	return send_command(normal_bash, cmd, check);
+	return send_command(normal_bash, false, cmd, check);
 }
 
 CommandResult Shell::run_elevated_command(const std::string& cmd, bool check) {
 	if (!elevated_bash.has_value()) {
 		throw new std::runtime_error("No elevated command available");
 	}
-	return send_command(elevated_bash.value(), cmd, check);
+	return send_command(elevated_bash.value(), true, cmd, check);
 }
 
 std::vector<std::string> Shell::copyEnviron() {

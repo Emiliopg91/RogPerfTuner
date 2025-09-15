@@ -100,7 +100,7 @@ class Shell : public Singleton<Shell> {
 
 	BashSession start_bash(const std::vector<std::string>& args, const std::string& initial_input = "");
 	void close_bash(BashSession& session);
-	CommandResult send_command(BashSession& session, const std::string& cmd, bool check);
+	CommandResult send_command(BashSession& session, bool elevated, const std::string& cmd, bool check);
 	std::mutex mtx;
 	std::mutex which_mtx;
 	std::unordered_map<std::string, std::vector<std::string>> whichCache;
