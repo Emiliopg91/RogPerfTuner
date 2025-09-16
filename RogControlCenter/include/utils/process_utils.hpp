@@ -1,9 +1,6 @@
 #pragma once
 
 #include <signal.h>
-#include <unistd.h>
-
-#include <vector>
 
 #include "../shell/shell.hpp"
 
