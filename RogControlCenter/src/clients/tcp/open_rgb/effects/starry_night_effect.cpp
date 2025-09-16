@@ -1,5 +1,7 @@
 #include "../../../../../include/clients/tcp/open_rgb/effects/starry_night_effect.hpp"
 
+#include <random>
+
 Color StarryNightEffect::_get_random() {
 	std::uniform_int_distribution<int> hue_dist(0, 359);
 	int hue = hue_dist(_rng);
@@ -10,7 +12,7 @@ void StarryNightEffect::_device_effect(Device& device) {
 	std::vector<Color> leds(device.leds.size(), Color::fromRgb("#000000"));
 	std::vector<int> steps(device.leds.size(), 0);
 
-	std::uniform_int_distribution<int> sleep_dist(0, 150);
+	std::uniform_real_distribution<double> sleep_dist(0, 0.15);
 	std::uniform_int_distribution<int> led_dist(0, device.leds.size() - 1);
 
 	while (device.enabled && _is_running) {
@@ -37,7 +39,7 @@ void StarryNightEffect::_device_effect(Device& device) {
 		}
 
 		_set_colors(device, new_colors);
-		std::this_thread::sleep_for(std::chrono::milliseconds(sleep_dist(_rng)));
+		_sleep(sleep_dist(_rng));
 	}
 }
 StarryNightEffect::StarryNightEffect(Client& client) : AbstractEffect(client, "Starry night") {

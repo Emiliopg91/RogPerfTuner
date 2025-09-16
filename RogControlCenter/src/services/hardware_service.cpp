@@ -20,6 +20,7 @@
 #include "../../include/services/open_rgb_service.hpp"
 #include "../../include/translator/translator.hpp"
 #include "../../include/utils/string_utils.hpp"
+#include "../../include/utils/time_utils.hpp"
 
 HardwareService::HardwareService() {
 	logger.info("Initializing HardwareService");
@@ -208,12 +209,12 @@ void HardwareService::setChargeThreshold(const BatteryThreshold& threshold) {
 	std::lock_guard<std::mutex> lock(actionMutex);
 	if (charge_limit != threshold) {
 		logger.info("Setting charge limit to {}%", threshold.toInt());
-		auto t0 = std::chrono::high_resolution_clock::now();
+		auto t0 = TimeUtils::now();
 		platformClient.setBatteryLimit(threshold);
-		auto t1 = std::chrono::high_resolution_clock::now();
+		auto t1 = TimeUtils::now();
 
 		charge_limit = threshold;
-		logger.info("Charge limit setted after {} ms", std::chrono::duration_cast<std::chrono::milliseconds>(t1 - t0).count());
+		logger.info("Charge limit setted after {} ms", TimeUtils::getTimeDiff(t0, t1));
 
 		toaster.showToast(translator.translate("applied.battery.threshold", {{"value", std::to_string(threshold.toInt())}}));
 		eventBus.emitChargeThreshold(threshold);

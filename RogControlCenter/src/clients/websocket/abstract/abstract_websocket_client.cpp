@@ -2,7 +2,6 @@
 
 #include <ixwebsocket/IXWebSocket.h>
 
-#include <chrono>
 #include <condition_variable>
 #include <mutex>
 #include <nlohmann/json.hpp>

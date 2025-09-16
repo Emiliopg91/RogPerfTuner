@@ -162,7 +162,7 @@ void MainWindow::setAuraEffect(std::string effect) {
 }
 
 void MainWindow::onProfileChanged(int) {
-	auto profile = PerformanceProfile::fromInt(_profileDropdown->currentData().toInt());
+	PerformanceProfile profile = PerformanceProfile::fromInt(_profileDropdown->currentData().toInt());
 	if (steamService.getRunningGames().empty()) {
 		if (profileService.getPerformanceProfile() != profile) {
 			profileService.setPerformanceProfile(profile);

@@ -1,13 +1,13 @@
 #include "../../include/services/profile_service.hpp"
 
-#include <thread>
-
 #include "../../include/configuration/configuration.hpp"
 #include "../../include/events/event_bus.hpp"
 #include "../../include/models/performance/cpu_governor.hpp"
 #include "../../include/models/performance/power_profile.hpp"
 #include "../../include/models/performance/ssd_scheduler.hpp"
+#include "../../include/utils/process_utils.hpp"
 #include "../../include/utils/string_utils.hpp"
+#include "../../include/utils/time_utils.hpp"
 
 ProfileService::ProfileService() {
 	logger.info("Initializing ProfileService");
@@ -31,7 +31,8 @@ ProfileService::ProfileService() {
 		onBattery = onBat;
 		if (runningGames == 0) {
 			if (onBattery) {
-				setPerformanceProfile(PerformanceProfile::Enum::QUIET, true, true);
+				PerformanceProfile p = PerformanceProfile::Enum::QUIET;
+				setPerformanceProfile(p, true, true);
 			} else {
 				restoreProfile();
 			}
@@ -46,7 +47,7 @@ ProfileService::ProfileService() {
 PerformanceProfile ProfileService::getPerformanceProfile() {
 	return currentProfile;
 }
-void ProfileService::setPerformanceProfile(const PerformanceProfile& profile, const bool& temporal, const bool& force) {
+void ProfileService::setPerformanceProfile(PerformanceProfile& profile, const bool& temporal, const bool& force) {
 	std::lock_guard<std::mutex> lock(actionMutex);
 	std::string profileName = profile.toName();
 
@@ -54,7 +55,7 @@ void ProfileService::setPerformanceProfile(const PerformanceProfile& profile, co
 		logger.info("Setting {} profile", profileName);
 		Logger::add_tab();
 		try {
-			auto t0 = std::chrono::high_resolution_clock::now();
+			auto t0 = TimeUtils::now();
 
 			setPlatformProfile(profile);
 			//  setFanCurves(profile);
@@ -71,9 +72,9 @@ void ProfileService::setPerformanceProfile(const PerformanceProfile& profile, co
 				configuration.saveConfig();
 			}
 
-			auto t1 = std::chrono::high_resolution_clock::now();
+			auto t1 = TimeUtils::now();
 			Logger::rem_tab();
-			logger.info("Profile setted after {} ms", std::chrono::duration_cast<std::chrono::milliseconds>(t1 - t0).count());
+			logger.info("Profile setted after {} ms", TimeUtils::getTimeDiff(t0, t1));
 			toaster.showToast(translator.translate("profile.applied",
 												   {{"profile", StringUtils::toLowerCase(translator.translate("label.profile." + profileName))}}));
 			eventBus.emitPerformanceProfile(profile);
@@ -85,9 +86,9 @@ void ProfileService::setPerformanceProfile(const PerformanceProfile& profile, co
 	}
 }
 
-void ProfileService::setPlatformProfile(const PerformanceProfile& profile) {
+void ProfileService::setPlatformProfile(PerformanceProfile& profile) {
 	if (platformClient.available()) {
-		auto platformProfile = getPlatformProfile(profile);
+		auto platformProfile = profile.getPlatformProfile();
 		logger.info("Platform profile: {}", platformProfile.toName());
 		Logger::add_tab();
 		try {
@@ -100,9 +101,9 @@ void ProfileService::setPlatformProfile(const PerformanceProfile& profile) {
 	}
 }
 
-void ProfileService::setFanCurves(const PerformanceProfile& profile) {
+void ProfileService::setFanCurves(PerformanceProfile& profile) {
 	if (fanCurvesClient.available()) {
-		auto platformProfile = getPlatformProfile(profile);
+		auto platformProfile = profile.getPlatformProfile();
 		logger.info("Fan profile: {}", platformProfile.toName());
 		Logger::add_tab();
 		try {
@@ -130,9 +131,9 @@ void ProfileService::setBoost(const PerformanceProfile&) {
 	}
 }
 
-void ProfileService::setSsdScheduler(const PerformanceProfile& profile) {
+void ProfileService::setSsdScheduler(PerformanceProfile& profile) {
 	if (ssdSchedulerClient.available()) {
-		SsdScheduler ssdScheduler = ssdQueueScheduler(profile);
+		SsdScheduler ssdScheduler = profile.getSsdQueueScheduler();
 		logger.info("SSD scheduler: {}", ssdScheduler.toName());
 		Logger::add_tab();
 		try {
@@ -158,9 +159,9 @@ void ProfileService::setCpuGovernor(const PerformanceProfile& profile) {
 	}
 }
 
-void ProfileService::setPowerProfile(const PerformanceProfile& profile) {
+void ProfileService::setPowerProfile(PerformanceProfile& profile) {
 	if (powerProfileClient.available()) {
-		PowerProfile powerProfile = getPowerProfile(profile);
+		PowerProfile powerProfile = profile.getPowerProfile();
 		logger.info("Power profile: {}", powerProfile.toName());
 		Logger::add_tab();
 		try {
@@ -181,11 +182,11 @@ void ProfileService::setTdps(const PerformanceProfile& profile) {
 		logger.info("PL1: {}W", pl1);
 		try {
 			pl1SpdClient.setCurrentValue(pl1);
-			std::this_thread::sleep_for(std::chrono::milliseconds(25));
+			ProcessUtils::sleep(25);
 			if (pl2SpptClient.available()) {
 				auto pl2 = onBattery ? batteryIntelPl2Sppt(profile) : acIntelPl2Sppt(profile);
 				logger.info("PL2: {}W", pl2);
-				std::this_thread::sleep_for(std::chrono::milliseconds(25));
+				ProcessUtils::sleep(25);
 				pl2SpptClient.setCurrentValue(pl2);
 			}
 		} catch (std::exception& e) {
@@ -206,7 +207,7 @@ void ProfileService::setTgp(const PerformanceProfile& profile) {
 				auto nvb = onBattery ? batteryNvBoost(profile) : acNvBoost(profile);
 				logger.info("Dynamic Boost: {}W", nvb);
 				nvBoostClient.setCurrentValue(nvb);
-				std::this_thread::sleep_for(std::chrono::milliseconds(25));
+				ProcessUtils::sleep(25);
 			} catch (std::exception& e) {
 				logger.info("Error setting Nvidia Boost");
 			}
@@ -231,7 +232,7 @@ void ProfileService::restoreProfile() {
 }
 
 PerformanceProfile ProfileService::nextPerformanceProfile() {
-	auto nextProfile = nextPerformanceProfile(currentProfile);
+	auto nextProfile = currentProfile.getNextPerformanceProfile();
 	setPerformanceProfile(nextProfile);
 	return nextProfile;
 }
@@ -326,19 +327,6 @@ int ProfileService::batteryNvTemp(PerformanceProfile profile) {
 	return client.getCurrentValue();
 }
 
-PerformanceProfile ProfileService::nextPerformanceProfile(PerformanceProfile profile) {
-	if (profile == PerformanceProfile::Enum::PERFORMANCE) {
-		return PerformanceProfile::Enum::QUIET;
-	}
-	if (profile == PerformanceProfile::Enum::BALANCED) {
-		return PerformanceProfile::Enum::PERFORMANCE;
-	}
-	if (profile == PerformanceProfile::Enum::QUIET) {
-		return PerformanceProfile::Enum::BALANCED;
-	}
-	return profile;
-}
-
 bool ProfileService::acBoost() {
 	return true;
 }
@@ -355,44 +343,6 @@ CpuGovernor ProfileService::acGovernor(PerformanceProfile profile) {
 
 CpuGovernor ProfileService::batteryGovernor() {
 	return CpuGovernor::Enum::POWERSAVE;
-}
-
-PerformanceProfile ProfileService::getGreater(PerformanceProfile profile, const PerformanceProfile& other) {
-	if (profile == PerformanceProfile::Enum::PERFORMANCE || other == PerformanceProfile::Enum::PERFORMANCE) {
-		return PerformanceProfile::Enum::PERFORMANCE;
-	}
-	if (profile == PerformanceProfile::Enum::BALANCED || other == PerformanceProfile::Enum::BALANCED) {
-		return PerformanceProfile::Enum::BALANCED;
-	}
-	return PerformanceProfile::Enum::QUIET;
-}
-
-PlatformProfile ProfileService::getPlatformProfile(PerformanceProfile profile) {
-	if (profile == PerformanceProfile::Enum::QUIET) {
-		return PlatformProfile::Enum::LOW_POWER;
-	} else if (profile == PerformanceProfile::Enum::BALANCED) {
-		return PlatformProfile::Enum::BALANCED;
-	} else {
-		return PlatformProfile::Enum::PERFORMANCE;
-	}
-}
-
-PowerProfile ProfileService::getPowerProfile(PerformanceProfile profile) {
-	if (profile == PerformanceProfile::Enum::QUIET) {
-		return PowerProfile::Enum::POWERSAVER;
-	} else if (profile == PerformanceProfile::Enum::BALANCED) {
-		return PowerProfile::Enum::BALANCED;
-	} else {
-		return PowerProfile::Enum::PERFORMANCE;
-	}
-}
-
-SsdScheduler ProfileService::ssdQueueScheduler(PerformanceProfile profile) {
-	if (profile == PerformanceProfile::Enum::QUIET) {
-		return SsdScheduler::Enum::NOOP;
-	} else {
-		return SsdScheduler::Enum::MQ_DEADLINE;
-	}
 }
 
 int ProfileService::acTdpToBatteryTdp(int tdp, int minTdp) {

@@ -1,6 +1,5 @@
 #include "../../include/utils/autoupdater.hpp"
 
-#include <chrono>
 #include <fstream>
 #include <functional>
 #include <iostream>
@@ -8,6 +7,7 @@
 #include <thread>
 
 #include "../../include/utils/file_utils.hpp"
+#include "../../include/utils/process_utils.hpp"
 
 #ifndef CPPHTTPLIB_OPENSSL_SUPPORT
 #define CPPHTTPLIB_OPENSSL_SUPPORT
@@ -121,19 +121,19 @@ void AutoUpdater::copy_file() {
 }
 
 void AutoUpdater::check_task() {
-	std::this_thread::sleep_for(std::chrono::seconds(1));
+	ProcessUtils::sleep(1000);
 
 	while (!FileUtils::exists(Constants::UPDATE_TMP_FILE)) {
 		logger.info("Checking for updates...");
 		Asset asset = get_update_url();
 		if (asset.url.empty()) {
 			logger.info("No update found");
-			std::this_thread::sleep_for(std::chrono::seconds(CHECK_INTERVAL));
+			ProcessUtils::sleep(CHECK_INTERVAL);
 		} else {
 			logger.info("Update found");
 			while (perform_update_check && !perform_update_check()) {
 				logger.info("Update blocked by application, retry in 10 minutes");
-				std::this_thread::sleep_for(std::chrono::minutes(10));
+				ProcessUtils::sleep(10 * 60 * 1000);
 			}
 
 			download_update(asset);

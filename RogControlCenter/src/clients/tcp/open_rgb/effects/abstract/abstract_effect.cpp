@@ -4,6 +4,7 @@
 #include <thread>
 
 #include "../../../../../../include/models/hardware/rgb_brightness.hpp"
+#include "../../../../../../include/utils/process_utils.hpp"
 #include "../../../../../../include/utils/string_utils.hpp"
 
 double AbstractEffect::brightnessMap(const RgbBrightness& b) {
@@ -53,10 +54,10 @@ void AbstractEffect::stop() {
 }
 
 void AbstractEffect::_sleep(const double& seconds) {
-	double remaining = seconds;
+	double remaining = seconds * 1000;
 	while (_is_running && remaining > 0) {
-		double nap = std::min(0.1, remaining);
-		std::this_thread::sleep_for(std::chrono::duration<double>(nap));
+		double nap = std::min(100.0, remaining);
+		ProcessUtils::sleep(nap);
 		remaining -= nap;
 	}
 }

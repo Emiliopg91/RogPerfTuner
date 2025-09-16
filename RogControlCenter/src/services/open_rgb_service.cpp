@@ -4,6 +4,7 @@
 #include "../../include/configuration/configuration.hpp"
 #include "../../include/events/event_bus.hpp"
 #include "../../include/models/hardware/usb_identifier.hpp"
+#include "../../include/utils/time_utils.hpp"
 
 OpenRgbService::OpenRgbService() {
 	logger.info("Initializing OpenRgbService");
@@ -84,21 +85,21 @@ void OpenRgbService::setEffect(const std::string& newEffect, const bool& tempora
 }
 
 void OpenRgbService::reload() {
-	auto t0 = std::chrono::high_resolution_clock::now();
+	auto t0 = TimeUtils::now();
 	logger.info("Reloading OpenRGB server");
 	Logger::add_tab();
 	openRgbClient.stop();
 	openRgbClient.start();
 	applyAura();
-	auto t1 = std::chrono::high_resolution_clock::now();
+	auto t1 = TimeUtils::now();
 	Logger::rem_tab();
-	logger.info("Reloaded after {} ms", std::chrono::duration_cast<std::chrono::milliseconds>(t1 - t0).count());
+	logger.info("Reloaded after {} ms", TimeUtils::getTimeDiff(t0, t1));
 }
 
 void OpenRgbService::applyAura(const bool& temporal) {
 	logger.info("Applying aura settings");
 	Logger::add_tab();
-	auto t0 = std::chrono::high_resolution_clock::now();
+	auto t0 = TimeUtils::now();
 	openRgbClient.applyEffect(effect, brightness);
 
 	if (!temporal) {
@@ -107,9 +108,9 @@ void OpenRgbService::applyAura(const bool& temporal) {
 		configuration.saveConfig();
 	}
 
-	auto t1 = std::chrono::high_resolution_clock::now();
+	auto t1 = TimeUtils::now();
 	Logger::rem_tab();
-	logger.info("Aura applied after {} ms", std::chrono::duration_cast<std::chrono::milliseconds>(t1 - t0).count());
+	logger.info("Aura applied after {} ms", TimeUtils::getTimeDiff(t0, t1));
 }
 
 void OpenRgbService::disableDevice(const UsbIdentifier& identifier) {

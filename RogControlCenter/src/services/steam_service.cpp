@@ -1,6 +1,5 @@
 #include "../../include/services/steam_service.hpp"
 
-#include <chrono>
 #include <csignal>
 #include <fstream>
 #include <optional>
@@ -16,6 +15,7 @@
 #include "../../include/services/hardware_service.hpp"
 #include "../../include/services/open_rgb_service.hpp"
 #include "../../include/services/profile_service.hpp"
+#include "../../include/utils/process_utils.hpp"
 #include "../../include/utils/string_utils.hpp"
 
 bool SteamService::metricsEnabled() {
@@ -44,7 +44,7 @@ SteamService::SteamService() {
 	logger.info("Initializing SteamService");
 	Logger::add_tab();
 
-	std::this_thread::sleep_for(std::chrono::milliseconds(25));
+	ProcessUtils::sleep(25);
 	if (steamClient.connected()) {
 		onConnect(true);
 	}
@@ -261,7 +261,7 @@ void SteamService::onGameLaunch(unsigned int gid, std::string name, int pid) {
 
 			logger.debug("Stopped {} processes, before {}", newSignaled, signaled);
 
-			std::this_thread::sleep_for(std::chrono::milliseconds(100));
+			ProcessUtils::sleep(100);
 		} while (signaled < newSignaled);
 		logger.debug("Killed {} processes", static_cast<uint>(std::stoul(StringUtils::trim(shell.run_elevated_command(killCmd).stdout_str))));
 
@@ -297,7 +297,8 @@ void SteamService::setProfileForGames(bool onConnect) {
 	if (!runningGames.empty()) {
 		hardwareService.setPanelOverdrive(true);
 		openRgbService.setEffect("Gaming", true);
-		profileService.setPerformanceProfile(PerformanceProfile::Enum::PERFORMANCE, true, true);
+		PerformanceProfile p = PerformanceProfile::Enum::PERFORMANCE;
+		profileService.setPerformanceProfile(p, true, true);
 	} else if (!onConnect) {
 		hardwareService.setPanelOverdrive(false);
 		openRgbService.restoreAura();

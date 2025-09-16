@@ -1,7 +1,6 @@
 #include "../../../../../include/clients/tcp/open_rgb/effects/digital_rain_effect.hpp"
 
 #include <algorithm>
-#include <chrono>
 #include <cmath>
 #include <fstream>
 #include <thread>
@@ -23,7 +22,7 @@ CPUUsage DigitalRainEffect::readCPU() {
 
 double DigitalRainEffect::getCPUUsagePercent() {
 	CPUUsage cpu1 = readCPU();
-	std::this_thread::sleep_for(std::chrono::milliseconds(100));
+	_sleep(0.1);
 	CPUUsage cpu2 = readCPU();
 
 	long long active_diff = cpu2.active() - cpu1.active();

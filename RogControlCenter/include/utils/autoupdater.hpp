@@ -28,7 +28,7 @@ class AutoUpdater : public Singleton<AutoUpdater> {
 	Callback restart_method;
 	std::function<bool()> perform_update_check;
 
-	static constexpr int CHECK_INTERVAL = 24 * 60 * 60;
+	static constexpr int CHECK_INTERVAL = 24 * 60 * 60 * 1000;
 
 	bool is_newer(const std::string& remote_version) const;
 	Asset get_update_url();

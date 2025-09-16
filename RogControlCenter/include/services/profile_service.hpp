@@ -22,7 +22,7 @@
 class ProfileService : public Singleton<ProfileService> {
   public:
 	PerformanceProfile getPerformanceProfile();
-	void setPerformanceProfile(const PerformanceProfile& profile, const bool& temporal = false, const bool& force = false);
+	void setPerformanceProfile(PerformanceProfile& profile, const bool& temporal = false, const bool& force = false);
 	void restoreProfile();
 
 	PerformanceProfile nextPerformanceProfile();
@@ -53,12 +53,12 @@ class ProfileService : public Singleton<ProfileService> {
 	Configuration& configuration		   = Configuration::getInstance();
 	Translator& translator				   = Translator::getInstance();
 
-	void setPlatformProfile(const PerformanceProfile& profile);
-	void setFanCurves(const PerformanceProfile& profile);
+	void setPlatformProfile(PerformanceProfile& profile);
+	void setFanCurves(PerformanceProfile& profile);
 	void setBoost(const PerformanceProfile& profile);
-	void setSsdScheduler(const PerformanceProfile& profile);
+	void setSsdScheduler(PerformanceProfile& profile);
 	void setCpuGovernor(const PerformanceProfile& profile);
-	void setPowerProfile(const PerformanceProfile& profile);
+	void setPowerProfile(PerformanceProfile& profile);
 	void setTdps(const PerformanceProfile& profile);
 	void setTgp(const PerformanceProfile& profile);
 
@@ -72,12 +72,7 @@ class ProfileService : public Singleton<ProfileService> {
 	int batteryNvTemp(PerformanceProfile profile);
 	bool acBoost();
 	bool batteryBoost();
-	PerformanceProfile nextPerformanceProfile(PerformanceProfile profile);
 	CpuGovernor acGovernor(PerformanceProfile profile);
 	CpuGovernor batteryGovernor();
-	PerformanceProfile getGreater(PerformanceProfile profile, const PerformanceProfile& other);
-	PlatformProfile getPlatformProfile(PerformanceProfile profile);
-	PowerProfile getPowerProfile(PerformanceProfile profile);
-	SsdScheduler ssdQueueScheduler(PerformanceProfile profile);
 	int acTdpToBatteryTdp(int tdp, int minTdp);
 };
