@@ -274,6 +274,18 @@ TrayIcon::TrayIcon() : QObject(&MainWindow::getInstance()), tray_icon_(new QSyst
 			shell.run_command("xdg-open " + Constants::LOG_DIR + "/" + Constants::LOG_FILE_NAME + ".log");
 		});
 		logsMenu->addAction(openLogsAct);
+
+		QAction* openRunnerLogsAct = new QAction("Open runner logs");
+		QObject::connect(openRunnerLogsAct, &QAction::triggered, [this]() {
+			shell.run_command("xdg-open " + Constants::LOG_DIR + "/" + Constants::LOG_RUNNER_FILE_NAME + ".log");
+		});
+		logsMenu->addAction(openRunnerLogsAct);
+
+		QAction* openOpenRGBLogsAct = new QAction("Open OpenRGB logs");
+		QObject::connect(openOpenRGBLogsAct, &QAction::triggered, [this]() {
+			shell.run_command("xdg-open " + Constants::LOG_DIR + "/" + Constants::LOG_ORGB_FILE_NAME + ".log");
+		});
+		logsMenu->addAction(openOpenRGBLogsAct);
 		// -------------------------
 		// Logs submenu
 		// -------------------------

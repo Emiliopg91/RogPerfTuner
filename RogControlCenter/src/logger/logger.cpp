@@ -35,5 +35,5 @@ void Logger::add_tab() {
 
 void Logger::rem_tab() {
 	std::lock_guard<std::mutex> lock(mutex);
-	tabs = std::min(0, tabs - 1);
+	tabs = std::max(0, tabs - 1);
 }

@@ -124,7 +124,8 @@ void OpenRgbClient::runner() {
 	}
 	env.push_back(nullptr);
 
-	pid			  = shell.launch_process(Constants::ORGB_PATH.c_str(), argv.data(), env.data(), Constants::LOG_ORGB_FILE);
+	pid			  = shell.launch_process(Constants::ORGB_PATH.c_str(), argv.data(), env.data(),
+										 Constants::LOG_DIR + "/" + Constants::LOG_ORGB_FILE_NAME + ".log");
 	int exit_code = shell.wait_for(pid);
 	logger.info("Command finished with exit code {}", exit_code);
 }

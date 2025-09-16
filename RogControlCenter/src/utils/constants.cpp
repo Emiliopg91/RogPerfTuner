@@ -61,7 +61,6 @@ const std::string Constants::LIB_VK_DIR			 = HOME_DIR + "/.RogControlCenter/lib/
 const std::string Constants::LIB_OCL_DIR		 = HOME_DIR + "/.RogControlCenter/lib/ocl/icd.d/";
 const std::string Constants::LOG_DIR			 = HOME_DIR + "/.RogControlCenter/logs";
 const std::string Constants::LOG_OLD_DIR		 = HOME_DIR + "/.RogControlCenter/logs/old";
-const std::string Constants::LOG_ORGB_FILE		 = HOME_DIR + "/.RogControlCenter/logs/OpenRGB.log";
 const std::string Constants::USER_PLUGIN_DIR	 = HOME_DIR + "/.RogControlCenter/plugin";
 const std::string Constants::UPDATE_DIR			 = HOME_DIR + "/.RogControlCenter/update";
 const std::string Constants::UPDATE_FILE		 = HOME_DIR + "/.RogControlCenter/update/RogControlCenter.AppImage";
@@ -73,6 +72,7 @@ const std::string Constants::DECKY_SERVICE_PATH	 = HOME_DIR + "/homebrew/service
 
 const std::string Constants::LOG_FILE_NAME		  = "RogControlCenter";
 const std::string Constants::LOG_RUNNER_FILE_NAME = "Runner";
+const std::string Constants::LOG_ORGB_FILE_NAME	  = "OpenRGB";
 
 const std::string Constants::URL_GAME_CFG	= "/game/config";
 const std::string Constants::URL_PERF_PROF	= "/performance/profile/next";
