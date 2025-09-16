@@ -16,6 +16,7 @@
 #include "../../include/services/profile_service.hpp"
 #include "../../include/utils/process_utils.hpp"
 #include "../../include/utils/string_utils.hpp"
+#include "../../include/utils/time_utils.hpp"
 
 bool SteamService::metricsEnabled() {
 	auto mangohud_which = shell.which("mangohud");
@@ -43,7 +44,7 @@ SteamService::SteamService() {
 	logger.info("Initializing SteamService");
 	Logger::add_tab();
 
-	ProcessUtils::sleep(25);
+	TimeUtils::sleep(25);
 	if (steamClient.connected()) {
 		onConnect(true);
 	}
@@ -255,7 +256,7 @@ void SteamService::onGameLaunch(unsigned int gid, std::string name, int pid) {
 
 			logger.debug("Stopped {} processes, before {}", newSignaled, signaled);
 
-			ProcessUtils::sleep(100);
+			TimeUtils::sleep(100);
 		} while (signaled < newSignaled);
 		logger.debug("Killed {} processes", ProcessUtils::sendSignalToHierarchy(pid, SIGKILL));
 

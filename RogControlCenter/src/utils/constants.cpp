@@ -11,7 +11,7 @@ const pid_t Constants::PID = getpid();
 
 const std::string Constants::PLUGIN_VERSION = "1.2.2";
 
-const bool Constants::DEV_MODE = false;
+const bool Constants::DEV_MODE = true;
 
 const std::string Constants::HOME_DIR = std::getenv("HOME");
 
@@ -30,6 +30,10 @@ const std::string Constants::ASSETS_DIR = [] {
 	}
 	return std::string(dir);
 }();
+
+const std::string Constants::LOG_FILE_NAME		  = APP_NAME;
+const std::string Constants::LOG_RUNNER_FILE_NAME = "Runner";
+const std::string Constants::LOG_ORGB_FILE_NAME	  = "OpenRGB";
 
 const std::string Constants::USR_SHARE_OCL_DIR = "/etc/OpenCL/vendors/";
 const std::string Constants::UDEV_RULES		   = "/usr/lib/udev/rules.d/60-openrgb.rules";
@@ -70,10 +74,6 @@ const std::string Constants::RCCDC_PATH			 = HOME_DIR + "/homebrew/plugins/RCCDe
 const std::string Constants::RCCDC_PACKAGE_FILE	 = HOME_DIR + "/homebrew/plugins/RCCDeckyCompanion/package.json";
 const std::string Constants::DECKY_SERVICE_PATH	 = HOME_DIR + "/homebrew/services/PluginLoader";
 
-const std::string Constants::LOG_FILE_NAME		  = "RogControlCenter";
-const std::string Constants::LOG_RUNNER_FILE_NAME = "Runner";
-const std::string Constants::LOG_ORGB_FILE_NAME	  = "OpenRGB";
-
 const std::string Constants::URL_GAME_CFG	= "/game/config";
 const std::string Constants::URL_PERF_PROF	= "/performance/profile/next";
 const std::string Constants::URL_RENICE		= "/performance/renice";
@@ -88,3 +88,5 @@ const std::string Constants::RCCDC_REQUIRED_PIP = "websockets dataclasses-json a
 
 const std::string Constants::FLATPAK_MANGOHUD		   = "org.freedesktop.Platform.VulkanLayer.MangoHud/x86_64/24.08";
 const std::string Constants::FLATPAK_MANGOHUD_OVERRIDE = "--filesystem=xdg-config/MangoHud:ro";
+
+const std::string Constants::LOGGER_PATTERN = "[%Y-%m-%d %H:%M:%S.%e][%-7l][%n] %v";

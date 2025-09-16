@@ -1,8 +1,6 @@
 #include "../../include/utils/process_utils.hpp"
 
-#include <chrono>
 #include <string>
-#include <thread>
 
 #include "../../include/utils/string_utils.hpp"
 #include "spdlog/fmt/bundled/format.h"
@@ -10,10 +8,6 @@
 Shell& ProcessUtils::getShell() {
 	static Shell& instance = Shell::getInstance();
 	return instance;
-}
-
-void ProcessUtils::sleep(long milliseconds) {
-	std::this_thread::sleep_for(std::chrono::milliseconds(milliseconds));
 }
 
 void ProcessUtils::sendSignal(pid_t pid, int signal) {

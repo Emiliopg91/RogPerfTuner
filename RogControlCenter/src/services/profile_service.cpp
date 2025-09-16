@@ -5,7 +5,6 @@
 #include "../../include/models/performance/cpu_governor.hpp"
 #include "../../include/models/performance/power_profile.hpp"
 #include "../../include/models/performance/ssd_scheduler.hpp"
-#include "../../include/utils/process_utils.hpp"
 #include "../../include/utils/string_utils.hpp"
 #include "../../include/utils/time_utils.hpp"
 
@@ -37,6 +36,11 @@ ProfileService::ProfileService() {
 				restoreProfile();
 			}
 		}
+	});
+
+	eventBus.onApplicationStop([this]() {
+		PerformanceProfile p = PerformanceProfile::Enum::PERFORMANCE;
+		this->setPerformanceProfile(p, true, true);
 	});
 
 	restoreProfile();
@@ -182,11 +186,11 @@ void ProfileService::setTdps(const PerformanceProfile& profile) {
 		logger.info("PL1: {}W", pl1);
 		try {
 			pl1SpdClient.setCurrentValue(pl1);
-			ProcessUtils::sleep(25);
+			TimeUtils::sleep(25);
 			if (pl2SpptClient.available()) {
 				auto pl2 = onBattery ? batteryIntelPl2Sppt(profile) : acIntelPl2Sppt(profile);
 				logger.info("PL2: {}W", pl2);
-				ProcessUtils::sleep(25);
+				TimeUtils::sleep(25);
 				pl2SpptClient.setCurrentValue(pl2);
 			}
 		} catch (std::exception& e) {
@@ -207,7 +211,7 @@ void ProfileService::setTgp(const PerformanceProfile& profile) {
 				auto nvb = onBattery ? batteryNvBoost(profile) : acNvBoost(profile);
 				logger.info("Dynamic Boost: {}W", nvb);
 				nvBoostClient.setCurrentValue(nvb);
-				ProcessUtils::sleep(25);
+				TimeUtils::sleep(25);
 			} catch (std::exception& e) {
 				logger.info("Error setting Nvidia Boost");
 			}

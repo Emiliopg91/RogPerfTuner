@@ -45,4 +45,4 @@ nuevo_contenido = re.sub(
 with open(translator_file, "w", encoding="utf-8") as f:
     f.write(nuevo_contenido)
 
-print(f"Updated translator.hpp and translations.cpp with {len(translations)} entries")
+print(f"    Updated translator.hpp and translations.cpp with {len(translations)} entries")

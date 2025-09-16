@@ -12,4 +12,6 @@ class TimeUtils {
 
 	static long getTimeDiff(std::chrono::time_point<std::chrono::high_resolution_clock> t0,
 							std::chrono::time_point<std::chrono::high_resolution_clock> t1);
+
+	static void sleep(long milliseconds);
 };

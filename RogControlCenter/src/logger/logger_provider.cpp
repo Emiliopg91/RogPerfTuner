@@ -6,6 +6,7 @@
 
 #include <filesystem>
 
+#include "../../include/utils/constants.hpp"
 #include "../../include/utils/file_utils.hpp"
 #include "../../include/utils/string_utils.hpp"
 
@@ -74,7 +75,7 @@ std::unordered_map<std::string, std::string> LoggerProvider::configMap{};
 
 void LoggerProvider::initialize(std::string fileName, std::string path) {
 	console_sink = std::make_shared<spdlog::sinks::stdout_color_sink_mt>();
-	console_sink->set_pattern("%^[%Y-%m-%d %H:%M:%S.%e] [%-7l] [%n] %v%$");
+	console_sink->set_pattern("%^" + Constants::LOGGER_PATTERN + "%$");
 
 	auto sinkList = spdlog::sinks_init_list{console_sink};
 
@@ -88,7 +89,7 @@ void LoggerProvider::initialize(std::string fileName, std::string path) {
 		rotate_log(fileName, dirPath, dirPath2);
 
 		file_sink = std::make_shared<spdlog::sinks::basic_file_sink_mt>(path + "/" + fileName + ".log", true);
-		file_sink.value()->set_pattern("[%Y-%m-%d %H:%M:%S.%e] [%-7l] [%n] %v");
+		file_sink.value()->set_pattern(Constants::LOGGER_PATTERN);
 
 		sinkList = spdlog::sinks_init_list{console_sink, file_sink.value()};
 	}

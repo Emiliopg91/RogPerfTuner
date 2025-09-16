@@ -18,6 +18,7 @@
 #include "../../../../include/utils/file_utils.hpp"
 #include "../../../../include/utils/net_utils.hpp"
 #include "../../../../include/utils/process_utils.hpp"
+#include "../../../../include/utils/time_utils.hpp"
 
 void OpenRgbClient::initialize() {
 	if (!FileUtils::exists(Constants::UDEV_RULES) || !md5SumClient.available() ||
@@ -75,7 +76,7 @@ void OpenRgbClient::stop() {
 		client.setDeviceColor(dev, Color::Black);
 	}
 	client.disconnect();
-	ProcessUtils::sleep(100);
+	TimeUtils::sleep(100);
 	stopOpenRgbProcess();
 	Logger::rem_tab();
 }
@@ -90,7 +91,7 @@ void OpenRgbClient::startOpenRgbProcess() {
 	port		 = NetUtils::getRandomFreePort();
 	runnerThread = std::thread(&OpenRgbClient::runner, this);
 	while (NetUtils::isPortFree(port)) {
-		ProcessUtils::sleep(50);
+		TimeUtils::sleep(50);
 	}
 	logger.info("OpenRgb server ready");
 	Logger::rem_tab();

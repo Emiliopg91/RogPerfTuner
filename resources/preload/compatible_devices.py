@@ -21,7 +21,7 @@ if os.path.exists(output_file):
         print("    Preload up to date")
         sys.exit(0)
 
-print("Clean up of rules file")
+print("    Clean up of rules file")
 lines=[]
 with open(input_file) as f:
     for line in f:
@@ -60,3 +60,4 @@ with open(output_file, "w") as out:
     for c in devices:
         out.write(f"    {{\"{c[0]}\",\"{c[1]}\",\"{c[2]}\"}},\n")
     out.write("}};\n\n")
+print("    Rules file generated")

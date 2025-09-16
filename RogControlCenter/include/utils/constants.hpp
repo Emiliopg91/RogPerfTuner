@@ -77,4 +77,6 @@ class Constants {
 	static const std::string RCCDC_REQUIRED_PIP;
 	static const std::string FLATPAK_MANGOHUD;
 	static const std::string FLATPAK_MANGOHUD_OVERRIDE;
+
+	static const std::string LOGGER_PATTERN;
 };

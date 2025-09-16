@@ -2,7 +2,7 @@
 
 #include <nlohmann/json.hpp>
 
-#include "../../../include/utils/process_utils.hpp"
+#include "../../../include/utils/time_utils.hpp"
 #include "httplib.h"
 
 using json = nlohmann::json;
@@ -66,7 +66,7 @@ HttpServer::HttpServer() {
 		logger.info("Server loop exited");
 	});
 	while (!started) {
-		ProcessUtils::sleep(10);
+		TimeUtils::sleep(10);
 	}
 
 	eventBus.onApplicationStop([this]() {

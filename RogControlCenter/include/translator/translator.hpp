@@ -19,7 +19,7 @@ class Translator : public Singleton<Translator> {
 	inline static Language FALLBACK_LANG = Language::Enum::EN;
 
 	// Begin translations
-	inline static const constexpr std::array<TranslationEntry, 76> initialTranslations = {{
+	inline static const constexpr std::array<TranslationEntry, 75> initialTranslations = {{
 		{
 			"performance",
 			"Performance",
@@ -29,11 +29,6 @@ class Translator : public Singleton<Translator> {
 			"profile",
 			"Profile",
 			"Perfil",
-		},
-		{
-			"label.profile.TURBO",
-			"Turbo",
-			"Turbo",
 		},
 		{
 			"label.profile.PERFORMANCE",
