@@ -1,6 +1,5 @@
 #include "../../../../include/clients/tcp/open_rgb/open_rgb_client.hpp"
 
-#include <csignal>
 #include <string>
 #include <vector>
 
@@ -100,9 +99,9 @@ void OpenRgbClient::startOpenRgbProcess() {
 void OpenRgbClient::stopOpenRgbProcess() {
 	logger.info("Stopping OpenRGB server");
 	Logger::add_tab();
-	kill(pid, SIGKILL);
+	ProcessUtils::sendSignal(pid, SIGKILL);
 	if (runnerThread.joinable()) {
-		runnerThread.join();  // o runnerThread.join();
+		runnerThread.join();
 	}
 	logger.info("OpenRGB server killed");
 	Logger::rem_tab();

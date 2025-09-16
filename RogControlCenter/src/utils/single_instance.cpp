@@ -1,6 +1,7 @@
 #include "../../include/utils/single_instance.hpp"
 
-#include <csignal>
+#include <signal.h>
+
 #include <filesystem>
 #include <fstream>
 #include <iostream>

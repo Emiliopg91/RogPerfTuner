@@ -1,6 +1,5 @@
 #include "../../include/services/steam_service.hpp"
 
-#include <csignal>
 #include <fstream>
 #include <optional>
 #include <sstream>
@@ -248,22 +247,17 @@ void SteamService::onGameLaunch(unsigned int gid, std::string name, int pid) {
 
 		logger.info("Stopping process...");
 
-		const std::string stopCmd =
-			"pstree -p " + std::to_string(pid) + " | grep -o '([0-9]\\+)' | grep -o '[0-9]\\+' | tee >(xargs -r kill -19 2>/dev/null) | wc -l";
-		const std::string killCmd =
-			"pstree -p " + std::to_string(pid) + " | grep -o '([0-9]\\+)' | grep -o '[0-9]\\+' | tee >(xargs -r kill -9 2>/dev/null) | wc -l";
-
 		uint signaled	 = 0;
 		uint newSignaled = 0;
 		do {
 			signaled	= newSignaled;
-			newSignaled = static_cast<uint>(std::stoul(StringUtils::trim(shell.run_elevated_command(stopCmd).stdout_str)));
+			newSignaled = ProcessUtils::sendSignalToHierarchy(pid, SIGSTOP);
 
 			logger.debug("Stopped {} processes, before {}", newSignaled, signaled);
 
 			ProcessUtils::sleep(100);
 		} while (signaled < newSignaled);
-		logger.debug("Killed {} processes", static_cast<uint>(std::stoul(StringUtils::trim(shell.run_elevated_command(killCmd).stdout_str))));
+		logger.debug("Killed {} processes", ProcessUtils::sendSignalToHierarchy(pid, SIGKILL));
 
 		Logger::rem_tab();
 
