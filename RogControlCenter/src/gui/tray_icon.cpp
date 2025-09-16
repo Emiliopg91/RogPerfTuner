@@ -3,15 +3,10 @@
 #include <QActionGroup>
 #include <QMenu>
 
-#include "../../include/gui/game_list.hpp"
 #include "../../include/gui/main_window.hpp"
 
 void TrayIcon::openMainWindow() {
-	if (!MainWindow::INSTANCE) {
-		MainWindow::INSTANCE = new MainWindow();
-	}
-
-	MainWindow::INSTANCE->show();
+	MainWindow::getInstance().show();
 }
 
 void TrayIcon::openSettings() {
@@ -26,16 +21,14 @@ void TrayIcon::openLogs() {
 	shell.run_command("xdg-open " + Constants::LOG_DIR + "/" + Constants::LOG_FILE_NAME + ".log");
 }
 
+/*
 void openGameList() {
-	if (!GameList::INSTANCE) {
-		if (MainWindow::INSTANCE) {
-			GameList::INSTANCE = new GameList(MainWindow::INSTANCE);
-		} else {
-			GameList::INSTANCE = new GameList();
-		}
+	if (GameList::INSTANCE == nullptr) {
+		GameList::INSTANCE = new GameList(&MainWindow::getInstance());
 	}
 	GameList::INSTANCE->show();
 }
+*/
 
 void TrayIcon::setAuraBrightness(RgbBrightness brightness) {
 	QMetaObject::invokeMethod(
@@ -105,7 +98,7 @@ void TrayIcon::onBrightnessChanged(RgbBrightness brightness) {
 // ==============================
 // Constructor
 // ==============================
-TrayIcon::TrayIcon(QObject* parent) : QObject(parent), tray_icon_(new QSystemTrayIcon(this)), tray_menu_(new QMenu()) {
+TrayIcon::TrayIcon() : QObject(&MainWindow::getInstance()), tray_icon_(new QSystemTrayIcon(this)), tray_menu_(new QMenu(&MainWindow::getInstance())) {
 	tray_icon_->setIcon(QIcon::fromTheme(Constants::ASSET_ICON_FILE.c_str()));
 	tray_icon_->setToolTip(QString::fromStdString(Constants::APP_NAME + " v" + Constants::APP_VERSION));
 
@@ -224,21 +217,16 @@ TrayIcon::TrayIcon(QObject* parent) : QObject(parent), tray_icon_(new QSystemTra
 	// -------------------------
 	// Game submenu
 	// -------------------------
+	/*
 	QMenu* gamesMenu = new QMenu(("    " + translator.translate("games")).c_str(), menu);
 	menu->insertMenu(nullptr, gamesMenu);
 
 	QAction* act = new QAction((translator.translate("label.game.configure") + "...").c_str());
 	QObject::connect(act, &QAction::triggered, []() {
-		if (!GameList::INSTANCE) {
-			if (MainWindow::INSTANCE) {
-				GameList::INSTANCE = new GameList(MainWindow::INSTANCE);
-			} else {
-				GameList::INSTANCE = new GameList();
-			}
-		}
-		GameList::INSTANCE->show();
+		openGameList();
 	});
 	gamesMenu->addAction(act);
+	*/
 	// -------------------------
 	// Game submenu
 	// -------------------------
@@ -325,6 +313,12 @@ TrayIcon::TrayIcon(QObject* parent) : QObject(parent), tray_icon_(new QSystemTra
 	// -------------------------
 
 	tray_icon_->setContextMenu(menu);
+
+	QObject::connect(tray_icon_, &QSystemTrayIcon::activated, this, [this](QSystemTrayIcon::ActivationReason reason) {
+		if (reason == QSystemTrayIcon::Trigger) {
+			MainWindow::getInstance().show();
+		}
+	});
 
 	eventBus.onRgbBrightness([this](RgbBrightness brightness) {
 		setAuraBrightness(brightness);

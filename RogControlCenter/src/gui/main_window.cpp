@@ -11,8 +11,8 @@
 
 MainWindow::MainWindow(QWidget* parent) : QMainWindow(parent), _logger(new Logger()) {
 	setWindowTitle(QString::fromStdString(Constants::APP_NAME + " v" + Constants::APP_VERSION));
-	setGeometry(0, 0, 350, 680);
-	setFixedSize(350, 680);
+	setGeometry(0, 0, 350, 660);
+	setFixedSize(350, 660);
 	setWindowIcon(QIcon(QString::fromStdString(Constants::ICON_45_FILE)));
 
 	QWidget* centralWidget	= new QWidget(this);
@@ -99,6 +99,7 @@ MainWindow::MainWindow(QWidget* parent) : QMainWindow(parent), _logger(new Logge
 
 	_autostart = new QCheckBox();
 	_autostart->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Preferred);
+	_autostart->setEnabled(!Constants::DEV_MODE);
 	_autostart->setChecked(applicationService.isAutostartEnabled());
 	connect(_autostart, &QCheckBox::toggled, this, &MainWindow::onAutostartChanged);
 	settingsLayout->addRow(_autostart, new QLabel(QString::fromStdString(translator.translate("autostart"))));

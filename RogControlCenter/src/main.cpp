@@ -4,6 +4,7 @@
 
 #include "..//include/logger/logger_provider.hpp"
 #include "../include/configuration/configuration.hpp"
+#include "../include/gui/main_window.hpp"
 #include "../include/gui/password_dialog.hpp"
 #include "../include/gui/toaster.hpp"
 #include "../include/gui/tray_icon.hpp"
@@ -67,6 +68,7 @@ int main(int argc, char** argv) {
 
 	logger.info("Creating QT application");
 	QApplication app(argc, argv);
+	app.setDesktopFileName(QString::fromStdString(Constants::APP_DRAW_FILE));
 
 	Translator::getInstance();
 
@@ -87,8 +89,7 @@ int main(int argc, char** argv) {
 
 	HttpServer::getInstance();
 
-	TrayIcon::getInstance().show();
-	app.setDesktopFileName(QString::fromStdString(Constants::APP_DRAW_FILE));
+	TrayIcon::init().show();
 
 	Logger::rem_tab();
 	logger.info("Application ready");

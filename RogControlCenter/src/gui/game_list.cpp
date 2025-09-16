@@ -14,6 +14,8 @@ GameList::GameList(QWidget* parent, bool manage_parent) : QDialog(parent), manag
 		INSTANCE = this;
 	}
 
+	setWindowModality(Qt::WindowModal);
+
 	setWindowTitle(QString::fromStdString(translator.translate("game.performance.configuration")));
 	setFixedSize(500, 600);
 	setWindowIcon(QIcon(QString::fromStdString(Constants::ICON_45_FILE)));
@@ -61,8 +63,10 @@ GameList::GameList(QWidget* parent, bool manage_parent) : QDialog(parent), manag
 	table->setFocusPolicy(Qt::NoFocus);
 
 	int row = 0;
-	std::sort(appIds.begin(), appIds.end(), [&](int a, int b) {
-		return gameCfg[std::to_string(a)].name > gameCfg[std::to_string(b)].name;
+	std::sort(appIds.begin(), appIds.end(), [&](unsigned int a, unsigned int b) {
+		const auto& na = gameCfg.at(std::to_string(a)).name;  // usar at() para no insertar
+		const auto& nb = gameCfg.at(std::to_string(b)).name;
+		return na < nb;	 // true si a debe ir antes que b (ascendente)
 	});
 
 	for (unsigned int appid : appIds) {

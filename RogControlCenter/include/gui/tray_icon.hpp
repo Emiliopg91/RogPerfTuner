@@ -19,7 +19,7 @@ class TrayIcon : public QObject, public Singleton<TrayIcon> {
 	Q_OBJECT
 
   public:
-	explicit TrayIcon(QObject* parent = nullptr);
+	explicit TrayIcon();
 	void show();
 
   public slots:

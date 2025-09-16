@@ -5,13 +5,13 @@
 
 const std::string Constants::APP_NAME = "RogControlCenter";
 
-const std::string Constants::APP_VERSION = "4.1.2";
+const std::string Constants::APP_VERSION = "4.1.3";
 
 const pid_t Constants::PID = getpid();
 
 const std::string Constants::PLUGIN_VERSION = "1.2.2";
 
-const bool Constants::DEV_MODE = false;
+const bool Constants::DEV_MODE = true;
 
 const std::string Constants::HOME_DIR = std::getenv("HOME");
 
@@ -85,3 +85,6 @@ const int Constants::HTTP_PORT = 18157;
 const int Constants::WS_PORT   = HTTP_PORT + 1;
 
 const std::string Constants::RCCDC_REQUIRED_PIP = "websockets dataclasses-json asyncio";
+
+const std::string Constants::FLATPAK_MANGOHUD		   = "org.freedesktop.Platform.VulkanLayer.MangoHud/x86_64/24.08";
+const std::string Constants::FLATPAK_MANGOHUD_OVERRIDE = "--filesystem=xdg-config/MangoHud:ro";

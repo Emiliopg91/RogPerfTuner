@@ -19,7 +19,7 @@ debug_file = os.path.abspath(os.path.dirname(__file__) + "/../../.Debug")
 release_file = os.path.abspath(os.path.dirname(__file__) + "/../../.Release")
 
 constants_file = os.path.abspath(
-    os.path.dirname(__file__) + "/../../RogControlCenter/include/utils/constants.hpp"
+    os.path.dirname(__file__) + "/../../RogControlCenter/src/utils/constants.cpp"
 )
 constants_time = os.path.getmtime(constants_file)
 
@@ -53,11 +53,11 @@ if (
         lines = f.readlines()
 
     version_pattern = re.compile(
-        r'(inline const static std::string APP_VERSION\s*=\s*")[^"]+(";)'
+        r'(const std::string Constants::APP_VERSION\s*=\s*")[^"]+(";)'
     )
-    dev_pattern = re.compile(r"(inline const static bool DEV_MODE\s*=\s*)\w+(;)")
+    dev_pattern = re.compile(r"(const bool Constants::DEV_MODE\s*=\s*)\w+(;)")
     plugin_pattern = re.compile(
-        r'(inline const static std::string PLUGIN_VERSION\s*=\s*")[^"]+(";)'
+        r'(const std::string Constants::PLUGIN_VERSION\s*=\s*")[^"]+(";)'
     )
 
     new_lines = []

@@ -1,3 +1,5 @@
+#include "../../../include/clients/shell/flatpak.hpp"
+
 #include <sys/wait.h>
 #include <unistd.h>
 
@@ -9,6 +11,7 @@
 
 #include "../../../include/logger/logger_provider.hpp"
 #include "../../../include/shell/shell.hpp"
+#include "../../../include/utils/constants.hpp"
 #include "../../../include/utils/file_utils.hpp"
 
 int main(int argc, char* argv[]) {
@@ -47,6 +50,7 @@ int main(int argc, char* argv[]) {
 		}
 	}
 
+	bool mangohudRequested = false;
 	if (isRun) {
 		const char* ofe = std::getenv("OVERRIDE_FLATPAK_ENV");
 		if (ofe) {
@@ -56,8 +60,20 @@ int main(int argc, char* argv[]) {
 				const char* val = std::getenv(token.c_str());
 				if (val) {
 					command += " --env=" + token + "=" + val;
+					if (token == "MANGOHUD") {
+						mangohudRequested = true;
+					}
 				}
 			}
+		}
+	}
+
+	if (mangohudRequested) {
+		if (!FlatpakClient::getInstance().checkInstalled(Constants::FLATPAK_MANGOHUD, false)) {
+			std::cout << "MangoHud flatpak installation missing, attempting installation" << std::endl;
+			FlatpakClient::getInstance().install(Constants::FLATPAK_MANGOHUD, false);
+			FlatpakClient::getInstance().install(Constants::FLATPAK_MANGOHUD_OVERRIDE, false);
+			FlatpakClient::getInstance().install(Constants::FLATPAK_MANGOHUD_OVERRIDE, true);
 		}
 	}
 

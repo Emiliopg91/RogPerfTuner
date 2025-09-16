@@ -75,4 +75,6 @@ class Constants {
 	static const int WS_PORT;
 
 	static const std::string RCCDC_REQUIRED_PIP;
+	static const std::string FLATPAK_MANGOHUD;
+	static const std::string FLATPAK_MANGOHUD_OVERRIDE;
 };

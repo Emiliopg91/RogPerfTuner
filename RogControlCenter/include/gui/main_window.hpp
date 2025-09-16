@@ -17,12 +17,11 @@
 #include "../services/steam_service.hpp"
 #include "../translator/translator.hpp"
 
-class MainWindow : public QMainWindow {
+class MainWindow : public QMainWindow, public Singleton<MainWindow> {
 	Q_OBJECT
 
   public:
 	explicit MainWindow(QWidget* parent = nullptr);
-	inline static MainWindow* INSTANCE = nullptr;
 
   protected:
 	void closeEvent(QCloseEvent* event) override;
@@ -51,6 +50,7 @@ class MainWindow : public QMainWindow {
 	void openGameList();
 
   private:
+	friend class Singleton<MainWindow>;
 	Logger* _logger;
 
 	EventBus& eventBus					   = EventBus::getInstance();

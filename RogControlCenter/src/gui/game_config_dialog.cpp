@@ -11,7 +11,7 @@
 GameConfigDialog::GameConfigDialog(unsigned int gid, bool runAfterSave, QWidget* parent) : QDialog(parent), gid(gid), runAfterSave(runAfterSave) {
 	Logger::add_tab();
 	setWindowTitle(QString::fromStdString(translator.translate("config.for.game", {{"game", ""}})));
-	setFixedSize(400, 300);
+	setFixedSize(400, 350);
 
 	gameEntry = configuration.getConfiguration().games[std::to_string(gid)];
 
