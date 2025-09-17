@@ -20,6 +20,8 @@ class MangoHudLevel : public StrEnum<MangoHudLevel, MangoHudLevelMeta::Enum, 5> 
 
 	int getPresetIndex() {
 		switch (this->value) {
+			case MangoHudLevelMeta::Enum::NO_DISPLAY:
+				return 0;
 			case MangoHudLevelMeta::Enum::FPS_ONLY:
 				return 1;
 			case MangoHudLevelMeta::Enum::HORIZONTAL_VIEW:
@@ -28,8 +30,6 @@ class MangoHudLevel : public StrEnum<MangoHudLevel, MangoHudLevelMeta::Enum, 5> 
 				return 3;
 			case MangoHudLevelMeta::Enum::HIGH_DETAILED:
 				return 4;
-			default:
-				return 0;
 		}
 	}
 

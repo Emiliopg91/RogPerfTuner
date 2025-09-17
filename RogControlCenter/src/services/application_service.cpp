@@ -13,31 +13,32 @@ ApplicationService::ApplicationService() {
 	logger.info("Initializing ApplicationService");
 	Logger::add_tab();
 
+	logger.info("Copying helper binaries");
 	FileUtils::copy(Constants::ASSETS_BIN_DIR, Constants::BIN_DIR);
-	FileUtils::mkdirs(Constants::BIN_APPLICATION_DIR);
-
-	if (!Constants::DEV_MODE) {
-		FileUtils::writeFileContent(Constants::LAUNCHER_FILE, buildLaunchFile());
-		logger.debug("Launch file '{}' written successfully", Constants::LAUNCHER_FILE);
-	}
-
-	FileUtils::copy(Constants::ASSET_ICONS_DIR, Constants::ICONS_DIR);
-
-	FileUtils::mkdirs(Constants::UPDATE_DIR);
-
 	FileUtils::chmodRecursive(Constants::BIN_DIR, 0777);
 
-	if (!FileUtils::exists(Constants::APP_DRAW_FILE)) {
-		FileUtils::writeFileContent(Constants::APP_DRAW_FILE, buildDesktopFile());
-		logger.debug("Menu entry file '{}' written successfully", Constants::APP_DRAW_FILE);
+	if (!Constants::DEV_MODE) {
+		logger.info("Copying launcher script");
+		FileUtils::mkdirs(Constants::BIN_APPLICATION_DIR);
+		FileUtils::writeFileContent(Constants::LAUNCHER_FILE, buildLaunchFile());
 	}
+
+	logger.info("Copying icons");
+	FileUtils::copy(Constants::ASSET_ICONS_DIR, Constants::ICONS_DIR);
+
+	if (!FileUtils::exists(Constants::APP_DRAW_FILE)) {
+		logger.info("Creating menu entry");
+		FileUtils::writeFileContent(Constants::APP_DRAW_FILE, buildDesktopFile());
+	}
+
+	FileUtils::mkdirs(Constants::UPDATE_DIR);
 
 	AutoUpdater::init(
 		[this]() {
 			applyUpdate();
 		},
 
-		[this]() -> bool {
+		[this]() {
 			return steamService.getRunningGames().empty();
 		});
 
@@ -76,4 +77,33 @@ void ApplicationService::shutdown() {
 	Logger::rem_tab();
 	logger.info("Shutdown finished");
 	kill(Constants::PID, SIGTERM);
+}
+
+const std::string ApplicationService::buildDesktopFile() {
+	std::ostringstream ss;
+	ss << "[Desktop Entry]\n"
+	   << "Exec=" << Constants::LAUNCHER_FILE << "\n"
+	   << "Icon=" << Constants::ICON_45_FILE << "\n"
+	   << "WName=" << Constants::APP_NAME << "\n"
+	   << "Comment=An utility to manage Asus Rog laptop performance\n"
+	   << "Path=\n"
+	   << "Terminal=False\n"
+	   << "Type=Application\n"
+	   << "Categories=Utility;\n";
+	return ss.str();
+}
+
+const std::string ApplicationService::buildLaunchFile() {
+	std::ostringstream ss;
+	ss << "#!/bin/bash\n"
+	   << "UPDATE_PATH=\"" << Constants::UPDATE_FILE << "\"\n"
+	   << "APPIMAGE_PATH=\"" << Constants::APPIMAGE_FILE << "\"\n"
+	   << "\n"
+	   << "if [[ -f \"$UPDATE_PATH\" ]]; then\n"
+	   << "  mv \"$UPDATE_PATH\" \"$APPIMAGE_PATH\"\n"
+	   << "  chmod 755 \"$APPIMAGE_PATH\"\n"
+	   << "  rm \"$UPDATE_PATH\"\n"
+	   << "fi\n"
+	   << Constants::APPIMAGE_FILE << "\n";
+	return ss.str();
 }
