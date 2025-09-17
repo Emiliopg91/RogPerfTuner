@@ -8,6 +8,7 @@
 #include <QActionGroup>
 #include <QMenu>
 
+#include "../../include/gui/game_list.hpp"
 #include "../../include/gui/main_window.hpp"
 #include "../../include/utils/string_utils.hpp"
 
@@ -27,14 +28,12 @@ void TrayIcon::openLogs() {
 	shell.run_command("xdg-open " + Constants::LOG_DIR + "/" + Constants::LOG_FILE_NAME + ".log");
 }
 
-/*
 void openGameList() {
 	if (GameList::INSTANCE == nullptr) {
 		GameList::INSTANCE = new GameList(&MainWindow::getInstance());
 	}
 	GameList::INSTANCE->show();
 }
-*/
 
 void TrayIcon::setAuraBrightness(RgbBrightness brightness) {
 	QMetaObject::invokeMethod(
@@ -262,7 +261,7 @@ TrayIcon::TrayIcon() : QObject(&MainWindow::getInstance()), tray_icon_(new QSyst
 	// -------------------------
 	// Game submenu
 	// -------------------------
-	/*
+
 	QMenu* gamesMenu = new QMenu(("    " + translator.translate("games")).c_str(), menu);
 	menu->insertMenu(nullptr, gamesMenu);
 
@@ -271,7 +270,7 @@ TrayIcon::TrayIcon() : QObject(&MainWindow::getInstance()), tray_icon_(new QSyst
 		openGameList();
 	});
 	gamesMenu->addAction(act);
-	*/
+
 	// -------------------------
 	// Game submenu
 	// -------------------------

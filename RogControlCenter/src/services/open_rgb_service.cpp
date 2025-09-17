@@ -149,14 +149,12 @@ void OpenRgbService::applyAura(const bool& temporal) {
 		configuration.getConfiguration().open_rgb.last_effect = effect;
 
 		if (_color.has_value()) {
-			EffectConfig ec = EffectConfig(_color.value());
-
 			auto it = configuration.getConfiguration().open_rgb.config.find(effect);
 			if (it != configuration.getConfiguration().open_rgb.config.end()) {
-				ec.color = it->second.color;
+				it->second.color = _color.value();
+			} else {
+				configuration.getConfiguration().open_rgb.config[effect] = EffectConfig(_color.value());
 			}
-
-			configuration.getConfiguration().open_rgb.config[effect] = ec;
 		}
 
 		configuration.saveConfig();
