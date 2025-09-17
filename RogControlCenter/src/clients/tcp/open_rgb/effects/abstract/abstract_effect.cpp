@@ -7,20 +7,6 @@
 #include "../../../../../../include/utils/string_utils.hpp"
 #include "../../../../../../include/utils/time_utils.hpp"
 
-double AbstractEffect::brightnessMap(const RgbBrightness& b) {
-	if (b == RgbBrightness::Enum::LOW) {
-		return 0.25;
-	}
-	if (b == RgbBrightness::Enum::MEDIUM) {
-		return 0.5;
-	}
-	if (b == RgbBrightness::Enum::HIGH) {
-		return 0.75;
-	}
-
-	return 1;
-}
-
 void AbstractEffect::start(const DeviceList& devices, const RgbBrightness& brightness) {
 	if (_is_running) {
 		stop();
@@ -35,7 +21,7 @@ void AbstractEffect::start(const DeviceList& devices, const RgbBrightness& brigh
 	}
 
 	_logger.info("Starting effect '{}' with {} brightness", getName(), StringUtils::toLowerCase(brightness.toName()));
-	_brightness = brightnessMap(brightness);
+	_brightness = brightness.toInt() / 100.0;
 	_is_running = true;
 
 	_thread = std::thread([this, &devices] {

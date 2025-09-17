@@ -5,7 +5,7 @@
 #include "../base/int_enum.hpp"
 
 struct RgbBrightnessMeta {
-	enum class Enum : int { MAX = 4, HIGH = 3, MEDIUM = 2, LOW = 1, OFF = 0 } e;
+	enum class Enum : int { MAX = 100, HIGH = 67, MEDIUM = 50, LOW = 33, OFF = 0 } e;
 	const char* name;
 	int val;
 };
@@ -48,7 +48,7 @@ class RgbBrightness : public IntEnum<RgbBrightness, RgbBrightnessMeta::Enum, Rgb
 
   private:
 	static constexpr std::array<RgbBrightnessMeta, 5> table{
-		{{Enum::MAX, "MAX", 4}, {Enum::HIGH, "HIGH", 3}, {Enum::MEDIUM, "MEDIUM", 2}, {Enum::LOW, "LOW", 1}, {Enum::OFF, "OFF", 0}}};
+		{{Enum::MAX, "MAX", 100}, {Enum::HIGH, "HIGH", 67}, {Enum::MEDIUM, "MEDIUM", 50}, {Enum::LOW, "LOW", 33}, {Enum::OFF, "OFF", 0}}};
 
 	static constexpr const std::array<RgbBrightnessMeta, 5>& metaTable() {
 		return table;

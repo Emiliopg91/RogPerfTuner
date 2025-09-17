@@ -28,8 +28,6 @@ class AbstractEffect {
 	std::thread _thread;
 	Client& _client;
 
-	static double brightnessMap(const RgbBrightness& b);
-
   public:
 	AbstractEffect(Client& client, const std::string& name);
 
