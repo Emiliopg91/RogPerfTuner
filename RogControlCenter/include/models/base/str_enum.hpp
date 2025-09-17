@@ -22,7 +22,7 @@ class StrEnum {
 				return table[i].val;
 			}
 		}
-		return "UNKNOWN";
+		throw std::runtime_error("Missing string matching");
 	}
 
 	std::string toName() const {
@@ -32,7 +32,7 @@ class StrEnum {
 				return table[i].name;
 			}
 		}
-		return "UNKNOWN";
+		throw std::runtime_error("Missing name matching");
 	}
 
 	bool operator==(const StrEnum& other) const {

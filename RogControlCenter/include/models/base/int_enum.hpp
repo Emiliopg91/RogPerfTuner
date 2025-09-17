@@ -28,7 +28,7 @@ class IntEnum {
 				return Derived::metaTable()[i].name;
 			}
 		}
-		return "UNKNOWN";
+		throw std::runtime_error("Missing name matching");
 	}
 
 	bool operator==(const IntEnum& other) const {

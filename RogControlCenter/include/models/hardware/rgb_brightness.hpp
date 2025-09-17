@@ -16,35 +16,9 @@ class RgbBrightness : public IntEnum<RgbBrightness, RgbBrightnessMeta::Enum, Rgb
 	using Base = IntEnum<RgbBrightness, Enum, RgbBrightnessMeta, 5>;
 	using Base::Base;
 
-	RgbBrightness getNextBrightness() const {
-		switch (this->value) {
-			case Enum::HIGH:
-				return RgbBrightness(Enum::MAX);
-			case Enum::MEDIUM:
-				return RgbBrightness(Enum::HIGH);
-			case Enum::LOW:
-				return RgbBrightness(Enum::MEDIUM);
-			case Enum::OFF:
-				return RgbBrightness(Enum::LOW);
-			default:
-				return *this;
-		}
-	}
+	RgbBrightness getNextBrightness() const;
 
-	RgbBrightness getPreviousBrightness() const {
-		switch (this->value) {
-			case Enum::MAX:
-				return RgbBrightness(Enum::HIGH);
-			case Enum::HIGH:
-				return RgbBrightness(Enum::MEDIUM);
-			case Enum::MEDIUM:
-				return RgbBrightness(Enum::LOW);
-			case Enum::LOW:
-				return RgbBrightness(Enum::OFF);
-			default:
-				return *this;
-		}
-	}
+	RgbBrightness getPreviousBrightness() const;
 
   private:
 	static constexpr std::array<RgbBrightnessMeta, 5> table{

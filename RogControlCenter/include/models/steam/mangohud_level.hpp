@@ -3,9 +3,7 @@
 #include <array>
 
 #include "../base/str_enum.hpp"
-// --------------------
-// Meta independiente
-// --------------------
+
 struct MangoHudLevelMeta {
 	enum class Enum { NO_DISPLAY, FPS_ONLY, HORIZONTAL_VIEW, EXTENDED, HIGH_DETAILED } e;
 	const char* name;
@@ -18,20 +16,7 @@ class MangoHudLevel : public StrEnum<MangoHudLevel, MangoHudLevelMeta::Enum, 5> 
 	using Base = StrEnum<MangoHudLevel, Enum, 5>;
 	using Base::Base;
 
-	int getPresetIndex() {
-		switch (this->value) {
-			case MangoHudLevelMeta::Enum::NO_DISPLAY:
-				return 0;
-			case MangoHudLevelMeta::Enum::FPS_ONLY:
-				return 1;
-			case MangoHudLevelMeta::Enum::HORIZONTAL_VIEW:
-				return 2;
-			case MangoHudLevelMeta::Enum::EXTENDED:
-				return 3;
-			case MangoHudLevelMeta::Enum::HIGH_DETAILED:
-				return 4;
-		}
-	}
+	int getPresetIndex();
 
   private:
 	static constexpr std::array<MangoHudLevelMeta, 5> table{{{Enum::NO_DISPLAY, "NO_DISPLAY", "no_display"},

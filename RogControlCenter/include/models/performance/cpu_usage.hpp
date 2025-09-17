@@ -9,11 +9,7 @@ struct CPUUsage {
 	long long irq	  = 0;
 	long long softirq = 0;
 
-	long long total() const {
-		return user + nice + system + idle + iowait + irq + softirq;
-	}
+	long long total() const;
 
-	long long active() const {
-		return total() - idle - iowait;
-	}
+	long long active() const;
 };
