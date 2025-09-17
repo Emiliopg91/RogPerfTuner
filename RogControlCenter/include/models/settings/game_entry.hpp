@@ -39,7 +39,7 @@ inline void to_json(json& j, const GameEntry& g) {
 		j["overlayId"] = json(*g.overlayId);
 	}
 
-	j["metrics"]   = g.metrics_level.toInt();
+	j["metrics"]   = g.metrics_level.toString();
 	j["name"]	   = g.name;
 	j["proton"]	   = g.proton;
 	j["steamdeck"] = g.steamdeck;
@@ -78,15 +78,9 @@ inline void from_json(const json& j, GameEntry& g) {
 		g.gpu = std::nullopt;
 	}
 
-	if (j.contains("metrics_level")) {
-		g.metrics_level = MangoHudLevel::fromInt(j.at("metrics_level").get<int>());
-	} else {
-		g.metrics_level = MangoHudLevel::fromInt(j.at("metrics").get<int>());
-	}
-
-	// Campos obligatorios (sin optional)
-	g.name		= j.at("name").get<std::string>();
-	g.proton	= j.at("proton").get<bool>();
-	g.steamdeck = j.at("steamdeck").get<bool>();
-	g.sync		= WineSyncOption::fromString(j.at("sync").get<std::string>());
+	g.metrics_level = MangoHudLevel::fromString(j.at("metrics").get<std::string>());
+	g.name			= j.at("name").get<std::string>();
+	g.proton		= j.at("proton").get<bool>();
+	g.steamdeck		= j.at("steamdeck").get<bool>();
+	g.sync			= WineSyncOption::fromString(j.at("sync").get<std::string>());
 }

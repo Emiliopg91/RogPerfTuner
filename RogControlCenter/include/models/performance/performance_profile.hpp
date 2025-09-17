@@ -2,21 +2,21 @@
 
 #include <array>
 
-#include "../base/int_enum.hpp"
+#include "../base/str_enum.hpp"
 #include "../performance/platform_profile.hpp"
 #include "../performance/power_profile.hpp"
 #include "../performance/ssd_scheduler.hpp"
 
 struct PerformanceProfileMeta {
-	enum class Enum : int { PERFORMANCE = 2, BALANCED = 1, QUIET = 0 } e;
+	enum class Enum { PERFORMANCE, BALANCED, QUIET } e;
 	const char* name;
-	int val;
+	const char* val;
 };
 
-class PerformanceProfile : public IntEnum<PerformanceProfile, PerformanceProfileMeta::Enum, PerformanceProfileMeta, 3> {
+class PerformanceProfile : public StrEnum<PerformanceProfile, PerformanceProfileMeta::Enum, 3> {
   public:
 	using Enum = PerformanceProfileMeta::Enum;
-	using Base = IntEnum<PerformanceProfile, Enum, PerformanceProfileMeta, 3>;
+	using Base = StrEnum<PerformanceProfile, Enum, 3>;
 	using Base::Base;
 
 	PerformanceProfile getNextPerformanceProfile() {
@@ -72,7 +72,7 @@ class PerformanceProfile : public IntEnum<PerformanceProfile, PerformanceProfile
 
   private:
 	static constexpr std::array<PerformanceProfileMeta, 3> table{
-		{{Enum::QUIET, "QUIET", 0}, {Enum::BALANCED, "BALANCED", 1}, {Enum::PERFORMANCE, "PERFORMANCE", 2}}};
+		{{Enum::QUIET, "QUIET", "quiet"}, {Enum::BALANCED, "BALANCED", "balanced"}, {Enum::PERFORMANCE, "PERFORMANCE", "performance"}}};
 
 	static constexpr const std::array<PerformanceProfileMeta, 3>& metaTable() {
 		return table;

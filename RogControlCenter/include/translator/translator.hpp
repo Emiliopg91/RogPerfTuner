@@ -256,27 +256,27 @@ class Translator : public Singleton<Translator> {
 			"Nivel",
 		},
 		{
-			"label.level.0",
+			"label.level.no_display",
 			"Disabled",
 			"Desactivado",
 		},
 		{
-			"label.level.1",
+			"label.level.fps_only",
 			"Only FPS",
 			"Solo FPS",
 		},
 		{
-			"label.level.2",
+			"label.level.horizontal",
 			"Horizontal",
 			"Horizontal",
 		},
 		{
-			"label.level.3",
+			"label.level.extended",
 			"Extended",
 			"Extendido",
 		},
 		{
-			"label.level.4",
+			"label.level.detailed",
 			"Detailed",
 			"Detallado",
 		},

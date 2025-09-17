@@ -38,7 +38,8 @@ MainWindow::MainWindow(QWidget* parent) : QMainWindow(parent), _logger(new Logge
 	auto items = PerformanceProfile::getAll();
 	std::reverse(items.begin(), items.end());
 	for (PerformanceProfile item : items) {
-		_profileDropdown->addItem(QString::fromStdString(translator.translate("label.profile." + item.toName())), item.toInt());
+		_profileDropdown->addItem(QString::fromStdString(translator.translate("label.profile." + item.toName())),
+								  QString::fromStdString(item.toString()));
 	}
 	connect(_profileDropdown, QOverload<int>::of(&QComboBox::currentIndexChanged), this, &MainWindow::onProfileChanged);
 	setPerformanceProfile(profileService.getPerformanceProfile());
@@ -147,7 +148,7 @@ void MainWindow::onGameEvent(int runningGames) {
 }
 
 void MainWindow::setPerformanceProfile(PerformanceProfile value) {
-	_profileDropdown->setCurrentIndex(_profileDropdown->findData(value.toInt()));
+	_profileDropdown->setCurrentIndex(_profileDropdown->findData(QString::fromStdString(value.toString())));
 }
 
 void MainWindow::setBatteryChargeLimit(BatteryThreshold value) {
@@ -163,7 +164,7 @@ void MainWindow::setAuraEffect(std::string effect) {
 }
 
 void MainWindow::onProfileChanged(int) {
-	PerformanceProfile profile = PerformanceProfile::fromInt(_profileDropdown->currentData().toInt());
+	PerformanceProfile profile = PerformanceProfile::fromString(_profileDropdown->currentData().toString().toStdString());
 	if (steamService.getRunningGames().empty()) {
 		if (profileService.getPerformanceProfile() != profile) {
 			profileService.setPerformanceProfile(profile);

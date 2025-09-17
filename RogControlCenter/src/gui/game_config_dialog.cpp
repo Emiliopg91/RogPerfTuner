@@ -67,11 +67,14 @@ GameConfigDialog::GameConfigDialog(unsigned int gid, bool runAfterSave, QWidget*
 	metricsCombo = new NoScrollComboBox();
 	metricsCombo->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Preferred);
 	auto items = MangoHudLevel::getAll();
+	i		   = 0;
 	for (MangoHudLevel level : items) {
-		metricsCombo->addItem(QString::fromStdString(translator.translate("label.level." + std::to_string(level.toInt()))), level.toInt());
+		metricsCombo->addItem(QString::fromStdString(translator.translate("label.level." + level.toString())),
+							  QString::fromStdString(level.toString()));
 		if (level == gameEntry.metrics_level) {
-			metricsCombo->setCurrentIndex(level.toInt());
+			metricsCombo->setCurrentIndex(i);
 		}
+		i++;
 	}
 	metricsCombo->setEnabled(steamService.metricsEnabled());
 	layout->addRow(new QLabel(QString::fromStdString(translator.translate("metrics") + ":")), metricsCombo);
@@ -127,7 +130,7 @@ void GameConfigDialog::onAccept() {
 
 	MangoHudLevel level = MangoHudLevel::Enum::NO_DISPLAY;
 	if (steamService.metricsEnabled()) {
-		level = MangoHudLevel::fromInt(metricsCombo->currentData().toInt());
+		level = MangoHudLevel::fromString(metricsCombo->currentData().toString().toStdString());
 	}
 
 	WineSyncOption sync = WineSyncOption::Enum::AUTO;
@@ -139,7 +142,7 @@ void GameConfigDialog::onAccept() {
 	gameEntry.env			= envInput->text().toStdString();
 	gameEntry.wrappers		= wrappersInput->text().toStdString();
 	gameEntry.gpu			= gpu;
-	gameEntry.metrics_level = level.toInt();
+	gameEntry.metrics_level = level.toString();
 	gameEntry.steamdeck		= modeCombo->currentData().toBool();
 	gameEntry.sync			= sync.toString();
 

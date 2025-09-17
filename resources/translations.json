@@ -187,23 +187,23 @@
     "en": "Level",
     "es": "Nivel"
   },
-  "label.level.0": {
+  "label.level.no_display": {
     "en": "Disabled",
     "es": "Desactivado"
   },
-  "label.level.1": {
+  "label.level.fps_only": {
     "en": "Only FPS",
     "es": "Solo FPS"
   },
-  "label.level.2": {
+  "label.level.horizontal": {
     "en": "Horizontal",
     "es": "Horizontal"
   },
-  "label.level.3": {
+  "label.level.extended": {
     "en": "Extended",
     "es": "Extendido"
   },
-  "label.level.4": {
+  "label.level.detailed": {
     "en": "Detailed",
     "es": "Detallado"
   },

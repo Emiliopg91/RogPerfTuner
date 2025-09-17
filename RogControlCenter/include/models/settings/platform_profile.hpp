@@ -10,8 +10,8 @@ struct PlatformProfiles {
 };
 
 inline void to_json(nlohmann::json& j, const PlatformProfiles& o) {
-	j = nlohmann::json{{"profile", o.profile.toInt()}};
+	j = nlohmann::json{{"profile", o.profile.toString()}};
 }
 inline void from_json(const nlohmann::json& j, PlatformProfiles& o) {
-	o.profile = PerformanceProfile::fromInt(j.at("profile").get<int>());
+	o.profile = PerformanceProfile::fromString(j.at("profile").get<std::string>());
 }
