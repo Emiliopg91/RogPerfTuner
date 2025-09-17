@@ -136,9 +136,9 @@ std::vector<Color> DigitalRainEffect::_to_color_matrix(const std::vector<std::ve
 				if (led.cur_val >= led.max_val) {
 					colors[led.pos_idx] = Color::White;
 				} else if (led.cur_val >= int(2 * led.max_val / 3)) {
-					colors[led.pos_idx] = Color::Green;
+					colors[led.pos_idx] = *_color;
 				} else {
-					colors[led.pos_idx] = Color::Green * _sin_array[std::floor(led.cur_val * (_max_count / static_cast<double>(_max_count)))];
+					colors[led.pos_idx] = *_color * _sin_array[std::floor(led.cur_val * (_max_count / static_cast<double>(_max_count)))];
 				}
 			}
 		}
@@ -170,7 +170,7 @@ void DigitalRainEffect::cpu_thread() {
 	}
 }
 
-DigitalRainEffect::DigitalRainEffect(Client& client) : AbstractEffect(client, "Digital rain") {
+DigitalRainEffect::DigitalRainEffect(Client& client) : AbstractEffect(client, "Digital rain", Color::Green.toHex()) {
 	std::random_device rd;
 	_rng = std::mt19937(rd());
 	_sin_array.resize(2 * _max_count / 3);

@@ -298,5 +298,13 @@
   "wrappers": {
     "en": "Wrappers",
     "es": "Wrappers"
+  },
+  "pick.color": {
+    "en": "Pick color",
+    "es": "Selección de color"
+  },
+  "select": {
+    "en": "Select",
+    "es": "Seleccionar"
   }
 }

@@ -1,6 +1,7 @@
 #pragma once
 
 #include <mutex>
+#include <optional>
 
 #include "../clients/dbus/linux/upower_client.hpp"
 #include "../clients/tcp/open_rgb/open_rgb_client.hpp"
@@ -15,10 +16,12 @@ class OpenRgbService : public Singleton<OpenRgbService> {
 	std::vector<std::string> getAvailableEffects();
 	std::string getCurrentEffect();
 	RgbBrightness getCurrentBrightness();
+	std::optional<std::string> getColor();
 
+	void restoreAura();
 	void setBrightness(const RgbBrightness& newBrightness);
 	void setEffect(const std::string& newEffect, const bool& temporal = false);
-	void restoreAura();
+	void setColor(const std::string& color);
 	void disableDevice(const UsbIdentifier&);
 
 	RgbBrightness increaseBrightness();
@@ -35,6 +38,7 @@ class OpenRgbService : public Singleton<OpenRgbService> {
 
 	RgbBrightness brightness = RgbBrightness::Enum::MAX;
 	std::string effect;
+	std::optional<std::string> _color = std::nullopt;
 
 	UPowerClient& uPowerClient	 = UPowerClient::getInstance();
 	OpenRgbClient& openRgbClient = OpenRgbClient::getInstance();

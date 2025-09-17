@@ -14,7 +14,7 @@ elseif(CMAKE_BUILD_TYPE STREQUAL "Debug")
     add_compile_options(-pg -O0 )
 endif()
 
-add_compile_options(-Wno-unqualified-std-cast-call -Wextra -Werror -Wno-unused-result -Wno-deprecated-copy)
+add_compile_options(-Wno-unqualified-std-cast-call -Wextra -Werror -Wno-unused-result -Wno-deprecated-copy -Wno-deprecated-literal-operator)
 
 add_subdirectory(submodules/httplib)
 

@@ -60,6 +60,9 @@ class EventBus : public Singleton<EventBus> {
 	void onBattery(std::function<void(bool)>&& callback);
 	void emitBattery(const bool& onBattery);
 
+	void onRgbColor(std::function<void(std::optional<std::string>)>&& callback);
+	void emitRgbColor(std::optional<std::string> color);
+
 	inline const static constexpr std::string_view APPLICATION_STOP					  = "APPLICATION_STOP";
 	inline const static constexpr std::string_view UDEV_CLIENT_DEVICE_EVENT			  = "UDEV_CLIENT_DEVICE_EVENT";
 	inline const static constexpr std::string_view HARDWARE_SERVICE_USB_REMOVED		  = "HARDWARE_SERVICE_USB_REMOVED";
@@ -68,6 +71,7 @@ class EventBus : public Singleton<EventBus> {
 	inline const static constexpr std::string_view HARDWARE_SERVICE_THRESHOLD_CHANGED = "HARDWARE_SERVICE_THRESHOLD_CHANGED";
 	inline const static constexpr std::string_view ORGB_SERVICE_ON_BRIGHTNESS		  = "ORGB_SERVICE_ON_BRIGHTNESS";
 	inline const static constexpr std::string_view ORGB_SERVICE_ON_EFFECT			  = "ORGB_SERVICE_ON_EFFECT";
+	inline const static constexpr std::string_view ORGB_SERVICE_ON_COLOR			  = "ORGB_SERVICE_ON_COLOR";
 	inline const static constexpr std::string_view PROFILE_SERVICE_ON_PROFILE		  = "PROFILE_SERVICE_ON_PROFILE";
 	inline const static constexpr std::string_view STEAM_SERVICE_GAME_EVENT			  = "STEAM_SERVICE_GAME_EVENT";
 

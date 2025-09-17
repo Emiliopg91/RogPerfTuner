@@ -104,6 +104,15 @@ void EventBus::emitRgbBrightness(const RgbBrightness& brightness) {
 	this->emit_event(ORGB_SERVICE_ON_BRIGHTNESS, {brightness});
 }
 
+void EventBus::onRgbColor(std::function<void(std::optional<std::string>)>&& callback) {
+	this->on_with_data(ORGB_SERVICE_ON_COLOR, [cb = std::move(callback)](CallbackParam data) {
+		cb(std::any_cast<std::optional<std::string>>(data[0]));
+	});
+}
+void EventBus::emitRgbColor(std::optional<std::string> color) {
+	this->emit_event(ORGB_SERVICE_ON_COLOR, {color});
+}
+
 void EventBus::onChargeThreshold(std::function<void(BatteryThreshold)>&& callback) {
 	this->on_with_data(HARDWARE_SERVICE_THRESHOLD_CHANGED, [cb = std::move(callback)](CallbackParam data) {
 		cb(std::any_cast<BatteryThreshold>(data[0]));

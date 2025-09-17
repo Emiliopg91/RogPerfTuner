@@ -1,6 +1,8 @@
 #include "../../../../../../include/clients/tcp/open_rgb/effects/abstract/abstract_effect.hpp"
 
 #include <mutex>
+#include <optional>
+#include <string>
 #include <thread>
 
 #include "../../../../../../include/models/hardware/rgb_brightness.hpp"
@@ -20,7 +22,12 @@ void AbstractEffect::start(const DeviceList& devices, const RgbBrightness& brigh
 		return;
 	}
 
-	_logger.info("Starting effect '{}' with {} brightness", getName(), StringUtils::toLowerCase(brightness.toName()));
+	if (!_color.has_value()) {
+		_logger.info("Starting effect '{}' with {} brightness", getName(), StringUtils::toLowerCase(brightness.toName()));
+	} else {
+		_logger.info("Starting effect '{}' with {} brightness and color {}", getName(), StringUtils::toLowerCase(brightness.toName()),
+					 StringUtils::toUpperCase(_color.value().toHex()));
+	}
 	_brightness = brightness.toInt() / 100.0;
 	_is_running = true;
 
@@ -66,9 +73,30 @@ void AbstractEffect::_thread_main(const DeviceList& devices) {
 	_logger.info("Effect finished");
 }
 
-AbstractEffect::AbstractEffect(Client& client, const std::string& name) : _name(name), _client(client) {
+AbstractEffect::AbstractEffect(Client& client, const std::string& name, const std::optional<std::string>& color) : _name(name), _client(client) {
+	if (color.has_value()) {
+		_color = Color::fromRgb(*color);
+	}
 }
 
 const std::string AbstractEffect::getName() {
 	return _name;
+}
+
+bool AbstractEffect::supportsColor() {
+	return _color.has_value();
+}
+
+void AbstractEffect::setColor(std::string color) {
+	if (supportsColor()) {
+		_color = Color::fromRgb(color);
+	}
+}
+
+std::optional<std::string> AbstractEffect::getColor() {
+	std::optional<std::string> res = std::nullopt;
+	if (_color.has_value()) {
+		res = _color->toHex();
+	}
+	return res;
 }

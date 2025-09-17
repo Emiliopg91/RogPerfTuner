@@ -2,7 +2,7 @@
 
 void StaticEffect::apply_effect(const DeviceList& devices) {
 	for (auto& dev : devices) {
-		std::vector<Color> colors(dev.leds.size(), Color::Red);
+		std::vector<Color> colors(dev.leds.size(), *_color);
 		_set_colors(dev, colors);
 	}
 	while (_is_running) {
@@ -10,5 +10,5 @@ void StaticEffect::apply_effect(const DeviceList& devices) {
 	}
 }
 
-StaticEffect::StaticEffect(Client& client) : AbstractEffect(client, "Static") {
+StaticEffect::StaticEffect(Client& client) : AbstractEffect(client, "Static", Color::Red.toHex()) {
 }

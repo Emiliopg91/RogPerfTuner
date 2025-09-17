@@ -1,6 +1,10 @@
 #include "../../include/gui/main_window.hpp"
 
+#include <qcontainerfwd.h>
+#include <qpushbutton.h>
+
 #include <QApplication>
+#include <QColorDialog>
 #include <QFormLayout>
 #include <QGroupBox>
 #include <QLabel>
@@ -8,6 +12,7 @@
 #include <algorithm>
 
 #include "../../include/gui/game_list.hpp"
+#include "OpenRGB/Color.hpp"
 
 MainWindow::MainWindow(QWidget* parent) : QMainWindow(parent), _logger(new Logger()) {
 	setWindowTitle(QString::fromStdString(Constants::APP_NAME + " v" + Constants::APP_VERSION));
@@ -80,6 +85,14 @@ MainWindow::MainWindow(QWidget* parent) : QMainWindow(parent), _logger(new Logge
 	connect(_brightnessDropdown, QOverload<int>::of(&QComboBox::currentIndexChanged), this, &MainWindow::onBrightnessChange);
 	auraLayout->addRow(new QLabel(QString::fromStdString(translator.translate("brightness") + ":")), _brightnessDropdown);
 
+	_colorButton = new QPushButton();
+	_colorButton->setFixedSize(25, 25);
+	_colorButton->setStyleSheet(QString::fromStdString("background-color: " + (openRgbService.getColor().value_or(Color::Black.toHex()))));
+	_colorButton->setCursor(Qt::PointingHandCursor);
+	_colorButton->setEnabled(openRgbService.getColor().has_value());
+	connect(_colorButton, &QPushButton::clicked, this, &MainWindow::showColorPicker);
+	auraLayout->addRow(new QLabel(QString::fromStdString(translator.translate("color") + ":")), _colorButton);
+
 	auraGroup->setLayout(auraLayout);
 	mainLayout->addWidget(auraGroup);
 
@@ -125,6 +138,10 @@ MainWindow::MainWindow(QWidget* parent) : QMainWindow(parent), _logger(new Logge
 		setAuraBrightness(brightness);
 	});
 
+	eventBus.onRgbColor([this](std::optional<std::string> color) {
+		setAuraColor(color);
+	});
+
 	eventBus.onRgbEffect([this](std::string effect) {
 		setAuraEffect(effect);
 	});
@@ -159,6 +176,11 @@ void MainWindow::setAuraBrightness(RgbBrightness brightness) {
 	_brightnessDropdown->setCurrentIndex(_brightnessDropdown->findData(brightness.toInt()));
 }
 
+void MainWindow::setAuraColor(std::optional<std::string> color) {
+	_colorButton->setStyleSheet(QString::fromStdString("background-color: " + (color.value_or(Color::Black.toHex()))));
+	_colorButton->setEnabled(color.has_value());
+}
+
 void MainWindow::setAuraEffect(std::string effect) {
 	_effectDropdown->setCurrentIndex(_effectDropdown->findData(QString::fromStdString(effect)));
 }
@@ -176,6 +198,15 @@ void MainWindow::onBatteryLimitChanged(int) {
 	auto threshold = BatteryThreshold::fromInt(_thresholdDropdown->currentData().toInt());
 	if (hardwareService.getChargeThreshold() != threshold) {
 		hardwareService.setChargeThreshold(threshold);
+	}
+}
+
+void MainWindow::showColorPicker() {
+	QColor initial = QColor(QString::fromStdString(openRgbService.getColor().value()));
+	QColor chosen  = QColorDialog::getColor(initial, this, QString::fromStdString(translator.translate("pick.color")));
+
+	if (chosen.isValid()) {
+		openRgbService.setColor(chosen.name(QColor::HexRgb).toStdString());
 	}
 }
 

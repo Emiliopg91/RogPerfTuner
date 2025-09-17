@@ -42,6 +42,7 @@ void OpenRgbClient::initialize() {
 	availableEffects.push_back(std::unique_ptr<AbstractEffect>(&SpectrumCycleEffect::init(client)));
 	availableEffects.push_back(std::unique_ptr<AbstractEffect>(&StarryNightEffect::init(client)));
 	availableEffects.push_back(std::unique_ptr<AbstractEffect>(&StaticEffect::init(client)));
+	currentEffectIdx = availableEffects.size() - 1;
 
 	eventBus.onApplicationStop([this]() {
 		stop();
@@ -163,15 +164,21 @@ const std::vector<std::string> OpenRgbClient::getAvailableEffects() {
 	return result;
 }
 
-void OpenRgbClient::applyEffect(const std::string& effectName, const RgbBrightness& brightness) {
+void OpenRgbClient::applyEffect(const std::string& effectName, const RgbBrightness& brightness, const std::optional<std::string>& color) {
 	for (const auto& effect : availableEffects) {
 		effect->stop();
 	}
+	int idx = 0;
 	for (const auto& effect : availableEffects) {
 		if (effect->getName() == effectName) {
+			if (effect->supportsColor() && color.has_value()) {
+				effect->setColor(color.value());
+			}
 			effect->start(detectedDevices, brightness);
+			currentEffectIdx = idx;
 			break;
 		}
+		idx++;
 	}
 }
 
@@ -181,4 +188,12 @@ void OpenRgbClient::disableDevice(const std::string& devName) {
 			dev->enabled = false;
 		}
 	}
+}
+
+bool OpenRgbClient::supportsColor() {
+	return availableEffects.at(currentEffectIdx)->supportsColor();
+}
+
+const std::optional<std::string> OpenRgbClient::getColor() {
+	return availableEffects.at(currentEffectIdx)->getColor();
 }

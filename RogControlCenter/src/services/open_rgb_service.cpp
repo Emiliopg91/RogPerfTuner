@@ -1,5 +1,7 @@
 #include "../../include/services/open_rgb_service.hpp"
 
+#include <optional>
+
 #include "../../include/clients/tcp/open_rgb/open_rgb_client.hpp"
 #include "../../include/configuration/configuration.hpp"
 #include "../../include/events/event_bus.hpp"
@@ -16,7 +18,7 @@ OpenRgbService::OpenRgbService() {
 
 	eventBus.onBattery([this](bool onBat) {
 		auto brightness = onBat ? RgbBrightness::Enum::OFF : this->brightness;
-		openRgbClient.applyEffect(effect, brightness);
+		openRgbClient.applyEffect(effect, brightness, _color);
 	});
 
 	eventBus.onUsbAdded([this]() {
@@ -35,11 +37,25 @@ OpenRgbService::OpenRgbService() {
 void OpenRgbService::restoreAura() {
 	effect	   = configuration.getConfiguration().open_rgb.last_effect.value_or("Static");
 	brightness = configuration.getConfiguration().open_rgb.brightness;
+	_color	   = std::nullopt;
+
+	auto it = configuration.getConfiguration().open_rgb.config.find(effect);
+	if (it != configuration.getConfiguration().open_rgb.config.end()) {
+		_color = it->second.color;
+	}
+
+	applyAura();
+
+	if (!_color.has_value()) {
+		auto c = openRgbClient.getColor();
+		if (c.has_value()) {
+			_color = c.value();
+		}
+	}
 
 	eventBus.emitRgbEffect(effect);
 	eventBus.emitRgbBrightness(brightness);
-
-	applyAura();
+	eventBus.emitRgbColor(_color);
 }
 
 std::string OpenRgbService::getDeviceName(const UsbIdentifier& identifier) {
@@ -66,6 +82,10 @@ RgbBrightness OpenRgbService::getCurrentBrightness() {
 	return brightness;
 }
 
+std::optional<std::string> OpenRgbService::getColor() {
+	return _color;
+}
+
 void OpenRgbService::setBrightness(const RgbBrightness& newBrightness) {
 	std::lock_guard<std::mutex> lock(actionMutex);
 	if (brightness != newBrightness) {
@@ -79,8 +99,30 @@ void OpenRgbService::setEffect(const std::string& newEffect, const bool& tempora
 	std::lock_guard<std::mutex> lock(actionMutex);
 	if (effect != newEffect) {
 		effect = newEffect;
+
+		_color	= std::nullopt;
+		auto it = configuration.getConfiguration().open_rgb.config.find(effect);
+		if (it != configuration.getConfiguration().open_rgb.config.end()) {
+			_color = it->second.color;
+		}
+
 		applyAura(temporal);
+
+		if (!_color.has_value()) {
+			_color = openRgbClient.getColor();
+		}
+
 		eventBus.emitRgbEffect(newEffect);
+		eventBus.emitRgbColor(openRgbClient.getColor());
+	}
+}
+
+void OpenRgbService::setColor(const std::string& color) {
+	std::lock_guard<std::mutex> lock(actionMutex);
+	if (_color.has_value()) {
+		_color = color;
+		applyAura();
+		eventBus.emitRgbColor(openRgbClient.getColor());
 	}
 }
 
@@ -100,11 +142,23 @@ void OpenRgbService::applyAura(const bool& temporal) {
 	logger.info("Applying aura settings");
 	Logger::add_tab();
 	auto t0 = TimeUtils::now();
-	openRgbClient.applyEffect(effect, brightness);
+	openRgbClient.applyEffect(effect, brightness, _color);
 
 	if (!temporal) {
 		configuration.getConfiguration().open_rgb.brightness  = brightness;
 		configuration.getConfiguration().open_rgb.last_effect = effect;
+
+		if (_color.has_value()) {
+			EffectConfig ec = EffectConfig(_color.value());
+
+			auto it = configuration.getConfiguration().open_rgb.config.find(effect);
+			if (it != configuration.getConfiguration().open_rgb.config.end()) {
+				ec.color = it->second.color;
+			}
+
+			configuration.getConfiguration().open_rgb.config[effect] = ec;
+		}
+
 		configuration.saveConfig();
 	}
 

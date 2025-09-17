@@ -35,6 +35,8 @@ class MainWindow : public QMainWindow, public Singleton<MainWindow> {
 
 	void setAuraBrightness(RgbBrightness brightness);
 
+	void setAuraColor(std::optional<std::string> color);
+
 	void setAuraEffect(std::string effect);
 
 	void onAutostartChanged(bool enabled);
@@ -48,6 +50,8 @@ class MainWindow : public QMainWindow, public Singleton<MainWindow> {
 	void onBrightnessChange(int index);
 
 	void openGameList();
+
+	void showColorPicker();
 
   private:
 	friend class Singleton<MainWindow>;
@@ -65,6 +69,7 @@ class MainWindow : public QMainWindow, public Singleton<MainWindow> {
 	QPushButton* _gameProfileButton;
 	QComboBox* _effectDropdown;
 	QComboBox* _brightnessDropdown;
+	QPushButton* _colorButton;
 	QComboBox* _thresholdDropdown;
 	QCheckBox* _autostart;
 };

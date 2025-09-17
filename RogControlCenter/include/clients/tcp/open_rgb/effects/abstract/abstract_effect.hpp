@@ -1,6 +1,7 @@
 #pragma once
 
 #include <mutex>
+#include <optional>
 #include <string>
 
 #include "../../../../../logger/logger.hpp"
@@ -27,9 +28,10 @@ class AbstractEffect {
 	std::mutex _mutex;
 	std::thread _thread;
 	Client& _client;
+	std::optional<Color> _color;
 
   public:
-	AbstractEffect(Client& client, const std::string& name);
+	AbstractEffect(Client& client, const std::string& name, const std::optional<std::string>& color = std::nullopt);
 
 	virtual ~AbstractEffect() {
 		stop();
@@ -38,8 +40,11 @@ class AbstractEffect {
 	const std::string getName();
 
 	void start(const DeviceList& devices, const RgbBrightness& brightness);
-
 	void stop();
+
+	void setColor(std::string color);
+	std::optional<std::string> getColor();
+	bool supportsColor();
 
   protected:
 	void _sleep(const double& seconds);

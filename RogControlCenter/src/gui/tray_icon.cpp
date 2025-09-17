@@ -1,9 +1,15 @@
 #include "../../include/gui/tray_icon.hpp"
 
+#include <qaction.h>
+#include <qcolordialog.h>
+#include <qkeysequence.h>
+#include <qobject.h>
+
 #include <QActionGroup>
 #include <QMenu>
 
 #include "../../include/gui/main_window.hpp"
+#include "../../include/utils/string_utils.hpp"
 
 void TrayIcon::openMainWindow() {
 	MainWindow::getInstance().show();
@@ -44,6 +50,20 @@ void TrayIcon::setAuraEffect(const std::string& effect) {
 		&TrayIcon::getInstance(),
 		[=, this]() {
 			effectActions[effect]->setChecked(true);
+		},
+		Qt::QueuedConnection);
+}
+
+void TrayIcon::setAuraColor(const std::optional<std::string>& color) {
+	QMetaObject::invokeMethod(
+		&TrayIcon::getInstance(),
+		[=, this]() {
+			if (color.has_value()) {
+				colorMenu->setEnabled(true);
+				currentColorAction->setText(QString::fromStdString(StringUtils::toUpperCase(color.value())));
+			} else {
+				colorMenu->setEnabled(false);
+			}
 		},
 		Qt::QueuedConnection);
 }
@@ -180,6 +200,31 @@ TrayIcon::TrayIcon() : QObject(&MainWindow::getInstance()), tray_icon_(new QSyst
 	menu->insertMenu(nullptr, brightnessMenu);
 	// -------------------------
 	// Brightness submenu
+	// -------------------------
+	// -------------------------
+	// Color submenu
+	// -------------------------
+	colorMenu = new QMenu(("    " + translator.translate("color")).c_str(), menu);
+	colorMenu->setEnabled(openRgbService.getColor().has_value());
+
+	currentColorAction = new QAction(StringUtils::toUpperCase(openRgbService.getColor().value_or("")).c_str(), menu);
+	currentColorAction->setEnabled(false);
+	colorMenu->addAction(currentColorAction);
+
+	pickColorAction = new QAction((translator.translate("select")).c_str(), menu);
+	QObject::connect(pickColorAction, &QAction::triggered, [this]() {
+		QColor initial = QColor(QString::fromStdString(openRgbService.getColor().value()));
+		QColor chosen  = QColorDialog::getColor(initial, nullptr, QString::fromStdString(translator.translate("pick.color")));
+
+		if (chosen.isValid()) {
+			openRgbService.setColor(chosen.name(QColor::HexRgb).toStdString());
+		}
+	});
+	colorMenu->addAction(pickColorAction);
+
+	menu->insertMenu(nullptr, colorMenu);
+	// -------------------------
+	// Color submenu
 	// -------------------------
 	// -------------------------
 	// Aura menu
@@ -338,6 +383,10 @@ TrayIcon::TrayIcon() : QObject(&MainWindow::getInstance()), tray_icon_(new QSyst
 
 	eventBus.onRgbEffect([this](std::string effect) {
 		setAuraEffect(effect);
+	});
+
+	eventBus.onRgbColor([this](std::optional<std::string> color) {
+		setAuraColor(color);
 	});
 
 	eventBus.onChargeThreshold([this](BatteryThreshold threshold) {

@@ -1,5 +1,7 @@
 #pragma once
 
+#include <qaction.h>
+
 #include <QAction>
 #include <QObject>
 #include <QSystemTrayIcon>
@@ -38,9 +40,13 @@ class TrayIcon : public QObject, public Singleton<TrayIcon> {
 	std::unordered_map<std::string, QAction*> effectActions;
 	std::unordered_map<std::string, QAction*> perfProfileActions;
 	QMenu* profileMenu;
+	QMenu* colorMenu;
+	QAction* currentColorAction;
+	QAction* pickColorAction;
 
 	void setAuraBrightness(RgbBrightness brightness);
 	void setAuraEffect(const std::string& effect);
+	void setAuraColor(const std::optional<std::string>& color);
 	void setPerformanceProfile(PerformanceProfile profile);
 	void setBatteryThreshold(BatteryThreshold threshold);
 	void setProfileMenuEnabled(bool enabled);

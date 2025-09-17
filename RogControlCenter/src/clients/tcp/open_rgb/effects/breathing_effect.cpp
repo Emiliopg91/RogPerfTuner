@@ -3,7 +3,7 @@
 void BreathingEffect::apply_effect(const DeviceList& devices) {
 	int offset = 0;
 	while (_is_running) {
-		Color new_color = Color::Red * _sin_steps[offset];
+		Color new_color = *_color * _sin_steps[offset];
 
 		for (auto& dev : devices) {
 			if (dev.enabled) {
@@ -22,7 +22,8 @@ void BreathingEffect::apply_effect(const DeviceList& devices) {
 	}
 }
 
-BreathingEffect::BreathingEffect(Client& client) : AbstractEffect(client, "Breathing"), _total_time(4.0), _pause_time(1.0), _frequency(0.05) {
+BreathingEffect::BreathingEffect(Client& client)
+	: AbstractEffect(client, "Breathing", Color::Red.toHex()), _total_time(4.0), _pause_time(1.0), _frequency(0.05) {
 	_step_count = static_cast<int>((_total_time - _pause_time) / _frequency);
 	_sin_steps.reserve(_step_count);
 	for (int offset = 0; offset < _step_count; ++offset) {

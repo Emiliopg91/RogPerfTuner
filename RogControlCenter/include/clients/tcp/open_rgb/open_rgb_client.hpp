@@ -12,11 +12,13 @@ class OpenRgbClient : public Singleton<OpenRgbClient> {
   public:
 	const CompatibleDeviceArray getCompatibleDevices();
 	const std::vector<std::string> getAvailableEffects();
-	void applyEffect(const std::string& effect, const RgbBrightness& brightness);
+	void applyEffect(const std::string& effect, const RgbBrightness& brightness, const std::optional<std::string>& color);
 	void initialize();
 	void start();
 	void stop();
 	void disableDevice(const std::string&);
+	bool supportsColor();
+	const std::optional<std::string> getColor();
 
   private:
 	friend class Singleton<OpenRgbClient>;
@@ -34,6 +36,8 @@ class OpenRgbClient : public Singleton<OpenRgbClient> {
 	EventBus& eventBus			 = EventBus::getInstance();
 	AsusCtlClient& asusCtlClient = AsusCtlClient::getInstance();
 	Md5SumClient& md5SumClient	 = Md5SumClient::getInstance();
+
+	uint currentEffectIdx = 0;
 
 	OpenRgbClient() {
 	}
