@@ -9,7 +9,7 @@ using json = nlohmann::json;
 
 struct RootConfig {
 	std::unordered_map<std::string, GameEntry> games	= {};
-	std::unordered_map<std::string, std::string> logger = {};
+	std::unordered_map<std::string, std::string> logger = {{"Default", "INFO"}};
 	OpenRGB open_rgb									= OpenRGB();
 	PlatformConfig platform								= PlatformConfig();
 };
