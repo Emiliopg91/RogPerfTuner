@@ -74,6 +74,11 @@ void AbstractEffect::_thread_main(const DeviceList& devices) {
 }
 
 AbstractEffect::AbstractEffect(Client& client, const std::string& name, const std::optional<std::string>& color) : _name(name), _client(client) {
+	auto parts = StringUtils::split(name, ' ');
+	for (size_t i = 0; i < parts.size(); i++) {
+		parts[i] = StringUtils::capitalize(parts[i]);
+	}
+	_logger = Logger{StringUtils::join(parts, "") + "Effect"};
 	if (color.has_value()) {
 		_color = Color::fromRgb(*color);
 	}

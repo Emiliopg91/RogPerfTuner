@@ -105,4 +105,13 @@ class StringUtils {
 	 * @return std::string
 	 */
 	static std::string rightPad(const std::string& input, size_t totalLength, char padChar = ' ');
+
+	/**
+	 * @brief Join vector of strings with separator
+	 *
+	 * @param tokens
+	 * @param delimiter
+	 * @return std::string
+	 */
+	static std::string join(const std::vector<std::string>& tokens, const std::string& delimiter);
 };

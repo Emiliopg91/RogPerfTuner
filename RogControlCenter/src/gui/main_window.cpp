@@ -67,7 +67,7 @@ MainWindow::MainWindow(QWidget* parent) : QMainWindow(parent), _logger(new Logge
 	_effectDropdown->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Preferred);
 	auto effects = openRgbService.getAvailableEffects();
 	for (const auto effect : effects) {
-		_effectDropdown->addItem(QString::fromStdString(effect), QString::fromStdString(effect));
+		_effectDropdown->addItem(QString::fromStdString("  " + effect), QString::fromStdString(effect));
 	}
 
 	auto it = std::find(effects.begin(), effects.end(), openRgbService.getCurrentEffect());
@@ -111,6 +111,7 @@ MainWindow::MainWindow(QWidget* parent) : QMainWindow(parent), _logger(new Logge
 	setBatteryChargeLimit(hardwareService.getChargeThreshold());
 	settingsLayout->addRow(new QLabel(QString::fromStdString(translator.translate("charge.threshold") + ":")), _thresholdDropdown);
 
+	settingsLayout->addRow(new QLabel(""), new QLabel(""));
 	_autostart = new QCheckBox();
 	_autostart->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Preferred);
 	_autostart->setEnabled(!Constants::DEV_MODE);

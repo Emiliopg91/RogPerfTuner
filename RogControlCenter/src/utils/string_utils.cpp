@@ -141,6 +141,26 @@ std::vector<std::string> StringUtils::split(const std::string& s, char delimiter
 }
 
 /**
+ * @brief Join vector of strings with separator
+ *
+ * @param tokens
+ * @param delimiter
+ * @return std::string
+ */
+std::string StringUtils::join(const std::vector<std::string>& tokens, const std::string& delimiter) {
+	std::ostringstream oss;
+
+	for (size_t i = 0; i < tokens.size(); ++i) {
+		if (i > 0) {
+			oss << delimiter;
+		}
+		oss << tokens[i];
+	}
+
+	return oss.str();
+}
+
+/**
  * @brief Capitalize string (first character to upper case)
  *
  * @param input

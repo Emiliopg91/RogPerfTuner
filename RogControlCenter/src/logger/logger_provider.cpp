@@ -121,10 +121,10 @@ std::shared_ptr<spdlog::logger> LoggerProvider::getLogger(const std::string& nam
 
 	std::string display_name = name;
 
-	if (display_name.size() < 15) {
-		display_name.append(15 - display_name.size(), ' ');
-	} else if (display_name.size() > 15) {
-		display_name.resize(15);
+	if (display_name.size() < 20) {
+		display_name.append(20 - display_name.size(), ' ');
+	} else if (display_name.size() > 20) {
+		display_name.resize(20);
 	}
 
 	auto sinkList = spdlog::sinks_init_list{console_sink};
