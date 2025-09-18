@@ -1,5 +1,6 @@
 #include "../../include/services/steam_service.hpp"
 
+#include <QApplication>
 #include <fstream>
 #include <optional>
 #include <sstream>
