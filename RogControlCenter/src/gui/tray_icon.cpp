@@ -184,7 +184,7 @@ TrayIcon::TrayIcon() : QObject(&MainWindow::getInstance()), tray_icon_(new QSyst
 	// -------------------------
 	// Aura menu
 	// -------------------------
-	QAction* auraTitle = new QAction("AuraSync", menu);
+	QAction* auraTitle = new QAction("Aura", menu);
 	auraTitle->setEnabled(false);
 	menu->addAction(auraTitle);
 	// -------------------------
@@ -462,7 +462,8 @@ TrayIcon::TrayIcon() : QObject(&MainWindow::getInstance()), tray_icon_(new QSyst
 	});
 
 	eventBus.onGameEvent([this](size_t runningGames) {
-		setProfileMenuEnabled(std::any_cast<size_t>(runningGames) == 0);
+		setProfileMenuEnabled(runningGames == 0);
+		// setSchedulerMenuEnabled(runningGames == 0);
 	});
 }
 

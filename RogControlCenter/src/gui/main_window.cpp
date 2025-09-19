@@ -18,8 +18,8 @@
 
 MainWindow::MainWindow(QWidget* parent) : QMainWindow(parent), _logger(new Logger()) {
 	setWindowTitle(QString::fromStdString(Constants::APP_NAME + " v" + Constants::APP_VERSION));
-	setGeometry(0, 0, 350, 660);
-	setFixedSize(350, 660);
+	setGeometry(0, 0, 350, 680);
+	setFixedSize(350, 680);
 	setWindowIcon(QIcon(QString::fromStdString(Constants::ICON_45_FILE)));
 
 	QWidget* centralWidget	= new QWidget(this);
@@ -45,7 +45,7 @@ MainWindow::MainWindow(QWidget* parent) : QMainWindow(parent), _logger(new Logge
 	auto items = PerformanceProfile::getAll();
 	std::reverse(items.begin(), items.end());
 	for (PerformanceProfile item : items) {
-		_profileDropdown->addItem(QString::fromStdString(translator.translate("label.profile." + item.toName())),
+		_profileDropdown->addItem(QString::fromStdString("  " + translator.translate("label.profile." + item.toName())),
 								  QString::fromStdString(item.toString()));
 	}
 	connect(_profileDropdown, QOverload<int>::of(&QComboBox::currentIndexChanged), this, &MainWindow::onProfileChanged);
@@ -55,12 +55,12 @@ MainWindow::MainWindow(QWidget* parent) : QMainWindow(parent), _logger(new Logge
 	if (!profileService.getAvailableSchedulers().empty()) {
 		_schedulerDropdown = new QComboBox();
 		_schedulerDropdown->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Preferred);
-		_schedulerDropdown->addItem(QString::fromStdString(translator.translate("label.scheduler.none")), QString(""));
+		_schedulerDropdown->addItem(QString::fromStdString("  " + translator.translate("label.scheduler.none")), QString(""));
 
 		auto items2 = profileService.getAvailableSchedulers();
 		std::reverse(items2.begin(), items2.end());
 		for (auto item : items2) {
-			_schedulerDropdown->addItem(QString::fromStdString(StringUtils::capitalize(item)), QString::fromStdString(item));
+			_schedulerDropdown->addItem("  " + QString::fromStdString(StringUtils::capitalize(item)), QString::fromStdString(item));
 		}
 		connect(_schedulerDropdown, QOverload<int>::of(&QComboBox::currentIndexChanged), this, &MainWindow::onSchedulerChanged);
 		setScheduler(profileService.getCurrentScheduler());
@@ -84,7 +84,7 @@ MainWindow::MainWindow(QWidget* parent) : QMainWindow(parent), _logger(new Logge
 	_effectDropdown->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Preferred);
 	auto effects = openRgbService.getAvailableEffects();
 	for (const auto effect : effects) {
-		_effectDropdown->addItem(QString::fromStdString("  " + effect), QString::fromStdString(effect));
+		_effectDropdown->addItem("  " + QString::fromStdString(effect), QString::fromStdString(effect));
 	}
 
 	auto it = std::find(effects.begin(), effects.end(), openRgbService.getCurrentEffect());
@@ -96,7 +96,7 @@ MainWindow::MainWindow(QWidget* parent) : QMainWindow(parent), _logger(new Logge
 	_brightnessDropdown->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Preferred);
 	auto brightnesses = RgbBrightness::getAll();
 	for (RgbBrightness b : brightnesses) {
-		_brightnessDropdown->addItem(QString::fromStdString(translator.translate("label.brightness." + b.toName())), b.toInt());
+		_brightnessDropdown->addItem("  " + QString::fromStdString(translator.translate("label.brightness." + b.toName())), b.toInt());
 	}
 	_brightnessDropdown->setCurrentIndex(_brightnessDropdown->findData(openRgbService.getCurrentBrightness().toInt()));
 	connect(_brightnessDropdown, QOverload<int>::of(&QComboBox::currentIndexChanged), this, &MainWindow::onBrightnessChange);
@@ -122,13 +122,14 @@ MainWindow::MainWindow(QWidget* parent) : QMainWindow(parent), _logger(new Logge
 	_thresholdDropdown->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Preferred);
 	auto thresholds = BatteryThreshold::getAll();
 	for (BatteryThreshold t : thresholds) {
-		_thresholdDropdown->addItem(QString::number(t.toInt()) + "%", t.toInt());
+		_thresholdDropdown->addItem("  " + QString::number(t.toInt()) + "%", t.toInt());
 	}
 	connect(_thresholdDropdown, QOverload<int>::of(&QComboBox::currentIndexChanged), this, &MainWindow::onBatteryLimitChanged);
 	setBatteryChargeLimit(hardwareService.getChargeThreshold());
 	settingsLayout->addRow(new QLabel(QString::fromStdString(translator.translate("charge.threshold") + ":")), _thresholdDropdown);
 
-	settingsLayout->addRow(new QLabel(""), new QLabel(""));
+	// settingsLayout->addRow(new QLabel(""), new QLabel(""));
+
 	_autostart = new QCheckBox();
 	_autostart->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Preferred);
 	_autostart->setEnabled(!Constants::DEV_MODE);
@@ -184,7 +185,7 @@ void MainWindow::closeEvent(QCloseEvent* event) {
 
 void MainWindow::onGameEvent(int runningGames) {
 	_profileDropdown->setEnabled(runningGames == 0);
-	_schedulerDropdown->setEnabled(runningGames == 0);
+	//_schedulerDropdown->setEnabled(runningGames == 0);
 }
 
 void MainWindow::setPerformanceProfile(PerformanceProfile value) {

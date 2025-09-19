@@ -35,12 +35,12 @@ OpenRgbService::OpenRgbService() : Loggable("OpenRgbService") {
 }
 
 void OpenRgbService::restoreAura() {
-	effect	   = configuration.getConfiguration().open_rgb.last_effect.value_or("Static");
-	brightness = configuration.getConfiguration().open_rgb.brightness;
+	effect	   = configuration.getConfiguration().aura.last_effect.value_or("Static");
+	brightness = configuration.getConfiguration().aura.brightness;
 	_color	   = std::nullopt;
 
-	auto it = configuration.getConfiguration().open_rgb.config.find(effect);
-	if (it != configuration.getConfiguration().open_rgb.config.end()) {
+	auto it = configuration.getConfiguration().aura.config.find(effect);
+	if (it != configuration.getConfiguration().aura.config.end()) {
 		_color = it->second.color;
 	}
 
@@ -101,8 +101,8 @@ void OpenRgbService::setEffect(const std::string& newEffect, const bool& tempora
 		effect = newEffect;
 
 		_color	= std::nullopt;
-		auto it = configuration.getConfiguration().open_rgb.config.find(effect);
-		if (it != configuration.getConfiguration().open_rgb.config.end()) {
+		auto it = configuration.getConfiguration().aura.config.find(effect);
+		if (it != configuration.getConfiguration().aura.config.end()) {
 			_color = it->second.color;
 		}
 
@@ -145,15 +145,15 @@ void OpenRgbService::applyAura(const bool& temporal) {
 	openRgbClient.applyEffect(effect, brightness, _color);
 
 	if (!temporal) {
-		configuration.getConfiguration().open_rgb.brightness  = brightness;
-		configuration.getConfiguration().open_rgb.last_effect = effect;
+		configuration.getConfiguration().aura.brightness  = brightness;
+		configuration.getConfiguration().aura.last_effect = effect;
 
 		if (_color.has_value()) {
-			auto it = configuration.getConfiguration().open_rgb.config.find(effect);
-			if (it != configuration.getConfiguration().open_rgb.config.end()) {
+			auto it = configuration.getConfiguration().aura.config.find(effect);
+			if (it != configuration.getConfiguration().aura.config.end()) {
 				it->second.color = _color.value();
 			} else {
-				configuration.getConfiguration().open_rgb.config[effect] = EffectConfig(_color.value());
+				configuration.getConfiguration().aura.config[effect] = EffectConfig(_color.value());
 			}
 		}
 

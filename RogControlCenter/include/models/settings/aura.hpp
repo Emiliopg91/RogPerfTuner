@@ -5,19 +5,21 @@
 #include "../hardware/rgb_brightness.hpp"
 #include "effect.hpp"
 
-struct OpenRGB {
+struct Aura {
 	RgbBrightness brightness							 = RgbBrightness::Enum::MAX;
 	std::unordered_map<std::string, EffectConfig> config = {};
 	std::optional<std::string> last_effect				 = std::nullopt;
 };
 
-inline void to_json(nlohmann::json& j, const OpenRGB& o) {
+inline void to_json(nlohmann::json& j, const Aura& o) {
 	j				= json{};
 	j["brightness"] = o.brightness.toInt();
-	j["config"]		= o.config;
-	j["effect"]		= o.last_effect ? json(*o.last_effect) : json(nullptr);
+	if (!o.config.empty()) {
+		j["config"] = o.config;
+	}
+	j["effect"] = o.last_effect ? json(*o.last_effect) : json(nullptr);
 }
-inline void from_json(const nlohmann::json& j, OpenRGB& o) {
+inline void from_json(const nlohmann::json& j, Aura& o) {
 	o.brightness = RgbBrightness::fromInt(j.at("brightness").get<int>());
 	if (j.contains("config")) {
 		j.at("config").get_to(o.config);

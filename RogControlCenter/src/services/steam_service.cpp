@@ -297,7 +297,7 @@ void SteamService::setProfileForGames(bool onConnect) {
 	} else if (!onConnect) {
 		hardwareService.setPanelOverdrive(false);
 		openRgbService.restoreAura();
-		profileService.restoreProfile();
+		profileService.restore();
 	}
 }
 
