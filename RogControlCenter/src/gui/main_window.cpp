@@ -27,19 +27,28 @@ MainWindow::MainWindow(QWidget* parent) : QMainWindow(parent), _logger(new Logge
 	mainLayout->setContentsMargins(20, 20, 20, 20);
 	mainLayout->setAlignment(Qt::AlignTop);
 
-	// Imagen
+	// -------------------------
+	// Logo
+	// -------------------------
 	QLabel* imageLabel = new QLabel();
 	QPixmap pixmap(QString::fromStdString(Constants::ICON_FILE));
 	QPixmap scaledPixmap = pixmap.scaled(200, 200, Qt::KeepAspectRatio, Qt::SmoothTransformation);
 	imageLabel->setPixmap(scaledPixmap);
 	imageLabel->setAlignment(Qt::AlignCenter);
 	mainLayout->addWidget(imageLabel, 0, Qt::AlignCenter);
+	// -------------------------
+	// Logo
+	// -------------------------
 
-	// Grupo performance
+	// -------------------------
+	// Performance group
+	// -------------------------
 	QGroupBox* performanceGroup	   = new QGroupBox(QString::fromStdString(translator.translate("performance")));
 	QFormLayout* performanceLayout = new QFormLayout();
 	performanceLayout->setContentsMargins(20, 20, 20, 20);
-
+	// -------------------------
+	// Profile menu
+	// -------------------------
 	_profileDropdown = new QComboBox();
 	_profileDropdown->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Preferred);
 	auto items = PerformanceProfile::getAll();
@@ -51,7 +60,12 @@ MainWindow::MainWindow(QWidget* parent) : QMainWindow(parent), _logger(new Logge
 	connect(_profileDropdown, QOverload<int>::of(&QComboBox::currentIndexChanged), this, &MainWindow::onProfileChanged);
 	setPerformanceProfile(profileService.getPerformanceProfile());
 	performanceLayout->addRow(new QLabel(QString::fromStdString(translator.translate("profile") + ":")), _profileDropdown);
-
+	// -------------------------
+	// Profile menu
+	// -------------------------
+	// -------------------------
+	// Scheduler menu
+	// -------------------------
 	if (!profileService.getAvailableSchedulers().empty()) {
 		_schedulerDropdown = new QComboBox();
 		_schedulerDropdown->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Preferred);
@@ -66,20 +80,34 @@ MainWindow::MainWindow(QWidget* parent) : QMainWindow(parent), _logger(new Logge
 		setScheduler(profileService.getCurrentScheduler());
 		performanceLayout->addRow(new QLabel(QString::fromStdString(translator.translate("scheduler") + ":")), _schedulerDropdown);
 	}
-
+	// -------------------------
+	// Scheduler menu
+	// -------------------------
+	// -------------------------
+	// Games menu
+	// -------------------------
 	_gameProfileButton = new QPushButton(QString::fromStdString(translator.translate("label.game.configure")));
 	_gameProfileButton->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Preferred);
 	connect(_gameProfileButton, &QPushButton::clicked, this, &MainWindow::openGameList);
 	performanceLayout->addRow(new QLabel(QString::fromStdString(translator.translate("games") + ":")), _gameProfileButton);
-
+	// -------------------------
+	// Games menu
+	// -------------------------
 	performanceGroup->setLayout(performanceLayout);
 	mainLayout->addWidget(performanceGroup);
+	// -------------------------
+	// Performance group
+	// -------------------------
 
-	// Grupo Aura
+	// -------------------------
+	// Aura group
+	// -------------------------
 	QGroupBox* auraGroup	= new QGroupBox("Aura");
 	QFormLayout* auraLayout = new QFormLayout();
 	auraLayout->setContentsMargins(20, 20, 20, 20);
-
+	// -------------------------
+	// Effect menu
+	// -------------------------
 	_effectDropdown = new QComboBox();
 	_effectDropdown->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Preferred);
 	auto effects = openRgbService.getAvailableEffects();
@@ -91,7 +119,12 @@ MainWindow::MainWindow(QWidget* parent) : QMainWindow(parent), _logger(new Logge
 	_effectDropdown->setCurrentIndex(std::distance(effects.begin(), it));
 	connect(_effectDropdown, QOverload<int>::of(&QComboBox::currentIndexChanged), this, &MainWindow::onEffectChange);
 	auraLayout->addRow(new QLabel(QString::fromStdString(translator.translate("effect") + ":")), _effectDropdown);
-
+	// -------------------------
+	// Effect menu
+	// -------------------------
+	// -------------------------
+	// Brightness menu
+	// -------------------------
 	_brightnessDropdown = new QComboBox();
 	_brightnessDropdown->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Preferred);
 	auto brightnesses = RgbBrightness::getAll();
@@ -101,7 +134,12 @@ MainWindow::MainWindow(QWidget* parent) : QMainWindow(parent), _logger(new Logge
 	_brightnessDropdown->setCurrentIndex(_brightnessDropdown->findData(openRgbService.getCurrentBrightness().toInt()));
 	connect(_brightnessDropdown, QOverload<int>::of(&QComboBox::currentIndexChanged), this, &MainWindow::onBrightnessChange);
 	auraLayout->addRow(new QLabel(QString::fromStdString(translator.translate("brightness") + ":")), _brightnessDropdown);
-
+	// -------------------------
+	// Brightness menu
+	// -------------------------
+	// -------------------------
+	// Color menu
+	// -------------------------
 	_colorButton = new QPushButton();
 	_colorButton->setFixedSize(25, 25);
 	_colorButton->setStyleSheet(QString::fromStdString("background-color: " + (openRgbService.getColor().value_or(Color::Black.toHex()))));
@@ -109,15 +147,24 @@ MainWindow::MainWindow(QWidget* parent) : QMainWindow(parent), _logger(new Logge
 	_colorButton->setEnabled(openRgbService.getColor().has_value());
 	connect(_colorButton, &QPushButton::clicked, this, &MainWindow::showColorPicker);
 	auraLayout->addRow(new QLabel(QString::fromStdString(translator.translate("color") + ":")), _colorButton);
-
+	// -------------------------
+	// Color menu
+	// -------------------------
 	auraGroup->setLayout(auraLayout);
 	mainLayout->addWidget(auraGroup);
+	// -------------------------
+	// Aura group
+	// -------------------------
 
-	// Grupo Settings
+	// -------------------------
+	// Settings group
+	// -------------------------
 	QGroupBox* settingsGroup	= new QGroupBox(QString::fromStdString(translator.translate("settings")));
 	QFormLayout* settingsLayout = new QFormLayout();
 	settingsLayout->setContentsMargins(20, 20, 20, 20);
-
+	// -------------------------
+	// Battery menu
+	// -------------------------
 	_thresholdDropdown = new QComboBox();
 	_thresholdDropdown->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Preferred);
 	auto thresholds = BatteryThreshold::getAll();
@@ -127,18 +174,26 @@ MainWindow::MainWindow(QWidget* parent) : QMainWindow(parent), _logger(new Logge
 	connect(_thresholdDropdown, QOverload<int>::of(&QComboBox::currentIndexChanged), this, &MainWindow::onBatteryLimitChanged);
 	setBatteryChargeLimit(hardwareService.getChargeThreshold());
 	settingsLayout->addRow(new QLabel(QString::fromStdString(translator.translate("charge.threshold") + ":")), _thresholdDropdown);
-
-	// settingsLayout->addRow(new QLabel(""), new QLabel(""));
-
+	// -------------------------
+	// Battery menu
+	// -------------------------
+	// -------------------------
+	// Autostart menu
+	// -------------------------
 	_autostart = new QCheckBox();
 	_autostart->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Preferred);
 	_autostart->setEnabled(!Constants::DEV_MODE);
 	_autostart->setChecked(applicationService.isAutostartEnabled());
 	connect(_autostart, &QCheckBox::toggled, this, &MainWindow::onAutostartChanged);
 	settingsLayout->addRow(_autostart, new QLabel(QString::fromStdString(translator.translate("autostart"))));
-
+	// -------------------------
+	// Autostart menu
+	// -------------------------
 	settingsGroup->setLayout(settingsLayout);
 	mainLayout->addWidget(settingsGroup);
+	// -------------------------
+	// Settings group
+	// -------------------------
 
 	setCentralWidget(centralWidget);
 	QScreen* screen = QApplication::screenAt(QCursor::pos());
