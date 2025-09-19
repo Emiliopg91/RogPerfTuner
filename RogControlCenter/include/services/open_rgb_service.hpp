@@ -10,7 +10,7 @@
 #include "../models/hardware/rgb_brightness.hpp"
 #include "../models/hardware/usb_identifier.hpp"
 
-class OpenRgbService : public Singleton<OpenRgbService> {
+class OpenRgbService : public Singleton<OpenRgbService>, Loggable {
   public:
 	std::string getDeviceName(const UsbIdentifier&);
 	std::vector<std::string> getAvailableEffects();
@@ -31,8 +31,6 @@ class OpenRgbService : public Singleton<OpenRgbService> {
   private:
 	friend class Singleton<OpenRgbService>;
 	OpenRgbService();
-
-	Logger logger{"OpenRgbService"};
 
 	std::mutex actionMutex;
 

@@ -22,7 +22,7 @@
 #include "../../include/utils/string_utils.hpp"
 #include "../../include/utils/time_utils.hpp"
 
-HardwareService::HardwareService() {
+HardwareService::HardwareService() : Loggable("HardwareService") {
 	logger.info("Initializing HardwareService");
 	Logger::add_tab();
 

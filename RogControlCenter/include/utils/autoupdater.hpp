@@ -4,6 +4,7 @@
 #include <string>
 
 #include "../logger/logger.hpp"
+#include "../models/others/loggable.hpp"
 #include "../models/others/singleton.hpp"
 #include "../utils/constants.hpp"
 
@@ -15,12 +16,10 @@ struct Asset {
 	}
 };
 
-class AutoUpdater : public Singleton<AutoUpdater> {
+class AutoUpdater : public Singleton<AutoUpdater>, Loggable {
   private:
 	friend class Singleton<AutoUpdater>;
 	typedef std::function<void()> Callback;
-
-	Logger logger{"AutoUpdater"};
 
 	std::string owner	   = "Emiliopg91";
 	std::string repository = Constants::APP_NAME;

@@ -14,11 +14,11 @@
 #include <string>
 #include <vector>
 
-#include "../logger/logger.hpp"
 #include "../models/others/command_result.hpp"
+#include "../models/others/loggable.hpp"
 #include "../models/others/singleton.hpp"
 
-class Shell : public Singleton<Shell> {
+class Shell : public Singleton<Shell>, Loggable {
   public:
 	~Shell();
 
@@ -49,7 +49,7 @@ class Shell : public Singleton<Shell> {
 	 * @param outFile
 	 * @return pid_t
 	 */
-	pid_t launch_process(const char* command, char* const argv[], char* const env[], std::string outFile = "");
+	pid_t launch_process(const char* command, char* const argv[], char* const env[], std::optional<std::string> outFile = std::nullopt);
 
 	/**
 	 * @brief Wait for process finish.
@@ -95,8 +95,6 @@ class Shell : public Singleton<Shell> {
 
 	BashSession normal_bash;
 	std::optional<BashSession> elevated_bash = std::nullopt;
-
-	Logger logger{"Shell"};
 
 	BashSession start_bash(const std::vector<std::string>& args, const std::string& initial_input = "");
 	void close_bash(BashSession& session);

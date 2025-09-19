@@ -8,7 +8,7 @@
 #include "compatible_devices.hpp"
 #include "effects/abstract/abstract_effect.hpp"
 
-class OpenRgbClient : public Singleton<OpenRgbClient> {
+class OpenRgbClient : public Singleton<OpenRgbClient>, Loggable {
   public:
 	const CompatibleDeviceArray getCompatibleDevices();
 	const std::vector<std::string> getAvailableEffects();
@@ -24,7 +24,6 @@ class OpenRgbClient : public Singleton<OpenRgbClient> {
 	friend class Singleton<OpenRgbClient>;
 	std::unordered_map<std::string, std::string> compatibleDeviceNames;
 	std::thread runnerThread;
-	Logger logger{"OpenRgbClient"};
 	int port  = 0;
 	pid_t pid = 0;
 	orgb::Client client{Constants::APP_NAME};
@@ -39,7 +38,7 @@ class OpenRgbClient : public Singleton<OpenRgbClient> {
 
 	uint currentEffectIdx = 0;
 
-	OpenRgbClient() {
+	OpenRgbClient() : Loggable("OpenRgbClient") {
 	}
 
 	void startOpenRgbProcess();

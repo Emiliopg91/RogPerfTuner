@@ -10,7 +10,7 @@
 #include <unordered_map>
 
 #include "../../../events/event_bus.hpp"
-#include "../../../logger/logger.hpp"
+#include "../../../models/others/loggable.hpp"
 #include "../../../models/others/websocket_message.hpp"
 
 struct WSMethodResponse {
@@ -18,7 +18,7 @@ struct WSMethodResponse {
 	std::string error;
 };
 
-class AbstractWebsocketClient {
+class AbstractWebsocketClient : Loggable {
   public:
 	AbstractWebsocketClient(const std::string& host, const int& port, const std::string& name);
 
@@ -40,8 +40,7 @@ class AbstractWebsocketClient {
 	std::string _name;
 	std::string _host;
 	int _port;
-	bool _connected = false;
-	Logger logger;
+	bool _connected	   = false;
 	EventBus& eventBus = EventBus::getInstance();
 
 	std::queue<std::string> _message_queue;

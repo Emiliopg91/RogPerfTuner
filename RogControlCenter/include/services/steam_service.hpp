@@ -8,10 +8,9 @@
 #include "./open_rgb_service.hpp"
 #include "./profile_service.hpp"
 
-class SteamService : public Singleton<SteamService> {
+class SteamService : public Singleton<SteamService>, Loggable {
   private:
 	friend class Singleton<SteamService>;
-	Logger logger{"SteamService"};
 	std::unordered_map<unsigned int, std::string> runningGames;
 	bool rccdcEnabled = false;
 	std::thread installer;

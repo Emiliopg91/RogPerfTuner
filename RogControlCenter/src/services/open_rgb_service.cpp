@@ -8,7 +8,7 @@
 #include "../../include/models/hardware/usb_identifier.hpp"
 #include "../../include/utils/time_utils.hpp"
 
-OpenRgbService::OpenRgbService() {
+OpenRgbService::OpenRgbService() : Loggable("OpenRgbService") {
 	logger.info("Initializing OpenRgbService");
 	Logger::add_tab();
 

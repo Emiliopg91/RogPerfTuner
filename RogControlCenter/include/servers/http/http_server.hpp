@@ -3,19 +3,17 @@
 #include <nlohmann/json.hpp>
 
 #include "../../events/event_bus.hpp"
-#include "../../logger/logger.hpp"
 #include "../../services/hardware_service.hpp"
 #include "../../services/open_rgb_service.hpp"
 #include "../../services/profile_service.hpp"
 #include "../../services/steam_service.hpp"
 #include "httplib.h"
 
-class HttpServer : public Singleton<HttpServer> {
+class HttpServer : public Singleton<HttpServer>, Loggable {
   private:
 	httplib::Server svr;
 	std::thread runner;
 	std::atomic<bool> started{false};
-	Logger logger{"HttpServer"};
 
 	EventBus& eventBus				 = EventBus::getInstance();
 	ProfileService& profileService	 = ProfileService::getInstance();

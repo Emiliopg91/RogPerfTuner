@@ -8,7 +8,7 @@
 #include "../../include/utils/string_utils.hpp"
 #include "../../include/utils/time_utils.hpp"
 
-ProfileService::ProfileService() {
+ProfileService::ProfileService() : Loggable("ProfileService") {
 	logger.info("Initializing ProfileService");
 	Logger::add_tab();
 

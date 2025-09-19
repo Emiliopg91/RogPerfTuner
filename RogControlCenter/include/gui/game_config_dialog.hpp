@@ -6,13 +6,12 @@
 
 #include "../configuration/configuration.hpp"
 #include "../gui/no_scroll_combo_box.hpp"
-#include "../logger/logger.hpp"
 #include "../services/hardware_service.hpp"
 #include "../services/steam_service.hpp"
 #include "../shell/shell.hpp"
 #include "../translator/translator.hpp"
 
-class GameConfigDialog : public QDialog {
+class GameConfigDialog : public QDialog, Loggable {
 	Q_OBJECT
 
   public:
@@ -40,7 +39,6 @@ class GameConfigDialog : public QDialog {
 
 	unsigned int gid;
 	GameEntry gameEntry;
-	Logger logger{"GameConfigDialog"};
 	bool runAfterSave;
 
 	Translator& translator			 = Translator::getInstance();

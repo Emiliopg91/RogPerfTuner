@@ -41,7 +41,7 @@ const std::unordered_map<std::string, GameEntry>& SteamService::getGames() {
 	return configuration.getConfiguration().games;
 }
 
-SteamService::SteamService() {
+SteamService::SteamService() : Loggable("SteamService") {
 	logger.info("Initializing SteamService");
 	Logger::add_tab();
 

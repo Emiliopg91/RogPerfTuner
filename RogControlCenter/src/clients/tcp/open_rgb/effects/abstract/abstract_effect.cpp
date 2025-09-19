@@ -15,7 +15,7 @@ void AbstractEffect::start(const DeviceList& devices, const RgbBrightness& brigh
 	}
 
 	if (brightness == RgbBrightness::Enum::OFF) {
-		_logger.info("Turning off RGB");
+		logger.info("Turning off RGB");
 		for (auto& dev : devices) {
 			_client.setDeviceColor(dev, Color::Black);
 		}
@@ -23,10 +23,10 @@ void AbstractEffect::start(const DeviceList& devices, const RgbBrightness& brigh
 	}
 
 	if (!_color.has_value()) {
-		_logger.info("Starting effect '{}' with {} brightness", getName(), StringUtils::toLowerCase(brightness.toName()));
+		logger.info("Starting effect '{}' with {} brightness", getName(), StringUtils::toLowerCase(brightness.toName()));
 	} else {
-		_logger.info("Starting effect '{}' with {} brightness and color {}", getName(), StringUtils::toLowerCase(brightness.toName()),
-					 StringUtils::toUpperCase(_color.value().toHex()));
+		logger.info("Starting effect '{}' with {} brightness and color {}", getName(), StringUtils::toLowerCase(brightness.toName()),
+					StringUtils::toUpperCase(_color.value().toHex()));
 	}
 	_brightness = brightness.toInt() / 100.0;
 	_is_running = true;
@@ -38,7 +38,7 @@ void AbstractEffect::start(const DeviceList& devices, const RgbBrightness& brigh
 
 void AbstractEffect::stop() {
 	if (_is_running) {
-		_logger.info("Stopping effect");
+		logger.info("Stopping effect");
 		_is_running = false;
 		if (_thread.joinable()) {
 			_thread.join();
@@ -70,15 +70,16 @@ void AbstractEffect::_set_colors(Device& dev, const std::vector<orgb::Color>& co
 
 void AbstractEffect::_thread_main(const DeviceList& devices) {
 	apply_effect(devices);
-	_logger.info("Effect finished");
+	logger.info("Effect finished");
 }
 
-AbstractEffect::AbstractEffect(Client& client, const std::string& name, const std::optional<std::string>& color) : _name(name), _client(client) {
+AbstractEffect::AbstractEffect(Client& client, const std::string& name, const std::optional<std::string>& color)
+	: Loggable(name), _name(name), _client(client) {
 	auto parts = StringUtils::split(name, ' ');
 	for (size_t i = 0; i < parts.size(); i++) {
 		parts[i] = StringUtils::capitalize(parts[i]);
 	}
-	_logger = Logger{StringUtils::join(parts, "") + "Effect"};
+	logger = Logger{StringUtils::join(parts, "") + "Effect"};
 	if (color.has_value()) {
 		_color = Color::fromRgb(*color);
 	}

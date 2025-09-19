@@ -8,7 +8,8 @@
 
 #include "../../include/utils/string_utils.hpp"
 
-GameConfigDialog::GameConfigDialog(unsigned int gid, bool runAfterSave, QWidget* parent) : QDialog(parent), gid(gid), runAfterSave(runAfterSave) {
+GameConfigDialog::GameConfigDialog(unsigned int gid, bool runAfterSave, QWidget* parent)
+	: Loggable("GameConfigDialog"), QDialog(parent), gid(gid), runAfterSave(runAfterSave) {
 	Logger::add_tab();
 	setWindowTitle(QString::fromStdString(translator.translate("config.for.game", {{"game", ""}})));
 	setFixedSize(400, 350);

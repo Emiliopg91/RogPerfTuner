@@ -16,7 +16,7 @@
 using json = nlohmann::json;
 
 AbstractWebsocketClient::AbstractWebsocketClient(const std::string& host, const int& port, const std::string& name)
-	: _name(name), _host(host), _port(port), logger(Logger(name)) {
+	: Loggable(name), _name(name), _host(host), _port(port) {
 	_ws.setUrl("ws://" + _host + ":" + std::to_string(_port));
 
 	_ws.setOnMessageCallback([this](const ix::WebSocketMessagePtr& msg) {

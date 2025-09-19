@@ -2,10 +2,10 @@
 
 #include <string>
 
-#include "../../../logger/logger.hpp"
+#include "../../../models/others/loggable.hpp"
 #include "../../../shell/shell.hpp"
 
-class AbstractCmdClient {
+class AbstractCmdClient : public Loggable {
   protected:
 	AbstractCmdClient(const std::string& command, const std::string& name, const bool& required = true);
 
@@ -17,7 +17,6 @@ class AbstractCmdClient {
   private:
 	std::string command_;
 	bool available_;
-	Logger logger_;
 	Shell& shell = Shell::getInstance();
 
 	bool isCommandAvailable();

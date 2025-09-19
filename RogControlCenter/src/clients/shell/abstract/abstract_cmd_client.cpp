@@ -6,14 +6,13 @@
 #include "../../../../include/utils/string_utils.hpp"
 
 AbstractCmdClient::AbstractCmdClient(const std::string& command, const std::string& name, const bool& required)
-	: command_(command), available_(true) {
-	logger_ = Logger{name};
+	: Loggable(name), command_(command), available_(true) {
 	if (!isCommandAvailable()) {
 		if (required) {
 			throw std::runtime_error(fmt::format("Command {} not available", command_));
 		}
 
-		logger_.error("Command {} not available", command_);
+		logger.error("Command {} not available", command_);
 		available_ = false;
 	}
 }

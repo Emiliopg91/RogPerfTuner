@@ -145,7 +145,7 @@ CommandResult Shell::send_command(BashSession& session, bool elevated, const std
 	return {exit_code, out, err};
 }
 
-Shell::Shell(const std::string& sudo_password) : logger(Logger("Shell")) {
+Shell::Shell(const std::string& sudo_password) : Loggable("Shell") {
 	logger.info("Initializing shells");
 	Logger::add_tab();
 
@@ -190,7 +190,7 @@ std::vector<std::string> Shell::copyEnviron() {
 	return envCopy;
 }
 
-pid_t Shell::launch_process(const char* command, char* const argv[], char* const env[], std::string outFile) {
+pid_t Shell::launch_process(const char* command, char* const argv[], char* const env[], std::optional<std::string> outFile) {
 	std::string cmd_str = command;
 	cmd_str += " ";
 
@@ -206,8 +206,8 @@ pid_t Shell::launch_process(const char* command, char* const argv[], char* const
 	}
 
 	if (pid == 0) {
-		if (outFile.size() > 0) {
-			int fd = open(outFile.c_str(), O_WRONLY | O_CREAT | O_APPEND, 0644);
+		if (outFile.has_value() > 0) {
+			int fd = open(outFile.value().c_str(), O_WRONLY | O_CREAT | O_APPEND, 0644);
 			if (dup2(fd, STDOUT_FILENO) < 0) {
 				logger.error("Error redirecting stdout: {}", std::strerror(errno));
 				exit(EXIT_FAILURE);
@@ -216,7 +216,7 @@ pid_t Shell::launch_process(const char* command, char* const argv[], char* const
 				logger.error("Error redirecting stderr: {}", std::strerror(errno));
 				exit(EXIT_FAILURE);
 			}
-			close(fd);	// ya no necesitamos fd original
+			close(fd);
 		}
 		prctl(PR_SET_PDEATHSIG, SIGTERM);
 		execve(command, argv, env);

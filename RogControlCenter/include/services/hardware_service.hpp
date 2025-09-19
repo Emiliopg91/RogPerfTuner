@@ -24,7 +24,7 @@
 #include "../services/open_rgb_service.hpp"
 #include "../translator/translator.hpp"
 
-class HardwareService : public Singleton<HardwareService> {
+class HardwareService : public Singleton<HardwareService>, Loggable {
   public:
 	BatteryThreshold getChargeThreshold();
 	void setChargeThreshold(const BatteryThreshold& threshold);
@@ -48,7 +48,6 @@ class HardwareService : public Singleton<HardwareService> {
 	void onBatteryEvent(const bool& onBattery, const bool& muted = false);
 	void onDeviceEvent();
 
-	Logger logger{"HardwareService"};
 	std::mutex actionMutex;
 
 	Shell& shell									 = Shell::getInstance();

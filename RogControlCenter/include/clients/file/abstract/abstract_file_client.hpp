@@ -2,10 +2,10 @@
 
 #include <string>
 
-#include "../../../logger/logger.hpp"
+#include "../../../models/others/loggable.hpp"
 #include "../../../shell/shell.hpp"
 
-class AbstractFileClient {
+class AbstractFileClient : public Loggable {
   public:
 	std::string read(const int& head = 0, const int& tail = 0);
 
@@ -20,6 +20,5 @@ class AbstractFileClient {
 	std::string path_;
 	bool sudo_;
 	bool available_;
-	Logger logger_;
 	Shell& shell = Shell::getInstance();
 };

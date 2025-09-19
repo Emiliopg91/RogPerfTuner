@@ -7,7 +7,7 @@
 
 using json = nlohmann::json;
 
-HttpServer::HttpServer() {
+HttpServer::HttpServer() : Loggable("HttpServer") {
 	logger.info("Initializing HTTP server");
 	Logger::add_tab();
 

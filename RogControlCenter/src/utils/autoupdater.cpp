@@ -148,7 +148,7 @@ void AutoUpdater::check_task() {
 }
 
 AutoUpdater::AutoUpdater(Callback restart_method_, std::function<bool()> perform_update_check_)
-	: restart_method(restart_method_), perform_update_check(perform_update_check_) {
+	: Loggable("AutoUpdater"), restart_method(restart_method_), perform_update_check(perform_update_check_) {
 	if (Constants::APPIMAGE_FILE.empty()) {
 		logger.warn("Auto update is only available for AppImage version");
 	}

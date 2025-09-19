@@ -133,6 +133,6 @@ RootConfig& Configuration::getConfiguration() {
 	return config.value();
 }
 
-Configuration::Configuration() {
+Configuration::Configuration() : Loggable("Configuration") {
 	loadConfig();
 }

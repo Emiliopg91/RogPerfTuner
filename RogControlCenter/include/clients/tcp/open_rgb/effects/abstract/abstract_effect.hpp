@@ -4,8 +4,8 @@
 #include <optional>
 #include <string>
 
-#include "../../../../../logger/logger.hpp"
 #include "../../../../../models/hardware/rgb_brightness.hpp"
+#include "../../../../../models/others/loggable.hpp"
 #include "OpenRGB/Client.hpp"
 
 using orgb::Client;
@@ -19,12 +19,11 @@ using orgb::enumString;
 using orgb::Mode;
 using orgb::RequestStatus;
 
-class AbstractEffect {
+class AbstractEffect : public Loggable {
   protected:
 	bool _is_running   = false;
 	double _brightness = 0;
 	std::string _name;
-	Logger _logger;
 	std::mutex _mutex;
 	std::thread _thread;
 	Client& _client;

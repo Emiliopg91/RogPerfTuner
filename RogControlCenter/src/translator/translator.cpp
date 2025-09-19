@@ -6,7 +6,7 @@
 
 using json = nlohmann::json;
 
-Translator::Translator() {
+Translator::Translator() : Loggable("Translator") {
 	currentLang = []() -> Language {
 		const char* lang = std::getenv("LC_MESSAGES");
 		if (!lang || std::string(lang).empty()) {

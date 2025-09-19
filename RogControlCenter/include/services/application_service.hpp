@@ -1,12 +1,10 @@
 #pragma once
 
-#include <sstream>
-
 #include "../events/event_bus.hpp"
 #include "../services/steam_service.hpp"
 #include "../translator/translator.hpp"
 
-class ApplicationService : public Singleton<ApplicationService> {
+class ApplicationService : public Singleton<ApplicationService>, Loggable {
   public:
 	void applyUpdate();
 	void shutdown();
@@ -15,7 +13,6 @@ class ApplicationService : public Singleton<ApplicationService> {
 
   private:
 	friend class Singleton<ApplicationService>;
-	Logger logger{"ApplicationService"};
 	bool rccdcEnabled = false;
 	bool shuttingDown = false;
 

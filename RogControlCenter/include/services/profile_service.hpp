@@ -19,7 +19,7 @@
 #include "../models/performance/performance_profile.hpp"
 #include "../translator/translator.hpp"
 
-class ProfileService : public Singleton<ProfileService> {
+class ProfileService : public Singleton<ProfileService>, Loggable {
   public:
 	PerformanceProfile getPerformanceProfile();
 	void setPerformanceProfile(PerformanceProfile& profile, const bool& temporal = false, const bool& force = false);
@@ -31,7 +31,6 @@ class ProfileService : public Singleton<ProfileService> {
 	friend class Singleton<ProfileService>;
 	ProfileService();
 
-	Logger logger{"ProfileService"};
 	bool onBattery	 = false;
 	int runningGames = 0;
 	std::mutex actionMutex;

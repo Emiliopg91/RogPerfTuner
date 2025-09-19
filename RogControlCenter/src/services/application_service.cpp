@@ -9,7 +9,7 @@
 #include "../../include/translator/translator.hpp"
 #include "../../include/utils/autoupdater.hpp"
 
-ApplicationService::ApplicationService() {
+ApplicationService::ApplicationService() : Loggable("ApplicationService") {
 	logger.info("Initializing ApplicationService");
 	Logger::add_tab();
 
