@@ -43,7 +43,7 @@ ProfileService::ProfileService() : Loggable("ProfileService") {
 
 	eventBus.onApplicationStop([this]() {
 		PerformanceProfile p = PerformanceProfile::Enum::PERFORMANCE;
-		this->setPerformanceProfile(p, true, true);
+		this->setPerformanceProfile(p, true, true, false);
 	});
 
 	restore();
@@ -62,7 +62,7 @@ PerformanceProfile ProfileService::getPerformanceProfile() {
 	return currentProfile;
 }
 
-void ProfileService::setPerformanceProfile(PerformanceProfile& profile, const bool& temporal, const bool& force, const bool& silent) {
+void ProfileService::setPerformanceProfile(PerformanceProfile& profile, const bool& temporal, const bool& force, const bool& showToast) {
 	std::lock_guard<std::mutex> lock(actionMutex);
 	std::string profileName = profile.toName();
 
@@ -88,7 +88,7 @@ void ProfileService::setPerformanceProfile(PerformanceProfile& profile, const bo
 			Logger::rem_tab();
 			logger.info("Profile setted succesfully");
 
-			if (silent) {
+			if (showToast) {
 				toaster.showToast(translator.translate(
 					"profile.applied", {{"profile", StringUtils::toLowerCase(translator.translate("label.profile." + profileName))}}));
 			}

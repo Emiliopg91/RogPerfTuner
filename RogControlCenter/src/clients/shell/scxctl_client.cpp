@@ -35,9 +35,9 @@ ScxCtlClient::ScxCtlClient() : AbstractCmdClient("scxctl", "ScxCtlClient") {
 
 		if (current == "scx") {
 			current = std::nullopt;
-			logger.info("No scheduler used");
+			logger.info("No active scheduler");
 		} else {
-			logger.info("Currently using {} sched", current.value());
+			logger.info("Currently using {} scheduler", current.value());
 		}
 
 		Logger::rem_tab();
