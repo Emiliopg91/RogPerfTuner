@@ -26,6 +26,11 @@ class ProfileService : public Singleton<ProfileService>, Loggable {
 	PerformanceProfile getPerformanceProfile();
 	void setPerformanceProfile(PerformanceProfile& profile, const bool& temporal = false, const bool& force = false);
 	void restoreProfile();
+
+	std::vector<std::string> getAvailableSchedulers();
+	std::optional<std::string> getCurrentScheduler();
+	void setScheduler(std::optional<std::string> scheduler);
+
 	void renice(const pid_t&);
 
 	PerformanceProfile nextPerformanceProfile();

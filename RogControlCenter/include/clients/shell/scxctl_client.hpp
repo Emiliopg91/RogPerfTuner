@@ -10,12 +10,13 @@ class ScxCtlClient : public AbstractCmdClient, public Singleton<ScxCtlClient> {
 	friend class Singleton<ScxCtlClient>;
 
 	std::optional<std::string> current;
-	std::unordered_map<std::string, std::string> available;
+	std::unordered_map<std::string, std::string> available_sched;
 
 	ScxCtlClient();
 
   public:
 	std::vector<std::string> getAvailable();
+	std::optional<std::string> getCurrent();
 	void start(std::string name);
 	void stop();
 };

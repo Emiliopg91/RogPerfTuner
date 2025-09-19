@@ -7,6 +7,7 @@
 
 #include <QActionGroup>
 #include <QMenu>
+#include <optional>
 
 #include "../../include/gui/game_list.hpp"
 #include "../../include/gui/main_window.hpp"
@@ -112,6 +113,10 @@ void TrayIcon::onEffectChanged(std::string effect) {
 
 void TrayIcon::onBrightnessChanged(RgbBrightness brightness) {
 	openRgbService.setBrightness(brightness);
+}
+
+void TrayIcon::onSchedulerChanged(std::optional<std::string> scheduler) {
+	profileService.setScheduler(scheduler);
 }
 
 // ==============================
@@ -257,6 +262,35 @@ TrayIcon::TrayIcon() : QObject(&MainWindow::getInstance()), tray_icon_(new QSyst
 	menu->insertMenu(nullptr, profileMenu);
 	// -------------------------
 	// Profile submenu
+	// -------------------------
+	// -------------------------
+	// Scheduler submenu
+	// -------------------------
+	if (!profileService.getAvailableSchedulers().empty()) {
+		QMenu* schedulerMenu	 = new QMenu(("    " + translator.translate("scheduler")).c_str(), menu);
+		QActionGroup* schedGroup = new QActionGroup(menu);
+
+		QAction* act = new QAction(translator.translate("label.scheduler.none").c_str(), schedGroup);
+		act->setCheckable(true);
+		act->setChecked(std::nullopt == profileService.getCurrentScheduler());
+		QObject::connect(act, &QAction::triggered, [this]() {
+			onSchedulerChanged(std::nullopt);
+		});
+
+		auto items2 = profileService.getAvailableSchedulers();
+		for (auto item : items2) {
+			act = new QAction(translator.translate("label.profile." + item).c_str(), schedGroup);
+			act->setCheckable(true);
+			act->setChecked(item == profileService.getCurrentScheduler());
+			QObject::connect(act, &QAction::triggered, [this, item]() {
+				onSchedulerChanged(item);
+			});
+			schedulerMenu->addAction(act);
+		}
+		menu->insertMenu(nullptr, schedulerMenu);
+	}
+	// -------------------------
+	// Scheduler submenu
 	// -------------------------
 	// -------------------------
 	// Game submenu

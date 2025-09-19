@@ -29,6 +29,7 @@ class TrayIcon : public QObject, public Singleton<TrayIcon> {
 	void onPerformanceProfileChanged(PerformanceProfile value);
 	void onEffectChanged(std::string effect);
 	void onBrightnessChanged(RgbBrightness brightness);
+	void onSchedulerChanged(std::optional<std::string> scheduler);
 
   private:
 	friend class Singleton<TrayIcon>;
@@ -39,6 +40,7 @@ class TrayIcon : public QObject, public Singleton<TrayIcon> {
 	std::unordered_map<std::string, QAction*> brightnessActions;
 	std::unordered_map<std::string, QAction*> effectActions;
 	std::unordered_map<std::string, QAction*> perfProfileActions;
+	std::unordered_map<std::string, QAction*> schedulerActions;
 	QMenu* profileMenu;
 	QMenu* colorMenu;
 	QAction* currentColorAction;

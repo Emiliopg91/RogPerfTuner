@@ -1,5 +1,7 @@
 #include "../../include/services/profile_service.hpp"
 
+#include <optional>
+
 #include "../../include/configuration/configuration.hpp"
 #include "../../include/events/event_bus.hpp"
 #include "../../include/models/performance/cpu_governor.hpp"
@@ -58,6 +60,7 @@ void ProfileService::renice(const pid_t& pid) {
 PerformanceProfile ProfileService::getPerformanceProfile() {
 	return currentProfile;
 }
+
 void ProfileService::setPerformanceProfile(PerformanceProfile& profile, const bool& temporal, const bool& force) {
 	std::lock_guard<std::mutex> lock(actionMutex);
 	std::string profileName = profile.toName();
@@ -358,4 +361,31 @@ CpuGovernor ProfileService::batteryGovernor() {
 
 int ProfileService::acTdpToBatteryTdp(int tdp, int minTdp) {
 	return std::max(minTdp, static_cast<int>(std::round(tdp * 0.6)));
+}
+
+std::vector<std::string> ProfileService::getAvailableSchedulers() {
+	if (!scxCtlClient.available()) {
+		return {};
+	}
+
+	return scxCtlClient.getAvailable();
+}
+
+std::optional<std::string> ProfileService::getCurrentScheduler() {
+	if (!scxCtlClient.available()) {
+		return std::nullopt;
+	}
+
+	return scxCtlClient.getCurrent();
+}
+void ProfileService::setScheduler(std::optional<std::string> scheduler) {
+	if (!scxCtlClient.available()) {
+		return;
+	}
+
+	if (scheduler.has_value()) {
+		scxCtlClient.start(scheduler.value());
+	} else {
+		scxCtlClient.stop();
+	}
 }

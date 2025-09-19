@@ -18,7 +18,7 @@ ScxCtlClient::ScxCtlClient() : AbstractCmdClient("scxctl", "ScxCtlClient") {
 	Logger::add_tab();
 	for (auto entry : all) {
 		if (shell.which("scx_" + entry[0]).has_value()) {
-			available[entry[0]] = entry[1];
+			available_sched[entry[0]] = entry[1];
 			logger.info("{}", entry[0]);
 		}
 	}
@@ -28,8 +28,8 @@ ScxCtlClient::ScxCtlClient() : AbstractCmdClient("scxctl", "ScxCtlClient") {
 }
 
 void ScxCtlClient::start(std::string name) {
-	auto it = available.find(name);
-	if (it == available.end()) {
+	auto it = available_sched.find(name);
+	if (it == available_sched.end()) {
 		logger.error("Scheduler {} not available", name);
 		return;
 	}
@@ -59,8 +59,12 @@ void ScxCtlClient::stop() {
 
 std::vector<std::string> ScxCtlClient::getAvailable() {
 	std::vector<std::string> res;
-	for (const auto& [key, val] : available) {
+	for (const auto& [key, val] : available_sched) {
 		res.emplace_back(key);
 	}
 	return res;
+}
+
+std::optional<std::string> ScxCtlClient::getCurrent() {
+	return current;
 }
