@@ -1,7 +1,7 @@
 #include "../../../include/models/translator/translation_entry.hpp"
 
-std::string_view TranslationEntry::getTranslation(const Language& lang) {
-	std::optional<std::string_view> tr = std::nullopt;
+std::string TranslationEntry::getTranslation(const Language& lang) {
+	std::optional<std::string> tr = std::nullopt;
 
 	if (lang == Language::Enum::EN) {
 		if (!es.empty()) {
