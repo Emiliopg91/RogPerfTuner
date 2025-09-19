@@ -7,7 +7,7 @@ input_file = os.path.abspath(
     os.path.dirname(__file__) + "/../../resources/translations.json"
 )
 translator_file = os.path.abspath(
-    os.path.dirname(__file__) + "/../../RogControlCenter/include/translator/translator.hpp"
+    os.path.dirname(__file__) + "/../../RogControlCenter/src/translator/translator.cpp"
 )
 
 print(f"Preloading translations from {input_file}")
@@ -23,14 +23,14 @@ with open(input_file, "r", encoding="utf-8") as f:
     translations: dict[str, dict[str, str]] = json.load(f)
 
 
-dec = f"inline static const constexpr std::array<TranslationEntry, {len(translations)}> initialTranslations = {{{{\n"
+dec = f"std::vector<TranslationEntry> Translator::translations  = {{\n"
 for entry in translations:
     dec = dec+ f'{{ "{entry}",'
     for lang in ["en", "es"]:
         tr = translations[entry].get(lang, "")
         dec =dec+ f'"{tr}",'
     dec =dec+ "},\n"
-dec = dec+"}};\n"
+dec = dec+"};\n"
 
 with open(translator_file, "r", encoding="utf-8") as f:
     contenido = f.read()
