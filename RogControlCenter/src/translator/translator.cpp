@@ -3,6 +3,7 @@
 
 #include <nlohmann/json.hpp>
 #include <optional>
+#include <string>
 
 using json = nlohmann::json;
 
@@ -28,7 +29,7 @@ Translator::Translator() : Loggable("Translator") {
 }
 
 std::string Translator::translate(const std::string& msg, const std::unordered_map<std::string, std::any>& replacement) {
-	std::optional<std::string_view> translation = std::nullopt;
+	std::optional<std::string> translation = std::nullopt;
 
 	for (auto entry : translations) {
 		if (entry.key == msg) {
