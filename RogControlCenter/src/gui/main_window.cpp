@@ -10,8 +10,10 @@
 #include <QLabel>
 #include <QVBoxLayout>
 #include <algorithm>
+#include <optional>
 
 #include "../../include/gui/game_list.hpp"
+#include "../../include/utils/string_utils.hpp"
 #include "OpenRGB/Color.hpp"
 
 MainWindow::MainWindow(QWidget* parent) : QMainWindow(parent), _logger(new Logger()) {
@@ -49,6 +51,21 @@ MainWindow::MainWindow(QWidget* parent) : QMainWindow(parent), _logger(new Logge
 	connect(_profileDropdown, QOverload<int>::of(&QComboBox::currentIndexChanged), this, &MainWindow::onProfileChanged);
 	setPerformanceProfile(profileService.getPerformanceProfile());
 	performanceLayout->addRow(new QLabel(QString::fromStdString(translator.translate("profile") + ":")), _profileDropdown);
+
+	if (!profileService.getAvailableSchedulers().empty()) {
+		_schedulerDropdown = new QComboBox();
+		_schedulerDropdown->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Preferred);
+		_schedulerDropdown->addItem(QString::fromStdString(translator.translate("label.scheduler.none")), QString(""));
+
+		auto items2 = profileService.getAvailableSchedulers();
+		std::reverse(items2.begin(), items2.end());
+		for (auto item : items2) {
+			_schedulerDropdown->addItem(QString::fromStdString(StringUtils::capitalize(item)), QString::fromStdString(item));
+		}
+		connect(_schedulerDropdown, QOverload<int>::of(&QComboBox::currentIndexChanged), this, &MainWindow::onSchedulerChanged);
+		setScheduler(profileService.getCurrentScheduler());
+		performanceLayout->addRow(new QLabel(QString::fromStdString(translator.translate("scheduler") + ":")), _schedulerDropdown);
+	}
 
 	_gameProfileButton = new QPushButton(QString::fromStdString(translator.translate("label.game.configure")));
 	_gameProfileButton->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Preferred);
@@ -151,6 +168,10 @@ MainWindow::MainWindow(QWidget* parent) : QMainWindow(parent), _logger(new Logge
 		setPerformanceProfile(profile);
 	});
 
+	eventBus.onScheduler([this](std::optional<std::string> sched) {
+		setScheduler(sched);
+	});
+
 	eventBus.onGameEvent([this](size_t runningGames) {
 		onGameEvent(runningGames);
 	});
@@ -163,10 +184,15 @@ void MainWindow::closeEvent(QCloseEvent* event) {
 
 void MainWindow::onGameEvent(int runningGames) {
 	_profileDropdown->setEnabled(runningGames == 0);
+	_schedulerDropdown->setEnabled(runningGames == 0);
 }
 
 void MainWindow::setPerformanceProfile(PerformanceProfile value) {
 	_profileDropdown->setCurrentIndex(_profileDropdown->findData(QString::fromStdString(value.toString())));
+}
+
+void MainWindow::setScheduler(std::optional<std::string> sched) {
+	_schedulerDropdown->setCurrentIndex(_schedulerDropdown->findData(QString::fromStdString(sched.value_or(""))));
 }
 
 void MainWindow::setBatteryChargeLimit(BatteryThreshold value) {
@@ -192,6 +218,17 @@ void MainWindow::onProfileChanged(int) {
 		if (profileService.getPerformanceProfile() != profile) {
 			profileService.setPerformanceProfile(profile);
 		}
+	}
+}
+
+void MainWindow::onSchedulerChanged(int) {
+	std::optional<std::string> scheduler = (_schedulerDropdown->currentData().toString().toStdString());
+	if (scheduler.value_or("").empty()) {
+		scheduler = std::nullopt;
+	}
+
+	if (steamService.getRunningGames().empty()) {
+		profileService.setScheduler(scheduler);
 	}
 }
 

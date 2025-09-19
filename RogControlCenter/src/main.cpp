@@ -4,7 +4,6 @@
 
 #include "..//include/logger/logger_provider.hpp"
 #include "../include/configuration/configuration.hpp"
-#include "../include/gui/main_window.hpp"
 #include "../include/gui/password_dialog.hpp"
 #include "../include/gui/toaster.hpp"
 #include "../include/gui/tray_icon.hpp"

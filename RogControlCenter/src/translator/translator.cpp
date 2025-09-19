@@ -456,6 +456,16 @@ std::vector<TranslationEntry> Translator::translations = {
 		"Select",
 		"Seleccionar",
 	},
+	{
+		"scheduler",
+		"Scheduler",
+		"Planificador",
+	},
+	{
+		"label.scheduler.none",
+		"None",
+		"Ninguno",
+	},
 };
 
 // End translations

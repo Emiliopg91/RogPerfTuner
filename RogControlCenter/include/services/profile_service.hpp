@@ -1,6 +1,7 @@
 #pragma once
 
 #include <mutex>
+#include <optional>
 
 #include "../../include/clients/dbus/asus/armoury/intel/pl1_spd_client.hpp"
 #include "../../include/clients/dbus/asus/armoury/intel/pl2_sppt_client.hpp"
@@ -25,7 +26,9 @@ class ProfileService : public Singleton<ProfileService>, Loggable {
   public:
 	PerformanceProfile getPerformanceProfile();
 	void setPerformanceProfile(PerformanceProfile& profile, const bool& temporal = false, const bool& force = false);
+	void restore();
 	void restoreProfile();
+	void restoreScheduler();
 
 	std::vector<std::string> getAvailableSchedulers();
 	std::optional<std::string> getCurrentScheduler();
@@ -45,8 +48,11 @@ class ProfileService : public Singleton<ProfileService>, Loggable {
 
 	bool onBattery	 = false;
 	int runningGames = 0;
+
 	std::mutex actionMutex;
-	PerformanceProfile currentProfile = PerformanceProfile::Enum::PERFORMANCE;
+
+	PerformanceProfile currentProfile			= PerformanceProfile::Enum::PERFORMANCE;
+	std::optional<std::string> currentScheduler = std::nullopt;
 
 	PlatformClient& platformClient		   = PlatformClient::getInstance();
 	Pl1SpdClient& pl1SpdClient			   = Pl1SpdClient::getInstance();

@@ -42,6 +42,7 @@ class TrayIcon : public QObject, public Singleton<TrayIcon> {
 	std::unordered_map<std::string, QAction*> perfProfileActions;
 	std::unordered_map<std::string, QAction*> schedulerActions;
 	QMenu* profileMenu;
+	QMenu* schedulerMenu;
 	QMenu* colorMenu;
 	QAction* currentColorAction;
 	QAction* pickColorAction;
@@ -50,8 +51,10 @@ class TrayIcon : public QObject, public Singleton<TrayIcon> {
 	void setAuraEffect(const std::string& effect);
 	void setAuraColor(const std::optional<std::string>& color);
 	void setPerformanceProfile(PerformanceProfile profile);
+	void setScheduler(std::optional<std::string> scheduler);
 	void setBatteryThreshold(BatteryThreshold threshold);
 	void setProfileMenuEnabled(bool enabled);
+	void setSchedulerMenuEnabled(bool enabled);
 	void openMainWindow();
 	void openSettings();
 	void reloadSettings();
@@ -65,4 +68,5 @@ class TrayIcon : public QObject, public Singleton<TrayIcon> {
 	ApplicationService& applicationService = ApplicationService::getInstance();
 	Translator& translator				   = Translator::getInstance();
 	Configuration& configuration		   = Configuration::getInstance();
+	SteamService& steamService			   = SteamService::getInstance();
 };

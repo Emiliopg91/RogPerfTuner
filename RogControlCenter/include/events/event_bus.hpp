@@ -63,6 +63,9 @@ class EventBus : public Singleton<EventBus> {
 	void onRgbColor(std::function<void(std::optional<std::string>)>&& callback);
 	void emitRgbColor(std::optional<std::string> color);
 
+	void onScheduler(std::function<void(std::optional<std::string>)>&& callback);
+	void emitScheduler(std::optional<std::string> scheduler);
+
 	inline const static constexpr std::string_view APPLICATION_STOP					  = "APPLICATION_STOP";
 	inline const static constexpr std::string_view UDEV_CLIENT_DEVICE_EVENT			  = "UDEV_CLIENT_DEVICE_EVENT";
 	inline const static constexpr std::string_view HARDWARE_SERVICE_USB_REMOVED		  = "HARDWARE_SERVICE_USB_REMOVED";
@@ -73,6 +76,7 @@ class EventBus : public Singleton<EventBus> {
 	inline const static constexpr std::string_view ORGB_SERVICE_ON_EFFECT			  = "ORGB_SERVICE_ON_EFFECT";
 	inline const static constexpr std::string_view ORGB_SERVICE_ON_COLOR			  = "ORGB_SERVICE_ON_COLOR";
 	inline const static constexpr std::string_view PROFILE_SERVICE_ON_PROFILE		  = "PROFILE_SERVICE_ON_PROFILE";
+	inline const static constexpr std::string_view PROFILE_SERVICE_ON_SCHEDULER		  = "PROFILE_SERVICE_ON_SCHEDULER";
 	inline const static constexpr std::string_view STEAM_SERVICE_GAME_EVENT			  = "STEAM_SERVICE_GAME_EVENT";
 
   private:

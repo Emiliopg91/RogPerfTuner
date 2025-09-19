@@ -31,6 +31,8 @@ class MainWindow : public QMainWindow, public Singleton<MainWindow> {
 
 	void setPerformanceProfile(PerformanceProfile value);
 
+	void setScheduler(std::optional<std::string> sched);
+
 	void setBatteryChargeLimit(BatteryThreshold value);
 
 	void setAuraBrightness(RgbBrightness brightness);
@@ -42,6 +44,8 @@ class MainWindow : public QMainWindow, public Singleton<MainWindow> {
 	void onAutostartChanged(bool enabled);
 
 	void onProfileChanged(int index);
+
+	void onSchedulerChanged(int index);
 
 	void onBatteryLimitChanged(int index);
 
@@ -66,6 +70,7 @@ class MainWindow : public QMainWindow, public Singleton<MainWindow> {
 	ApplicationService& applicationService = ApplicationService::getInstance();
 
 	QComboBox* _profileDropdown;
+	QComboBox* _schedulerDropdown;
 	QPushButton* _gameProfileButton;
 	QComboBox* _effectDropdown;
 	QComboBox* _brightnessDropdown;

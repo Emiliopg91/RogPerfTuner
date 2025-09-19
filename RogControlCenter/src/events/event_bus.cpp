@@ -173,3 +173,12 @@ void EventBus::onBattery(std::function<void(bool)>&& callback) {
 void EventBus::emitBattery(const bool& onBat) {
 	this->emit_event(HARDWARE_SERVICE_ON_BATTERY, {onBat});
 }
+
+void EventBus::onScheduler(std::function<void(std::optional<std::string>)>&& callback) {
+	this->on_with_data(PROFILE_SERVICE_ON_SCHEDULER, [cb = std::move(callback)](CallbackParam data) {
+		cb(std::any_cast<std::optional<std::string>>(data[0]));
+	});
+}
+void EventBus::emitScheduler(std::optional<std::string> scheduler) {
+	this->emit_event(PROFILE_SERVICE_ON_SCHEDULER, {scheduler});
+}

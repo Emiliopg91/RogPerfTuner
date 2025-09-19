@@ -5,17 +5,17 @@ using json = nlohmann::json;
 
 #include "game_entry.hpp"
 #include "openrgb.hpp"
-#include "platform_config.hpp"
+#include "performance.hpp"
 
 struct RootConfig {
 	std::unordered_map<std::string, GameEntry> games	= {};
 	std::unordered_map<std::string, std::string> logger = {{"Default", "INFO"}};
 	OpenRGB open_rgb									= OpenRGB();
-	PlatformConfig platform								= PlatformConfig();
+	Performance performance								= Performance();
 };
 
 inline void to_json(nlohmann::json& j, const RootConfig& r) {
-	j = nlohmann::json{{"games", r.games}, {"logger", r.logger}, {"open_rgb", r.open_rgb}, {"platform", r.platform}};
+	j = nlohmann::json{{"games", r.games}, {"logger", r.logger}, {"open_rgb", r.open_rgb}, {"performance", r.performance}};
 }
 
 inline void from_json(const nlohmann::json& j, RootConfig& r) {
@@ -29,6 +29,6 @@ inline void from_json(const nlohmann::json& j, RootConfig& r) {
 	// open_rgb: si no está, queda en default
 	r.open_rgb = j.contains("open_rgb") ? j.at("open_rgb").get<OpenRGB>() : OpenRGB{};
 
-	// platform: si no está, queda en default
-	r.platform = j.contains("platform") ? j.at("platform").get<PlatformConfig>() : PlatformConfig{};
+	// performance: si no está, queda en default
+	r.performance = j.contains("performance") ? j.at("performance").get<Performance>() : Performance{};
 }

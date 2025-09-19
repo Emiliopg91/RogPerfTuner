@@ -77,6 +77,15 @@ void TrayIcon::setPerformanceProfile(PerformanceProfile profile) {
 		Qt::QueuedConnection);
 }
 
+void TrayIcon::setScheduler(std::optional<std::string> scheduler) {
+	QMetaObject::invokeMethod(
+		&TrayIcon::getInstance(),
+		[=, this]() {
+			schedulerActions[scheduler.value_or("")]->setChecked(true);
+		},
+		Qt::QueuedConnection);
+}
+
 void TrayIcon::setBatteryThreshold(BatteryThreshold threshold) {
 	QMetaObject::invokeMethod(
 		&TrayIcon::getInstance(),
@@ -95,16 +104,21 @@ void TrayIcon::setProfileMenuEnabled(bool enabled) {
 		Qt::QueuedConnection);
 }
 
+void TrayIcon::setSchedulerMenuEnabled(bool enabled) {
+	QMetaObject::invokeMethod(
+		&TrayIcon::getInstance(),
+		[=, this]() {
+			schedulerMenu->setEnabled(enabled);
+		},
+		Qt::QueuedConnection);
+}
+
 // ==============================
 // Implementación de slots
 // ==============================
 
 void TrayIcon::onBatteryLimitChanged(BatteryThreshold value) {
 	hardwareService.setChargeThreshold(value);
-}
-
-void TrayIcon::onPerformanceProfileChanged(PerformanceProfile value) {
-	profileService.setPerformanceProfile(value);
 }
 
 void TrayIcon::onEffectChanged(std::string effect) {
@@ -115,8 +129,16 @@ void TrayIcon::onBrightnessChanged(RgbBrightness brightness) {
 	openRgbService.setBrightness(brightness);
 }
 
+void TrayIcon::onPerformanceProfileChanged(PerformanceProfile value) {
+	if (steamService.getRunningGames().empty()) {
+		profileService.setPerformanceProfile(value);
+	}
+}
+
 void TrayIcon::onSchedulerChanged(std::optional<std::string> scheduler) {
-	profileService.setScheduler(scheduler);
+	if (steamService.getRunningGames().empty()) {
+		profileService.setScheduler(scheduler);
+	}
 }
 
 // ==============================
@@ -267,7 +289,7 @@ TrayIcon::TrayIcon() : QObject(&MainWindow::getInstance()), tray_icon_(new QSyst
 	// Scheduler submenu
 	// -------------------------
 	if (!profileService.getAvailableSchedulers().empty()) {
-		QMenu* schedulerMenu	 = new QMenu(("    " + translator.translate("scheduler")).c_str(), menu);
+		schedulerMenu			 = new QMenu(("    " + translator.translate("scheduler")).c_str(), menu);
 		QActionGroup* schedGroup = new QActionGroup(menu);
 
 		QAction* act = new QAction(translator.translate("label.scheduler.none").c_str(), schedGroup);
@@ -276,16 +298,21 @@ TrayIcon::TrayIcon() : QObject(&MainWindow::getInstance()), tray_icon_(new QSyst
 		QObject::connect(act, &QAction::triggered, [this]() {
 			onSchedulerChanged(std::nullopt);
 		});
+		schedulerMenu->addAction(act);
+		schedulerActions[""] = act;
+		schedulerMenu->addSeparator();
 
 		auto items2 = profileService.getAvailableSchedulers();
+		std::reverse(items2.begin(), items2.end());
 		for (auto item : items2) {
-			act = new QAction(translator.translate("label.profile." + item).c_str(), schedGroup);
+			act = new QAction(StringUtils::capitalize(item).c_str(), schedGroup);
 			act->setCheckable(true);
 			act->setChecked(item == profileService.getCurrentScheduler());
 			QObject::connect(act, &QAction::triggered, [this, item]() {
 				onSchedulerChanged(item);
 			});
 			schedulerMenu->addAction(act);
+			schedulerActions[item] = act;
 		}
 		menu->insertMenu(nullptr, schedulerMenu);
 	}
@@ -428,6 +455,10 @@ TrayIcon::TrayIcon() : QObject(&MainWindow::getInstance()), tray_icon_(new QSyst
 
 	eventBus.onPerformanceProfile([this](PerformanceProfile profile) {
 		setPerformanceProfile(profile);
+	});
+
+	eventBus.onScheduler([this](std::optional<std::string> scheduler) {
+		setScheduler(scheduler);
 	});
 
 	eventBus.onGameEvent([this](size_t runningGames) {

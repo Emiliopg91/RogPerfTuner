@@ -14,7 +14,8 @@ ProfileService::ProfileService() : Loggable("ProfileService") {
 	logger.info("Initializing ProfileService");
 	Logger::add_tab();
 
-	currentProfile = configuration.getConfiguration().platform.profiles.profile;
+	currentProfile	 = configuration.getConfiguration().performance.profile;
+	currentScheduler = configuration.getConfiguration().performance.scheduler;
 
 	if (uPowerClient.available()) {
 		onBattery		 = uPowerClient.isOnBattery();
@@ -45,7 +46,7 @@ ProfileService::ProfileService() : Loggable("ProfileService") {
 		this->setPerformanceProfile(p, true, true);
 	});
 
-	restoreProfile();
+	restore();
 
 	Logger::rem_tab();
 }
@@ -69,8 +70,6 @@ void ProfileService::setPerformanceProfile(PerformanceProfile& profile, const bo
 		logger.info("Setting {} profile", profileName);
 		Logger::add_tab();
 		try {
-			auto t0 = TimeUtils::now();
-
 			setPlatformProfile(profile);
 			//  setFanCurves(profile);
 			setBoost(profile);
@@ -82,13 +81,12 @@ void ProfileService::setPerformanceProfile(PerformanceProfile& profile, const bo
 
 			currentProfile = profile;
 			if (!temporal) {
-				configuration.getConfiguration().platform.profiles.profile = profile;
+				configuration.getConfiguration().performance.profile = profile;
 				configuration.saveConfig();
 			}
 
-			auto t1 = TimeUtils::now();
 			Logger::rem_tab();
-			logger.info("Profile setted after {} ms", TimeUtils::getTimeDiff(t0, t1));
+			logger.info("Profile setted succesfully");
 			toaster.showToast(translator.translate("profile.applied",
 												   {{"profile", StringUtils::toLowerCase(translator.translate("label.profile." + profileName))}}));
 			eventBus.emitPerformanceProfile(profile);
@@ -241,8 +239,17 @@ void ProfileService::setTgp(const PerformanceProfile& profile) {
 	}
 }
 
+void ProfileService::restore() {
+	restoreProfile();
+	restoreScheduler();
+}
+
 void ProfileService::restoreProfile() {
-	setPerformanceProfile(configuration.getConfiguration().platform.profiles.profile, false, true);
+	setPerformanceProfile(configuration.getConfiguration().performance.profile, false, true);
+}
+
+void ProfileService::restoreScheduler() {
+	setScheduler(configuration.getConfiguration().performance.scheduler);
 }
 
 PerformanceProfile ProfileService::nextPerformanceProfile() {
@@ -376,8 +383,9 @@ std::optional<std::string> ProfileService::getCurrentScheduler() {
 		return std::nullopt;
 	}
 
-	return scxCtlClient.getCurrent();
+	return currentScheduler;
 }
+
 void ProfileService::setScheduler(std::optional<std::string> scheduler) {
 	if (!scxCtlClient.available()) {
 		return;
@@ -388,4 +396,11 @@ void ProfileService::setScheduler(std::optional<std::string> scheduler) {
 	} else {
 		scxCtlClient.stop();
 	}
+
+	currentScheduler = scheduler;
+
+	configuration.getConfiguration().performance.scheduler = scheduler;
+	configuration.saveConfig();
+
+	eventBus.emitScheduler(scheduler);
 }

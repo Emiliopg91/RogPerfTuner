@@ -306,5 +306,13 @@
   "select": {
     "en": "Select",
     "es": "Seleccionar"
+  },
+  "scheduler": {
+    "en": "Scheduler",
+    "es": "Planificador"
+  },
+  "label.scheduler.none": {
+    "en": "None",
+    "es": "Ninguno"
   }
 }
