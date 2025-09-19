@@ -13,10 +13,12 @@
 #include "../../include/clients/file/boost_control_client.hpp"
 #include "../../include/clients/file/ssd_scheduler_client.hpp"
 #include "../../include/clients/shell/cpupower_client.hpp"
+#include "../../include/clients/shell/scxctl_client.hpp"
 #include "../../include/gui/toaster.hpp"
 #include "../configuration/configuration.hpp"
 #include "../events/event_bus.hpp"
 #include "../models/performance/performance_profile.hpp"
+#include "../shell/shell.hpp"
 #include "../translator/translator.hpp"
 
 class ProfileService : public Singleton<ProfileService>, Loggable {
@@ -24,10 +26,15 @@ class ProfileService : public Singleton<ProfileService>, Loggable {
 	PerformanceProfile getPerformanceProfile();
 	void setPerformanceProfile(PerformanceProfile& profile, const bool& temporal = false, const bool& force = false);
 	void restoreProfile();
+	void renice(const pid_t&);
 
 	PerformanceProfile nextPerformanceProfile();
 
   private:
+	inline static int8_t CPU_PRIORITY = -17;
+	inline static uint8_t IO_PRIORITY = (CPU_PRIORITY + 20) / 5;
+	inline static uint8_t IO_CLASS	  = 2;
+
 	friend class Singleton<ProfileService>;
 	ProfileService();
 
@@ -51,6 +58,8 @@ class ProfileService : public Singleton<ProfileService>, Loggable {
 	EventBus& eventBus					   = EventBus::getInstance();
 	Configuration& configuration		   = Configuration::getInstance();
 	Translator& translator				   = Translator::getInstance();
+	ScxCtlClient& scxCtlClient			   = ScxCtlClient::getInstance();
+	Shell& shell						   = Shell::getInstance();
 
 	void setPlatformProfile(PerformanceProfile& profile);
 	void setFanCurves(PerformanceProfile& profile);

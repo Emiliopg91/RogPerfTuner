@@ -29,7 +29,6 @@ class HardwareService : public Singleton<HardwareService>, Loggable {
 	BatteryThreshold getChargeThreshold();
 	void setChargeThreshold(const BatteryThreshold& threshold);
 	void setPanelOverdrive(const bool&);
-	void renice(const pid_t&);
 	std::unordered_map<std::string, std::string> getGpuSelectorEnv(const std::string&);
 
 	std::unordered_map<std::string, std::string> getGpus() {
@@ -40,17 +39,12 @@ class HardwareService : public Singleton<HardwareService>, Loggable {
 	friend class Singleton<HardwareService>;
 	HardwareService();
 
-	inline static int8_t CPU_PRIORITY = -17;
-	inline static uint8_t IO_PRIORITY = (CPU_PRIORITY + 20) / 5;
-	inline static uint8_t IO_CLASS	  = 2;
-
 	void setupDeviceLoop();
 	void onBatteryEvent(const bool& onBattery, const bool& muted = false);
 	void onDeviceEvent();
 
 	std::mutex actionMutex;
 
-	Shell& shell									 = Shell::getInstance();
 	EventBus& eventBus								 = EventBus::getInstance();
 	Toaster& toaster								 = Toaster::getInstance();
 	OpenRgbService& openRgbService					 = OpenRgbService::getInstance();

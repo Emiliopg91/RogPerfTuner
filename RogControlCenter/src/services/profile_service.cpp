@@ -48,6 +48,13 @@ ProfileService::ProfileService() : Loggable("ProfileService") {
 	Logger::rem_tab();
 }
 
+void ProfileService::renice(const pid_t& pid) {
+	logger.info("Renicing process {}", pid);
+	Logger::add_tab();
+	shell.run_elevated_command(fmt::format("renice -n {} -p {} && ionice -c {} -n {} -p {}", CPU_PRIORITY, pid, IO_CLASS, IO_PRIORITY, pid));
+	Logger::rem_tab();
+}
+
 PerformanceProfile ProfileService::getPerformanceProfile() {
 	return currentProfile;
 }

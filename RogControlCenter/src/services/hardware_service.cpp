@@ -246,12 +246,6 @@ void HardwareService::setPanelOverdrive(const bool& enable) {
 		panelOverdriveClient.setCurrentValue(enable);
 	}
 }
-void HardwareService::renice(const pid_t& pid) {
-	logger.info("Renicing process {}", pid);
-	Logger::add_tab();
-	shell.run_elevated_command(fmt::format("renice -n {} -p {} && ionice -c {} -n {} -p {}", CPU_PRIORITY, pid, IO_CLASS, IO_PRIORITY, pid));
-	Logger::rem_tab();
-}
 
 std::unordered_map<std::string, std::string> HardwareService::getGpuSelectorEnv(const std::string& gpu) {
 	std::unordered_map<std::string, std::string> env;

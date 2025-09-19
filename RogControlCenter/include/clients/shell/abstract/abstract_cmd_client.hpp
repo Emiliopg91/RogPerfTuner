@@ -11,13 +11,13 @@ class AbstractCmdClient : public Loggable {
 
 	CommandResult run_command(const std::string& args = "", const bool& check = true, const bool& sudo = false);
 
+	bool isCommandAvailable();
+	Shell& shell = Shell::getInstance();
+
   public:
 	bool available();
 
   private:
 	std::string command_;
 	bool available_;
-	Shell& shell = Shell::getInstance();
-
-	bool isCommandAvailable();
 };

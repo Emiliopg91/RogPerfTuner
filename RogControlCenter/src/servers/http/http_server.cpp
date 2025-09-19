@@ -46,7 +46,7 @@ HttpServer::HttpServer() : Loggable("HttpServer") {
 
 	svr.Get(Constants::URL_RENICE, [this](const httplib::Request& req, httplib::Response&) {
 		auto pidStr = req.get_param_value("pid");
-		hardwareService.renice(static_cast<pid_t>(std::stoi(pidStr)));
+		profileService.renice(static_cast<pid_t>(std::stoi(pidStr)));
 	});
 
 	svr.Get(Constants::URL_GAME_CFG, [this](const httplib::Request& req, httplib::Response& res) {
