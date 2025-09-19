@@ -3,7 +3,6 @@
 #include <functional>
 #include <string>
 
-#include "../logger/logger.hpp"
 #include "../models/others/loggable.hpp"
 #include "../models/others/singleton.hpp"
 #include "../utils/constants.hpp"
