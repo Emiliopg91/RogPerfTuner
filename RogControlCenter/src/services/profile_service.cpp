@@ -62,7 +62,7 @@ PerformanceProfile ProfileService::getPerformanceProfile() {
 	return currentProfile;
 }
 
-void ProfileService::setPerformanceProfile(PerformanceProfile& profile, const bool& temporal, const bool& force) {
+void ProfileService::setPerformanceProfile(PerformanceProfile& profile, const bool& temporal, const bool& force, const bool& silent) {
 	std::lock_guard<std::mutex> lock(actionMutex);
 	std::string profileName = profile.toName();
 
@@ -87,8 +87,12 @@ void ProfileService::setPerformanceProfile(PerformanceProfile& profile, const bo
 
 			Logger::rem_tab();
 			logger.info("Profile setted succesfully");
-			toaster.showToast(translator.translate("profile.applied",
-												   {{"profile", StringUtils::toLowerCase(translator.translate("label.profile." + profileName))}}));
+
+			if (silent) {
+				toaster.showToast(translator.translate(
+					"profile.applied", {{"profile", StringUtils::toLowerCase(translator.translate("label.profile." + profileName))}}));
+			}
+
 			eventBus.emitPerformanceProfile(profile);
 		} catch (std::exception& e) {
 			Logger::rem_tab();

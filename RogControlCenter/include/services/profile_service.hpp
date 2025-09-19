@@ -25,7 +25,7 @@
 class ProfileService : public Singleton<ProfileService>, Loggable {
   public:
 	PerformanceProfile getPerformanceProfile();
-	void setPerformanceProfile(PerformanceProfile& profile, const bool& temporal = false, const bool& force = false);
+	void setPerformanceProfile(PerformanceProfile& profile, const bool& temporal = false, const bool& force = false, const bool& silent = true);
 	void restore();
 	void restoreProfile();
 	void restoreScheduler();
