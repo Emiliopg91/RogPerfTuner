@@ -32,7 +32,7 @@ class ProfileService : public Singleton<ProfileService>, Loggable {
 
 	std::vector<std::string> getAvailableSchedulers();
 	std::optional<std::string> getCurrentScheduler();
-	void setScheduler(std::optional<std::string> scheduler);
+	void setScheduler(std::optional<std::string> scheduler, bool temporal = false);
 
 	void renice(const pid_t&);
 

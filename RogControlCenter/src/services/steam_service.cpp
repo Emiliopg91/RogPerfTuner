@@ -33,7 +33,7 @@ bool SteamService::isRunning(const unsigned int& appid) const {
 	return false;
 }
 
-const std::unordered_map<unsigned int, std::string>& SteamService::getRunningGames() const {
+const std::unordered_map<unsigned int, GameEntry>& SteamService::getRunningGames() const {
 	return runningGames;
 }
 
@@ -129,6 +129,7 @@ void SteamService::onFirstGameRun(unsigned int gid, std::string name) {
 
 	GameEntry entry{args,
 					env,
+					std::nullopt,
 					std::nullopt,
 					MangoHudLevel::Enum::NO_DISPLAY,
 					name,
@@ -242,7 +243,9 @@ void SteamService::installPipDeps() {
 void SteamService::onGameLaunch(unsigned int gid, std::string name, int pid) {
 	logger.info("Launched '{}' ({}) with PID {}", name, gid, pid);
 	Logger::add_tab();
-	if (configuration.getConfiguration().games.find(std::to_string(gid)) == configuration.getConfiguration().games.end()) {
+
+	auto it = configuration.getConfiguration().games.find(std::to_string(gid));
+	if (it == configuration.getConfiguration().games.end()) {
 		logger.info("Game not configured");
 		Logger::add_tab();
 
@@ -266,7 +269,7 @@ void SteamService::onGameLaunch(unsigned int gid, std::string name, int pid) {
 			onFirstGameRun(gid, name);
 		}).detach();
 	} else if (runningGames.find(gid) == runningGames.end()) {
-		runningGames[gid] = name;
+		runningGames[gid] = GameEntry(it->second);
 		setProfileForGames();
 
 		eventBus.emitGameEvent(runningGames.size());
@@ -275,16 +278,20 @@ void SteamService::onGameLaunch(unsigned int gid, std::string name, int pid) {
 }
 
 void SteamService::onGameStop(unsigned int gid, std::string name) {
-	if (runningGames.find(gid) != runningGames.end()) {
+	auto it = runningGames.find(gid);
+	if (it != runningGames.end()) {
 		logger.info("Stopped '{}' ({})", name, gid);
 		runningGames.erase(gid);
-		{
-			Logger::add_tab();
-			setProfileForGames();
+		Logger::add_tab();
 
-			eventBus.emitGameEvent(runningGames.size());
-			Logger::rem_tab();
+		if (it->second.scheduler.has_value() && profileService.getCurrentScheduler() == it->second.scheduler) {
+			profileService.setScheduler(std::nullopt);
 		}
+
+		setProfileForGames();
+
+		eventBus.emitGameEvent(runningGames.size());
+		Logger::rem_tab();
 	}
 }
 
@@ -294,6 +301,15 @@ void SteamService::setProfileForGames(bool onConnect) {
 		openRgbService.setEffect("Gaming", true);
 		PerformanceProfile p = PerformanceProfile::Enum::PERFORMANCE;
 		profileService.setPerformanceProfile(p, true, true);
+
+		std::optional<std::string> sched = configuration.getConfiguration().performance.scheduler;
+		for (const auto& [key, value] : runningGames) {
+			if (value.scheduler.has_value() && value.scheduler != profileService.getCurrentScheduler()) {
+				sched = value.scheduler;
+				break;
+			}
+		}
+		profileService.setScheduler(sched, true);
 	} else if (!onConnect) {
 		hardwareService.setPanelOverdrive(false);
 		openRgbService.restoreAura();

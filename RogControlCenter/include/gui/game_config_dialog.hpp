@@ -28,6 +28,7 @@ class GameConfigDialog : public QDialog, Loggable {
 	QFormLayout* layout = new QFormLayout();
 
 	NoScrollComboBox* gpuCombo;
+	NoScrollComboBox* schedulerCombo;
 	NoScrollComboBox* modeCombo;
 	NoScrollComboBox* metricsCombo;
 	NoScrollComboBox* wineSyncCombo;
@@ -44,6 +45,7 @@ class GameConfigDialog : public QDialog, Loggable {
 	Translator& translator			 = Translator::getInstance();
 	Configuration& configuration	 = Configuration::getInstance();
 	HardwareService& hardwareService = HardwareService::getInstance();
+	ProfileService& profileService	 = ProfileService::getInstance();
 	SteamService& steamService		 = SteamService::getInstance();
 	Shell& shell					 = Shell::getInstance();
 

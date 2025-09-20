@@ -56,13 +56,25 @@ GameConfigDialog::GameConfigDialog(unsigned int gid, bool runAfterSave, QWidget*
 	gpuCombo->setCurrentIndex(index);
 	layout->addRow(new QLabel(QString::fromStdString(translator.translate("used.gpu") + ":")), gpuCombo);
 
-	// --- Mode ---
-	modeCombo = new NoScrollComboBox();
-	modeCombo->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Preferred);
-	modeCombo->addItem(QString::fromStdString(translator.translate("label.steamdeck.no")), false);
-	modeCombo->addItem(QString::fromStdString(translator.translate("label.steamdeck.yes")), true);
-	modeCombo->setCurrentIndex(gameEntry.steamdeck ? 1 : 0);
-	layout->addRow(new QLabel(QString::fromStdString(translator.translate("used.steamdeck") + ":")), modeCombo);
+	// --- Scheduler ---
+	schedulerCombo = new NoScrollComboBox();
+	schedulerCombo->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Preferred);
+
+	index = 0;
+	i	  = 1;
+
+	schedulerCombo->addItem(QString::fromStdString(translator.translate("label.scheduler.none")), QString::fromStdString(""));
+	auto scheds = profileService.getAvailableSchedulers();
+	for (const auto& sched : scheds) {
+		schedulerCombo->addItem(QString::fromStdString(StringUtils::capitalize(sched)), QString::fromStdString(sched));
+		if (gameEntry.scheduler.has_value() && gameEntry.scheduler.value() == sched) {
+			index = i;
+		}
+		i++;
+	}
+	schedulerCombo->setCurrentIndex(index);
+	schedulerCombo->setEnabled(!profileService.getAvailableSchedulers().empty());
+	layout->addRow(new QLabel(QString::fromStdString(translator.translate("scheduler") + ":")), schedulerCombo);
 
 	// --- Metrics ---
 	metricsCombo = new NoScrollComboBox();
@@ -79,6 +91,15 @@ GameConfigDialog::GameConfigDialog(unsigned int gid, bool runAfterSave, QWidget*
 	}
 	metricsCombo->setEnabled(steamService.metricsEnabled());
 	layout->addRow(new QLabel(QString::fromStdString(translator.translate("metrics") + ":")), metricsCombo);
+
+	// --- Mode ---
+	modeCombo = new NoScrollComboBox();
+	modeCombo->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Preferred);
+	modeCombo->addItem(QString::fromStdString(translator.translate("label.steamdeck.no")), false);
+	modeCombo->addItem(QString::fromStdString(translator.translate("label.steamdeck.yes")), true);
+	modeCombo->setCurrentIndex(gameEntry.steamdeck ? 1 : 0);
+	modeCombo->setEnabled(gameEntry.proton);
+	layout->addRow(new QLabel(QString::fromStdString(translator.translate("used.steamdeck") + ":")), modeCombo);
 
 	// --- Wine Sync ---
 
@@ -128,6 +149,10 @@ void GameConfigDialog::onAccept() {
 	if (gpu.value().empty()) {
 		gpu = std::nullopt;
 	}
+	std::optional<std::string> scheduler = schedulerCombo->currentData().toString().toStdString();
+	if (scheduler.value().empty()) {
+		scheduler = std::nullopt;
+	}
 
 	MangoHudLevel level = MangoHudLevel::Enum::NO_DISPLAY;
 	if (steamService.metricsEnabled()) {
@@ -142,6 +167,7 @@ void GameConfigDialog::onAccept() {
 	gameEntry.args			= paramsInput->text().toStdString();
 	gameEntry.env			= envInput->text().toStdString();
 	gameEntry.wrappers		= wrappersInput->text().toStdString();
+	gameEntry.scheduler		= scheduler;
 	gameEntry.gpu			= gpu;
 	gameEntry.metrics_level = level.toString();
 	gameEntry.steamdeck		= modeCombo->currentData().toBool();

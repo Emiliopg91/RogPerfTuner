@@ -283,7 +283,7 @@ void MainWindow::onSchedulerChanged(int) {
 		scheduler = std::nullopt;
 	}
 
-	if (steamService.getRunningGames().empty()) {
+	if (scheduler != profileService.getCurrentScheduler() && steamService.getRunningGames().empty()) {
 		profileService.setScheduler(scheduler);
 	}
 }

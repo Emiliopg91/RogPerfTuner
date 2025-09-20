@@ -11,7 +11,7 @@
 class SteamService : public Singleton<SteamService>, Loggable {
   private:
 	friend class Singleton<SteamService>;
-	std::unordered_map<unsigned int, std::string> runningGames;
+	std::unordered_map<unsigned int, GameEntry> runningGames;
 	bool rccdcEnabled = false;
 	std::thread installer;
 
@@ -39,7 +39,7 @@ class SteamService : public Singleton<SteamService>, Loggable {
 	std::string encodeAppId(uint32_t appid);
 
   public:
-	const std::unordered_map<unsigned int, std::string>& getRunningGames() const;
+	const std::unordered_map<unsigned int, GameEntry>& getRunningGames() const;
 	const std::unordered_map<std::string, GameEntry>& getGames();
 
 	bool isRunning(const unsigned int& appid) const;

@@ -390,7 +390,7 @@ std::optional<std::string> ProfileService::getCurrentScheduler() {
 	return currentScheduler;
 }
 
-void ProfileService::setScheduler(std::optional<std::string> scheduler) {
+void ProfileService::setScheduler(std::optional<std::string> scheduler, bool temporal) {
 	if (!scxCtlClient.available()) {
 		return;
 	}
@@ -403,8 +403,10 @@ void ProfileService::setScheduler(std::optional<std::string> scheduler) {
 
 	currentScheduler = scheduler;
 
-	configuration.getConfiguration().performance.scheduler = scheduler;
-	configuration.saveConfig();
+	if (!temporal) {
+		configuration.getConfiguration().performance.scheduler = scheduler;
+		configuration.saveConfig();
+	}
 
 	eventBus.emitScheduler(scheduler);
 }

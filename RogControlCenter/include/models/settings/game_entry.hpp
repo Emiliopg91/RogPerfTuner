@@ -8,10 +8,11 @@ using json = nlohmann::json;
 #include "../steam/wine_sync_option.hpp"
 
 struct GameEntry {
-	std::optional<std::string> args = std::nullopt;
-	std::optional<std::string> env	= std::nullopt;
-	std::optional<std::string> gpu	= std::nullopt;
-	MangoHudLevel metrics_level		= MangoHudLevel::Enum::NO_DISPLAY;
+	std::optional<std::string> args		 = std::nullopt;
+	std::optional<std::string> env		 = std::nullopt;
+	std::optional<std::string> gpu		 = std::nullopt;
+	std::optional<std::string> scheduler = std::nullopt;
+	MangoHudLevel metrics_level			 = MangoHudLevel::Enum::NO_DISPLAY;
 	std::string name;
 	std::optional<std::string> overlayId;
 	bool proton							= true;
@@ -38,12 +39,21 @@ inline void to_json(json& j, const GameEntry& g) {
 	if (!g.overlayId.value_or("").empty()) {
 		j["overlayId"] = json(*g.overlayId);
 	}
+	if (!g.scheduler.value_or("").empty()) {
+		j["scheduler"] = json(*g.scheduler);
+	}
+	if (!g.proton) {
+		j["proton"] = false;
+	}
+	if (g.proton) {
+		if (g.steamdeck) {
+			j["steamdeck"] = true;
+		}
+		j["sync"] = g.sync.toString();
+	}
 
-	j["metrics"]   = g.metrics_level.toString();
-	j["name"]	   = g.name;
-	j["proton"]	   = g.proton;
-	j["steamdeck"] = g.steamdeck;
-	j["sync"]	   = g.sync.toString();
+	j["metrics"] = g.metrics_level.toString();
+	j["name"]	 = g.name;
 }
 
 inline void from_json(const json& j, GameEntry& g) {
@@ -78,9 +88,30 @@ inline void from_json(const json& j, GameEntry& g) {
 		g.gpu = std::nullopt;
 	}
 
+	if (j.contains("scheduler") && !j.at("scheduler").is_null()) {
+		g.scheduler = j.at("scheduler").get<std::string>();
+	} else {
+		g.scheduler = std::nullopt;
+	}
+
+	if (j.contains("proton")) {
+		g.proton = j.at("proton").get<bool>();
+	} else {
+		g.proton = true;
+	}
+
+	if (j.contains("steamdeck")) {
+		g.steamdeck = j.at("steamdeck").get<bool>();
+	} else {
+		g.steamdeck = false;
+	}
+
+	if (j.contains("sync")) {
+		g.sync = j.at("sync").get<std::string>();
+	} else {
+		g.sync = ((WineSyncOption)WineSyncOption::Enum::AUTO).toString();
+	}
+
 	g.metrics_level = MangoHudLevel::fromString(j.at("metrics").get<std::string>());
 	g.name			= j.at("name").get<std::string>();
-	g.proton		= j.at("proton").get<bool>();
-	g.steamdeck		= j.at("steamdeck").get<bool>();
-	g.sync			= WineSyncOption::fromString(j.at("sync").get<std::string>());
 }
