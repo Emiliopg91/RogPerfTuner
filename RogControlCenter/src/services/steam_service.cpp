@@ -275,6 +275,7 @@ void SteamService::onGameLaunch(unsigned int gid, std::string name, int pid) {
 		eventBus.emitGameEvent(runningGames.size());
 	}
 	Logger::rem_tab();
+	Logger::rem_tab();
 }
 
 void SteamService::onGameStop(unsigned int gid, std::string name) {

@@ -240,7 +240,7 @@ void MainWindow::closeEvent(QCloseEvent* event) {
 
 void MainWindow::onGameEvent(int runningGames) {
 	_profileDropdown->setEnabled(runningGames == 0);
-	//_schedulerDropdown->setEnabled(runningGames == 0);
+	_schedulerDropdown->setEnabled(runningGames == 0);
 }
 
 void MainWindow::setPerformanceProfile(PerformanceProfile value) {

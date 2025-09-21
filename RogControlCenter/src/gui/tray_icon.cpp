@@ -463,7 +463,7 @@ TrayIcon::TrayIcon() : QObject(&MainWindow::getInstance()), tray_icon_(new QSyst
 
 	eventBus.onGameEvent([this](size_t runningGames) {
 		setProfileMenuEnabled(runningGames == 0);
-		// setSchedulerMenuEnabled(runningGames == 0);
+		setSchedulerMenuEnabled(runningGames == 0);
 	});
 }
 
