@@ -61,6 +61,7 @@ class HardwareService : public Singleton<HardwareService>, Loggable {
 	SwitcherooCtlClient& switcherooCtlClient		 = SwitcherooCtlClient::getInstance();
 	PanelOverdriveClient& panelOverdriveClient		 = PanelOverdriveClient::getInstance();
 	PMKeyboardBrightness& pmKeyboardBrightnessClient = PMKeyboardBrightness::getInstance();
+	Configuration& configuration					 = Configuration::getInstance();
 	LsUsbClient& udevClient							 = LsUsbClient::getInstance();
 
 	std::unordered_map<std::string, std::string> gpus;

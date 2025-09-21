@@ -92,9 +92,9 @@ std::vector<TranslationEntry> Translator::translations = {
 		"Equilibrado",
 	},
 	{
-		"label.profile.QUIET",
-		"Quiet",
-		"Silencioso",
+		"label.profile.LOWPOWER",
+		"Low power",
+		"Bajo consumo",
 	},
 	{
 		"effect",

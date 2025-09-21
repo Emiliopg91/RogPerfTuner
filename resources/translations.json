@@ -15,9 +15,9 @@
     "en": "Balanced",
     "es": "Equilibrado"
   },
-  "label.profile.QUIET": {
-    "en": "Quiet",
-    "es": "Silencioso"
+  "label.profile.LOWPOWER": {
+    "en": "Low power",
+    "es": "Bajo consumo"
   },
   "effect": {
     "en": "Effect",

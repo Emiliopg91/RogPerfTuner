@@ -8,7 +8,7 @@
 #include "../performance/ssd_scheduler.hpp"
 
 struct PerformanceProfileMeta {
-	enum class Enum { PERFORMANCE, BALANCED, QUIET } e;
+	enum class Enum { PERFORMANCE, BALANCED, LOWPOWER } e;
 	const char* name;
 	const char* val;
 };
@@ -31,7 +31,7 @@ class PerformanceProfile : public StrEnum<PerformanceProfile, PerformanceProfile
 
   private:
 	static constexpr std::array<PerformanceProfileMeta, 3> table{
-		{{Enum::QUIET, "QUIET", "quiet"}, {Enum::BALANCED, "BALANCED", "balanced"}, {Enum::PERFORMANCE, "PERFORMANCE", "performance"}}};
+		{{Enum::LOWPOWER, "LOWPOWER", "LowPower"}, {Enum::BALANCED, "BALANCED", "Balanced"}, {Enum::PERFORMANCE, "PERFORMANCE", "Performance"}}};
 
 	static constexpr const std::array<PerformanceProfileMeta, 3>& metaTable() {
 		return table;
