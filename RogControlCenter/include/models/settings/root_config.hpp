@@ -3,14 +3,16 @@
 #include <nlohmann/json.hpp>
 using json = nlohmann::json;
 
+#include "application.hpp"
 #include "aura.hpp"
 #include "game_entry.hpp"
 #include "platform.hpp"
 
 struct RootConfig {
+	Aura aura											= Aura();
+	Application application								= Application();
 	std::unordered_map<std::string, GameEntry> games	= {};
 	std::unordered_map<std::string, std::string> logger = {};
-	Aura aura											= Aura();
 	Platform platform									= Platform();
 };
 
@@ -22,8 +24,10 @@ inline void to_json(nlohmann::json& j, const RootConfig& r) {
 	if (!r.logger.empty()) {
 		j["logger"] = r.logger;
 	}
-	j["aura"]	  = r.aura;
-	j["platform"] = r.platform;
+
+	j["application"] = r.application;
+	j["aura"]		 = r.aura;
+	j["platform"]	 = r.platform;
 }
 
 inline void from_json(const nlohmann::json& j, RootConfig& r) {
@@ -39,4 +43,7 @@ inline void from_json(const nlohmann::json& j, RootConfig& r) {
 
 	// performance: si no está, queda en default
 	r.platform = j.contains("platform") ? j.at("platform").get<Platform>() : Platform{};
+
+	// performance: si no está, queda en default
+	r.application = j.contains("application") ? j.at("application").get<Application>() : Application{};
 }

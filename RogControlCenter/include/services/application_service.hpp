@@ -16,11 +16,12 @@ class ApplicationService : public Singleton<ApplicationService>, Loggable {
 	bool rccdcEnabled = false;
 	bool shuttingDown = false;
 
-	Shell& shell			   = Shell::getInstance();
-	EventBus& eventBus		   = EventBus::getInstance();
-	SteamService& steamService = SteamService::getInstance();
-	Translator& translator	   = Translator::getInstance();
-	Toaster& toaster		   = Toaster::getInstance();
+	Shell& shell				 = Shell::getInstance();
+	EventBus& eventBus			 = EventBus::getInstance();
+	SteamService& steamService	 = SteamService::getInstance();
+	Translator& translator		 = Translator::getInstance();
+	Toaster& toaster			 = Toaster::getInstance();
+	Configuration& configuration = Configuration::getInstance();
 
 	const std::string buildDesktopFile();
 
