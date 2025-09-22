@@ -466,6 +466,31 @@ std::vector<TranslationEntry> Translator::translations = {
 		"None",
 		"Ninguno",
 	},
+	{
+		"fan.curves",
+		"Fan",
+		"Ventilador",
+	},
+	{
+		"edit.curve",
+		"Edit curve",
+		"Editar curva",
+	},
+	{
+		"edit.fan.profile",
+		"Edit {fan} curve for {prof} profile",
+		"Editar curva {fan} para perfil {prof}",
+	},
+	{
+		"reset",
+		"Reset",
+		"Restablecer",
+	},
+	{
+		"reset.default",
+		"Reset to default",
+		"Valor por defecto",
+	},
 };
 
 // End translations

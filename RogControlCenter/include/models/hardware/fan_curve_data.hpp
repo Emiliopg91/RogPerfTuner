@@ -6,7 +6,7 @@
 
 class FanCurveData {
   public:
-	std::vector<int> pwm;
+	std::vector<int> perc;
 	std::vector<int> temp;
 
 	static std::unordered_map<std::string, FanCurveData> parseCurves(std::string);

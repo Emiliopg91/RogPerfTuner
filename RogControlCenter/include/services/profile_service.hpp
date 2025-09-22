@@ -35,6 +35,11 @@ class ProfileService : public Singleton<ProfileService>, Loggable {
 	std::optional<std::string> getCurrentScheduler();
 	void setScheduler(std::optional<std::string> scheduler, bool temporal = false);
 
+	std::vector<std::string> getFans();
+	FanCurveData getFanCurve(std::string fan, std::string profile);
+	FanCurveData getDefaultFanCurve(std::string fan, std::string profile);
+	void saveFanCurve(std::string fan, std::string profile, FanCurveData curve);
+
 	void renice(const pid_t&);
 
 	PerformanceProfile nextPerformanceProfile();

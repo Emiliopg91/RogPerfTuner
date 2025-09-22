@@ -55,6 +55,8 @@ class MainWindow : public QMainWindow, public Singleton<MainWindow> {
 
 	void openGameList();
 
+	void openFanEditor();
+
 	void showColorPicker();
 
   private:
@@ -77,4 +79,5 @@ class MainWindow : public QMainWindow, public Singleton<MainWindow> {
 	QPushButton* _colorButton;
 	QComboBox* _thresholdDropdown;
 	QCheckBox* _autostart;
+	QComboBox* _fanCombo;
 };

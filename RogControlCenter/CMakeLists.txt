@@ -11,9 +11,9 @@ endif()
 # ------------------------------
 # Buscar paquetes de Qt6
 # ------------------------------
-find_package(Qt6 REQUIRED COMPONENTS Core DBus Gui Widgets)
+find_package(Qt6 REQUIRED COMPONENTS Core DBus Gui Widgets Charts)
 
-# ------------------------------
+# ------------------------------ 
 # Buscar paquetes de libsecret-1
 # ------------------------------
 find_package(PkgConfig REQUIRED)
@@ -39,6 +39,7 @@ target_link_libraries(RogControlCenter PRIVATE
     Qt6::Gui
     Qt6::Widgets
     Qt6::DBus
+    Qt6::Charts
     spdlog::spdlog 
     nlohmann_json::nlohmann_json
     httplib::httplib

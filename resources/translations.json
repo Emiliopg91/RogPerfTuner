@@ -314,5 +314,25 @@
   "label.scheduler.none": {
     "en": "None",
     "es": "Ninguno"
+  },
+  "fan.curves": {
+    "en": "Fan",
+    "es": "Ventilador"
+  },
+  "edit.curve": {
+    "en": "Edit curve",
+    "es": "Editar curva"
+  },
+  "edit.fan.profile": {
+    "en": "Edit {fan} curve for {prof} profile",
+    "es": "Editar curva {fan} para perfil {prof}"
+  },
+  "reset": {
+    "en": "Reset",
+    "es": "Restablecer"
+  },
+  "reset.default": {
+    "en": "Reset to default",
+    "es": "Valor por defecto"
   }
 }

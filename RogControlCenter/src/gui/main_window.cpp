@@ -12,6 +12,7 @@
 #include <algorithm>
 #include <optional>
 
+#include "../../include/gui/fan_curve_editor.hpp"
 #include "../../include/gui/game_list.hpp"
 #include "../../include/utils/string_utils.hpp"
 #include "OpenRGB/Color.hpp"
@@ -24,7 +25,7 @@ MainWindow::MainWindow(QWidget* parent) : QMainWindow(parent), _logger(new Logge
 
 	QWidget* centralWidget	= new QWidget(this);
 	QVBoxLayout* mainLayout = new QVBoxLayout(centralWidget);
-	mainLayout->setContentsMargins(20, 20, 20, 20);
+	mainLayout->setContentsMargins(20, 10, 20, 10);
 	mainLayout->setAlignment(Qt::AlignTop);
 
 	// -------------------------
@@ -45,7 +46,7 @@ MainWindow::MainWindow(QWidget* parent) : QMainWindow(parent), _logger(new Logge
 	// -------------------------
 	QGroupBox* performanceGroup	   = new QGroupBox(QString::fromStdString(translator.translate("performance")));
 	QFormLayout* performanceLayout = new QFormLayout();
-	performanceLayout->setContentsMargins(20, 20, 20, 20);
+	performanceLayout->setContentsMargins(20, 10, 20, 10);
 	// -------------------------
 	// Profile menu
 	// -------------------------
@@ -84,6 +85,33 @@ MainWindow::MainWindow(QWidget* parent) : QMainWindow(parent), _logger(new Logge
 	// Scheduler menu
 	// -------------------------
 	// -------------------------
+	// Fan curves menu
+	// -------------------------
+	QPushButton* fanEdit = new QPushButton();
+	fanEdit->setText(QString::fromStdString(translator.translate("edit.curve")));
+	connect(fanEdit, &QPushButton::clicked, this, &MainWindow::openFanEditor);
+
+	_fanCombo = new QComboBox();
+	auto fans = std::vector<std::string>(profileService.getFans());
+	std::sort(fans.begin(), fans.end());
+	for (const auto& fan : fans) {
+		_fanCombo->addItem(fan.c_str(), fan.c_str());
+	}
+
+	QWidget* rightGroup = new QWidget();
+	rightGroup->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Preferred);
+
+	QHBoxLayout* hLayout = new QHBoxLayout(rightGroup);
+	hLayout->setContentsMargins(0, 0, 0, 0);
+	hLayout->setSpacing(5);
+	hLayout->addWidget(_fanCombo);
+	hLayout->addWidget(fanEdit);
+
+	performanceLayout->addRow(new QLabel(QString::fromStdString(translator.translate("fan.curves") + ":")), rightGroup);
+	// -------------------------
+	// Fan curves menu
+	// -------------------------
+	// -------------------------
 	// Games menu
 	// -------------------------
 	_gameProfileButton = new QPushButton(QString::fromStdString(translator.translate("label.game.configure")));
@@ -104,7 +132,7 @@ MainWindow::MainWindow(QWidget* parent) : QMainWindow(parent), _logger(new Logge
 	// -------------------------
 	QGroupBox* auraGroup	= new QGroupBox("Aura");
 	QFormLayout* auraLayout = new QFormLayout();
-	auraLayout->setContentsMargins(20, 20, 20, 20);
+	auraLayout->setContentsMargins(20, 10, 20, 10);
 	// -------------------------
 	// Effect menu
 	// -------------------------
@@ -161,7 +189,7 @@ MainWindow::MainWindow(QWidget* parent) : QMainWindow(parent), _logger(new Logge
 	// -------------------------
 	QGroupBox* settingsGroup	= new QGroupBox(QString::fromStdString(translator.translate("settings")));
 	QFormLayout* settingsLayout = new QFormLayout();
-	settingsLayout->setContentsMargins(20, 20, 20, 20);
+	settingsLayout->setContentsMargins(20, 10, 20, 10);
 	// -------------------------
 	// Battery menu
 	// -------------------------
@@ -321,6 +349,13 @@ void MainWindow::onBrightnessChange(int) {
 void MainWindow::openGameList() {
 	GameList* list = new GameList(this);
 	list->show();
+}
+
+void MainWindow::openFanEditor() {
+	auto fan			= _fanCombo->currentData().toString().toStdString();
+	auto profile		= _profileDropdown->currentData().toString().toStdString();
+	CurveEditor* editor = new CurveEditor(fan, profile, this);
+	editor->show();
 }
 
 void MainWindow::onAutostartChanged(bool enabled) {
