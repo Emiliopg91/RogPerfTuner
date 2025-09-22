@@ -10,5 +10,7 @@ class FanCurveData {
 	std::vector<int> temp;
 
 	static std::unordered_map<std::string, FanCurveData> parseCurves(std::string);
+	static FanCurveData fromData(std::string);
+
 	std::string toData();
 };

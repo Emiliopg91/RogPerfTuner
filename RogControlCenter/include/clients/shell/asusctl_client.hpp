@@ -16,9 +16,10 @@ class AsusCtlClient : public AbstractCmdClient, public Singleton<AsusCtlClient> 
 
 	void setCurveToDefaults();
 
-	void setFanCurvesEnabled(PlatformProfile profile);
+	void setFanCurvesEnabled(PlatformProfile profile, bool enabled);
 
 	void setFanCurveData(PlatformProfile profile, std::string fanName, FanCurveData data);
+	void setFanCurveStringData(PlatformProfile profile, std::string fanName, std::string data);
 
 	std::unordered_map<std::string, FanCurveData> getFanCurveData(PlatformProfile profile);
 };

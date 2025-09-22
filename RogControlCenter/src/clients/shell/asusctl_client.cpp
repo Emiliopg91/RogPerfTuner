@@ -24,10 +24,14 @@ std::unordered_map<std::string, FanCurveData> AsusCtlClient::getFanCurveData(Pla
 	return {};
 }
 
-void AsusCtlClient::setFanCurvesEnabled(PlatformProfile profile) {
-	run_command(fmt::format("fan-curve --mod-profile {} --enable-fan-curves true", profile.formatValue()));
+void AsusCtlClient::setFanCurvesEnabled(PlatformProfile profile, bool enabled) {
+	run_command(fmt::format("fan-curve --mod-profile {} --enable-fan-curves {}", profile.formatValue(), enabled));
 }
 
 void AsusCtlClient::setFanCurveData(PlatformProfile profile, std::string fanName, FanCurveData data) {
-	run_command(fmt::format("fan-curve --mod-profile {} --fan {} --data {}", profile.formatValue(), fanName, data.toData()));
+	setFanCurveStringData(profile, fanName, data.toData());
+}
+
+void AsusCtlClient::setFanCurveStringData(PlatformProfile profile, std::string fanName, std::string data) {
+	run_command(fmt::format("fan-curve --mod-profile {} --fan {} --data {}", profile.formatValue(), fanName, data));
 }

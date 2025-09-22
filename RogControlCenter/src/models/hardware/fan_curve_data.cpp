@@ -1,6 +1,7 @@
 #include "../../../include/models/hardware/fan_curve_data.hpp"
 
 #include <regex>
+#include <set>
 #include <sstream>
 
 #include "../../../include/utils/string_utils.hpp"
@@ -46,8 +47,37 @@ std::unordered_map<std::string, FanCurveData> FanCurveData::parseCurves(std::str
 
 std::string FanCurveData::toData() {
 	std::vector<std::string> data;
+	std::set<int> addedTemps = {};
 	for (size_t i = 0; i < pwm.size(); i++) {
-		data.emplace_back(fmt::format("{}c:{}", temp[i], pwm[i]));
+		if (!addedTemps.contains(temp[i])) {
+			data.emplace_back(fmt::format("{}c:{}%", temp[i], (100 * pwm[i]) / 255));
+			addedTemps.emplace(temp[i]);
+		} else {
+			auto newTemp = i < pwm.size() - 1 ? (temp[i] + temp[i + 1]) / 2 : temp[i] + 2;
+			auto newPwm	 = i < pwm.size() - 1 ? (pwm[i] + pwm[i + 1]) / 2 : pwm[i];
+
+			data.emplace_back(fmt::format("{}c:{}%", newTemp, (100 * newPwm) / 255));
+			addedTemps.emplace(newTemp);
+		}
 	}
 	return StringUtils::join(data, ",");
+}
+
+FanCurveData FanCurveData::fromData(std::string data) {
+	auto entries = StringUtils::split(data, ',');
+
+	std::vector<int> tmp;
+	std::vector<int> pwm;
+
+	for (auto entry : entries) {
+		auto entryParts = StringUtils::split(entry, ':');
+
+		int t = std::stoi(entryParts[0].substr(0, entryParts[0].size() - 1));
+		int p = std::stoi(entryParts[1].substr(0, entryParts[1].size() - 1)) * 255 / 100;
+
+		tmp.emplace_back(t);
+		pwm.emplace_back(p);
+	}
+
+	return FanCurveData{pwm, tmp};
 }
