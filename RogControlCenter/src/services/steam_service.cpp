@@ -303,7 +303,7 @@ void SteamService::setProfileForGames(bool onConnect) {
 		PerformanceProfile p = PerformanceProfile::Enum::PERFORMANCE;
 		profileService.setPerformanceProfile(p, true, true);
 
-		std::optional<std::string> sched = configuration.getConfiguration().platform.performance.scheduler;
+		std::optional<std::string> sched = configuration.getConfiguration().performance.scheduler;
 		for (const auto& [key, value] : runningGames) {
 			if (value.scheduler.has_value() && value.scheduler != profileService.getCurrentScheduler()) {
 				sched = value.scheduler;

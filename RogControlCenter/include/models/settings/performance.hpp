@@ -7,7 +7,7 @@ using json = nlohmann::json;
 #include "../performance/performance_profile.hpp"
 
 struct Performance {
-	PerformanceProfile profile			 = PerformanceProfile::Enum::LOWPOWER;
+	PerformanceProfile profile			 = PerformanceProfile::Enum::QUIET;
 	std::optional<std::string> scheduler = std::nullopt;
 };
 

@@ -131,11 +131,10 @@ HardwareService::HardwareService() : Loggable("HardwareService") {
 	}
 
 	if (platformClient.available()) {
-		logger.info("Setting battery charge limit");
+		logger.info("Getting battery charge limit");
 		Logger::add_tab();
-		charge_limit = configuration.getConfiguration().platform.chargeLimit;
+		charge_limit = platformClient.getBatteryLimit();
 		logger.info("{} %", charge_limit.toInt());
-		platformClient.setBatteryLimit(charge_limit);
 		Logger::rem_tab();
 	}
 
@@ -215,14 +214,9 @@ void HardwareService::setChargeThreshold(const BatteryThreshold& threshold) {
 		auto t1 = TimeUtils::now();
 
 		charge_limit = threshold;
-
-		configuration.getConfiguration().platform.chargeLimit = threshold;
-		configuration.saveConfig();
-
 		logger.info("Charge limit setted after {} ms", TimeUtils::getTimeDiff(t0, t1));
 
 		toaster.showToast(translator.translate("applied.battery.threshold", {{"value", std::to_string(threshold.toInt())}}));
-
 		eventBus.emitChargeThreshold(threshold);
 	}
 }

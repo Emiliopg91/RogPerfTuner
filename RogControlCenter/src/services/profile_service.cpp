@@ -14,8 +14,8 @@ ProfileService::ProfileService() : Loggable("ProfileService") {
 	logger.info("Initializing ProfileService");
 	Logger::add_tab();
 
-	currentProfile	 = configuration.getConfiguration().platform.performance.profile;
-	currentScheduler = configuration.getConfiguration().platform.performance.scheduler;
+	currentProfile	 = configuration.getConfiguration().performance.profile;
+	currentScheduler = configuration.getConfiguration().performance.scheduler;
 
 	if (uPowerClient.available()) {
 		onBattery		 = uPowerClient.isOnBattery();
@@ -33,7 +33,7 @@ ProfileService::ProfileService() : Loggable("ProfileService") {
 		onBattery = onBat;
 		if (runningGames == 0) {
 			if (onBattery) {
-				PerformanceProfile p = PerformanceProfile::Enum::LOWPOWER;
+				PerformanceProfile p = PerformanceProfile::Enum::QUIET;
 				setPerformanceProfile(p, true, true);
 			} else {
 				restoreProfile();
@@ -81,7 +81,7 @@ void ProfileService::setPerformanceProfile(PerformanceProfile& profile, const bo
 
 			currentProfile = profile;
 			if (!temporal) {
-				configuration.getConfiguration().platform.performance.profile = profile;
+				configuration.getConfiguration().performance.profile = profile;
 				configuration.saveConfig();
 			}
 
@@ -249,11 +249,11 @@ void ProfileService::restore() {
 }
 
 void ProfileService::restoreProfile() {
-	setPerformanceProfile(configuration.getConfiguration().platform.performance.profile, false, true);
+	setPerformanceProfile(configuration.getConfiguration().performance.profile, false, true);
 }
 
 void ProfileService::restoreScheduler() {
-	setScheduler(configuration.getConfiguration().platform.performance.scheduler);
+	setScheduler(configuration.getConfiguration().performance.scheduler);
 }
 
 PerformanceProfile ProfileService::nextPerformanceProfile() {
@@ -271,7 +271,7 @@ int ProfileService::acIntelPl1Spl(PerformanceProfile profile) {
 	if (profile == PerformanceProfile::Enum::BALANCED) {
 		return client.getMaxValue() * 0.6;
 	}
-	if (profile == PerformanceProfile::Enum::LOWPOWER) {
+	if (profile == PerformanceProfile::Enum::QUIET) {
 		return client.getMaxValue() * 0.4;
 	}
 
@@ -297,7 +297,7 @@ int ProfileService::acIntelPl2Sppt(PerformanceProfile profile) {
 	if (profile == PerformanceProfile::Enum::BALANCED) {
 		return client.getMaxValue() * 0.8;	// modificar
 	}
-	if (profile == PerformanceProfile::Enum::LOWPOWER) {
+	if (profile == PerformanceProfile::Enum::QUIET) {
 		return client.getMaxValue() * 0.6;	// modificar
 	}
 
@@ -319,7 +319,7 @@ int ProfileService::acNvBoost(PerformanceProfile profile) {
 	if (profile == PerformanceProfile::Enum::BALANCED) {
 		return (client.getMaxValue() + client.getMinValue()) / 2;
 	}
-	if (profile == PerformanceProfile::Enum::LOWPOWER) {
+	if (profile == PerformanceProfile::Enum::QUIET) {
 		return client.getMinValue();
 	}
 
@@ -345,7 +345,7 @@ int ProfileService::batteryNvTemp(PerformanceProfile profile) {
 	if (profile == PerformanceProfile::Enum::BALANCED) {
 		return (client.getMaxValue() + client.getMinValue()) / 2;
 	}
-	if (profile == PerformanceProfile::Enum::LOWPOWER) {
+	if (profile == PerformanceProfile::Enum::QUIET) {
 		return client.getMinValue();
 	}
 
@@ -404,7 +404,7 @@ void ProfileService::setScheduler(std::optional<std::string> scheduler, bool tem
 	currentScheduler = scheduler;
 
 	if (!temporal) {
-		configuration.getConfiguration().platform.performance.scheduler = scheduler;
+		configuration.getConfiguration().performance.scheduler = scheduler;
 		configuration.saveConfig();
 	}
 
