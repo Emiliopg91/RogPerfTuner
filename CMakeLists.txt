@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.16)
 
-project(RogControlCenter VERSION 4.3.0 LANGUAGES CXX)
+project(RogControlCenter VERSION 4.3.1 LANGUAGES CXX)
 
 set(CMAKE_CXX_FLAGS_RELEASE "-DNDEBUG" CACHE STRING "" FORCE)
 
