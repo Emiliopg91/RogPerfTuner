@@ -87,7 +87,7 @@ jobs:
       - name: Install dependencies
         run: |
           sudo apt-get update
-          sudo apt-get install --no-install-recommends -y libfuse2 qt6-charts qt6-base-dev qt6-tools-dev qt6-tools-dev-tools build-essential cmake libsecret-1-dev libzstd-dev pkg-config libudev-dev clang clang-format zsync
+          sudo apt-get install --no-install-recommends -y libfuse2 qt6-charts-dev qt6-charts6 qt6-base-dev qt6-tools-dev qt6-tools-dev-tools build-essential cmake libsecret-1-dev libzstd-dev pkg-config libudev-dev clang clang-format zsync
 
       - name: Download OpenRGB artifact
         uses: actions/download-artifact@v4
