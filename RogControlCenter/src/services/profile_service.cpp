@@ -14,8 +14,8 @@ ProfileService::ProfileService() : Loggable("ProfileService") {
 	logger.info("Initializing ProfileService");
 	Logger::add_tab();
 
-	currentProfile	 = configuration.getConfiguration().performance.profile;
-	currentScheduler = configuration.getConfiguration().performance.scheduler;
+	currentProfile	 = configuration.getConfiguration().platform.performance.profile;
+	currentScheduler = configuration.getConfiguration().platform.performance.scheduler;
 
 	if (uPowerClient.available()) {
 		onBattery		 = uPowerClient.isOnBattery();
@@ -81,7 +81,7 @@ void ProfileService::setPerformanceProfile(PerformanceProfile& profile, const bo
 
 			currentProfile = profile;
 			if (!temporal) {
-				configuration.getConfiguration().performance.profile = profile;
+				configuration.getConfiguration().platform.performance.profile = profile;
 				configuration.saveConfig();
 			}
 
@@ -255,11 +255,11 @@ void ProfileService::restore() {
 }
 
 void ProfileService::restoreProfile() {
-	setPerformanceProfile(configuration.getConfiguration().performance.profile, false, true);
+	setPerformanceProfile(configuration.getConfiguration().platform.performance.profile, false, true);
 }
 
 void ProfileService::restoreScheduler() {
-	setScheduler(configuration.getConfiguration().performance.scheduler);
+	setScheduler(configuration.getConfiguration().platform.performance.scheduler);
 }
 
 PerformanceProfile ProfileService::nextPerformanceProfile() {
@@ -410,7 +410,7 @@ void ProfileService::setScheduler(std::optional<std::string> scheduler, bool tem
 	currentScheduler = scheduler;
 
 	if (!temporal) {
-		configuration.getConfiguration().performance.scheduler = scheduler;
+		configuration.getConfiguration().platform.performance.scheduler = scheduler;
 		configuration.saveConfig();
 	}
 

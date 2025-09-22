@@ -62,6 +62,7 @@ class HardwareService : public Singleton<HardwareService>, Loggable {
 	PanelOverdriveClient& panelOverdriveClient		 = PanelOverdriveClient::getInstance();
 	PMKeyboardBrightness& pmKeyboardBrightnessClient = PMKeyboardBrightness::getInstance();
 	LsUsbClient& udevClient							 = LsUsbClient::getInstance();
+	Configuration& configuration					 = Configuration::getInstance();
 
 	std::unordered_map<std::string, std::string> gpus;
 	std::vector<SsdScheduler> ssd_schedulers;

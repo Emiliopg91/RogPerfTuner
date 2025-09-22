@@ -5,13 +5,13 @@ using json = nlohmann::json;
 
 #include "aura.hpp"
 #include "game_entry.hpp"
-#include "performance.hpp"
+#include "platform.hpp"
 
 struct RootConfig {
 	std::unordered_map<std::string, GameEntry> games	= {};
 	std::unordered_map<std::string, std::string> logger = {};
 	Aura aura											= Aura();
-	Performance performance								= Performance();
+	Platform platform									= Platform();
 };
 
 inline void to_json(nlohmann::json& j, const RootConfig& r) {
@@ -22,8 +22,8 @@ inline void to_json(nlohmann::json& j, const RootConfig& r) {
 	if (!r.logger.empty()) {
 		j["logger"] = r.logger;
 	}
-	j["aura"]		 = r.aura;
-	j["performance"] = r.performance;
+	j["aura"]	  = r.aura;
+	j["platform"] = r.platform;
 }
 
 inline void from_json(const nlohmann::json& j, RootConfig& r) {
@@ -38,5 +38,5 @@ inline void from_json(const nlohmann::json& j, RootConfig& r) {
 	r.aura = j.contains("aura") ? j.at("aura").get<Aura>() : Aura{};
 
 	// performance: si no está, queda en default
-	r.performance = j.contains("performance") ? j.at("performance").get<Performance>() : Performance{};
+	r.platform = j.contains("platform") ? j.at("platform").get<Platform>() : Platform{};
 }
