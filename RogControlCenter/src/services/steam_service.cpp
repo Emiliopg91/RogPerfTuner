@@ -14,7 +14,7 @@
 #include "../../include/models/steam/steam_game_details.hpp"
 #include "../../include/services/hardware_service.hpp"
 #include "../../include/services/open_rgb_service.hpp"
-#include "../../include/services/profile_service.hpp"
+#include "../../include/services/performance_service.hpp"
 #include "../../include/utils/process_utils.hpp"
 #include "../../include/utils/string_utils.hpp"
 #include "../../include/utils/time_utils.hpp"
@@ -285,8 +285,8 @@ void SteamService::onGameStop(unsigned int gid, std::string name) {
 		runningGames.erase(gid);
 		Logger::add_tab();
 
-		if (it->second.scheduler.has_value() && profileService.getCurrentScheduler() == it->second.scheduler) {
-			profileService.setScheduler(std::nullopt);
+		if (it->second.scheduler.has_value() && performanceService.getCurrentScheduler() == it->second.scheduler) {
+			performanceService.setScheduler(std::nullopt);
 		}
 
 		setProfileForGames();
@@ -301,20 +301,20 @@ void SteamService::setProfileForGames(bool onConnect) {
 		hardwareService.setPanelOverdrive(true);
 		openRgbService.setEffect("Gaming", true);
 		PerformanceProfile p = PerformanceProfile::Enum::PERFORMANCE;
-		profileService.setPerformanceProfile(p, true, true);
+		performanceService.setPerformanceProfile(p, true, true);
 
 		std::optional<std::string> sched = configuration.getConfiguration().platform.performance.scheduler;
 		for (const auto& [key, value] : runningGames) {
-			if (value.scheduler.has_value() && value.scheduler != profileService.getCurrentScheduler()) {
+			if (value.scheduler.has_value() && value.scheduler != performanceService.getCurrentScheduler()) {
 				sched = value.scheduler;
 				break;
 			}
 		}
-		profileService.setScheduler(sched, true);
+		performanceService.setScheduler(sched, true);
 	} else if (!onConnect) {
 		hardwareService.setPanelOverdrive(false);
 		openRgbService.restoreAura();
-		profileService.restore();
+		performanceService.restore();
 	}
 }
 
@@ -332,7 +332,7 @@ void SteamService::onDisconnect() {
 	logger.info("Disconnected from Steam");
 	Logger::add_tab();
 	if (!runningGames.empty()) {
-		profileService.restoreProfile();
+		performanceService.restoreProfile();
 		openRgbService.restoreAura();
 		runningGames.clear();
 	}

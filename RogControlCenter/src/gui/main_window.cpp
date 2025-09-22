@@ -59,7 +59,7 @@ MainWindow::MainWindow(QWidget* parent) : QMainWindow(parent), _logger(new Logge
 								  QString::fromStdString(item.toString()));
 	}
 	connect(_profileDropdown, QOverload<int>::of(&QComboBox::currentIndexChanged), this, &MainWindow::onProfileChanged);
-	setPerformanceProfile(profileService.getPerformanceProfile());
+	setPerformanceProfile(performanceService.getPerformanceProfile());
 	performanceLayout->addRow(new QLabel(QString::fromStdString(translator.translate("profile") + ":")), _profileDropdown);
 	// -------------------------
 	// Profile menu
@@ -67,18 +67,18 @@ MainWindow::MainWindow(QWidget* parent) : QMainWindow(parent), _logger(new Logge
 	// -------------------------
 	// Scheduler menu
 	// -------------------------
-	if (!profileService.getAvailableSchedulers().empty()) {
+	if (!performanceService.getAvailableSchedulers().empty()) {
 		_schedulerDropdown = new QComboBox();
 		_schedulerDropdown->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Preferred);
 		_schedulerDropdown->addItem(QString::fromStdString("  " + translator.translate("label.scheduler.none")), QString(""));
 
-		auto items2 = profileService.getAvailableSchedulers();
+		auto items2 = performanceService.getAvailableSchedulers();
 		std::reverse(items2.begin(), items2.end());
 		for (auto item : items2) {
 			_schedulerDropdown->addItem("  " + QString::fromStdString(StringUtils::capitalize(item)), QString::fromStdString(item));
 		}
 		connect(_schedulerDropdown, QOverload<int>::of(&QComboBox::currentIndexChanged), this, &MainWindow::onSchedulerChanged);
-		setScheduler(profileService.getCurrentScheduler());
+		setScheduler(performanceService.getCurrentScheduler());
 		performanceLayout->addRow(new QLabel(QString::fromStdString(translator.translate("scheduler") + ":")), _schedulerDropdown);
 	}
 	// -------------------------
@@ -92,7 +92,7 @@ MainWindow::MainWindow(QWidget* parent) : QMainWindow(parent), _logger(new Logge
 	connect(fanEdit, &QPushButton::clicked, this, &MainWindow::openFanEditor);
 
 	_fanCombo = new QComboBox();
-	auto fans = std::vector<std::string>(profileService.getFans());
+	auto fans = std::vector<std::string>(performanceService.getFans());
 	std::sort(fans.begin(), fans.end());
 	for (const auto& fan : fans) {
 		_fanCombo->addItem(fan.c_str(), fan.c_str());
@@ -299,8 +299,8 @@ void MainWindow::setAuraEffect(std::string effect) {
 void MainWindow::onProfileChanged(int) {
 	PerformanceProfile profile = PerformanceProfile::fromString(_profileDropdown->currentData().toString().toStdString());
 	if (steamService.getRunningGames().empty()) {
-		if (profileService.getPerformanceProfile() != profile) {
-			profileService.setPerformanceProfile(profile);
+		if (performanceService.getPerformanceProfile() != profile) {
+			performanceService.setPerformanceProfile(profile);
 		}
 	}
 }
@@ -311,8 +311,8 @@ void MainWindow::onSchedulerChanged(int) {
 		scheduler = std::nullopt;
 	}
 
-	if (scheduler != profileService.getCurrentScheduler() && steamService.getRunningGames().empty()) {
-		profileService.setScheduler(scheduler);
+	if (scheduler != performanceService.getCurrentScheduler() && steamService.getRunningGames().empty()) {
+		performanceService.setScheduler(scheduler);
 	}
 }
 

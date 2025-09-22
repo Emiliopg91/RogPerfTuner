@@ -23,7 +23,7 @@
 #include "../shell/shell.hpp"
 #include "../translator/translator.hpp"
 
-class ProfileService : public Singleton<ProfileService>, Loggable {
+class PerformanceService : public Singleton<PerformanceService>, Loggable {
   public:
 	PerformanceProfile getPerformanceProfile();
 	void setPerformanceProfile(PerformanceProfile& profile, const bool& temporal = false, const bool& force = false, const bool& showToast = true);
@@ -49,8 +49,8 @@ class ProfileService : public Singleton<ProfileService>, Loggable {
 	inline static uint8_t IO_PRIORITY = (CPU_PRIORITY + 20) / 5;
 	inline static uint8_t IO_CLASS	  = 2;
 
-	friend class Singleton<ProfileService>;
-	ProfileService();
+	friend class Singleton<PerformanceService>;
+	PerformanceService();
 
 	bool onBattery	 = false;
 	int runningGames = 0;

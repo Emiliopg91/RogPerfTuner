@@ -11,7 +11,7 @@
 #include "../include/services/application_service.hpp"
 #include "../include/services/hardware_service.hpp"
 #include "../include/services/open_rgb_service.hpp"
-#include "../include/services/profile_service.hpp"
+#include "../include/services/performance_service.hpp"
 #include "../include/services/steam_service.hpp"
 #include "../include/translator/translator.hpp"
 #include "../include/utils/constants.hpp"
@@ -82,7 +82,7 @@ int main(int argc, char** argv) {
 
 	OpenRgbService::getInstance();
 	HardwareService::getInstance();
-	ProfileService::getInstance();
+	PerformanceService::getInstance();
 	ApplicationService::getInstance();
 	SteamService::getInstance();
 

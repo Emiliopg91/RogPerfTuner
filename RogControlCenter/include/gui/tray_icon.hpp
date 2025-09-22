@@ -14,7 +14,7 @@
 #include "../services/application_service.hpp"
 #include "../services/hardware_service.hpp"
 #include "../services/open_rgb_service.hpp"
-#include "../services/profile_service.hpp"
+#include "../services/performance_service.hpp"
 #include "../translator/translator.hpp"
 
 class TrayIcon : public QObject, public Singleton<TrayIcon> {
@@ -62,7 +62,7 @@ class TrayIcon : public QObject, public Singleton<TrayIcon> {
 
 	Shell& shell						   = Shell::getInstance();
 	EventBus& eventBus					   = EventBus::getInstance();
-	ProfileService& profileService		   = ProfileService::getInstance();
+	PerformanceService& performanceService = PerformanceService::getInstance();
 	OpenRgbService& openRgbService		   = OpenRgbService::getInstance();
 	HardwareService& hardwareService	   = HardwareService::getInstance();
 	ApplicationService& applicationService = ApplicationService::getInstance();

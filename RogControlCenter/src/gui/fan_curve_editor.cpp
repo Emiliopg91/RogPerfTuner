@@ -24,7 +24,7 @@ CurveEditor::CurveEditor(const std::string& fan, const std::string& profile, QWi
 	series->setPointsVisible(true);
 	series->setMarkerSize(5.0);
 
-	const auto& curve = profileService.getFanCurve(fan, profile);
+	const auto& curve = performanceService.getFanCurve(fan, profile);
 	for (size_t i = 0; i < curve.perc.size(); i++) {
 		*series << QPointF(curve.temp[i], curve.perc[i]);
 	}
@@ -72,12 +72,12 @@ CurveEditor::CurveEditor(const std::string& fan, const std::string& profile, QWi
 			curve.temp.emplace_back(static_cast<int>(p.x()));
 			curve.perc.emplace_back(static_cast<int>(p.y()));
 		}
-		profileService.saveFanCurve(this->fan, this->profile, curve);
+		performanceService.saveFanCurve(this->fan, this->profile, curve);
 		this->close();
 	});
 
 	connect(resetBtn, &QPushButton::clicked, this, [this]() {
-		auto curve = profileService.getFanCurve(this->fan, this->profile);
+		auto curve = performanceService.getFanCurve(this->fan, this->profile);
 		;
 
 		for (int i = 0; i < series->count(); ++i) {
@@ -90,7 +90,7 @@ CurveEditor::CurveEditor(const std::string& fan, const std::string& profile, QWi
 	});
 
 	connect(defaultBtn, &QPushButton::clicked, this, [this]() {
-		auto curve = profileService.getDefaultFanCurve(this->fan, this->profile);
+		auto curve = performanceService.getDefaultFanCurve(this->fan, this->profile);
 
 		for (int i = 0; i < series->count(); ++i) {
 			qreal x = curve.temp[i];

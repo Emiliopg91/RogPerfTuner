@@ -64,7 +64,7 @@ GameConfigDialog::GameConfigDialog(unsigned int gid, bool runAfterSave, QWidget*
 	i	  = 1;
 
 	schedulerCombo->addItem(QString::fromStdString(translator.translate("label.scheduler.none")), QString::fromStdString(""));
-	auto scheds = profileService.getAvailableSchedulers();
+	auto scheds = performanceService.getAvailableSchedulers();
 	for (const auto& sched : scheds) {
 		schedulerCombo->addItem(QString::fromStdString(StringUtils::capitalize(sched)), QString::fromStdString(sched));
 		if (gameEntry.scheduler.has_value() && gameEntry.scheduler.value() == sched) {
@@ -73,7 +73,7 @@ GameConfigDialog::GameConfigDialog(unsigned int gid, bool runAfterSave, QWidget*
 		i++;
 	}
 	schedulerCombo->setCurrentIndex(index);
-	schedulerCombo->setEnabled(!profileService.getAvailableSchedulers().empty());
+	schedulerCombo->setEnabled(!performanceService.getAvailableSchedulers().empty());
 	layout->addRow(new QLabel(QString::fromStdString(translator.translate("scheduler") + ":")), schedulerCombo);
 
 	// --- Metrics ---

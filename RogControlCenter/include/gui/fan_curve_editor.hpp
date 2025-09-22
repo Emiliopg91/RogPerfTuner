@@ -4,7 +4,7 @@
 #include <QtCharts>
 #include <QtWidgets>
 
-#include "../services/profile_service.hpp"
+#include "../services/performance_service.hpp"
 #include "../translator/translator.hpp"
 #include "fan_curve_view.hpp"
 
@@ -19,8 +19,8 @@ class CurveEditor : public QDialog {
 	std::string fan;
 	std::string profile;
 
-	Translator& translator		   = Translator::getInstance();
-	ProfileService& profileService = ProfileService::getInstance();
+	Translator& translator				   = Translator::getInstance();
+	PerformanceService& performanceService = PerformanceService::getInstance();
 
 	int findClosestPoint(const QPointF& pos);
 };

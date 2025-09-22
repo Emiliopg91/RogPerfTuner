@@ -42,12 +42,12 @@ class GameConfigDialog : public QDialog, Loggable {
 	GameEntry gameEntry;
 	bool runAfterSave;
 
-	Translator& translator			 = Translator::getInstance();
-	Configuration& configuration	 = Configuration::getInstance();
-	HardwareService& hardwareService = HardwareService::getInstance();
-	ProfileService& profileService	 = ProfileService::getInstance();
-	SteamService& steamService		 = SteamService::getInstance();
-	Shell& shell					 = Shell::getInstance();
+	Translator& translator				   = Translator::getInstance();
+	Configuration& configuration		   = Configuration::getInstance();
+	HardwareService& hardwareService	   = HardwareService::getInstance();
+	PerformanceService& performanceService = PerformanceService::getInstance();
+	SteamService& steamService			   = SteamService::getInstance();
+	Shell& shell						   = Shell::getInstance();
 
   protected:
 	void closeEvent(QCloseEvent*);

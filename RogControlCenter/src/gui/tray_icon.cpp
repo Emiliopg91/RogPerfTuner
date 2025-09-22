@@ -131,13 +131,13 @@ void TrayIcon::onBrightnessChanged(RgbBrightness brightness) {
 
 void TrayIcon::onPerformanceProfileChanged(PerformanceProfile value) {
 	if (steamService.getRunningGames().empty()) {
-		profileService.setPerformanceProfile(value);
+		performanceService.setPerformanceProfile(value);
 	}
 }
 
 void TrayIcon::onSchedulerChanged(std::optional<std::string> scheduler) {
 	if (steamService.getRunningGames().empty()) {
-		profileService.setScheduler(scheduler);
+		performanceService.setScheduler(scheduler);
 	}
 }
 
@@ -274,7 +274,7 @@ TrayIcon::TrayIcon() : QObject(&MainWindow::getInstance()), tray_icon_(new QSyst
 	for (PerformanceProfile item : items) {
 		QAction* act = new QAction(translator.translate("label.profile." + item.toName()).c_str(), profileGroup);
 		act->setCheckable(true);
-		act->setChecked(item == profileService.getPerformanceProfile());
+		act->setChecked(item == performanceService.getPerformanceProfile());
 		QObject::connect(act, &QAction::triggered, [this, item]() {
 			onPerformanceProfileChanged(item);
 		});
@@ -288,13 +288,13 @@ TrayIcon::TrayIcon() : QObject(&MainWindow::getInstance()), tray_icon_(new QSyst
 	// -------------------------
 	// Scheduler submenu
 	// -------------------------
-	if (!profileService.getAvailableSchedulers().empty()) {
+	if (!performanceService.getAvailableSchedulers().empty()) {
 		schedulerMenu			 = new QMenu(("    " + translator.translate("scheduler")).c_str(), menu);
 		QActionGroup* schedGroup = new QActionGroup(menu);
 
 		QAction* act = new QAction(translator.translate("label.scheduler.none").c_str(), schedGroup);
 		act->setCheckable(true);
-		act->setChecked(std::nullopt == profileService.getCurrentScheduler());
+		act->setChecked(std::nullopt == performanceService.getCurrentScheduler());
 		QObject::connect(act, &QAction::triggered, [this]() {
 			onSchedulerChanged(std::nullopt);
 		});
@@ -302,12 +302,12 @@ TrayIcon::TrayIcon() : QObject(&MainWindow::getInstance()), tray_icon_(new QSyst
 		schedulerActions[""] = act;
 		schedulerMenu->addSeparator();
 
-		auto items2 = profileService.getAvailableSchedulers();
+		auto items2 = performanceService.getAvailableSchedulers();
 		std::reverse(items2.begin(), items2.end());
 		for (auto item : items2) {
 			act = new QAction(StringUtils::capitalize(item).c_str(), schedGroup);
 			act->setCheckable(true);
-			act->setChecked(item == profileService.getCurrentScheduler());
+			act->setChecked(item == performanceService.getCurrentScheduler());
 			QObject::connect(act, &QAction::triggered, [this, item]() {
 				onSchedulerChanged(item);
 			});

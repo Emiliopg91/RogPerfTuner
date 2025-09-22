@@ -18,7 +18,7 @@ HttpServer::HttpServer() : Loggable("HttpServer") {
 
 	svr.Get(Constants::URL_PERF_PROF, [this](const httplib::Request&, httplib::Response& res) {
 		json response;
-		response["profile"] = profileService.nextPerformanceProfile().toName();
+		response["profile"] = performanceService.nextPerformanceProfile().toName();
 
 		res.set_content(response.dump(4), "application/json");
 	});
@@ -46,7 +46,7 @@ HttpServer::HttpServer() : Loggable("HttpServer") {
 
 	svr.Get(Constants::URL_RENICE, [this](const httplib::Request& req, httplib::Response&) {
 		auto pidStr = req.get_param_value("pid");
-		profileService.renice(static_cast<pid_t>(std::stoi(pidStr)));
+		performanceService.renice(static_cast<pid_t>(std::stoi(pidStr)));
 	});
 
 	svr.Get(Constants::URL_GAME_CFG, [this](const httplib::Request& req, httplib::Response& res) {

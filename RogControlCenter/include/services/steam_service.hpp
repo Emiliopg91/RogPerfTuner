@@ -6,7 +6,7 @@
 #include "../models/steam/steam_game_config.hpp"
 #include "./hardware_service.hpp"
 #include "./open_rgb_service.hpp"
-#include "./profile_service.hpp"
+#include "./performance_service.hpp"
 
 class SteamService : public Singleton<SteamService>, Loggable {
   private:
@@ -15,14 +15,14 @@ class SteamService : public Singleton<SteamService>, Loggable {
 	bool rccdcEnabled = false;
 	std::thread installer;
 
-	Shell& shell					 = Shell::getInstance();
-	EventBus& eventBus				 = EventBus::getInstance();
-	Configuration& configuration	 = Configuration::getInstance();
-	ProfileService& profileService	 = ProfileService::getInstance();
-	OpenRgbService& openRgbService	 = OpenRgbService::getInstance();
-	HardwareService& hardwareService = HardwareService::getInstance();
-	SteamClient& steamClient		 = SteamClient::getInstance();
-	PipClient& pipClient			 = PipClient::getInstance();
+	Shell& shell						   = Shell::getInstance();
+	EventBus& eventBus					   = EventBus::getInstance();
+	Configuration& configuration		   = Configuration::getInstance();
+	PerformanceService& performanceService = PerformanceService::getInstance();
+	OpenRgbService& openRgbService		   = OpenRgbService::getInstance();
+	HardwareService& hardwareService	   = HardwareService::getInstance();
+	SteamClient& steamClient			   = SteamClient::getInstance();
+	PipClient& pipClient				   = PipClient::getInstance();
 
 	SteamService();
 

@@ -13,7 +13,7 @@
 #include "../services/application_service.hpp"
 #include "../services/hardware_service.hpp"
 #include "../services/open_rgb_service.hpp"
-#include "../services/profile_service.hpp"
+#include "../services/performance_service.hpp"
 #include "../services/steam_service.hpp"
 #include "../translator/translator.hpp"
 
@@ -64,7 +64,7 @@ class MainWindow : public QMainWindow, public Singleton<MainWindow> {
 	Logger* _logger;
 
 	EventBus& eventBus					   = EventBus::getInstance();
-	ProfileService& profileService		   = ProfileService::getInstance();
+	PerformanceService& performanceService = PerformanceService::getInstance();
 	OpenRgbService& openRgbService		   = OpenRgbService::getInstance();
 	HardwareService& hardwareService	   = HardwareService::getInstance();
 	SteamService& steamService			   = SteamService::getInstance();

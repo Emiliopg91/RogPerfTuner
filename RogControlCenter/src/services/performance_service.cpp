@@ -1,4 +1,4 @@
-#include "../../include/services/profile_service.hpp"
+#include "../../include/services/performance_service.hpp"
 
 #include <optional>
 
@@ -10,7 +10,7 @@
 #include "../../include/utils/string_utils.hpp"
 #include "../../include/utils/time_utils.hpp"
 
-ProfileService::ProfileService() : Loggable("ProfileService") {
+PerformanceService::PerformanceService() : Loggable("ProfileService") {
 	logger.info("Initializing ProfileService");
 	Logger::add_tab();
 
@@ -51,18 +51,18 @@ ProfileService::ProfileService() : Loggable("ProfileService") {
 	Logger::rem_tab();
 }
 
-void ProfileService::renice(const pid_t& pid) {
+void PerformanceService::renice(const pid_t& pid) {
 	logger.info("Renicing process {}", pid);
 	Logger::add_tab();
 	shell.run_elevated_command(fmt::format("renice -n {} -p {} && ionice -c {} -n {} -p {}", CPU_PRIORITY, pid, IO_CLASS, IO_PRIORITY, pid));
 	Logger::rem_tab();
 }
 
-PerformanceProfile ProfileService::getPerformanceProfile() {
+PerformanceProfile PerformanceService::getPerformanceProfile() {
 	return currentProfile;
 }
 
-void ProfileService::setPerformanceProfile(PerformanceProfile& profile, const bool& temporal, const bool& force, const bool& showToast) {
+void PerformanceService::setPerformanceProfile(PerformanceProfile& profile, const bool& temporal, const bool& force, const bool& showToast) {
 	std::lock_guard<std::mutex> lock(actionMutex);
 	std::string profileName = profile.toName();
 
@@ -102,7 +102,7 @@ void ProfileService::setPerformanceProfile(PerformanceProfile& profile, const bo
 	}
 }
 
-void ProfileService::setPlatformProfile(PerformanceProfile& profile) {
+void PerformanceService::setPlatformProfile(PerformanceProfile& profile) {
 	if (platformClient.available()) {
 		auto platformProfile = profile.getPlatformProfile();
 		logger.info("Platform profile: {}", platformProfile.toName());
@@ -117,7 +117,7 @@ void ProfileService::setPlatformProfile(PerformanceProfile& profile) {
 	}
 }
 
-void ProfileService::setFanCurves(PerformanceProfile& profile) {
+void PerformanceService::setFanCurves(PerformanceProfile& profile) {
 	if (asusCtlClient.available()) {
 		auto platformProfile = profile.getPlatformProfile();
 		logger.info("Fan profile: {}", platformProfile.toName());
@@ -156,7 +156,7 @@ void ProfileService::setFanCurves(PerformanceProfile& profile) {
 	}
 }
 
-void ProfileService::setBoost(const PerformanceProfile&) {
+void PerformanceService::setBoost(const PerformanceProfile&) {
 	if (boostControlClient.available()) {
 		bool enabled = onBattery ? batteryBoost() : acBoost();
 		logger.info("CPU boost: {}", enabled ? "ON" : "OFF");
@@ -170,7 +170,7 @@ void ProfileService::setBoost(const PerformanceProfile&) {
 	}
 }
 
-void ProfileService::setSsdScheduler(PerformanceProfile& profile) {
+void PerformanceService::setSsdScheduler(PerformanceProfile& profile) {
 	if (ssdSchedulerClient.available()) {
 		SsdScheduler ssdScheduler = profile.getSsdQueueScheduler();
 		logger.info("SSD scheduler: {}", ssdScheduler.toName());
@@ -184,7 +184,7 @@ void ProfileService::setSsdScheduler(PerformanceProfile& profile) {
 	}
 }
 
-void ProfileService::setCpuGovernor(const PerformanceProfile& profile) {
+void PerformanceService::setCpuGovernor(const PerformanceProfile& profile) {
 	if (cpuPowerClient.available()) {
 		CpuGovernor cpuGovernor = onBattery ? batteryGovernor() : acGovernor(profile);
 		logger.info("CPU governor: {}", cpuGovernor.toName());
@@ -198,7 +198,7 @@ void ProfileService::setCpuGovernor(const PerformanceProfile& profile) {
 	}
 }
 
-void ProfileService::setPowerProfile(PerformanceProfile& profile) {
+void PerformanceService::setPowerProfile(PerformanceProfile& profile) {
 	if (powerProfileClient.available()) {
 		PowerProfile powerProfile = profile.getPowerProfile();
 		logger.info("Power profile: {}", powerProfile.toName());
@@ -212,7 +212,7 @@ void ProfileService::setPowerProfile(PerformanceProfile& profile) {
 	}
 }
 
-void ProfileService::setTdps(const PerformanceProfile& profile) {
+void PerformanceService::setTdps(const PerformanceProfile& profile) {
 	if (pl1SpdClient.available()) {
 		logger.info("TDP values");
 		Logger::add_tab();
@@ -236,7 +236,7 @@ void ProfileService::setTdps(const PerformanceProfile& profile) {
 	}
 }
 
-void ProfileService::setTgp(const PerformanceProfile& profile) {
+void PerformanceService::setTgp(const PerformanceProfile& profile) {
 	if (nvTempClient.available() || nvBoostClient.available()) {
 		logger.info("Nvidia GPU");
 		Logger::add_tab();
@@ -266,26 +266,26 @@ void ProfileService::setTgp(const PerformanceProfile& profile) {
 	}
 }
 
-void ProfileService::restore() {
+void PerformanceService::restore() {
 	restoreProfile();
 	restoreScheduler();
 }
 
-void ProfileService::restoreProfile() {
+void PerformanceService::restoreProfile() {
 	setPerformanceProfile(configuration.getConfiguration().platform.performance.profile, false, true);
 }
 
-void ProfileService::restoreScheduler() {
+void PerformanceService::restoreScheduler() {
 	setScheduler(configuration.getConfiguration().platform.performance.scheduler);
 }
 
-PerformanceProfile ProfileService::nextPerformanceProfile() {
+PerformanceProfile PerformanceService::nextPerformanceProfile() {
 	auto nextProfile = currentProfile.getNextPerformanceProfile();
 	setPerformanceProfile(nextProfile);
 	return nextProfile;
 }
 
-int ProfileService::acIntelPl1Spl(PerformanceProfile profile) {
+int PerformanceService::acIntelPl1Spl(PerformanceProfile profile) {
 	auto& client = Pl1SpdClient::getInstance();
 
 	if (profile == PerformanceProfile::Enum::PERFORMANCE) {
@@ -301,13 +301,13 @@ int ProfileService::acIntelPl1Spl(PerformanceProfile profile) {
 	return client.getCurrentValue();
 }
 
-int ProfileService::batteryIntelPl1Spl(PerformanceProfile profile) {
+int PerformanceService::batteryIntelPl1Spl(PerformanceProfile profile) {
 	int acVal	 = acIntelPl1Spl(profile);
 	auto& client = Pl1SpdClient::getInstance();
 	return acTdpToBatteryTdp(acIntelPl1Spl(profile), client.getMinValue());
 }
 
-int ProfileService::acIntelPl2Sppt(PerformanceProfile profile) {
+int PerformanceService::acIntelPl2Sppt(PerformanceProfile profile) {
 	auto& client = Pl2SpptClient::getInstance();
 
 	if (!acBoost()) {
@@ -327,13 +327,13 @@ int ProfileService::acIntelPl2Sppt(PerformanceProfile profile) {
 	return client.getCurrentValue();
 }
 
-int ProfileService::batteryIntelPl2Sppt(PerformanceProfile profile) {
+int PerformanceService::batteryIntelPl2Sppt(PerformanceProfile profile) {
 	int acVal	 = acIntelPl2Sppt(profile);
 	auto& client = Pl2SpptClient::getInstance();
 	return acTdpToBatteryTdp(acIntelPl2Sppt(profile), client.getMinValue());
 }
 
-int ProfileService::acNvBoost(PerformanceProfile profile) {
+int PerformanceService::acNvBoost(PerformanceProfile profile) {
 	auto& client = NvBoostClient::getInstance();
 
 	if (profile == PerformanceProfile::Enum::PERFORMANCE) {
@@ -349,17 +349,17 @@ int ProfileService::acNvBoost(PerformanceProfile profile) {
 	return client.getCurrentValue();
 }
 
-int ProfileService::batteryNvBoost(PerformanceProfile profile) {
+int PerformanceService::batteryNvBoost(PerformanceProfile profile) {
 	auto& client = NvBoostClient::getInstance();
 	return acTdpToBatteryTdp(acNvBoost(profile), client.getMinValue());
 }
 
-int ProfileService::acNvTemp() {
+int PerformanceService::acNvTemp() {
 	auto& client = NvTempClient::getInstance();
 	return client.getMaxValue();
 }
 
-int ProfileService::batteryNvTemp(PerformanceProfile profile) {
+int PerformanceService::batteryNvTemp(PerformanceProfile profile) {
 	auto& client = NvTempClient::getInstance();
 
 	if (profile == PerformanceProfile::Enum::PERFORMANCE) {
@@ -375,29 +375,29 @@ int ProfileService::batteryNvTemp(PerformanceProfile profile) {
 	return client.getCurrentValue();
 }
 
-bool ProfileService::acBoost() {
+bool PerformanceService::acBoost() {
 	return true;
 }
-bool ProfileService::batteryBoost() {
+bool PerformanceService::batteryBoost() {
 	return false;
 }
 
-CpuGovernor ProfileService::acGovernor(PerformanceProfile profile) {
+CpuGovernor PerformanceService::acGovernor(PerformanceProfile profile) {
 	if (profile == PerformanceProfile::Enum::PERFORMANCE) {
 		return CpuGovernor::Enum::PERFORMANCE;
 	}
 	return CpuGovernor::Enum::POWERSAVE;
 }
 
-CpuGovernor ProfileService::batteryGovernor() {
+CpuGovernor PerformanceService::batteryGovernor() {
 	return CpuGovernor::Enum::POWERSAVE;
 }
 
-int ProfileService::acTdpToBatteryTdp(int tdp, int minTdp) {
+int PerformanceService::acTdpToBatteryTdp(int tdp, int minTdp) {
 	return std::max(minTdp, static_cast<int>(std::round(tdp * 0.6)));
 }
 
-std::vector<std::string> ProfileService::getAvailableSchedulers() {
+std::vector<std::string> PerformanceService::getAvailableSchedulers() {
 	if (!scxCtlClient.available()) {
 		return {};
 	}
@@ -405,7 +405,7 @@ std::vector<std::string> ProfileService::getAvailableSchedulers() {
 	return scxCtlClient.getAvailable();
 }
 
-std::optional<std::string> ProfileService::getCurrentScheduler() {
+std::optional<std::string> PerformanceService::getCurrentScheduler() {
 	if (!scxCtlClient.available()) {
 		return std::nullopt;
 	}
@@ -413,7 +413,7 @@ std::optional<std::string> ProfileService::getCurrentScheduler() {
 	return currentScheduler;
 }
 
-void ProfileService::setScheduler(std::optional<std::string> scheduler, bool temporal) {
+void PerformanceService::setScheduler(std::optional<std::string> scheduler, bool temporal) {
 	if (!scxCtlClient.available()) {
 		return;
 	}
@@ -434,7 +434,7 @@ void ProfileService::setScheduler(std::optional<std::string> scheduler, bool tem
 	eventBus.emitScheduler(scheduler);
 }
 
-std::vector<std::string> ProfileService::getFans() {
+std::vector<std::string> PerformanceService::getFans() {
 	std::vector<std::string> res;
 
 	for (const auto& [key, val] : configuration.getConfiguration().platform.fanCurves[currentProfile.toString()]) {
@@ -444,15 +444,15 @@ std::vector<std::string> ProfileService::getFans() {
 	return res;
 }
 
-FanCurveData ProfileService::getFanCurve(std::string fan, std::string profile) {
+FanCurveData PerformanceService::getFanCurve(std::string fan, std::string profile) {
 	return FanCurveData::fromData(configuration.getConfiguration().platform.fanCurves[profile][fan]);
 }
 
-FanCurveData ProfileService::getDefaultFanCurve(std::string fan, std::string profile) {
+FanCurveData PerformanceService::getDefaultFanCurve(std::string fan, std::string profile) {
 	return FanCurveData::fromData(configuration.getConfiguration().platform.defaultFanCurves[profile][fan]);
 }
 
-void ProfileService::saveFanCurve(std::string fan, std::string profile, FanCurveData curve) {
+void PerformanceService::saveFanCurve(std::string fan, std::string profile, FanCurveData curve) {
 	logger.info("Setting curve of {} fan for {} profile", fan, profile);
 	Logger::add_tab();
 
