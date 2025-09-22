@@ -71,7 +71,7 @@ void ProfileService::setPerformanceProfile(PerformanceProfile& profile, const bo
 		Logger::add_tab();
 		try {
 			setPlatformProfile(profile);
-			//  setFanCurves(profile);
+			setFanCurves(profile);
 			setBoost(profile);
 			setCpuGovernor(profile);
 			setSsdScheduler(profile);
@@ -118,14 +118,20 @@ void ProfileService::setPlatformProfile(PerformanceProfile& profile) {
 }
 
 void ProfileService::setFanCurves(PerformanceProfile& profile) {
-	if (fanCurvesClient.available()) {
+	if (asusCtlClient.available()) {
 		auto platformProfile = profile.getPlatformProfile();
 		logger.info("Fan profile: {}", platformProfile.toName());
 		Logger::add_tab();
 		try {
-			fanCurvesClient.resetProfileCurve(platformProfile);
-			fanCurvesClient.setCurveToDefaults(platformProfile);
-			fanCurvesClient.setFanCurveEnabled(platformProfile);
+			asusCtlClient.setCurveToDefaults();
+			auto data = asusCtlClient.getFanCurveData(platformProfile);
+			for (auto& [fan, curve] : data) {
+				for (size_t i = 0; i < curve.pwm.size(); i++) {
+					curve.pwm[i] = std::min(static_cast<int>(std::floor(curve.pwm[i] * 1.1)), 255);
+				}
+				asusCtlClient.setFanCurveData(platformProfile, fan, curve);
+			}
+			asusCtlClient.setFanCurvesEnabled(platformProfile);
 		} catch (std::exception& e) {
 			logger.error("Error while setting fan curve: {}", e.what());
 		}

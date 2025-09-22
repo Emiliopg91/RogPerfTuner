@@ -13,6 +13,7 @@
 #include "../../include/clients/dbus/linux/upower_client.hpp"
 #include "../../include/clients/file/boost_control_client.hpp"
 #include "../../include/clients/file/ssd_scheduler_client.hpp"
+#include "../../include/clients/shell/asusctl_client.hpp"
 #include "../../include/clients/shell/cpupower_client.hpp"
 #include "../../include/clients/shell/scxctl_client.hpp"
 #include "../../include/gui/toaster.hpp"
@@ -70,6 +71,7 @@ class ProfileService : public Singleton<ProfileService>, Loggable {
 	Configuration& configuration		   = Configuration::getInstance();
 	Translator& translator				   = Translator::getInstance();
 	ScxCtlClient& scxCtlClient			   = ScxCtlClient::getInstance();
+	AsusCtlClient& asusCtlClient		   = AsusCtlClient::getInstance();
 	Shell& shell						   = Shell::getInstance();
 
 	void setPlatformProfile(PerformanceProfile& profile);

@@ -2,7 +2,7 @@
 #include "../../../../../include/clients/dbus/asus/core/fan_curves_client.hpp"
 
 void FanCurvesClient::resetProfileCurve(PlatformProfile profile) {
-	call("ResetPowerProfile", {static_cast<uint>(profile.toInt())});
+	call("ResetProfileCurves", {static_cast<uint>(profile.toInt())});
 }
 
 void FanCurvesClient::setCurveToDefaults(PlatformProfile profile) {

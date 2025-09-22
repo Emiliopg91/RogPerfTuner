@@ -16,6 +16,17 @@ class PlatformProfile : public IntEnum<PlatformProfile, PlatformProfileMeta::Enu
 	using Base = IntEnum<PlatformProfile, Enum, PlatformProfileMeta, 3>;
 	using Base::Base;
 
+	std::string formatValue() {
+		switch (this->value) {
+			case PlatformProfileMeta::Enum::LOW_POWER:
+				return "Quiet";
+			case PlatformProfileMeta::Enum::BALANCED:
+				return "Balanced";
+			case PlatformProfileMeta::Enum::PERFORMANCE:
+				return "Performance";
+		}
+	}
+
   private:
 	static constexpr std::array<PlatformProfileMeta, 3> table{
 		{{Enum::BALANCED, "BALANCED", 0}, {Enum::PERFORMANCE, "PERFORMANCE", 1}, {Enum::LOW_POWER, "LOW_POWER", 3}}};
