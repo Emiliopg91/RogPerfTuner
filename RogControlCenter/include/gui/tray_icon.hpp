@@ -56,6 +56,7 @@ class TrayIcon : public QObject, public Singleton<TrayIcon> {
 	void setProfileMenuEnabled(bool enabled);
 	void setSchedulerMenuEnabled(bool enabled);
 	void openMainWindow();
+	void openFanEditor();
 	void openSettings();
 	void reloadSettings();
 	void openLogs();

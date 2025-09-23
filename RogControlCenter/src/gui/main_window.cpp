@@ -87,12 +87,14 @@ MainWindow::MainWindow(QWidget* parent) : QMainWindow(parent), _logger(new Logge
 	// -------------------------
 	// Fan curves menu
 	// -------------------------
-	QPushButton* fanEdit = new QPushButton();
-	fanEdit->setText(QString::fromStdString(translator.translate("edit.curve")));
-	connect(fanEdit, &QPushButton::clicked, this, &MainWindow::openFanEditor);
-	fanEdit->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Preferred);
+	if (!performanceService.getFans().empty()) {
+		QPushButton* fanEdit = new QPushButton();
+		fanEdit->setText(QString::fromStdString(translator.translate("edit.curve")));
+		connect(fanEdit, &QPushButton::clicked, this, &MainWindow::openFanEditor);
+		fanEdit->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Preferred);
 
-	performanceLayout->addRow(new QLabel(QString::fromStdString(translator.translate("fan.curves") + ":")), fanEdit);
+		performanceLayout->addRow(new QLabel(QString::fromStdString(translator.translate("fan.curves") + ":")), fanEdit);
+	}
 	// -------------------------
 	// Fan curves menu
 	// -------------------------

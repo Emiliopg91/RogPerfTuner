@@ -9,6 +9,7 @@
 #include <QMenu>
 #include <optional>
 
+#include "../../include/gui/fan_curve_editor.hpp"
 #include "../../include/gui/game_list.hpp"
 #include "../../include/gui/main_window.hpp"
 #include "../../include/utils/string_utils.hpp"
@@ -34,6 +35,12 @@ void openGameList() {
 		GameList::INSTANCE = new GameList(&MainWindow::getInstance());
 	}
 	GameList::INSTANCE->show();
+}
+
+void TrayIcon::openFanEditor() {
+	auto profile		= performanceService.getPerformanceProfile().toString();
+	CurveEditor* editor = new CurveEditor(profile, &MainWindow::getInstance());
+	editor->show();
 }
 
 void TrayIcon::setAuraBrightness(RgbBrightness brightness) {
@@ -320,9 +327,24 @@ TrayIcon::TrayIcon() : QObject(&MainWindow::getInstance()), tray_icon_(new QSyst
 	// Scheduler submenu
 	// -------------------------
 	// -------------------------
+	// Fan curves menu
+	// -------------------------
+	if (!performanceService.getFans().empty()) {
+		QMenu* fanMenu = new QMenu(("    " + translator.translate("fan.curves")).c_str(), menu);
+		menu->insertMenu(nullptr, fanMenu);
+
+		QAction* act = new QAction((translator.translate("edit.curve") + "...").c_str());
+		QObject::connect(act, &QAction::triggered, [this]() {
+			openFanEditor();
+		});
+		fanMenu->addAction(act);
+	}
+	// -------------------------
+	// Fan curves menu
+	// -------------------------
+	// -------------------------
 	// Game submenu
 	// -------------------------
-
 	QMenu* gamesMenu = new QMenu(("    " + translator.translate("games")).c_str(), menu);
 	menu->insertMenu(nullptr, gamesMenu);
 
