@@ -455,7 +455,7 @@ TrayIcon::TrayIcon() : QObject(&MainWindow::getInstance()), tray_icon_(new QSyst
 
 	QObject::connect(tray_icon_, &QSystemTrayIcon::activated, this, [this](QSystemTrayIcon::ActivationReason reason) {
 		if (reason == QSystemTrayIcon::Trigger) {
-			MainWindow::getInstance().show();
+			openMainWindow();
 		}
 	});
 
