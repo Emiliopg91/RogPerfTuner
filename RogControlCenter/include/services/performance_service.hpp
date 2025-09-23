@@ -38,7 +38,7 @@ class PerformanceService : public Singleton<PerformanceService>, Loggable {
 	std::vector<std::string> getFans();
 	FanCurveData getFanCurve(std::string fan, std::string profile);
 	FanCurveData getDefaultFanCurve(std::string fan, std::string profile);
-	void saveFanCurve(std::string fan, std::string profile, FanCurveData curve);
+	void saveFanCurves(std::string profile, std::unordered_map<std::string, FanCurveData> curves);
 
 	void renice(const pid_t&);
 

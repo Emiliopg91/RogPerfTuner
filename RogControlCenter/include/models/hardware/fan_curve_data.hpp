@@ -12,5 +12,5 @@ class FanCurveData {
 	static std::unordered_map<std::string, FanCurveData> parseCurves(std::string);
 	static FanCurveData fromData(std::string);
 
-	std::string toData();
+	std::string toData() const;
 };

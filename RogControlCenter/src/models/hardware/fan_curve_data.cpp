@@ -48,7 +48,7 @@ std::unordered_map<std::string, FanCurveData> FanCurveData::parseCurves(std::str
 	return result;
 }
 
-std::string FanCurveData::toData() {
+std::string FanCurveData::toData() const {
 	std::vector<std::string> data;
 	for (size_t i = 0; i < perc.size(); i++) {
 		data.emplace_back(fmt::format("{}c:{}%", temp[i], perc[i]));

@@ -79,5 +79,4 @@ class MainWindow : public QMainWindow, public Singleton<MainWindow> {
 	QPushButton* _colorButton;
 	QComboBox* _thresholdDropdown;
 	QCheckBox* _autostart;
-	QComboBox* _fanCombo;
 };

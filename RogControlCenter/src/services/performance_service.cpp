@@ -123,30 +123,26 @@ void PerformanceService::setFanCurves(PerformanceProfile& profile) {
 		logger.info("Fan profile: {}", platformProfile.toName());
 		Logger::add_tab();
 		try {
-			auto it = configuration.getConfiguration().platform.fanCurves.find(profile.toString());
+			auto it = configuration.getConfiguration().platform.curves.find(profile.toString());
 
-			if (it == configuration.getConfiguration().platform.fanCurves.end()) {
-				configuration.getConfiguration().platform.fanCurves[profile.toString()] = {};
+			if (it == configuration.getConfiguration().platform.curves.end()) {
+				configuration.getConfiguration().platform.curves[profile.toString()] = {};
 
-				auto it2 = configuration.getConfiguration().platform.defaultFanCurves.find(profile.toString());
-				if (it2 == configuration.getConfiguration().platform.defaultFanCurves.end()) {
-					configuration.getConfiguration().platform.defaultFanCurves[profile.toString()] = {};
-					auto data																	   = asusCtlClient.getFanCurveData(platformProfile);
-					for (auto& [fan, curve] : data) {
-						configuration.getConfiguration().platform.defaultFanCurves[profile.toString()][fan] = curve.toData();
-					}
+				asusCtlClient.setCurvesToDefaults(platformProfile);
+				auto data = asusCtlClient.getFanCurveData(platformProfile);
+				for (auto& [fan, curve] : data) {
+					configuration.getConfiguration().platform.curves[profile.toString()][fan].factory = curve.toData();
+					configuration.getConfiguration().platform.curves[profile.toString()][fan].current = curve.toData();
 				}
 
-				configuration.getConfiguration().platform.fanCurves[profile.toString()] =
-					configuration.getConfiguration().platform.defaultFanCurves[profile.toString()];
 				configuration.saveConfig();
 			}
 
 			for (PlatformProfile pp : PlatformProfile::getAll()) {
 				asusCtlClient.setFanCurvesEnabled(pp, false);
 			}
-			for (const auto& [fan, data] : configuration.getConfiguration().platform.fanCurves[profile.toString()]) {
-				asusCtlClient.setFanCurveStringData(platformProfile, fan, data);
+			for (const auto& [fan, data] : configuration.getConfiguration().platform.curves[profile.toString()]) {
+				asusCtlClient.setFanCurveStringData(platformProfile, fan, data.current);
 			}
 			asusCtlClient.setFanCurvesEnabled(platformProfile, true);
 		} catch (std::exception& e) {
@@ -437,7 +433,7 @@ void PerformanceService::setScheduler(std::optional<std::string> scheduler, bool
 std::vector<std::string> PerformanceService::getFans() {
 	std::vector<std::string> res;
 
-	for (const auto& [key, val] : configuration.getConfiguration().platform.fanCurves[currentProfile.toString()]) {
+	for (const auto& [key, val] : configuration.getConfiguration().platform.curves[currentProfile.toString()]) {
 		res.emplace_back(key);
 	}
 
@@ -445,23 +441,26 @@ std::vector<std::string> PerformanceService::getFans() {
 }
 
 FanCurveData PerformanceService::getFanCurve(std::string fan, std::string profile) {
-	return FanCurveData::fromData(configuration.getConfiguration().platform.fanCurves[profile][fan]);
+	return FanCurveData::fromData(configuration.getConfiguration().platform.curves[profile][fan].current);
 }
 
 FanCurveData PerformanceService::getDefaultFanCurve(std::string fan, std::string profile) {
-	return FanCurveData::fromData(configuration.getConfiguration().platform.defaultFanCurves[profile][fan]);
+	return FanCurveData::fromData(configuration.getConfiguration().platform.curves[profile][fan].factory);
 }
 
-void PerformanceService::saveFanCurve(std::string fan, std::string profile, FanCurveData curve) {
-	logger.info("Setting curve of {} fan for {} profile", fan, profile);
+void PerformanceService::saveFanCurves(std::string profile, std::unordered_map<std::string, FanCurveData> curves) {
+	logger.info("Setting curves for {} profile", profile);
 	Logger::add_tab();
 
 	auto pp = ((PerformanceProfile)PerformanceProfile::fromString(profile)).getPlatformProfile();
 
-	asusCtlClient.setFanCurveStringData(pp, fan, curve.toData());
 	asusCtlClient.setFanCurvesEnabled(pp, false);
+	for (const auto& [fan, curve] : curves) {
+		asusCtlClient.setFanCurveStringData(pp, fan, curve.toData());
+		configuration.getConfiguration().platform.curves[profile][fan].current = curve.toData();
+	}
 	asusCtlClient.setFanCurvesEnabled(pp, true);
-	configuration.getConfiguration().platform.fanCurves[profile][fan] = curve.toData();
+
 	configuration.saveConfig();
 
 	Logger::rem_tab();

@@ -90,24 +90,9 @@ MainWindow::MainWindow(QWidget* parent) : QMainWindow(parent), _logger(new Logge
 	QPushButton* fanEdit = new QPushButton();
 	fanEdit->setText(QString::fromStdString(translator.translate("edit.curve")));
 	connect(fanEdit, &QPushButton::clicked, this, &MainWindow::openFanEditor);
+	fanEdit->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Preferred);
 
-	_fanCombo = new QComboBox();
-	auto fans = std::vector<std::string>(performanceService.getFans());
-	std::sort(fans.begin(), fans.end());
-	for (const auto& fan : fans) {
-		_fanCombo->addItem(fan.c_str(), fan.c_str());
-	}
-
-	QWidget* rightGroup = new QWidget();
-	rightGroup->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Preferred);
-
-	QHBoxLayout* hLayout = new QHBoxLayout(rightGroup);
-	hLayout->setContentsMargins(0, 0, 0, 0);
-	hLayout->setSpacing(5);
-	hLayout->addWidget(_fanCombo);
-	hLayout->addWidget(fanEdit);
-
-	performanceLayout->addRow(new QLabel(QString::fromStdString(translator.translate("fan.curves") + ":")), rightGroup);
+	performanceLayout->addRow(new QLabel(QString::fromStdString(translator.translate("fan.curves") + ":")), fanEdit);
 	// -------------------------
 	// Fan curves menu
 	// -------------------------
@@ -352,9 +337,8 @@ void MainWindow::openGameList() {
 }
 
 void MainWindow::openFanEditor() {
-	auto fan			= _fanCombo->currentData().toString().toStdString();
 	auto profile		= _profileDropdown->currentData().toString().toStdString();
-	CurveEditor* editor = new CurveEditor(fan, profile, this);
+	CurveEditor* editor = new CurveEditor(profile, this);
 	editor->show();
 }
 

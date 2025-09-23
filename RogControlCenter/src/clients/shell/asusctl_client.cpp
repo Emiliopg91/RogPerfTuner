@@ -8,10 +8,6 @@ void AsusCtlClient::turnOffAura() {
 	run_command("aura static -c 000000", true, false);
 }
 
-void AsusCtlClient::setCurveToDefaults() {
-	run_command("fan-curve --default");
-}
-
 std::unordered_map<std::string, FanCurveData> AsusCtlClient::getFanCurveData(PlatformProfile profile) {
 	auto output = run_command(fmt::format("fan-curve --mod-profile {}", profile.formatValue())).stdout_str;
 
@@ -22,6 +18,10 @@ std::unordered_map<std::string, FanCurveData> AsusCtlClient::getFanCurveData(Pla
 	}
 
 	return {};
+}
+
+void AsusCtlClient::setCurvesToDefaults(PlatformProfile profile) {
+	run_command(fmt::format("fan-curve --mod-profile {} --default", profile.formatValue()));
 }
 
 void AsusCtlClient::setFanCurvesEnabled(PlatformProfile profile, bool enabled) {
