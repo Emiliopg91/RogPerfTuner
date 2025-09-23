@@ -382,12 +382,14 @@ const SteamGameConfig SteamService::getConfiguration(const std::string& gid) {
 			cfg.parameters = gameEntry.args.value();
 		}
 
-		cfg.environment["SteamDeck"] = gameEntry.steamdeck ? "1" : "0";
 		if (gameEntry.proton) {
-			cfg.environment["PROTON_USE_NTSYNC"] = gameEntry.sync == WineSyncOption::Enum::NTSYNC ? "1" : "0";
-			cfg.environment["PROTON_NO_NTSYNC"]	 = gameEntry.sync == WineSyncOption::Enum::NTSYNC ? "0" : "1";
-			cfg.environment["PROTON_NO_FSYNC"]	 = gameEntry.sync == WineSyncOption::Enum::FSYNC ? "0" : "1";
-			cfg.environment["PROTON_NO_ESYNC"]	 = gameEntry.sync == WineSyncOption::Enum::ESYNC ? "0" : "1";
+			cfg.environment["SteamDeck"] = gameEntry.steamdeck ? "1" : "0";
+			if (gameEntry.sync != WineSyncOption::Enum::AUTO) {
+				cfg.environment["PROTON_USE_NTSYNC"] = gameEntry.sync == WineSyncOption::Enum::NTSYNC ? "1" : "0";
+				cfg.environment["PROTON_NO_NTSYNC"]	 = gameEntry.sync == WineSyncOption::Enum::NTSYNC ? "0" : "1";
+				cfg.environment["PROTON_NO_FSYNC"]	 = gameEntry.sync == WineSyncOption::Enum::FSYNC ? "0" : "1";
+				cfg.environment["PROTON_NO_ESYNC"]	 = gameEntry.sync == WineSyncOption::Enum::ESYNC ? "0" : "1";
+			}
 		}
 
 		if (gameEntry.gpu.has_value()) {
