@@ -9,6 +9,7 @@
 #include <QMenu>
 #include <optional>
 
+#include "../../include/gui/fan_curve_editor.hpp"
 #include "../../include/gui/game_list.hpp"
 #include "../../include/gui/main_window.hpp"
 #include "../../include/utils/string_utils.hpp"
@@ -34,6 +35,12 @@ void openGameList() {
 		GameList::INSTANCE = new GameList(&MainWindow::getInstance());
 	}
 	GameList::INSTANCE->show();
+}
+
+void TrayIcon::openFanEditor() {
+	auto profile		= performanceService.getPerformanceProfile().toString();
+	CurveEditor* editor = new CurveEditor(profile, &MainWindow::getInstance());
+	editor->show();
 }
 
 void TrayIcon::setAuraBrightness(RgbBrightness brightness) {
@@ -95,20 +102,20 @@ void TrayIcon::setBatteryThreshold(BatteryThreshold threshold) {
 		Qt::QueuedConnection);
 }
 
-void TrayIcon::setProfileMenuEnabled(bool enabled) {
+void TrayIcon::setProfileMenuEnabled() {
 	QMetaObject::invokeMethod(
 		&TrayIcon::getInstance(),
 		[=, this]() {
-			profileMenu->setEnabled(enabled);
+			profileMenu->setEnabled(!onBattery && runningGames == 0);
 		},
 		Qt::QueuedConnection);
 }
 
-void TrayIcon::setSchedulerMenuEnabled(bool enabled) {
+void TrayIcon::setSchedulerMenuEnabled() {
 	QMetaObject::invokeMethod(
 		&TrayIcon::getInstance(),
 		[=, this]() {
-			schedulerMenu->setEnabled(enabled);
+			schedulerMenu->setEnabled(runningGames == 0);
 		},
 		Qt::QueuedConnection);
 }
@@ -149,6 +156,9 @@ TrayIcon::TrayIcon() : QObject(&MainWindow::getInstance()), tray_icon_(new QSyst
 	tray_icon_->setToolTip(QString::fromStdString(Constants::APP_NAME + " v" + Constants::APP_VERSION));
 
 	QMenu* menu = tray_menu_;
+
+	onBattery	 = uPowerClient.isOnBattery();
+	runningGames = steamService.getRunningGames().size();
 
 	// -------------------------
 	// Battery menu
@@ -281,6 +291,8 @@ TrayIcon::TrayIcon() : QObject(&MainWindow::getInstance()), tray_icon_(new QSyst
 		profileMenu->addAction(act);
 		perfProfileActions[item.toName()] = act;
 	}
+
+	profileMenu->setEnabled(runningGames == 0 && !onBattery);
 	menu->insertMenu(nullptr, profileMenu);
 	// -------------------------
 	// Profile submenu
@@ -302,6 +314,8 @@ TrayIcon::TrayIcon() : QObject(&MainWindow::getInstance()), tray_icon_(new QSyst
 		schedulerActions[""] = act;
 		schedulerMenu->addSeparator();
 
+		schedulerMenu->setEnabled(runningGames == 0);
+
 		auto items2 = performanceService.getAvailableSchedulers();
 		std::reverse(items2.begin(), items2.end());
 		for (auto item : items2) {
@@ -320,9 +334,24 @@ TrayIcon::TrayIcon() : QObject(&MainWindow::getInstance()), tray_icon_(new QSyst
 	// Scheduler submenu
 	// -------------------------
 	// -------------------------
+	// Fan curves menu
+	// -------------------------
+	if (!performanceService.getFans().empty()) {
+		QMenu* fanMenu = new QMenu(("    " + translator.translate("fan.curves")).c_str(), menu);
+		menu->insertMenu(nullptr, fanMenu);
+
+		QAction* act = new QAction((translator.translate("edit.curve") + "...").c_str());
+		QObject::connect(act, &QAction::triggered, [this]() {
+			openFanEditor();
+		});
+		fanMenu->addAction(act);
+	}
+	// -------------------------
+	// Fan curves menu
+	// -------------------------
+	// -------------------------
 	// Game submenu
 	// -------------------------
-
 	QMenu* gamesMenu = new QMenu(("    " + translator.translate("games")).c_str(), menu);
 	menu->insertMenu(nullptr, gamesMenu);
 
@@ -433,7 +462,7 @@ TrayIcon::TrayIcon() : QObject(&MainWindow::getInstance()), tray_icon_(new QSyst
 
 	QObject::connect(tray_icon_, &QSystemTrayIcon::activated, this, [this](QSystemTrayIcon::ActivationReason reason) {
 		if (reason == QSystemTrayIcon::Trigger) {
-			MainWindow::getInstance().show();
+			openMainWindow();
 		}
 	});
 
@@ -462,8 +491,14 @@ TrayIcon::TrayIcon() : QObject(&MainWindow::getInstance()), tray_icon_(new QSyst
 	});
 
 	eventBus.onGameEvent([this](size_t runningGames) {
-		setProfileMenuEnabled(runningGames == 0);
-		setSchedulerMenuEnabled(runningGames == 0);
+		this->runningGames = runningGames;
+		setProfileMenuEnabled();
+		setSchedulerMenuEnabled();
+	});
+
+	eventBus.onBattery([this](bool onBattery) {
+		this->onBattery = onBattery;
+		setProfileMenuEnabled();
 	});
 }
 

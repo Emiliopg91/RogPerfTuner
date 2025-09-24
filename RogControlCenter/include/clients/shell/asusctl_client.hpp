@@ -14,7 +14,7 @@ class AsusCtlClient : public AbstractCmdClient, public Singleton<AsusCtlClient> 
   public:
 	void turnOffAura();
 
-	void setCurveToDefaults();
+	void setCurvesToDefaults(PlatformProfile profile);
 
 	void setFanCurvesEnabled(PlatformProfile profile, bool enabled);
 

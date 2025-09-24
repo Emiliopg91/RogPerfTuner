@@ -7,8 +7,13 @@
 #include "../../include/models/performance/cpu_governor.hpp"
 #include "../../include/models/performance/power_profile.hpp"
 #include "../../include/models/performance/ssd_scheduler.hpp"
+#include "../../include/utils/process_utils.hpp"
 #include "../../include/utils/string_utils.hpp"
 #include "../../include/utils/time_utils.hpp"
+
+int8_t PerformanceService::CPU_PRIORITY = -17;
+uint8_t PerformanceService::IO_PRIORITY = (CPU_PRIORITY + 20) / 5;
+uint8_t PerformanceService::IO_CLASS	= 2;
 
 PerformanceService::PerformanceService() : Loggable("ProfileService") {
 	logger.info("Initializing ProfileService");
@@ -32,12 +37,7 @@ PerformanceService::PerformanceService() : Loggable("ProfileService") {
 	eventBus.onBattery([this](bool onBat) {
 		onBattery = onBat;
 		if (runningGames == 0) {
-			if (onBattery) {
-				PerformanceProfile p = PerformanceProfile::Enum::QUIET;
-				setPerformanceProfile(p, true, true);
-			} else {
-				restoreProfile();
-			}
+			restoreProfile();
 		}
 	});
 
@@ -54,7 +54,11 @@ PerformanceService::PerformanceService() : Loggable("ProfileService") {
 void PerformanceService::renice(const pid_t& pid) {
 	logger.info("Renicing process {}", pid);
 	Logger::add_tab();
-	shell.run_elevated_command(fmt::format("renice -n {} -p {} && ionice -c {} -n {} -p {}", CPU_PRIORITY, pid, IO_CLASS, IO_PRIORITY, pid));
+	std::set<pid_t> ion, ren;
+	do {
+		ion = ProcessUtils::reniceHierarchy(pid, CPU_PRIORITY);
+		ren = ProcessUtils::ioniceHierarchy(pid, IO_CLASS, IO_PRIORITY);
+	} while (ion != ren);
 	Logger::rem_tab();
 }
 
@@ -123,30 +127,26 @@ void PerformanceService::setFanCurves(PerformanceProfile& profile) {
 		logger.info("Fan profile: {}", platformProfile.toName());
 		Logger::add_tab();
 		try {
-			auto it = configuration.getConfiguration().platform.fanCurves.find(profile.toString());
+			auto it = configuration.getConfiguration().platform.curves.find(profile.toString());
 
-			if (it == configuration.getConfiguration().platform.fanCurves.end()) {
-				configuration.getConfiguration().platform.fanCurves[profile.toString()] = {};
+			if (it == configuration.getConfiguration().platform.curves.end()) {
+				configuration.getConfiguration().platform.curves[profile.toString()] = {};
 
-				auto it2 = configuration.getConfiguration().platform.defaultFanCurves.find(profile.toString());
-				if (it2 == configuration.getConfiguration().platform.defaultFanCurves.end()) {
-					configuration.getConfiguration().platform.defaultFanCurves[profile.toString()] = {};
-					auto data																	   = asusCtlClient.getFanCurveData(platformProfile);
-					for (auto& [fan, curve] : data) {
-						configuration.getConfiguration().platform.defaultFanCurves[profile.toString()][fan] = curve.toData();
-					}
+				asusCtlClient.setCurvesToDefaults(platformProfile);
+				auto data = asusCtlClient.getFanCurveData(platformProfile);
+				for (auto& [fan, curve] : data) {
+					configuration.getConfiguration().platform.curves[profile.toString()][fan].factory = curve.toData();
+					configuration.getConfiguration().platform.curves[profile.toString()][fan].current = curve.toData();
 				}
 
-				configuration.getConfiguration().platform.fanCurves[profile.toString()] =
-					configuration.getConfiguration().platform.defaultFanCurves[profile.toString()];
 				configuration.saveConfig();
 			}
 
 			for (PlatformProfile pp : PlatformProfile::getAll()) {
 				asusCtlClient.setFanCurvesEnabled(pp, false);
 			}
-			for (const auto& [fan, data] : configuration.getConfiguration().platform.fanCurves[profile.toString()]) {
-				asusCtlClient.setFanCurveStringData(platformProfile, fan, data);
+			for (const auto& [fan, data] : configuration.getConfiguration().platform.curves[profile.toString()]) {
+				asusCtlClient.setFanCurveStringData(platformProfile, fan, data.current);
 			}
 			asusCtlClient.setFanCurvesEnabled(platformProfile, true);
 		} catch (std::exception& e) {
@@ -229,7 +229,7 @@ void PerformanceService::setTdps(const PerformanceProfile& profile) {
 				pl2SpptClient.setCurrentValue(pl2);
 			}
 		} catch (std::exception& e) {
-			logger.info("Error setting CPU TDPs");
+			logger.info("Error setting CPU TDPs: {}", e.what());
 		}
 
 		Logger::rem_tab();
@@ -248,7 +248,7 @@ void PerformanceService::setTgp(const PerformanceProfile& profile) {
 				nvBoostClient.setCurrentValue(nvb);
 				TimeUtils::sleep(25);
 			} catch (std::exception& e) {
-				logger.info("Error setting Nvidia Boost");
+				logger.info("Error setting Nvidia Boost: {}", e.what());
 			}
 		}
 
@@ -272,7 +272,12 @@ void PerformanceService::restore() {
 }
 
 void PerformanceService::restoreProfile() {
-	setPerformanceProfile(configuration.getConfiguration().platform.performance.profile, false, true);
+	if (onBattery) {
+		PerformanceProfile p = PerformanceProfile::Enum::QUIET;
+		setPerformanceProfile(p, true, true);
+	} else {
+		setPerformanceProfile(configuration.getConfiguration().platform.performance.profile, false, true);
+	}
 }
 
 void PerformanceService::restoreScheduler() {
@@ -292,10 +297,10 @@ int PerformanceService::acIntelPl1Spl(PerformanceProfile profile) {
 		return client.getMaxValue();
 	}
 	if (profile == PerformanceProfile::Enum::BALANCED) {
-		return client.getMaxValue() * 0.6;
+		return client.getMaxValue() * 0.75;
 	}
 	if (profile == PerformanceProfile::Enum::QUIET) {
-		return client.getMaxValue() * 0.4;
+		return client.getMaxValue() * 0.55;
 	}
 
 	return client.getCurrentValue();
@@ -318,10 +323,10 @@ int PerformanceService::acIntelPl2Sppt(PerformanceProfile profile) {
 		return client.getMaxValue();
 	}
 	if (profile == PerformanceProfile::Enum::BALANCED) {
-		return client.getMaxValue() * 0.8;	// modificar
+		return client.getMaxValue() * 0.85;	 // modificar
 	}
 	if (profile == PerformanceProfile::Enum::QUIET) {
-		return client.getMaxValue() * 0.6;	// modificar
+		return client.getMaxValue() * 0.7;	// modificar
 	}
 
 	return client.getCurrentValue();
@@ -437,7 +442,7 @@ void PerformanceService::setScheduler(std::optional<std::string> scheduler, bool
 std::vector<std::string> PerformanceService::getFans() {
 	std::vector<std::string> res;
 
-	for (const auto& [key, val] : configuration.getConfiguration().platform.fanCurves[currentProfile.toString()]) {
+	for (const auto& [key, val] : configuration.getConfiguration().platform.curves[currentProfile.toString()]) {
 		res.emplace_back(key);
 	}
 
@@ -445,23 +450,26 @@ std::vector<std::string> PerformanceService::getFans() {
 }
 
 FanCurveData PerformanceService::getFanCurve(std::string fan, std::string profile) {
-	return FanCurveData::fromData(configuration.getConfiguration().platform.fanCurves[profile][fan]);
+	return FanCurveData::fromData(configuration.getConfiguration().platform.curves[profile][fan].current);
 }
 
 FanCurveData PerformanceService::getDefaultFanCurve(std::string fan, std::string profile) {
-	return FanCurveData::fromData(configuration.getConfiguration().platform.defaultFanCurves[profile][fan]);
+	return FanCurveData::fromData(configuration.getConfiguration().platform.curves[profile][fan].factory);
 }
 
-void PerformanceService::saveFanCurve(std::string fan, std::string profile, FanCurveData curve) {
-	logger.info("Setting curve of {} fan for {} profile", fan, profile);
+void PerformanceService::saveFanCurves(std::string profile, std::unordered_map<std::string, FanCurveData> curves) {
+	logger.info("Setting curves for {} profile", profile);
 	Logger::add_tab();
 
 	auto pp = ((PerformanceProfile)PerformanceProfile::fromString(profile)).getPlatformProfile();
 
-	asusCtlClient.setFanCurveStringData(pp, fan, curve.toData());
 	asusCtlClient.setFanCurvesEnabled(pp, false);
+	for (const auto& [fan, curve] : curves) {
+		asusCtlClient.setFanCurveStringData(pp, fan, curve.toData());
+		configuration.getConfiguration().platform.curves[profile][fan].current = curve.toData();
+	}
 	asusCtlClient.setFanCurvesEnabled(pp, true);
-	configuration.getConfiguration().platform.fanCurves[profile][fan] = curve.toData();
+
 	configuration.saveConfig();
 
 	Logger::rem_tab();

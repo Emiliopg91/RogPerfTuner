@@ -27,7 +27,9 @@ class MainWindow : public QMainWindow, public Singleton<MainWindow> {
 	void closeEvent(QCloseEvent* event) override;
 
   private slots:
-	void onGameEvent(int runningGames);
+	void onGameEvent();
+
+	void onBatteryEvent();
 
 	void setPerformanceProfile(PerformanceProfile value);
 
@@ -62,6 +64,8 @@ class MainWindow : public QMainWindow, public Singleton<MainWindow> {
   private:
 	friend class Singleton<MainWindow>;
 	Logger* _logger;
+	int runningGames;
+	bool onBattery;
 
 	EventBus& eventBus					   = EventBus::getInstance();
 	PerformanceService& performanceService = PerformanceService::getInstance();
@@ -70,6 +74,7 @@ class MainWindow : public QMainWindow, public Singleton<MainWindow> {
 	SteamService& steamService			   = SteamService::getInstance();
 	Translator& translator				   = Translator::getInstance();
 	ApplicationService& applicationService = ApplicationService::getInstance();
+	UPowerClient& uPowerClient			   = UPowerClient::getInstance();
 
 	QComboBox* _profileDropdown;
 	QComboBox* _schedulerDropdown;
@@ -79,5 +84,4 @@ class MainWindow : public QMainWindow, public Singleton<MainWindow> {
 	QPushButton* _colorButton;
 	QComboBox* _thresholdDropdown;
 	QCheckBox* _autostart;
-	QComboBox* _fanCombo;
 };

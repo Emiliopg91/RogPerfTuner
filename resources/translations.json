@@ -316,16 +316,16 @@
     "es": "Ninguno"
   },
   "fan.curves": {
-    "en": "Fan",
-    "es": "Ventilador"
+    "en": "Fans",
+    "es": "Ventiladores"
   },
   "edit.curve": {
-    "en": "Edit curve",
-    "es": "Editar curva"
+    "en": "Edit curves",
+    "es": "Editar curvas"
   },
   "edit.fan.profile": {
-    "en": "Edit {fan} curve for {prof} profile",
-    "es": "Editar curva {fan} para perfil {prof}"
+    "en": "Edit curves for {prof} profile",
+    "es": "Editar curvas para perfil {prof}"
   },
   "reset": {
     "en": "Reset",
@@ -334,5 +334,9 @@
   "reset.default": {
     "en": "Reset to default",
     "es": "Valor por defecto"
+  },
+  "apply.suggestion": {
+    "en": "Apply optimization",
+    "es": "Aplicar optimización"
   }
 }

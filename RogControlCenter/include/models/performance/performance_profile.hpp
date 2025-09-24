@@ -19,6 +19,8 @@ class PerformanceProfile : public StrEnum<PerformanceProfile, PerformanceProfile
 	using Base = StrEnum<PerformanceProfile, Enum, 3>;
 	using Base::Base;
 
+	bool supportedOnBattery();
+
 	PerformanceProfile getNextPerformanceProfile();
 
 	PerformanceProfile getGreater(const PerformanceProfile& other);

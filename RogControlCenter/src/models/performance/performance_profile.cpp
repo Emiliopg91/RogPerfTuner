@@ -1,5 +1,9 @@
 #include "../../../include/models/performance/performance_profile.hpp"
 
+bool PerformanceProfile::supportedOnBattery() {
+	return *this == PerformanceProfile::Enum::QUIET;
+}
+
 PerformanceProfile PerformanceProfile::getNextPerformanceProfile() {
 	if (*this == PerformanceProfile::Enum::PERFORMANCE) {
 		return PerformanceProfile::Enum::QUIET;

@@ -251,17 +251,16 @@ void SteamService::onGameLaunch(unsigned int gid, std::string name, int pid) {
 
 		logger.info("Stopping process...");
 
-		uint signaled	 = 0;
-		uint newSignaled = 0;
+		std::set<pid_t> signaled, newSignaled;
 		do {
 			signaled	= newSignaled;
 			newSignaled = ProcessUtils::sendSignalToHierarchy(pid, SIGSTOP);
 
-			logger.debug("Stopped {} processes, before {}", newSignaled, signaled);
+			logger.debug("Stopped {} processes, before {}", newSignaled.size(), signaled.size());
 
 			TimeUtils::sleep(100);
-		} while (signaled < newSignaled);
-		logger.debug("Killed {} processes", ProcessUtils::sendSignalToHierarchy(pid, SIGKILL));
+		} while (signaled != newSignaled);
+		logger.debug("Killed {} processes", ProcessUtils::sendSignalToHierarchy(pid, SIGKILL).size());
 
 		Logger::rem_tab();
 
@@ -270,6 +269,7 @@ void SteamService::onGameLaunch(unsigned int gid, std::string name, int pid) {
 		}).detach();
 	} else if (runningGames.find(gid) == runningGames.end()) {
 		runningGames[gid] = GameEntry(it->second);
+		performanceService.renice(pid);
 		setProfileForGames();
 
 		eventBus.emitGameEvent(runningGames.size());
@@ -382,12 +382,14 @@ const SteamGameConfig SteamService::getConfiguration(const std::string& gid) {
 			cfg.parameters = gameEntry.args.value();
 		}
 
-		cfg.environment["SteamDeck"] = gameEntry.steamdeck ? "1" : "0";
 		if (gameEntry.proton) {
-			cfg.environment["PROTON_USE_NTSYNC"] = gameEntry.sync == WineSyncOption::Enum::NTSYNC ? "1" : "0";
-			cfg.environment["PROTON_NO_NTSYNC"]	 = gameEntry.sync == WineSyncOption::Enum::NTSYNC ? "0" : "1";
-			cfg.environment["PROTON_NO_FSYNC"]	 = gameEntry.sync == WineSyncOption::Enum::FSYNC ? "0" : "1";
-			cfg.environment["PROTON_NO_ESYNC"]	 = gameEntry.sync == WineSyncOption::Enum::ESYNC ? "0" : "1";
+			cfg.environment["SteamDeck"] = gameEntry.steamdeck ? "1" : "0";
+			if (gameEntry.sync != WineSyncOption::Enum::AUTO) {
+				cfg.environment["PROTON_USE_NTSYNC"] = gameEntry.sync == WineSyncOption::Enum::NTSYNC ? "1" : "0";
+				cfg.environment["PROTON_NO_NTSYNC"]	 = gameEntry.sync == WineSyncOption::Enum::NTSYNC ? "0" : "1";
+				cfg.environment["PROTON_NO_FSYNC"]	 = gameEntry.sync == WineSyncOption::Enum::FSYNC ? "0" : "1";
+				cfg.environment["PROTON_NO_ESYNC"]	 = gameEntry.sync == WineSyncOption::Enum::ESYNC ? "0" : "1";
+			}
 		}
 
 		if (gameEntry.gpu.has_value()) {

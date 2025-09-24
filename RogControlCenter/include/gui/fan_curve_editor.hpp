@@ -11,12 +11,13 @@
 class CurveEditor : public QDialog {
 	Q_OBJECT
   public:
-	CurveEditor(const std::string& fan, const std::string& profile, QWidget* parent = nullptr);
+	CurveEditor(const std::string& profile, QWidget* parent = nullptr);
 
   private:
-	FanCurveView* chart;
-	QLineSeries* series;
-	std::string fan;
+	QTabWidget* tabs;
+	std::vector<QLineSeries*> seriesList;
+	std::vector<FanCurveView*> charts;
+	std::vector<std::string> fans;
 	std::string profile;
 
 	Translator& translator				   = Translator::getInstance();

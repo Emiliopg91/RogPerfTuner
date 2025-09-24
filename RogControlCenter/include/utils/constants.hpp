@@ -66,7 +66,6 @@ class Constants {
 
 	static const std::string URL_GAME_CFG;
 	static const std::string URL_PERF_PROF;
-	static const std::string URL_RENICE;
 	static const std::string URL_DEC_BRIGHT;
 	static const std::string URL_INC_BRIGHT;
 	static const std::string URL_NEXT_EFF;

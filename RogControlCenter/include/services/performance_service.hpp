@@ -38,16 +38,16 @@ class PerformanceService : public Singleton<PerformanceService>, Loggable {
 	std::vector<std::string> getFans();
 	FanCurveData getFanCurve(std::string fan, std::string profile);
 	FanCurveData getDefaultFanCurve(std::string fan, std::string profile);
-	void saveFanCurve(std::string fan, std::string profile, FanCurveData curve);
+	void saveFanCurves(std::string profile, std::unordered_map<std::string, FanCurveData> curves);
 
 	void renice(const pid_t&);
 
 	PerformanceProfile nextPerformanceProfile();
 
   private:
-	inline static int8_t CPU_PRIORITY = -17;
-	inline static uint8_t IO_PRIORITY = (CPU_PRIORITY + 20) / 5;
-	inline static uint8_t IO_CLASS	  = 2;
+	static int8_t CPU_PRIORITY;
+	static uint8_t IO_PRIORITY;
+	static uint8_t IO_CLASS;
 
 	friend class Singleton<PerformanceService>;
 	PerformanceService();

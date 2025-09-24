@@ -18,6 +18,9 @@
 #include "OpenRGB/Color.hpp"
 
 MainWindow::MainWindow(QWidget* parent) : QMainWindow(parent), _logger(new Logger()) {
+	onBattery	 = uPowerClient.isOnBattery();
+	runningGames = steamService.getRunningGames().size();
+
 	setWindowTitle(QString::fromStdString(Constants::APP_NAME + " v" + Constants::APP_VERSION));
 	setGeometry(0, 0, 350, 680);
 	setFixedSize(350, 680);
@@ -60,6 +63,7 @@ MainWindow::MainWindow(QWidget* parent) : QMainWindow(parent), _logger(new Logge
 	}
 	connect(_profileDropdown, QOverload<int>::of(&QComboBox::currentIndexChanged), this, &MainWindow::onProfileChanged);
 	setPerformanceProfile(performanceService.getPerformanceProfile());
+	_profileDropdown->setEnabled(runningGames == 0 && !onBattery);
 	performanceLayout->addRow(new QLabel(QString::fromStdString(translator.translate("profile") + ":")), _profileDropdown);
 	// -------------------------
 	// Profile menu
@@ -79,6 +83,7 @@ MainWindow::MainWindow(QWidget* parent) : QMainWindow(parent), _logger(new Logge
 		}
 		connect(_schedulerDropdown, QOverload<int>::of(&QComboBox::currentIndexChanged), this, &MainWindow::onSchedulerChanged);
 		setScheduler(performanceService.getCurrentScheduler());
+		_schedulerDropdown->setEnabled(runningGames == 0);
 		performanceLayout->addRow(new QLabel(QString::fromStdString(translator.translate("scheduler") + ":")), _schedulerDropdown);
 	}
 	// -------------------------
@@ -87,27 +92,14 @@ MainWindow::MainWindow(QWidget* parent) : QMainWindow(parent), _logger(new Logge
 	// -------------------------
 	// Fan curves menu
 	// -------------------------
-	QPushButton* fanEdit = new QPushButton();
-	fanEdit->setText(QString::fromStdString(translator.translate("edit.curve")));
-	connect(fanEdit, &QPushButton::clicked, this, &MainWindow::openFanEditor);
+	if (!performanceService.getFans().empty()) {
+		QPushButton* fanEdit = new QPushButton();
+		fanEdit->setText(QString::fromStdString(translator.translate("edit.curve")));
+		connect(fanEdit, &QPushButton::clicked, this, &MainWindow::openFanEditor);
+		fanEdit->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Preferred);
 
-	_fanCombo = new QComboBox();
-	auto fans = std::vector<std::string>(performanceService.getFans());
-	std::sort(fans.begin(), fans.end());
-	for (const auto& fan : fans) {
-		_fanCombo->addItem(fan.c_str(), fan.c_str());
+		performanceLayout->addRow(new QLabel(QString::fromStdString(translator.translate("fan.curves") + ":")), fanEdit);
 	}
-
-	QWidget* rightGroup = new QWidget();
-	rightGroup->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Preferred);
-
-	QHBoxLayout* hLayout = new QHBoxLayout(rightGroup);
-	hLayout->setContentsMargins(0, 0, 0, 0);
-	hLayout->setSpacing(5);
-	hLayout->addWidget(_fanCombo);
-	hLayout->addWidget(fanEdit);
-
-	performanceLayout->addRow(new QLabel(QString::fromStdString(translator.translate("fan.curves") + ":")), rightGroup);
 	// -------------------------
 	// Fan curves menu
 	// -------------------------
@@ -257,7 +249,13 @@ MainWindow::MainWindow(QWidget* parent) : QMainWindow(parent), _logger(new Logge
 	});
 
 	eventBus.onGameEvent([this](size_t runningGames) {
-		onGameEvent(runningGames);
+		this->runningGames = runningGames;
+		onGameEvent();
+	});
+
+	eventBus.onBattery([this](bool onBattery) {
+		this->onBattery = onBattery;
+		onBatteryEvent();
 	});
 }
 
@@ -266,9 +264,13 @@ void MainWindow::closeEvent(QCloseEvent* event) {
 	this->hide();
 }
 
-void MainWindow::onGameEvent(int runningGames) {
-	_profileDropdown->setEnabled(runningGames == 0);
+void MainWindow::onGameEvent() {
+	_profileDropdown->setEnabled(runningGames == 0 && !onBattery);
 	_schedulerDropdown->setEnabled(runningGames == 0);
+}
+
+void MainWindow::onBatteryEvent() {
+	_profileDropdown->setEnabled(runningGames == 0 && !onBattery);
 }
 
 void MainWindow::setPerformanceProfile(PerformanceProfile value) {
@@ -352,9 +354,8 @@ void MainWindow::openGameList() {
 }
 
 void MainWindow::openFanEditor() {
-	auto fan			= _fanCombo->currentData().toString().toStdString();
 	auto profile		= _profileDropdown->currentData().toString().toStdString();
-	CurveEditor* editor = new CurveEditor(fan, profile, this);
+	CurveEditor* editor = new CurveEditor(profile, this);
 	editor->show();
 }
 
