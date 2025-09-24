@@ -53,8 +53,8 @@ class TrayIcon : public QObject, public Singleton<TrayIcon> {
 	void setPerformanceProfile(PerformanceProfile profile);
 	void setScheduler(std::optional<std::string> scheduler);
 	void setBatteryThreshold(BatteryThreshold threshold);
-	void setProfileMenuEnabled(bool enabled);
-	void setSchedulerMenuEnabled(bool enabled);
+	void setProfileMenuEnabled();
+	void setSchedulerMenuEnabled();
 	void openMainWindow();
 	void openFanEditor();
 	void openSettings();
@@ -70,4 +70,8 @@ class TrayIcon : public QObject, public Singleton<TrayIcon> {
 	Translator& translator				   = Translator::getInstance();
 	Configuration& configuration		   = Configuration::getInstance();
 	SteamService& steamService			   = SteamService::getInstance();
+	UPowerClient& uPowerClient			   = UPowerClient::getInstance();
+
+	int runningGames;
+	bool onBattery;
 };

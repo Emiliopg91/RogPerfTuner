@@ -146,5 +146,5 @@ int FanCurveView::findClosestPoint(const QPointF& pos) {
 			idx		 = i;
 		}
 	}
-	return (bestDist < 5.0) ? idx : -1;
+	return (bestDist < 2.0) ? idx : -1;
 }

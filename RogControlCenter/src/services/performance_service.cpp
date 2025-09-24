@@ -7,8 +7,13 @@
 #include "../../include/models/performance/cpu_governor.hpp"
 #include "../../include/models/performance/power_profile.hpp"
 #include "../../include/models/performance/ssd_scheduler.hpp"
+#include "../../include/utils/process_utils.hpp"
 #include "../../include/utils/string_utils.hpp"
 #include "../../include/utils/time_utils.hpp"
+
+int8_t PerformanceService::CPU_PRIORITY = -17;
+uint8_t PerformanceService::IO_PRIORITY = (CPU_PRIORITY + 20) / 5;
+uint8_t PerformanceService::IO_CLASS	= 2;
 
 PerformanceService::PerformanceService() : Loggable("ProfileService") {
 	logger.info("Initializing ProfileService");
@@ -32,12 +37,7 @@ PerformanceService::PerformanceService() : Loggable("ProfileService") {
 	eventBus.onBattery([this](bool onBat) {
 		onBattery = onBat;
 		if (runningGames == 0) {
-			if (onBattery) {
-				PerformanceProfile p = PerformanceProfile::Enum::QUIET;
-				setPerformanceProfile(p, true, true);
-			} else {
-				restoreProfile();
-			}
+			restoreProfile();
 		}
 	});
 
@@ -54,7 +54,11 @@ PerformanceService::PerformanceService() : Loggable("ProfileService") {
 void PerformanceService::renice(const pid_t& pid) {
 	logger.info("Renicing process {}", pid);
 	Logger::add_tab();
-	shell.run_elevated_command(fmt::format("renice -n {} -p {} && ionice -c {} -n {} -p {}", CPU_PRIORITY, pid, IO_CLASS, IO_PRIORITY, pid));
+	std::set<pid_t> ion, ren;
+	do {
+		ion = ProcessUtils::reniceHierarchy(pid, CPU_PRIORITY);
+		ren = ProcessUtils::ioniceHierarchy(pid, IO_CLASS, IO_PRIORITY);
+	} while (ion != ren);
 	Logger::rem_tab();
 }
 
@@ -225,7 +229,7 @@ void PerformanceService::setTdps(const PerformanceProfile& profile) {
 				pl2SpptClient.setCurrentValue(pl2);
 			}
 		} catch (std::exception& e) {
-			logger.info("Error setting CPU TDPs");
+			logger.info("Error setting CPU TDPs: {}", e.what());
 		}
 
 		Logger::rem_tab();
@@ -244,7 +248,7 @@ void PerformanceService::setTgp(const PerformanceProfile& profile) {
 				nvBoostClient.setCurrentValue(nvb);
 				TimeUtils::sleep(25);
 			} catch (std::exception& e) {
-				logger.info("Error setting Nvidia Boost");
+				logger.info("Error setting Nvidia Boost: {}", e.what());
 			}
 		}
 
@@ -268,7 +272,12 @@ void PerformanceService::restore() {
 }
 
 void PerformanceService::restoreProfile() {
-	setPerformanceProfile(configuration.getConfiguration().platform.performance.profile, false, true);
+	if (onBattery) {
+		PerformanceProfile p = PerformanceProfile::Enum::QUIET;
+		setPerformanceProfile(p, true, true);
+	} else {
+		setPerformanceProfile(configuration.getConfiguration().platform.performance.profile, false, true);
+	}
 }
 
 void PerformanceService::restoreScheduler() {
@@ -288,10 +297,10 @@ int PerformanceService::acIntelPl1Spl(PerformanceProfile profile) {
 		return client.getMaxValue();
 	}
 	if (profile == PerformanceProfile::Enum::BALANCED) {
-		return client.getMaxValue() * 0.6;
+		return client.getMaxValue() * 0.75;
 	}
 	if (profile == PerformanceProfile::Enum::QUIET) {
-		return client.getMaxValue() * 0.4;
+		return client.getMaxValue() * 0.55;
 	}
 
 	return client.getCurrentValue();
@@ -314,10 +323,10 @@ int PerformanceService::acIntelPl2Sppt(PerformanceProfile profile) {
 		return client.getMaxValue();
 	}
 	if (profile == PerformanceProfile::Enum::BALANCED) {
-		return client.getMaxValue() * 0.8;	// modificar
+		return client.getMaxValue() * 0.85;	 // modificar
 	}
 	if (profile == PerformanceProfile::Enum::QUIET) {
-		return client.getMaxValue() * 0.6;	// modificar
+		return client.getMaxValue() * 0.7;	// modificar
 	}
 
 	return client.getCurrentValue();

@@ -45,9 +45,9 @@ class PerformanceService : public Singleton<PerformanceService>, Loggable {
 	PerformanceProfile nextPerformanceProfile();
 
   private:
-	inline static int8_t CPU_PRIORITY = -17;
-	inline static uint8_t IO_PRIORITY = (CPU_PRIORITY + 20) / 5;
-	inline static uint8_t IO_CLASS	  = 2;
+	static int8_t CPU_PRIORITY;
+	static uint8_t IO_PRIORITY;
+	static uint8_t IO_CLASS;
 
 	friend class Singleton<PerformanceService>;
 	PerformanceService();

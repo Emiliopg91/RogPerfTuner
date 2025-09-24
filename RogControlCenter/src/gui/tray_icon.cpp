@@ -102,20 +102,20 @@ void TrayIcon::setBatteryThreshold(BatteryThreshold threshold) {
 		Qt::QueuedConnection);
 }
 
-void TrayIcon::setProfileMenuEnabled(bool enabled) {
+void TrayIcon::setProfileMenuEnabled() {
 	QMetaObject::invokeMethod(
 		&TrayIcon::getInstance(),
 		[=, this]() {
-			profileMenu->setEnabled(enabled);
+			profileMenu->setEnabled(!onBattery && runningGames == 0);
 		},
 		Qt::QueuedConnection);
 }
 
-void TrayIcon::setSchedulerMenuEnabled(bool enabled) {
+void TrayIcon::setSchedulerMenuEnabled() {
 	QMetaObject::invokeMethod(
 		&TrayIcon::getInstance(),
 		[=, this]() {
-			schedulerMenu->setEnabled(enabled);
+			schedulerMenu->setEnabled(runningGames == 0);
 		},
 		Qt::QueuedConnection);
 }
@@ -156,6 +156,9 @@ TrayIcon::TrayIcon() : QObject(&MainWindow::getInstance()), tray_icon_(new QSyst
 	tray_icon_->setToolTip(QString::fromStdString(Constants::APP_NAME + " v" + Constants::APP_VERSION));
 
 	QMenu* menu = tray_menu_;
+
+	onBattery	 = uPowerClient.isOnBattery();
+	runningGames = steamService.getRunningGames().size();
 
 	// -------------------------
 	// Battery menu
@@ -288,6 +291,8 @@ TrayIcon::TrayIcon() : QObject(&MainWindow::getInstance()), tray_icon_(new QSyst
 		profileMenu->addAction(act);
 		perfProfileActions[item.toName()] = act;
 	}
+
+	profileMenu->setEnabled(runningGames == 0 && !onBattery);
 	menu->insertMenu(nullptr, profileMenu);
 	// -------------------------
 	// Profile submenu
@@ -308,6 +313,8 @@ TrayIcon::TrayIcon() : QObject(&MainWindow::getInstance()), tray_icon_(new QSyst
 		schedulerMenu->addAction(act);
 		schedulerActions[""] = act;
 		schedulerMenu->addSeparator();
+
+		schedulerMenu->setEnabled(runningGames == 0);
 
 		auto items2 = performanceService.getAvailableSchedulers();
 		std::reverse(items2.begin(), items2.end());
@@ -484,8 +491,14 @@ TrayIcon::TrayIcon() : QObject(&MainWindow::getInstance()), tray_icon_(new QSyst
 	});
 
 	eventBus.onGameEvent([this](size_t runningGames) {
-		setProfileMenuEnabled(runningGames == 0);
-		setSchedulerMenuEnabled(runningGames == 0);
+		this->runningGames = runningGames;
+		setProfileMenuEnabled();
+		setSchedulerMenuEnabled();
+	});
+
+	eventBus.onBattery([this](bool onBattery) {
+		this->onBattery = onBattery;
+		setProfileMenuEnabled();
 	});
 }
 

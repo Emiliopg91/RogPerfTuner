@@ -251,17 +251,16 @@ void SteamService::onGameLaunch(unsigned int gid, std::string name, int pid) {
 
 		logger.info("Stopping process...");
 
-		uint signaled	 = 0;
-		uint newSignaled = 0;
+		std::set<pid_t> signaled, newSignaled;
 		do {
 			signaled	= newSignaled;
 			newSignaled = ProcessUtils::sendSignalToHierarchy(pid, SIGSTOP);
 
-			logger.debug("Stopped {} processes, before {}", newSignaled, signaled);
+			logger.debug("Stopped {} processes, before {}", newSignaled.size(), signaled.size());
 
 			TimeUtils::sleep(100);
-		} while (signaled < newSignaled);
-		logger.debug("Killed {} processes", ProcessUtils::sendSignalToHierarchy(pid, SIGKILL));
+		} while (signaled != newSignaled);
+		logger.debug("Killed {} processes", ProcessUtils::sendSignalToHierarchy(pid, SIGKILL).size());
 
 		Logger::rem_tab();
 
