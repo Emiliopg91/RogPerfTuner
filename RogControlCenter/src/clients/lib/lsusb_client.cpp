@@ -1,4 +1,4 @@
-#include "../../../include/clients/shell/lsusb_client.hpp"
+#include "../../../include/clients/lib/lsusb_client.hpp"
 
 LsUsbClient::LsUsbClient() {
 	udev = udev_new();

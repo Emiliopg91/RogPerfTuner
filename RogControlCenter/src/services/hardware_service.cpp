@@ -10,7 +10,7 @@
 #include "../../include/clients/file/boost_control_client.hpp"
 #include "../../include/clients/file/cpuinfo_client.hpp"
 #include "../../include/clients/file/ssd_scheduler_client.hpp"
-#include "../../include/clients/shell/lsusb_client.hpp"
+#include "../../include/clients/lib/lsusb_client.hpp"
 #include "../../include/clients/shell/switcherooctl_client.hpp"
 #include "../../include/events/event_bus.hpp"
 #include "../../include/gui/toaster.hpp"
