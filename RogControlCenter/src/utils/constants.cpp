@@ -76,7 +76,6 @@ const std::string Constants::DECKY_SERVICE_PATH	 = HOME_DIR + "/homebrew/service
 
 const std::string Constants::URL_GAME_CFG	= "/game/config";
 const std::string Constants::URL_PERF_PROF	= "/performance/profile/next";
-const std::string Constants::URL_RENICE		= "/performance/renice";
 const std::string Constants::URL_DEC_BRIGHT = "/rgb/brightness/decrease";
 const std::string Constants::URL_INC_BRIGHT = "/rgb/brightness/increase";
 const std::string Constants::URL_NEXT_EFF	= "/rgb/effect/next";

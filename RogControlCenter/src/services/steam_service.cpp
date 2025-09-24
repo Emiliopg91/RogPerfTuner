@@ -269,6 +269,7 @@ void SteamService::onGameLaunch(unsigned int gid, std::string name, int pid) {
 		}).detach();
 	} else if (runningGames.find(gid) == runningGames.end()) {
 		runningGames[gid] = GameEntry(it->second);
+		performanceService.renice(pid);
 		setProfileForGames();
 
 		eventBus.emitGameEvent(runningGames.size());

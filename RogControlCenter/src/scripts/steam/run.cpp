@@ -246,16 +246,6 @@ int main(int argc, char* argv[]) {
 		logger.error("Error requesting configuration {}", e.what());
 	}
 
-	try {
-		logger.info("Requesting renice");
-		auto res = cli.Get(Constants::URL_RENICE + "?pid=" + std::to_string(Constants::PID));
-		if (!res || res->status != 200) {
-			logger.error("Error on renice request");
-		}
-	} catch (std::exception& e) {
-		logger.error("Error requesting renice {}", e.what());
-	}
-
 	int code = run_command(logger, command, wrappers, parameters);
 
 	return code;

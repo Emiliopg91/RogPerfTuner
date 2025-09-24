@@ -44,11 +44,6 @@ HttpServer::HttpServer() : Loggable("HttpServer") {
 		res.set_content(response.dump(4), "application/json");
 	});
 
-	svr.Get(Constants::URL_RENICE, [this](const httplib::Request& req, httplib::Response&) {
-		auto pidStr = req.get_param_value("pid");
-		performanceService.renice(static_cast<pid_t>(std::stoi(pidStr)));
-	});
-
 	svr.Get(Constants::URL_GAME_CFG, [this](const httplib::Request& req, httplib::Response& res) {
 		auto gidStr = req.get_param_value("appid");
 		json j		= steamService.getConfiguration(gidStr);
