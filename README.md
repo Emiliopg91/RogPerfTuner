@@ -31,6 +31,7 @@ Do you want something similar for Asus Rog Ally/Ally X? Check [AllyDeckyCompanio
   - CPU TDP
   - CPU Boost
   - CPU Governor
+  - CPU Scheduler
   - GPU TGP
   - GPU Thermal throttling policy
   - Fan curves
