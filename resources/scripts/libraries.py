@@ -8,7 +8,9 @@ binaries = ["dist/RogControlCenter/RogControlCenter", "assets/OpenRGB/OpenRGB"]
 excluded = ["/lib64/ld-linux-x86-64.so.2", "linux-vdso.so.1", "libc.so.6", "libm.so.6", "libgcc_s.so.1"]
 
 for binary in binaries:
+    print(f"Libaries for binary {binary}:")
     output=subprocess.run(f"ldd {binary} | sort", shell=True, text=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE).stdout
+    print(output)
 
     for line in output.splitlines():
         line=line.strip()
