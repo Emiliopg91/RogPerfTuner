@@ -5,7 +5,6 @@
 
 #include "../../include/events/event_bus.hpp"
 #include "../../include/gui/toaster.hpp"
-#include "../../include/models/others/semantic_version.hpp"
 #include "../../include/services/steam_service.hpp"
 #include "../../include/translator/translator.hpp"
 #include "../../include/utils/autoupdater.hpp"
@@ -34,16 +33,14 @@ ApplicationService::ApplicationService() : Loggable("ApplicationService") {
 
 	FileUtils::mkdirs(Constants::UPDATE_DIR);
 
-	if (SemanticVersion::parse(configuration.getConfiguration().application.latestVersion) <= SemanticVersion::parse(Constants::APP_VERSION)) {
-		AutoUpdater::init(
-			[this]() {
-				applyUpdate();
-			},
+	AutoUpdater::init(
+		[this]() {
+			applyUpdate();
+		},
 
-			[this]() {
-				return steamService.getRunningGames().empty();
-			});
-	}
+		[this]() {
+			return steamService.getRunningGames().empty();
+		});
 
 	configuration.getConfiguration().application.latestVersion = Constants::APP_VERSION;
 	configuration.saveConfig();
