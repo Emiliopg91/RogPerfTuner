@@ -91,7 +91,8 @@ build_openrgb:
 		cd ../../assets/OpenRGB && \
 		mv AppRun OpenRGB.sh && \
 		mv AppRun.wrapped OpenRGB && \
-		sed -i 's/AppRun.wrapped/OpenRGB/g' OpenRGB.sh; \
+		sed -i 's/AppRun.wrapped/OpenRGB/g' OpenRGB.sh && \
+		rm usr/lib/libQt5Core.so.5 usr/lib/libQt5Gui.so.5 usr/lib/libQt5Svg.so.5 usr/lib/libQt5Widgets.so.5 usr/lib/libQt5XcbQpa.so.5 usr/lib/libxcb* usr/lib/libjpeg.so.62 usr/lib/libpng16.so.16 usr/bin/OpenRGB.exe; \
 	fi
 
 build_rccdc:
@@ -119,12 +120,15 @@ package:
 	@echo "######################### Generating AppImage #########################"
 	@echo "#######################################################################"
 	@rm -rf dist/appimage-fs
-	@cp -r dist/RogControlCenter dist/appimage-fs
+	@mkdir -p dist/appimage-fs dist/appimage-fs/usr/bin dist/appimage-fs/usr/share/RogControlCenter
+	@cp dist/RogControlCenter/RogControlCenter dist/appimage-fs/usr/bin
+	@cp -r dist/RogControlCenter/assets/* dist/appimage-fs/usr/share/RogControlCenter
 	@cp resources/AppRun dist/appimage-fs/
 	@cp resources/RogControlCenter.desktop dist/appimage-fs/RogControlCenter.desktop
 	@cp assets/icons/icon.svg dist/appimage-fs/icon.svg
+	@python resources/scripts/copyRccLibraries.py
 	@chmod 777 -R resources/appimagetool dist/appimage-fs
-	@VERSION=$$(cat resources/version) ./resources/appimagetool -u "gh-releases-zsync|Emiliopg91|RogControlCenter|latest|RogControlCenter.AppImage.zsync" -n dist/appimage-fs dist/RogControlCenter.AppImage
+	@ARCH=x86_64 VERSION=$$(cat resources/version) ./resources/appimagetool -u "gh-releases-zsync|Emiliopg91|RogControlCenter|latest|RogControlCenter.AppImage.zsync" -n dist/appimage-fs dist/RogControlCenter.AppImage
 	@mv RogControlCenter.AppImage.zsync dist
 
 release:

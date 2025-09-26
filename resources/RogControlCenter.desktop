@@ -1,7 +1,7 @@
 [Desktop Entry]
 Name=RogControlCenter
 Comment=An utility to manage Asus Rog laptop performance
-Exec=RogControlCenter
+Exec=usr/bin/RogControlCenter
 Icon=icon
 Terminal=false
 Type=Application
