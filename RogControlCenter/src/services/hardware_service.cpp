@@ -19,6 +19,7 @@
 #include "../../include/models/hardware/gpu_brand.hpp"
 #include "../../include/services/open_rgb_service.hpp"
 #include "../../include/translator/translator.hpp"
+#include "../../include/utils/file_utils.hpp"
 #include "../../include/utils/string_utils.hpp"
 #include "../../include/utils/time_utils.hpp"
 
@@ -277,4 +278,8 @@ std::unordered_map<std::string, std::string> HardwareService::getGpuSelectorEnv(
 	}
 
 	return env;
+}
+
+std::unordered_map<std::string, std::string> HardwareService::getGpus() {
+	return gpus;
 }

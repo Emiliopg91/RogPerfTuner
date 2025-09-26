@@ -1,5 +1,7 @@
 #include "../../../include/clients/file/boost_control_client.hpp"
 
+#include "../../../include/utils/file_utils.hpp"
+
 BoostControlClient::BoostControlClient() {
 	std::vector<std::unordered_map<std::string, std::string>> BOOST_CONTROLS = {
 		{{"path", "/sys/devices/system/cpu/intel_pstate/no_turbo"}, {"on", "0"}, {"off", "1"}},

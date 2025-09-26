@@ -8,6 +8,7 @@
 #include "../../include/services/steam_service.hpp"
 #include "../../include/translator/translator.hpp"
 #include "../../include/utils/autoupdater.hpp"
+#include "../../include/utils/file_utils.hpp"
 
 ApplicationService::ApplicationService() : Loggable("ApplicationService") {
 	logger.info("Initializing ApplicationService");

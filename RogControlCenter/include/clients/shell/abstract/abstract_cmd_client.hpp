@@ -15,6 +15,11 @@ class AbstractCmdClient : public Loggable {
 	Shell& shell = Shell::getInstance();
 
   public:
+	/**
+	 * @brief Checks if the client is currently available for operations.
+	 *
+	 * @return true if the client is available; false otherwise.
+	 */
 	bool available();
 
   private:

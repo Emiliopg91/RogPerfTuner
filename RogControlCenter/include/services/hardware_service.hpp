@@ -26,14 +26,41 @@
 
 class HardwareService : public Singleton<HardwareService>, Loggable {
   public:
+	/**
+	 * @brief Gets the current battery charge threshold.
+	 *
+	 * @return The current BatteryThreshold value.
+	 */
 	BatteryThreshold getChargeThreshold();
-	void setChargeThreshold(const BatteryThreshold& threshold);
-	void setPanelOverdrive(const bool&);
-	std::unordered_map<std::string, std::string> getGpuSelectorEnv(const std::string&);
 
-	std::unordered_map<std::string, std::string> getGpus() {
-		return gpus;
-	}
+	/**
+	 * @brief Sets the battery charge threshold.
+	 *
+	 * @param threshold The new BatteryThreshold value to set.
+	 */
+	void setChargeThreshold(const BatteryThreshold& threshold);
+
+	/**
+	 * @brief Enables or disables panel overdrive.
+	 *
+	 * @param enabled Set to true to enable panel overdrive, false to disable it.
+	 */
+	void setPanelOverdrive(const bool& enabled);
+
+	/**
+	 * @brief Gets the environment variables required for GPU selection.
+	 *
+	 * @param gpu The GPU identifier string.
+	 * @return A map of environment variable names and their values.
+	 */
+	std::unordered_map<std::string, std::string> getGpuSelectorEnv(const std::string& gpu);
+
+	/**
+	 * @brief Gets the map of available GPUs.
+	 *
+	 * @return A map where the key is the GPU identifier and the value is its description.
+	 */
+	std::unordered_map<std::string, std::string> getGpus();
 
   private:
 	friend class Singleton<HardwareService>;

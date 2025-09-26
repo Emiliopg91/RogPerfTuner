@@ -15,6 +15,7 @@
 #include "../../include/services/hardware_service.hpp"
 #include "../../include/services/open_rgb_service.hpp"
 #include "../../include/services/performance_service.hpp"
+#include "../../include/utils/file_utils.hpp"
 #include "../../include/utils/process_utils.hpp"
 #include "../../include/utils/string_utils.hpp"
 #include "../../include/utils/time_utils.hpp"

@@ -14,5 +14,13 @@ class SwitcherooCtlClient : AbstractCmdClient, public Singleton<SwitcherooCtlCli
 	friend class Singleton<SwitcherooCtlClient>;
 
   public:
+	/**
+	 * @brief Retrieves a list of available GPUs.
+	 *
+	 * This function queries the system for all detected GPUs and returns their information
+	 * encapsulated in a vector of GPUInfo objects.
+	 *
+	 * @return A vector containing GPUInfo objects for each detected GPU.
+	 */
 	const std::vector<GPUInfo> getGpus();
 };

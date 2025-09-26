@@ -7,7 +7,6 @@
 #include "../../include/clients/dbus/asus/armoury/intel/pl2_sppt_client.hpp"
 #include "../../include/clients/dbus/asus/armoury/nvidia/nv_boost_client.hpp"
 #include "../../include/clients/dbus/asus/armoury/nvidia/nv_temp_client.hpp"
-#include "../../include/clients/dbus/asus/core/fan_curves_client.hpp"
 #include "../../include/clients/dbus/asus/core/platform_client.hpp"
 #include "../../include/clients/dbus/linux/power_profile_client.hpp"
 #include "../../include/clients/dbus/linux/upower_client.hpp"
@@ -25,23 +24,105 @@
 
 class PerformanceService : public Singleton<PerformanceService>, Loggable {
   public:
+	/**
+	 * @brief Gets the current performance profile.
+	 *
+	 * @return The current PerformanceProfile.
+	 */
 	PerformanceProfile getPerformanceProfile();
+
+	/**
+	 * @brief Sets the performance profile.
+	 *
+	 * @param profile The PerformanceProfile to set.
+	 * @param temporal If true, the profile is set temporarily.
+	 * @param force If true, forces the profile to be set even if already active.
+	 * @param showToast If true, shows a notification toast.
+	 */
 	void setPerformanceProfile(PerformanceProfile& profile, const bool& temporal = false, const bool& force = false, const bool& showToast = true);
+
+	/**
+	 * @brief Restores the last saved performance settings.
+	 */
 	void restore();
+
+	/**
+	 * @brief Restores the last saved performance profile.
+	 */
 	void restoreProfile();
+
+	/**
+	 * @brief Restores the last saved scheduler.
+	 */
 	void restoreScheduler();
 
+	/**
+	 * @brief Gets the list of available schedulers.
+	 *
+	 * @return A vector of scheduler names.
+	 */
 	std::vector<std::string> getAvailableSchedulers();
+
+	/**
+	 * @brief Gets the current scheduler if set.
+	 *
+	 * @return An optional string with the current scheduler name.
+	 */
 	std::optional<std::string> getCurrentScheduler();
+
+	/**
+	 * @brief Sets the scheduler.
+	 *
+	 * @param scheduler The scheduler name to set (optional).
+	 * @param temporal If true, the scheduler is set temporarily.
+	 */
 	void setScheduler(std::optional<std::string> scheduler, bool temporal = false);
 
+	/**
+	 * @brief Gets the list of available fans.
+	 *
+	 * @return A vector of fan names.
+	 */
 	std::vector<std::string> getFans();
+
+	/**
+	 * @brief Gets the fan curve data for a given fan and profile.
+	 *
+	 * @param fan The fan name.
+	 * @param profile The profile name.
+	 * @return The FanCurveData for the specified fan and profile.
+	 */
 	FanCurveData getFanCurve(std::string fan, std::string profile);
+
+	/**
+	 * @brief Gets the default fan curve data for a given fan and profile.
+	 *
+	 * @param fan The fan name.
+	 * @param profile The profile name.
+	 * @return The default FanCurveData for the specified fan and profile.
+	 */
 	FanCurveData getDefaultFanCurve(std::string fan, std::string profile);
+
+	/**
+	 * @brief Saves the fan curves for a given profile.
+	 *
+	 * @param profile The profile name.
+	 * @param curves A map of fan names to their FanCurveData.
+	 */
 	void saveFanCurves(std::string profile, std::unordered_map<std::string, FanCurveData> curves);
 
+	/**
+	 * @brief Changes the scheduling priority of a process.
+	 *
+	 * @param pid The process ID to renice.
+	 */
 	void renice(const pid_t&);
 
+	/**
+	 * @brief Switches to the next available performance profile.
+	 *
+	 * @return The next PerformanceProfile.
+	 */
 	PerformanceProfile nextPerformanceProfile();
 
   private:
@@ -68,7 +149,6 @@ class PerformanceService : public Singleton<PerformanceService>, Loggable {
 	UPowerClient& uPowerClient			   = UPowerClient::getInstance();
 	SsdSchedulerClient& ssdSchedulerClient = SsdSchedulerClient::getInstance();
 	PowerProfileClient& powerProfileClient = PowerProfileClient::getInstance();
-	FanCurvesClient& fanCurvesClient	   = FanCurvesClient::getInstance();
 	Toaster& toaster					   = Toaster::getInstance();
 	CpuPowerClient& cpuPowerClient		   = CpuPowerClient::getInstance();
 	BoostControlClient& boostControlClient = BoostControlClient::getInstance();

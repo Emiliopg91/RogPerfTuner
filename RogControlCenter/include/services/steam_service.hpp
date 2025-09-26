@@ -39,12 +39,55 @@ class SteamService : public Singleton<SteamService>, Loggable {
 	std::string encodeAppId(uint32_t appid);
 
   public:
+	/**
+	 * @brief Gets the map of currently running games.
+	 *
+	 * @return A constant reference to a map of running games, keyed by their app IDs.
+	 */
 	const std::unordered_map<unsigned int, GameEntry>& getRunningGames() const;
+
+	/**
+	 * @brief Gets the map of all known games.
+	 *
+	 * @return A constant reference to a map of games, keyed by their string IDs.
+	 */
 	const std::unordered_map<std::string, GameEntry>& getGames();
 
+	/**
+	 * @brief Checks if a game with the given app ID is currently running.
+	 *
+	 * @param appid The app ID of the game.
+	 * @return true if the game is running, false otherwise.
+	 */
 	bool isRunning(const unsigned int& appid) const;
+
+	/**
+	 * @brief Checks if metrics collection is enabled.
+	 *
+	 * @return true if metrics are enabled, false otherwise.
+	 */
 	bool metricsEnabled();
+
+	/**
+	 * @brief Gets the configuration for a specific Steam game.
+	 *
+	 * @param gid The game ID as a string.
+	 * @return The SteamGameConfig for the specified game.
+	 */
 	const SteamGameConfig getConfiguration(const std::string& gid);
+
+	/**
+	 * @brief Saves the configuration for a specific game.
+	 *
+	 * @param gid The game ID as an unsigned integer.
+	 * @param entry The GameEntry containing the configuration to save.
+	 */
 	void saveGameConfig(uint gid, const GameEntry& entry);
+
+	/**
+	 * @brief Launches a game by its ID.
+	 *
+	 * @param id The game ID as a string.
+	 */
 	void launchGame(const std::string& id);
 };
