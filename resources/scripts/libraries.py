@@ -4,7 +4,7 @@ import subprocess
 
 os.makedirs("dist/appimage-fs/usr/lib",exist_ok=True)
 
-binaries = ["dist/RogControlCenter/RogControlCenter", "assets/OpenRGB/OpenRGB"]
+binaries = [ "assets/OpenRGB/OpenRGB","dist/RogControlCenter/RogControlCenter"]
 excluded = ["/lib64/ld-linux-x86-64.so.2", "linux-vdso.so.1", "libc.so.6", "libm.so.6", "libgcc_s.so.1"]
 
 for binary in binaries:

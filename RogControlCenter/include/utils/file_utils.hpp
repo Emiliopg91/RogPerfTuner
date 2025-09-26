@@ -146,4 +146,8 @@ class FileUtils {
 	 * @param mode
 	 */
 	static void chmodRecursive(const std::filesystem::path& path, mode_t mode);
+
+	static uint32_t crc(const std::string& path);
+
+	static uint32_t crc(const std::filesystem::path& path);
 };
