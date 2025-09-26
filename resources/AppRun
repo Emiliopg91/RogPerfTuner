@@ -24,9 +24,6 @@ fi
 
 export PATH="${APPDIR}:${PATH}"
 export RCC_ASSETS_DIR="${APPDIR}/usr/share/RogControlCenter"
-export LD_LIBRARY_PATH="$APPDIR/usr/lib:$LD_LIBRARY_PATH"
-export QT_PLUGIN_PATH="$HERE/usr/lib/qt6/plugins"
-
 
 BIN="$APPDIR/usr/bin/RogControlCenter"
 

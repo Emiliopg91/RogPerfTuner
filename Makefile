@@ -61,9 +61,9 @@ build:
 
 	@rm -rf assets/bin
 
-	@python3 resources/preload/constants.py
-	@python3 resources/preload/compatible_devices.py
-	@python3 resources/preload/translations.py
+	@python3 resources/scripts/constants.py
+	@python3 resources/scripts/compatible_devices.py
+	@python3 resources/scripts/translations.py
 
 	@echo "Formatting code..."
 	@clang-format -i $$(find RogControlCenter -name '*.cpp' -o -name '*.hpp')
@@ -126,7 +126,6 @@ package:
 	@cp resources/AppRun dist/appimage-fs/
 	@cp resources/RogControlCenter.desktop dist/appimage-fs/RogControlCenter.desktop
 	@cp assets/icons/icon.svg dist/appimage-fs/icon.svg
-	@python resources/scripts/copyRccLibraries.py
 	@chmod 777 -R resources/appimagetool dist/appimage-fs
 	@ARCH=x86_64 VERSION=$$(cat resources/version) ./resources/appimagetool -u "gh-releases-zsync|Emiliopg91|RogControlCenter|latest|RogControlCenter.AppImage.zsync" -n dist/appimage-fs dist/RogControlCenter.AppImage
 	@mv RogControlCenter.AppImage.zsync dist
