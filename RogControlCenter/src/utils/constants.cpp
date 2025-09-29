@@ -11,7 +11,7 @@ const pid_t Constants::PID = getpid();
 
 const std::string Constants::PLUGIN_VERSION = "1.2.2";
 
-const bool Constants::DEV_MODE = true;
+const bool Constants::DEV_MODE = false;
 
 const std::string Constants::HOME_DIR = std::getenv("HOME");
 
@@ -26,9 +26,13 @@ const std::string Constants::APPIMAGE_FILE = []() {
 const std::string Constants::ASSETS_DIR = [] {
 	const char* dir = std::getenv("RCC_ASSETS_DIR");
 	if (!dir) {
-		dir = std::getenv("PWD");
+		dir = "/usr/share/rogcontrolcenter";
 	}
 	return std::string(dir);
+}();
+
+const std::string Constants::WRAPPER_PATH = [] {
+	return (APPIMAGE_FILE.empty() ? ASSETS_DIR : (HOME_DIR + "/.RogControlCenter")) + "/bin/steam/run";
 }();
 
 const std::string Constants::LOG_FILE_NAME		  = APP_NAME;
@@ -54,7 +58,6 @@ const std::string Constants::APP_DRAW_FILE		 = HOME_DIR + "/.local/share/applica
 const std::string Constants::BIN_DIR			 = HOME_DIR + "/.RogControlCenter/bin";
 const std::string Constants::BIN_APPLICATION_DIR = HOME_DIR + "/.RogControlCenter/bin/application";
 const std::string Constants::LAUNCHER_FILE		 = HOME_DIR + "/.RogControlCenter/bin/application/launcher.sh";
-const std::string Constants::WRAPPER_PATH		 = HOME_DIR + "/.RogControlCenter/bin" + "/steam/run";
 const std::string Constants::CONFIG_DIR			 = HOME_DIR + "/.RogControlCenter/config";
 const std::string Constants::CONFIG_FILE		 = HOME_DIR + "/.RogControlCenter/config/config.json";
 const std::string Constants::ICONS_DIR			 = HOME_DIR + "/.RogControlCenter/icons";

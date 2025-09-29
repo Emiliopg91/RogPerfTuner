@@ -49,6 +49,16 @@ class Logger {
 	}
 
 	/**
+	 * @brief Send trace log line
+	 *
+	 * @param msg
+	 * @param args
+	 */
+	void trace(std::string msg) {
+		trace("{}", msg);
+	}
+
+	/**
 	 * @brief  Send debug log line
 	 *
 	 * @tparam Args
@@ -58,6 +68,16 @@ class Logger {
 	template <typename... Args>
 	void debug(format_string_t<Args...> fmt, Args&&... args) {
 		log(spdlog::level::debug, fmt, std::forward<Args>(args)...);
+	}
+
+	/**
+	 * @brief Send debug log line
+	 *
+	 * @param msg
+	 * @param args
+	 */
+	void debug(std::string msg) {
+		debug("{}", msg);
 	}
 
 	/**
@@ -73,6 +93,16 @@ class Logger {
 	}
 
 	/**
+	 * @brief Send info log line
+	 *
+	 * @param msg
+	 * @param args
+	 */
+	void info(std::string msg) {
+		info("{}", msg);
+	}
+
+	/**
 	 * @brief  Send warning log line
 	 *
 	 * @tparam Args
@@ -82,6 +112,16 @@ class Logger {
 	template <typename... Args>
 	void warn(format_string_t<Args...> fmt, Args&&... args) {
 		log(spdlog::level::warn, fmt, std::forward<Args>(args)...);
+	}
+
+	/**
+	 * @brief Send warning log line
+	 *
+	 * @param msg
+	 * @param args
+	 */
+	void warn(std::string msg) {
+		warn("{}", msg);
 	}
 
 	/**
@@ -97,6 +137,16 @@ class Logger {
 	}
 
 	/**
+	 * @brief Send error log line
+	 *
+	 * @param msg
+	 * @param args
+	 */
+	void error(std::string msg) {
+		error("{}", msg);
+	}
+
+	/**
 	 * @brief  Send critical log line
 	 *
 	 * @tparam Args
@@ -106,6 +156,16 @@ class Logger {
 	template <typename... Args>
 	void critical(format_string_t<Args...> fmt, Args&&... args) {
 		log(spdlog::level::critical, fmt, std::forward<Args>(args)...);
+	}
+
+	/**
+	 * @brief Send critical log line
+	 *
+	 * @param msg
+	 * @param args
+	 */
+	void critical(std::string msg) {
+		critical("{}", msg);
 	}
 
 	static void add_tab();

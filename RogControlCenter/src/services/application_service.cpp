@@ -14,37 +14,41 @@ ApplicationService::ApplicationService() : Loggable("ApplicationService") {
 	logger.info("Initializing ApplicationService");
 	Logger::add_tab();
 
-	logger.info("Copying helper binaries");
-	FileUtils::copy(Constants::ASSETS_BIN_DIR, Constants::BIN_DIR);
-	FileUtils::chmodRecursive(Constants::BIN_DIR, 0777);
+	if (!Constants::APPIMAGE_FILE.empty()) {
+		logger.info("Running from AppImage");
+		Logger::add_tab();
 
-	if (!Constants::DEV_MODE) {
-		logger.info("Copying launcher script");
-		FileUtils::mkdirs(Constants::BIN_APPLICATION_DIR);
-		FileUtils::writeFileContent(Constants::LAUNCHER_FILE, buildLaunchFile());
+		logger.info("Copying helper binaries");
+		FileUtils::copy(Constants::ASSETS_BIN_DIR, Constants::BIN_DIR);
+		FileUtils::chmodRecursive(Constants::BIN_DIR, 0777);
+
+		if (!Constants::DEV_MODE) {
+			logger.info("Copying launcher script");
+			FileUtils::mkdirs(Constants::BIN_APPLICATION_DIR);
+			FileUtils::writeFileContent(Constants::LAUNCHER_FILE, buildLaunchFile());
+
+			if (!FileUtils::exists(Constants::APP_DRAW_FILE)) {
+				logger.info("Creating menu entry");
+				FileUtils::writeFileContent(Constants::APP_DRAW_FILE, buildDesktopFile());
+			}
+		}
+
+		AutoUpdater::init(
+			[this]() {
+				applyUpdate();
+			},
+
+			[this]() {
+				return steamService.getRunningGames().empty();
+			});
+
+		FileUtils::mkdirs(Constants::UPDATE_DIR);
+
+		Logger::rem_tab();
 	}
 
 	logger.info("Copying icons");
 	FileUtils::copy(Constants::ASSET_ICONS_DIR, Constants::ICONS_DIR);
-
-	if (!FileUtils::exists(Constants::APP_DRAW_FILE)) {
-		logger.info("Creating menu entry");
-		FileUtils::writeFileContent(Constants::APP_DRAW_FILE, buildDesktopFile());
-	}
-
-	FileUtils::mkdirs(Constants::UPDATE_DIR);
-
-	AutoUpdater::init(
-		[this]() {
-			applyUpdate();
-		},
-
-		[this]() {
-			return steamService.getRunningGames().empty();
-		});
-
-	configuration.getConfiguration().application.latestVersion = Constants::APP_VERSION;
-	configuration.saveConfig();
 
 	Logger::rem_tab();
 }

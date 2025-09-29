@@ -1,0 +1,49 @@
+# Maintainer: Emiliopg91 <ojosdeserbio@gmail.com>
+pkgname=rog-control-center
+pkgver=<version>
+pkgrel=1
+pkgdesc="RogControlCenter - An utility to manage Asus Rog laptop performance and RGB lighting"
+arch=('x86_64')
+url="https://github.com/Emiliopg91/RogControlCenter"
+license=('GPL2')
+depends=(
+  'asusctl' 
+  'hicolor-icon-theme'
+  'qt6-base'
+  'qt6-charts' 
+  'qt6-svg'
+  'libsecret' 
+  'power-profiles-daemon'
+)
+makedepends=(
+  'git'
+  'clang'
+  'cmake'
+  'python'
+  'clang-format'
+)
+source=("git+https://github.com/Emiliopg91/RogControlCenter.git#tag=v$pkgver")
+sha256sums=('SKIP')
+
+build() {
+    cd "$srcdir/RogControlCenter"
+    make release
+}
+
+package() {
+    cd "$srcdir/RogControlCenter/dist/appimage-fs"
+
+    install -Dm755 usr/bin/RogControlCenter \
+        "$pkgdir/usr/bin/rogcontrolcenter"
+
+    cp -r usr/share/rogcontrolcenter \
+        "$pkgdir/usr/share/"
+    chmod 777 -R "$pkgdir/usr/share/rogcontrolcenter"
+
+    sed -e 's|Exec=usr/bin/RogControlCenter|Exec=/usr/bin/rogcontrolcenter|' \
+        -e 's|Icon=icon|Icon=rogcontrolcenter|' \
+        RogControlCenter.desktop > "$pkgdir/usr/share/applications/rogcontrolcenter.desktop"
+
+    install -Dm644 icon.svg \
+        "$pkgdir/usr/share/icons/hicolor/scalable/apps/rogcontrolcenter.svg"
+}

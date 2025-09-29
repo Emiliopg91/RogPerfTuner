@@ -109,6 +109,17 @@ class StringUtils {
 	static std::string capitalize(const std::string& input);
 
 	/**
+	 * @brief Replaces all occurrences of a substring
+	 * Replaces all occurrences of a substring with another substring.
+	 *
+	 * @param haystack The string to replace in.
+	 * @param needle The substring to replace.
+	 * @param replacement The substring to replace with.
+	 * @return std::string The modified string.
+	 */
+	static std::string replaceAll(const std::string& input, const std::string& substring, const std::string& replacement);
+
+	/**
 	 * @brief Apply left padding
 	 *
 	 * Pads the string on the left to the specified total length.

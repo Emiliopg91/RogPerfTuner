@@ -37,7 +37,7 @@ HardwareService::HardwareService() : Loggable("HardwareService") {
 		auto pos   = line.find(":");
 		if (pos != std::string::npos) {
 			line = line.substr(pos + 2);
-			logger.info("{}", line);
+			logger.info(line);
 		}
 	}
 
@@ -57,7 +57,7 @@ HardwareService::HardwareService() : Loggable("HardwareService") {
 	Logger::add_tab();
 	auto detected_gpus = switcherooCtlClient.getGpus();
 	for (auto gpu : detected_gpus) {
-		logger.info("{}", gpu.name);
+		logger.info(gpu.name);
 		if (!gpu.default_flag) {
 			auto brand = static_cast<GpuBrand>(GpuBrand::fromString(StringUtils::toLowerCase(StringUtils::split(gpu.name, ' ')[0])));
 			std::string env;
@@ -126,7 +126,7 @@ HardwareService::HardwareService() : Loggable("HardwareService") {
 		Logger::add_tab();
 		ssd_schedulers = ssdSchedulerClient.get_schedulers();
 		for (auto sched : ssd_schedulers) {
-			logger.info("{}", sched.toString());
+			logger.info(sched.toString());
 		}
 		Logger::rem_tab();
 	}
@@ -180,7 +180,7 @@ void HardwareService::onDeviceEvent() {
 		logger.info("Added compatible device(s):");
 		Logger::add_tab();
 		for (auto dev : added) {
-			logger.info("{}", openRgbService.getDeviceName(dev));
+			logger.info(openRgbService.getDeviceName(dev));
 		}
 		Logger::rem_tab();
 	}
@@ -189,7 +189,7 @@ void HardwareService::onDeviceEvent() {
 		logger.info("Removed compatible device(s):");
 		Logger::add_tab();
 		for (auto dev : removed) {
-			logger.info("{}", openRgbService.getDeviceName(dev));
+			logger.info(openRgbService.getDeviceName(dev));
 		}
 		Logger::rem_tab();
 	}

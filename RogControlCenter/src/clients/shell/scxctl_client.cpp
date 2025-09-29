@@ -19,12 +19,14 @@ ScxCtlClient::ScxCtlClient() : AbstractCmdClient("scxctl", "ScxCtlClient") {
 
 		logger.info("Available schedulers:");
 		Logger::add_tab();
+		std::vector<std::string> schedulers;
 		for (auto entry : all) {
 			if (shell.which("scx_" + entry[0]).has_value()) {
 				available_sched[entry[0]] = entry[1];
-				logger.info("{}", entry[0]);
+				schedulers.emplace_back(entry[0]);
 			}
 		}
+		logger.info(StringUtils::join(schedulers, ", "));
 		Logger::rem_tab();
 
 		auto currentStr = run_command("get").stdout_str;

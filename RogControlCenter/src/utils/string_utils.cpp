@@ -188,3 +188,17 @@ std::string StringUtils::rightPad(const std::string& input, size_t totalLength, 
 	}
 	return input + std::string(totalLength - input.size(), padChar);
 }
+
+std::string StringUtils::replaceAll(const std::string& input, const std::string& substring, const std::string& replacement) {
+	if (substring.empty()) {
+		return input;
+	}
+
+	std::string result = input;
+	size_t pos		   = 0;
+	while ((pos = result.find(substring, pos)) != std::string::npos) {
+		result.replace(pos, substring.length(), replacement);
+		pos += replacement.length();
+	}
+	return result;
+}

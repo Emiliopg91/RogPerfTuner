@@ -19,17 +19,17 @@ class PerformanceProfile : public StrEnum<PerformanceProfile, PerformanceProfile
 	using Base = StrEnum<PerformanceProfile, Enum, 3>;
 	using Base::Base;
 
-	bool supportedOnBattery();
+	bool supportedOnBattery() const;
 
-	PerformanceProfile getNextPerformanceProfile();
+	PerformanceProfile getNextPerformanceProfile() const;
 
 	PerformanceProfile getGreater(const PerformanceProfile& other);
 
-	PlatformProfile getPlatformProfile();
+	PlatformProfile getPlatformProfile() const;
 
-	PowerProfile getPowerProfile();
+	PowerProfile getPowerProfile() const;
 
-	SsdScheduler getSsdQueueScheduler();
+	SsdScheduler getSsdQueueScheduler() const;
 
   private:
 	static constexpr std::array<PerformanceProfileMeta, 3> table{

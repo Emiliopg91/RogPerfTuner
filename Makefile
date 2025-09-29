@@ -38,7 +38,7 @@ config:
 	@if [ ! -f "patches/OpenRGB-cppSDK.diff.applied" ]; then \
 		cd submodules/OpenRGB-cppSDK && git apply ../../patches/OpenRGB-cppSDK.diff && touch ../../patches/OpenRGB-cppSDK.diff.applied; \
 	fi
-
+	
 	@CXX=clang++ CC=clang cmake -B build -S . -DCMAKE_BUILD_TYPE=$(BUILD_TYPE) -DCMAKE_EXPORT_COMPILE_COMMANDS=ON
 
 	@if [ ! -f "compile_commands.json" ]; then \
@@ -115,6 +115,12 @@ package:
 	@echo "######################### Generating Tar GZip #########################"
 	@echo "#######################################################################"
 	@tar -czvf dist/RogControlCenter.tgz dist/RogControlCenter/* > /dev/null
+
+	@echo "#######################################################################"
+	@echo "######################### Generating PKGBUILD #########################"
+	@echo "#######################################################################"
+	@cp resources/PKGBUILD dist/PKGBUILD
+	@python resources/scripts/pkgbuild.py
 
 	@echo "#######################################################################"
 	@echo "######################### Generating AppImage #########################"

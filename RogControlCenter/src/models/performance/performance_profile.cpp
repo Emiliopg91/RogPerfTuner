@@ -1,10 +1,10 @@
 #include "../../../include/models/performance/performance_profile.hpp"
 
-bool PerformanceProfile::supportedOnBattery() {
+bool PerformanceProfile::supportedOnBattery() const {
 	return *this == PerformanceProfile::Enum::QUIET;
 }
 
-PerformanceProfile PerformanceProfile::getNextPerformanceProfile() {
+PerformanceProfile PerformanceProfile::getNextPerformanceProfile() const {
 	if (*this == PerformanceProfile::Enum::PERFORMANCE) {
 		return PerformanceProfile::Enum::QUIET;
 	}
@@ -27,7 +27,7 @@ PerformanceProfile PerformanceProfile::getGreater(const PerformanceProfile& othe
 	return PerformanceProfile::Enum::QUIET;
 }
 
-PlatformProfile PerformanceProfile::getPlatformProfile() {
+PlatformProfile PerformanceProfile::getPlatformProfile() const {
 	if (*this == PerformanceProfile::Enum::QUIET) {
 		return PlatformProfile::Enum::LOW_POWER;
 	} else if (*this == PerformanceProfile::Enum::BALANCED) {
@@ -37,7 +37,7 @@ PlatformProfile PerformanceProfile::getPlatformProfile() {
 	}
 }
 
-PowerProfile PerformanceProfile::getPowerProfile() {
+PowerProfile PerformanceProfile::getPowerProfile() const {
 	if (*this == PerformanceProfile::Enum::QUIET) {
 		return PowerProfile::Enum::POWERSAVER;
 	} else if (*this == PerformanceProfile::Enum::BALANCED) {
@@ -47,7 +47,7 @@ PowerProfile PerformanceProfile::getPowerProfile() {
 	}
 }
 
-SsdScheduler PerformanceProfile::getSsdQueueScheduler() {
+SsdScheduler PerformanceProfile::getSsdQueueScheduler() const {
 	if (*this == PerformanceProfile::Enum::QUIET) {
 		return SsdScheduler::Enum::NOOP;
 	} else {

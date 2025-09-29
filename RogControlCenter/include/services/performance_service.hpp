@@ -159,8 +159,8 @@ class PerformanceService : public Singleton<PerformanceService>, Loggable {
 	AsusCtlClient& asusCtlClient		   = AsusCtlClient::getInstance();
 	Shell& shell						   = Shell::getInstance();
 
-	void setPlatformProfile(PerformanceProfile& profile);
-	void setFanCurves(PerformanceProfile& profile);
+	void setPlatformProfile(const PerformanceProfile& profile);
+	void setFanCurves(const PerformanceProfile& profile);
 	void setBoost(const PerformanceProfile& profile);
 	void setSsdScheduler(PerformanceProfile& profile);
 	void setCpuGovernor(const PerformanceProfile& profile);

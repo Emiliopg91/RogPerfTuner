@@ -1,6 +1,6 @@
 [Desktop Entry]
 Name=RogControlCenter
-Comment=An utility to manage Asus Rog laptop performance
+Comment=An utility to manage Asus Rog laptop performance and RGB lighting
 Exec=usr/bin/RogControlCenter
 Icon=icon
 Terminal=false

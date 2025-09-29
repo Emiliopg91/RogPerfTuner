@@ -160,10 +160,10 @@ int main(int argc, char* argv[]) {
 	setenv("PATH", path.c_str(), 1);
 
 	logger.info("===== Started wrapping =====");
-	logger.info(">>> Entorno:");
+	logger.info(">>> Environment:");
 	Logger::add_tab();
 	for (char** env = environ; *env; ++env) {
-		logger.info("{}", std::string(*env));
+		logger.info(std::string(*env));
 	}
 	Logger::rem_tab();
 
@@ -173,7 +173,7 @@ int main(int argc, char* argv[]) {
 	}
 	logger.info(">>> Command:");
 	Logger::add_tab();
-	logger.info("{}", cmdline.str());
+	logger.info(cmdline.str());
 	Logger::rem_tab();
 
 	std::vector<std::string> wrappers;

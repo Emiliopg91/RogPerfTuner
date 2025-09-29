@@ -30,6 +30,8 @@ void OpenRgbClient::initialize() {
 								   " && udevadm control --reload-rules && udevadm trigger");
 
 		Logger::rem_tab();
+	} else {
+		logger.info("UDEV rules already configured");
 	}
 
 	availableEffects.push_back(std::unique_ptr<AbstractEffect>(&BreathingEffect::init(client)));
@@ -75,7 +77,10 @@ void OpenRgbClient::stop() {
 	for (auto& dev : detectedDevices) {
 		client.setDeviceColor(dev, Color::Black);
 	}
-	client.disconnect();
+	try {
+		client.disconnect();
+	} catch (std::exception& e) {
+	}
 	TimeUtils::sleep(100);
 	stopOpenRgbProcess();
 	Logger::rem_tab();
@@ -147,7 +152,7 @@ void OpenRgbClient::getAvailableDevices() {
 	for (auto& dev : detectedDevices) {
 		const orgb::Mode* directMode = dev.findMode("Direct");
 		if (directMode) {
-			logger.info("{}", dev.name);
+			logger.info(dev.name);
 			client.changeMode(dev, *directMode);
 			client.setDeviceColor(dev, orgb::Color::Black);
 		}

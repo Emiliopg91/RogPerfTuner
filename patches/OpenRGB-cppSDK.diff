@@ -1,9 +1,3 @@
-diff --git a/external/CppUtils-Essential b/external/CppUtils-Essential
---- a/external/CppUtils-Essential
-+++ b/external/CppUtils-Essential
-@@ -1 +1 @@
--Subproject commit f2a74804f4c9a369d016464b99c04d896f026738
-+Subproject commit f2a74804f4c9a369d016464b99c04d896f026738-dirty
 diff --git a/include/OpenRGB/Client.hpp b/include/OpenRGB/Client.hpp
 index b70416d..70df01d 100644
 --- a/include/OpenRGB/Client.hpp
