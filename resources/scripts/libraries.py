@@ -33,5 +33,8 @@ for e in os.listdir("dist/appimage-fs/usr/share/RogControlCenter/OpenRGB/usr/lib
         os.unlink(f"dist/appimage-fs/usr/share/RogControlCenter/OpenRGB/usr/lib/{e}")
 shutil.rmtree("dist/appimage-fs/usr/share/RogControlCenter/OpenRGB/usr/plugins")
 
-if os.path.exists("/usr/lib/qt6/plugins"):
-    shutil.copytree("/usr/lib/qt6/plugins", "dist/appimage-fs/assets/usr/lib/qt6/plugins/")
+plugin_folder = ["/usr/lib/qt6/plugins", "/usr/lib/x86_64-linux-gnu/qt6/plugins" ]
+for f in plugin_folder:
+    if os.path.exists(f):
+        shutil.copytree(f, "dist/appimage-fs/assets/usr/lib/qt6/plugins/")
+        break
