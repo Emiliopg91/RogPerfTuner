@@ -496,6 +496,16 @@ std::vector<TranslationEntry> Translator::translations = {
 		"Apply optimization",
 		"Aplicar optimización",
 	},
+	{
+		"enable.decky.integration.title",
+		"Enable Decky integration?",
+		"¿Habilitar integración con Decky?",
+	},
+	{
+		"enable.decky.integration.body",
+		"Decky plugin for Steam will enable integration between both applications in order to apply optimizations.",
+		"El plugin de Decky para Steam habilitará la integración entre ambas aplicaciones para aplicar optimizaciones.",
+	},
 };
 
 // End translations

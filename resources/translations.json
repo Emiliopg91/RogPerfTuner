@@ -338,5 +338,13 @@
   "apply.suggestion": {
     "en": "Apply optimization",
     "es": "Aplicar optimización"
+  },
+  "enable.decky.integration.title": {
+    "en": "Enable Decky integration?",
+    "es": "¿Habilitar integración con Decky?"
+  },
+  "enable.decky.integration.body": {
+    "en": "Decky plugin for Steam will enable integration between both applications in order to apply optimizations.",
+    "es": "El plugin de Decky para Steam habilitará la integración entre ambas aplicaciones para aplicar optimizaciones."
   }
 }

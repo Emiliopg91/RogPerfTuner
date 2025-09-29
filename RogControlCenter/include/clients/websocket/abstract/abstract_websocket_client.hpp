@@ -10,11 +10,11 @@
 #include <unordered_map>
 
 #include "../../../events/event_bus.hpp"
+#include "../../../models/others/communication_message.hpp"
 #include "../../../models/others/loggable.hpp"
-#include "../../../models/others/websocket_message.hpp"
 
 struct WSMethodResponse {
-	WebsocketMessage data;
+	CommunicationMessage data;
 	std::string error;
 };
 

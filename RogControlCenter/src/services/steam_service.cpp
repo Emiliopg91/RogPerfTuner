@@ -10,6 +10,7 @@
 #include "../../include/configuration/configuration.hpp"
 #include "../../include/events/event_bus.hpp"
 #include "../../include/gui/game_config_dialog.hpp"
+#include "../../include/gui/yes_no_dialog.hpp"
 #include "../../include/models/others/semantic_version.hpp"
 #include "../../include/models/steam/steam_game_details.hpp"
 #include "../../include/services/hardware_service.hpp"
@@ -190,11 +191,17 @@ void SteamService::installRccDC() {
 	try {
 		if (FileUtils::exists(Constants::DECKY_SERVICE_PATH)) {
 			if (!FileUtils::exists(Constants::RCCDC_PATH)) {
-				logger.info("Installing plugin for first time");
-				Logger::add_tab();
-				installPipDeps();
-				copyPlugin();
-				Logger::rem_tab();
+				if (!configuration.getConfiguration().application.askedInstallRccdc &&
+					YesNoDialog::showDialog(translator.translate("enable.decky.integration.title"),
+											translator.translate("enable.decky.integration.body"))) {
+					logger.info("Installing plugin for first time");
+					Logger::add_tab();
+					installPipDeps();
+					copyPlugin();
+					Logger::rem_tab();
+				}
+				configuration.getConfiguration().application.askedInstallRccdc = true;
+				configuration.saveConfig();
 			} else {
 				if (checkIfRequiredInstallation()) {
 					logger.info("Updating Decky plugin");
@@ -205,6 +212,8 @@ void SteamService::installRccDC() {
 				} else {
 					logger.info("Plugin up to date");
 				}
+				configuration.getConfiguration().application.askedInstallRccdc = true;
+				configuration.saveConfig();
 			}
 			rccdcEnabled = true;
 		} else {
@@ -235,9 +244,10 @@ void SteamService::copyPlugin() {
 }
 
 void SteamService::installPipDeps() {
-	logger.info("Installing PIP dependencies {}", Constants::RCCDC_REQUIRED_PIP);
+	auto depStr = StringUtils::join(Constants::RCCDC_REQUIRED_PIP, " ");
+	logger.info("Installing PIP dependencies {}", depStr);
 	Logger::add_tab();
-	pipClient.installPackage(Constants::RCCDC_REQUIRED_PIP);
+	pipClient.installPackage(depStr);
 	Logger::rem_tab();
 }
 

@@ -7,7 +7,7 @@
 #include "../include/gui/password_dialog.hpp"
 #include "../include/gui/toaster.hpp"
 #include "../include/gui/tray_icon.hpp"
-#include "../include/servers/http/http_server.hpp"
+#include "../include/servers/socket_server.hpp"
 #include "../include/services/application_service.hpp"
 #include "../include/services/hardware_service.hpp"
 #include "../include/services/open_rgb_service.hpp"
@@ -86,7 +86,7 @@ int main(int argc, char** argv) {
 	ApplicationService::getInstance();
 	SteamService::getInstance();
 
-	HttpServer::getInstance();
+	SocketServer::getInstance();
 
 	TrayIcon::init().show();
 

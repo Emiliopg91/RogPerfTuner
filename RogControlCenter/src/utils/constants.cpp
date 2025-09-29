@@ -69,6 +69,7 @@ const std::string Constants::LIB_OCL_DIR		 = HOME_DIR + "/.RogControlCenter/lib/
 const std::string Constants::LOG_DIR			 = HOME_DIR + "/.RogControlCenter/logs";
 const std::string Constants::LOG_OLD_DIR		 = HOME_DIR + "/.RogControlCenter/logs/old";
 const std::string Constants::USER_PLUGIN_DIR	 = HOME_DIR + "/.RogControlCenter/plugin";
+const std::string Constants::SOCKET_FILE		 = HOME_DIR + "/.RogControlCenter/RogControlCenter.sock";
 const std::string Constants::UPDATE_DIR			 = HOME_DIR + "/.RogControlCenter/update";
 const std::string Constants::UPDATE_FILE		 = HOME_DIR + "/.RogControlCenter/update/RogControlCenter.AppImage";
 const std::string Constants::UPDATE_TMP_FILE	 = HOME_DIR + "/.RogControlCenter/update/RogControlCenter.AppImage.tmp";
@@ -77,16 +78,15 @@ const std::string Constants::RCCDC_PATH			 = HOME_DIR + "/homebrew/plugins/RCCDe
 const std::string Constants::RCCDC_PACKAGE_FILE	 = HOME_DIR + "/homebrew/plugins/RCCDeckyCompanion/package.json";
 const std::string Constants::DECKY_SERVICE_PATH	 = HOME_DIR + "/homebrew/services/PluginLoader";
 
-const std::string Constants::URL_GAME_CFG	= "/game/config";
-const std::string Constants::URL_PERF_PROF	= "/performance/profile/next";
-const std::string Constants::URL_DEC_BRIGHT = "/rgb/brightness/decrease";
-const std::string Constants::URL_INC_BRIGHT = "/rgb/brightness/increase";
-const std::string Constants::URL_NEXT_EFF	= "/rgb/effect/next";
+const std::string Constants::GAME_CFG	= "gameConfig";
+const std::string Constants::PERF_PROF	= "nexPerformanceProfile";
+const std::string Constants::DEC_BRIGHT = "decRgbBrightness";
+const std::string Constants::INC_BRIGHT = "incRgbBrightness";
+const std::string Constants::NEXT_EFF	= "nextRgbEffect";
 
-const int Constants::HTTP_PORT = 18157;
-const int Constants::WS_PORT   = HTTP_PORT + 1;
+const int Constants::WS_PORT = 18158;
 
-const std::string Constants::RCCDC_REQUIRED_PIP = "websockets dataclasses-json asyncio";
+const std::vector<std::string> Constants::RCCDC_REQUIRED_PIP = {"websockets", "dataclasses-json", "asyncio"};
 
 const std::string Constants::FLATPAK_MANGOHUD		   = "org.freedesktop.Platform.VulkanLayer.MangoHud/x86_64/24.08";
 const std::string Constants::FLATPAK_MANGOHUD_OVERRIDE = "--filesystem=xdg-config/MangoHud:ro";

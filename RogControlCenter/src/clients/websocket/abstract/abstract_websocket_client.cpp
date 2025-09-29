@@ -10,7 +10,7 @@
 #include <unordered_map>
 
 #include "../../../../include/events/event_bus.hpp"
-#include "../../../../include/models/others/websocket_message.hpp"
+#include "../../../../include/models/others/communication_message.hpp"
 #include "../../../../include/utils/string_utils.hpp"
 
 using json = nlohmann::json;
@@ -66,7 +66,7 @@ void AbstractWebsocketClient::handle_message(const std::string& payload) {
 		return;
 	}
 
-	WebsocketMessage msg = WebsocketMessage::from_json(j);
+	CommunicationMessage msg = CommunicationMessage::from_json(j);
 
 	if (msg.type == "EVENT") {
 		trigger_event(msg.name, msg.data);
@@ -86,7 +86,7 @@ std::vector<std::any> AbstractWebsocketClient::invoke(const std::string& method,
 		throw std::runtime_error("No connection to server");
 	}
 
-	WebsocketMessage message{"REQUEST", method, args, StringUtils::generateUUIDv4()};
+	CommunicationMessage message{"REQUEST", method, args, StringUtils::generateUUIDv4()};
 
 	std::promise<WSMethodResponse> prom;
 	std::future fut = prom.get_future();

@@ -6,6 +6,7 @@
 #include <QPushButton>
 #include <optional>
 
+#include "../../include/gui/yes_no_dialog.hpp"
 #include "../../include/utils/string_utils.hpp"
 
 GameConfigDialog::GameConfigDialog(unsigned int gid, bool runAfterSave, QWidget* parent)
@@ -188,11 +189,8 @@ void GameConfigDialog::showDialog() {
 
 void GameConfigDialog::closeEvent(QCloseEvent* event) {
 	if (runAfterSave) {
-		QMessageBox::StandardButton reply =
-			QMessageBox::question(this, QString::fromStdString(translator.translate("confirmation.required")),
-								  QString::fromStdString(translator.translate("run.with.default.config")), QMessageBox::Yes | QMessageBox::No);
-
-		if (reply == QMessageBox::Yes) {
+		auto reply = YesNoDialog::showDialog(translator.translate("confirmation.required"), translator.translate("run.with.default.config"), this);
+		if (reply) {
 			logger.info("Game will launch with default configuration");
 			event->accept();
 		} else {

@@ -3,14 +3,16 @@
 #include <nlohmann/json.hpp>
 using json = nlohmann::json;
 
-struct Application {};
+struct Application {
+	bool askedInstallRccdc = false;
+};
 
-inline void to_json(nlohmann::json& j, const Application&) {
-	j = json{};
-	// j["latestVersion"] = o.latestVersion;
+inline void to_json(nlohmann::json& j, const Application& o) {
+	j					   = json{};
+	j["askedInstallRccdc"] = o.askedInstallRccdc;
 }
-inline void from_json(const nlohmann::json&, Application&) {
-	/*if (j.contains("latestVersion")) {
-		j.at("latestVersion").get_to(o.latestVersion);
-	}*/
+inline void from_json(const nlohmann::json& j, Application& o) {
+	if (j.contains("askedInstallRccdc")) {
+		j.at("askedInstallRccdc").get_to(o.askedInstallRccdc);
+	}
 }

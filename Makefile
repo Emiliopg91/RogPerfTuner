@@ -39,7 +39,7 @@ config:
 		cd submodules/OpenRGB-cppSDK && git apply ../../patches/OpenRGB-cppSDK.diff && touch ../../patches/OpenRGB-cppSDK.diff.applied; \
 	fi
 	
-	@CXX=clang++ CC=clang cmake -B build -S . -DCMAKE_BUILD_TYPE=$(BUILD_TYPE) -DCMAKE_EXPORT_COMPILE_COMMANDS=ON
+	@CXX=clang++ CC=clang cmake -B build -G Ninja -S . -DCMAKE_BUILD_TYPE=$(BUILD_TYPE) -DCMAKE_EXPORT_COMPILE_COMMANDS=ON
 
 	@if [ ! -f "compile_commands.json" ]; then \
 		ln -s build/compile_commands.json .; \
@@ -110,11 +110,6 @@ package:
 	@mkdir dist dist/RogControlCenter
 	@cp ./build/RogControlCenter/RogControlCenter dist/RogControlCenter
 	@cp -r assets dist/RogControlCenter
-
-	@echo "#######################################################################"
-	@echo "######################### Generating Tar GZip #########################"
-	@echo "#######################################################################"
-	@tar -czvf dist/RogControlCenter.tgz dist/RogControlCenter/* > /dev/null
 
 	@echo "#######################################################################"
 	@echo "######################### Generating PKGBUILD #########################"

@@ -1,6 +1,8 @@
 #include <signal.h>
 #include <sys/prctl.h>
+#include <sys/socket.h>
 #include <sys/types.h>
+#include <sys/un.h>
 #include <sys/wait.h>
 #include <unistd.h>
 
@@ -8,6 +10,8 @@
 #include <cstdlib>
 #include <cstring>
 #include <ctime>
+#include <exception>
+#include <optional>
 #include <sstream>
 #include <string>
 #include <thread>
@@ -15,13 +19,83 @@
 
 #include "../../../include/logger/logger.hpp"
 #include "../../../include/logger/logger_provider.hpp"
+#include "../../../include/models/others/communication_message.hpp"
 #include "../../../include/models/steam/steam_game_config.hpp"
 #include "../../../include/shell/shell.hpp"
 #include "../../../include/utils/constants.hpp"
 #include "../../../include/utils/file_utils.hpp"
 #include "../../../include/utils/string_utils.hpp"
-#include "httplib.h"
 #include "nlohmann/json.hpp"
+#include "nlohmann/json_fwd.hpp"
+
+std::optional<SteamGameConfig> getConfigurationGame(Logger& logger, std::string steamId) {
+	std::optional<SteamGameConfig> result = std::nullopt;
+	int sock							  = -1;
+	logger.info("Requesting configuration");
+	Logger::add_tab();
+
+	try {
+		sock = socket(AF_UNIX, SOCK_STREAM, 0);
+
+		if (sock < 0) {
+			logger.error("Error on socket: {}", std::string(strerror(errno)));
+		} else {
+			sockaddr_un addr{};
+			addr.sun_family = AF_UNIX;
+			strncpy(addr.sun_path, Constants::SOCKET_FILE.c_str(), sizeof(addr.sun_path) - 1);
+
+			if (connect(sock, (sockaddr*)&addr, sizeof(addr)) < 0) {
+				logger.error("Error on connection: {}", std::string(strerror(errno)));
+			} else {
+				CommunicationMessage msg;
+				msg.id	 = StringUtils::generateUUIDv4();
+				msg.name = Constants::GAME_CFG;
+				msg.data = {steamId};
+
+				std::string message = msg.to_json();
+				if (write(sock, message.c_str(), message.size()) < 0) {
+					logger.error("Error writing request: {}", std::string(strerror(errno)));
+				} else {
+					char buffer[1024];
+					ssize_t bytes = read(sock, buffer, sizeof(buffer) - 1);
+					if (bytes > 0) {
+						buffer[bytes] = '\0';
+						std::string data(buffer, bytes);
+
+						logger.info("Received JSON: {}", data);
+						try {
+							auto json_msg			  = nlohmann::json::parse(data);
+							CommunicationMessage resp = CommunicationMessage::from_json(json_msg);
+							if (resp.error.has_value()) {
+								logger.error("Error on request: {}", resp.error.value());
+							} else {
+								if (resp.data.empty()) {
+									logger.error("No data on response");
+								} else {
+									nlohmann::json j = nlohmann::json::parse(std::any_cast<std::string>(resp.data[0]));
+									SteamGameConfig cfg;
+									from_json(j, cfg);
+									result = cfg;
+								}
+							}
+						} catch (const std::exception& e) {
+							logger.info("Error parsing JSON: {}", e.what());
+						}
+					}
+				}
+			}
+		}
+	} catch (std::exception& e) {
+	}
+
+	if (sock >= 0) {
+		close(sock);
+	}
+
+	Logger::rem_tab();
+
+	return result;
+}
 
 void reader_thread(int fd, Logger logger, bool error) {
 	char buffer[4096];
@@ -210,20 +284,13 @@ int main(int argc, char* argv[]) {
 		command.push_back(argv[i]);
 	}
 
-	httplib::Client cli("localhost", Constants::HTTP_PORT);
-
 	try {
 		const char* steamId = getenv("SteamGameId");
 		if (steamId) {
-			logger.info("Requesting configuration");
-			auto res = cli.Get(Constants::URL_GAME_CFG + "?appid=" + steamId);
+			auto optCfg = getConfigurationGame(logger, steamId);
 
-			if (!res || res->status != 200) {
-				logger.error("Error on configuration request");
-			} else {
-				auto j	 = nlohmann::json::parse(res->body);
-				auto cfg = j.get<SteamGameConfig>();
-
+			if (optCfg.has_value()) {
+				auto cfg = optCfg.value();
 				for (const auto& [key, val] : cfg.environment) {
 					setenv(key.c_str(), val.c_str(), 1);
 				}

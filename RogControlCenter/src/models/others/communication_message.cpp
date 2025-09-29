@@ -1,7 +1,7 @@
-#include "../../../include/models/others/websocket_message.hpp"
+#include "../../../include/models/others/communication_message.hpp"
 
-WebsocketMessage WebsocketMessage::from_json(const nlohmann::json& j) {
-	WebsocketMessage msg;
+CommunicationMessage CommunicationMessage::from_json(const nlohmann::json& j) {
+	CommunicationMessage msg;
 	msg.type = j.value("type", "");
 	msg.name = j.value("name", "");
 	msg.id	 = j.value("id", "");
@@ -32,7 +32,7 @@ WebsocketMessage WebsocketMessage::from_json(const nlohmann::json& j) {
 	return msg;
 }
 
-std::string WebsocketMessage::to_json() const {
+std::string CommunicationMessage::to_json() const {
 	nlohmann::json j;
 	j["type"]  = type;
 	j["name"]  = name;

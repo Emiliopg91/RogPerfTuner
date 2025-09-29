@@ -6,14 +6,14 @@
 #include <string>
 #include <vector>
 
-struct WebsocketMessage {
+struct CommunicationMessage {
 	std::string type;
 	std::string name;
 	std::vector<std::any> data = {};
 	std::string id;
 	std::optional<std::string> error = std::nullopt;
 
-	static WebsocketMessage from_json(const nlohmann::json& j);
+	static CommunicationMessage from_json(const nlohmann::json& j);
 
 	std::string to_json() const;
 };

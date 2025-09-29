@@ -23,6 +23,7 @@ class SteamService : public Singleton<SteamService>, Loggable {
 	HardwareService& hardwareService	   = HardwareService::getInstance();
 	SteamClient& steamClient			   = SteamClient::getInstance();
 	PipClient& pipClient				   = PipClient::getInstance();
+	Translator& translator				   = Translator::getInstance();
 
 	SteamService();
 

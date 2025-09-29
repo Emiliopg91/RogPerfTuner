@@ -3,6 +3,7 @@
 #include <sys/types.h>
 
 #include <string>
+#include <vector>
 
 class Constants {
   public:
@@ -70,10 +71,17 @@ class Constants {
 	static const std::string URL_INC_BRIGHT;
 	static const std::string URL_NEXT_EFF;
 
+	static const std::string GAME_CFG;
+	static const std::string PERF_PROF;
+	static const std::string DEC_BRIGHT;
+	static const std::string INC_BRIGHT;
+	static const std::string NEXT_EFF;
+
+	static const std::string SOCKET_FILE;
 	static const int HTTP_PORT;
 	static const int WS_PORT;
 
-	static const std::string RCCDC_REQUIRED_PIP;
+	static const std::vector<std::string> RCCDC_REQUIRED_PIP;
 	static const std::string FLATPAK_MANGOHUD;
 	static const std::string FLATPAK_MANGOHUD_OVERRIDE;
 

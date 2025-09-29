@@ -14,13 +14,16 @@ depends=(
   'qt6-svg'
   'libsecret' 
   'power-profiles-daemon'
+  'python'
+  'python-pip'
 )
 makedepends=(
-  'git'
   'clang'
   'cmake'
-  'python'
+  'git'
+  'ninja'
   'podman'
+  'python'
 )
 source=("git+https://github.com/Emiliopg91/RogControlCenter.git#tag=$pkgver")
 sha256sums=('SKIP')
