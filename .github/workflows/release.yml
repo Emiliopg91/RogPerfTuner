@@ -138,6 +138,7 @@ jobs:
           tag_name: ${{ env.VERSION }}
           name: ${{ env.VERSION }}
           files: |
+            dist/PKGBUILD
             dist/RogControlCenter.AppImage
             dist/RogControlCenter.AppImage.zsync
         env:
