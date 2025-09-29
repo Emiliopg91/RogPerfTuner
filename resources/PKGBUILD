@@ -20,14 +20,31 @@ makedepends=(
   'clang'
   'cmake'
   'python'
-  'clang-format'
+  'podman'
 )
-source=("git+https://github.com/Emiliopg91/RogControlCenter.git#tag=v$pkgver")
+source=("git+https://github.com/Emiliopg91/RogControlCenter.git#tag=$pkgver")
 sha256sums=('SKIP')
+
+prepare() {
+
+    if ! command -v node &> /dev/null || ! command -v npm &> /dev/null; then
+        echo "Installing nodejs and its packages"
+        curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.40.3/install.sh | bash
+        export NVM_DIR="$HOME/.nvm"
+            [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
+            [ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"
+        nvm install 24
+        nvm use 24
+        npm i -g pnpm@8.5.1 shx@0.3.4
+    fi
+    
+    cd "$srcdir/RogControlCenter"
+    git submodule update --init --recursive
+}
 
 build() {
     cd "$srcdir/RogControlCenter"
-    make release
+    IN_PKGBUILD=1 make release
 }
 
 package() {
@@ -36,10 +53,12 @@ package() {
     install -Dm755 usr/bin/RogControlCenter \
         "$pkgdir/usr/bin/rogcontrolcenter"
 
-    cp -r usr/share/rogcontrolcenter \
-        "$pkgdir/usr/share/"
+    install -d "$pkgdir/usr/share/rogcontrolcenter"
+    cp -r usr/share/RogControlCenter/* \
+        "$pkgdir/usr/share/rogcontrolcenter/"
     chmod 777 -R "$pkgdir/usr/share/rogcontrolcenter"
 
+    install -d "$pkgdir/usr/share/applications"
     sed -e 's|Exec=usr/bin/RogControlCenter|Exec=/usr/bin/rogcontrolcenter|' \
         -e 's|Icon=icon|Icon=rogcontrolcenter|' \
         RogControlCenter.desktop > "$pkgdir/usr/share/applications/rogcontrolcenter.desktop"
