@@ -5,7 +5,7 @@
 
 const std::string Constants::APP_NAME = "RogControlCenter";
 
-const std::string Constants::APP_VERSION = "4.3.4";
+const std::string Constants::APP_VERSION = "4.3.5";
 
 const pid_t Constants::PID = getpid();
 
