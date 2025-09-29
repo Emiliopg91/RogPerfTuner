@@ -9,21 +9,28 @@ license=('GPL2')
 depends=(
   'asusctl' 
   'hicolor-icon-theme'
-  'qt6-base'
-  'qt6-charts' 
-  'qt6-svg'
   'libsecret' 
   'power-profiles-daemon'
   'python'
   'python-pip'
+  'qt6-base'
+  'qt6-charts' 
+  'qt6-svg'
+  'zlib'
 )
 makedepends=(
   'clang'
   'cmake'
   'git'
+  'libsecret' 
   'ninja'
   'podman'
   'python'
+  'qt6-base'
+  'qt6-charts'
+  'qt6-svg'
+  'libsecret'
+  'zlib'
 )
 source=("git+https://github.com/Emiliopg91/RogControlCenter.git#tag=$pkgver")
 sha256sums=('SKIP')
