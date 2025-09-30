@@ -1,7 +1,10 @@
+#include <arpa/inet.h>
+#include <netinet/in.h>
 #include <sys/socket.h>
 #include <sys/un.h>
 #include <unistd.h>
 
+#include <any>
 #include <cstring>
 #include <iostream>
 #include <string>
@@ -28,23 +31,42 @@ int main() {
 	}
 
 	CommunicationMessage msg;
+	msg.type = "REQUEST";
 	msg.id	 = StringUtils::generateUUIDv4();
 	msg.name = Constants::PERF_PROF;
 
 	std::string message = msg.to_json();
-	if (write(sock, message.c_str(), message.size()) < 0) {
+	uint32_t resp_len	= htonl(message.size());
+
+	if (write(sock, &resp_len, sizeof(resp_len)) < 0 || write(sock, message.c_str(), message.size()) < 0) {
 		perror("write");
 		close(sock);
 		return 1;
 	}
 
-	char buffer[1024];
-	ssize_t bytes = read(sock, buffer, sizeof(buffer) - 1);
-	if (bytes > 0) {
-		buffer[bytes] = '\0';
-		std::cout << buffer << "\n";
-	}
+	ssize_t n = read(sock, &resp_len, sizeof(resp_len));
+	if (n == sizeof(resp_len)) {
+		resp_len = ntohl(resp_len);
+		std::string data(resp_len, '\0');
+		size_t total_read = 0;
+		while (total_read < resp_len) {
+			ssize_t r = read(sock, &data[total_read], resp_len - total_read);
+			if (r <= 0) {
+				perror("read");
+				close(sock);
+				return 1;
+			}
+			total_read += r;
+		}
 
-	close(sock);
-	return 0;
+		auto json = nlohmann::json::parse(data);
+		auto j	  = CommunicationMessage::from_json(json);
+		std::cout << std::any_cast<std::string>(j.data[0]) << std::endl;
+
+		return 0;
+	} else {
+		perror("read");
+		close(sock);
+		return 1;
+	}
 }

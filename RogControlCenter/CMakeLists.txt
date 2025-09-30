@@ -96,13 +96,20 @@ file(GLOB_RECURSE SOURCES_UTILS
 )
 
 file(GLOB_RECURSE SOURCES_COMMUNICATION_MESSAGE
+    "${CMAKE_CURRENT_SOURCE_DIR}/src/events/event_bus.cpp"
     "${CMAKE_CURRENT_SOURCE_DIR}/src/models/others/communication_message.cpp"
+    "${CMAKE_CURRENT_SOURCE_DIR}/src/models/others/loggable.cpp"
+    "${CMAKE_CURRENT_SOURCE_DIR}/src/clients/unix_socket/abstract/abstract_unix_socket_client.cpp"
+    "${CMAKE_CURRENT_SOURCE_DIR}/src/clients/unix_socket/rog_control_center_client.cpp"
+    "${CMAKE_CURRENT_SOURCE_DIR}/src/logger/*.cpp"
+    "${CMAKE_CURRENT_SOURCE_DIR}/src/utils/time_utils.cpp"
 )
 
 add_executable(NextProfile ${CMAKE_CURRENT_SOURCE_DIR}/src/scripts/performance/next_profile.cpp ${SOURCES_UTILS} ${SOURCES_COMMUNICATION_MESSAGE})
 target_include_directories(NextProfile PRIVATE ${LIBSECRET_INCLUDE_DIRS})
 target_link_libraries(NextProfile PRIVATE 
     nlohmann_json::nlohmann_json
+    spdlog::spdlog
     ZLIB::ZLIB
 )
 
@@ -110,6 +117,7 @@ add_executable(NextEffect ${CMAKE_CURRENT_SOURCE_DIR}/src/scripts/rgb/next_effec
 target_include_directories(NextEffect PRIVATE ${LIBSECRET_INCLUDE_DIRS})
 target_link_libraries(NextEffect PRIVATE 
     nlohmann_json::nlohmann_json
+    spdlog::spdlog
     ZLIB::ZLIB
 )
 
@@ -117,6 +125,7 @@ add_executable(IncBrightness ${CMAKE_CURRENT_SOURCE_DIR}/src/scripts/rgb/increas
 target_include_directories(IncBrightness PRIVATE ${LIBSECRET_INCLUDE_DIRS})
 target_link_libraries(IncBrightness PRIVATE 
     nlohmann_json::nlohmann_json
+    spdlog::spdlog
     ZLIB::ZLIB
 )
 
@@ -124,6 +133,7 @@ add_executable(DecBrightness ${CMAKE_CURRENT_SOURCE_DIR}/src/scripts/rgb/decreas
 target_include_directories(DecBrightness PRIVATE ${LIBSECRET_INCLUDE_DIRS})
 target_link_libraries(DecBrightness PRIVATE 
     nlohmann_json::nlohmann_json
+    spdlog::spdlog
     ZLIB::ZLIB
 )
 
@@ -131,7 +141,7 @@ add_executable(SteamRunner ${CMAKE_CURRENT_SOURCE_DIR}/src/scripts/steam/run.cpp
 target_include_directories(SteamRunner PRIVATE ${LIBSECRET_INCLUDE_DIRS})
 target_link_libraries(SteamRunner PRIVATE 
     nlohmann_json::nlohmann_json
-    spdlog::spdlog 
+    spdlog::spdlog
     ZLIB::ZLIB
 )
 
