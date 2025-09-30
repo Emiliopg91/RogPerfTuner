@@ -4,7 +4,6 @@
 #include <sstream>
 
 #include "../../../include/utils/string_utils.hpp"
-#include "spdlog/fmt/bundled/format.h"
 
 std::unordered_map<std::string, FanCurveData> FanCurveData::parseCurves(std::string input) {
 	std::unordered_map<std::string, FanCurveData> result;
@@ -51,7 +50,7 @@ std::unordered_map<std::string, FanCurveData> FanCurveData::parseCurves(std::str
 std::string FanCurveData::toData() const {
 	std::vector<std::string> data;
 	for (size_t i = 0; i < perc.size(); i++) {
-		data.emplace_back(fmt::format("{}c:{}%", temp[i], perc[i]));
+		data.emplace_back(std::to_string(temp[i]) + "c:" + std::to_string(perc[i]) + "%");
 	}
 	return StringUtils::join(data, ",");
 }

@@ -2,8 +2,6 @@
 
 #include <unordered_map>
 
-#include "spdlog/fmt/bundled/format.h"
-
 void AsusCtlClient::turnOffAura() {
 	run_command("aura static -c 000000", true, false);
 }

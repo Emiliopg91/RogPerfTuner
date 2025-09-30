@@ -5,7 +5,6 @@
 #include <string>
 
 #include "../../include/utils/string_utils.hpp"
-#include "spdlog/fmt/bundled/format.h"
 
 Shell& ProcessUtils::getShell() {
 	static Shell& instance = Shell::getInstance();
