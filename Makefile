@@ -115,12 +115,6 @@ package:
 	@cp -r build/assets dist/RogControlCenter
 
 	@echo "#######################################################################"
-	@echo "######################### Generating PKGBUILD #########################"
-	@echo "#######################################################################"
-	@cp resources/PKGBUILD dist/PKGBUILD
-	@python resources/scripts/pkgbuild.py
-
-	@echo "#######################################################################"
 	@echo "######################### Generating AppImage #########################"
 	@echo "#######################################################################"
 	@rm -rf dist/appimage-fs
@@ -137,6 +131,12 @@ else
 	@ARCH=x86_64 VERSION=$$(cat resources/version) ./resources/appimagetool -u "gh-releases-zsync|Emiliopg91|RogControlCenter|latest|RogControlCenter.AppImage.zsync" -n dist/appimage-fs dist/RogControlCenter.AppImage
 	@mv RogControlCenter.AppImage.zsync dist
 endif
+
+	@echo "#######################################################################"
+	@echo "######################### Generating PKGBUILD #########################"
+	@echo "#######################################################################"
+	@cp resources/PKGBUILD dist/PKGBUILD
+	@python resources/scripts/pkgbuild.py
 
 release:
 	@rm -rf dist
