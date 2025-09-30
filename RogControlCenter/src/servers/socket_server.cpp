@@ -1,6 +1,5 @@
 #include "../../include/servers/socket_server.hpp"
 
-#include <arpa/inet.h>
 #include <fcntl.h>
 #include <sys/socket.h>
 #include <sys/stat.h>
@@ -112,7 +111,8 @@ void SocketServer::handleClient(int client_fd) {
 
 		try {
 			auto json_msg = nlohmann::json::parse(data);
-			logger.debug("Received message: " + json_msg.dump());
+			logger.info("Received message: " + json_msg.dump());
+			Logger::add_tab();
 
 			CommunicationMessage req = CommunicationMessage::from_json(json_msg);
 			CommunicationMessage res = CommunicationMessage::from_json(json_msg);
@@ -121,37 +121,17 @@ void SocketServer::handleClient(int client_fd) {
 
 			try {
 				if (req.name == Constants::NEXT_EFF) {
-					logger.info("Requested next effect");
-					Logger::add_tab();
 					res.data.emplace_back(openRgbService.nextEffect());
-					Logger::rem_tab();
-					logger.info("Request finished");
 				} else if (req.name == Constants::INC_BRIGHT) {
-					logger.info("Requested increase brightness");
-					Logger::add_tab();
-					res.data.emplace_back(openRgbService.increaseBrightness().toInt());
-					Logger::rem_tab();
-					logger.info("Request finished");
+					res.data.emplace_back(openRgbService.increaseBrightness().toName());
 				} else if (req.name == Constants::DEC_BRIGHT) {
-					logger.info("Requested decrease brightness");
-					Logger::add_tab();
-					res.data.emplace_back(openRgbService.decreaseBrightness().toInt());
-					Logger::rem_tab();
-					logger.info("Request finished");
+					res.data.emplace_back(openRgbService.decreaseBrightness().toName());
 				} else if (req.name == Constants::PERF_PROF) {
-					logger.info("Requested next performance profile");
-					Logger::add_tab();
 					res.data.emplace_back(performanceService.nextPerformanceProfile().toName());
-					Logger::rem_tab();
-					logger.info("Request finished");
 				} else if (req.name == Constants::GAME_CFG) {
-					logger.info("Requested configuration for game {}", std::any_cast<std::string>(req.data[0]));
-					Logger::add_tab();
 					json j;
 					to_json(j, steamService.getConfiguration(std::any_cast<std::string>(req.data[0])));
 					res.data.emplace_back(j.dump());
-					Logger::rem_tab();
-					logger.info("Request finished");
 				} else {
 					res.error = "No such functionality";
 				}
@@ -161,11 +141,8 @@ void SocketServer::handleClient(int client_fd) {
 			}
 
 			std::string resp_str = res.to_json();
-			logger.debug("Response message: " + resp_str);
-			uint32_t len	 = resp_str.size();
-			uint32_t net_len = htonl(len);	// host -> network byte order (big endian)
-
-			write(client_fd, &net_len, sizeof(net_len));
+			Logger::rem_tab();
+			logger.info("Response message: " + resp_str);
 			write(client_fd, resp_str.c_str(), resp_str.size());
 		} catch (const std::exception& e) {
 			logger.error("JSON parse error: " + std::string(e.what()));
