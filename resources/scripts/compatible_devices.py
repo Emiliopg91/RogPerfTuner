@@ -4,7 +4,7 @@ import sys
 
 input_file = os.path.abspath(
     os.path.dirname(__file__)
-    + "/../../assets/OpenRGB/usr/lib/udev/rules.d/60-openrgb.rules"
+    + "/../../build/assets/OpenRGB/usr/lib/udev/rules.d/60-openrgb.rules"
 )
 output_file = os.path.abspath(
     os.path.dirname(__file__)
