@@ -10,7 +10,7 @@ clean:
 	@echo "#######################################################################"
 	@echo "######################### Cleaning workspace ##########################"
 	@echo "#######################################################################"
-	@rm -rf build dist .Debug .Release .qt CMakeCache.txt **/cmake_install.cmake CMakeFiles patches/*.diff.applied assets/scripts assets/bin assets/OpenRGB assets/RccDeckyCompanion **/CMakeFiles
+	@rm -rf build dist .Debug .Release .qt CMakeCache.txt **/cmake_install.cmake CMakeFiles submodules/patches/*.diff.applied assets/scripts assets/bin assets/OpenRGB assets/RccDeckyCompanion **/CMakeFiles
 	@cd submodules/json && git reset --hard > /dev/null
 	@cd submodules/httplib && git reset --hard > /dev/null
 	@cd submodules/OpenRGB-cppSDK && git reset --hard > /dev/null && git submodule foreach git reset --hard > /dev/null
@@ -26,17 +26,17 @@ config:
 	@echo "######################## Configuring compiler ########################"
 	@echo "#######################################################################"
 
-	@if [ ! -f "patches/json.diff.applied" ]; then \
-		cd submodules/json && git apply ../../patches/json.diff && touch ../../patches/json.diff.applied; \
+	@if [ ! -f "submodules/patches/json.diff.applied" ]; then \
+		cd submodules/json && git apply ../patches/json.diff && touch ../patches/json.diff.applied; \
 	fi
-	@if [ ! -f "patches/httplib.diff.applied" ]; then \
-		cd submodules/httplib && git apply ../../patches/httplib.diff && touch ../../patches/httplib.diff.applied; \
+	@if [ ! -f "submodules/patches/httplib.diff.applied" ]; then \
+		cd submodules/httplib && git apply ../patches/httplib.diff && touch ../patches/httplib.diff.applied; \
 	fi
-	@if [ ! -f "patches/ixwebsocket.diff.applied" ]; then \
-		cd submodules/ixwebsocket && git apply ../../patches/ixwebsocket.diff && touch ../../patches/ixwebsocket.diff.applied; \
+	@if [ ! -f "submodules/patches/ixwebsocket.diff.applied" ]; then \
+		cd submodules/ixwebsocket && git apply ../patches/ixwebsocket.diff && touch ../patches/ixwebsocket.diff.applied; \
 	fi
-	@if [ ! -f "patches/OpenRGB-cppSDK.diff.applied" ]; then \
-		cd submodules/OpenRGB-cppSDK && git apply ../../patches/OpenRGB-cppSDK.diff && touch ../../patches/OpenRGB-cppSDK.diff.applied; \
+	@if [ ! -f "submodules/patches/OpenRGB-cppSDK.diff.applied" ]; then \
+		cd submodules/OpenRGB-cppSDK && git apply ../patches/OpenRGB-cppSDK.diff && touch ../patches/OpenRGB-cppSDK.diff.applied; \
 	fi
 	
 	@CXX=clang++ CC=clang cmake -B build -G Ninja -S . -DCMAKE_BUILD_TYPE=$(BUILD_TYPE) -DCMAKE_EXPORT_COMPILE_COMMANDS=ON
@@ -44,6 +44,9 @@ config:
 	@if [ ! -f "compile_commands.json" ]; then \
 		ln -s build/compile_commands.json .; \
 	fi
+
+	@mkdir build/assets
+	@cp -R resources/icons build/assets
 
 	@touch .$(BUILD_TYPE);\
 
@@ -59,7 +62,7 @@ build:
 	@echo "##################### Compiling RogControlCenter ######################"
 	@echo "#######################################################################"
 
-	@rm -rf assets/bin
+	@rm -rf build/assets/bin
 
 	@python3 resources/scripts/constants.py
 	@python3 resources/scripts/compatible_devices.py
@@ -70,25 +73,25 @@ build:
 
 	@cmake --build build -- -j$(NUM_CORES)
 
-	@mkdir assets/bin assets/bin/rgb  assets/bin/performance assets/bin/steam
-	@cp build/RogControlCenter/NextEffect assets/bin/rgb/nextEffect
-	@cp build/RogControlCenter/IncBrightness assets/bin/rgb/incBrightness
-	@cp build/RogControlCenter/DecBrightness assets/bin/rgb/decBrightness
-	@cp build/RogControlCenter/NextProfile assets/bin/performance/nextProfile
-	@cp build/RogControlCenter/SteamRunner assets/bin/steam/run
-	@cp build/RogControlCenter/FlatpakWrapper assets/bin/steam/flatpak
+	@mkdir build/assets/bin build/assets/bin/rgb  build/assets/bin/performance build/assets/bin/steam
+	@cp build/RogControlCenter/NextEffect build/assets/bin/rgb/nextEffect
+	@cp build/RogControlCenter/IncBrightness build/assets/bin/rgb/incBrightness
+	@cp build/RogControlCenter/DecBrightness build/assets/bin/rgb/decBrightness
+	@cp build/RogControlCenter/NextProfile build/assets/bin/performance/nextProfile
+	@cp build/RogControlCenter/SteamRunner build/assets/bin/steam/run
+	@cp build/RogControlCenter/FlatpakWrapper build/assets/bin/steam/flatpak
 
 build_openrgb:
-	@if [ ! -f "patches/OpenRGB.diff.applied" ]; then \
-		cd submodules/OpenRGB && git apply ../../patches/OpenRGB.diff && touch ../../patches/OpenRGB.diff.applied; \
+	@if [ ! -f "submodules/patches/OpenRGB.diff.applied" ]; then \
+		cd submodules/OpenRGB && git apply ../patches/OpenRGB.diff && touch ../patches/OpenRGB.diff.applied; \
 	fi
-	@if [ ! -d "assets/OpenRGB" ]; then \
+	@if [ ! -d "build/assets/OpenRGB" ]; then \
 		echo "#######################################################################" && \
 		echo "######################### Compiling OpenRGB ###########################" && \
 		echo "#######################################################################" && \
 		cd submodules/OpenRGB && ./build.sh \
-		./OpenRGB.AppImage --appimage-extract && cp -r squashfs-root ../../assets/OpenRGB && \
-		cd ../../assets/OpenRGB && \
+		./OpenRGB.AppImage --appimage-extract && cp -r squashfs-root ../../build/assets/OpenRGB && \
+		cd ../../build/assets/OpenRGB && \
 		mv AppRun OpenRGB.sh && \
 		mv AppRun.wrapped OpenRGB && \
 		sed -i 's/AppRun.wrapped/OpenRGB/g' OpenRGB.sh && \
@@ -96,11 +99,11 @@ build_openrgb:
 	fi
 
 build_rccdc:
-	@if [ ! -d "assets/RccDeckyCompanion" ]; then \
+	@if [ ! -d "build/assets/RccDeckyCompanion" ]; then \
 		echo "#######################################################################" && \
 		echo "#################### Compiling RccDeckyCompanion ######################" && \
 		echo "#######################################################################" && \
-	    cd submodules/RccDeckyCompanion && ./cli/decky.py build && cp -r out/RccDeckyCompanion ../../assets/RccDeckyCompanion; \
+	    cd submodules/RccDeckyCompanion && ./cli/decky.py build && cp -r out/RccDeckyCompanion ../../build/assets/RccDeckyCompanion; \
 	fi
 
 package:
@@ -109,13 +112,7 @@ package:
 	@echo "#######################################################################"
 	@mkdir dist dist/RogControlCenter
 	@cp ./build/RogControlCenter/RogControlCenter dist/RogControlCenter
-	@cp -r assets dist/RogControlCenter
-
-	@echo "#######################################################################"
-	@echo "######################### Generating PKGBUILD #########################"
-	@echo "#######################################################################"
-	@cp resources/PKGBUILD dist/PKGBUILD
-	@python resources/scripts/pkgbuild.py
+	@cp -r build/assets dist/RogControlCenter
 
 	@echo "#######################################################################"
 	@echo "######################### Generating AppImage #########################"
@@ -126,7 +123,7 @@ package:
 	@cp -r dist/RogControlCenter/assets/* dist/appimage-fs/usr/share/RogControlCenter
 	@cp resources/AppRun dist/appimage-fs/
 	@cp resources/RogControlCenter.desktop dist/appimage-fs/RogControlCenter.desktop
-	@cp assets/icons/icon.svg dist/appimage-fs/icon.svg
+	@cp build/assets/icons/icon.svg dist/appimage-fs/icon.svg
 ifdef IN_PKGBUILD
 	@echo "Skipping AppImage creation"
 else
@@ -134,6 +131,12 @@ else
 	@ARCH=x86_64 VERSION=$$(cat resources/version) ./resources/appimagetool -u "gh-releases-zsync|Emiliopg91|RogControlCenter|latest|RogControlCenter.AppImage.zsync" -n dist/appimage-fs dist/RogControlCenter.AppImage
 	@mv RogControlCenter.AppImage.zsync dist
 endif
+
+	@echo "#######################################################################"
+	@echo "######################### Generating PKGBUILD #########################"
+	@echo "#######################################################################"
+	@cp resources/PKGBUILD dist/PKGBUILD
+	@python resources/scripts/pkgbuild.py
 
 release:
 	@rm -rf dist
@@ -146,9 +149,9 @@ build_debug:
 
 run: build_debug
 	@touch /tmp/fake.AppImage
-	@echo "Running 'APPIMAGE=/tmp/fake.AppImage RCC_ASSETS_DIR=$(MAKEFILE_DIR)assets ./build/RogControlCenter/RogControlCenter'"
+	@echo "Running 'APPIMAGE=/tmp/fake.AppImage RCC_ASSETS_DIR=$(MAKEFILE_DIR)build/assets ./build/RogControlCenter/RogControlCenter'"
 	@echo ""
-	@APPIMAGE=/tmp/fake.AppImage RCC_MODE=DEV RCC_ASSETS_DIR=$(MAKEFILE_DIR)assets ./build/RogControlCenter/RogControlCenter
+	@APPIMAGE=/tmp/fake.AppImage RCC_MODE=DEV RCC_ASSETS_DIR=$(MAKEFILE_DIR)build/assets ./build/RogControlCenter/RogControlCenter
 
 increase_version:
 	@awk '{if ($$0 ~ /project\(.*VERSION/) {match($$0, /([0-9]+)\.([0-9]+)\.([0-9]+)/, v); patch = v[3] + 1; sub(/[0-9]+\.[0-9]+\.[0-9]+/, v[1] "." v[2] "." patch);} print}' CMakeLists.txt > CMakeLists.txt.tmp && mv CMakeLists.txt.tmp CMakeLists.txt

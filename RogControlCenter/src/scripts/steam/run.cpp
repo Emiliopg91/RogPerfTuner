@@ -1,3 +1,4 @@
+#include <arpa/inet.h>
 #include <signal.h>
 #include <sys/prctl.h>
 #include <sys/socket.h>
@@ -214,8 +215,7 @@ int main(int argc, char* argv[]) {
 	try {
 		const char* steamId = getenv("SteamGameId");
 		if (steamId) {
-			auto cfg = RogControlCenterClient::getInstance().getGameConfiguration(steamId);
-
+			auto cfg = RogControlCenterClient::getInstance().getGameConfig(steamId);
 			for (const auto& [key, val] : cfg.environment) {
 				setenv(key.c_str(), val.c_str(), 1);
 			}

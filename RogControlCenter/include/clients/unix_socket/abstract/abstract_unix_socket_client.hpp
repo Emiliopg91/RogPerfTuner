@@ -1,17 +1,9 @@
 #pragma once
 
-#include <sys/socket.h>
-#include <sys/un.h>
-#include <unistd.h>
-
-#include <any>
-#include <condition_variable>
+#include <atomic>
 #include <future>
 #include <mutex>
-#include <nlohmann/json.hpp>
-#include <optional>
 #include <queue>
-#include <string>
 #include <unordered_map>
 
 #include "../../../events/event_bus.hpp"
@@ -23,46 +15,35 @@ struct UnixMethodResponse {
 	std::string error;
 };
 
-class AbstractUnixSocketClient : public Loggable {
+class AbstractUnixSocketClient : Loggable {
   public:
-	std::vector<std::any> invoke(const std::string& method, const std::vector<std::any>& args, const int& timeout_ms = 3000);
-
-	void onConnect(Callback&& callback);
-
-	void onDisconnect(Callback&& callback);
-
-	bool connected();
-
+	AbstractUnixSocketClient(const std::string& path, const std::string& name);
 	virtual ~AbstractUnixSocketClient();
 
   protected:
-	AbstractUnixSocketClient(const std::string& socketPath, const std::string& name);
-
-	void on_without_params(const std::string& name, Callback&& callback);
-
-	void on_with_params(const std::string& name, CallbackWithParams&& callback);
+	std::vector<std::any> invoke(std::string method, std::vector<std::any> data, const int& timeout_ms = 3000);
 
   private:
-	int _fd = -1;
-	std::string _name;
-	std::string _socketPath;
-	bool _connected	   = false;
-	EventBus& eventBus = EventBus::getInstance();
-	std::thread _writeThread;
-	std::thread _readThread;
+	void connectionLoop();
+	void writeLoop();
+	void readLoop();
+	void handleResponse(CommunicationMessage msg);
+	void handleEvent(CommunicationMessage msg);
 
+	std::string path;
+	std::string name;
+	int sock;
 	std::queue<std::string> _message_queue;
-	std::mutex _queue_mutex;
-	std::condition_variable _queue_cv;
+	std::unordered_map<std::string, std::promise<UnixMethodResponse>> promises;
 
-	std::unordered_map<std::string, std::promise<UnixMethodResponse>> _promises;
-	std::mutex _response_mutex;
+	std::atomic<bool> running;
+	std::atomic<bool> connected;
+	std::mutex mutex;
+	std::condition_variable queue_cv;
 
-	int _id_counter = 0;
+	std::thread connectionThread;
+	std::thread writeThread;
+	std::thread readThread;
 
-	void trigger_event(const std::string& name, const std::optional<std::vector<std::any>>& data = std::nullopt);
-
-	void handle_message(const std::string& payload);
-
-	void listen_loop();
+	EventBus& eventBus = EventBus::getInstance();
 };

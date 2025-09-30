@@ -3,38 +3,31 @@
 #include <any>
 
 #include "../../../include/utils/constants.hpp"
+#include "nlohmann/json_fwd.hpp"
 
 RogControlCenterClient::RogControlCenterClient() : AbstractUnixSocketClient(Constants::SOCKET_FILE, "RogControlCenterClient") {
 }
 
-std::string RogControlCenterClient::nextEffect() {
-	auto resp = invoke(Constants::NEXT_EFF, {})[0];
-	return std::any_cast<std::string>(resp);
+void RogControlCenterClient::nextEffect() {
+	invoke(Constants::NEXT_EFF, {});
 }
 
-RgbBrightness RogControlCenterClient::increaseBrightness() {
-	auto resp = invoke(Constants::INC_BRIGHT, {})[0];
-	return RgbBrightness::fromInt(std::any_cast<int>(resp));
+void RogControlCenterClient::increaseBrightness() {
+	invoke(Constants::INC_BRIGHT, {});
 }
 
-RgbBrightness RogControlCenterClient::decreaseBrightness() {
-	auto resp = invoke(Constants::DEC_BRIGHT, {})[0];
-	return RgbBrightness::fromInt(std::any_cast<int>(resp));
+void RogControlCenterClient::decreaseBrightness() {
+	invoke(Constants::DEC_BRIGHT, {});
 }
 
-PerformanceProfile RogControlCenterClient::nextProfile() {
-	auto resp = invoke(Constants::PERF_PROF, {})[0];
-	return PerformanceProfile::fromString(std::any_cast<std::string>(resp));
-}
+SteamGameConfig RogControlCenterClient::getGameConfig(std::string steamId) {
+	auto res = invoke(Constants::GAME_CFG, {steamId});
 
-SteamGameConfig RogControlCenterClient::getGameConfiguration(std::string appId) {
-	auto arr = invoke(Constants::GAME_CFG, {appId})[0];
+	auto json		 = std::any_cast<std::string>(res[0]);
+	nlohmann::json j = nlohmann::json::parse(json);
 
-	logger.error(std::any_cast<std::string>(arr));
-	nlohmann::json j = nlohmann::json::parse(std::any_cast<std::string>(arr));
+	SteamGameConfig cfg;
+	from_json(j, cfg);
 
-	SteamGameConfig resp;
-	from_json(j, resp);
-
-	return resp;
+	return cfg;
 }
