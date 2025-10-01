@@ -22,6 +22,4 @@ class CurveEditor : public QDialog {
 
 	Translator& translator				   = Translator::getInstance();
 	PerformanceService& performanceService = PerformanceService::getInstance();
-
-	int findClosestPoint(const QPointF& pos);
 };
