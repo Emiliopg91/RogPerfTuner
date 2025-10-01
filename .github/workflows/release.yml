@@ -35,7 +35,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: OpenRGB
-          path: assets/OpenRGB
+          path: build/assets/OpenRGB
 
   compile_rccdc:
     runs-on: ubuntu-latest
@@ -63,7 +63,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: RccDeckyCompanion
-          path: assets/RccDeckyCompanion
+          path: build/assets/RccDeckyCompanion
 
   compile_and_release:
     runs-on: ubuntu-latest
@@ -89,17 +89,21 @@ jobs:
           sudo apt-get update
           sudo apt-get install --no-install-recommends -y libfuse2 libqt5core5a libhidapi-hidraw0 qt6-wayland qt6-base-dev qt6-charts-dev libqt6charts6 qt6-base-dev qt6-tools-dev qt6-tools-dev-tools build-essential cmake libsecret-1-dev libzstd-dev pkg-config libudev-dev clang clang-format zsync
 
+      - name: Configure project
+        run: |
+          make config
+
       - name: Download OpenRGB artifact
         uses: actions/download-artifact@v4
         with:
           name: OpenRGB
-          path: assets/OpenRGB
+          path: build/assets/OpenRGB
 
       - name: Download RccDeckyCompanion artifact
         uses: actions/download-artifact@v4
         with:
           name: RccDeckyCompanion
-          path: assets/RccDeckyCompanion
+          path: build/assets/RccDeckyCompanion
 
       - name: Compile
         run: |

@@ -86,7 +86,7 @@ build_openrgb:
 		echo "######################### Compiling OpenRGB ###########################" && \
 		echo "#######################################################################" && \
 		cd submodules/OpenRGB && ./build.sh \
-		./OpenRGB.AppImage --appimage-extract && cp -r squashfs-root ../../build/assets/OpenRGB && \
+		./OpenRGB.AppImage --appimage-extract && mkdir -p ../../build/assets  && cp -r squashfs-root ../../build/assets/OpenRGB && \
 		cd ../../build/assets/OpenRGB && \
 		mv AppRun OpenRGB.sh && \
 		mv AppRun.wrapped OpenRGB && \
@@ -99,7 +99,7 @@ build_rccdc:
 		echo "#######################################################################" && \
 		echo "#################### Compiling RccDeckyCompanion ######################" && \
 		echo "#######################################################################" && \
-	    cd submodules/RccDeckyCompanion && ./cli/decky.py build && cp -r out/RccDeckyCompanion ../../build/assets/RccDeckyCompanion; \
+	    cd submodules/RccDeckyCompanion && ./cli/decky.py build && mkdir -p ../../build/assets && cp -r out/RccDeckyCompanion ../../build/assets/RccDeckyCompanion; \
 	fi
 
 package:

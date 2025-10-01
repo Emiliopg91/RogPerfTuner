@@ -9,7 +9,7 @@ const std::string Constants::APP_VERSION = "4.3.7";
 
 const pid_t Constants::PID = getpid();
 
-const std::string Constants::PLUGIN_VERSION = "1.2.2";
+const std::string Constants::PLUGIN_VERSION = "1.2.3";
 
 const bool Constants::DEV_MODE = true;
 
