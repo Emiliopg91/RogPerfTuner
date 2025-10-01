@@ -87,7 +87,7 @@ const std::string Constants::NEXT_EFF	= "nextRgbEffect";
 
 const int Constants::WS_PORT = 18158;
 
-const std::vector<std::string> Constants::RCCDC_REQUIRED_PIP = {"websockets", "dataclasses-json", "asyncio"};
+const std::vector<std::string> Constants::RCCDC_REQUIRED_PIP = {"dataclasses-json", "asyncio"};
 
 const std::string Constants::FLATPAK_MANGOHUD		   = "org.freedesktop.Platform.VulkanLayer.MangoHud/x86_64/24.08";
 const std::string Constants::FLATPAK_MANGOHUD_OVERRIDE = "--filesystem=xdg-config/MangoHud:ro";
