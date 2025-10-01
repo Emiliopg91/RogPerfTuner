@@ -47,7 +47,6 @@ SteamService::SteamService() : Loggable("SteamService") {
 	logger.info("Initializing SteamService");
 	Logger::add_tab();
 
-	TimeUtils::sleep(25);
 	if (steamClient.connected()) {
 		onConnect(true);
 	}
@@ -191,9 +190,9 @@ void SteamService::installRccDC() {
 	try {
 		if (FileUtils::exists(Constants::DECKY_SERVICE_PATH)) {
 			if (!FileUtils::exists(Constants::RCCDC_PATH)) {
-				if (!configuration.getConfiguration().application.askedInstallRccdc &&
-					YesNoDialog::showDialog(translator.translate("enable.decky.integration.title"),
-											translator.translate("enable.decky.integration.body"))) {
+				if (Constants::DEV_MODE || (!configuration.getConfiguration().application.askedInstallRccdc &&
+											YesNoDialog::showDialog(translator.translate("enable.decky.integration.title"),
+																	translator.translate("enable.decky.integration.body")))) {
 					logger.info("Installing plugin for first time");
 					Logger::add_tab();
 					installPipDeps();

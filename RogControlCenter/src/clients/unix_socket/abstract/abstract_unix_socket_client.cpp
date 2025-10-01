@@ -1,6 +1,7 @@
 #include "../../../../include/clients/unix_socket/abstract/abstract_unix_socket_client.hpp"
 
 #include <arpa/inet.h>
+#include <execinfo.h>
 #include <netinet/in.h>
 #include <sys/socket.h>
 #include <sys/un.h>
@@ -9,15 +10,14 @@
 #include <mutex>
 #include <thread>
 
-#include "../../../../include/utils/constants.hpp"
 #include "../../../../include/utils/string_utils.hpp"
 #include "../../../../include/utils/time_utils.hpp"
 
 using json = nlohmann::json;
 
 AbstractUnixSocketClient::AbstractUnixSocketClient(const std::string& path, const std::string& name) : Loggable(name), path(path), name(name) {
-	running.store(true);
-	connected.store(false);
+	_running.store(true);
+	_connected.store(false);
 
 	connectionThread = std::thread([this] {
 		connectionLoop();
@@ -25,9 +25,15 @@ AbstractUnixSocketClient::AbstractUnixSocketClient(const std::string& path, cons
 }
 
 AbstractUnixSocketClient::~AbstractUnixSocketClient() {
+	stop();
+}
+
+void AbstractUnixSocketClient::stop(bool stopConnThread) {
 	try {
-		connected = false;
-		running	  = false;
+		logger.info("Stopping client");
+		Logger::add_tab();
+		_connected = false;
+		_running   = false;
 
 		if (sock != -1) {
 			shutdown(sock, SHUT_RDWR);
@@ -37,7 +43,7 @@ AbstractUnixSocketClient::~AbstractUnixSocketClient() {
 
 		queue_cv.notify_all();
 
-		if (connectionThread.joinable()) {
+		if (stopConnThread && connectionThread.joinable()) {
 			connectionThread.join();
 		}
 		if (writeThread.joinable()) {
@@ -46,40 +52,61 @@ AbstractUnixSocketClient::~AbstractUnixSocketClient() {
 		if (readThread.joinable()) {
 			readThread.join();
 		}
+		Logger::rem_tab();
+		logger.info("Client stopped");
 	} catch (std::exception& e) {
-		logger.error(e.what());
+		logger.error("Error on stop: {}", e.what());
 	}
 }
 
 void AbstractUnixSocketClient::connectionLoop() {
-	while (running) {
-		sock = socket(AF_UNIX, SOCK_STREAM, 0);
-		sockaddr_un addr{};
-		addr.sun_family = AF_UNIX;
-		strncpy(addr.sun_path, Constants::SOCKET_FILE.c_str(), sizeof(addr.sun_path) - 1);
-
-		if (connect(sock, (sockaddr*)&addr, sizeof(addr)) < 0) {
+	while (_running) {
+		if (_connected) {
+			TimeUtils::sleep(5000);
 			continue;
 		}
 
-		connected.store(true);
+		sock = socket(AF_UNIX, SOCK_STREAM, 0);
+		sockaddr_un addr{};
+		addr.sun_family = AF_UNIX;
+		strncpy(addr.sun_path, path.c_str(), sizeof(addr.sun_path) - 1);
 
+		if (connect(sock, (sockaddr*)&addr, sizeof(addr)) < 0) {
+			logger.debug(std::string(strerror(errno)));
+			TimeUtils::sleep(3000);
+			continue;
+		}
+
+		eventBus.emit_event("unix.socket.event." + name + ".connect");
+		_connected.store(true);
+
+		if (writeThread.joinable()) {
+			writeThread.join();
+		}
 		writeThread = std::thread([this] {
 			writeLoop();
 		});
-		readThread	= std::thread([this] {
-			 readLoop();
-		 });
 
-		while (connected) {
-			for (int i = 0; i < 20 && connected && running; i++) {
+		if (readThread.joinable()) {
+			readThread.join();
+		}
+		readThread = std::thread([this] {
+			readLoop();
+		});
+
+		while (_connected) {
+			for (int i = 0; i < 20 && _connected && _running; i++) {
 				TimeUtils::sleep(250);
 			}
-			if (!running) {
+			if (_connected && _running) {
 				try {
 					invoke("ping", {}, 5);
 				} catch (std::exception& e) {
 					logger.debug("Lost connection");
+					stop(false);
+					_running = true;
+					TimeUtils::sleep(1000);
+					continue;
 				}
 			}
 		}
@@ -87,27 +114,30 @@ void AbstractUnixSocketClient::connectionLoop() {
 }
 
 void AbstractUnixSocketClient::writeLoop() {
-	while (true) {
+	while (_running && _connected) {
 		std::unique_lock<std::mutex> lock(mutex);
 		queue_cv.wait(lock, [this] {
-			return !_message_queue.empty() || !running;
+			return !_message_queue.empty() || !_running;
 		});
 
-		if (!running) {
+		if (!_running) {
 			break;
 		}
 
-		if (!connected) {
+		if (!_connected) {
+			lock.unlock();	// <-- ¡soltar!
+			TimeUtils::sleep(50);
 			continue;
 		}
 
 		if (_message_queue.empty()) {
+			lock.unlock();	// <-- ¡soltar!
 			continue;
 		}
 
 		std::string msg = _message_queue.front();
 		_message_queue.pop();
-		lock.unlock();
+		lock.unlock();	// <-- ¡soltar antes de I/O!
 
 		uint32_t msgLen = htonl(msg.size());
 		if (write(sock, &msgLen, sizeof(msgLen)) <= 0 || write(sock, msg.c_str(), msg.size()) <= 0) {
@@ -118,7 +148,7 @@ void AbstractUnixSocketClient::writeLoop() {
 
 void AbstractUnixSocketClient::readLoop() {
 	uint32_t resp_len;
-	while (running && connected) {
+	while (_running && _connected) {
 		ssize_t n = read(sock, &resp_len, sizeof(resp_len));
 		if (n == sizeof(resp_len)) {
 			resp_len = ntohl(resp_len);
@@ -127,8 +157,10 @@ void AbstractUnixSocketClient::readLoop() {
 			while (total_read < resp_len) {
 				ssize_t r = read(sock, &data[total_read], resp_len - total_read);
 				if (r <= 0) {
-					logger.error(std::string(strerror(errno)));
-					continue;
+					logger.debug("Server closed the connection");
+					eventBus.emit_event("unix.socket.event." + name + ".disconnect");
+					_connected.store(false);
+					break;
 				}
 				total_read += r;
 			}
@@ -138,6 +170,8 @@ void AbstractUnixSocketClient::readLoop() {
 
 			if (j.type == "RESPONSE") {
 				handleResponse(j);
+			} else if (j.type == "EVENT") {
+				handleEvent(j);
 			}
 		}
 	}
@@ -150,15 +184,6 @@ void AbstractUnixSocketClient::handleResponse(CommunicationMessage msg) {
 		UnixMethodResponse wsmr{msg, ""};
 		it->second.set_value(wsmr);
 		promises.erase(it);
-	}
-}
-
-void AbstractUnixSocketClient::handleEvent(CommunicationMessage msg) {
-	std::string eventName = "unix.socket.event." + name + "." + msg.name;
-	if (msg.data.empty()) {
-		eventBus.emit_event(eventName);
-	} else {
-		eventBus.emit_event(eventName, msg.data);
 	}
 }
 
@@ -179,7 +204,7 @@ std::vector<std::any> AbstractUnixSocketClient::invoke(std::string method, std::
 	queue_cv.notify_one();
 
 	if (fut.wait_for(std::chrono::milliseconds(timeout_ms)) == std::future_status::timeout) {
-		logger.error("No response for {} after {} ms", timeout_ms, method);
+		logger.error("No response for {} after {} ms", method, timeout_ms);
 		throw std::runtime_error("UnixSocketTimeoutError");
 	}
 
@@ -190,4 +215,35 @@ std::vector<std::any> AbstractUnixSocketClient::invoke(std::string method, std::
 	}
 
 	return resp.data.data;
+}
+
+void AbstractUnixSocketClient::handleEvent(CommunicationMessage msg) {
+	std::string eventName = "unix.socket.event." + name + "." + msg.name;
+	if (msg.data.empty()) {
+		eventBus.emit_event(eventName);
+	} else {
+		eventBus.emit_event(eventName, msg.data);
+	}
+}
+
+void AbstractUnixSocketClient::on_without_params(const std::string& evName, Callback&& callback) {
+	auto eventName = "unix.socket.event." + name + "." + evName;
+	eventBus.on_without_data(eventName, callback);
+}
+
+void AbstractUnixSocketClient::on_with_params(const std::string& evName, CallbackWithParams&& callback) {
+	auto eventName = "unix.socket.event." + name + "." + evName;
+	eventBus.on_with_data(eventName, std::move(callback));
+}
+
+void AbstractUnixSocketClient::onConnect(Callback&& callback) {
+	on_without_params("connect", std::move(callback));
+}
+
+void AbstractUnixSocketClient::onDisconnect(Callback&& callback) {
+	on_without_params("disconnect", std::move(callback));
+}
+
+bool AbstractUnixSocketClient::connected() {
+	return _connected;
 }

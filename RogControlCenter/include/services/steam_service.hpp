@@ -1,7 +1,7 @@
 #pragma once
 
 #include "../clients/shell/pip_client.hpp"
-#include "../clients/websocket/steam_client.hpp"
+#include "../clients/unix_socket/steam_client.hpp"
 #include "../configuration/configuration.hpp"
 #include "../models/steam/steam_game_config.hpp"
 #include "./hardware_service.hpp"
@@ -21,7 +21,7 @@ class SteamService : public Singleton<SteamService>, Loggable {
 	PerformanceService& performanceService = PerformanceService::getInstance();
 	OpenRgbService& openRgbService		   = OpenRgbService::getInstance();
 	HardwareService& hardwareService	   = HardwareService::getInstance();
-	SteamClient& steamClient			   = SteamClient::getInstance();
+	SteamSocketClient& steamClient		   = SteamSocketClient::getInstance();
 	PipClient& pipClient				   = PipClient::getInstance();
 	Translator& translator				   = Translator::getInstance();
 

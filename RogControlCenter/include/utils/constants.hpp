@@ -86,4 +86,6 @@ class Constants {
 	static const std::string FLATPAK_MANGOHUD_OVERRIDE;
 
 	static const std::string LOGGER_PATTERN;
+
+	static const std::string RCDCC_SOCKET_PATH;
 };
