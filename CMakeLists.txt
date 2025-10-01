@@ -18,8 +18,6 @@ add_compile_options(-Wno-unqualified-std-cast-call -Wextra -Werror -Wno-unused-r
 
 add_subdirectory(submodules/httplib)
 
-add_subdirectory(submodules/ixwebsocket)
-
 set(JSON_BuildTests OFF CACHE INTERNAL "")
 add_subdirectory(submodules/json)
 

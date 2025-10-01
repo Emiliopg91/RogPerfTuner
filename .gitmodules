@@ -16,6 +16,3 @@
 [submodule "submodules/httplib"]
 	path = submodules/httplib
 	url = https://github.com/Emiliopg91/yhirose-cpp-httplib
-[submodule "submodules/ixwebsocket"]
-	path = submodules/ixwebsocket
-	url = https://github.com/Emiliopg91/machinezone-IXWebSocket

@@ -16,7 +16,6 @@ clean:
 	@cd submodules/OpenRGB-cppSDK && git reset --hard > /dev/null && git submodule foreach git reset --hard > /dev/null
 	@cd submodules/OpenRGB && git reset --hard > /dev/null
 	@cd submodules/RccDeckyCompanion && git reset --hard > /dev/null
-	@cd submodules/ixwebsocket && git reset --hard > /dev/null
 	@rm -Rf dist logs out build
 
 config:
@@ -31,9 +30,6 @@ config:
 	fi
 	@if [ ! -f "submodules/patches/httplib.diff.applied" ]; then \
 		cd submodules/httplib && git apply ../patches/httplib.diff && touch ../patches/httplib.diff.applied; \
-	fi
-	@if [ ! -f "submodules/patches/ixwebsocket.diff.applied" ]; then \
-		cd submodules/ixwebsocket && git apply ../patches/ixwebsocket.diff && touch ../patches/ixwebsocket.diff.applied; \
 	fi
 	@if [ ! -f "submodules/patches/OpenRGB-cppSDK.diff.applied" ]; then \
 		cd submodules/OpenRGB-cppSDK && git apply ../patches/OpenRGB-cppSDK.diff && touch ../patches/OpenRGB-cppSDK.diff.applied; \

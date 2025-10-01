@@ -57,7 +57,6 @@ target_link_libraries(RogControlCenter PRIVATE
     spdlog::spdlog 
     nlohmann_json::nlohmann_json
     httplib::httplib
-    ixwebsocket::ixwebsocket
     ${LIBSECRET_LIBRARIES}
     udev
     orgbsdk
