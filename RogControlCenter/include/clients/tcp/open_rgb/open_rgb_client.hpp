@@ -2,9 +2,9 @@
 
 #include "../../../clients/shell/asusctl_client.hpp"
 #include "../../../events/event_bus.hpp"
+#include "../../../models/hardware/usb_identifier.hpp"
 #include "../../../utils/constants.hpp"
 #include "OpenRGB/Client.hpp"
-#include "compatible_devices.hpp"
 #include "effects/abstract/abstract_effect.hpp"
 
 class OpenRgbClient : public Singleton<OpenRgbClient>, Loggable {
@@ -18,7 +18,7 @@ class OpenRgbClient : public Singleton<OpenRgbClient>, Loggable {
 	 *
 	 * @return CompatibleDeviceArray An array containing the compatible devices.
 	 */
-	const CompatibleDeviceArray getCompatibleDevices();
+	const std::vector<UsbIdentifier> getCompatibleDevices();
 	/**
 	 * @brief Retrieves a list of available lighting effects supported by the device.
 	 *
@@ -96,6 +96,7 @@ class OpenRgbClient : public Singleton<OpenRgbClient>, Loggable {
 	orgb::DeviceList detectedDevices;
 	std::vector<std::unique_ptr<AbstractEffect>> availableEffects;
 	std::thread udevConfigurer;
+	std::vector<UsbIdentifier> compatibleDevices;
 
 	Shell& shell				 = Shell::getInstance();
 	EventBus& eventBus			 = EventBus::getInstance();

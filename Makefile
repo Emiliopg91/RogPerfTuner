@@ -61,7 +61,6 @@ build:
 	@rm -rf build/assets/bin
 
 	@python3 resources/scripts/constants.py
-	@python3 resources/scripts/compatible_devices.py
 	@python3 resources/scripts/translations.py
 
 	@echo "Formatting code..."

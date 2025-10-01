@@ -1,5 +1,6 @@
 #include "../../../../include/clients/tcp/open_rgb/open_rgb_client.hpp"
 
+#include <cstdio>
 #include <string>
 #include <vector>
 
@@ -18,6 +19,7 @@
 #include "../../../../include/utils/file_utils.hpp"
 #include "../../../../include/utils/net_utils.hpp"
 #include "../../../../include/utils/process_utils.hpp"
+#include "../../../../include/utils/string_utils.hpp"
 #include "../../../../include/utils/time_utils.hpp"
 
 void OpenRgbClient::initialize() {
@@ -33,6 +35,38 @@ void OpenRgbClient::initialize() {
 	} else {
 		logger.info("UDEV rules already configured");
 	}
+
+	logger.info("Reading UDEV files");
+	Logger::add_tab();
+	auto lines = StringUtils::splitLines(FileUtils::readFileContent(Constants::UDEV_RULES));
+	std::regex regex(
+		"SUBSYSTEMS==\".*?\", ATTRS\\{idVendor\\}==\"([0-9a-fA-F]+)\", ATTRS\\{idProduct\\}==\"([0-9a-fA-F]+)\".*?TAG\\+=\"([a-zA-Z0-9_]+)\"");
+
+	for (auto line : lines) {
+		auto pos = line.find(", TAG+=\"uaccess\"");
+		if (pos != std::string::npos) {
+			line.erase(pos, std::string(", TAG+=\"uaccess\"").size());
+		}
+
+		std::smatch m;
+		if (std::regex_search(line, m, regex)) {
+			std::string vendor_id = m[1].str();
+			if (vendor_id == "0b05") {
+				std::string product_id = m[2].str();
+				std::string name	   = m[3].str();
+
+				for (auto& c : name) {
+					if (c == '_') {
+						c = ' ';
+					}
+				}
+
+				compatibleDevices.emplace_back(UsbIdentifier{vendor_id, product_id, name});
+			}
+		}
+	}
+	Logger::rem_tab();
+	logger.debug("Found {} compatible devices", compatibleDevices.size());
 
 	availableEffects.push_back(std::unique_ptr<AbstractEffect>(&BreathingEffect::init(client)));
 	availableEffects.push_back(std::unique_ptr<AbstractEffect>(&DanceFloorEffect::init(client)));
@@ -86,7 +120,7 @@ void OpenRgbClient::stop() {
 	Logger::rem_tab();
 }
 
-const CompatibleDeviceArray OpenRgbClient::getCompatibleDevices() {
+const std::vector<UsbIdentifier> OpenRgbClient::getCompatibleDevices() {
 	return compatibleDevices;
 }
 

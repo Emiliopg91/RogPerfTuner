@@ -59,7 +59,7 @@ void OpenRgbService::restoreAura() {
 }
 
 std::string OpenRgbService::getDeviceName(const UsbIdentifier& identifier) {
-	for (auto dev : compatibleDevices) {
+	for (auto dev : openRgbClient.getCompatibleDevices()) {
 		if (identifier == dev) {
 			return std::string(dev.name);
 		}
