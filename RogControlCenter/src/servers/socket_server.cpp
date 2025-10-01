@@ -33,6 +33,10 @@ SocketServer::SocketServer() : Loggable("SocketServer") {
 		}
 	}
 
+	eventBus.onApplicationStop([this] {
+		stop();
+	});
+
 	logger.info("Socket server started on " + Constants::SOCKET_FILE);
 	Logger::rem_tab();
 }
@@ -42,6 +46,8 @@ SocketServer::~SocketServer() {
 }
 
 void SocketServer::stop() {
+	logger.info("Stopping socket server");
+
 	if (!started.load()) {
 		return;
 	}
@@ -49,11 +55,9 @@ void SocketServer::stop() {
 	started.store(false);
 
 	if (server_fd != -1) {
+		shutdown(server_fd, SHUT_RDWR);
 		close(server_fd);
 		server_fd = -1;
-	}
-
-	if (!Constants::SOCKET_FILE.empty()) {
 		unlink(Constants::SOCKET_FILE.c_str());
 	}
 
