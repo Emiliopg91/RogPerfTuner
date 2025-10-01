@@ -19,7 +19,7 @@ clean:
 	@rm -Rf dist logs out build
 
 config:
-	@rm -rf build dist .Debug .Release CMakeCache.txt **/cmake_install.cmake CMakeFiles assets/bin **/CMakeFiles
+	@rm -rf build dist .Debug .Release CMakeCache.txt **/cmake_install.cmake CMakeFiles **/CMakeFiles
 
 	@echo "#######################################################################"
 	@echo "######################## Configuring compiler ########################"
