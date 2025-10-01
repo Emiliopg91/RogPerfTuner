@@ -121,6 +121,10 @@ void AutoUpdater::copy_file() {
 }
 
 void AutoUpdater::check_task() {
+	if (FileUtils::exists(Constants::UPDATE_TMP_FILE)) {
+		FileUtils::remove(Constants::UPDATE_TMP_FILE);
+	}
+
 	TimeUtils::sleep(1000);
 
 	while (!FileUtils::exists(Constants::UPDATE_TMP_FILE)) {

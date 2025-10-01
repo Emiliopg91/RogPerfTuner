@@ -12,7 +12,7 @@
             "console": "integratedTerminal",
             "env": {
                 "APPIMAGE": "/tmp/fake.AppImage",
-                "RCC_ASSETS_DIR": "${workspaceFolder}/assets"
+                "RCC_ASSETS_DIR": "${workspaceFolder}/build/assets"
             }
         }
     ]
