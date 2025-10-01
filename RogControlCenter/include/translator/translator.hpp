@@ -6,7 +6,7 @@
 
 #include "../models/others/loggable.hpp"
 #include "../models/others/singleton.hpp"
-#include "../models/translator/translation_entry.hpp"
+#include "../models/translator/language.hpp"
 
 class Translator : public Singleton<Translator>, Loggable {
   public:
@@ -24,9 +24,9 @@ class Translator : public Singleton<Translator>, Loggable {
 
   private:
 	inline static Language FALLBACK_LANG = Language::Enum::EN;
-	static std::vector<TranslationEntry> translations;
 
 	friend class Singleton<Translator>;
 	Translator();
 	Language currentLang = Language::Enum::EN;
+	std::unordered_map<std::string, std::string> translations;
 };

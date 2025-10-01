@@ -1,6 +1,5 @@
 #include "../../../../include/clients/tcp/open_rgb/open_rgb_client.hpp"
 
-#include <cstdio>
 #include <string>
 #include <vector>
 

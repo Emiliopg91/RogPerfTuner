@@ -88,4 +88,6 @@ class Constants {
 	static const std::string LOGGER_PATTERN;
 
 	static const std::string RCDCC_SOCKET_PATH;
+
+	static const std::string TRANSLATIONS_FILE;
 };

@@ -61,7 +61,6 @@ build:
 	@rm -rf build/assets/bin
 
 	@python3 resources/scripts/constants.py
-	@python3 resources/scripts/translations.py
 
 	@echo "Formatting code..."
 	@clang-format -i $$(find RogControlCenter -name '*.cpp' -o -name '*.hpp')
@@ -69,6 +68,7 @@ build:
 	@cmake --build build -- -j$(NUM_CORES)
 
 	@mkdir build/assets/bin build/assets/bin/rgb  build/assets/bin/performance build/assets/bin/steam
+	@cp resources/translations.json build/assets/translations.json
 	@cp build/RogControlCenter/NextEffect build/assets/bin/rgb/nextEffect
 	@cp build/RogControlCenter/IncBrightness build/assets/bin/rgb/incBrightness
 	@cp build/RogControlCenter/DecBrightness build/assets/bin/rgb/decBrightness

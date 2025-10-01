@@ -46,13 +46,14 @@ const std::string Constants::TMP_UDEV_PATH	   = "/tmp/60-openrgb.rules";
 const std::string Constants::LOCK_FILE		   = "/tmp/RogControlCenter.lock";
 const std::string Constants::SOCKET_FILE	   = "/tmp/RogControlCenter.sock";
 
-const std::string Constants::ASSETS_BIN_DIR	  = ASSETS_DIR + "/bin";
-const std::string Constants::ASSET_ICONS_DIR  = ASSETS_DIR + "/icons";
-const std::string Constants::ASSET_ICON_FILE  = ASSETS_DIR + "/icons/icon.svg";
-const std::string Constants::ORGB_DIR		  = ASSETS_DIR + "/OpenRGB";
-const std::string Constants::ORGB_UDEV_PATH	  = ASSETS_DIR + "/OpenRGB/usr/lib/udev/rules.d/60-openrgb.rules";
-const std::string Constants::ORGB_PATH		  = ASSETS_DIR + "/OpenRGB/OpenRGB.sh";
-const std::string Constants::RCCDC_ASSET_PATH = ASSETS_DIR + "/RccDeckyCompanion";
+const std::string Constants::ASSETS_BIN_DIR	   = ASSETS_DIR + "/bin";
+const std::string Constants::TRANSLATIONS_FILE = ASSETS_DIR + "/translations.json";
+const std::string Constants::ASSET_ICONS_DIR   = ASSETS_DIR + "/icons";
+const std::string Constants::ASSET_ICON_FILE   = ASSETS_DIR + "/icons/icon.svg";
+const std::string Constants::ORGB_DIR		   = ASSETS_DIR + "/OpenRGB";
+const std::string Constants::ORGB_UDEV_PATH	   = ASSETS_DIR + "/OpenRGB/usr/lib/udev/rules.d/60-openrgb.rules";
+const std::string Constants::ORGB_PATH		   = ASSETS_DIR + "/OpenRGB/OpenRGB.sh";
+const std::string Constants::RCCDC_ASSET_PATH  = ASSETS_DIR + "/RccDeckyCompanion";
 
 const std::string Constants::AUTOSTART_FILE		 = HOME_DIR + "/.config/autostart/RogControlCenter.desktop";
 const std::string Constants::APP_DRAW_FILE		 = HOME_DIR + "/.local/share/applications/RogControlCenter.desktop";
