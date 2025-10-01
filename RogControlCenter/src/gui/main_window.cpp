@@ -36,7 +36,7 @@ MainWindow::MainWindow(QWidget* parent) : QMainWindow(parent), _logger(new Logge
 	// -------------------------
 	QLabel* imageLabel = new QLabel();
 	QPixmap pixmap(QString::fromStdString(Constants::ICON_FILE));
-	QPixmap scaledPixmap = pixmap.scaled(200, 200, Qt::KeepAspectRatio, Qt::SmoothTransformation);
+	QPixmap scaledPixmap = pixmap.scaled(250, 230, Qt::KeepAspectRatio, Qt::SmoothTransformation);
 	imageLabel->setPixmap(scaledPixmap);
 	imageLabel->setAlignment(Qt::AlignCenter);
 	mainLayout->addWidget(imageLabel, 0, Qt::AlignCenter);
