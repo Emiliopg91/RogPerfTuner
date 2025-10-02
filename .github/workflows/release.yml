@@ -1,4 +1,4 @@
-name: Release AppImage
+name: Release AppImage and PKGBUILD
 
 on:
   push:
