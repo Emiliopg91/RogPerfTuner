@@ -2,15 +2,14 @@
 <img src="./resources/icons/icon.svg" alt="RogControlCenter logo" width="300">
   <br>
   RogControlCenter
+  <br>  
+  <p align="center">
+    <a href="https://github.com/Emiliopg91/RogControlCenter/releases"><img src="https://img.shields.io/github/downloads/Emiliopg91/RogControlCenter/total" /></a>
+    <a href="https://github.com/Emiliopg91/RogControlCenter/actions/workflows/release.yml"><img src="https://github.com/Emiliopg91/RogControlCenter/actions/workflows/release.yml/badge.svg" /></a>
+    <a href="https://deepwiki.com/Emiliopg91/RogControlCenter"><img src="https://deepwiki.com/badge.svg" /></a>
+    <br>
+  </p>
 </h1>
-
-<p align="center">
-  <a href="https://github.com/Emiliopg91/RogControlCenter/releases"><img src="https://img.shields.io/github/downloads/Emiliopg91/RogControlCenter/total" /></a>
-  <a href="https://github.com/Emiliopg91/RogControlCenter/actions/workflows/release.yml"><img src="https://github.com/Emiliopg91/RogControlCenter/actions/workflows/release.yml/badge.svg" /></a>
-  <a href="https://deepwiki.com/Emiliopg91/RogControlCenter"><img src="https://deepwiki.com/badge.svg" /></a>
-  <br>
-</p>
-
 
 - [Description](#description)
   
