@@ -42,7 +42,7 @@ Do you want something similar for Asus Rog Ally/Ally X? Check [AllyDeckyCompanio
   - CPU Scheduler
   - GPU TGP
   - GPU Thermal throttling policy
-  - Fan curves
+  - Fan curves, customizable via charts
   - Power profile
   - SSD IO scheduler
 
