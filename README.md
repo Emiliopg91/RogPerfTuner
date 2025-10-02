@@ -1,8 +1,12 @@
+<img src="./resources/icons/icon.svg" alt="Alt Text" width="300">
+
 # RogControlCenter
 
 [![Ask DeepWiki](https://deepwiki.com/badge.svg)](https://deepwiki.com/Emiliopg91/RogControlCenter)
 [![Release](https://github.com/Emiliopg91/RogControlCenter/actions/workflows/release.yml/badge.svg)](https://github.com/Emiliopg91/RogControlCenter/actions/workflows/release.yml)
 [![Downloads](https://img.shields.io/github/downloads/Emiliopg91/RogControlCenter/total.svg)](https://github.com/Emiliopg91/RogControlCenter/releases)
+
+
 
 - [Description](#description)
   
