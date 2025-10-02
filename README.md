@@ -73,20 +73,25 @@ Do you want something similar for Asus Rog Ally/Ally X? Check [AllyDeckyCompanio
 - [x] Steam integration through Decky plugin
   - Interception of game first run to change it's launch option to use our custom wrapper
   - Force use of dGPU or letting Linux select for you
-  - Show performance metrics (may not work with flatpak applications)
-  - Process CPU and IO priority
+  - Show performance metrics
+  - Adjust process CPU and IO priority
+  - Support for flatpak added
 
 - [x] Start on boot
 
 - [x] Autoupdates
 
-- [x] Portable AppImage or RPM package  
+- [x] Portable AppImage or PKGBUILD for AUR
 
 ## Requirements
-- asusctl 6.1.12 or later
+- asusctl 6.1.12 or later - Platform control
+- Qt6 - for user interface
+- libsecret - for secure storage of password
+- power-profiles-daemon - for adjusting energy saving policy
+- zlib - for file access utilities 
 
 ## Compatibility
-- Tested on Bazzite based on Fedora 41/42 with KDE environment
+- Tested on CachyOS and Bazzite with KDE desktop environment
 - Only tested on Laptops with Intel+Nvidia settings
 
 ## Attribution
