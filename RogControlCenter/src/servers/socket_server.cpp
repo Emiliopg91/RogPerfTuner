@@ -146,6 +146,7 @@ void SocketServer::handleClient(int client_fd) {
 				handleRequest(client_fd, req);
 			}
 
+			Logger::rem_tab();
 		} catch (const std::exception& e) {
 			logger.error("JSON parse error: " + std::string(e.what()));
 		}
