@@ -1,0 +1,420 @@
+oct 02 11:53:53 AsusRogStrix systemd[1]: Starting Docker Application Container Engine...
+░░ Subject: A start job for unit docker.service has begun execution
+░░ Defined-By: systemd
+░░ Support: https://lists.freedesktop.org/mailman/listinfo/systemd-devel
+░░ 
+░░ A start job for unit docker.service has begun execution.
+░░ 
+░░ The job identifier is 16722.
+oct 02 11:53:53 AsusRogStrix dockerd[115394]: time="2025-10-02T11:53:53.444523720+02:00" level=info msg="Starting up"
+oct 02 11:53:53 AsusRogStrix dockerd[115394]: time="2025-10-02T11:53:53.444847688+02:00" level=info msg="OTEL tracing is not configured, using no-op tracer provider"
+oct 02 11:53:53 AsusRogStrix dockerd[115394]: time="2025-10-02T11:53:53.444890227+02:00" level=info msg="CDI directory does not exist, skipping: failed to monitor for changes: no such file or directory" dir=/etc/cdi
+oct 02 11:53:53 AsusRogStrix dockerd[115394]: time="2025-10-02T11:53:53.444903458+02:00" level=info msg="CDI directory does not exist, skipping: failed to monitor for changes: no such file or directory" dir=/var/run/cdi
+oct 02 11:53:53 AsusRogStrix dockerd[115394]: time="2025-10-02T11:53:53.444944327+02:00" level=info msg="detected 127.0.0.53 nameserver, assuming systemd-resolved, so using resolv.conf: /run/systemd/resolve/resolv.conf"
+oct 02 11:53:53 AsusRogStrix dockerd[115394]: time="2025-10-02T11:53:53.451739023+02:00" level=info msg="Creating a containerd client" address=/run/containerd/containerd.sock timeout=1m0s
+oct 02 11:53:53 AsusRogStrix dockerd[115394]: time="2025-10-02T11:53:53.494787332+02:00" level=error msg="failed to mount overlay: no such device" storage-driver=overlay2
+oct 02 11:53:53 AsusRogStrix dockerd[115394]: time="2025-10-02T11:53:53.494806667+02:00" level=error msg="exec: \"fuse-overlayfs\": executable file not found in $PATH" storage-driver=fuse-overlayfs
+oct 02 11:53:53 AsusRogStrix dockerd[115394]: time="2025-10-02T11:53:53.499839866+02:00" level=info msg="Loading containers: start."
+oct 02 11:53:53 AsusRogStrix dockerd[115394]: time="2025-10-02T11:53:53.511449081+02:00" level=warning msg="Could not load necessary modules for IPSEC rules: protocol not supported"
+oct 02 11:53:53 AsusRogStrix dockerd[115394]: time="2025-10-02T11:53:53.560710768+02:00" level=info msg="stopping event stream following graceful shutdown" error="<nil>" module=libcontainerd namespace=moby
+oct 02 11:53:53 AsusRogStrix dockerd[115394]: failed to start daemon: Error initializing network controller: error obtaining controller instance: failed to register "bridge" driver: failed to create NAT chain DOCKER: iptables failed: iptables --wait -t nat -N DOCKER: iptables v1.8.11 (nf_tables): Could not fetch rule set generation id: Invalid argument
+oct 02 11:53:53 AsusRogStrix dockerd[115394]:  (exit status 4)
+oct 02 11:53:53 AsusRogStrix systemd[1]: docker.service: Main process exited, code=exited, status=1/FAILURE
+░░ Subject: Unit process exited
+░░ Defined-By: systemd
+░░ Support: https://lists.freedesktop.org/mailman/listinfo/systemd-devel
+░░ 
+░░ An ExecStart= process belonging to unit docker.service has exited.
+░░ 
+░░ The process' exit code is 'exited' and its exit status is 1.
+oct 02 11:53:53 AsusRogStrix systemd[1]: docker.service: Failed with result 'exit-code'.
+░░ Subject: Unit failed
+░░ Defined-By: systemd
+░░ Support: https://lists.freedesktop.org/mailman/listinfo/systemd-devel
+░░ 
+░░ The unit docker.service has entered the 'failed' state with result 'exit-code'.
+oct 02 11:53:53 AsusRogStrix systemd[1]: Failed to start Docker Application Container Engine.
+░░ Subject: A start job for unit docker.service has failed
+░░ Defined-By: systemd
+░░ Support: https://lists.freedesktop.org/mailman/listinfo/systemd-devel
+░░ 
+░░ A start job for unit docker.service has finished with a failure.
+░░ 
+░░ The job identifier is 16722 and the job result is failed.
+oct 02 11:53:55 AsusRogStrix systemd[1]: docker.service: Scheduled restart job, restart counter is at 1.
+░░ Subject: Automatic restarting of a unit has been scheduled
+░░ Defined-By: systemd
+░░ Support: https://lists.freedesktop.org/mailman/listinfo/systemd-devel
+░░ 
+░░ Automatic restarting of the unit docker.service has been scheduled, as the result for
+░░ the configured Restart= setting for the unit.
+oct 02 11:53:55 AsusRogStrix systemd[1]: Starting Docker Application Container Engine...
+░░ Subject: A start job for unit docker.service has begun execution
+░░ Defined-By: systemd
+░░ Support: https://lists.freedesktop.org/mailman/listinfo/systemd-devel
+░░ 
+░░ A start job for unit docker.service has begun execution.
+░░ 
+░░ The job identifier is 16894.
+oct 02 11:53:55 AsusRogStrix dockerd[115494]: time="2025-10-02T11:53:55.818544948+02:00" level=info msg="Starting up"
+oct 02 11:53:55 AsusRogStrix dockerd[115494]: time="2025-10-02T11:53:55.819039151+02:00" level=info msg="OTEL tracing is not configured, using no-op tracer provider"
+oct 02 11:53:55 AsusRogStrix dockerd[115494]: time="2025-10-02T11:53:55.819078781+02:00" level=info msg="CDI directory does not exist, skipping: failed to monitor for changes: no such file or directory" dir=/etc/cdi
+oct 02 11:53:55 AsusRogStrix dockerd[115494]: time="2025-10-02T11:53:55.819086718+02:00" level=info msg="CDI directory does not exist, skipping: failed to monitor for changes: no such file or directory" dir=/var/run/cdi
+oct 02 11:53:55 AsusRogStrix dockerd[115494]: time="2025-10-02T11:53:55.819114083+02:00" level=info msg="detected 127.0.0.53 nameserver, assuming systemd-resolved, so using resolv.conf: /run/systemd/resolve/resolv.conf"
+oct 02 11:53:55 AsusRogStrix dockerd[115494]: time="2025-10-02T11:53:55.825119109+02:00" level=info msg="Creating a containerd client" address=/run/containerd/containerd.sock timeout=1m0s
+oct 02 11:53:55 AsusRogStrix dockerd[115494]: time="2025-10-02T11:53:55.852170744+02:00" level=error msg="failed to mount overlay: no such device" storage-driver=overlay2
+oct 02 11:53:55 AsusRogStrix dockerd[115494]: time="2025-10-02T11:53:55.852186359+02:00" level=error msg="exec: \"fuse-overlayfs\": executable file not found in $PATH" storage-driver=fuse-overlayfs
+oct 02 11:53:55 AsusRogStrix dockerd[115494]: time="2025-10-02T11:53:55.852340537+02:00" level=info msg="Loading containers: start."
+oct 02 11:53:55 AsusRogStrix dockerd[115494]: time="2025-10-02T11:53:55.853495137+02:00" level=warning msg="Could not load necessary modules for IPSEC rules: protocol not supported"
+oct 02 11:53:55 AsusRogStrix dockerd[115494]: time="2025-10-02T11:53:55.896616951+02:00" level=info msg="stopping event stream following graceful shutdown" error="<nil>" module=libcontainerd namespace=moby
+oct 02 11:53:55 AsusRogStrix dockerd[115494]: time="2025-10-02T11:53:55.896752917+02:00" level=info msg="stopping event stream following graceful shutdown" error="context canceled" module=libcontainerd namespace=plugins.moby
+oct 02 11:53:55 AsusRogStrix dockerd[115494]: failed to start daemon: Error initializing network controller: error obtaining controller instance: failed to register "bridge" driver: failed to create NAT chain DOCKER: iptables failed: iptables --wait -t nat -N DOCKER: iptables v1.8.11 (nf_tables): Could not fetch rule set generation id: Invalid argument
+oct 02 11:53:55 AsusRogStrix dockerd[115494]:  (exit status 4)
+oct 02 11:53:55 AsusRogStrix systemd[1]: docker.service: Main process exited, code=exited, status=1/FAILURE
+░░ Subject: Unit process exited
+░░ Defined-By: systemd
+░░ Support: https://lists.freedesktop.org/mailman/listinfo/systemd-devel
+░░ 
+░░ An ExecStart= process belonging to unit docker.service has exited.
+░░ 
+░░ The process' exit code is 'exited' and its exit status is 1.
+oct 02 11:53:55 AsusRogStrix systemd[1]: docker.service: Failed with result 'exit-code'.
+░░ Subject: Unit failed
+░░ Defined-By: systemd
+░░ Support: https://lists.freedesktop.org/mailman/listinfo/systemd-devel
+░░ 
+░░ The unit docker.service has entered the 'failed' state with result 'exit-code'.
+oct 02 11:53:55 AsusRogStrix systemd[1]: Failed to start Docker Application Container Engine.
+░░ Subject: A start job for unit docker.service has failed
+░░ Defined-By: systemd
+░░ Support: https://lists.freedesktop.org/mailman/listinfo/systemd-devel
+░░ 
+░░ A start job for unit docker.service has finished with a failure.
+░░ 
+░░ The job identifier is 16894 and the job result is failed.
+oct 02 11:53:58 AsusRogStrix systemd[1]: docker.service: Scheduled restart job, restart counter is at 2.
+░░ Subject: Automatic restarting of a unit has been scheduled
+░░ Defined-By: systemd
+░░ Support: https://lists.freedesktop.org/mailman/listinfo/systemd-devel
+░░ 
+░░ Automatic restarting of the unit docker.service has been scheduled, as the result for
+░░ the configured Restart= setting for the unit.
+oct 02 11:53:58 AsusRogStrix systemd[1]: Starting Docker Application Container Engine...
+░░ Subject: A start job for unit docker.service has begun execution
+░░ Defined-By: systemd
+░░ Support: https://lists.freedesktop.org/mailman/listinfo/systemd-devel
+░░ 
+░░ A start job for unit docker.service has begun execution.
+░░ 
+░░ The job identifier is 17066.
+oct 02 11:53:58 AsusRogStrix dockerd[115578]: time="2025-10-02T11:53:58.064299087+02:00" level=info msg="Starting up"
+oct 02 11:53:58 AsusRogStrix dockerd[115578]: time="2025-10-02T11:53:58.064534100+02:00" level=info msg="OTEL tracing is not configured, using no-op tracer provider"
+oct 02 11:53:58 AsusRogStrix dockerd[115578]: time="2025-10-02T11:53:58.064560370+02:00" level=info msg="CDI directory does not exist, skipping: failed to monitor for changes: no such file or directory" dir=/etc/cdi
+oct 02 11:53:58 AsusRogStrix dockerd[115578]: time="2025-10-02T11:53:58.064564861+02:00" level=info msg="CDI directory does not exist, skipping: failed to monitor for changes: no such file or directory" dir=/var/run/cdi
+oct 02 11:53:58 AsusRogStrix dockerd[115578]: time="2025-10-02T11:53:58.064746506+02:00" level=info msg="detected 127.0.0.53 nameserver, assuming systemd-resolved, so using resolv.conf: /run/systemd/resolve/resolv.conf"
+oct 02 11:53:58 AsusRogStrix dockerd[115578]: time="2025-10-02T11:53:58.070617554+02:00" level=info msg="Creating a containerd client" address=/run/containerd/containerd.sock timeout=1m0s
+oct 02 11:53:58 AsusRogStrix dockerd[115578]: time="2025-10-02T11:53:58.097337852+02:00" level=error msg="failed to mount overlay: no such device" storage-driver=overlay2
+oct 02 11:53:58 AsusRogStrix dockerd[115578]: time="2025-10-02T11:53:58.097350582+02:00" level=error msg="exec: \"fuse-overlayfs\": executable file not found in $PATH" storage-driver=fuse-overlayfs
+oct 02 11:53:58 AsusRogStrix dockerd[115578]: time="2025-10-02T11:53:58.097450226+02:00" level=info msg="Loading containers: start."
+oct 02 11:53:58 AsusRogStrix dockerd[115578]: time="2025-10-02T11:53:58.098672981+02:00" level=warning msg="Could not load necessary modules for IPSEC rules: protocol not supported"
+oct 02 11:53:58 AsusRogStrix dockerd[115578]: time="2025-10-02T11:53:58.142291418+02:00" level=info msg="stopping event stream following graceful shutdown" error="<nil>" module=libcontainerd namespace=moby
+oct 02 11:53:58 AsusRogStrix dockerd[115578]: failed to start daemon: Error initializing network controller: error obtaining controller instance: failed to register "bridge" driver: failed to create NAT chain DOCKER: iptables failed: iptables --wait -t nat -N DOCKER: iptables v1.8.11 (nf_tables): Could not fetch rule set generation id: Invalid argument
+oct 02 11:53:58 AsusRogStrix dockerd[115578]:  (exit status 4)
+oct 02 11:53:58 AsusRogStrix systemd[1]: docker.service: Main process exited, code=exited, status=1/FAILURE
+░░ Subject: Unit process exited
+░░ Defined-By: systemd
+░░ Support: https://lists.freedesktop.org/mailman/listinfo/systemd-devel
+░░ 
+░░ An ExecStart= process belonging to unit docker.service has exited.
+░░ 
+░░ The process' exit code is 'exited' and its exit status is 1.
+oct 02 11:53:58 AsusRogStrix systemd[1]: docker.service: Failed with result 'exit-code'.
+░░ Subject: Unit failed
+░░ Defined-By: systemd
+░░ Support: https://lists.freedesktop.org/mailman/listinfo/systemd-devel
+░░ 
+░░ The unit docker.service has entered the 'failed' state with result 'exit-code'.
+oct 02 11:53:58 AsusRogStrix systemd[1]: Failed to start Docker Application Container Engine.
+░░ Subject: A start job for unit docker.service has failed
+░░ Defined-By: systemd
+░░ Support: https://lists.freedesktop.org/mailman/listinfo/systemd-devel
+░░ 
+░░ A start job for unit docker.service has finished with a failure.
+░░ 
+░░ The job identifier is 17066 and the job result is failed.
+oct 02 11:54:00 AsusRogStrix systemd[1]: docker.service: Scheduled restart job, restart counter is at 3.
+░░ Subject: Automatic restarting of a unit has been scheduled
+░░ Defined-By: systemd
+░░ Support: https://lists.freedesktop.org/mailman/listinfo/systemd-devel
+░░ 
+░░ Automatic restarting of the unit docker.service has been scheduled, as the result for
+░░ the configured Restart= setting for the unit.
+oct 02 11:54:00 AsusRogStrix systemd[1]: docker.service: Start request repeated too quickly.
+oct 02 11:54:00 AsusRogStrix systemd[1]: docker.service: Failed with result 'exit-code'.
+░░ Subject: Unit failed
+░░ Defined-By: systemd
+░░ Support: https://lists.freedesktop.org/mailman/listinfo/systemd-devel
+░░ 
+░░ The unit docker.service has entered the 'failed' state with result 'exit-code'.
+oct 02 11:54:00 AsusRogStrix systemd[1]: Failed to start Docker Application Container Engine.
+░░ Subject: A start job for unit docker.service has failed
+░░ Defined-By: systemd
+░░ Support: https://lists.freedesktop.org/mailman/listinfo/systemd-devel
+░░ 
+░░ A start job for unit docker.service has finished with a failure.
+░░ 
+░░ The job identifier is 17238 and the job result is failed.
+oct 02 11:55:14 AsusRogStrix systemd[1]: Starting Docker Application Container Engine...
+░░ Subject: A start job for unit docker.service has begun execution
+░░ Defined-By: systemd
+░░ Support: https://lists.freedesktop.org/mailman/listinfo/systemd-devel
+░░ 
+░░ A start job for unit docker.service has begun execution.
+░░ 
+░░ The job identifier is 17575.
+oct 02 11:55:14 AsusRogStrix dockerd[115909]: time="2025-10-02T11:55:14.025601217+02:00" level=info msg="Starting up"
+oct 02 11:55:14 AsusRogStrix dockerd[115909]: time="2025-10-02T11:55:14.025903780+02:00" level=info msg="OTEL tracing is not configured, using no-op tracer provider"
+oct 02 11:55:14 AsusRogStrix dockerd[115909]: time="2025-10-02T11:55:14.025953695+02:00" level=info msg="CDI directory does not exist, skipping: failed to monitor for changes: no such file or directory" dir=/etc/cdi
+oct 02 11:55:14 AsusRogStrix dockerd[115909]: time="2025-10-02T11:55:14.025964559+02:00" level=info msg="CDI directory does not exist, skipping: failed to monitor for changes: no such file or directory" dir=/var/run/cdi
+oct 02 11:55:14 AsusRogStrix dockerd[115909]: time="2025-10-02T11:55:14.026013863+02:00" level=info msg="detected 127.0.0.53 nameserver, assuming systemd-resolved, so using resolv.conf: /run/systemd/resolve/resolv.conf"
+oct 02 11:55:14 AsusRogStrix dockerd[115909]: time="2025-10-02T11:55:14.032237489+02:00" level=info msg="Creating a containerd client" address=/run/containerd/containerd.sock timeout=1m0s
+oct 02 11:55:14 AsusRogStrix dockerd[115909]: time="2025-10-02T11:55:14.054636185+02:00" level=error msg="failed to mount overlay: no such device" storage-driver=overlay2
+oct 02 11:55:14 AsusRogStrix dockerd[115909]: time="2025-10-02T11:55:14.059436141+02:00" level=info msg="Loading containers: start."
+oct 02 11:55:14 AsusRogStrix dockerd[115909]: time="2025-10-02T11:55:14.060824151+02:00" level=warning msg="Could not load necessary modules for IPSEC rules: protocol not supported"
+oct 02 11:55:14 AsusRogStrix dockerd[115909]: time="2025-10-02T11:55:14.105567890+02:00" level=info msg="stopping event stream following graceful shutdown" error="<nil>" module=libcontainerd namespace=moby
+oct 02 11:55:14 AsusRogStrix dockerd[115909]: failed to start daemon: Error initializing network controller: error obtaining controller instance: failed to register "bridge" driver: failed to create NAT chain DOCKER: iptables failed: iptables --wait -t nat -N DOCKER: iptables v1.8.11 (nf_tables): Could not fetch rule set generation id: Invalid argument
+oct 02 11:55:14 AsusRogStrix dockerd[115909]:  (exit status 4)
+oct 02 11:55:14 AsusRogStrix systemd[1]: docker.service: Main process exited, code=exited, status=1/FAILURE
+░░ Subject: Unit process exited
+░░ Defined-By: systemd
+░░ Support: https://lists.freedesktop.org/mailman/listinfo/systemd-devel
+░░ 
+░░ An ExecStart= process belonging to unit docker.service has exited.
+░░ 
+░░ The process' exit code is 'exited' and its exit status is 1.
+oct 02 11:55:14 AsusRogStrix systemd[1]: docker.service: Failed with result 'exit-code'.
+░░ Subject: Unit failed
+░░ Defined-By: systemd
+░░ Support: https://lists.freedesktop.org/mailman/listinfo/systemd-devel
+░░ 
+░░ The unit docker.service has entered the 'failed' state with result 'exit-code'.
+oct 02 11:55:14 AsusRogStrix systemd[1]: Failed to start Docker Application Container Engine.
+░░ Subject: A start job for unit docker.service has failed
+░░ Defined-By: systemd
+░░ Support: https://lists.freedesktop.org/mailman/listinfo/systemd-devel
+░░ 
+░░ A start job for unit docker.service has finished with a failure.
+░░ 
+░░ The job identifier is 17575 and the job result is failed.
+oct 02 11:55:16 AsusRogStrix systemd[1]: docker.service: Scheduled restart job, restart counter is at 1.
+░░ Subject: Automatic restarting of a unit has been scheduled
+░░ Defined-By: systemd
+░░ Support: https://lists.freedesktop.org/mailman/listinfo/systemd-devel
+░░ 
+░░ Automatic restarting of the unit docker.service has been scheduled, as the result for
+░░ the configured Restart= setting for the unit.
+oct 02 11:55:16 AsusRogStrix systemd[1]: Starting Docker Application Container Engine...
+░░ Subject: A start job for unit docker.service has begun execution
+░░ Defined-By: systemd
+░░ Support: https://lists.freedesktop.org/mailman/listinfo/systemd-devel
+░░ 
+░░ A start job for unit docker.service has begun execution.
+░░ 
+░░ The job identifier is 17747.
+oct 02 11:55:16 AsusRogStrix dockerd[116008]: time="2025-10-02T11:55:16.315895340+02:00" level=info msg="Starting up"
+oct 02 11:55:16 AsusRogStrix dockerd[116008]: time="2025-10-02T11:55:16.316088406+02:00" level=info msg="OTEL tracing is not configured, using no-op tracer provider"
+oct 02 11:55:16 AsusRogStrix dockerd[116008]: time="2025-10-02T11:55:16.316113044+02:00" level=info msg="CDI directory does not exist, skipping: failed to monitor for changes: no such file or directory" dir=/var/run/cdi
+oct 02 11:55:16 AsusRogStrix dockerd[116008]: time="2025-10-02T11:55:16.316117319+02:00" level=info msg="CDI directory does not exist, skipping: failed to monitor for changes: no such file or directory" dir=/etc/cdi
+oct 02 11:55:16 AsusRogStrix dockerd[116008]: time="2025-10-02T11:55:16.316141235+02:00" level=info msg="detected 127.0.0.53 nameserver, assuming systemd-resolved, so using resolv.conf: /run/systemd/resolve/resolv.conf"
+oct 02 11:55:16 AsusRogStrix dockerd[116008]: time="2025-10-02T11:55:16.322047384+02:00" level=info msg="Creating a containerd client" address=/run/containerd/containerd.sock timeout=1m0s
+oct 02 11:55:16 AsusRogStrix dockerd[116008]: time="2025-10-02T11:55:16.342643382+02:00" level=info msg="[graphdriver] using prior storage driver: fuse-overlayfs"
+oct 02 11:55:16 AsusRogStrix dockerd[116008]: time="2025-10-02T11:55:16.342688831+02:00" level=info msg="Loading containers: start."
+oct 02 11:55:16 AsusRogStrix dockerd[116008]: time="2025-10-02T11:55:16.343994087+02:00" level=warning msg="Could not load necessary modules for IPSEC rules: protocol not supported"
+oct 02 11:55:16 AsusRogStrix dockerd[116008]: time="2025-10-02T11:55:16.391294303+02:00" level=info msg="stopping event stream following graceful shutdown" error="<nil>" module=libcontainerd namespace=moby
+oct 02 11:55:16 AsusRogStrix dockerd[116008]: failed to start daemon: Error initializing network controller: error obtaining controller instance: failed to register "bridge" driver: failed to create NAT chain DOCKER: iptables failed: iptables --wait -t nat -N DOCKER: iptables v1.8.11 (nf_tables): Could not fetch rule set generation id: Invalid argument
+oct 02 11:55:16 AsusRogStrix dockerd[116008]:  (exit status 4)
+oct 02 11:55:16 AsusRogStrix systemd[1]: docker.service: Main process exited, code=exited, status=1/FAILURE
+░░ Subject: Unit process exited
+░░ Defined-By: systemd
+░░ Support: https://lists.freedesktop.org/mailman/listinfo/systemd-devel
+░░ 
+░░ An ExecStart= process belonging to unit docker.service has exited.
+░░ 
+░░ The process' exit code is 'exited' and its exit status is 1.
+oct 02 11:55:16 AsusRogStrix systemd[1]: docker.service: Failed with result 'exit-code'.
+░░ Subject: Unit failed
+░░ Defined-By: systemd
+░░ Support: https://lists.freedesktop.org/mailman/listinfo/systemd-devel
+░░ 
+░░ The unit docker.service has entered the 'failed' state with result 'exit-code'.
+oct 02 11:55:16 AsusRogStrix systemd[1]: Failed to start Docker Application Container Engine.
+░░ Subject: A start job for unit docker.service has failed
+░░ Defined-By: systemd
+░░ Support: https://lists.freedesktop.org/mailman/listinfo/systemd-devel
+░░ 
+░░ A start job for unit docker.service has finished with a failure.
+░░ 
+░░ The job identifier is 17747 and the job result is failed.
+oct 02 11:55:18 AsusRogStrix systemd[1]: docker.service: Scheduled restart job, restart counter is at 2.
+░░ Subject: Automatic restarting of a unit has been scheduled
+░░ Defined-By: systemd
+░░ Support: https://lists.freedesktop.org/mailman/listinfo/systemd-devel
+░░ 
+░░ Automatic restarting of the unit docker.service has been scheduled, as the result for
+░░ the configured Restart= setting for the unit.
+oct 02 11:55:18 AsusRogStrix systemd[1]: Starting Docker Application Container Engine...
+░░ Subject: A start job for unit docker.service has begun execution
+░░ Defined-By: systemd
+░░ Support: https://lists.freedesktop.org/mailman/listinfo/systemd-devel
+░░ 
+░░ A start job for unit docker.service has begun execution.
+░░ 
+░░ The job identifier is 17919.
+oct 02 11:55:18 AsusRogStrix dockerd[116097]: time="2025-10-02T11:55:18.568737035+02:00" level=info msg="Starting up"
+oct 02 11:55:18 AsusRogStrix dockerd[116097]: time="2025-10-02T11:55:18.568942415+02:00" level=info msg="OTEL tracing is not configured, using no-op tracer provider"
+oct 02 11:55:18 AsusRogStrix dockerd[116097]: time="2025-10-02T11:55:18.568971149+02:00" level=info msg="CDI directory does not exist, skipping: failed to monitor for changes: no such file or directory" dir=/etc/cdi
+oct 02 11:55:18 AsusRogStrix dockerd[116097]: time="2025-10-02T11:55:18.568975769+02:00" level=info msg="CDI directory does not exist, skipping: failed to monitor for changes: no such file or directory" dir=/var/run/cdi
+oct 02 11:55:18 AsusRogStrix dockerd[116097]: time="2025-10-02T11:55:18.568997566+02:00" level=info msg="detected 127.0.0.53 nameserver, assuming systemd-resolved, so using resolv.conf: /run/systemd/resolve/resolv.conf"
+oct 02 11:55:18 AsusRogStrix dockerd[116097]: time="2025-10-02T11:55:18.574209403+02:00" level=info msg="Creating a containerd client" address=/run/containerd/containerd.sock timeout=1m0s
+oct 02 11:55:18 AsusRogStrix dockerd[116097]: time="2025-10-02T11:55:18.594265815+02:00" level=info msg="[graphdriver] using prior storage driver: fuse-overlayfs"
+oct 02 11:55:18 AsusRogStrix dockerd[116097]: time="2025-10-02T11:55:18.594314701+02:00" level=info msg="Loading containers: start."
+oct 02 11:55:18 AsusRogStrix dockerd[116097]: time="2025-10-02T11:55:18.595460564+02:00" level=warning msg="Could not load necessary modules for IPSEC rules: protocol not supported"
+oct 02 11:55:18 AsusRogStrix dockerd[116097]: time="2025-10-02T11:55:18.639061529+02:00" level=info msg="stopping event stream following graceful shutdown" error="<nil>" module=libcontainerd namespace=moby
+oct 02 11:55:18 AsusRogStrix dockerd[116097]: failed to start daemon: Error initializing network controller: error obtaining controller instance: failed to register "bridge" driver: failed to create NAT chain DOCKER: iptables failed: iptables --wait -t nat -N DOCKER: iptables v1.8.11 (nf_tables): Could not fetch rule set generation id: Invalid argument
+oct 02 11:55:18 AsusRogStrix dockerd[116097]:  (exit status 4)
+oct 02 11:55:18 AsusRogStrix systemd[1]: docker.service: Main process exited, code=exited, status=1/FAILURE
+░░ Subject: Unit process exited
+░░ Defined-By: systemd
+░░ Support: https://lists.freedesktop.org/mailman/listinfo/systemd-devel
+░░ 
+░░ An ExecStart= process belonging to unit docker.service has exited.
+░░ 
+░░ The process' exit code is 'exited' and its exit status is 1.
+oct 02 11:55:18 AsusRogStrix systemd[1]: docker.service: Failed with result 'exit-code'.
+░░ Subject: Unit failed
+░░ Defined-By: systemd
+░░ Support: https://lists.freedesktop.org/mailman/listinfo/systemd-devel
+░░ 
+░░ The unit docker.service has entered the 'failed' state with result 'exit-code'.
+oct 02 11:55:18 AsusRogStrix systemd[1]: Failed to start Docker Application Container Engine.
+░░ Subject: A start job for unit docker.service has failed
+░░ Defined-By: systemd
+░░ Support: https://lists.freedesktop.org/mailman/listinfo/systemd-devel
+░░ 
+░░ A start job for unit docker.service has finished with a failure.
+░░ 
+░░ The job identifier is 17919 and the job result is failed.
+oct 02 11:55:20 AsusRogStrix systemd[1]: docker.service: Scheduled restart job, restart counter is at 3.
+░░ Subject: Automatic restarting of a unit has been scheduled
+░░ Defined-By: systemd
+░░ Support: https://lists.freedesktop.org/mailman/listinfo/systemd-devel
+░░ 
+░░ Automatic restarting of the unit docker.service has been scheduled, as the result for
+░░ the configured Restart= setting for the unit.
+oct 02 11:55:20 AsusRogStrix systemd[1]: docker.service: Start request repeated too quickly.
+oct 02 11:55:20 AsusRogStrix systemd[1]: docker.service: Failed with result 'exit-code'.
+░░ Subject: Unit failed
+░░ Defined-By: systemd
+░░ Support: https://lists.freedesktop.org/mailman/listinfo/systemd-devel
+░░ 
+░░ The unit docker.service has entered the 'failed' state with result 'exit-code'.
+oct 02 11:55:20 AsusRogStrix systemd[1]: Failed to start Docker Application Container Engine.
+░░ Subject: A start job for unit docker.service has failed
+░░ Defined-By: systemd
+░░ Support: https://lists.freedesktop.org/mailman/listinfo/systemd-devel
+░░ 
+░░ A start job for unit docker.service has finished with a failure.
+░░ 
+░░ The job identifier is 18091 and the job result is failed.
+oct 02 11:56:24 AsusRogStrix systemd[1]: Starting Docker Application Container Engine...
+░░ Subject: A start job for unit docker.service has begun execution
+░░ Defined-By: systemd
+░░ Support: https://lists.freedesktop.org/mailman/listinfo/systemd-devel
+░░ 
+░░ A start job for unit docker.service has begun execution.
+░░ 
+░░ The job identifier is 18428.
+oct 02 11:56:24 AsusRogStrix dockerd[116992]: time="2025-10-02T11:56:24.413775335+02:00" level=info msg="Starting up"
+oct 02 11:56:24 AsusRogStrix dockerd[116992]: time="2025-10-02T11:56:24.413983071+02:00" level=info msg="OTEL tracing is not configured, using no-op tracer provider"
+oct 02 11:56:24 AsusRogStrix dockerd[116992]: time="2025-10-02T11:56:24.414010454+02:00" level=info msg="CDI directory does not exist, skipping: failed to monitor for changes: no such file or directory" dir=/etc/cdi
+oct 02 11:56:24 AsusRogStrix dockerd[116992]: time="2025-10-02T11:56:24.414014543+02:00" level=info msg="CDI directory does not exist, skipping: failed to monitor for changes: no such file or directory" dir=/var/run/cdi
+oct 02 11:56:24 AsusRogStrix dockerd[116992]: time="2025-10-02T11:56:24.414037744+02:00" level=info msg="detected 127.0.0.53 nameserver, assuming systemd-resolved, so using resolv.conf: /run/systemd/resolve/resolv.conf"
+oct 02 11:56:24 AsusRogStrix dockerd[116992]: time="2025-10-02T11:56:24.419098920+02:00" level=info msg="Creating a containerd client" address=/run/containerd/containerd.sock timeout=1m0s
+oct 02 11:56:24 AsusRogStrix dockerd[116992]: time="2025-10-02T11:56:24.439569355+02:00" level=info msg="[graphdriver] using prior storage driver: fuse-overlayfs"
+oct 02 11:56:24 AsusRogStrix dockerd[116992]: time="2025-10-02T11:56:24.439613131+02:00" level=info msg="Loading containers: start."
+oct 02 11:56:24 AsusRogStrix dockerd[116992]: time="2025-10-02T11:56:24.440856557+02:00" level=warning msg="Could not load necessary modules for IPSEC rules: protocol not supported"
+oct 02 11:56:24 AsusRogStrix dockerd[116992]: time="2025-10-02T11:56:24.487932493+02:00" level=info msg="stopping event stream following graceful shutdown" error="<nil>" module=libcontainerd namespace=moby
+oct 02 11:56:24 AsusRogStrix dockerd[116992]: time="2025-10-02T11:56:24.488016622+02:00" level=info msg="stopping event stream following graceful shutdown" error="context canceled" module=libcontainerd namespace=plugins.moby
+oct 02 11:56:24 AsusRogStrix dockerd[116992]: failed to start daemon: Error initializing network controller: error obtaining controller instance: failed to register "bridge" driver: failed to create NAT chain DOCKER: iptables failed: iptables --wait -t nat -N DOCKER: iptables v1.8.11 (nf_tables): Could not fetch rule set generation id: Invalid argument
+oct 02 11:56:24 AsusRogStrix dockerd[116992]:  (exit status 4)
+oct 02 11:56:24 AsusRogStrix systemd[1]: docker.service: Main process exited, code=exited, status=1/FAILURE
+░░ Subject: Unit process exited
+░░ Defined-By: systemd
+░░ Support: https://lists.freedesktop.org/mailman/listinfo/systemd-devel
+░░ 
+░░ An ExecStart= process belonging to unit docker.service has exited.
+░░ 
+░░ The process' exit code is 'exited' and its exit status is 1.
+oct 02 11:56:24 AsusRogStrix systemd[1]: docker.service: Failed with result 'exit-code'.
+░░ Subject: Unit failed
+░░ Defined-By: systemd
+░░ Support: https://lists.freedesktop.org/mailman/listinfo/systemd-devel
+░░ 
+░░ The unit docker.service has entered the 'failed' state with result 'exit-code'.
+oct 02 11:56:24 AsusRogStrix systemd[1]: Failed to start Docker Application Container Engine.
+░░ Subject: A start job for unit docker.service has failed
+░░ Defined-By: systemd
+░░ Support: https://lists.freedesktop.org/mailman/listinfo/systemd-devel
+░░ 
+░░ A start job for unit docker.service has finished with a failure.
+░░ 
+░░ The job identifier is 18428 and the job result is failed.
+oct 02 11:56:26 AsusRogStrix systemd[1]: docker.service: Scheduled restart job, restart counter is at 1.
+░░ Subject: Automatic restarting of a unit has been scheduled
+░░ Defined-By: systemd
+░░ Support: https://lists.freedesktop.org/mailman/listinfo/systemd-devel
+░░ 
+░░ Automatic restarting of the unit docker.service has been scheduled, as the result for
+░░ the configured Restart= setting for the unit.
+oct 02 11:56:26 AsusRogStrix systemd[1]: Starting Docker Application Container Engine...
+░░ Subject: A start job for unit docker.service has begun execution
+░░ Defined-By: systemd
+░░ Support: https://lists.freedesktop.org/mailman/listinfo/systemd-devel
+░░ 
+░░ A start job for unit docker.service has begun execution.
+░░ 
+░░ The job identifier is 18600.
+oct 02 11:56:26 AsusRogStrix dockerd[117091]: time="2025-10-02T11:56:26.557465693+02:00" level=info msg="Starting up"
+oct 02 11:56:26 AsusRogStrix dockerd[117091]: time="2025-10-02T11:56:26.557714074+02:00" level=info msg="OTEL tracing is not configured, using no-op tracer provider"
+oct 02 11:56:26 AsusRogStrix dockerd[117091]: time="2025-10-02T11:56:26.557752040+02:00" level=info msg="CDI directory does not exist, skipping: failed to monitor for changes: no such file or directory" dir=/etc/cdi
+oct 02 11:56:26 AsusRogStrix dockerd[117091]: time="2025-10-02T11:56:26.557756132+02:00" level=info msg="CDI directory does not exist, skipping: failed to monitor for changes: no such file or directory" dir=/var/run/cdi
+oct 02 11:56:26 AsusRogStrix dockerd[117091]: time="2025-10-02T11:56:26.557778068+02:00" level=info msg="detected 127.0.0.53 nameserver, assuming systemd-resolved, so using resolv.conf: /run/systemd/resolve/resolv.conf"
+oct 02 11:56:26 AsusRogStrix dockerd[117091]: time="2025-10-02T11:56:26.562850857+02:00" level=info msg="Creating a containerd client" address=/run/containerd/containerd.sock timeout=1m0s
+oct 02 11:56:26 AsusRogStrix dockerd[117091]: time="2025-10-02T11:56:26.583317130+02:00" level=info msg="[graphdriver] using prior storage driver: fuse-overlayfs"
+oct 02 11:56:26 AsusRogStrix dockerd[117091]: time="2025-10-02T11:56:26.583366101+02:00" level=info msg="Loading containers: start."
+oct 02 11:56:26 AsusRogStrix dockerd[117091]: time="2025-10-02T11:56:26.584871791+02:00" level=warning msg="Could not load necessary modules for IPSEC rules: protocol not supported"
+oct 02 11:56:26 AsusRogStrix dockerd[117091]: time="2025-10-02T11:56:26.632186241+02:00" level=info msg="stopping event stream following graceful shutdown" error="<nil>" module=libcontainerd namespace=moby
+oct 02 11:56:26 AsusRogStrix dockerd[117091]: failed to start daemon: Error initializing network controller: error obtaining controller instance: failed to register "bridge" driver: failed to create NAT chain DOCKER: iptables failed: iptables --wait -t nat -N DOCKER: iptables v1.8.11 (nf_tables): Could not fetch rule set generation id: Invalid argument
+oct 02 11:56:26 AsusRogStrix dockerd[117091]:  (exit status 4)
+oct 02 11:56:26 AsusRogStrix systemd[1]: docker.service: Main process exited, code=exited, status=1/FAILURE
+░░ Subject: Unit process exited
+░░ Defined-By: systemd
+░░ Support: https://lists.freedesktop.org/mailman/listinfo/systemd-devel
+░░ 
+░░ An ExecStart= process belonging to unit docker.service has exited.
+░░ 
+░░ The process' exit code is 'exited' and its exit status is 1.
+oct 02 11:56:26 AsusRogStrix systemd[1]: docker.service: Failed with result 'exit-code'.
+░░ Subject: Unit failed
+░░ Defined-By: systemd
+░░ Support: https://lists.freedesktop.org/mailman/listinfo/systemd-devel
+░░ 
+░░ The unit docker.service has entered the 'failed' state with result 'exit-code'.
+oct 02 11:56:26 AsusRogStrix systemd[1]: Failed to start Docker Application Container Engine.
+░░ Subject: A start job for unit docker.service has failed
+░░ Defined-By: systemd
+░░ Support: https://lists.freedesktop.org/mailman/listinfo/systemd-devel
+░░ 
+░░ A start job for unit docker.service has finished with a failure.
+░░ 
+░░ The job identifier is 18600 and the job result is failed.

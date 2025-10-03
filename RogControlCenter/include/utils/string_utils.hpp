@@ -188,4 +188,6 @@ class StringUtils {
 		}
 		return oss.str();
 	}
+
+	static std::string replace(std::string original, std::string substring, std::string replacement, bool onlyFirst = false);
 };

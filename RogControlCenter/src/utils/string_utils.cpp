@@ -202,3 +202,21 @@ std::string StringUtils::replaceAll(const std::string& input, const std::string&
 	}
 	return result;
 }
+
+std::string StringUtils::replace(std::string original, std::string substring, std::string replacement, bool onlyFirst) {
+	auto result = std::string(original);
+
+	while (true) {
+		auto pos = result.find(substring);
+		if (pos == std::string::npos) {
+			break;
+		}
+
+		result.replace(pos, substring.size(), replacement);
+		if (onlyFirst) {
+			break;
+		}
+	}
+
+	return result;
+}

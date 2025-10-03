@@ -12,6 +12,7 @@
 #include <cstring>
 #include <ctime>
 #include <exception>
+#include <optional>
 #include <sstream>
 #include <string>
 #include <thread>
@@ -192,13 +193,8 @@ int main(int argc, char* argv[]) {
 
 	Shell& shell = Shell::getInstance();
 
-	auto whichResult = shell.whichAll("flatpak");
-	if (whichResult.size() > 1) {
-		setenv("ORIG_FLATPAK_BIN", StringUtils::trim(whichResult[whichResult.size() - 1]).c_str(), 1);
-	}
-
 	auto cmdWhichResult = shell.whichAll(std::string(argv[1]));
-	if (whichResult.empty()) {
+	if (cmdWhichResult.empty()) {
 		logger.error("Command {} not found", argv[1]);
 		exit(127);
 	}
@@ -237,7 +233,40 @@ int main(int argc, char* argv[]) {
 		logger.error("Error requesting configuration {}", e.what());
 	}
 
+	std::optional<std::string> bin = std::string(argv[argc - 1]);
+	auto whichResult			   = shell.whichAll("flatpak");
+	if (whichResult.size() > 1) {
+		setenv("ORIG_FLATPAK_BIN", StringUtils::trim(whichResult[whichResult.size() - 1]).c_str(), 1);
+
+		for (int i = argc - 1; i >= 1; i--) {
+			if (i == 1 || std::string(argv[i - 1]) == "--") {
+				bin = std::string(argv[i]);
+				break;
+			}
+		}
+		logger.error("{}", *bin);
+		if (FileUtils::exists(*bin)) {
+			try {
+				FileUtils::copy(*bin, *bin + ".bk");
+				auto content = FileUtils::readFileContent(*bin);
+				for (auto wr : whichResult) {
+					content = StringUtils::replaceAll(content, wr, "flatpak");
+				}
+				FileUtils::writeFileContent(*bin, content);
+				logger.error(content);
+			} catch (std::exception& e) {
+				bin = std::nullopt;
+			}
+		} else {
+			bin = std::nullopt;
+		}
+	}
+
 	int code = run_command(logger, command, wrappers, parameters);
+
+	if (bin.has_value()) {
+		FileUtils::move(*bin + ".bk", *bin);
+	}
 
 	return code;
 }
