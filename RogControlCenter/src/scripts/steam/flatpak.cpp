@@ -72,8 +72,8 @@ int main(int argc, char* argv[]) {
 		if (!FlatpakClient::getInstance().checkInstalled(Constants::FLATPAK_MANGOHUD, false)) {
 			std::cout << "MangoHud flatpak installation missing, attempting installation" << std::endl;
 			FlatpakClient::getInstance().install(Constants::FLATPAK_MANGOHUD, false);
-			FlatpakClient::getInstance().install(Constants::FLATPAK_MANGOHUD_OVERRIDE, false);
-			FlatpakClient::getInstance().install(Constants::FLATPAK_MANGOHUD_OVERRIDE, true);
+			FlatpakClient::getInstance().override(Constants::FLATPAK_MANGOHUD_OVERRIDE, false);
+			FlatpakClient::getInstance().override(Constants::FLATPAK_MANGOHUD_OVERRIDE, true);
 		}
 	}
 
