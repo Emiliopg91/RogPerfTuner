@@ -1,9 +1,17 @@
-# RogControlCenter
+<h1 align="center">
+<img src="./resources/icons/icon.svg" alt="RogControlCenter logo" width="300">
+  <br>
+  RogControlCenter
+  <br>  
+  <p align="center">
+    <a href="https://github.com/Emiliopg91/RogControlCenter/releases"><img src="https://img.shields.io/github/downloads/Emiliopg91/RogControlCenter/total" /></a>
+    <a href="https://github.com/Emiliopg91/RogControlCenter/actions/workflows/release.yml"><img src="https://github.com/Emiliopg91/RogControlCenter/actions/workflows/release.yml/badge.svg" /></a>
+    <a href="https://deepwiki.com/Emiliopg91/RogControlCenter"><img src="https://deepwiki.com/badge.svg" /></a>
+    <br>
+  </p>
+</h1>
 
-[![Ask DeepWiki](https://deepwiki.com/badge.svg)](https://deepwiki.com/Emiliopg91/RogControlCenter)
-[![Release](https://github.com/Emiliopg91/RogControlCenter/actions/workflows/release.yml/badge.svg)](https://github.com/Emiliopg91/RogControlCenter/actions/workflows/release.yml)
-[![Downloads](https://img.shields.io/github/downloads/Emiliopg91/RogControlCenter/total.svg)](https://github.com/Emiliopg91/RogControlCenter/releases)
-
+## Index
 - [Description](#description)
   
 - [Features](#features)
@@ -34,7 +42,7 @@ Do you want something similar for Asus Rog Ally/Ally X? Check [AllyDeckyCompanio
   - CPU Scheduler
   - GPU TGP
   - GPU Thermal throttling policy
-  - Fan curves
+  - Fan curves, customizable via charts
   - Power profile
   - SSD IO scheduler
 
@@ -69,20 +77,25 @@ Do you want something similar for Asus Rog Ally/Ally X? Check [AllyDeckyCompanio
 - [x] Steam integration through Decky plugin
   - Interception of game first run to change it's launch option to use our custom wrapper
   - Force use of dGPU or letting Linux select for you
-  - Show performance metrics (may not work with flatpak applications)
-  - Process CPU and IO priority
+  - Show performance metrics
+  - Adjust process CPU and IO priority
+  - Support for flatpak added
 
 - [x] Start on boot
 
 - [x] Autoupdates
 
-- [x] Portable AppImage or RPM package  
+- [x] Portable AppImage or PKGBUILD for AUR
 
 ## Requirements
-- asusctl 6.1.12 or later
+- asusctl 6.1.12 or later - Platform control
+- Qt6 - for user interface
+- libsecret - for secure storage of password
+- power-profiles-daemon - for adjusting energy saving policy
+- zlib - for file access utilities 
 
 ## Compatibility
-- Tested on Bazzite based on Fedora 41/42 with KDE environment
+- Tested on CachyOS and Bazzite with KDE desktop environment
 - Only tested on Laptops with Intel+Nvidia settings
 
 ## Attribution
