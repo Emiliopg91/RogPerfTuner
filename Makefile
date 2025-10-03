@@ -94,6 +94,9 @@ build_openrgb:
 	fi
 
 build_rccdc:
+	@if [ ! -f "submodules/patches/RccDeckyCompanion.diff.applied" ]; then \
+		cd submodules/RccDeckyCompanion && git apply ../patches/RccDeckyCompanion.diff && touch ../patches/RccDeckyCompanion.diff.applied; \
+	fi
 	@if [ ! -d "build/assets/RccDeckyCompanion" ]; then \
 		echo "#######################################################################" && \
 		echo "#################### Compiling RccDeckyCompanion ######################" && \

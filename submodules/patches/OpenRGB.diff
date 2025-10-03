@@ -26,7 +26,7 @@ index b0a17604..e75875d9 100644
 -    make -j$(nproc)"]
 +    make -j$(nproc)"
 diff --git a/OpenRGB.pro b/OpenRGB.pro
-index 3d938d61..c2c18a99 100644
+index 3d938d61..2d2ba3c5 100644
 --- a/OpenRGB.pro
 +++ b/OpenRGB.pro
 @@ -4,12 +4,6 @@
@@ -1110,10 +1110,18 @@ index 389e5fd1..00000000
 -    const char *            plugins_path = "plugins/";
 -};
 diff --git a/build.sh b/build.sh
-index ebc7370d..cb3ae6b3 100755
+index ebc7370d..2f73a05b 100755
 --- a/build.sh
 +++ b/build.sh
-@@ -6,4 +6,4 @@ if [ -f ./build/openrgb ]; then
+@@ -1,9 +1,9 @@
+-podman build -t openrgb-build .
+-rm -R ./build
++docker build -t openrgb-build .
++rm -Rf ./build
+ mkdir build
+-podman run --rm --privileged --cpus=$(nproc) -v $(pwd):/input openrgb-build
++docker run --rm --privileged --cpus=$(nproc) -v $(pwd):/input openrgb-build
+ if [ -f ./build/openrgb ]; then
      ./OpenRGB.AppImage --appimage-extract
      cp ./build/openrgb squashfs-root/usr/bin/OpenRGB
      ./appimagetool squashfs-root/ ./OpenRGB.AppImage
