@@ -1110,17 +1110,32 @@ index 389e5fd1..00000000
 -    const char *            plugins_path = "plugins/";
 -};
 diff --git a/build.sh b/build.sh
-index ebc7370d..2f73a05b 100755
+index ebc7370d..eac4304b 100755
 --- a/build.sh
 +++ b/build.sh
-@@ -1,9 +1,9 @@
+@@ -1,9 +1,24 @@
 -podman build -t openrgb-build .
 -rm -R ./build
-+docker build -t openrgb-build .
-+rm -Rf ./build
++#!/bin/sh
++
++# Detect which container runtime to use (prefer podman)
++if command -v podman >/dev/null 2>&1; then
++    CONTAINER=podman
++elif command -v docker >/dev/null 2>&1; then
++    CONTAINER=docker
++else
++    echo "Error: neither podman nor docker is installed."
++    exit 1
++fi
++
++echo "Using $CONTAINER..."
++
++$CONTAINER build -t openrgb-build .
++rm -rf ./build
  mkdir build
 -podman run --rm --privileged --cpus=$(nproc) -v $(pwd):/input openrgb-build
-+docker run --rm --privileged --cpus=$(nproc) -v $(pwd):/input openrgb-build
++$CONTAINER run --rm --privileged --cpus=$(nproc) -v "$(pwd):/input" openrgb-build
++
  if [ -f ./build/openrgb ]; then
      ./OpenRGB.AppImage --appimage-extract
      cp ./build/openrgb squashfs-root/usr/bin/OpenRGB
