@@ -133,8 +133,12 @@ endif
 	@echo "#######################################################################"
 	@echo "######################### Generating PKGBUILD #########################"
 	@echo "#######################################################################"
+ifdef IN_PKGBUILD
+	@echo "Skipping PKGBUILD creation"
+else
 	@cp resources/PKGBUILD dist/PKGBUILD
 	@python resources/scripts/pkgbuild.py
+endif
 
 release:
 	@rm -rf dist

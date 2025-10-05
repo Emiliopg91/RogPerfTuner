@@ -18,8 +18,6 @@
 #include <string>
 #include <unordered_map>
 
-#include "spdlog/async_logger.h"
-
 class LoggerProvider {
   public:
 	/**
@@ -48,7 +46,7 @@ class LoggerProvider {
   private:
 	inline static std::shared_ptr<spdlog::sinks::stdout_color_sink_mt> console_sink{};
 	inline static std::optional<std::shared_ptr<spdlog::sinks::basic_file_sink_mt>> file_sink = std::nullopt;
-	inline static std::unordered_map<std::string, std::shared_ptr<spdlog::async_logger>> loggers{};
+	inline static std::unordered_map<std::string, std::shared_ptr<spdlog::logger>> loggers{};
 
 	inline static spdlog::level::level_enum defaultLevel;
 	static std::unordered_map<std::string, std::string> configMap;

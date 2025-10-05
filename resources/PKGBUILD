@@ -7,14 +7,15 @@ arch=('x86_64')
 url="https://github.com/Emiliopg91/RogControlCenter"
 license=('GPL2')
 depends=(
-  'asusctl' 
+  'asusctl'
+  'fuse2'
   'hicolor-icon-theme'
-  'libsecret' 
+  'libsecret'
   'power-profiles-daemon'
   'python'
   'python-pip'
   'qt6-base'
-  'qt6-charts' 
+  'qt6-charts'
   'qt6-svg'
   'zlib'
 )
@@ -22,21 +23,23 @@ makedepends=(
   'clang'
   'cmake'
   'git'
-  'libsecret' 
+  'libsecret'
   'ninja'
   'podman'
+  'podman-docker'
   'python'
   'qt6-base'
   'qt6-charts'
   'qt6-svg'
   'libsecret'
   'zlib'
+  'unzip'
+  'zip'
 )
 source=("git+https://github.com/Emiliopg91/RogControlCenter.git#tag=$pkgver")
 sha256sums=('SKIP')
 
 prepare() {
-
     if ! command -v node &> /dev/null || ! command -v npm &> /dev/null; then
         echo "Installing nodejs and its packages"
         curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.40.3/install.sh | bash
@@ -47,13 +50,22 @@ prepare() {
         nvm use 24
         npm i -g pnpm@8.5.1 shx@0.3.4
     fi
-    
+
     cd "$srcdir/RogControlCenter"
     git submodule update --init --recursive
+
+    export CONTAINERS_STORAGE_CONF=$srcdir/containers-storage.conf
+    cat > "$CONTAINERS_STORAGE_CONF" <<EOF
+[storage]
+driver = "vfs"
+runroot = "/tmp/containers/runroot"
+graphroot = "/tmp/containers/storage"
+EOF
 }
 
 build() {
     cd "$srcdir/RogControlCenter"
+    make config
     IN_PKGBUILD=1 make release
 }
 

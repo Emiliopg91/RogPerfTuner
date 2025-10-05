@@ -1,8 +1,7 @@
 #include "../../include/logger/logger_provider.hpp"
 
-#include <spdlog/async.h>
-#include <spdlog/async_logger.h>
 #include <spdlog/fmt/ostr.h>
+#include <spdlog/logger.h>
 
 #include <filesystem>
 
@@ -93,14 +92,7 @@ void LoggerProvider::initialize(std::string fileName, std::string path) {
 
 		sinkList = spdlog::sinks_init_list{console_sink, file_sink.value()};
 	}
-
-	// inicializa la cola asíncrona (tamaño 8192, 1 thread de background)
-	spdlog::init_thread_pool(8192, 1);
-
-	// crea logger asíncrono
-	auto main_logger = std::make_shared<spdlog::async_logger>("Default", sinkList.begin(), sinkList.end(), spdlog::thread_pool(),
-															  spdlog::async_overflow_policy::block	// o .overrun_oldest
-	);
+	auto main_logger = std::make_shared<spdlog::logger>("Default", sinkList.begin(), sinkList.end());
 
 	defaultLevel = spdlog::level::info;
 	if (getenv("RCC_LOG_LEVEL")) {
@@ -131,8 +123,8 @@ std::shared_ptr<spdlog::logger> LoggerProvider::getLogger(const std::string& nam
 	if (file_sink.has_value()) {
 		sinkList = spdlog::sinks_init_list{console_sink, file_sink.value()};
 	}
-	auto logger = std::make_shared<spdlog::async_logger>(display_name, sinkList.begin(), sinkList.end(), spdlog::thread_pool(),
-														 spdlog::async_overflow_policy::block);
+
+	auto logger = std::make_shared<spdlog::logger>(display_name, sinkList.begin(), sinkList.end());
 
 	auto level = defaultLevel;
 	auto it2   = LoggerProvider::configMap.find(name);
