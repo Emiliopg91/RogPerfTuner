@@ -38,9 +38,9 @@ RogControlCenter is here to simplify your life and help you enjoy gaming on your
 Do you want something similar for Asus Rog Ally/Ally X? Check [AllyDeckyCompanion](https://github.com/Emiliopg91/AllyDeckyCompanion/)
 
 ## Screenshots
-| ![Main Window](./resources/screenshots/main_window.png) | ![Schedulers](./resources/screenshots/schedulers.png) | ![Fan curve editor](./resources/screenshots/fan_editor.png) | ![Game configuration editor](./resources/screenshots/game_cfg.png) |
-|---|---|---|---|
-
+| ![Main Window](./resources/screenshots/main_window.png) | ![Schedulers](./resources/screenshots/schedulers.png) |
+|---|---|
+| ![Fan curve editor](./resources/screenshots/fan_editor.png) | ![Game configuration editor](./resources/screenshots/game_cfg.png) |S
 
 ## Features
 
