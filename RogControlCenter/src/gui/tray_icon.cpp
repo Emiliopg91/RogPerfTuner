@@ -7,9 +7,7 @@
 
 #include <QActionGroup>
 #include <QMenu>
-#include <iostream>
 #include <optional>
-#include <print>
 
 #include "../../include/gui/fan_curve_editor.hpp"
 #include "../../include/gui/game_list.hpp"
@@ -154,7 +152,6 @@ void TrayIcon::onSchedulerChanged(std::optional<std::string> scheduler) {
 // Constructor
 // ==============================
 TrayIcon::TrayIcon() : QObject(&MainWindow::getInstance()), tray_icon_(new QSystemTrayIcon(this)), tray_menu_(new QMenu(&MainWindow::getInstance())) {
-	std::cout << Constants::ASSET_ICON_FILE.c_str() << std::endl;
 	tray_icon_->setIcon(QIcon::fromTheme(Constants::ASSET_ICON_FILE.c_str()));
 	tray_icon_->setToolTip(QString::fromStdString(Constants::APP_NAME + " v" + Constants::APP_VERSION));
 
