@@ -3,7 +3,7 @@
 #include "../../include/clients/dbus/asus/armoury/intel/pl1_spd_client.hpp"
 #include "../../include/clients/dbus/asus/armoury/nvidia/nv_boost_client.hpp"
 #include "../../include/clients/dbus/asus/armoury/nvidia/nv_temp_client.hpp"
-#include "../../include/clients/dbus/asus/armoury/other/panel_overdrive_client.hpp"
+// #include "../../include/clients/dbus/asus/armoury/other/panel_overdrive_client.hpp"
 #include "../../include/clients/dbus/asus/core/platform_client.hpp"
 #include "../../include/clients/dbus/linux/power_management_kb_brightness.hpp"
 #include "../../include/clients/dbus/linux/upower_client.hpp"
@@ -246,11 +246,11 @@ void HardwareService::onBatteryEvent(const bool& onBat, const bool& muted) {
 	}
 }
 
-void HardwareService::setPanelOverdrive(const bool& enable) {
-	if (panelOverdriveClient.available()) {
+void HardwareService::setPanelOverdrive(const bool&) {
+	/*if (panelOverdriveClient.available()) {
 		logger.info("Panel Overdrive: {}", enable ? "Enabled" : "Disabled");
 		panelOverdriveClient.setCurrentValue(enable);
-	}
+	}*/
 }
 
 std::unordered_map<std::string, std::string> HardwareService::getGpuSelectorEnv(const std::string& gpu) {

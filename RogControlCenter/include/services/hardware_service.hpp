@@ -72,21 +72,21 @@ class HardwareService : public Singleton<HardwareService>, Loggable {
 
 	std::mutex actionMutex;
 
-	EventBus& eventBus								 = EventBus::getInstance();
-	Toaster& toaster								 = Toaster::getInstance();
-	OpenRgbService& openRgbService					 = OpenRgbService::getInstance();
-	Translator& translator							 = Translator::getInstance();
-	PlatformClient& platformClient					 = PlatformClient::getInstance();
-	Pl1SpdClient& pl1SpdClient						 = Pl1SpdClient::getInstance();
-	Pl2SpptClient& pl2SpptClient					 = Pl2SpptClient::getInstance();
-	NvBoostClient& nvBoostClient					 = NvBoostClient::getInstance();
-	NvTempClient& nvTempClient						 = NvTempClient::getInstance();
-	UPowerClient& uPowerClient						 = UPowerClient::getInstance();
-	CPUInfoClient& cpuInfoClient					 = CPUInfoClient::getInstance();
-	SsdSchedulerClient& ssdSchedulerClient			 = SsdSchedulerClient::getInstance();
-	BoostControlClient& boostControlClient			 = BoostControlClient::getInstance();
-	SwitcherooCtlClient& switcherooCtlClient		 = SwitcherooCtlClient::getInstance();
-	PanelOverdriveClient& panelOverdriveClient		 = PanelOverdriveClient::getInstance();
+	EventBus& eventBus						 = EventBus::getInstance();
+	Toaster& toaster						 = Toaster::getInstance();
+	OpenRgbService& openRgbService			 = OpenRgbService::getInstance();
+	Translator& translator					 = Translator::getInstance();
+	PlatformClient& platformClient			 = PlatformClient::getInstance();
+	Pl1SpdClient& pl1SpdClient				 = Pl1SpdClient::getInstance();
+	Pl2SpptClient& pl2SpptClient			 = Pl2SpptClient::getInstance();
+	NvBoostClient& nvBoostClient			 = NvBoostClient::getInstance();
+	NvTempClient& nvTempClient				 = NvTempClient::getInstance();
+	UPowerClient& uPowerClient				 = UPowerClient::getInstance();
+	CPUInfoClient& cpuInfoClient			 = CPUInfoClient::getInstance();
+	SsdSchedulerClient& ssdSchedulerClient	 = SsdSchedulerClient::getInstance();
+	BoostControlClient& boostControlClient	 = BoostControlClient::getInstance();
+	SwitcherooCtlClient& switcherooCtlClient = SwitcherooCtlClient::getInstance();
+	// PanelOverdriveClient& panelOverdriveClient		 = PanelOverdriveClient::getInstance();
 	PMKeyboardBrightness& pmKeyboardBrightnessClient = PMKeyboardBrightness::getInstance();
 	LsUsbClient& udevClient							 = LsUsbClient::getInstance();
 	Configuration& configuration					 = Configuration::getInstance();
