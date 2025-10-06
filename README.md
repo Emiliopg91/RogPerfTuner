@@ -100,9 +100,9 @@ Do you want something similar for Asus Rog Ally/Ally X? Check [AllyDeckyCompanio
 
 - [x] Start on boot
 
-- [x] Autoupdates
-
 - [x] AppImage or PKGBUILD for AUR
+
+- [x] Autoupdates for AppImage version
 
 ## Installation
 
