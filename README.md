@@ -22,7 +22,7 @@
 - [Installation](#installation)
   - [AppImage version](#appimage-version) 
   - [PKGBUILD version](#pkgbuild-version) 
-  - [Steam and DeckyLoader integration](#note-about-steam-and-deckyloader-integration) 
+  - [Steam and DeckyLoader integration](#steam-and-deckyloader-integration) 
 
 - [Compatibility](#compatibility)
 
@@ -120,7 +120,7 @@ Once you installed those packages, you can run the AppImage with support for eve
 You can use any AUR helper (tested on yay and paru) to make a local installation of the package.
 That process performs installation of every dependency.
 
-### Note about Steam and DeckyLoader integration 
+### Steam and DeckyLoader integration 
 
 To enable Steam integration, you should install Steam and DeckyLoader previous to the first run of RogControlCenter. If you've already launched RogControlCenter you can delete ~/.RogControlCenter and perform Steam and DeckyLoader installation.
 
