@@ -143,6 +143,7 @@ HardwareService::HardwareService() : Loggable("HardwareService") {
 	setupDeviceLoop();
 
 	runningGames = 0;
+	setPanelOverdrive(false);
 
 	if (uPowerClient.available()) {
 		onBattery = uPowerClient.isOnBattery();
