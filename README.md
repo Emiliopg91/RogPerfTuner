@@ -19,7 +19,7 @@
   
 - [Features](#features)
 
-- [Requirements](#requirements)
+- [Installation](#installation)
 
 - [Compatibility](#compatibility)
 
@@ -101,8 +101,9 @@ Do you want something similar for Asus Rog Ally/Ally X? Check [AllyDeckyCompanio
 
 - [x] AppImage or PKGBUILD for AUR
 
-## Requirements
+## Installation
 
+### AppImage version
 For full support of this application, run the following command to install the dependencies:
 
 ```bash
@@ -111,7 +112,14 @@ sudo pacman -S --needed asusctl coreutils fuse2 hicolor-icon-theme hidapi libsec
 
 Once you installed those packages, you can run the AppImage with support for every feature.
 
-To enable Steam integration, you should install Steam and Decky Loader previous to the first run of RogControlCenter. If you've already launched RogControlCenter you can delete ~/.RogControlCenter and perform Steam and DeckyLoader installation.
+### PKGBUILD version
+
+You can use any AUR helper (tested on yay and paru) to make a local installation of the package.
+That process performs installation of every dependency.
+
+### Note about Steam and DeckyLoader integration 
+
+To enable Steam integration, you should install Steam and DeckyLoader previous to the first run of RogControlCenter. If you've already launched RogControlCenter you can delete ~/.RogControlCenter and perform Steam and DeckyLoader installation.
 
 ## Compatibility
 
