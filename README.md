@@ -20,6 +20,9 @@
 - [Features](#features)
 
 - [Installation](#installation)
+  - [AppImage version](#appimage-version) 
+  - [PKGBUILD version](#pkgbuild-version) 
+  - [Steam and DeckyLoader integration](#note-about-steam-and-deckyloader-integration) 
 
 - [Compatibility](#compatibility)
 
