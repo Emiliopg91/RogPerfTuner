@@ -109,6 +109,10 @@ For full support of this application, run the following command to install the d
 sudo pacman -S --needed asusctl coreutils fuse2 hicolor-icon-theme hidapi libsecret libusb mbedtls power-profiles-daemon python python-pip qt5-base qt5-tools qt6-base qt6-charts qt6-svg scx-scheds upower
 ```
 
+Once you installed those packages, you can run the AppImage with support for every feature.
+
+To enable Steam integration, you should install Steam and Decky Loader previous to the first run of RogControlCenter. If you've already launched RogControlCenter you can delete ~/.RogControlCenter and perform Steam and DeckyLoader installation.
+
 ## Compatibility
 
 - Tested on CachyOS and Bazzite with KDE desktop environment
