@@ -146,12 +146,10 @@ void PerformanceService::setFanCurves(const PerformanceProfile& profile) {
 				asusCtlClient.setFanCurvesEnabled(pp, false);
 			}
 
-			Logger::add_tab();
 			for (const auto& [fan, data] : configuration.getConfiguration().platform.curves[profile.toString()]) {
 				logger.info("{}: {}", fan, StringUtils::replaceAll(data.current, ",", " "));
 				asusCtlClient.setFanCurveStringData(platformProfile, fan, data.current);
 			}
-			Logger::rem_tab();
 
 			asusCtlClient.setFanCurvesEnabled(platformProfile, true);
 		} catch (std::exception& e) {

@@ -6,38 +6,42 @@ pkgdesc="RogControlCenter - An utility to manage Asus Rog laptop performance and
 arch=('x86_64')
 url="https://github.com/Emiliopg91/RogControlCenter"
 license=('GPL2')
+source=("git+https://github.com/Emiliopg91/RogControlCenter.git#tag=$pkgver")
+sha256sums=('SKIP')
+options=('!strip')
 depends=(
   'asusctl'
+  'coreutils'
   'fuse2'
   'hicolor-icon-theme'
+  'hidapi'
   'libsecret'
+  'libusb'
+  'mbedtls'
   'power-profiles-daemon'
   'python'
   'python-pip'
+  'qt5-base'
+  'qt5-tools'
   'qt6-base'
   'qt6-charts'
   'qt6-svg'
-  'zlib'
+  'scx-scheds'
+  'upower'
 )
 makedepends=(
+  'base-devel'
   'clang'
   'cmake'
   'git'
   'libsecret'
   'ninja'
+  'pkgconf'
   'podman'
-  'podman-docker'
-  'python'
-  'qt6-base'
-  'qt6-charts'
-  'qt6-svg'
-  'libsecret'
-  'zlib'
+  'qtcreator'
   'unzip'
   'zip'
 )
-source=("git+https://github.com/Emiliopg91/RogControlCenter.git#tag=$pkgver")
-sha256sums=('SKIP')
 
 prepare() {
     if ! command -v node &> /dev/null || ! command -v npm &> /dev/null; then
@@ -64,21 +68,27 @@ EOF
 }
 
 build() {
+    export APPIMAGE_EXTRACT_AND_RUN=1
+    unset SOURCE_DATE_EPOCH
+
+    case "$ARCH_LEVEL" in
+        x86-64-v3) export CXXFLAGS="-march=x86-64-v3" ;;
+        x86-64-v4) export CXXFLAGS="-march=x86-64-v4" ;;
+        zen4)      export CXXFLAGS="-march=znver4" ;;
+        native)    export CXXFLAGS="-march=native" ;;
+        ""|default|*) export CXXFLAGS="" ;;  # Por defecto
+    esac
+
     cd "$srcdir/RogControlCenter"
     make config
-    IN_PKGBUILD=1 make release
+    make release
 }
 
 package() {
     cd "$srcdir/RogControlCenter/dist/appimage-fs"
 
-    install -Dm755 usr/bin/RogControlCenter \
+    install -Dm755 ../RogControlCenter.AppImage \
         "$pkgdir/usr/bin/rogcontrolcenter"
-
-    install -d "$pkgdir/usr/share/rogcontrolcenter"
-    cp -r usr/share/RogControlCenter/* \
-        "$pkgdir/usr/share/rogcontrolcenter/"
-    chmod 777 -R "$pkgdir/usr/share/rogcontrolcenter"
 
     install -d "$pkgdir/usr/share/applications"
     sed -e 's|Exec=usr/bin/RogControlCenter|Exec=/usr/bin/rogcontrolcenter|' \
