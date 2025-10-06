@@ -153,7 +153,7 @@ void TrayIcon::onSchedulerChanged(std::optional<std::string> scheduler) {
 // ==============================
 TrayIcon::TrayIcon() : QObject(&MainWindow::getInstance()), tray_icon_(new QSystemTrayIcon(this)), tray_menu_(new QMenu(&MainWindow::getInstance())) {
 	tray_icon_->setIcon(QIcon::fromTheme(Constants::ASSET_ICON_FILE.c_str()));
-	tray_icon_->setToolTip(QString::fromStdString(Constants::APP_NAME + " v" + Constants::APP_VERSION));
+	tray_icon_->setToolTip(QString::fromStdString(Constants::APP_NAME + " | " + Constants::APP_VERSION));
 
 	QMenu* menu = tray_menu_;
 
