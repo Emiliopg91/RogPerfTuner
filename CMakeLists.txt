@@ -21,7 +21,12 @@ endif()
 
 add_compile_options(-Wno-unqualified-std-cast-call -Wextra -Werror -Wno-unused-result -Wno-deprecated-copy -Wno-deprecated-literal-operator)
 
-add_subdirectory(submodules/httplib)
+if(IS_AURPKG)
+    message(STATUS "Building for AUR package")
+    message(STATUS "Autoupdater excluded")
+else()
+    add_subdirectory(submodules/httplib)
+endif()
 
 set(JSON_BuildTests OFF CACHE INTERNAL "")
 add_subdirectory(submodules/json)

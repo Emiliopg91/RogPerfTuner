@@ -15,14 +15,6 @@ const bool Constants::DEV_MODE = false;
 
 const std::string Constants::HOME_DIR = std::getenv("HOME");
 
-const std::string Constants::APPIMAGE_FILE = []() {
-	const char* appimage = std::getenv("APPIMAGE");
-	if (appimage == nullptr) {
-		appimage = "";
-	}
-	return appimage;
-}();
-
 const std::string Constants::ASSETS_DIR = [] {
 	const char* dir = std::getenv("RCC_ASSETS_DIR");
 	if (!dir) {
@@ -31,9 +23,19 @@ const std::string Constants::ASSETS_DIR = [] {
 	return std::string(dir);
 }();
 
-const std::string Constants::WRAPPER_PATH = [] {
-	return (APPIMAGE_FILE.empty() ? ASSETS_DIR : (HOME_DIR + "/.RogControlCenter")) + "/bin/steam/run";
+#ifndef IS_AURPKG
+const std::optional<std::string> Constants::APPIMAGE_FILE = []() {
+	const char* appimage = std::getenv("APPIMAGE");
+	if (appimage == nullptr) {
+		appimage = "";
+	}
+	return appimage;
 }();
+const std::string Constants::WRAPPER_PATH = HOME_DIR + "/.RogControlCenter/bin/steam/run";
+#else
+const std::optional<std::string> Constants::APPIMAGE_FILE = std::nullopt;
+const std::string Constants::WRAPPER_PATH				  = ASSETS_DIR + "/bin/steam/run";
+#endif
 
 const std::string Constants::LOG_FILE_NAME		  = APP_NAME;
 const std::string Constants::LOG_RUNNER_FILE_NAME = "Runner";

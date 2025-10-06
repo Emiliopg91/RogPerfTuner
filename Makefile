@@ -35,7 +35,7 @@ config:
 		cd submodules/OpenRGB-cppSDK && git apply ../patches/OpenRGB-cppSDK.diff && touch ../patches/OpenRGB-cppSDK.diff.applied; \
 	fi
 	
-	@CXX=clang++ CC=clang cmake -B build -G Ninja -S . -DCMAKE_BUILD_TYPE=$(BUILD_TYPE) -DCMAKE_EXPORT_COMPILE_COMMANDS=ON
+	@CXX=clang++ CC=clang cmake -B build -G Ninja -S . -DCMAKE_BUILD_TYPE=$(BUILD_TYPE) -DCMAKE_EXPORT_COMPILE_COMMANDS=ON $${IS_AURPKG:+-DIS_AURPKG=1}
 
 	@if [ ! -f "compile_commands.json" ]; then \
 		ln -s build/compile_commands.json .; \
@@ -122,14 +122,11 @@ package:
 	@cp resources/AppRun dist/appimage-fs/
 	@cp resources/RogControlCenter.desktop dist/appimage-fs/RogControlCenter.desktop
 	@cp build/assets/icons/icon.svg dist/appimage-fs/icon.svg
-ifdef IN_PKGBUILD
 	@echo "Skipping AppImage creation"
-else
 	@chmod 777 -R resources/appimagetool dist/appimage-fs
 	@rm -f dist/appimage-fs/usr/share/RogControlCenter/OpenRGB/usr/lib/*.so*
 	@ARCH=x86_64 VERSION=$$(cat resources/version) ./resources/appimagetool -u "gh-releases-zsync|Emiliopg91|RogControlCenter|latest|RogControlCenter.AppImage.zsync" -n dist/appimage-fs dist/RogControlCenter.AppImage
 	@mv RogControlCenter.AppImage.zsync dist
-endif
 
 	@echo "#######################################################################"
 	@echo "######################### Generating PKGBUILD #########################"

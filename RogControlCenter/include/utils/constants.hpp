@@ -2,6 +2,7 @@
 
 #include <sys/types.h>
 
+#include <optional>
 #include <string>
 #include <vector>
 
@@ -10,7 +11,7 @@ class Constants {
 	static const std::string APP_NAME;
 
 	const static std::string APP_VERSION;
-	const static std::string APPIMAGE_FILE;
+	const static std::optional<std::string> APPIMAGE_FILE;
 
 	const static pid_t PID;
 

@@ -54,12 +54,16 @@ target_link_libraries(RogControlCenter PRIVATE
     Qt6::Charts
     spdlog::spdlog 
     nlohmann_json::nlohmann_json
-    httplib::httplib
     ${LIBSECRET_LIBRARIES}
     udev
     orgbsdk
 )
 
+if(IS_AURPKG)
+    add_compile_definitions(IS_AURPKG)
+else()
+    target_link_libraries(RogControlCenter PRIVATE httplib::httplib)
+endif()
 
 # ------------------------------
 # Scripts

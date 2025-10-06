@@ -1,4 +1,5 @@
 #pragma once
+#ifndef IS_AURPKG
 
 #include <functional>
 #include <string>
@@ -36,3 +37,4 @@ class AutoUpdater : public Singleton<AutoUpdater>, Loggable {
 
 	AutoUpdater(Callback restart_method_, std::function<bool()> perform_update_check_ = nullptr);
 };
+#endif

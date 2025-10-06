@@ -1,3 +1,5 @@
+#ifndef IS_AURPKG
+
 #include "../../include/utils/autoupdater.hpp"
 
 #include <fstream>
@@ -153,11 +155,6 @@ void AutoUpdater::check_task() {
 
 AutoUpdater::AutoUpdater(Callback restart_method_, std::function<bool()> perform_update_check_)
 	: Loggable("AutoUpdater"), restart_method(restart_method_), perform_update_check(perform_update_check_) {
-	if (Constants::APPIMAGE_FILE.empty()) {
-		logger.warn("Auto update is only available for AppImage version");
-	}
-
-	if (!Constants::APPIMAGE_FILE.empty()) {
-		std::thread(&AutoUpdater::check_task, this).detach();
-	}
+	std::thread(&AutoUpdater::check_task, this).detach();
 }
+#endif

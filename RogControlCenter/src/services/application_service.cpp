@@ -5,16 +5,20 @@
 
 #include "../../include/events/event_bus.hpp"
 #include "../../include/gui/toaster.hpp"
-#include "../../include/services/steam_service.hpp"
 #include "../../include/translator/translator.hpp"
-#include "../../include/utils/autoupdater.hpp"
 #include "../../include/utils/file_utils.hpp"
+
+#ifndef IS_AURPKG
+#include "../../include/services/steam_service.hpp"
+#include "../../include/utils/autoupdater.hpp"
+#endif
 
 ApplicationService::ApplicationService() : Loggable("ApplicationService") {
 	logger.info("Initializing ApplicationService");
 	Logger::add_tab();
 
-	if (!Constants::APPIMAGE_FILE.empty()) {
+#ifndef IS_AURPKG
+	if (Constants::APPIMAGE_FILE.has_value()) {
 		logger.info("Running from AppImage");
 		Logger::add_tab();
 
@@ -25,7 +29,19 @@ ApplicationService::ApplicationService() : Loggable("ApplicationService") {
 		if (!Constants::DEV_MODE) {
 			logger.info("Copying launcher script");
 			FileUtils::mkdirs(Constants::BIN_APPLICATION_DIR);
-			FileUtils::writeFileContent(Constants::LAUNCHER_FILE, buildLaunchFile());
+			std::ostringstream ss;
+			ss << "#!/bin/bash\n"
+			   << "UPDATE_PATH=\"" << Constants::UPDATE_FILE << "\"\n"
+			   << "APPIMAGE_PATH=\"" << *Constants::APPIMAGE_FILE << "\"\n"
+			   << "\n"
+			   << "if [[ -f \"$UPDATE_PATH\" ]]; then\n"
+			   << "  mv \"$UPDATE_PATH\" \"$APPIMAGE_PATH\"\n"
+			   << "  chmod 755 \"$APPIMAGE_PATH\"\n"
+			   << "  rm \"$UPDATE_PATH\"\n"
+			   << "fi\n"
+			   << *Constants::APPIMAGE_FILE << "\n";
+			auto content = ss.str();
+			FileUtils::writeFileContent(Constants::LAUNCHER_FILE, content);
 
 			if (!FileUtils::exists(Constants::APP_DRAW_FILE)) {
 				logger.info("Creating menu entry");
@@ -46,6 +62,9 @@ ApplicationService::ApplicationService() : Loggable("ApplicationService") {
 
 		Logger::rem_tab();
 	}
+#else
+	logger.info("Autoupdate not available for AUR package");
+#endif
 
 	logger.info("Copying icons");
 	FileUtils::copy(Constants::ASSET_ICONS_DIR, Constants::ICONS_DIR);
@@ -98,20 +117,5 @@ const std::string ApplicationService::buildDesktopFile() {
 	   << "Terminal=False\n"
 	   << "Type=Application\n"
 	   << "Categories=Utility;\n";
-	return ss.str();
-}
-
-const std::string ApplicationService::buildLaunchFile() {
-	std::ostringstream ss;
-	ss << "#!/bin/bash\n"
-	   << "UPDATE_PATH=\"" << Constants::UPDATE_FILE << "\"\n"
-	   << "APPIMAGE_PATH=\"" << Constants::APPIMAGE_FILE << "\"\n"
-	   << "\n"
-	   << "if [[ -f \"$UPDATE_PATH\" ]]; then\n"
-	   << "  mv \"$UPDATE_PATH\" \"$APPIMAGE_PATH\"\n"
-	   << "  chmod 755 \"$APPIMAGE_PATH\"\n"
-	   << "  rm \"$UPDATE_PATH\"\n"
-	   << "fi\n"
-	   << Constants::APPIMAGE_FILE << "\n";
 	return ss.str();
 }

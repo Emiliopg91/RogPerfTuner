@@ -50,7 +50,5 @@ class ApplicationService : public Singleton<ApplicationService>, Loggable {
 
 	const std::string buildDesktopFile();
 
-	const std::string buildLaunchFile();
-
 	ApplicationService();
 };
