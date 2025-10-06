@@ -14,6 +14,9 @@
 ## Index
 
 - [Description](#description)
+
+- [Screenshots](#screenshots)
+  
 - [Features](#features)
 
 - [Requirements](#requirements)
@@ -33,6 +36,11 @@ What if I told you you can also integrate with Steam and assign which GPU to use
 RogControlCenter is here to simplify your life and help you enjoy gaming on your Asus ROG laptop once and for all.
 
 Do you want something similar for Asus Rog Ally/Ally X? Check [AllyDeckyCompanion](https://github.com/Emiliopg91/AllyDeckyCompanion/)
+
+## Screenshots
+| ![Main Window](./resources/screenshots/main_window.png) | ![Schedulers](./resources/screenshots/schedulers.png) | ![Fan curve editor](./resources/screenshots/fan_editor.png) | ![Game configuration editor](./resources/screenshots/game_cfg.png) |
+|---|---|---|---|
+
 
 ## Features
 
