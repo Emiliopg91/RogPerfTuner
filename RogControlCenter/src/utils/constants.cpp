@@ -24,6 +24,8 @@ const std::string Constants::ASSETS_DIR = [] {
 }();
 
 #ifndef IS_AURPKG
+const std::string Constants::WRAPPER_PATH				  = HOME_DIR + "/.RogControlCenter/bin/steam/run";
+const std::string Constants::LAUNCHER_FILE				  = HOME_DIR + "/.RogControlCenter/bin/application/launcher.sh";
 const std::optional<std::string> Constants::APPIMAGE_FILE = []() {
 	const char* appimage = std::getenv("APPIMAGE");
 	if (appimage == nullptr) {
@@ -31,10 +33,10 @@ const std::optional<std::string> Constants::APPIMAGE_FILE = []() {
 	}
 	return appimage;
 }();
-const std::string Constants::WRAPPER_PATH = HOME_DIR + "/.RogControlCenter/bin/steam/run";
 #else
-const std::optional<std::string> Constants::APPIMAGE_FILE = std::nullopt;
 const std::string Constants::WRAPPER_PATH				  = ASSETS_DIR + "/bin/steam/run";
+const std::string Constants::LAUNCHER_FILE				  = "rogcontrolcenter";
+const std::optional<std::string> Constants::APPIMAGE_FILE = std::nullopt;
 #endif
 
 const std::string Constants::LOG_FILE_NAME		  = APP_NAME;
@@ -61,7 +63,6 @@ const std::string Constants::AUTOSTART_FILE		 = HOME_DIR + "/.config/autostart/R
 const std::string Constants::APP_DRAW_FILE		 = HOME_DIR + "/.local/share/applications/RogControlCenter.desktop";
 const std::string Constants::BIN_DIR			 = HOME_DIR + "/.RogControlCenter/bin";
 const std::string Constants::BIN_APPLICATION_DIR = HOME_DIR + "/.RogControlCenter/bin/application";
-const std::string Constants::LAUNCHER_FILE		 = HOME_DIR + "/.RogControlCenter/bin/application/launcher.sh";
 const std::string Constants::CONFIG_DIR			 = HOME_DIR + "/.RogControlCenter/config";
 const std::string Constants::CONFIG_FILE		 = HOME_DIR + "/.RogControlCenter/config/config.json";
 const std::string Constants::ICONS_DIR			 = HOME_DIR + "/.RogControlCenter/icons";

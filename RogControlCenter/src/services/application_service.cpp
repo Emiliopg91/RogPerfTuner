@@ -4,18 +4,33 @@
 #include <unistd.h>
 
 #include "../../include/events/event_bus.hpp"
-#include "../../include/gui/toaster.hpp"
-#include "../../include/translator/translator.hpp"
 #include "../../include/utils/file_utils.hpp"
 
 #ifndef IS_AURPKG
+#include "../../include/gui/toaster.hpp"
 #include "../../include/services/steam_service.hpp"
+#include "../../include/translator/translator.hpp"
 #include "../../include/utils/autoupdater.hpp"
 #endif
 
 ApplicationService::ApplicationService() : Loggable("ApplicationService") {
 	logger.info("Initializing ApplicationService");
 	Logger::add_tab();
+
+	logger.info("Copying icons");
+	FileUtils::copy(Constants::ASSET_ICONS_DIR, Constants::ICONS_DIR);
+
+	if (FileUtils::exists(Constants::AUTOSTART_FILE) &&
+		configuration.getConfiguration().application.appimage != Constants::APPIMAGE_FILE.has_value()) {
+		logger.info("Migrating autostart file");
+		Logger::add_tab();
+		setAutostart(false);
+		setAutostart(true);
+		Logger::rem_tab();
+	}
+
+	configuration.getConfiguration().application.appimage = Constants::APPIMAGE_FILE.has_value();
+	configuration.saveConfig();
 
 #ifndef IS_AURPKG
 	if (Constants::APPIMAGE_FILE.has_value()) {
@@ -51,7 +66,12 @@ ApplicationService::ApplicationService() : Loggable("ApplicationService") {
 
 		AutoUpdater::init(
 			[this]() {
-				applyUpdate();
+				logger.info("Applying update");
+				Logger::add_tab();
+				toaster.showToast(translator.translate("applying.update"));
+				shell.run_command("nohup bash -c \"sleep 1 && " + Constants::LAUNCHER_FILE + "\" > /dev/null 2>&1 &");
+				shutdown();
+				Logger::rem_tab();
 			},
 
 			[this]() {
@@ -65,9 +85,6 @@ ApplicationService::ApplicationService() : Loggable("ApplicationService") {
 #else
 	logger.info("Autoupdate not available for AUR package");
 #endif
-
-	logger.info("Copying icons");
-	FileUtils::copy(Constants::ASSET_ICONS_DIR, Constants::ICONS_DIR);
 
 	Logger::rem_tab();
 }
@@ -85,15 +102,6 @@ void ApplicationService::setAutostart(bool enabled) {
 		FileUtils::remove(Constants::AUTOSTART_FILE);
 		logger.info("Autostart file '{}' deleted successfully", Constants::AUTOSTART_FILE);
 	}
-}
-
-void ApplicationService::applyUpdate() {
-	logger.info("Applying update");
-	Logger::add_tab();
-	toaster.showToast(translator.translate("applying.update"));
-	shell.run_command("nohup bash -c \"sleep 1 && " + Constants::LAUNCHER_FILE + "\" > /dev/null 2>&1 &");
-	shutdown();
-	Logger::rem_tab();
 }
 
 void ApplicationService::shutdown() {

@@ -7,14 +7,6 @@
 class ApplicationService : public Singleton<ApplicationService>, Loggable {
   public:
 	/**
-	 * @brief Applies an available update to the application.
-	 *
-	 * This method handles the process of updating the application to a newer version,
-	 * if an update is available.
-	 */
-	void applyUpdate();
-
-	/**
 	 * @brief Shuts down the application gracefully.
 	 *
 	 * This method initiates the shutdown process, ensuring that all necessary cleanup
