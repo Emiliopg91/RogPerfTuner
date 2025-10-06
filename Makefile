@@ -126,6 +126,7 @@ ifdef IN_PKGBUILD
 	@echo "Skipping AppImage creation"
 else
 	@chmod 777 -R resources/appimagetool dist/appimage-fs
+	@rm -f dist/appimage-fs/usr/share/RogControlCenter/OpenRGB/usr/lib/*.so*
 	@ARCH=x86_64 VERSION=$$(cat resources/version) ./resources/appimagetool -u "gh-releases-zsync|Emiliopg91|RogControlCenter|latest|RogControlCenter.AppImage.zsync" -n dist/appimage-fs dist/RogControlCenter.AppImage
 	@mv RogControlCenter.AppImage.zsync dist
 endif
