@@ -22,7 +22,7 @@
 #include "../../../../include/utils/time_utils.hpp"
 
 void OpenRgbClient::initialize() {
-	if (!FileUtils::exists(Constants::UDEV_RULES) || FileUtils::crc(Constants::ORGB_UDEV_PATH) != FileUtils::crc(Constants::Constants::UDEV_RULES)) {
+	if (!FileUtils::exists(Constants::UDEV_RULES) || FileUtils::md5(Constants::ORGB_UDEV_PATH) != FileUtils::md5(Constants::Constants::UDEV_RULES)) {
 		logger.info("Configuring UDEV rules");
 		Logger::add_tab();
 

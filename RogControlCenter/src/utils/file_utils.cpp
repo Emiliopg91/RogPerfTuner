@@ -10,6 +10,7 @@
 #include <sstream>
 #include <string>
 
+#include "../../include/clients/shell/md5_client.hpp"
 #include "../../include/utils/constants.hpp"
 
 std::filesystem::path FileUtils::expandPath(const std::string& path) {
@@ -137,24 +138,10 @@ void FileUtils::chmodRecursive(const std::filesystem::path& path, mode_t mode) {
 	}
 }
 
-uint32_t FileUtils::crc(const std::string& path) {
-	return FileUtils::crc(std::filesystem::path(path));
+std::string FileUtils::md5(const std::string& path) {
+	return FileUtils::md5(std::filesystem::path(path));
 }
 
-uint32_t FileUtils::crc(const std::filesystem::path& path) {
-	std::ifstream file(path, std::ios::binary);
-	if (!file) {
-		throw std::runtime_error("Could not open file");
-	}
-
-	uint32_t crc = crc32(0L, Z_NULL, 0);
-
-	const size_t buffer_size = 4096;
-	char buffer[buffer_size];
-
-	while (file.read(buffer, buffer_size) || file.gcount() > 0) {
-		crc = crc32(crc, reinterpret_cast<const unsigned char*>(buffer), file.gcount());
-	}
-
-	return crc;
+std::string FileUtils::md5(const std::filesystem::path& path) {
+	return Md5SumClient::getInstance().checksum(path);
 }

@@ -179,22 +179,25 @@ class FileUtils {
 	static void chmodRecursive(const std::filesystem::path& path, mode_t mode);
 
 	/**
-	 * @brief Calculate CRC32 checksum of a file.
+	 * @brief Calculates the MD5 hash of the contents of the specified file.
 	 *
-	 * Calculates and returns the CRC32 checksum of the file at the given path.
+	 * @param path The path to the file whose MD5 hash is to be computed.
+	 * @return std::string The MD5 hash as a hexadecimal string.
 	 *
-	 * @param path The file path.
-	 * @return The CRC32 checksum.
+	 * @note Throws an exception if the file cannot be opened or read.
 	 */
-	static uint32_t crc(const std::string& path);
+	static std::string md5(const std::string& path);
 
 	/**
-	 * @brief Calculate CRC32 checksum of a file.
+	 * @brief Calculates the MD5 hash of the contents of the specified file.
 	 *
-	 * Calculates and returns the CRC32 checksum of the file at the given filesystem path.
+	 * This function reads the file at the given path and computes its MD5 hash.
+	 * The resulting hash is returned as a hexadecimal string.
 	 *
-	 * @param path The filesystem path.
-	 * @return The CRC32 checksum.
+	 * @param path The path to the file whose MD5 hash is to be calculated.
+	 * @return std::string The hexadecimal representation of the MD5 hash.
+	 * @throws std::filesystem::filesystem_error If the file cannot be accessed.
+	 * @throws std::runtime_error If the file cannot be read or the hash cannot be computed.
 	 */
-	static uint32_t crc(const std::filesystem::path& path);
+	static std::string md5(const std::filesystem::path& path);
 };
