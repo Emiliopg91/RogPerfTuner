@@ -83,10 +83,11 @@ int main(int argc, char** argv) {
 	OpenRgbService::getInstance();
 	HardwareService::getInstance();
 	PerformanceService::getInstance();
-	ApplicationService::getInstance();
 	SteamService::getInstance();
 
 	SocketServer::getInstance();
+
+	ApplicationService::getInstance();
 
 	TrayIcon::init().show();
 
