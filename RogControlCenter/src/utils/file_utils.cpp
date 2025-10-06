@@ -1,7 +1,6 @@
 #include "../../include/utils/file_utils.hpp"
 
 #include <sys/stat.h>
-#include <zlib.h>
 
 #include <cstring>
 #include <filesystem>

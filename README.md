@@ -12,8 +12,8 @@
 </h1>
 
 ## Index
+
 - [Description](#description)
-  
 - [Features](#features)
 
 - [Requirements](#requirements)
@@ -23,6 +23,7 @@
 - [Attribution](#attribution)
 
 ## Description
+
 Are you tired of having to manually adjust operating system settings to get the most out of your Asus ROG?
 
 Do you want breathtaking RGB effects on your laptop and peripherals? And with synchronized effects across all your RGBs?
@@ -36,6 +37,7 @@ Do you want something similar for Asus Rog Ally/Ally X? Check [AllyDeckyCompanio
 ## Features
 
 - [x] Selection of three performance profiles, which control:
+
   - CPU TDP
   - CPU Boost
   - CPU Governor
@@ -49,6 +51,7 @@ Do you want something similar for Asus Rog Ally/Ally X? Check [AllyDeckyCompanio
 - [x] RGB control for Asus ROG laptops and peripherics and support for custom AuraSync
 
 - [x] Available RGB effects:
+
   - **Breathing**: Feel every breath
   - **Dance floor**: Every led dancing at rithm
   - **Digital rain**: Matrix like animation that speeds up as your CPU is more demanded
@@ -56,18 +59,20 @@ Do you want something similar for Asus Rog Ally/Ally X? Check [AllyDeckyCompanio
   - **Gaming**: Highlights most used in game keyboard keys
   - **Rainbow wave**: A rainbow sliding on your leds
   - **Spectrum cycle**: A cycle of every color of RGB spectrum
-  - **Starry night**: Stars blinking on your devices 
+  - **Starry night**: Stars blinking on your devices
   - **Static**: A classic solid color effect
 
 - [x] Select color for the effect (only available on Breathing, Digital Rain and Static effect)
 
 - [x] Allow changing RGB brightness
+
   - Off
   - Low
   - Medium
-  - High 
+  - High
 
 - [x] Limit battery charge threshold to maintain its life-span
+
   - 100%: If you requires full battery without bothering about its health
   - 75%: If you want big battery capacity saving its health
   - 50%: for laptops that are always connected to AC
@@ -75,6 +80,7 @@ Do you want something similar for Asus Rog Ally/Ally X? Check [AllyDeckyCompanio
 - [x] Wrapper to apply optimization to applications (standard and flatpak)
 
 - [x] Steam integration through Decky plugin
+
   - Interception of game first run to change it's launch option to use our custom wrapper
   - Force use of dGPU or letting Linux select for you
   - Show performance metrics
@@ -85,16 +91,18 @@ Do you want something similar for Asus Rog Ally/Ally X? Check [AllyDeckyCompanio
 
 - [x] Autoupdates
 
-- [x] Portable AppImage or PKGBUILD for AUR
+- [x] AppImage or PKGBUILD for AUR
 
 ## Requirements
-- asusctl 6.1.12 or later - Platform control
-- Qt6 - for user interface
-- libsecret - for secure storage of password
-- power-profiles-daemon - for adjusting energy saving policy
-- zlib - for file access utilities 
+
+For full support of this application, run the following command to install the dependencies:
+
+```bash
+sudo pacman -S --needed asusctl coreutils fuse2 hicolor-icon-theme hidapi libsecret libusb mbedtls power-profiles-daemon python python-pip qt5-base qt5-tools qt6-base qt6-charts qt6-svg scx-scheds upower
+```
 
 ## Compatibility
+
 - Tested on CachyOS and Bazzite with KDE desktop environment
 - Only tested on Laptops with Intel+Nvidia settings
 
