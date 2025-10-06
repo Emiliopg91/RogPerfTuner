@@ -80,8 +80,7 @@ build() {
     esac
 
     cd "$srcdir/RogControlCenter"
-    make config
-    make release
+    IS_AURPKG=1 make release
 }
 
 package() {
