@@ -10,7 +10,7 @@
 using json = nlohmann::json;
 
 Translator::Translator() : Loggable("Translator") {
-	currentLang = []() -> Language {
+	currentLang = [this]() -> Language {
 		const char* lang = std::getenv("LC_MESSAGES");
 		if (!lang || std::string(lang).empty()) {
 			lang = std::getenv("LANG");
@@ -24,7 +24,12 @@ Translator::Translator() : Loggable("Translator") {
 		if (pos != std::string::npos) {
 			langStr = langStr.substr(0, pos);
 		}
-		return Language::fromString(langStr);
+		try {
+			return Language::fromString(langStr);
+		} catch (std::exception& e) {
+			logger.warn("Unsupported language {}, fallback to {}", langStr, FALLBACK_LANG.toString());
+			return FALLBACK_LANG;
+		}
 	}();
 
 	std::ifstream file(Constants::TRANSLATIONS_FILE);
