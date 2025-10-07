@@ -1,8 +1,9 @@
 #pragma once
 
+#include "../../../../models/others/loggable.hpp"
 #include "../asus_base_client.hpp"
 
-class ArmouryBaseClient : public AsusBaseClient {
+class ArmouryBaseClient : public AsusBaseClient, Loggable {
   public:
 	ArmouryBaseClient(std::string object_path_sufix, bool required = false);
 

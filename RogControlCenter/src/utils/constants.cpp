@@ -5,13 +5,13 @@
 
 const std::string Constants::APP_NAME = "RogControlCenter";
 
-const std::string Constants::APP_VERSION = "4.3.16";
+const std::string Constants::APP_VERSION = "4.3.17";
 
 const pid_t Constants::PID = getpid();
 
 const std::string Constants::PLUGIN_VERSION = "1.2.3";
 
-const bool Constants::DEV_MODE = false;
+const bool Constants::DEV_MODE = true;
 
 const std::string Constants::HOME_DIR = std::getenv("HOME");
 
