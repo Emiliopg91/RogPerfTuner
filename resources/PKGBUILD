@@ -36,6 +36,7 @@ makedepends=(
   'git'
   'libsecret'
   'ninja'
+  'npm'
   'pkgconf'
   'podman'
   'qtcreator'
@@ -44,15 +45,10 @@ makedepends=(
 )
 
 prepare() {
-    if ! command -v node &> /dev/null || ! command -v npm &> /dev/null; then
-        echo "Installing nodejs and its packages"
-        curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.40.3/install.sh | bash
-        export NVM_DIR="$HOME/.nvm"
-            [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
-            [ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"
-        nvm install 24
-        nvm use 24
-        npm i -g pnpm@8.5.1 shx@0.3.4
+
+    if ! command -v pnpm &> /dev/null || ! command -v shx &> /dev/null; then
+        echo "Installing missing npm modules"
+        sudo npm i -g pnpm@8.5.1 shx@0.3.4
     fi
 
     cd "$srcdir/RogControlCenter"
