@@ -232,7 +232,7 @@ void PerformanceService::setTdps(const PerformanceProfile& profile) {
 				pl2SpptClient.setCurrentValue(pl2);
 			}
 		} catch (std::exception& e) {
-			logger.info("Error setting CPU TDPs: {}", e.what());
+			logger.error("Error setting CPU TDPs: {}", e.what());
 		}
 
 		Logger::rem_tab();
@@ -251,7 +251,7 @@ void PerformanceService::setTgp(const PerformanceProfile& profile) {
 				nvBoostClient.setCurrentValue(nvb);
 				TimeUtils::sleep(25);
 			} catch (std::exception& e) {
-				logger.info("Error setting Nvidia Boost: {}", e.what());
+				logger.error("Error setting Nvidia Boost: {}", e.what());
 			}
 		}
 
@@ -261,7 +261,7 @@ void PerformanceService::setTgp(const PerformanceProfile& profile) {
 				logger.info("Throttle temp: {}ºC", nvt);
 				nvTempClient.setCurrentValue(nvt);
 			} catch (std::exception& e) {
-				logger.info("Error setting Nvidia TGP");
+				logger.error("Error setting Nvidia TGP");
 			}
 		}
 

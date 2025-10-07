@@ -1,7 +1,7 @@
 #include "../../../../../include/clients/dbus/asus/armoury/armoury_base_client.hpp"
 
 ArmouryBaseClient::ArmouryBaseClient(std::string object_path_sufix, bool required)
-	: AsusBaseClient("AsusArmoury", "asus_armoury/" + object_path_sufix, required) {
+	: AsusBaseClient("AsusArmoury", "asus_armoury/" + object_path_sufix, required), Loggable(object_path_sufix) {
 }
 
 int ArmouryBaseClient::getMinValue() {
