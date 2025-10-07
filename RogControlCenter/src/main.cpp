@@ -65,11 +65,11 @@ int main(int argc, char** argv) {
 	logger.info("Starting initialization");
 	Logger::add_tab();
 
+	Translator::getInstance();
+
 	logger.info("Creating QT application");
 	QApplication app(argc, argv);
 	app.setDesktopFileName(QString::fromStdString(Constants::APP_DRAW_FILE));
-
-	Translator::getInstance();
 
 	Toaster::getInstance().showToast(Translator::getInstance().translate("initializing"));
 
