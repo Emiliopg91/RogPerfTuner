@@ -7,13 +7,13 @@
 
 const std::string Constants::APP_NAME = "RogPerfTuner";
 
-const std::string Constants::APP_VERSION = "4.3.19";
+const std::string Constants::APP_VERSION = "4.4.0";
 
 const pid_t Constants::PID = getpid();
 
 const std::string Constants::PLUGIN_VERSION = "1.2.3";
 
-const bool Constants::DEV_MODE = false;
+const bool Constants::DEV_MODE = true;
 
 const std::string Constants::HOME_DIR = std::getenv("HOME");
 
