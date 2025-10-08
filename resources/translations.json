@@ -55,9 +55,9 @@
     "en": "Select color",
     "es": "Seleccione color"
   },
-  "battery": {
-    "en": "Battery",
-    "es": "Bateria"
+  "hardware": {
+    "en": "Hardware",
+    "es": "Hardware"
   },
   "charge.threshold": {
     "en": "Charge limit",
@@ -346,5 +346,17 @@
   "enable.decky.integration.body": {
     "en": "Decky plugin for Steam will enable integration between both applications in order to apply optimizations.",
     "es": "El plugin de Decky para Steam habilitará la integración entre ambas aplicaciones para aplicar optimizaciones."
+  },
+  "boot.sound": {
+    "en": "Boot sound",
+    "es": "Sonido de arranque"
+  },
+  "enabled": {
+    "en": "Enabled",
+    "es": "Activado"
+  },
+  "disabled": {
+    "en": "Disabled",
+    "es": "Desactivado"
   }
 }

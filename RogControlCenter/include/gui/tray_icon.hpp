@@ -25,6 +25,7 @@ class TrayIcon : public QObject, public Singleton<TrayIcon> {
 	void show();
 
   public slots:
+	void onBootSoundChanged(bool value);
 	void onBatteryLimitChanged(BatteryThreshold value);
 	void onPerformanceProfileChanged(PerformanceProfile value);
 	void onEffectChanged(std::string effect);
@@ -41,6 +42,7 @@ class TrayIcon : public QObject, public Singleton<TrayIcon> {
 	std::unordered_map<std::string, QAction*> effectActions;
 	std::unordered_map<std::string, QAction*> perfProfileActions;
 	std::unordered_map<std::string, QAction*> schedulerActions;
+	std::unordered_map<bool, QAction*> bootSoundActions;
 	QMenu* profileMenu;
 	QMenu* schedulerMenu;
 	QMenu* colorMenu;
@@ -53,6 +55,7 @@ class TrayIcon : public QObject, public Singleton<TrayIcon> {
 	void setPerformanceProfile(PerformanceProfile profile);
 	void setScheduler(std::optional<std::string> scheduler);
 	void setBatteryThreshold(BatteryThreshold threshold);
+	void setBootSound(bool value);
 	void setProfileMenuEnabled();
 	void setSchedulerMenuEnabled();
 	void openMainWindow();

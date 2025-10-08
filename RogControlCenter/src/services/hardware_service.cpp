@@ -291,3 +291,27 @@ std::unordered_map<std::string, std::string> HardwareService::getGpuSelectorEnv(
 std::unordered_map<std::string, std::string> HardwareService::getGpus() {
 	return gpus;
 }
+
+bool HardwareService::getBootSoundAvailable() {
+	return bootSoundClient.available();
+}
+
+bool HardwareService::getBootSound() {
+	return bootSoundClient.getCurrentValue();
+}
+
+void HardwareService::setBootSound(bool enable) {
+	if (enable == getBootSound()) {
+		return;
+	}
+
+	std::lock_guard<std::mutex> lock(actionMutex);
+	logger.info("Setting boot sound: {}", enable ? "Enabled" : "Disabled");
+	Logger::add_tab();
+	auto t0 = TimeUtils::now();
+	bootSoundClient.setCurrentValue(enable);
+	auto t1 = TimeUtils::now();
+	Logger::rem_tab();
+	logger.info("Boot sound setted after {} ms", TimeUtils::getTimeDiff(t0, t1));
+	eventBus.emitBootSound(enable);
+}
