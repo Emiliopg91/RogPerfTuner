@@ -21,6 +21,16 @@ endif()
 #)
 
 # ------------------------------
+# Buscar paquetes de SPDLOG
+# ------------------------------
+find_package(spdlog REQUIRED)
+
+# ------------------------------
+# Buscar paquetes de NLOHNMANN_JSON
+# ------------------------------
+find_package(nlohmann_json REQUIRED)
+
+# ------------------------------
 # Buscar paquetes de Qt6
 # ------------------------------
 find_package(Qt6 REQUIRED COMPONENTS Core DBus Gui Widgets Charts)
@@ -43,10 +53,10 @@ file(GLOB_RECURSE HEADERS_RCC
     "${CMAKE_CURRENT_SOURCE_DIR}/include/*.hpp"
 )
 
-add_executable(RogControlCenter ${SOURCES_RCC} ${HEADERS_RCC})
-set_target_properties(RogControlCenter PROPERTIES AUTOMOC ON)
-target_include_directories(RogControlCenter PRIVATE ${LIBSECRET_INCLUDE_DIRS})
-target_link_libraries(RogControlCenter PRIVATE 
+add_executable(RogPerfTuner ${SOURCES_RCC} ${HEADERS_RCC})
+set_target_properties(RogPerfTuner PROPERTIES AUTOMOC ON)
+target_include_directories(RogPerfTuner PRIVATE ${LIBSECRET_INCLUDE_DIRS})
+target_link_libraries(RogPerfTuner PRIVATE 
     Qt6::Core
     Qt6::Gui
     Qt6::Widgets
@@ -62,7 +72,10 @@ target_link_libraries(RogControlCenter PRIVATE
 if(IS_AURPKG)
     add_compile_definitions(IS_AURPKG)
 else()
-    target_link_libraries(RogControlCenter PRIVATE httplib::httplib)
+    # ------------------------------
+    # Buscar paquetes de httplib
+    # ------------------------------
+    target_link_libraries(RogPerfTuner PRIVATE httplib::httplib)
 endif()
 
 # ------------------------------
@@ -103,7 +116,7 @@ file(GLOB_RECURSE SOURCES_COMMUNICATION_MESSAGE
     "${CMAKE_CURRENT_SOURCE_DIR}/src/models/others/communication_message.cpp"
     "${CMAKE_CURRENT_SOURCE_DIR}/src/models/others/loggable.cpp"
     "${CMAKE_CURRENT_SOURCE_DIR}/src/clients/unix_socket/abstract/abstract_unix_socket_client.cpp"
-    "${CMAKE_CURRENT_SOURCE_DIR}/src/clients/unix_socket/rog_control_center_client.cpp"
+    "${CMAKE_CURRENT_SOURCE_DIR}/src/clients/unix_socket/rog_perf_tuner_client.cpp"
     "${CMAKE_CURRENT_SOURCE_DIR}/src/logger/*.cpp"
     "${CMAKE_CURRENT_SOURCE_DIR}/src/shell/*.cpp"
     "${CMAKE_CURRENT_SOURCE_DIR}/src/utils/time_utils.cpp"

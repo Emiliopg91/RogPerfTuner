@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.16)
 
-project(RogControlCenter VERSION 4.3.18 LANGUAGES CXX)
+project(RogPerfTuner VERSION 4.3.19 LANGUAGES CXX)
 
 set(CMAKE_CXX_FLAGS_RELEASE "-DNDEBUG" CACHE STRING "" FORCE)
 
@@ -28,11 +28,6 @@ else()
     add_subdirectory(submodules/httplib)
 endif()
 
-set(JSON_BuildTests OFF CACHE INTERNAL "")
-add_subdirectory(submodules/json)
-
-add_subdirectory(submodules/spdlog)
-
 add_subdirectory(submodules/OpenRGB-cppSDK)
 
-add_subdirectory(RogControlCenter)
+add_subdirectory(RogPerfTuner)

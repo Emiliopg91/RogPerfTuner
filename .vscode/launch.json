@@ -5,7 +5,7 @@
             "name": "Debug MiProyecto",
             "type": "lldb",
             "request": "launch",
-            "program": "${workspaceFolder}/build/RogControlCenter/RogControlCenter",
+            "program": "${workspaceFolder}/build/RogPerfTuner/RogPerfTuner",
             "args": [],
             "cwd": "${workspaceFolder}",
             "preLaunchTask": "CMake Build",

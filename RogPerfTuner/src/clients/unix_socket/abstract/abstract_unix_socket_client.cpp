@@ -30,7 +30,6 @@ AbstractUnixSocketClient::~AbstractUnixSocketClient() {
 
 void AbstractUnixSocketClient::stop(bool stopConnThread) {
 	try {
-		logger.info("Stopping client");
 		Logger::add_tab();
 		_connected = false;
 		_running   = false;
@@ -53,7 +52,6 @@ void AbstractUnixSocketClient::stop(bool stopConnThread) {
 			readThread.join();
 		}
 		Logger::rem_tab();
-		logger.info("Client stopped");
 	} catch (std::exception& e) {
 		logger.error("Error on stop: {}", e.what());
 	}

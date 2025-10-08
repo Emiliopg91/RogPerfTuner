@@ -4,11 +4,11 @@
 #include <sys/un.h>
 #include <unistd.h>
 
-#include "../../../include/clients/unix_socket/rog_control_center_client.hpp"
+#include "../../../include/clients/unix_socket/rog_perf_tuner_client.hpp"
 #include "../../../include/logger/logger_provider.hpp"
 
 int main() {
 	LoggerProvider::initialize();
-	RogControlCenterClient::getInstance().decreaseBrightness();
+	RogPerfTunerClient::getInstance().nextProfile();
 	return 0;
 }

@@ -7,7 +7,7 @@ input_file = os.path.abspath(
     os.path.dirname(__file__) + "/../../resources/translations.json"
 )
 translator_file = os.path.abspath(
-    os.path.dirname(__file__) + "/../../RogControlCenter/src/translator/translator.cpp"
+    os.path.dirname(__file__) + "/../../RogPerfTuner/src/translator/translator.cpp"
 )
 
 print(f"Preloading translations from {input_file}")
