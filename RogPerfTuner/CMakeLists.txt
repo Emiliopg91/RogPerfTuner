@@ -21,6 +21,16 @@ endif()
 #)
 
 # ------------------------------
+# Buscar paquetes de SPDLOG
+# ------------------------------
+find_package(spdlog REQUIRED)
+
+# ------------------------------
+# Buscar paquetes de NLOHNMANN_JSON
+# ------------------------------
+find_package(nlohmann_json REQUIRED)
+
+# ------------------------------
 # Buscar paquetes de Qt6
 # ------------------------------
 find_package(Qt6 REQUIRED COMPONENTS Core DBus Gui Widgets Charts)
@@ -62,6 +72,9 @@ target_link_libraries(RogPerfTuner PRIVATE
 if(IS_AURPKG)
     add_compile_definitions(IS_AURPKG)
 else()
+    # ------------------------------
+    # Buscar paquetes de httplib
+    # ------------------------------
     target_link_libraries(RogPerfTuner PRIVATE httplib::httplib)
 endif()
 

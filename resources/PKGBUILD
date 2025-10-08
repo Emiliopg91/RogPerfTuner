@@ -18,6 +18,7 @@ depends=(
   'libsecret'
   'libusb'
   'mbedtls'
+  'nlohmann-json'
   'power-profiles-daemon'
   'python'
   'python-pip'
@@ -27,6 +28,7 @@ depends=(
   'qt6-charts'
   'qt6-svg'
   'scx-scheds'
+  'spdlog'
   'upower'
 )
 makedepends=(
@@ -88,7 +90,7 @@ package() {
     install -d "$pkgdir/usr/share/applications"
     sed -e 's|Exec=usr/bin/RogPerfTuner|Exec=/usr/bin/rog-perf-tuner|' \
         -e 's|Icon=icon|Icon=rog-perf-tuner|' \
-        RogPerfTuner.desktop > "$pkgdir/usr/share/applications/rog-perf-tuner.desktop"
+        rog-perf-tuner.desktop > "$pkgdir/usr/share/applications/rog-perf-tuner.desktop"
 
     install -Dm644 icon.svg \
         "$pkgdir/usr/share/icons/hicolor/scalable/apps/rog-perf-tuner.svg"

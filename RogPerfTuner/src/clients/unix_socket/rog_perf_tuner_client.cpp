@@ -20,6 +20,10 @@ void RogPerfTunerClient::decreaseBrightness() {
 	invoke(Constants::DEC_BRIGHT, {});
 }
 
+void RogPerfTunerClient::nextProfile() {
+	invoke(Constants::PERF_PROF, {});
+}
+
 SteamGameConfig RogPerfTunerClient::getGameConfig(std::string steamId) {
 	auto res = invoke(Constants::GAME_CFG, {steamId});
 

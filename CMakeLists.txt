@@ -28,11 +28,6 @@ else()
     add_subdirectory(submodules/httplib)
 endif()
 
-set(JSON_BuildTests OFF CACHE INTERNAL "")
-add_subdirectory(submodules/json)
-
-add_subdirectory(submodules/spdlog)
-
 add_subdirectory(submodules/OpenRGB-cppSDK)
 
 add_subdirectory(RogPerfTuner)
