@@ -1,7 +1,7 @@
 [Desktop Entry]
-Name=RogControlCenter
+Name=RogPerfTuner
 Comment=An utility to manage Asus Rog laptop performance and RGB lighting
-Exec=usr/bin/RogControlCenter
+Exec=usr/bin/RogPerfTuner
 Icon=icon
 Terminal=false
 Type=Application

@@ -4,10 +4,10 @@
 #include "../../models/steam/steam_game_config.hpp"
 #include "abstract/abstract_unix_socket_client.hpp"
 
-class RogControlCenterClient : public AbstractUnixSocketClient, public Singleton<RogControlCenterClient> {
+class RogPerfTunerClient : public AbstractUnixSocketClient, public Singleton<RogPerfTunerClient> {
   private:
-	RogControlCenterClient();
-	friend class Singleton<RogControlCenterClient>;
+	RogPerfTunerClient();
+	friend class Singleton<RogPerfTunerClient>;
 
   public:
 	void nextEffect();

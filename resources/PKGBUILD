@@ -1,12 +1,12 @@
 # Maintainer: Emiliopg91 <ojosdeserbio@gmail.com>
-pkgname=rog-control-center
+pkgname=rog-perf-tuner
 pkgver=<version>
 pkgrel=1
-pkgdesc="RogControlCenter - An utility to manage Asus Rog laptop performance and RGB lighting"
+pkgdesc="RogPerfTuner - An utility to manage Asus Rog laptop performance and RGB lighting"
 arch=('x86_64')
-url="https://github.com/Emiliopg91/RogControlCenter"
+url="https://github.com/Emiliopg91/RogPerfTuner"
 license=('GPL2')
-source=("git+https://github.com/Emiliopg91/RogControlCenter.git#tag=$pkgver")
+source=("git+https://github.com/Emiliopg91/RogPerfTuner.git#tag=$pkgver")
 sha256sums=('SKIP')
 options=('!strip')
 depends=(
@@ -51,7 +51,7 @@ prepare() {
         sudo npm i -g pnpm@8.5.1 shx@0.3.4
     fi
 
-    cd "$srcdir/RogControlCenter"
+    cd "$srcdir/RogPerfTuner"
     git submodule update --init --recursive
 
     export CONTAINERS_STORAGE_CONF=$srcdir/containers-storage.conf
@@ -75,21 +75,21 @@ build() {
         ""|default|*) export CXXFLAGS="" ;;  # Por defecto
     esac
 
-    cd "$srcdir/RogControlCenter"
+    cd "$srcdir/RogPerfTuner"
     IS_AURPKG=1 make release
 }
 
 package() {
-    cd "$srcdir/RogControlCenter/dist/appimage-fs"
+    cd "$srcdir/RogPerfTuner/dist/appimage-fs"
 
-    install -Dm755 ../RogControlCenter.AppImage \
-        "$pkgdir/usr/bin/rogcontrolcenter"
+    install -Dm755 ../RogPerfTuner.AppImage \
+        "$pkgdir/usr/bin/rog-perf-tuner"
 
     install -d "$pkgdir/usr/share/applications"
-    sed -e 's|Exec=usr/bin/RogControlCenter|Exec=/usr/bin/rogcontrolcenter|' \
-        -e 's|Icon=icon|Icon=rogcontrolcenter|' \
-        RogControlCenter.desktop > "$pkgdir/usr/share/applications/rogcontrolcenter.desktop"
+    sed -e 's|Exec=usr/bin/RogPerfTuner|Exec=/usr/bin/rog-perf-tuner|' \
+        -e 's|Icon=icon|Icon=rog-perf-tuner|' \
+        RogPerfTuner.desktop > "$pkgdir/usr/share/applications/rog-perf-tuner.desktop"
 
     install -Dm644 icon.svg \
-        "$pkgdir/usr/share/icons/hicolor/scalable/apps/rogcontrolcenter.svg"
+        "$pkgdir/usr/share/icons/hicolor/scalable/apps/rog-perf-tuner.svg"
 }

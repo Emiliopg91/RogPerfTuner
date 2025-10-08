@@ -1,12 +1,12 @@
 <h1 align="center">
-<img src="./resources/icons/icon.svg" alt="RogControlCenter logo" width="300">
+<img src="./resources/icons/icon.svg" alt="RogPerfTuner logo" width="300">
   <br>
-  RogControlCenter
+  RogPerfTuner
   <br>  
   <p align="center">
-    <a href="https://github.com/Emiliopg91/RogControlCenter/releases"><img src="https://img.shields.io/github/downloads/Emiliopg91/RogControlCenter/total" /></a>
-    <a href="https://github.com/Emiliopg91/RogControlCenter/actions/workflows/release.yml"><img src="https://github.com/Emiliopg91/RogControlCenter/actions/workflows/release.yml/badge.svg" /></a>
-    <a href="https://deepwiki.com/Emiliopg91/RogControlCenter"><img src="https://deepwiki.com/badge.svg" /></a>
+    <a href="https://github.com/Emiliopg91/RogPerfTuner/releases"><img src="https://img.shields.io/github/downloads/Emiliopg91/RogPerfTuner/total" /></a>
+    <a href="https://github.com/Emiliopg91/RogPerfTuner/actions/workflows/release.yml"><img src="https://github.com/Emiliopg91/RogPerfTuner/actions/workflows/release.yml/badge.svg" /></a>
+    <a href="https://deepwiki.com/Emiliopg91/RogPerfTuner"><img src="https://deepwiki.com/badge.svg" /></a>
     <br>
   </p>
 </h1>
@@ -16,13 +16,13 @@
 - [Description](#description)
 
 - [Screenshots](#screenshots)
-  
 - [Features](#features)
 
 - [Installation](#installation)
-  - [AppImage version](#appimage-version) 
-  - [PKGBUILD version](#pkgbuild-version) 
-  - [Steam and DeckyLoader integration](#steam-and-deckyloader-integration) 
+
+  - [AppImage version](#appimage-version)
+  - [PKGBUILD version](#pkgbuild-version)
+  - [Steam and DeckyLoader integration](#steam-and-deckyloader-integration)
 
 - [Compatibility](#compatibility)
 
@@ -36,14 +36,15 @@ Do you want breathtaking RGB effects on your laptop and peripherals? And with sy
 
 What if I told you you can also integrate with Steam and assign which GPU to use from a graphical interface, and view performance metrics?
 
-RogControlCenter is here to simplify your life and help you enjoy gaming on your Asus ROG laptop once and for all.
+RogPerfTuner is here to simplify your life and help you enjoy gaming on your Asus ROG laptop once and for all.
 
 Do you want something similar for Asus Rog Ally/Ally X? Check [AllyDeckyCompanion](https://github.com/Emiliopg91/AllyDeckyCompanion/)
 
 ## Screenshots
-| ![Main Window](./resources/screenshots/main_window.png) | ![Schedulers](./resources/screenshots/schedulers.png) |
-|---|---|
-| ![Fan curve editor](./resources/screenshots/fan_editor.png) | ![Game configuration editor](./resources/screenshots/game_cfg.png) |S
+
+| ![Main Window](./resources/screenshots/main_window.png)     | ![Schedulers](./resources/screenshots/schedulers.png)              |
+| ----------------------------------------------------------- | ------------------------------------------------------------------ | --- |
+| ![Fan curve editor](./resources/screenshots/fan_editor.png) | ![Game configuration editor](./resources/screenshots/game_cfg.png) | S   |
 
 ## Features
 
@@ -107,6 +108,7 @@ Do you want something similar for Asus Rog Ally/Ally X? Check [AllyDeckyCompanio
 ## Installation
 
 ### AppImage version
+
 For full support of this application, run the following command to install the dependencies:
 
 ```bash
@@ -120,9 +122,9 @@ Once you installed those packages, you can run the AppImage with support for eve
 You can use any AUR helper (tested on yay and paru) to make a local installation of the package.
 That process performs installation of every dependency.
 
-### Steam and DeckyLoader integration 
+### Steam and DeckyLoader integration
 
-To enable Steam integration, you should install Steam and DeckyLoader previous to the first run of RogControlCenter. If you've already launched RogControlCenter you can delete ~/.RogControlCenter and perform Steam and DeckyLoader installation.
+To enable Steam integration, you should install Steam and DeckyLoader previous to the first run of RogPerfTuner. If you've already launched RogPerfTuner you can delete ~/.RogPerfTuner and perform Steam and DeckyLoader installation.
 
 ## Compatibility
 

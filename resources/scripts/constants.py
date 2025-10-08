@@ -19,7 +19,7 @@ debug_file = os.path.abspath(os.path.dirname(__file__) + "/../../.Debug")
 release_file = os.path.abspath(os.path.dirname(__file__) + "/../../.Release")
 
 constants_file = os.path.abspath(
-    os.path.dirname(__file__) + "/../../RogControlCenter/src/utils/constants.cpp"
+    os.path.dirname(__file__) + "/../../RogPerfTuner/src/utils/constants.cpp"
 )
 constants_time = os.path.getmtime(constants_file)
 

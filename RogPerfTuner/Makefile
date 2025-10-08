@@ -132,14 +132,14 @@ install/strip/fast: preinstall/fast
 
 # The main all target
 all: cmake_check_build_system
-	cd /var/mnt/Datos/Desarrollo/Workspace/VSCode/C++_sandbox && $(CMAKE_COMMAND) -E cmake_progress_start /var/mnt/Datos/Desarrollo/Workspace/VSCode/C++_sandbox/CMakeFiles /var/mnt/Datos/Desarrollo/Workspace/VSCode/C++_sandbox/RogControlCenter//CMakeFiles/progress.marks
-	cd /var/mnt/Datos/Desarrollo/Workspace/VSCode/C++_sandbox && $(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 RogControlCenter/all
+	cd /var/mnt/Datos/Desarrollo/Workspace/VSCode/C++_sandbox && $(CMAKE_COMMAND) -E cmake_progress_start /var/mnt/Datos/Desarrollo/Workspace/VSCode/C++_sandbox/CMakeFiles /var/mnt/Datos/Desarrollo/Workspace/VSCode/C++_sandbox/RogPerfTuner//CMakeFiles/progress.marks
+	cd /var/mnt/Datos/Desarrollo/Workspace/VSCode/C++_sandbox && $(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 RogPerfTuner/all
 	$(CMAKE_COMMAND) -E cmake_progress_start /var/mnt/Datos/Desarrollo/Workspace/VSCode/C++_sandbox/CMakeFiles 0
 .PHONY : all
 
 # The main clean target
 clean:
-	cd /var/mnt/Datos/Desarrollo/Workspace/VSCode/C++_sandbox && $(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 RogControlCenter/clean
+	cd /var/mnt/Datos/Desarrollo/Workspace/VSCode/C++_sandbox && $(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 RogPerfTuner/clean
 .PHONY : clean
 
 # The main clean target
@@ -148,12 +148,12 @@ clean/fast: clean
 
 # Prepare targets for installation.
 preinstall: all
-	cd /var/mnt/Datos/Desarrollo/Workspace/VSCode/C++_sandbox && $(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 RogControlCenter/preinstall
+	cd /var/mnt/Datos/Desarrollo/Workspace/VSCode/C++_sandbox && $(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 RogPerfTuner/preinstall
 .PHONY : preinstall
 
 # Prepare targets for installation.
 preinstall/fast:
-	cd /var/mnt/Datos/Desarrollo/Workspace/VSCode/C++_sandbox && $(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 RogControlCenter/preinstall
+	cd /var/mnt/Datos/Desarrollo/Workspace/VSCode/C++_sandbox && $(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 RogPerfTuner/preinstall
 .PHONY : preinstall/fast
 
 # clear depends
@@ -163,77 +163,77 @@ depend:
 .PHONY : depend
 
 # Convenience name for target.
-RogControlCenter/CMakeFiles/RogControlCenter.dir/rule:
-	cd /var/mnt/Datos/Desarrollo/Workspace/VSCode/C++_sandbox && $(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 RogControlCenter/CMakeFiles/RogControlCenter.dir/rule
-.PHONY : RogControlCenter/CMakeFiles/RogControlCenter.dir/rule
+RogPerfTuner/CMakeFiles/RogPerfTuner.dir/rule:
+	cd /var/mnt/Datos/Desarrollo/Workspace/VSCode/C++_sandbox && $(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 RogPerfTuner/CMakeFiles/RogPerfTuner.dir/rule
+.PHONY : RogPerfTuner/CMakeFiles/RogPerfTuner.dir/rule
 
 # Convenience name for target.
-RogControlCenter: RogControlCenter/CMakeFiles/RogControlCenter.dir/rule
-.PHONY : RogControlCenter
+RogPerfTuner: RogPerfTuner/CMakeFiles/RogPerfTuner.dir/rule
+.PHONY : RogPerfTuner
 
 # fast build rule for target.
-RogControlCenter/fast:
-	cd /var/mnt/Datos/Desarrollo/Workspace/VSCode/C++_sandbox && $(MAKE) $(MAKESILENT) -f RogControlCenter/CMakeFiles/RogControlCenter.dir/build.make RogControlCenter/CMakeFiles/RogControlCenter.dir/build
-.PHONY : RogControlCenter/fast
+RogPerfTuner/fast:
+	cd /var/mnt/Datos/Desarrollo/Workspace/VSCode/C++_sandbox && $(MAKE) $(MAKESILENT) -f RogPerfTuner/CMakeFiles/RogPerfTuner.dir/build.make RogPerfTuner/CMakeFiles/RogPerfTuner.dir/build
+.PHONY : RogPerfTuner/fast
 
 # Convenience name for target.
-RogControlCenter/CMakeFiles/RogControlCenter_autogen_timestamp_deps.dir/rule:
-	cd /var/mnt/Datos/Desarrollo/Workspace/VSCode/C++_sandbox && $(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 RogControlCenter/CMakeFiles/RogControlCenter_autogen_timestamp_deps.dir/rule
-.PHONY : RogControlCenter/CMakeFiles/RogControlCenter_autogen_timestamp_deps.dir/rule
+RogPerfTuner/CMakeFiles/RogPerfTuner_autogen_timestamp_deps.dir/rule:
+	cd /var/mnt/Datos/Desarrollo/Workspace/VSCode/C++_sandbox && $(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 RogPerfTuner/CMakeFiles/RogPerfTuner_autogen_timestamp_deps.dir/rule
+.PHONY : RogPerfTuner/CMakeFiles/RogPerfTuner_autogen_timestamp_deps.dir/rule
 
 # Convenience name for target.
-RogControlCenter_autogen_timestamp_deps: RogControlCenter/CMakeFiles/RogControlCenter_autogen_timestamp_deps.dir/rule
-.PHONY : RogControlCenter_autogen_timestamp_deps
+RogPerfTuner_autogen_timestamp_deps: RogPerfTuner/CMakeFiles/RogPerfTuner_autogen_timestamp_deps.dir/rule
+.PHONY : RogPerfTuner_autogen_timestamp_deps
 
 # fast build rule for target.
-RogControlCenter_autogen_timestamp_deps/fast:
-	cd /var/mnt/Datos/Desarrollo/Workspace/VSCode/C++_sandbox && $(MAKE) $(MAKESILENT) -f RogControlCenter/CMakeFiles/RogControlCenter_autogen_timestamp_deps.dir/build.make RogControlCenter/CMakeFiles/RogControlCenter_autogen_timestamp_deps.dir/build
-.PHONY : RogControlCenter_autogen_timestamp_deps/fast
+RogPerfTuner_autogen_timestamp_deps/fast:
+	cd /var/mnt/Datos/Desarrollo/Workspace/VSCode/C++_sandbox && $(MAKE) $(MAKESILENT) -f RogPerfTuner/CMakeFiles/RogPerfTuner_autogen_timestamp_deps.dir/build.make RogPerfTuner/CMakeFiles/RogPerfTuner_autogen_timestamp_deps.dir/build
+.PHONY : RogPerfTuner_autogen_timestamp_deps/fast
 
 # Convenience name for target.
-RogControlCenter/CMakeFiles/RogControlCenter_autogen.dir/rule:
-	cd /var/mnt/Datos/Desarrollo/Workspace/VSCode/C++_sandbox && $(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 RogControlCenter/CMakeFiles/RogControlCenter_autogen.dir/rule
-.PHONY : RogControlCenter/CMakeFiles/RogControlCenter_autogen.dir/rule
+RogPerfTuner/CMakeFiles/RogPerfTuner_autogen.dir/rule:
+	cd /var/mnt/Datos/Desarrollo/Workspace/VSCode/C++_sandbox && $(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 RogPerfTuner/CMakeFiles/RogPerfTuner_autogen.dir/rule
+.PHONY : RogPerfTuner/CMakeFiles/RogPerfTuner_autogen.dir/rule
 
 # Convenience name for target.
-RogControlCenter_autogen: RogControlCenter/CMakeFiles/RogControlCenter_autogen.dir/rule
-.PHONY : RogControlCenter_autogen
+RogPerfTuner_autogen: RogPerfTuner/CMakeFiles/RogPerfTuner_autogen.dir/rule
+.PHONY : RogPerfTuner_autogen
 
 # fast build rule for target.
-RogControlCenter_autogen/fast:
-	cd /var/mnt/Datos/Desarrollo/Workspace/VSCode/C++_sandbox && $(MAKE) $(MAKESILENT) -f RogControlCenter/CMakeFiles/RogControlCenter_autogen.dir/build.make RogControlCenter/CMakeFiles/RogControlCenter_autogen.dir/build
-.PHONY : RogControlCenter_autogen/fast
+RogPerfTuner_autogen/fast:
+	cd /var/mnt/Datos/Desarrollo/Workspace/VSCode/C++_sandbox && $(MAKE) $(MAKESILENT) -f RogPerfTuner/CMakeFiles/RogPerfTuner_autogen.dir/build.make RogPerfTuner/CMakeFiles/RogPerfTuner_autogen.dir/build
+.PHONY : RogPerfTuner_autogen/fast
 
-RogControlCenter_autogen/mocs_compilation.o: RogControlCenter_autogen/mocs_compilation.cpp.o
-.PHONY : RogControlCenter_autogen/mocs_compilation.o
+RogPerfTuner_autogen/mocs_compilation.o: RogPerfTuner_autogen/mocs_compilation.cpp.o
+.PHONY : RogPerfTuner_autogen/mocs_compilation.o
 
 # target to build an object file
-RogControlCenter_autogen/mocs_compilation.cpp.o:
-	cd /var/mnt/Datos/Desarrollo/Workspace/VSCode/C++_sandbox && $(MAKE) $(MAKESILENT) -f RogControlCenter/CMakeFiles/RogControlCenter.dir/build.make RogControlCenter/CMakeFiles/RogControlCenter.dir/RogControlCenter_autogen/mocs_compilation.cpp.o
-.PHONY : RogControlCenter_autogen/mocs_compilation.cpp.o
+RogPerfTuner_autogen/mocs_compilation.cpp.o:
+	cd /var/mnt/Datos/Desarrollo/Workspace/VSCode/C++_sandbox && $(MAKE) $(MAKESILENT) -f RogPerfTuner/CMakeFiles/RogPerfTuner.dir/build.make RogPerfTuner/CMakeFiles/RogPerfTuner.dir/RogPerfTuner_autogen/mocs_compilation.cpp.o
+.PHONY : RogPerfTuner_autogen/mocs_compilation.cpp.o
 
-RogControlCenter_autogen/mocs_compilation.i: RogControlCenter_autogen/mocs_compilation.cpp.i
-.PHONY : RogControlCenter_autogen/mocs_compilation.i
+RogPerfTuner_autogen/mocs_compilation.i: RogPerfTuner_autogen/mocs_compilation.cpp.i
+.PHONY : RogPerfTuner_autogen/mocs_compilation.i
 
 # target to preprocess a source file
-RogControlCenter_autogen/mocs_compilation.cpp.i:
-	cd /var/mnt/Datos/Desarrollo/Workspace/VSCode/C++_sandbox && $(MAKE) $(MAKESILENT) -f RogControlCenter/CMakeFiles/RogControlCenter.dir/build.make RogControlCenter/CMakeFiles/RogControlCenter.dir/RogControlCenter_autogen/mocs_compilation.cpp.i
-.PHONY : RogControlCenter_autogen/mocs_compilation.cpp.i
+RogPerfTuner_autogen/mocs_compilation.cpp.i:
+	cd /var/mnt/Datos/Desarrollo/Workspace/VSCode/C++_sandbox && $(MAKE) $(MAKESILENT) -f RogPerfTuner/CMakeFiles/RogPerfTuner.dir/build.make RogPerfTuner/CMakeFiles/RogPerfTuner.dir/RogPerfTuner_autogen/mocs_compilation.cpp.i
+.PHONY : RogPerfTuner_autogen/mocs_compilation.cpp.i
 
-RogControlCenter_autogen/mocs_compilation.s: RogControlCenter_autogen/mocs_compilation.cpp.s
-.PHONY : RogControlCenter_autogen/mocs_compilation.s
+RogPerfTuner_autogen/mocs_compilation.s: RogPerfTuner_autogen/mocs_compilation.cpp.s
+.PHONY : RogPerfTuner_autogen/mocs_compilation.s
 
 # target to generate assembly for a file
-RogControlCenter_autogen/mocs_compilation.cpp.s:
-	cd /var/mnt/Datos/Desarrollo/Workspace/VSCode/C++_sandbox && $(MAKE) $(MAKESILENT) -f RogControlCenter/CMakeFiles/RogControlCenter.dir/build.make RogControlCenter/CMakeFiles/RogControlCenter.dir/RogControlCenter_autogen/mocs_compilation.cpp.s
-.PHONY : RogControlCenter_autogen/mocs_compilation.cpp.s
+RogPerfTuner_autogen/mocs_compilation.cpp.s:
+	cd /var/mnt/Datos/Desarrollo/Workspace/VSCode/C++_sandbox && $(MAKE) $(MAKESILENT) -f RogPerfTuner/CMakeFiles/RogPerfTuner.dir/build.make RogPerfTuner/CMakeFiles/RogPerfTuner.dir/RogPerfTuner_autogen/mocs_compilation.cpp.s
+.PHONY : RogPerfTuner_autogen/mocs_compilation.cpp.s
 
 src/clients/dbus/abstract/abstract_dbus_client.o: src/clients/dbus/abstract/abstract_dbus_client.cpp.o
 .PHONY : src/clients/dbus/abstract/abstract_dbus_client.o
 
 # target to build an object file
 src/clients/dbus/abstract/abstract_dbus_client.cpp.o:
-	cd /var/mnt/Datos/Desarrollo/Workspace/VSCode/C++_sandbox && $(MAKE) $(MAKESILENT) -f RogControlCenter/CMakeFiles/RogControlCenter.dir/build.make RogControlCenter/CMakeFiles/RogControlCenter.dir/src/clients/dbus/abstract/abstract_dbus_client.cpp.o
+	cd /var/mnt/Datos/Desarrollo/Workspace/VSCode/C++_sandbox && $(MAKE) $(MAKESILENT) -f RogPerfTuner/CMakeFiles/RogPerfTuner.dir/build.make RogPerfTuner/CMakeFiles/RogPerfTuner.dir/src/clients/dbus/abstract/abstract_dbus_client.cpp.o
 .PHONY : src/clients/dbus/abstract/abstract_dbus_client.cpp.o
 
 src/clients/dbus/abstract/abstract_dbus_client.i: src/clients/dbus/abstract/abstract_dbus_client.cpp.i
@@ -241,7 +241,7 @@ src/clients/dbus/abstract/abstract_dbus_client.i: src/clients/dbus/abstract/abst
 
 # target to preprocess a source file
 src/clients/dbus/abstract/abstract_dbus_client.cpp.i:
-	cd /var/mnt/Datos/Desarrollo/Workspace/VSCode/C++_sandbox && $(MAKE) $(MAKESILENT) -f RogControlCenter/CMakeFiles/RogControlCenter.dir/build.make RogControlCenter/CMakeFiles/RogControlCenter.dir/src/clients/dbus/abstract/abstract_dbus_client.cpp.i
+	cd /var/mnt/Datos/Desarrollo/Workspace/VSCode/C++_sandbox && $(MAKE) $(MAKESILENT) -f RogPerfTuner/CMakeFiles/RogPerfTuner.dir/build.make RogPerfTuner/CMakeFiles/RogPerfTuner.dir/src/clients/dbus/abstract/abstract_dbus_client.cpp.i
 .PHONY : src/clients/dbus/abstract/abstract_dbus_client.cpp.i
 
 src/clients/dbus/abstract/abstract_dbus_client.s: src/clients/dbus/abstract/abstract_dbus_client.cpp.s
@@ -249,7 +249,7 @@ src/clients/dbus/abstract/abstract_dbus_client.s: src/clients/dbus/abstract/abst
 
 # target to generate assembly for a file
 src/clients/dbus/abstract/abstract_dbus_client.cpp.s:
-	cd /var/mnt/Datos/Desarrollo/Workspace/VSCode/C++_sandbox && $(MAKE) $(MAKESILENT) -f RogControlCenter/CMakeFiles/RogControlCenter.dir/build.make RogControlCenter/CMakeFiles/RogControlCenter.dir/src/clients/dbus/abstract/abstract_dbus_client.cpp.s
+	cd /var/mnt/Datos/Desarrollo/Workspace/VSCode/C++_sandbox && $(MAKE) $(MAKESILENT) -f RogPerfTuner/CMakeFiles/RogPerfTuner.dir/build.make RogPerfTuner/CMakeFiles/RogPerfTuner.dir/src/clients/dbus/abstract/abstract_dbus_client.cpp.s
 .PHONY : src/clients/dbus/abstract/abstract_dbus_client.cpp.s
 
 src/gui/password_dialog.o: src/gui/password_dialog.cpp.o
@@ -257,7 +257,7 @@ src/gui/password_dialog.o: src/gui/password_dialog.cpp.o
 
 # target to build an object file
 src/gui/password_dialog.cpp.o:
-	cd /var/mnt/Datos/Desarrollo/Workspace/VSCode/C++_sandbox && $(MAKE) $(MAKESILENT) -f RogControlCenter/CMakeFiles/RogControlCenter.dir/build.make RogControlCenter/CMakeFiles/RogControlCenter.dir/src/gui/password_dialog.cpp.o
+	cd /var/mnt/Datos/Desarrollo/Workspace/VSCode/C++_sandbox && $(MAKE) $(MAKESILENT) -f RogPerfTuner/CMakeFiles/RogPerfTuner.dir/build.make RogPerfTuner/CMakeFiles/RogPerfTuner.dir/src/gui/password_dialog.cpp.o
 .PHONY : src/gui/password_dialog.cpp.o
 
 src/gui/password_dialog.i: src/gui/password_dialog.cpp.i
@@ -265,7 +265,7 @@ src/gui/password_dialog.i: src/gui/password_dialog.cpp.i
 
 # target to preprocess a source file
 src/gui/password_dialog.cpp.i:
-	cd /var/mnt/Datos/Desarrollo/Workspace/VSCode/C++_sandbox && $(MAKE) $(MAKESILENT) -f RogControlCenter/CMakeFiles/RogControlCenter.dir/build.make RogControlCenter/CMakeFiles/RogControlCenter.dir/src/gui/password_dialog.cpp.i
+	cd /var/mnt/Datos/Desarrollo/Workspace/VSCode/C++_sandbox && $(MAKE) $(MAKESILENT) -f RogPerfTuner/CMakeFiles/RogPerfTuner.dir/build.make RogPerfTuner/CMakeFiles/RogPerfTuner.dir/src/gui/password_dialog.cpp.i
 .PHONY : src/gui/password_dialog.cpp.i
 
 src/gui/password_dialog.s: src/gui/password_dialog.cpp.s
@@ -273,7 +273,7 @@ src/gui/password_dialog.s: src/gui/password_dialog.cpp.s
 
 # target to generate assembly for a file
 src/gui/password_dialog.cpp.s:
-	cd /var/mnt/Datos/Desarrollo/Workspace/VSCode/C++_sandbox && $(MAKE) $(MAKESILENT) -f RogControlCenter/CMakeFiles/RogControlCenter.dir/build.make RogControlCenter/CMakeFiles/RogControlCenter.dir/src/gui/password_dialog.cpp.s
+	cd /var/mnt/Datos/Desarrollo/Workspace/VSCode/C++_sandbox && $(MAKE) $(MAKESILENT) -f RogPerfTuner/CMakeFiles/RogPerfTuner.dir/build.make RogPerfTuner/CMakeFiles/RogPerfTuner.dir/src/gui/password_dialog.cpp.s
 .PHONY : src/gui/password_dialog.cpp.s
 
 src/gui/toaster.o: src/gui/toaster.cpp.o
@@ -281,7 +281,7 @@ src/gui/toaster.o: src/gui/toaster.cpp.o
 
 # target to build an object file
 src/gui/toaster.cpp.o:
-	cd /var/mnt/Datos/Desarrollo/Workspace/VSCode/C++_sandbox && $(MAKE) $(MAKESILENT) -f RogControlCenter/CMakeFiles/RogControlCenter.dir/build.make RogControlCenter/CMakeFiles/RogControlCenter.dir/src/gui/toaster.cpp.o
+	cd /var/mnt/Datos/Desarrollo/Workspace/VSCode/C++_sandbox && $(MAKE) $(MAKESILENT) -f RogPerfTuner/CMakeFiles/RogPerfTuner.dir/build.make RogPerfTuner/CMakeFiles/RogPerfTuner.dir/src/gui/toaster.cpp.o
 .PHONY : src/gui/toaster.cpp.o
 
 src/gui/toaster.i: src/gui/toaster.cpp.i
@@ -289,7 +289,7 @@ src/gui/toaster.i: src/gui/toaster.cpp.i
 
 # target to preprocess a source file
 src/gui/toaster.cpp.i:
-	cd /var/mnt/Datos/Desarrollo/Workspace/VSCode/C++_sandbox && $(MAKE) $(MAKESILENT) -f RogControlCenter/CMakeFiles/RogControlCenter.dir/build.make RogControlCenter/CMakeFiles/RogControlCenter.dir/src/gui/toaster.cpp.i
+	cd /var/mnt/Datos/Desarrollo/Workspace/VSCode/C++_sandbox && $(MAKE) $(MAKESILENT) -f RogPerfTuner/CMakeFiles/RogPerfTuner.dir/build.make RogPerfTuner/CMakeFiles/RogPerfTuner.dir/src/gui/toaster.cpp.i
 .PHONY : src/gui/toaster.cpp.i
 
 src/gui/toaster.s: src/gui/toaster.cpp.s
@@ -297,7 +297,7 @@ src/gui/toaster.s: src/gui/toaster.cpp.s
 
 # target to generate assembly for a file
 src/gui/toaster.cpp.s:
-	cd /var/mnt/Datos/Desarrollo/Workspace/VSCode/C++_sandbox && $(MAKE) $(MAKESILENT) -f RogControlCenter/CMakeFiles/RogControlCenter.dir/build.make RogControlCenter/CMakeFiles/RogControlCenter.dir/src/gui/toaster.cpp.s
+	cd /var/mnt/Datos/Desarrollo/Workspace/VSCode/C++_sandbox && $(MAKE) $(MAKESILENT) -f RogPerfTuner/CMakeFiles/RogPerfTuner.dir/build.make RogPerfTuner/CMakeFiles/RogPerfTuner.dir/src/gui/toaster.cpp.s
 .PHONY : src/gui/toaster.cpp.s
 
 src/gui/tray_icon.o: src/gui/tray_icon.cpp.o
@@ -305,7 +305,7 @@ src/gui/tray_icon.o: src/gui/tray_icon.cpp.o
 
 # target to build an object file
 src/gui/tray_icon.cpp.o:
-	cd /var/mnt/Datos/Desarrollo/Workspace/VSCode/C++_sandbox && $(MAKE) $(MAKESILENT) -f RogControlCenter/CMakeFiles/RogControlCenter.dir/build.make RogControlCenter/CMakeFiles/RogControlCenter.dir/src/gui/tray_icon.cpp.o
+	cd /var/mnt/Datos/Desarrollo/Workspace/VSCode/C++_sandbox && $(MAKE) $(MAKESILENT) -f RogPerfTuner/CMakeFiles/RogPerfTuner.dir/build.make RogPerfTuner/CMakeFiles/RogPerfTuner.dir/src/gui/tray_icon.cpp.o
 .PHONY : src/gui/tray_icon.cpp.o
 
 src/gui/tray_icon.i: src/gui/tray_icon.cpp.i
@@ -313,7 +313,7 @@ src/gui/tray_icon.i: src/gui/tray_icon.cpp.i
 
 # target to preprocess a source file
 src/gui/tray_icon.cpp.i:
-	cd /var/mnt/Datos/Desarrollo/Workspace/VSCode/C++_sandbox && $(MAKE) $(MAKESILENT) -f RogControlCenter/CMakeFiles/RogControlCenter.dir/build.make RogControlCenter/CMakeFiles/RogControlCenter.dir/src/gui/tray_icon.cpp.i
+	cd /var/mnt/Datos/Desarrollo/Workspace/VSCode/C++_sandbox && $(MAKE) $(MAKESILENT) -f RogPerfTuner/CMakeFiles/RogPerfTuner.dir/build.make RogPerfTuner/CMakeFiles/RogPerfTuner.dir/src/gui/tray_icon.cpp.i
 .PHONY : src/gui/tray_icon.cpp.i
 
 src/gui/tray_icon.s: src/gui/tray_icon.cpp.s
@@ -321,7 +321,7 @@ src/gui/tray_icon.s: src/gui/tray_icon.cpp.s
 
 # target to generate assembly for a file
 src/gui/tray_icon.cpp.s:
-	cd /var/mnt/Datos/Desarrollo/Workspace/VSCode/C++_sandbox && $(MAKE) $(MAKESILENT) -f RogControlCenter/CMakeFiles/RogControlCenter.dir/build.make RogControlCenter/CMakeFiles/RogControlCenter.dir/src/gui/tray_icon.cpp.s
+	cd /var/mnt/Datos/Desarrollo/Workspace/VSCode/C++_sandbox && $(MAKE) $(MAKESILENT) -f RogPerfTuner/CMakeFiles/RogPerfTuner.dir/build.make RogPerfTuner/CMakeFiles/RogPerfTuner.dir/src/gui/tray_icon.cpp.s
 .PHONY : src/gui/tray_icon.cpp.s
 
 src/main.o: src/main.cpp.o
@@ -329,7 +329,7 @@ src/main.o: src/main.cpp.o
 
 # target to build an object file
 src/main.cpp.o:
-	cd /var/mnt/Datos/Desarrollo/Workspace/VSCode/C++_sandbox && $(MAKE) $(MAKESILENT) -f RogControlCenter/CMakeFiles/RogControlCenter.dir/build.make RogControlCenter/CMakeFiles/RogControlCenter.dir/src/main.cpp.o
+	cd /var/mnt/Datos/Desarrollo/Workspace/VSCode/C++_sandbox && $(MAKE) $(MAKESILENT) -f RogPerfTuner/CMakeFiles/RogPerfTuner.dir/build.make RogPerfTuner/CMakeFiles/RogPerfTuner.dir/src/main.cpp.o
 .PHONY : src/main.cpp.o
 
 src/main.i: src/main.cpp.i
@@ -337,7 +337,7 @@ src/main.i: src/main.cpp.i
 
 # target to preprocess a source file
 src/main.cpp.i:
-	cd /var/mnt/Datos/Desarrollo/Workspace/VSCode/C++_sandbox && $(MAKE) $(MAKESILENT) -f RogControlCenter/CMakeFiles/RogControlCenter.dir/build.make RogControlCenter/CMakeFiles/RogControlCenter.dir/src/main.cpp.i
+	cd /var/mnt/Datos/Desarrollo/Workspace/VSCode/C++_sandbox && $(MAKE) $(MAKESILENT) -f RogPerfTuner/CMakeFiles/RogPerfTuner.dir/build.make RogPerfTuner/CMakeFiles/RogPerfTuner.dir/src/main.cpp.i
 .PHONY : src/main.cpp.i
 
 src/main.s: src/main.cpp.s
@@ -345,7 +345,7 @@ src/main.s: src/main.cpp.s
 
 # target to generate assembly for a file
 src/main.cpp.s:
-	cd /var/mnt/Datos/Desarrollo/Workspace/VSCode/C++_sandbox && $(MAKE) $(MAKESILENT) -f RogControlCenter/CMakeFiles/RogControlCenter.dir/build.make RogControlCenter/CMakeFiles/RogControlCenter.dir/src/main.cpp.s
+	cd /var/mnt/Datos/Desarrollo/Workspace/VSCode/C++_sandbox && $(MAKE) $(MAKESILENT) -f RogPerfTuner/CMakeFiles/RogPerfTuner.dir/build.make RogPerfTuner/CMakeFiles/RogPerfTuner.dir/src/main.cpp.s
 .PHONY : src/main.cpp.s
 
 src/services/hardware_service.o: src/services/hardware_service.cpp.o
@@ -353,7 +353,7 @@ src/services/hardware_service.o: src/services/hardware_service.cpp.o
 
 # target to build an object file
 src/services/hardware_service.cpp.o:
-	cd /var/mnt/Datos/Desarrollo/Workspace/VSCode/C++_sandbox && $(MAKE) $(MAKESILENT) -f RogControlCenter/CMakeFiles/RogControlCenter.dir/build.make RogControlCenter/CMakeFiles/RogControlCenter.dir/src/services/hardware_service.cpp.o
+	cd /var/mnt/Datos/Desarrollo/Workspace/VSCode/C++_sandbox && $(MAKE) $(MAKESILENT) -f RogPerfTuner/CMakeFiles/RogPerfTuner.dir/build.make RogPerfTuner/CMakeFiles/RogPerfTuner.dir/src/services/hardware_service.cpp.o
 .PHONY : src/services/hardware_service.cpp.o
 
 src/services/hardware_service.i: src/services/hardware_service.cpp.i
@@ -361,7 +361,7 @@ src/services/hardware_service.i: src/services/hardware_service.cpp.i
 
 # target to preprocess a source file
 src/services/hardware_service.cpp.i:
-	cd /var/mnt/Datos/Desarrollo/Workspace/VSCode/C++_sandbox && $(MAKE) $(MAKESILENT) -f RogControlCenter/CMakeFiles/RogControlCenter.dir/build.make RogControlCenter/CMakeFiles/RogControlCenter.dir/src/services/hardware_service.cpp.i
+	cd /var/mnt/Datos/Desarrollo/Workspace/VSCode/C++_sandbox && $(MAKE) $(MAKESILENT) -f RogPerfTuner/CMakeFiles/RogPerfTuner.dir/build.make RogPerfTuner/CMakeFiles/RogPerfTuner.dir/src/services/hardware_service.cpp.i
 .PHONY : src/services/hardware_service.cpp.i
 
 src/services/hardware_service.s: src/services/hardware_service.cpp.s
@@ -369,7 +369,7 @@ src/services/hardware_service.s: src/services/hardware_service.cpp.s
 
 # target to generate assembly for a file
 src/services/hardware_service.cpp.s:
-	cd /var/mnt/Datos/Desarrollo/Workspace/VSCode/C++_sandbox && $(MAKE) $(MAKESILENT) -f RogControlCenter/CMakeFiles/RogControlCenter.dir/build.make RogControlCenter/CMakeFiles/RogControlCenter.dir/src/services/hardware_service.cpp.s
+	cd /var/mnt/Datos/Desarrollo/Workspace/VSCode/C++_sandbox && $(MAKE) $(MAKESILENT) -f RogPerfTuner/CMakeFiles/RogPerfTuner.dir/build.make RogPerfTuner/CMakeFiles/RogPerfTuner.dir/src/services/hardware_service.cpp.s
 .PHONY : src/services/hardware_service.cpp.s
 
 src/services/profile_service.o: src/services/profile_service.cpp.o
@@ -377,7 +377,7 @@ src/services/profile_service.o: src/services/profile_service.cpp.o
 
 # target to build an object file
 src/services/profile_service.cpp.o:
-	cd /var/mnt/Datos/Desarrollo/Workspace/VSCode/C++_sandbox && $(MAKE) $(MAKESILENT) -f RogControlCenter/CMakeFiles/RogControlCenter.dir/build.make RogControlCenter/CMakeFiles/RogControlCenter.dir/src/services/profile_service.cpp.o
+	cd /var/mnt/Datos/Desarrollo/Workspace/VSCode/C++_sandbox && $(MAKE) $(MAKESILENT) -f RogPerfTuner/CMakeFiles/RogPerfTuner.dir/build.make RogPerfTuner/CMakeFiles/RogPerfTuner.dir/src/services/profile_service.cpp.o
 .PHONY : src/services/profile_service.cpp.o
 
 src/services/profile_service.i: src/services/profile_service.cpp.i
@@ -385,7 +385,7 @@ src/services/profile_service.i: src/services/profile_service.cpp.i
 
 # target to preprocess a source file
 src/services/profile_service.cpp.i:
-	cd /var/mnt/Datos/Desarrollo/Workspace/VSCode/C++_sandbox && $(MAKE) $(MAKESILENT) -f RogControlCenter/CMakeFiles/RogControlCenter.dir/build.make RogControlCenter/CMakeFiles/RogControlCenter.dir/src/services/profile_service.cpp.i
+	cd /var/mnt/Datos/Desarrollo/Workspace/VSCode/C++_sandbox && $(MAKE) $(MAKESILENT) -f RogPerfTuner/CMakeFiles/RogPerfTuner.dir/build.make RogPerfTuner/CMakeFiles/RogPerfTuner.dir/src/services/profile_service.cpp.i
 .PHONY : src/services/profile_service.cpp.i
 
 src/services/profile_service.s: src/services/profile_service.cpp.s
@@ -393,7 +393,7 @@ src/services/profile_service.s: src/services/profile_service.cpp.s
 
 # target to generate assembly for a file
 src/services/profile_service.cpp.s:
-	cd /var/mnt/Datos/Desarrollo/Workspace/VSCode/C++_sandbox && $(MAKE) $(MAKESILENT) -f RogControlCenter/CMakeFiles/RogControlCenter.dir/build.make RogControlCenter/CMakeFiles/RogControlCenter.dir/src/services/profile_service.cpp.s
+	cd /var/mnt/Datos/Desarrollo/Workspace/VSCode/C++_sandbox && $(MAKE) $(MAKESILENT) -f RogPerfTuner/CMakeFiles/RogPerfTuner.dir/build.make RogPerfTuner/CMakeFiles/RogPerfTuner.dir/src/services/profile_service.cpp.s
 .PHONY : src/services/profile_service.cpp.s
 
 # Help Target
@@ -408,12 +408,12 @@ help:
 	@echo "... install/strip"
 	@echo "... list_install_components"
 	@echo "... rebuild_cache"
-	@echo "... RogControlCenter_autogen"
-	@echo "... RogControlCenter_autogen_timestamp_deps"
-	@echo "... RogControlCenter"
-	@echo "... RogControlCenter_autogen/mocs_compilation.o"
-	@echo "... RogControlCenter_autogen/mocs_compilation.i"
-	@echo "... RogControlCenter_autogen/mocs_compilation.s"
+	@echo "... RogPerfTuner_autogen"
+	@echo "... RogPerfTuner_autogen_timestamp_deps"
+	@echo "... RogPerfTuner"
+	@echo "... RogPerfTuner_autogen/mocs_compilation.o"
+	@echo "... RogPerfTuner_autogen/mocs_compilation.i"
+	@echo "... RogPerfTuner_autogen/mocs_compilation.s"
 	@echo "... src/clients/dbus/abstract/abstract_dbus_client.o"
 	@echo "... src/clients/dbus/abstract/abstract_dbus_client.i"
 	@echo "... src/clients/dbus/abstract/abstract_dbus_client.s"

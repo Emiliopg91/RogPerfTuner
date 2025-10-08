@@ -18,7 +18,7 @@
 #include <thread>
 #include <vector>
 
-#include "../../../include/clients/unix_socket/rog_control_center_client.hpp"
+#include "../../../include/clients/unix_socket/rog_perf_tuner_client.hpp"
 #include "../../../include/logger/logger.hpp"
 #include "../../../include/logger/logger_provider.hpp"
 #include "../../../include/shell/shell.hpp"
@@ -211,7 +211,7 @@ int main(int argc, char* argv[]) {
 	try {
 		const char* steamId = getenv("SteamGameId");
 		if (steamId) {
-			auto cfg = RogControlCenterClient::getInstance().getGameConfig(steamId);
+			auto cfg = RogPerfTunerClient::getInstance().getGameConfig(steamId);
 			for (const auto& [key, val] : cfg.environment) {
 				setenv(key.c_str(), val.c_str(), 1);
 			}

@@ -116,7 +116,7 @@ void Configuration::setPassword(const std::string& pss) {
 		0  // reserved1..reserved7
 	};
 
-	secret_password_store_sync(&schema, SECRET_COLLECTION_DEFAULT, "Password for RogControlCenter", pss.c_str(), nullptr, &error, "key", "default",
+	secret_password_store_sync(&schema, SECRET_COLLECTION_DEFAULT, "Password for RogPerfTuner", pss.c_str(), nullptr, &error, "key", "default",
 							   nullptr);
 
 	if (error) {

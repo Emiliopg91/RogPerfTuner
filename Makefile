@@ -55,7 +55,7 @@ build:
 	@make build_rccdc
 
 	@echo "#######################################################################"
-	@echo "##################### Compiling RogControlCenter ######################"
+	@echo "####################### Compiling RogPerfTuner ########################"
 	@echo "#######################################################################"
 
 	@rm -rf build/assets/bin
@@ -63,18 +63,18 @@ build:
 	@python3 resources/scripts/constants.py
 
 	@echo "Formatting code..."
-	@clang-format -i $$(find RogControlCenter -name '*.cpp' -o -name '*.hpp')
+	@clang-format -i $$(find RogPerfTuner -name '*.cpp' -o -name '*.hpp')
 
 	@cmake --build build -- -j$(NUM_CORES)
 
 	@mkdir build/assets/bin build/assets/bin/rgb  build/assets/bin/performance build/assets/bin/steam
 	@cp resources/translations.json build/assets/translations.json
-	@cp build/RogControlCenter/NextEffect build/assets/bin/rgb/nextEffect
-	@cp build/RogControlCenter/IncBrightness build/assets/bin/rgb/incBrightness
-	@cp build/RogControlCenter/DecBrightness build/assets/bin/rgb/decBrightness
-	@cp build/RogControlCenter/NextProfile build/assets/bin/performance/nextProfile
-	@cp build/RogControlCenter/SteamRunner build/assets/bin/steam/run
-	@cp build/RogControlCenter/FlatpakWrapper build/assets/bin/steam/flatpak
+	@cp build/RogPerfTuner/NextEffect build/assets/bin/rgb/nextEffect
+	@cp build/RogPerfTuner/IncBrightness build/assets/bin/rgb/incBrightness
+	@cp build/RogPerfTuner/DecBrightness build/assets/bin/rgb/decBrightness
+	@cp build/RogPerfTuner/NextProfile build/assets/bin/performance/nextProfile
+	@cp build/RogPerfTuner/SteamRunner build/assets/bin/steam/run
+	@cp build/RogPerfTuner/FlatpakWrapper build/assets/bin/steam/flatpak
 
 build_openrgb:
 	@if [ ! -f "submodules/patches/OpenRGB.diff.applied" ]; then \
@@ -108,25 +108,25 @@ package:
 	@echo "#######################################################################"
 	@echo "####################### Generating Dist folder ########################"
 	@echo "#######################################################################"
-	@mkdir dist dist/RogControlCenter
-	@cp ./build/RogControlCenter/RogControlCenter dist/RogControlCenter
-	@cp -r build/assets dist/RogControlCenter
+	@mkdir dist dist/RogPerfTuner
+	@cp ./build/RogPerfTuner/RogPerfTuner dist/RogPerfTuner
+	@cp -r build/assets dist/RogPerfTuner
 
 	@echo "#######################################################################"
 	@echo "######################### Generating AppImage #########################"
 	@echo "#######################################################################"
 	@rm -rf dist/appimage-fs
-	@mkdir -p dist/appimage-fs dist/appimage-fs/usr/bin dist/appimage-fs/usr/share/RogControlCenter
-	@cp dist/RogControlCenter/RogControlCenter dist/appimage-fs/usr/bin
-	@cp -r dist/RogControlCenter/assets/* dist/appimage-fs/usr/share/RogControlCenter
+	@mkdir -p dist/appimage-fs dist/appimage-fs/usr/bin dist/appimage-fs/usr/share/rog-perf-tuner
+	@cp dist/RogPerfTuner/RogPerfTuner dist/appimage-fs/usr/bin/rog-perf-tuner
+	@cp -r dist/RogPerfTuner/assets/* dist/appimage-fs/usr/share/rog-perf-tuner
 	@cp resources/AppRun dist/appimage-fs/
-	@cp resources/RogControlCenter.desktop dist/appimage-fs/RogControlCenter.desktop
+	@cp resources/RogPerfTuner.desktop dist/appimage-fs/rog-perf-tuner.desktop
 	@cp build/assets/icons/icon.svg dist/appimage-fs/icon.svg
 	@echo "Skipping AppImage creation"
 	@chmod 777 -R resources/appimagetool dist/appimage-fs
-	@rm -f dist/appimage-fs/usr/share/RogControlCenter/OpenRGB/usr/lib/*.so*
-	@ARCH=x86_64 VERSION=$$(cat resources/version) ./resources/appimagetool -u "gh-releases-zsync|Emiliopg91|RogControlCenter|latest|RogControlCenter.AppImage.zsync" -n dist/appimage-fs dist/RogControlCenter.AppImage
-	@mv RogControlCenter.AppImage.zsync dist
+	@rm -f dist/appimage-fs/usr/share/rog-perf-tuner/OpenRGB/usr/lib/*.so*
+	@ARCH=x86_64 VERSION=$$(cat resources/version) ./resources/appimagetool -u "gh-releases-zsync|Emiliopg91|RogPerfTuner|latest|RogPerfTuner.AppImage.zsync" -n dist/appimage-fs dist/RogPerfTuner.AppImage
+	@mv RogPerfTuner.AppImage.zsync dist
 
 ifndef IS_AURPKG
 	@echo "#######################################################################"
@@ -147,9 +147,9 @@ build_debug:
 
 run: build_debug
 	@touch /tmp/fake.AppImage
-	@echo "Running 'APPIMAGE=/tmp/fake.AppImage RCC_ASSETS_DIR=$(MAKEFILE_DIR)build/assets ./build/RogControlCenter/RogControlCenter'"
+	@echo "Running 'APPIMAGE=/tmp/fake.AppImage RCC_ASSETS_DIR=$(MAKEFILE_DIR)build/assets ./build/RogPerfTuner/RogPerfTuner'"
 	@echo ""
-	@APPIMAGE=/tmp/fake.AppImage RCC_MODE=DEV RCC_ASSETS_DIR=$(MAKEFILE_DIR)build/assets ./build/RogControlCenter/RogControlCenter
+	@APPIMAGE=/tmp/fake.AppImage RCC_MODE=DEV RCC_ASSETS_DIR=$(MAKEFILE_DIR)build/assets ./build/RogPerfTuner/RogPerfTuner
 
 increase_version:
 	@awk '{if ($$0 ~ /project\(.*VERSION/) {match($$0, /([0-9]+)\.([0-9]+)\.([0-9]+)/, v); patch = v[3] + 1; sub(/[0-9]+\.[0-9]+\.[0-9]+/, v[1] "." v[2] "." patch);} print}' CMakeLists.txt > CMakeLists.txt.tmp && mv CMakeLists.txt.tmp CMakeLists.txt

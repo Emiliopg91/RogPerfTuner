@@ -109,7 +109,7 @@ jobs:
         run: |
           make release
 
-            if [[ -n $(git status --porcelain "RogControlCenter") ]]; then
+            if [[ -n $(git status --porcelain "RogPerfTuner") ]]; then
                 changes=1
                 break
             fi
@@ -143,7 +143,7 @@ jobs:
           name: ${{ env.VERSION }}
           files: |
             dist/PKGBUILD
-            dist/RogControlCenter.AppImage
-            dist/RogControlCenter.AppImage.zsync
+            dist/RogPerfTuner.AppImage
+            dist/RogPerfTuner.AppImage.zsync
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
