@@ -6,6 +6,7 @@
 #include "../clients/dbus/asus/armoury/intel/pl2_sppt_client.hpp"
 #include "../clients/dbus/asus/armoury/nvidia/nv_boost_client.hpp"
 #include "../clients/dbus/asus/armoury/nvidia/nv_temp_client.hpp"
+#include "../clients/dbus/asus/armoury/other/boot_sound_client.hpp"
 #include "../clients/dbus/asus/armoury/other/panel_overdrive_client.hpp"
 #include "../clients/dbus/asus/core/platform_client.hpp"
 #include "../clients/dbus/linux/power_management_kb_brightness.hpp"
@@ -39,6 +40,27 @@ class HardwareService : public Singleton<HardwareService>, Loggable {
 	 * @param threshold The new BatteryThreshold value to set.
 	 */
 	void setChargeThreshold(const BatteryThreshold& threshold);
+
+	/**
+	 * @brief Gets the current boot sound availability.
+	 *
+	 * @return The current boot sound availability.
+	 */
+	bool getBootSoundAvailable();
+
+	/**
+	 * @brief Gets the current boot sound status.
+	 *
+	 * @return The current boot sound value.
+	 */
+	bool getBootSound();
+
+	/**
+	 * @brief Sets the boot sound flag.
+	 *
+	 * @param threshold The new boot sound value to set.
+	 */
+	void setBootSound(bool enable);
 
 	/**
 	 * @brief Enables or disables panel overdrive.
@@ -77,6 +99,7 @@ class HardwareService : public Singleton<HardwareService>, Loggable {
 	OpenRgbService& openRgbService					 = OpenRgbService::getInstance();
 	Translator& translator							 = Translator::getInstance();
 	PlatformClient& platformClient					 = PlatformClient::getInstance();
+	BootSoundClient& bootSoundClient				 = BootSoundClient::getInstance();
 	Pl1SpdClient& pl1SpdClient						 = Pl1SpdClient::getInstance();
 	Pl2SpptClient& pl2SpptClient					 = Pl2SpptClient::getInstance();
 	NvBoostClient& nvBoostClient					 = NvBoostClient::getInstance();

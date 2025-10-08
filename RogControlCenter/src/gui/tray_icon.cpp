@@ -7,6 +7,7 @@
 
 #include <QActionGroup>
 #include <QMenu>
+#include <array>
 #include <optional>
 
 #include "../../include/gui/fan_curve_editor.hpp"
@@ -102,6 +103,15 @@ void TrayIcon::setBatteryThreshold(BatteryThreshold threshold) {
 		Qt::QueuedConnection);
 }
 
+void TrayIcon::setBootSound(bool value) {
+	QMetaObject::invokeMethod(
+		&TrayIcon::getInstance(),
+		[=, this]() {
+			bootSoundActions[value]->setChecked(true);
+		},
+		Qt::QueuedConnection);
+}
+
 void TrayIcon::setProfileMenuEnabled() {
 	QMetaObject::invokeMethod(
 		&TrayIcon::getInstance(),
@@ -161,11 +171,11 @@ TrayIcon::TrayIcon() : QObject(&MainWindow::getInstance()), tray_icon_(new QSyst
 	runningGames = steamService.getRunningGames().size();
 
 	// -------------------------
-	// Battery menu
+	// Hardware menu
 	// -------------------------
-	QAction* batteryTitle = new QAction(translator.translate("battery").c_str(), menu);
-	batteryTitle->setEnabled(false);
-	menu->addAction(batteryTitle);
+	QAction* hardwareTitle = new QAction(translator.translate("hardware").c_str(), menu);
+	hardwareTitle->setEnabled(false);
+	menu->addAction(hardwareTitle);
 	// -------------------------
 	// BatteryThreshold submenu
 	// -------------------------
@@ -186,7 +196,31 @@ TrayIcon::TrayIcon() : QObject(&MainWindow::getInstance()), tray_icon_(new QSyst
 	// BatteryThreshold submenu
 	// -------------------------
 	// -------------------------
-	// Battery menu
+	// Boot sound submenu
+	// -------------------------
+	if (hardwareService.getBootSoundAvailable()) {
+		QMenu* bootSoundMenu		 = new QMenu(("    " + translator.translate("boot.sound")).c_str(), menu);
+		QActionGroup* bootSoundGroup = new QActionGroup(menu);
+
+		const std::array<bool, 2> vals = {true, false};
+		for (auto v : vals) {
+			QAction* bsAct = new QAction(translator.translate(v ? "enabled" : "disabled").c_str(), bootSoundGroup);
+			bsAct->setCheckable(true);
+			bsAct->setChecked(v == hardwareService.getBootSound());
+			QObject::connect(bsAct, &QAction::triggered, [this, v]() {
+				onBootSoundChanged(v);
+			});
+			bootSoundMenu->addAction(bsAct);
+			bootSoundActions[v] = bsAct;
+		}
+
+		menu->insertMenu(nullptr, bootSoundMenu);
+	}
+	// -------------------------
+	// Boot sound submenu
+	// -------------------------
+	// -------------------------
+	// Hardware menu
 	// -------------------------
 
 	menu->addSeparator();
@@ -482,6 +516,10 @@ TrayIcon::TrayIcon() : QObject(&MainWindow::getInstance()), tray_icon_(new QSyst
 		setBatteryThreshold(threshold);
 	});
 
+	eventBus.onBootSound([this](bool value) {
+		setBootSound(value);
+	});
+
 	eventBus.onPerformanceProfile([this](PerformanceProfile profile) {
 		setPerformanceProfile(profile);
 	});
@@ -504,4 +542,8 @@ TrayIcon::TrayIcon() : QObject(&MainWindow::getInstance()), tray_icon_(new QSyst
 
 void TrayIcon::show() {
 	tray_icon_->show();
+}
+
+void TrayIcon::onBootSoundChanged(bool enable) {
+	hardwareService.setBootSound(enable);
 }

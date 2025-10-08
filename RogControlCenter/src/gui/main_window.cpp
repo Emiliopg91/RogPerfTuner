@@ -1,5 +1,6 @@
 #include "../../include/gui/main_window.hpp"
 
+#include <qcombobox.h>
 #include <qcontainerfwd.h>
 #include <qpushbutton.h>
 
@@ -22,8 +23,8 @@ MainWindow::MainWindow(QWidget* parent) : QMainWindow(parent), _logger(new Logge
 	runningGames = steamService.getRunningGames().size();
 
 	setWindowTitle(QString::fromStdString(Constants::APP_NAME + " | " + Constants::APP_VERSION));
-	setGeometry(0, 0, 350, 680);
-	setFixedSize(350, 680);
+	setGeometry(0, 0, 350, 700);
+	setFixedSize(350, 700);
 	setWindowIcon(QIcon(QString::fromStdString(Constants::ICON_45_FILE)));
 
 	QWidget* centralWidget	= new QWidget(this);
@@ -36,7 +37,7 @@ MainWindow::MainWindow(QWidget* parent) : QMainWindow(parent), _logger(new Logge
 	// -------------------------
 	QLabel* imageLabel = new QLabel();
 	QPixmap pixmap(QString::fromStdString(Constants::ICON_FILE));
-	QPixmap scaledPixmap = pixmap.scaled(200, 200, Qt::KeepAspectRatio, Qt::SmoothTransformation);
+	QPixmap scaledPixmap = pixmap.scaled(140, 140, Qt::KeepAspectRatio, Qt::SmoothTransformation);
 	imageLabel->setPixmap(scaledPixmap);
 	imageLabel->setAlignment(Qt::AlignCenter);
 	mainLayout->addWidget(imageLabel, 0, Qt::AlignCenter);
@@ -177,11 +178,11 @@ MainWindow::MainWindow(QWidget* parent) : QMainWindow(parent), _logger(new Logge
 	// -------------------------
 
 	// -------------------------
-	// Settings group
+	// Hardware group
 	// -------------------------
-	QGroupBox* settingsGroup	= new QGroupBox(QString::fromStdString(translator.translate("settings")));
-	QFormLayout* settingsLayout = new QFormLayout();
-	settingsLayout->setContentsMargins(20, 10, 20, 10);
+	QGroupBox* hardwareGroup	= new QGroupBox(QString::fromStdString(translator.translate("hardware")));
+	QFormLayout* hardwareLayout = new QFormLayout();
+	hardwareLayout->setContentsMargins(20, 10, 20, 10);
 	// -------------------------
 	// Battery menu
 	// -------------------------
@@ -193,10 +194,40 @@ MainWindow::MainWindow(QWidget* parent) : QMainWindow(parent), _logger(new Logge
 	}
 	connect(_thresholdDropdown, QOverload<int>::of(&QComboBox::currentIndexChanged), this, &MainWindow::onBatteryLimitChanged);
 	setBatteryChargeLimit(hardwareService.getChargeThreshold());
-	settingsLayout->addRow(new QLabel(QString::fromStdString(translator.translate("charge.threshold") + ":")), _thresholdDropdown);
+	hardwareLayout->addRow(new QLabel(QString::fromStdString(translator.translate("charge.threshold") + ":")), _thresholdDropdown);
 	// -------------------------
 	// Battery menu
 	// -------------------------
+	// -------------------------
+	// Boot sound menu
+	// -------------------------
+	if (hardwareService.getBootSoundAvailable()) {
+		_bootSoundDropdown = new QComboBox();
+		_bootSoundDropdown->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Preferred);
+
+		auto vals = std::array<bool, 2>{true, false};
+		for (auto v : vals) {
+			_bootSoundDropdown->addItem(("  " + translator.translate(v ? "enabled" : "disabled")).c_str(), v);
+		}
+
+		connect(_bootSoundDropdown, QOverload<int>::of(&QComboBox::currentIndexChanged), this, &MainWindow::onBootSoundChanged);
+		hardwareLayout->addRow(new QLabel(QString::fromStdString(translator.translate("boot.sound"))), _bootSoundDropdown);
+	}
+	// -------------------------
+	// Boot sound menu
+	// -------------------------
+	hardwareGroup->setLayout(hardwareLayout);
+	mainLayout->addWidget(hardwareGroup);
+	// -------------------------
+	// Hardware group
+	// -------------------------
+
+	// -------------------------
+	// Settings group
+	// -------------------------
+	QGroupBox* settingsGroup	= new QGroupBox(QString::fromStdString(translator.translate("settings")));
+	QFormLayout* settingsLayout = new QFormLayout();
+	settingsLayout->setContentsMargins(20, 10, 20, 10);
 	// -------------------------
 	// Autostart menu
 	// -------------------------
@@ -257,6 +288,10 @@ MainWindow::MainWindow(QWidget* parent) : QMainWindow(parent), _logger(new Logge
 		this->onBattery = onBattery;
 		onBatteryEvent();
 	});
+
+	eventBus.onBootSound([this](bool value) {
+		onBootSoundEvent(value);
+	});
 }
 
 void MainWindow::closeEvent(QCloseEvent* event) {
@@ -271,6 +306,10 @@ void MainWindow::onGameEvent() {
 
 void MainWindow::onBatteryEvent() {
 	_profileDropdown->setEnabled(runningGames == 0 && !onBattery);
+}
+
+void MainWindow::onBootSoundEvent(bool value) {
+	_bootSoundDropdown->setCurrentIndex(_bootSoundDropdown->findData(value));
 }
 
 void MainWindow::setPerformanceProfile(PerformanceProfile value) {
@@ -361,4 +400,11 @@ void MainWindow::openFanEditor() {
 
 void MainWindow::onAutostartChanged(bool enabled) {
 	applicationService.setAutostart(enabled);
+}
+
+void MainWindow::onBootSoundChanged(int) {
+	auto enabled = _bootSoundDropdown->currentData().toBool();
+	if (hardwareService.getBootSound() != enabled) {
+		hardwareService.setBootSound(enabled);
+	}
 }

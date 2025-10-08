@@ -182,3 +182,12 @@ void EventBus::onScheduler(std::function<void(std::optional<std::string>)>&& cal
 void EventBus::emitScheduler(std::optional<std::string> scheduler) {
 	this->emit_event(PROFILE_SERVICE_ON_SCHEDULER, {scheduler});
 }
+
+void EventBus::onBootSound(std::function<void(bool)>&& callback) {
+	this->on_with_data(HARDWARE_SERVICE_BOOT_SOUND_CHANGED, [cb = std::move(callback)](CallbackParam data) {
+		cb(std::any_cast<bool>(data[0]));
+	});
+}
+void EventBus::emitBootSound(bool value) {
+	this->emit_event(HARDWARE_SERVICE_BOOT_SOUND_CHANGED, {value});
+}

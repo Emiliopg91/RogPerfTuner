@@ -120,6 +120,25 @@ class EventBus : public Singleton<EventBus> {
 	void emitChargeThreshold(const BatteryThreshold& threshold);
 
 	/**
+	 * @brief Registers a callback to be invoked when the boot sound event occurs.
+	 *
+	 * @param callback A callable object (such as a lambda or function) that takes a boolean parameter.
+	 *                 The boolean parameter typically indicates the state or result related to the boot sound event.
+	 *                 The callback is moved into the event bus and will be called when the event is triggered.
+	 */
+	void onBootSound(std::function<void(bool)>&& callback);
+
+	/**
+	 * @brief Emits an event to enable or disable the boot sound.
+	 *
+	 * This function triggers the boot sound event, allowing subscribers to respond
+	 * to changes in the boot sound setting.
+	 *
+	 * @param enabled Set to true to enable the boot sound, or false to disable it.
+	 */
+	void emitBootSound(bool enabled);
+
+	/**
 	 * @brief Registers a callback for RGB effect events.
 	 * @param callback The callback function to be called with the new RGB effect.
 	 */
@@ -226,18 +245,19 @@ class EventBus : public Singleton<EventBus> {
 	 */
 	void emitScheduler(std::optional<std::string> scheduler);
 
-	inline const static constexpr std::string_view APPLICATION_STOP					  = "APPLICATION_STOP";
-	inline const static constexpr std::string_view UDEV_CLIENT_DEVICE_EVENT			  = "UDEV_CLIENT_DEVICE_EVENT";
-	inline const static constexpr std::string_view HARDWARE_SERVICE_USB_REMOVED		  = "HARDWARE_SERVICE_USB_REMOVED";
-	inline const static constexpr std::string_view HARDWARE_SERVICE_USB_ADDED		  = "HARDWARE_SERVICE_USB_ADDED";
-	inline const static constexpr std::string_view HARDWARE_SERVICE_ON_BATTERY		  = "HARDWARE_SERVICE_ON_BATTERY";
-	inline const static constexpr std::string_view HARDWARE_SERVICE_THRESHOLD_CHANGED = "HARDWARE_SERVICE_THRESHOLD_CHANGED";
-	inline const static constexpr std::string_view ORGB_SERVICE_ON_BRIGHTNESS		  = "ORGB_SERVICE_ON_BRIGHTNESS";
-	inline const static constexpr std::string_view ORGB_SERVICE_ON_EFFECT			  = "ORGB_SERVICE_ON_EFFECT";
-	inline const static constexpr std::string_view ORGB_SERVICE_ON_COLOR			  = "ORGB_SERVICE_ON_COLOR";
-	inline const static constexpr std::string_view PROFILE_SERVICE_ON_PROFILE		  = "PROFILE_SERVICE_ON_PROFILE";
-	inline const static constexpr std::string_view PROFILE_SERVICE_ON_SCHEDULER		  = "PROFILE_SERVICE_ON_SCHEDULER";
-	inline const static constexpr std::string_view STEAM_SERVICE_GAME_EVENT			  = "STEAM_SERVICE_GAME_EVENT";
+	inline const static constexpr std::string_view APPLICATION_STOP					   = "APPLICATION_STOP";
+	inline const static constexpr std::string_view UDEV_CLIENT_DEVICE_EVENT			   = "UDEV_CLIENT_DEVICE_EVENT";
+	inline const static constexpr std::string_view HARDWARE_SERVICE_USB_REMOVED		   = "HARDWARE_SERVICE_USB_REMOVED";
+	inline const static constexpr std::string_view HARDWARE_SERVICE_USB_ADDED		   = "HARDWARE_SERVICE_USB_ADDED";
+	inline const static constexpr std::string_view HARDWARE_SERVICE_ON_BATTERY		   = "HARDWARE_SERVICE_ON_BATTERY";
+	inline const static constexpr std::string_view HARDWARE_SERVICE_THRESHOLD_CHANGED  = "HARDWARE_SERVICE_THRESHOLD_CHANGED";
+	inline const static constexpr std::string_view HARDWARE_SERVICE_BOOT_SOUND_CHANGED = "HARDWARE_SERVICE_BOOT_SOUND_CHANGED";
+	inline const static constexpr std::string_view ORGB_SERVICE_ON_BRIGHTNESS		   = "ORGB_SERVICE_ON_BRIGHTNESS";
+	inline const static constexpr std::string_view ORGB_SERVICE_ON_EFFECT			   = "ORGB_SERVICE_ON_EFFECT";
+	inline const static constexpr std::string_view ORGB_SERVICE_ON_COLOR			   = "ORGB_SERVICE_ON_COLOR";
+	inline const static constexpr std::string_view PROFILE_SERVICE_ON_PROFILE		   = "PROFILE_SERVICE_ON_PROFILE";
+	inline const static constexpr std::string_view PROFILE_SERVICE_ON_SCHEDULER		   = "PROFILE_SERVICE_ON_SCHEDULER";
+	inline const static constexpr std::string_view STEAM_SERVICE_GAME_EVENT			   = "STEAM_SERVICE_GAME_EVENT";
 
   private:
 	EventBus()							 = default;
