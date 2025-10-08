@@ -18,7 +18,6 @@ depends=(
   'libsecret'
   'libusb'
   'mbedtls'
-  'nlohmann-json'
   'power-profiles-daemon'
   'python'
   'python-pip'
@@ -28,7 +27,6 @@ depends=(
   'qt6-charts'
   'qt6-svg'
   'scx-scheds'
-  'spdlog'
   'upower'
 )
 makedepends=(

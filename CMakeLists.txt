@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.16)
 
-project(RogPerfTuner VERSION 4.4.1 LANGUAGES CXX)
+project(RogPerfTuner VERSION 4.4.2 LANGUAGES CXX)
 
 set(CMAKE_CXX_FLAGS_RELEASE "-DNDEBUG" CACHE STRING "" FORCE)
 
@@ -27,6 +27,10 @@ if(IS_AURPKG)
 else()
     add_subdirectory(submodules/httplib)
 endif()
+
+add_subdirectory(submodules/json)
+
+add_subdirectory(submodules/spdlog)
 
 add_subdirectory(submodules/OpenRGB-cppSDK)
 
