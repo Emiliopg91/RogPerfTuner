@@ -36,9 +36,8 @@ const std::string Constants::ASSETS_DIR	   = [] {
 	   return std::string(dir);
 }();
 #else
-const std::string Constants::WRAPPER_PATH				  = ASSETS_DIR + "/bin/steam/run";
-const std::string Constants::LAUNCHER_FILE				  = APP_NAME;
-const std::optional<std::string> Constants::APPIMAGE_FILE = std::nullopt;
+const std::string Constants::WRAPPER_PATH  = ASSETS_DIR + "/bin/steam/run";
+const std::string Constants::LAUNCHER_FILE = APP_NAME;
 #endif
 
 const std::string Constants::LOG_FILE_NAME		  = APP_NAME;
