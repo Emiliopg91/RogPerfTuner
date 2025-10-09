@@ -312,8 +312,8 @@
     "es": "Planificador"
   },
   "label.scheduler.none": {
-    "en": "None",
-    "es": "Ninguno"
+    "en": "Default",
+    "es": "Predeterminado"
   },
   "fan.curves": {
     "en": "Cooling",

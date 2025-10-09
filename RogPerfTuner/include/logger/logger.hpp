@@ -10,6 +10,9 @@
 
 #include <spdlog/spdlog.h>
 
+#include "../utils/string_utils.hpp"
+#include "spdlog/common.h"
+
 template <typename... Args>
 using format_string_t = fmt::format_string<Args...>;
 
@@ -179,11 +182,10 @@ class Logger {
 
 	template <typename... Args>
 	void log(spdlog::level::level_enum level, format_string_t<Args...> fmt, Args&&... args) {
-		std::string padding;
-		for (int i = 0; i < tabs; i++) {
-			padding += "  ";
+		if (static_cast<int>(logger->level()) > static_cast<int>(level)) {
+			return;
+		} else {
+			logger->log(level, fmt::format("{}{}", StringUtils::leftPad("", tabs * 2), fmt::format(fmt, std::forward<Args>(args)...)));
 		}
-		// Formatear todo de una vez
-		logger->log(level, fmt::format("{}{}", padding, fmt::format(fmt, std::forward<Args>(args)...)));
 	}
 };
