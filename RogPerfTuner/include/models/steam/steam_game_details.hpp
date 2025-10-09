@@ -1,8 +1,8 @@
 #pragma once
-#include <nlohmann/json.hpp>
-#include <string>
 
-using json = nlohmann::json;
+#include <yaml-cpp/yaml.h>
+
+#include <string>
 
 struct SteamGameDetails {
 	int appid;
@@ -11,35 +11,35 @@ struct SteamGameDetails {
 	std::string launch_opts;
 	std::string compat_tool;
 	bool is_shortcut;
-
-	// from_json
-	inline static SteamGameDetails from_json(const json& j) {
-		SteamGameDetails g;
-		g.appid		   = j.value("appid", 0);
-		g.name		   = j.value("name", "");
-		g.is_steam_app = j.value("is_steam_app", true);
-		g.launch_opts  = j.value("launch_opts", "%command%");
-		g.compat_tool  = j.value("compat_tool", "");
-		g.is_shortcut  = j.value("is_shortcut", false);
-
-		return g;
-	}
 };
 
-inline void from_json(const json& j, SteamGameDetails& g) {
-	g.appid		   = j.value("appid", 0);
-	g.name		   = j.value("name", "");
-	g.is_steam_app = j.value("is_steam_app", true);
-	g.launch_opts  = j.value("launch_opts", "%command%");
-	g.compat_tool  = j.value("compat_tool", "");
-	g.is_shortcut  = j.value("is_shortcut", false);
-}
+namespace YAML {
+template <>
+struct convert<SteamGameDetails> {
+	static Node encode(const SteamGameDetails& g) {
+		Node node;
+		node["appid"]		 = g.appid;
+		node["name"]		 = g.name;
+		node["is_steam_app"] = g.is_steam_app;
+		node["launch_opts"]	 = g.launch_opts;
+		node["compat_tool"]	 = g.compat_tool;
+		node["is_shortcut"]	 = g.is_shortcut;
+		return node;
+	}
 
-inline void to_json(json& j, const SteamGameDetails& g) {
-	j = json{{"appid", g.appid},
-			 {"name", g.name},
-			 {"is_steam_app", g.is_steam_app},
-			 {"launch_opts", g.launch_opts},
-			 {"compat_tool", g.compat_tool},
-			 {"is_shortcut", g.is_shortcut}};
-}
+	static bool decode(const Node& node, SteamGameDetails& g) {
+		if (!node.IsMap()) {
+			return false;
+		}
+
+		g.appid		   = node["appid"] ? node["appid"].as<int>() : 0;
+		g.name		   = node["name"] ? node["name"].as<std::string>() : "";
+		g.is_steam_app = node["is_steam_app"] ? node["is_steam_app"].as<bool>() : true;
+		g.launch_opts  = node["launch_opts"] ? node["launch_opts"].as<std::string>() : "%command%";
+		g.compat_tool  = node["compat_tool"] ? node["compat_tool"].as<std::string>() : "";
+		g.is_shortcut  = node["is_shortcut"] ? node["is_shortcut"].as<bool>() : false;
+
+		return true;
+	}
+};
+}  // namespace YAML

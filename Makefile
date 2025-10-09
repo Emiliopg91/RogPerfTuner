@@ -68,7 +68,7 @@ build:
 	@cmake --build build -- -j$(NUM_CORES)
 
 	@mkdir build/assets/bin build/assets/bin/rgb  build/assets/bin/performance build/assets/bin/steam
-	@cp resources/translations.json build/assets/translations.json
+	@cp resources/translations.yaml build/assets/translations.yaml
 	@cp build/RogPerfTuner/NextEffect build/assets/bin/rgb/nextEffect
 	@cp build/RogPerfTuner/IncBrightness build/assets/bin/rgb/incBrightness
 	@cp build/RogPerfTuner/DecBrightness build/assets/bin/rgb/decBrightness

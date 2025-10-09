@@ -13,8 +13,6 @@
 #include "../../../../include/utils/string_utils.hpp"
 #include "../../../../include/utils/time_utils.hpp"
 
-using json = nlohmann::json;
-
 AbstractUnixSocketClient::AbstractUnixSocketClient(const std::string& path, const std::string& name) : Loggable(name), path(path), name(name) {
 	_running.store(true);
 	_connected.store(false);
@@ -123,19 +121,19 @@ void AbstractUnixSocketClient::writeLoop() {
 		}
 
 		if (!_connected) {
-			lock.unlock();	// <-- ¡soltar!
+			lock.unlock();
 			TimeUtils::sleep(50);
 			continue;
 		}
 
 		if (_message_queue.empty()) {
-			lock.unlock();	// <-- ¡soltar!
+			lock.unlock();
 			continue;
 		}
 
 		std::string msg = _message_queue.front();
 		_message_queue.pop();
-		lock.unlock();	// <-- ¡soltar antes de I/O!
+		lock.unlock();
 
 		uint32_t msgLen = htonl(msg.size());
 		if (write(sock, &msgLen, sizeof(msgLen)) <= 0 || write(sock, msg.c_str(), msg.size()) <= 0) {
@@ -163,8 +161,8 @@ void AbstractUnixSocketClient::readLoop() {
 				total_read += r;
 			}
 
-			auto json = nlohmann::json::parse(data);
-			auto j	  = CommunicationMessage::from_json(json);
+			YAML::Node node		   = YAML::Load(data);
+			CommunicationMessage j = node.as<CommunicationMessage>();
 
 			if (j.type == "RESPONSE") {
 				handleResponse(j);
@@ -197,7 +195,10 @@ std::vector<std::any> AbstractUnixSocketClient::invoke(std::string method, std::
 	{
 		std::lock_guard<std::mutex> lock(mutex);
 		promises[cm.id] = std::move(prom);
-		_message_queue.push(cm.to_json());
+		YAML::Node node = YAML::convert<CommunicationMessage>::encode(cm);
+		std::stringstream ss;
+		ss << node;
+		_message_queue.push(ss.str());
 	}
 	queue_cv.notify_one();
 

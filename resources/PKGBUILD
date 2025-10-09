@@ -38,6 +38,7 @@ makedepends=(
   'ninja'
   'npm'
   'pkgconf'
+  'pnpm'
   'podman'
   'qtcreator'
   'unzip'
@@ -45,10 +46,9 @@ makedepends=(
 )
 
 prepare() {
-
-    if ! command -v pnpm &> /dev/null || ! command -v shx &> /dev/null; then
-        echo "Installing missing npm modules"
-        sudo npm i -g pnpm@8.5.1 shx@0.3.4
+    if [[ ! -d "${HOME}/.local/share/pnpm" ]]; then
+        echo "Setup for pnpm..."
+        SHELL=/bin/bash pnpm setup
     fi
 
     cd "$srcdir/RogPerfTuner"
@@ -74,6 +74,8 @@ build() {
         native)    export CXXFLAGS="-march=native" ;;
         ""|default|*) export CXXFLAGS="" ;;  # Por defecto
     esac
+
+    echo "Using CXXFLAGS: $CXXFLAGS"
 
     cd "$srcdir/RogPerfTuner"
     IS_AURPKG=1 make release

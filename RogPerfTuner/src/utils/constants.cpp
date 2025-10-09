@@ -53,7 +53,7 @@ const std::string Constants::LOCK_FILE		   = "/tmp/" + APP_NAME + ".lock";
 const std::string Constants::SOCKET_FILE	   = "/tmp/" + APP_NAME + ".sock";
 
 const std::string Constants::ASSETS_BIN_DIR	   = ASSETS_DIR + "/bin";
-const std::string Constants::TRANSLATIONS_FILE = ASSETS_DIR + "/translations.json";
+const std::string Constants::TRANSLATIONS_FILE = ASSETS_DIR + "/translations.yaml";
 const std::string Constants::ASSET_ICONS_DIR   = ASSETS_DIR + "/icons";
 const std::string Constants::ASSET_ICON_FILE   = ASSETS_DIR + "/icons/icon.svg";
 const std::string Constants::ORGB_DIR		   = ASSETS_DIR + "/OpenRGB";
@@ -93,7 +93,7 @@ const std::string Constants::NEXT_EFF	= "nextRgbEffect";
 
 const int Constants::WS_PORT = 18158;
 
-const std::vector<std::string> Constants::RCCDC_REQUIRED_PIP = {"dataclasses-json", "asyncio"};
+const std::vector<std::string> Constants::RCCDC_REQUIRED_PIP = {"dataclasses-json", "asyncio", "pyyaml"};
 
 const std::string Constants::FLATPAK_MANGOHUD		   = "org.freedesktop.Platform.VulkanLayer.MangoHud/x86_64/24.08";
 const std::string Constants::FLATPAK_MANGOHUD_OVERRIDE = "--filesystem=xdg-config/MangoHud:ro";

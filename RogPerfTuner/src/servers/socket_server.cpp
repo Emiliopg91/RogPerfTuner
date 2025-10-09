@@ -136,20 +136,19 @@ void SocketServer::handleClient(int client_fd) {
 			total_read += r;
 		}
 
+		Logger::add_tab();
 		try {
-			auto json_msg = nlohmann::json::parse(data);
-			Logger::add_tab();
+			YAML::Node node = YAML::Load(data);
 
-			const CommunicationMessage req = CommunicationMessage::from_json(json_msg);
+			CommunicationMessage req = node.as<CommunicationMessage>();
 
 			if (req.type == "REQUEST") {
 				handleRequest(client_fd, req);
 			}
-
-			Logger::rem_tab();
 		} catch (const std::exception& e) {
 			logger.error("JSON parse error: " + std::string(e.what()));
 		}
+		Logger::rem_tab();
 	}
 
 	close(client_fd);
@@ -180,9 +179,12 @@ void SocketServer::handleRequest(const int& clientFd, const CommunicationMessage
 		} else if (req.name == Constants::PERF_PROF) {
 			res.data.emplace_back(performanceService.nextPerformanceProfile().toName());
 		} else if (req.name == Constants::GAME_CFG) {
-			json j;
-			to_json(j, steamService.getConfiguration(std::any_cast<std::string>(req.data[0])));
-			res.data.emplace_back(j.dump());
+			YAML::Node node;
+			node = YAML::convert<SteamGameConfig>::encode(steamService.getConfiguration(std::any_cast<std::string>(req.data[0])));
+
+			std::stringstream ss;
+			ss << node;
+			res.data.emplace_back(ss.str());
 		} else {
 			res.error = "No such method";
 		}
@@ -191,7 +193,10 @@ void SocketServer::handleRequest(const int& clientFd, const CommunicationMessage
 		res.error = e.what();
 	}
 
-	std::string resp_str = res.to_json();
+	YAML::Node node = YAML::convert<CommunicationMessage>::encode(res);
+	std::stringstream ss;
+	ss << node;
+	std::string resp_str = ss.str();
 
 	uint32_t resp_len = htonl(resp_str.size());
 	write(clientFd, &resp_len, sizeof(resp_len));

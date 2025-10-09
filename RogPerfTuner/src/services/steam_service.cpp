@@ -2,6 +2,7 @@
 
 #include <QApplication>
 #include <fstream>
+#include <nlohmann/json.hpp>
 #include <optional>
 #include <sstream>
 #include <string>
