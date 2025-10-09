@@ -316,8 +316,8 @@
     "es": "Ninguno"
   },
   "fan.curves": {
-    "en": "Fans",
-    "es": "Ventiladores"
+    "en": "Cooling",
+    "es": "Refrigeración"
   },
   "edit.curve": {
     "en": "Edit curves",
