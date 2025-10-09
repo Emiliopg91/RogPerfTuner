@@ -432,35 +432,38 @@ TrayIcon::TrayIcon() : QObject(&MainWindow::getInstance()), tray_icon_(new QSyst
 		// Settings submenu
 		// -------------------------
 		// -------------------------
-		// Logs submenu
-		// -------------------------
-		QMenu* logsMenu = new QMenu("    Logs", menu);
-		menu->insertMenu(nullptr, logsMenu);
-
-		QAction* openLogsAct = new QAction("Open logs");
-		QObject::connect(openLogsAct, &QAction::triggered, [this]() {
-			shell.run_command("xdg-open " + Constants::LOG_DIR + "/" + Constants::LOG_FILE_NAME + ".log");
-		});
-		logsMenu->addAction(openLogsAct);
-
-		QAction* openRunnerLogsAct = new QAction("Open runner logs");
-		QObject::connect(openRunnerLogsAct, &QAction::triggered, [this]() {
-			shell.run_command("xdg-open " + Constants::LOG_DIR + "/" + Constants::LOG_RUNNER_FILE_NAME + ".log");
-		});
-		logsMenu->addAction(openRunnerLogsAct);
-
-		QAction* openOpenRGBLogsAct = new QAction("Open OpenRGB logs");
-		QObject::connect(openOpenRGBLogsAct, &QAction::triggered, [this]() {
-			shell.run_command("xdg-open " + Constants::LOG_DIR + "/" + Constants::LOG_ORGB_FILE_NAME + ".log");
-		});
-		logsMenu->addAction(openOpenRGBLogsAct);
-		// -------------------------
-		// Logs submenu
-		// -------------------------
-		// -------------------------
 		// Develop menu
 		// -------------------------
 	}
+
+	menu->addSeparator();
+
+	// -------------------------
+	// Logs submenu
+	// -------------------------
+	QMenu* logsMenu = new QMenu(translator.translate("logs").c_str(), menu);
+	menu->insertMenu(nullptr, logsMenu);
+
+	QAction* openLogsAct = new QAction(translator.translate("open.log").c_str());
+	QObject::connect(openLogsAct, &QAction::triggered, [this]() {
+		shell.run_command("xdg-open " + Constants::LOG_DIR + "/" + Constants::LOG_FILE_NAME + ".log", false);
+	});
+	logsMenu->addAction(openLogsAct);
+
+	QAction* openRunnerLogsAct = new QAction(translator.translate("open.log.runner").c_str());
+	QObject::connect(openRunnerLogsAct, &QAction::triggered, [this]() {
+		shell.run_command("xdg-open " + Constants::LOG_DIR + "/" + Constants::LOG_RUNNER_FILE_NAME + ".log", false);
+	});
+	logsMenu->addAction(openRunnerLogsAct);
+
+	QAction* openOpenRGBLogsAct = new QAction(translator.translate("open.log.openrgb").c_str());
+	QObject::connect(openOpenRGBLogsAct, &QAction::triggered, [this]() {
+		shell.run_command("xdg-open " + Constants::LOG_DIR + "/" + Constants::LOG_ORGB_FILE_NAME + ".log", false);
+	});
+	logsMenu->addAction(openOpenRGBLogsAct);
+	// -------------------------
+	// Logs submenu
+	// -------------------------
 
 	menu->addSeparator();
 

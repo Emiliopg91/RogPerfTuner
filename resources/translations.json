@@ -358,5 +358,21 @@
   "disabled": {
     "en": "Disabled",
     "es": "Desactivado"
+  },
+  "logs": {
+    "en": "Logs",
+    "es": "Registros"
+  },
+  "open.log": {
+    "en": "Open logs",
+    "es": "Abrir registros"
+  },
+  "open.log.runner": {
+    "en": "Open runner logs",
+    "es": "Abrir registros del runner"
+  },
+  "open.log.openrgb": {
+    "en": "Open OpenRGB logs",
+    "es": "Abrir registros de OpenRGB"
   }
 }
