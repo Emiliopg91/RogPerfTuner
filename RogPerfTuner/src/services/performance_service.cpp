@@ -467,10 +467,10 @@ void PerformanceService::saveFanCurves(std::string profile, std::unordered_map<s
 	auto pp = ((PerformanceProfile)PerformanceProfile::fromString(profile)).getPlatformProfile();
 
 	asusCtlClient.setFanCurvesEnabled(pp, false);
-	setFanCurves(((PerformanceProfile)PerformanceProfile::fromString(profile)));
 	for (const auto& [fan, curve] : curves) {
 		configuration.getConfiguration().platform.curves[profile][fan].current = curve.toData();
 	}
+	setFanCurves(((PerformanceProfile)PerformanceProfile::fromString(profile)));
 	asusCtlClient.setFanCurvesEnabled(pp, true);
 
 	configuration.saveConfig();
