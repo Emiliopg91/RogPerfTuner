@@ -19,3 +19,6 @@
 [submodule "submodules/spdlog"]
 	path = submodules/spdlog
 	url = https://github.com/Emiliopg91/gabime-spdlog
+[submodule "submodules/yaml"]
+	path = submodules/yaml
+	url = https://github.com/Emiliopg91/jbeder-yaml-cpp

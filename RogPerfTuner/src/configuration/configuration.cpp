@@ -4,30 +4,19 @@
 
 #include <cstdlib>
 #include <fstream>
-#include <iostream>
 
 #include "../../include/logger/logger_provider.hpp"
 #include "../../include/utils/constants.hpp"
 #include "../../include/utils/file_utils.hpp"
+#include "yaml-cpp/node/parse.h"
 
 void Configuration::loadConfig() {
 	if (FileUtils::exists(Constants::CONFIG_FILE)) {
 		logger.debug("Loading settings from '{}'", Constants::CONFIG_FILE);
 		try {
-			std::ifstream f(Constants::CONFIG_FILE);
-			if (!f) {
-				logger.error("Couldn't load settings: {}", Constants::CONFIG_FILE);
-				return;
-			}
-
-			nlohmann::json j;
-			f >> j;
-
-			// Convierte JSON → RootConfig
-			RootConfig cfg = j.get<RootConfig>();
-			config		   = cfg;
-
-			LoggerProvider::setConfigMap(cfg.logger);
+			auto node = YAML::LoadFile(Constants::CONFIG_FILE);
+			config	  = node.as<RootConfig>();
+			LoggerProvider::setConfigMap(config->logger);
 		} catch (const std::exception& e) {
 			logger.error("Error loading settings: {}", e.what());
 		}
@@ -35,7 +24,6 @@ void Configuration::loadConfig() {
 		logger.debug("Settings file not found, creating new");
 		FileUtils::createDirectory(Constants::CONFIG_DIR);
 
-		// Configuración por defecto
 		RootConfig defaultCfg;
 		config = defaultCfg;
 
@@ -52,14 +40,11 @@ void Configuration::saveConfig() {
 	logger.debug("Configuration saved");
 
 	try {
-		std::ofstream f(Constants::CONFIG_FILE);
-		if (!f) {
-			logger.error("Couldn't save settings file '{}'", Constants::CONFIG_FILE);
-			return;
-		}
+		YAML::Node node = YAML::convert<RootConfig>::encode(*config);
 
-		nlohmann::json j = config.value();
-		f << j.dump(2);	 // indentación de 2 espacios
+		std::ofstream fout(Constants::CONFIG_FILE);
+		fout << node;
+		fout.close();
 	} catch (const std::exception& e) {
 		logger.error("Error saving settings file: '{}'", e.what());
 	}

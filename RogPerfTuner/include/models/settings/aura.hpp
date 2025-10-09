@@ -1,5 +1,7 @@
 #pragma once
 
+#include <yaml-cpp/yaml.h>
+
 #include <string>
 
 #include "../hardware/rgb_brightness.hpp"
@@ -11,27 +13,42 @@ struct Aura {
 	std::optional<std::string> last_effect				 = std::nullopt;
 };
 
-inline void to_json(nlohmann::json& j, const Aura& o) {
-	j				= json{};
-	j["brightness"] = o.brightness.toInt();
-	if (!o.config.empty()) {
-		j["config"] = o.config;
-	}
-	j["effect"] = o.last_effect ? json(*o.last_effect) : json(nullptr);
-}
-inline void from_json(const nlohmann::json& j, Aura& o) {
-	o.brightness = RgbBrightness::fromInt(j.at("brightness").get<int>());
-	if (j.contains("config")) {
-		j.at("config").get_to(o.config);
-	} else if (j.contains("effects")) {
-		j.at("effects").get_to(o.config);
+// YAML-CPP serialization/deserialization
+namespace YAML {
+template <>
+struct convert<Aura> {
+	static Node encode(const Aura& aura) {
+		Node node;
+		node["brightness"] = aura.brightness.toInt();
+		if (!aura.config.empty()) {
+			node["config"] = aura.config;
+		}
+		if (aura.last_effect) {
+			node["effect"] = *aura.last_effect;
+		}
+		return node;
 	}
 
-	if (j.contains("effect") && !j.at("effect").is_null()) {
-		o.last_effect = j.at("effect").get<std::string>();
-	} else if (j.contains("last_effect") && !j.at("last_effect").is_null()) {
-		o.last_effect = j.at("last_effect").get<std::string>();
-	} else {
-		o.last_effect = std::nullopt;
+	static bool decode(const Node& node, Aura& aura) {
+		if (node["brightness"]) {
+			aura.brightness = RgbBrightness::fromInt(node["brightness"].as<int>());
+		}
+
+		if (node["config"]) {
+			aura.config = node["config"].as<std::unordered_map<std::string, EffectConfig>>();
+		} else if (node["effects"]) {
+			aura.config = node["effects"].as<std::unordered_map<std::string, EffectConfig>>();
+		}
+
+		if (node["effect"] && !node["effect"].IsNull()) {
+			aura.last_effect = node["effect"].as<std::string>();
+		} else if (node["last_effect"] && !node["last_effect"].IsNull()) {
+			aura.last_effect = node["last_effect"].as<std::string>();
+		} else {
+			aura.last_effect = std::nullopt;
+		}
+
+		return true;
 	}
-}
+};
+}  // namespace YAML

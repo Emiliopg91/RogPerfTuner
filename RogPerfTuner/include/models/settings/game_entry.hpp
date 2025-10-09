@@ -1,8 +1,8 @@
 #pragma once
 
-#include <nlohmann/json.hpp>
+#include <yaml-cpp/yaml.h>
+
 #include <optional>
-using json = nlohmann::json;
 
 #include "../steam/mangohud_level.hpp"
 #include "../steam/wine_sync_option.hpp"
@@ -21,97 +21,109 @@ struct GameEntry {
 	std::optional<std::string> wrappers = std::nullopt;
 };
 
-inline void to_json(json& j, const GameEntry& g) {
-	j = json{};
+// YAML-CPP serialization/deserialization
+namespace YAML {
+template <>
+struct convert<GameEntry> {
+	static Node encode(const GameEntry& game) {
+		Node node;
 
-	if (!g.args.value_or("").empty()) {
-		j["args"] = json(*g.args);
-	}
-	if (!g.env.value_or("").empty()) {
-		j["env"] = json(*g.env);
-	}
-	if (!g.wrappers.value_or("").empty()) {
-		j["wrappers"] = json(*g.wrappers);
-	}
-	if (!g.gpu.value_or("").empty()) {
-		j["gpu"] = json(*g.gpu);
-	}
-	if (!g.overlayId.value_or("").empty()) {
-		j["overlayId"] = json(*g.overlayId);
-	}
-	if (!g.scheduler.value_or("").empty()) {
-		j["scheduler"] = json(*g.scheduler);
-	}
-	if (!g.proton) {
-		j["proton"] = false;
-	}
-	if (g.proton) {
-		if (g.steamdeck) {
-			j["steamdeck"] = true;
+		if (game.args && !game.args->empty()) {
+			node["args"] = *game.args;
 		}
-		j["sync"] = g.sync.toString();
+		if (game.env && !game.env->empty()) {
+			node["env"] = *game.env;
+		}
+		if (game.gpu && !game.gpu->empty()) {
+			node["gpu"] = *game.gpu;
+		}
+		node["metrics"] = game.metrics_level.toString();
+		node["name"]	= game.name;
+		if (game.overlayId && !game.overlayId->empty()) {
+			node["overlayId"] = *game.overlayId;
+		}
+		if (!game.proton) {
+			node["proton"] = false;
+		}
+		if (game.scheduler && !game.scheduler->empty()) {
+			node["scheduler"] = *game.scheduler;
+		}
+		if (game.proton) {
+			if (game.steamdeck) {
+				node["steamdeck"] = true;
+			}
+			node["sync"] = game.sync.toString();
+		}
+		if (game.wrappers && !game.wrappers->empty()) {
+			node["wrappers"] = *game.wrappers;
+		}
+
+		return node;
 	}
 
-	j["metrics"] = g.metrics_level.toString();
-	j["name"]	 = g.name;
-}
+	static bool decode(const Node& node, GameEntry& game) {
+		if (node["args"] && !node["args"].IsNull()) {
+			game.args = node["args"].as<std::string>();
+		} else {
+			game.args = std::nullopt;
+		}
 
-inline void from_json(const json& j, GameEntry& g) {
-	// Manejo de opcionales
-	if (j.contains("args") && !j.at("args").is_null()) {
-		g.args = j.at("args").get<std::string>();
-	} else {
-		g.args = std::nullopt;
+		if (node["env"] && !node["env"].IsNull()) {
+			game.env = node["env"].as<std::string>();
+		} else {
+			game.env = std::nullopt;
+		}
+
+		if (node["wrappers"] && !node["wrappers"].IsNull()) {
+			game.wrappers = node["wrappers"].as<std::string>();
+		} else {
+			game.wrappers = std::nullopt;
+		}
+
+		if (node["overlayId"] && !node["overlayId"].IsNull()) {
+			game.overlayId = node["overlayId"].as<std::string>();
+		} else {
+			game.overlayId = std::nullopt;
+		}
+
+		if (node["gpu"] && !node["gpu"].IsNull()) {
+			game.gpu = node["gpu"].as<std::string>();
+		} else {
+			game.gpu = std::nullopt;
+		}
+
+		if (node["scheduler"] && !node["scheduler"].IsNull()) {
+			game.scheduler = node["scheduler"].as<std::string>();
+		} else {
+			game.scheduler = std::nullopt;
+		}
+
+		if (node["proton"]) {
+			game.proton = node["proton"].as<bool>();
+		} else {
+			game.proton = true;
+		}
+
+		if (node["steamdeck"]) {
+			game.steamdeck = node["steamdeck"].as<bool>();
+		} else {
+			game.steamdeck = false;
+		}
+
+		if (node["sync"]) {
+			game.sync = WineSyncOption::fromString(node["sync"].as<std::string>());
+		} else {
+			game.sync = WineSyncOption::Enum::AUTO;
+		}
+
+		if (node["metrics"]) {
+			game.metrics_level = MangoHudLevel::fromString(node["metrics"].as<std::string>());
+		}
+		if (node["name"]) {
+			game.name = node["name"].as<std::string>();
+		}
+
+		return true;
 	}
-
-	if (j.contains("env") && !j.at("env").is_null()) {
-		g.env = j.at("env").get<std::string>();
-	} else {
-		g.env = std::nullopt;
-	}
-
-	if (j.contains("wrappers") && !j.at("wrappers").is_null()) {
-		g.wrappers = j.at("wrappers").get<std::string>();
-	} else {
-		g.wrappers = std::nullopt;
-	}
-
-	if (j.contains("overlayId") && !j.at("overlayId").is_null()) {
-		g.overlayId = j.at("overlayId").get<std::string>();
-	} else {
-		g.overlayId = std::nullopt;
-	}
-
-	if (j.contains("gpu") && !j.at("gpu").is_null()) {
-		g.gpu = j.at("gpu").get<std::string>();
-	} else {
-		g.gpu = std::nullopt;
-	}
-
-	if (j.contains("scheduler") && !j.at("scheduler").is_null()) {
-		g.scheduler = j.at("scheduler").get<std::string>();
-	} else {
-		g.scheduler = std::nullopt;
-	}
-
-	if (j.contains("proton")) {
-		g.proton = j.at("proton").get<bool>();
-	} else {
-		g.proton = true;
-	}
-
-	if (j.contains("steamdeck")) {
-		g.steamdeck = j.at("steamdeck").get<bool>();
-	} else {
-		g.steamdeck = false;
-	}
-
-	if (j.contains("sync")) {
-		g.sync = j.at("sync").get<std::string>();
-	} else {
-		g.sync = ((WineSyncOption)WineSyncOption::Enum::AUTO).toString();
-	}
-
-	g.metrics_level = MangoHudLevel::fromString(j.at("metrics").get<std::string>());
-	g.name			= j.at("name").get<std::string>();
-}
+};
+}  // namespace YAML

@@ -54,6 +54,7 @@ target_link_libraries(RogPerfTuner PRIVATE
     Qt6::Charts
     spdlog::spdlog 
     nlohmann_json::nlohmann_json
+    yaml-cpp::yaml-cpp
     ${LIBSECRET_LIBRARIES}
     udev
     orgbsdk
