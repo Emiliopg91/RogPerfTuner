@@ -2,7 +2,6 @@
 
 #include <QApplication>
 #include <cstdint>
-#include <fstream>
 #include <optional>
 #include <sstream>
 #include <string>
