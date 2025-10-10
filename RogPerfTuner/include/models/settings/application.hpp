@@ -1,24 +1,33 @@
 #pragma once
-#include <nlohmann/json.hpp>
+
+#include <yaml-cpp/yaml.h>
 
 #include "../../utils/constants.hpp"
-using json = nlohmann::json;
 
 struct Application {
 	bool askedInstallRccdc = false;
 	bool appimage		   = Constants::APPIMAGE_FILE.has_value();
 };
 
-inline void to_json(nlohmann::json& j, const Application& o) {
-	j					   = json{};
-	j["askedInstallRccdc"] = o.askedInstallRccdc;
-	j["appimage"]		   = o.appimage;
-}
-inline void from_json(const nlohmann::json& j, Application& o) {
-	if (j.contains("askedInstallRccdc")) {
-		j.at("askedInstallRccdc").get_to(o.askedInstallRccdc);
+// YAML-CPP serialization/deserialization
+namespace YAML {
+template <>
+struct convert<Application> {
+	static Node encode(const Application& app) {
+		Node node;
+		node["appimage"]		  = app.appimage;
+		node["askedInstallRccdc"] = app.askedInstallRccdc;
+		return node;
 	}
-	if (j.contains("appimage")) {
-		j.at("appimage").get_to(o.appimage);
+
+	static bool decode(const Node& node, Application& app) {
+		if (node["askedInstallRccdc"]) {
+			app.askedInstallRccdc = node["askedInstallRccdc"].as<bool>();
+		}
+		if (node["appimage"]) {
+			app.appimage = node["appimage"].as<bool>();
+		}
+		return true;
 	}
-}
+};
+}  // namespace YAML

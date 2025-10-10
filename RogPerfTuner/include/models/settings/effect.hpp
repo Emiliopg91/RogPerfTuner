@@ -1,16 +1,28 @@
 #pragma once
 
-#include <nlohmann/json.hpp>
+#include <yaml-cpp/yaml.h>
+
 #include <string>
-using json = nlohmann::json;
 
 struct EffectConfig {
 	std::string color;
 };
 
-inline void to_json(nlohmann::json& j, const EffectConfig& e) {
-	j = nlohmann::json{{"color", e.color}};
-}
-inline void from_json(const nlohmann::json& j, EffectConfig& e) {
-	j.at("color").get_to(e.color);
-}
+// YAML-CPP serialization/deserialization
+namespace YAML {
+template <>
+struct convert<EffectConfig> {
+	static Node encode(const EffectConfig& effect) {
+		Node node;
+		node["color"] = effect.color;
+		return node;
+	}
+
+	static bool decode(const Node& node, EffectConfig& effect) {
+		if (node["color"]) {
+			effect.color = node["color"].as<std::string>();
+		}
+		return true;
+	}
+};
+}  // namespace YAML

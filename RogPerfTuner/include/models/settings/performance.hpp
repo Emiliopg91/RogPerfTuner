@@ -1,8 +1,8 @@
 #pragma once
 
-#include <nlohmann/json.hpp>
+#include <yaml-cpp/yaml.h>
+
 #include <optional>
-using json = nlohmann::json;
 
 #include "../performance/performance_profile.hpp"
 
@@ -11,16 +11,29 @@ struct Performance {
 	std::optional<std::string> scheduler = std::nullopt;
 };
 
-inline void to_json(nlohmann::json& j, const Performance& o) {
-	j			 = nlohmann::json{};
-	j["profile"] = o.profile.toString();
-	if (o.scheduler.has_value()) {
-		j["scheduler"] = o.scheduler.value();
+// YAML-CPP serialization/deserialization
+namespace YAML {
+template <>
+struct convert<Performance> {
+	static Node encode(const Performance& perf) {
+		Node node;
+		node["profile"] = perf.profile.toString();
+		if (perf.scheduler.has_value()) {
+			node["scheduler"] = perf.scheduler.value();
+		}
+		return node;
 	}
-}
-inline void from_json(const nlohmann::json& j, Performance& o) {
-	o.profile = PerformanceProfile::fromString(j.at("profile").get<std::string>());
-	if (j.contains("scheduler")) {
-		o.scheduler = j["scheduler"];
+
+	static bool decode(const Node& node, Performance& perf) {
+		if (node["profile"]) {
+			perf.profile = PerformanceProfile::fromString(node["profile"].as<std::string>());
+		}
+		if (node["scheduler"]) {
+			perf.scheduler = node["scheduler"].as<std::string>();
+		} else {
+			perf.scheduler = std::nullopt;
+		}
+		return true;
 	}
-}
+};
+}  // namespace YAML

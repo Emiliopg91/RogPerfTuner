@@ -1,7 +1,7 @@
 #include "../../include/services/steam_service.hpp"
 
 #include <QApplication>
-#include <fstream>
+#include <cstdint>
 #include <optional>
 #include <sstream>
 #include <string>
@@ -20,6 +20,8 @@
 #include "../../include/utils/process_utils.hpp"
 #include "../../include/utils/string_utils.hpp"
 #include "../../include/utils/time_utils.hpp"
+#include "yaml-cpp/node/node.h"
+#include "yaml-cpp/node/parse.h"
 
 bool SteamService::metricsEnabled() {
 	auto mangohud_which = shell.which("mangohud");
@@ -62,15 +64,15 @@ SteamService::SteamService() : Loggable("SteamService") {
 	});
 
 	steamClient.onGameLaunch([this](CallbackParam data) {
-		auto id	  = static_cast<uint32_t>(std::any_cast<int>(data[0]));
+		auto id	  = static_cast<uint32_t>(std::any_cast<long long>(data[0]));
 		auto name = std::any_cast<std::string>(data[1]);
-		auto pid  = std::any_cast<int>(data[2]);
+		auto pid  = static_cast<int>(std::any_cast<long long>(data[2]));
 
 		onGameLaunch(id, name, pid);
 	});
 
 	steamClient.onGameStop([this](CallbackParam data) {
-		auto id	  = static_cast<uint32_t>(std::any_cast<int>(data[0]));
+		auto id	  = static_cast<uint32_t>(std::any_cast<long long>(data[0]));
 		auto name = std::any_cast<std::string>(data[1]);
 
 		onGameStop(id, name);
@@ -175,13 +177,10 @@ void SteamService::launchGame(const std::string& id) {
 }
 
 bool SteamService::checkIfRequiredInstallation() {
-	std::ifstream fileRunning(Constants::RCCDC_PACKAGE_FILE);
-
-	nlohmann::json jR;
-	fileRunning >> jR;
+	YAML::Node node = YAML::LoadFile(Constants::RCCDC_PACKAGE_FILE);
 
 	SemanticVersion vA = SemanticVersion::parse(Constants::PLUGIN_VERSION);
-	SemanticVersion vR = SemanticVersion::parse(jR["version"]);
+	SemanticVersion vR = SemanticVersion::parse(node["version"].as<std::string>());
 
 	return vA > vR;
 }

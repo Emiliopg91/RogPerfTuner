@@ -3,7 +3,6 @@
 #include <any>
 
 #include "../../../include/utils/constants.hpp"
-#include "nlohmann/json_fwd.hpp"
 
 RogPerfTunerClient::RogPerfTunerClient() : AbstractUnixSocketClient(Constants::SOCKET_FILE, "RogPerfTunerClient") {
 }
@@ -27,11 +26,11 @@ void RogPerfTunerClient::nextProfile() {
 SteamGameConfig RogPerfTunerClient::getGameConfig(std::string steamId) {
 	auto res = invoke(Constants::GAME_CFG, {steamId});
 
-	auto json		 = std::any_cast<std::string>(res[0]);
-	nlohmann::json j = nlohmann::json::parse(json);
+	auto yaml_str = std::any_cast<std::string>(res[0]);
 
-	SteamGameConfig cfg;
-	from_json(j, cfg);
+	YAML::Node node = YAML::Load(yaml_str);
+
+	SteamGameConfig cfg = node.as<SteamGameConfig>();
 
 	return cfg;
 }

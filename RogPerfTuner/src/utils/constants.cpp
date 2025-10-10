@@ -7,11 +7,11 @@
 
 const std::string Constants::APP_NAME = "RogPerfTuner";
 
-const std::string Constants::APP_VERSION = "4.4.1";
+const std::string Constants::APP_VERSION = "4.4.2";
 
 const pid_t Constants::PID = getpid();
 
-const std::string Constants::PLUGIN_VERSION = "1.2.3";
+const std::string Constants::PLUGIN_VERSION = "1.2.4";
 
 const bool Constants::DEV_MODE = false;
 
@@ -53,7 +53,7 @@ const std::string Constants::LOCK_FILE		   = "/tmp/" + APP_NAME + ".lock";
 const std::string Constants::SOCKET_FILE	   = "/tmp/" + APP_NAME + ".sock";
 
 const std::string Constants::ASSETS_BIN_DIR	   = ASSETS_DIR + "/bin";
-const std::string Constants::TRANSLATIONS_FILE = ASSETS_DIR + "/translations.json";
+const std::string Constants::TRANSLATIONS_FILE = ASSETS_DIR + "/translations.yaml";
 const std::string Constants::ASSET_ICONS_DIR   = ASSETS_DIR + "/icons";
 const std::string Constants::ASSET_ICON_FILE   = ASSETS_DIR + "/icons/icon.svg";
 const std::string Constants::ORGB_DIR		   = ASSETS_DIR + "/OpenRGB";
@@ -66,7 +66,7 @@ const std::string Constants::APP_DRAW_FILE		 = HOME_DIR + "/.local/share/applica
 const std::string Constants::BIN_DIR			 = HOME_DIR + "/." + APP_NAME + "/bin";
 const std::string Constants::BIN_APPLICATION_DIR = HOME_DIR + "/." + APP_NAME + "/bin/application";
 const std::string Constants::CONFIG_DIR			 = HOME_DIR + "/." + APP_NAME + "/config";
-const std::string Constants::CONFIG_FILE		 = HOME_DIR + "/." + APP_NAME + "/config/config.json";
+const std::string Constants::CONFIG_FILE		 = HOME_DIR + "/." + APP_NAME + "/config/config.yaml";
 const std::string Constants::ICONS_DIR			 = HOME_DIR + "/." + APP_NAME + "/icons";
 const std::string Constants::ICON_FILE			 = HOME_DIR + "/." + APP_NAME + "/icons/icon.svg";
 const std::string Constants::ICON_45_FILE		 = HOME_DIR + "/." + APP_NAME + "/icons/icon-45x45.png";
@@ -93,7 +93,7 @@ const std::string Constants::NEXT_EFF	= "nextRgbEffect";
 
 const int Constants::WS_PORT = 18158;
 
-const std::vector<std::string> Constants::RCCDC_REQUIRED_PIP = {"dataclasses-json", "asyncio"};
+const std::vector<std::string> Constants::RCCDC_REQUIRED_PIP = {"asyncio", "pyyaml"};
 
 const std::string Constants::FLATPAK_MANGOHUD		   = "org.freedesktop.Platform.VulkanLayer.MangoHud/x86_64/24.08";
 const std::string Constants::FLATPAK_MANGOHUD_OVERRIDE = "--filesystem=xdg-config/MangoHud:ro";

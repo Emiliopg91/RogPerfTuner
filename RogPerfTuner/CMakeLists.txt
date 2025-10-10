@@ -53,7 +53,7 @@ target_link_libraries(RogPerfTuner PRIVATE
     Qt6::DBus
     Qt6::Charts
     spdlog::spdlog 
-    nlohmann_json::nlohmann_json
+    yaml-cpp::yaml-cpp
     ${LIBSECRET_LIBRARIES}
     udev
     orgbsdk
@@ -115,41 +115,41 @@ file(GLOB_RECURSE SOURCES_COMMUNICATION_MESSAGE
 add_executable(NextProfile ${CMAKE_CURRENT_SOURCE_DIR}/src/scripts/performance/next_profile.cpp ${SOURCES_UTILS} ${SOURCES_COMMUNICATION_MESSAGE})
 target_include_directories(NextProfile PRIVATE ${LIBSECRET_INCLUDE_DIRS})
 target_link_libraries(NextProfile PRIVATE 
-    nlohmann_json::nlohmann_json
+    yaml-cpp::yaml-cpp
     spdlog::spdlog
 )
 
 add_executable(NextEffect ${CMAKE_CURRENT_SOURCE_DIR}/src/scripts/rgb/next_effect.cpp ${SOURCES_UTILS} ${SOURCES_COMMUNICATION_MESSAGE})
 target_include_directories(NextEffect PRIVATE ${LIBSECRET_INCLUDE_DIRS})
 target_link_libraries(NextEffect PRIVATE 
-    nlohmann_json::nlohmann_json
+    yaml-cpp::yaml-cpp
     spdlog::spdlog
 )
 
 add_executable(IncBrightness ${CMAKE_CURRENT_SOURCE_DIR}/src/scripts/rgb/increase_brightness.cpp ${SOURCES_UTILS} ${SOURCES_COMMUNICATION_MESSAGE})
 target_include_directories(IncBrightness PRIVATE ${LIBSECRET_INCLUDE_DIRS})
 target_link_libraries(IncBrightness PRIVATE 
-    nlohmann_json::nlohmann_json
+    yaml-cpp::yaml-cpp
     spdlog::spdlog
 )
 
 add_executable(DecBrightness ${CMAKE_CURRENT_SOURCE_DIR}/src/scripts/rgb/decrease_brightness.cpp ${SOURCES_UTILS} ${SOURCES_COMMUNICATION_MESSAGE})
 target_include_directories(DecBrightness PRIVATE ${LIBSECRET_INCLUDE_DIRS})
 target_link_libraries(DecBrightness PRIVATE 
-    nlohmann_json::nlohmann_json
+    yaml-cpp::yaml-cpp
     spdlog::spdlog
 )
 
 add_executable(SteamRunner ${CMAKE_CURRENT_SOURCE_DIR}/src/scripts/steam/run.cpp ${SOURCES_SHELL} ${SOURCES_LOGGER} ${SOURCES_UTILS} ${SOURCES_COMMUNICATION_MESSAGE})
 target_include_directories(SteamRunner PRIVATE ${LIBSECRET_INCLUDE_DIRS})
 target_link_libraries(SteamRunner PRIVATE 
-    nlohmann_json::nlohmann_json
+    yaml-cpp::yaml-cpp
     spdlog::spdlog
 )
 
 add_executable(FlatpakWrapper ${CMAKE_CURRENT_SOURCE_DIR}/src/scripts/steam/flatpak.cpp ${SOURCES_SHELL} ${SOURCES_LOGGER} ${SOURCES_UTILS} ${SOURCES_FLATPAK})
 target_include_directories(FlatpakWrapper PRIVATE ${LIBSECRET_INCLUDE_DIRS})
 target_link_libraries(FlatpakWrapper PRIVATE 
-    nlohmann_json::nlohmann_json
+    yaml-cpp::yaml-cpp
     spdlog::spdlog 
 )

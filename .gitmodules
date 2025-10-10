@@ -10,12 +10,12 @@
 [submodule "submodules/httplib"]
 	path = submodules/httplib
 	url = https://github.com/Emiliopg91/yhirose-cpp-httplib
-[submodule "submodules/json"]
-	path = submodules/json
-	url = https://github.com/Emiliopg91/nlohmann-json
 [submodule "gabime-spdlog"]
 	path = gabime-spdlog
 	url = https://github.com/Emiliopg91/gabime-spdlog
 [submodule "submodules/spdlog"]
 	path = submodules/spdlog
 	url = https://github.com/Emiliopg91/gabime-spdlog
+[submodule "submodules/yaml"]
+	path = submodules/yaml
+	url = https://github.com/Emiliopg91/jbeder-yaml-cpp

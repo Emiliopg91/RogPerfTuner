@@ -1,8 +1,6 @@
 #pragma once
 
-#include <nlohmann/json.hpp>
-
-using json = nlohmann::json;
+#include <yaml-cpp/yaml.h>
 
 #include "../hardware/battery_charge_threshold.hpp"
 #include "fan_curve.hpp"
@@ -14,20 +12,31 @@ struct Platform {
 	std::unordered_map<std::string, std::unordered_map<std::string, FanCurve>> curves = {};
 };
 
-inline void to_json(nlohmann::json& j, const Platform& o) {
-	j				 = nlohmann::json{};
-	j["performance"] = o.performance;
-	j["chargeLimit"] = o.chargeLimit.toInt();
-	if (!o.curves.empty()) {
-		j["curves"] = o.curves;
+// YAML-CPP serialization/deserialization
+namespace YAML {
+template <>
+struct convert<Platform> {
+	static Node encode(const Platform& platform) {
+		Node node;
+		node["chargeLimit"] = platform.chargeLimit.toInt();
+		if (!platform.curves.empty()) {
+			node["curves"] = platform.curves;
+		}
+		node["performance"] = platform.performance;
+		return node;
 	}
-}
-inline void from_json(const nlohmann::json& j, Platform& o) {
-	o.performance = j.at("performance").get<Performance>();
-	if (j.contains("chargeLimit")) {
-		o.chargeLimit = BatteryThreshold::fromInt(j.at("chargeLimit").get<int>());
+
+	static bool decode(const Node& node, Platform& platform) {
+		if (node["performance"]) {
+			platform.performance = node["performance"].as<Performance>();
+		}
+		if (node["chargeLimit"]) {
+			platform.chargeLimit = BatteryThreshold::fromInt(node["chargeLimit"].as<int>());
+		}
+		if (node["curves"]) {
+			platform.curves = node["curves"].as<std::unordered_map<std::string, std::unordered_map<std::string, FanCurve>>>();
+		}
+		return true;
 	}
-	if (j.contains("curves")) {
-		o.curves = j.at("curves").get<std::unordered_map<std::string, std::unordered_map<std::string, FanCurve>>>();
-	}
-}
+};
+}  // namespace YAML

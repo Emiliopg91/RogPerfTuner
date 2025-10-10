@@ -1,13 +1,11 @@
 
 #include "../../include/translator/translator.hpp"
 
-#include <fstream>
-#include <nlohmann/json.hpp>
+#include <yaml-cpp/yaml.h>
+
 #include <string>
 
 #include "../../include/utils/constants.hpp"
-
-using json = nlohmann::json;
 
 Translator::Translator() : Loggable("Translator") {
 	currentLang = [this]() -> Language {
@@ -32,20 +30,22 @@ Translator::Translator() : Loggable("Translator") {
 		}
 	}();
 
-	std::ifstream file(Constants::TRANSLATIONS_FILE);
-	json j;
-	file >> j;
+	YAML::Node root = YAML::LoadFile(Constants::TRANSLATIONS_FILE);
 
-	for (auto& [key, value] : j.items()) {
+	for (auto it = root.begin(); it != root.end(); ++it) {
+		const std::string key	= it->first.as<std::string>();
+		const YAML::Node& value = it->second;
+
 		std::string val = key;
-		if (value.contains(currentLang.toString())) {
-			val = value.at(currentLang.toString()).get<std::string>();
-		} else if (value.contains(FALLBACK_LANG.toString())) {
+		if (value[currentLang.toString()]) {
+			val = value[currentLang.toString()].as<std::string>();
+		} else if (value[FALLBACK_LANG.toString()]) {
 			logger.warn("Missing specific translation for {}", key);
-			val = value.at(FALLBACK_LANG.toString()).get<std::string>();
+			val = value[FALLBACK_LANG.toString()].as<std::string>();
 		} else {
 			logger.warn("Missing specific and default translation for {}", key);
 		}
+
 		translations[key] = val;
 	}
 

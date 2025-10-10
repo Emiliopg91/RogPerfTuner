@@ -9,5 +9,5 @@ const std::string Md5SumClient::checksum(const std::string& path) {
 	auto out	  = StringUtils::trim(run_command(path).stdout_str);
 	auto outParts = StringUtils::split(out, ' ');
 
-	return outParts[outParts.size() - 1];
+	return outParts[0];
 }

@@ -24,7 +24,9 @@ const std::vector<SteamGameDetails> SteamSocketClient::getAppsDetails(const std:
 
 	auto invResult = invoke("get_apps_details", converted);
 
-	auto map = (std::any_cast<json>(invResult[0])).get<std::unordered_map<std::string, SteamGameDetails>>();
+	auto yaml_node	= std::any_cast<std::string>(invResult[0]);
+	YAML::Node node = YAML::Load(yaml_node);
+	auto map		= node.as<std::unordered_map<std::string, SteamGameDetails>>();
 	for (const auto& [key, val] : map) {
 		result.emplace_back(val);
 	}

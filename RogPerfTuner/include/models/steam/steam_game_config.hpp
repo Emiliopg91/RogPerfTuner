@@ -1,15 +1,16 @@
 /**
  * @file steam_game_config.hpp
- * @author Emiliopg91 (ojosdeserbio@gmail.com)
- * @brief
+ * @author Emili...
+ * @brief YAML-CPP conversion helpers for SteamGameConfig
  * @version 4.0.0
  * @date 2025-09-10
- *
- *
  */
 
-#include <nlohmann/json.hpp>
+#pragma once
+#include <yaml-cpp/yaml.h>
+
 #include <string>
+#include <unordered_map>
 #include <vector>
 
 struct SteamGameConfig {
@@ -18,12 +19,35 @@ struct SteamGameConfig {
 	std::string parameters;
 };
 
-inline void to_json(nlohmann::json& j, const SteamGameConfig& d) {
-	j = nlohmann::json{{"environment", d.environment}, {"wrappers", d.wrappers}, {"parameters", d.parameters}};
-}
+namespace YAML {
+template <>
+struct convert<SteamGameConfig> {
+	static Node encode(const SteamGameConfig& d) {
+		Node node;
+		node["environment"] = d.environment;
+		node["wrappers"]	= d.wrappers;
+		node["parameters"]	= d.parameters;
+		return node;
+	}
 
-inline void from_json(const nlohmann::json& j, SteamGameConfig& d) {
-	j.at("environment").get_to(d.environment);
-	j.at("wrappers").get_to(d.wrappers);
-	j.at("parameters").get_to(d.parameters);
-}
+	static bool decode(const Node& node, SteamGameConfig& d) {
+		if (!node.IsMap()) {
+			return false;
+		}
+
+		if (node["environment"]) {
+			d.environment = node["environment"].as<std::unordered_map<std::string, std::string>>();
+		}
+
+		if (node["wrappers"]) {
+			d.wrappers = node["wrappers"].as<std::vector<std::string>>();
+		}
+
+		if (node["parameters"]) {
+			d.parameters = node["parameters"].as<std::string>();
+		}
+
+		return true;
+	}
+};
+}  // namespace YAML

@@ -1,6 +1,7 @@
+#include "yaml-cpp/node/parse.h"
 #ifndef IS_AURPKG
 
-#include "../../include/utils/autoupdater.hpp"
+#include <yaml-cpp/yaml.h>
 
 #include <fstream>
 #include <functional>
@@ -8,6 +9,7 @@
 #include <string>
 #include <thread>
 
+#include "../../include/utils/autoupdater.hpp"
 #include "../../include/utils/file_utils.hpp"
 #include "../../include/utils/time_utils.hpp"
 
@@ -15,11 +17,7 @@
 #define CPPHTTPLIB_OPENSSL_SUPPORT
 #endif
 
-#include <nlohmann/json.hpp>
-
 #include "httplib.h"
-
-using json = nlohmann::json;
 
 bool AutoUpdater::is_newer(const std::string& remote_version) const {
 	auto parse_version = [](const std::string& v) {
@@ -53,19 +51,18 @@ Asset AutoUpdater::get_update_url() {
 	}
 
 	try {
-		auto release_data		   = json::parse(res->body);
-		std::string remote_version = release_data["tag_name"];
+		auto release_data		   = YAML::Load(res->body);
+		std::string remote_version = release_data["tag_name"].as<std::string>();
 
 		if (!is_newer(remote_version)) {
 			return Asset("", 0);
 		}
 
-		// Buscar assets que terminen con ".AppImage"
 		for (const auto& asset : release_data["assets"]) {
-			std::string name = asset["name"];
+			std::string name = asset["name"].as<std::string>();
 			if (name.size() >= 9 && name.substr(name.size() - 9) == ".AppImage") {
-				std::string url = asset["browser_download_url"];
-				size_t size		= asset["size"];
+				std::string url = asset["browser_download_url"].as<std::string>();
+				size_t size		= asset["size"].as<size_t>();
 				logger.info("Update found: {}({} bytes)", name, std::to_string(size));
 				return Asset(url, size);
 			}
