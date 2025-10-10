@@ -7,7 +7,9 @@
 #include <yaml-cpp/yaml.h>
 
 #include <any>
+#include <iostream>
 #include <optional>
+#include <regex>
 #include <string>
 #include <vector>
 
@@ -35,6 +37,8 @@ struct convert<CommunicationMessage> {
 				dataNode.push_back(std::string(std::any_cast<const char*>(elem)));
 			} else if (elem.type() == typeid(int)) {
 				dataNode.push_back(std::any_cast<int>(elem));
+			} else if (elem.type() == typeid(uint32_t)) {
+				dataNode.push_back(static_cast<uint32_t>(std::any_cast<uint32_t>(elem)));
 			} else if (elem.type() == typeid(double)) {
 				dataNode.push_back(std::any_cast<double>(elem));
 			} else if (elem.type() == typeid(bool)) {
@@ -67,8 +71,39 @@ struct convert<CommunicationMessage> {
 		if (node["data"] && node["data"].IsSequence()) {
 			for (const auto& item : node["data"]) {
 				if (item.IsScalar()) {
-					std::string val = item.as<std::string>();
-					msg.data.push_back(val);
+					std::string s = item.Scalar();
+
+					if (item.Tag() == "!!int") {
+						msg.data.push_back(item.as<int64_t>());
+					} else if (item.Tag() == "!!float") {
+						msg.data.push_back(item.as<double>());
+					} else if (item.Tag() == "!!bool") {
+						msg.data.push_back(item.as<bool>());
+					} else {
+						if (std::regex_match(s, std::regex("^-?[0-9]+$"))) {
+							try {
+								msg.data.push_back(std::stoll(s));
+							} catch (std::exception& e) {
+								msg.data.push_back(static_cast<uint64_t>(std::stoull(s)));
+							}
+						} else if (std::regex_match(s, std::regex("^[0-9]+u$"))) {
+							msg.data.push_back(static_cast<uint64_t>(std::stoull(s)));
+						} else if (std::regex_match(s, std::regex("^-?[0-9]*\\.[0-9]+$"))) {
+							msg.data.push_back(std::stod(s));
+						} else if (s == "true" || s == "false") {
+							msg.data.push_back(s == "true");
+						} else {
+							msg.data.push_back(s);
+						}
+					}
+				} else if (item.IsMap()) {
+					std::stringstream ss;
+					ss << item;
+					msg.data.push_back(ss.str());
+				} else if (item.IsSequence()) {
+					std::stringstream ss;
+					ss << item;
+					msg.data.push_back(ss.str());
 				}
 			}
 		}

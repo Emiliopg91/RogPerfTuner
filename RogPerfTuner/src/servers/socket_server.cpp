@@ -9,6 +9,7 @@
 
 #include <cstring>
 #include <filesystem>
+#include <iostream>
 
 #include "../../include/utils/file_utils.hpp"
 
@@ -146,7 +147,7 @@ void SocketServer::handleClient(int client_fd) {
 				handleRequest(client_fd, req);
 			}
 		} catch (const std::exception& e) {
-			logger.error("JSON parse error: " + std::string(e.what()));
+			logger.error("YAML parse error: " + std::string(e.what()));
 		}
 		Logger::rem_tab();
 	}
@@ -180,7 +181,11 @@ void SocketServer::handleRequest(const int& clientFd, const CommunicationMessage
 			res.data.emplace_back(performanceService.nextPerformanceProfile().toName());
 		} else if (req.name == Constants::GAME_CFG) {
 			YAML::Node node;
-			node = YAML::convert<SteamGameConfig>::encode(steamService.getConfiguration(std::any_cast<std::string>(req.data[0])));
+			try {
+				node = YAML::convert<SteamGameConfig>::encode(steamService.getConfiguration(std::to_string(std::any_cast<long long>(req.data[0]))));
+			} catch (std::exception& e) {
+				node = YAML::convert<SteamGameConfig>::encode(steamService.getConfiguration(std::to_string(std::any_cast<uint64_t>(req.data[0]))));
+			}
 
 			std::stringstream ss;
 			ss << node;

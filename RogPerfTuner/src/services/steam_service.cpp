@@ -1,6 +1,7 @@
 #include "../../include/services/steam_service.hpp"
 
 #include <QApplication>
+#include <cstdint>
 #include <fstream>
 #include <nlohmann/json.hpp>
 #include <optional>
@@ -63,15 +64,15 @@ SteamService::SteamService() : Loggable("SteamService") {
 	});
 
 	steamClient.onGameLaunch([this](CallbackParam data) {
-		auto id	  = static_cast<uint32_t>(std::any_cast<int>(data[0]));
+		auto id	  = static_cast<uint32_t>(std::any_cast<long long>(data[0]));
 		auto name = std::any_cast<std::string>(data[1]);
-		auto pid  = std::any_cast<int>(data[2]);
+		auto pid  = static_cast<int>(std::any_cast<long long>(data[2]));
 
 		onGameLaunch(id, name, pid);
 	});
 
 	steamClient.onGameStop([this](CallbackParam data) {
-		auto id	  = static_cast<uint32_t>(std::any_cast<int>(data[0]));
+		auto id	  = static_cast<uint32_t>(std::any_cast<long long>(data[0]));
 		auto name = std::any_cast<std::string>(data[1]);
 
 		onGameStop(id, name);

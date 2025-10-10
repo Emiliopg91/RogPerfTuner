@@ -11,7 +11,7 @@ const std::string Constants::APP_VERSION = "4.4.2";
 
 const pid_t Constants::PID = getpid();
 
-const std::string Constants::PLUGIN_VERSION = "1.2.3";
+const std::string Constants::PLUGIN_VERSION = "1.2.4";
 
 const bool Constants::DEV_MODE = true;
 
@@ -93,7 +93,7 @@ const std::string Constants::NEXT_EFF	= "nextRgbEffect";
 
 const int Constants::WS_PORT = 18158;
 
-const std::vector<std::string> Constants::RCCDC_REQUIRED_PIP = {"dataclasses-json", "asyncio", "pyyaml"};
+const std::vector<std::string> Constants::RCCDC_REQUIRED_PIP = {"asyncio", "pyyaml"};
 
 const std::string Constants::FLATPAK_MANGOHUD		   = "org.freedesktop.Platform.VulkanLayer.MangoHud/x86_64/24.08";
 const std::string Constants::FLATPAK_MANGOHUD_OVERRIDE = "--filesystem=xdg-config/MangoHud:ro";

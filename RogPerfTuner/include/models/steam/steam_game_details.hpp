@@ -5,7 +5,7 @@
 #include <string>
 
 struct SteamGameDetails {
-	int appid;
+	uint32_t appid;
 	std::string name;
 	bool is_steam_app = true;
 	std::string launch_opts;
@@ -32,7 +32,7 @@ struct convert<SteamGameDetails> {
 			return false;
 		}
 
-		g.appid		   = node["appid"] ? node["appid"].as<int>() : 0;
+		g.appid		   = node["appid"] ? node["appid"].as<uint32_t>() : 0;
 		g.name		   = node["name"] ? node["name"].as<std::string>() : "";
 		g.is_steam_app = node["is_steam_app"] ? node["is_steam_app"].as<bool>() : true;
 		g.launch_opts  = node["launch_opts"] ? node["launch_opts"].as<std::string>() : "%command%";
