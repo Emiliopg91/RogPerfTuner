@@ -180,12 +180,13 @@ void SocketServer::handleRequest(const int& clientFd, const CommunicationMessage
 		} else if (req.name == Constants::PERF_PROF) {
 			res.data.emplace_back(performanceService.nextPerformanceProfile().toName());
 		} else if (req.name == Constants::GAME_CFG) {
-			YAML::Node node;
+			std::string idStr;
 			try {
-				node = YAML::convert<SteamGameConfig>::encode(steamService.getConfiguration(std::to_string(std::any_cast<long long>(req.data[0]))));
+				idStr = std::to_string(std::any_cast<long long>(req.data[0]));
 			} catch (std::exception& e) {
-				node = YAML::convert<SteamGameConfig>::encode(steamService.getConfiguration(std::to_string(std::any_cast<uint64_t>(req.data[0]))));
+				idStr = std::to_string(std::any_cast<uint64_t>(req.data[0]));
 			}
+			YAML::Node node = YAML::convert<SteamGameConfig>::encode(steamService.getConfiguration(idStr));
 
 			std::stringstream ss;
 			ss << node;

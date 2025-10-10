@@ -22,3 +22,6 @@
 [submodule "submodules/yaml"]
 	path = submodules/yaml
 	url = https://github.com/Emiliopg91/jbeder-yaml-cpp
+[submodule "submodules/ryml"]
+	path = submodules/ryml
+	url = https://github.com/Emiliopg91/biojppm-rapidyaml-fork

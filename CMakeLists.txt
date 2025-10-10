@@ -28,8 +28,6 @@ else()
     add_subdirectory(submodules/httplib)
 endif()
 
-add_subdirectory(submodules/json)
-
 add_subdirectory(submodules/spdlog)
 
 add_subdirectory(submodules/yaml)

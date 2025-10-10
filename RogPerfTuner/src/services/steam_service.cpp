@@ -3,7 +3,6 @@
 #include <QApplication>
 #include <cstdint>
 #include <fstream>
-#include <nlohmann/json.hpp>
 #include <optional>
 #include <sstream>
 #include <string>
@@ -22,6 +21,8 @@
 #include "../../include/utils/process_utils.hpp"
 #include "../../include/utils/string_utils.hpp"
 #include "../../include/utils/time_utils.hpp"
+#include "yaml-cpp/node/node.h"
+#include "yaml-cpp/node/parse.h"
 
 bool SteamService::metricsEnabled() {
 	auto mangohud_which = shell.which("mangohud");
@@ -177,13 +178,10 @@ void SteamService::launchGame(const std::string& id) {
 }
 
 bool SteamService::checkIfRequiredInstallation() {
-	std::ifstream fileRunning(Constants::RCCDC_PACKAGE_FILE);
-
-	nlohmann::json jR;
-	fileRunning >> jR;
+	YAML::Node node = YAML::LoadFile(Constants::RCCDC_PACKAGE_FILE);
 
 	SemanticVersion vA = SemanticVersion::parse(Constants::PLUGIN_VERSION);
-	SemanticVersion vR = SemanticVersion::parse(jR["version"]);
+	SemanticVersion vR = SemanticVersion::parse(node["version"].as<std::string>());
 
 	return vA > vR;
 }
