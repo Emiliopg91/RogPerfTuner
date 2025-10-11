@@ -112,34 +112,6 @@ file(GLOB_RECURSE SOURCES_COMMUNICATION_MESSAGE
     "${CMAKE_CURRENT_SOURCE_DIR}/src/utils/time_utils.cpp"
 )
 
-add_executable(NextProfile ${CMAKE_CURRENT_SOURCE_DIR}/src/scripts/performance/next_profile.cpp ${SOURCES_UTILS} ${SOURCES_COMMUNICATION_MESSAGE})
-target_include_directories(NextProfile PRIVATE ${LIBSECRET_INCLUDE_DIRS})
-target_link_libraries(NextProfile PRIVATE 
-    yaml-cpp::yaml-cpp
-    spdlog::spdlog
-)
-
-add_executable(NextEffect ${CMAKE_CURRENT_SOURCE_DIR}/src/scripts/rgb/next_effect.cpp ${SOURCES_UTILS} ${SOURCES_COMMUNICATION_MESSAGE})
-target_include_directories(NextEffect PRIVATE ${LIBSECRET_INCLUDE_DIRS})
-target_link_libraries(NextEffect PRIVATE 
-    yaml-cpp::yaml-cpp
-    spdlog::spdlog
-)
-
-add_executable(IncBrightness ${CMAKE_CURRENT_SOURCE_DIR}/src/scripts/rgb/increase_brightness.cpp ${SOURCES_UTILS} ${SOURCES_COMMUNICATION_MESSAGE})
-target_include_directories(IncBrightness PRIVATE ${LIBSECRET_INCLUDE_DIRS})
-target_link_libraries(IncBrightness PRIVATE 
-    yaml-cpp::yaml-cpp
-    spdlog::spdlog
-)
-
-add_executable(DecBrightness ${CMAKE_CURRENT_SOURCE_DIR}/src/scripts/rgb/decrease_brightness.cpp ${SOURCES_UTILS} ${SOURCES_COMMUNICATION_MESSAGE})
-target_include_directories(DecBrightness PRIVATE ${LIBSECRET_INCLUDE_DIRS})
-target_link_libraries(DecBrightness PRIVATE 
-    yaml-cpp::yaml-cpp
-    spdlog::spdlog
-)
-
 add_executable(SteamRunner ${CMAKE_CURRENT_SOURCE_DIR}/src/scripts/steam/run.cpp ${SOURCES_SHELL} ${SOURCES_LOGGER} ${SOURCES_UTILS} ${SOURCES_COMMUNICATION_MESSAGE})
 target_include_directories(SteamRunner PRIVATE ${LIBSECRET_INCLUDE_DIRS})
 target_link_libraries(SteamRunner PRIVATE 

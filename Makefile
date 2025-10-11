@@ -66,10 +66,6 @@ build:
 
 	@mkdir build/assets/bin build/assets/bin/rgb  build/assets/bin/performance build/assets/bin/steam
 	@cp resources/translations.yaml build/assets/translations.yaml
-	@cp build/RogPerfTuner/NextEffect build/assets/bin/rgb/nextEffect
-	@cp build/RogPerfTuner/IncBrightness build/assets/bin/rgb/incBrightness
-	@cp build/RogPerfTuner/DecBrightness build/assets/bin/rgb/decBrightness
-	@cp build/RogPerfTuner/NextProfile build/assets/bin/performance/nextProfile
 	@cp build/RogPerfTuner/SteamRunner build/assets/bin/steam/run
 	@cp build/RogPerfTuner/FlatpakWrapper build/assets/bin/steam/flatpak
 

@@ -5,6 +5,7 @@
 #include <QAction>
 #include <QObject>
 #include <QSystemTrayIcon>
+#include <optional>
 
 #include "../configuration/configuration.hpp"
 #include "../events/event_bus.hpp"
@@ -69,7 +70,7 @@ class TrayIcon : public QObject, public Singleton<TrayIcon> {
 	PerformanceService& performanceService = PerformanceService::getInstance();
 	OpenRgbService& openRgbService		   = OpenRgbService::getInstance();
 	HardwareService& hardwareService	   = HardwareService::getInstance();
-	ApplicationService& applicationService = ApplicationService::getInstance();
+	ApplicationService& applicationService = ApplicationService::init(std::nullopt);
 	Translator& translator				   = Translator::getInstance();
 	Configuration& configuration		   = Configuration::getInstance();
 	SteamService& steamService			   = SteamService::getInstance();

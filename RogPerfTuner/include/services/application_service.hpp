@@ -41,6 +41,7 @@ class ApplicationService : public Singleton<ApplicationService>, Loggable {
 	Configuration& configuration = Configuration::getInstance();
 
 	const std::string buildDesktopFile();
+	void createScriptFile(std::string path, std::string execPath, std::string option);
 
-	ApplicationService();
+	ApplicationService(std::optional<std::string> execPath);
 };

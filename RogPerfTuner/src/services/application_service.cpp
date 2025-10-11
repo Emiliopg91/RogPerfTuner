@@ -3,6 +3,8 @@
 #include <signal.h>
 #include <unistd.h>
 
+#include <sstream>
+
 #include "../../include/events/event_bus.hpp"
 #include "../../include/utils/file_utils.hpp"
 
@@ -13,7 +15,7 @@
 #include "../../include/utils/autoupdater.hpp"
 #endif
 
-ApplicationService::ApplicationService() : Loggable("ApplicationService") {
+ApplicationService::ApplicationService(std::optional<std::string> execPath) : Loggable("ApplicationService") {
 	logger.info("Initializing ApplicationService");
 	Logger::add_tab();
 
@@ -39,7 +41,6 @@ ApplicationService::ApplicationService() : Loggable("ApplicationService") {
 
 		logger.info("Copying helper binaries");
 		FileUtils::copy(Constants::ASSETS_BIN_DIR, Constants::BIN_DIR);
-		FileUtils::chmodRecursive(Constants::BIN_DIR, 0777);
 
 		if (!Constants::DEV_MODE) {
 			logger.info("Copying launcher script");
@@ -86,7 +87,36 @@ ApplicationService::ApplicationService() : Loggable("ApplicationService") {
 	logger.info("Autoupdate not available for AUR package");
 #endif
 
+	if (execPath.has_value()) {
+		Logger::add_tab();
+		logger.info("Creating helper scripts");
+		FileUtils::chmodRecursive(Constants::BIN_DIR, 0777);
+		if (!FileUtils::exists(Constants::BIN_DIR + "/performance")) {
+			FileUtils::mkdirs(Constants::BIN_DIR + "/performance");
+		}
+		createScriptFile(Constants::BIN_DIR + "/performance/nextProfile", *execPath, "-p");
+
+		if (!FileUtils::exists(Constants::BIN_DIR + "/rgb")) {
+			FileUtils::mkdirs(Constants::BIN_DIR + "/rgb");
+		}
+		createScriptFile(Constants::BIN_DIR + "/rgb/nextEffect", *execPath, "-e");
+		createScriptFile(Constants::BIN_DIR + "/rgb/increaseBrightness", *execPath, "-i");
+		createScriptFile(Constants::BIN_DIR + "/rgb/decreaseBrightness", *execPath, "-d");
+
+		FileUtils::chmodRecursive(Constants::BIN_DIR, 0777);
+		Logger::rem_tab();
+	}
+
 	Logger::rem_tab();
+}
+
+void ApplicationService::createScriptFile(std::string path, std::string execPath, std::string option) {
+	std::ostringstream script;
+	script << "#!/bin/bash\n\n";
+	script << "set -e\n\n";
+	script << "\"" << execPath << "\" " << option << "\n";
+
+	FileUtils::writeFileContent(path, script.str());
 }
 
 bool ApplicationService::isAutostartEnabled() {

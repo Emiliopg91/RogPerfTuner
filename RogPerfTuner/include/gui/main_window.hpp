@@ -77,7 +77,7 @@ class MainWindow : public QMainWindow, public Singleton<MainWindow> {
 	HardwareService& hardwareService	   = HardwareService::getInstance();
 	SteamService& steamService			   = SteamService::getInstance();
 	Translator& translator				   = Translator::getInstance();
-	ApplicationService& applicationService = ApplicationService::getInstance();
+	ApplicationService& applicationService = ApplicationService::init(std::nullopt);
 	UPowerClient& uPowerClient			   = UPowerClient::getInstance();
 
 	QComboBox* _profileDropdown;
