@@ -87,7 +87,6 @@ ApplicationService::ApplicationService(std::optional<std::string> execPath) : Lo
 	logger.info("Copying helper binaries");
 	FileUtils::copy(Constants::ASSETS_BIN_DIR, Constants::BIN_DIR);
 
-	Logger::add_tab();
 	logger.info("Creating helper scripts");
 	if (execPath.has_value()) {
 		if (!FileUtils::exists(Constants::BIN_DIR + "/performance")) {
@@ -109,7 +108,6 @@ ApplicationService::ApplicationService(std::optional<std::string> execPath) : Lo
 	FileUtils::createSymlink(Constants::BIN_DIR + "/steam/run", Constants::BIN_DIR + "/steam/flatpak");
 
 	FileUtils::chmodRecursive(Constants::BIN_DIR, 0777);
-	Logger::rem_tab();
 
 	Logger::rem_tab();
 }
