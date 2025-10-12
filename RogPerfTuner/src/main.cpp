@@ -65,99 +65,111 @@ void printHelp(char* exec) {
 	std::cout << "    -h: Show this menu" << std::endl;
 }
 
+void nextProfile() {
+	LoggerProvider::initialize();
+	RogPerfTunerClient::getInstance().nextProfile();
+}
+
+void nextEffect() {
+	LoggerProvider::initialize();
+	RogPerfTunerClient::getInstance().nextEffect();
+}
+
+void decreaseBrightness() {
+	LoggerProvider::initialize();
+	RogPerfTunerClient::getInstance().decreaseBrightness();
+}
+
+void increaseBrightness() {
+	LoggerProvider::initialize();
+	RogPerfTunerClient::getInstance().increaseBrightness();
+}
+
+int startGui(int argc, char** argv) {
+	std::set_terminate(terminateHandler);
+
+	auto execPath = getExecutablePath(argv[0]);
+
+	std::strncpy(argv[0], (Constants::APP_NAME + " v" + Constants::APP_VERSION).c_str(), std::strlen(argv[0]));
+	argv[0][std::strlen(argv[0])] = '\0';
+
+	std::cout << "Running application with PID " << Constants::PID << std::endl;
+
+	SingleInstance::getInstance().acquire();
+
+	if (Constants::DEV_MODE) {
+		std::cout << "Dev mode enabled" << std::endl;
+	}
+	std::cout << "Assets directory: " << Constants::ASSETS_DIR << std::endl;
+
+	LoggerProvider::initialize(Constants::LOG_FILE_NAME, Constants::LOG_DIR);
+	Logger logger{};
+
+	std::string title = "Starting " + Constants::APP_NAME;
+	title			  = StringUtils::leftPad(title, title.length() + (49 - title.length()) / 2);
+	title			  = StringUtils::rightPad(title, 49);
+
+	logger.info("###################################################");
+	logger.info("#{}#", title);
+	logger.info("###################################################");
+	logger.info("Version {}", Constants::APP_VERSION);
+	logger.info("Starting initialization");
+	Logger::add_tab();
+
+	Translator::getInstance();
+
+	logger.info("Creating QT application");
+	QApplication app(argc, argv);
+	app.setDesktopFileName(QString::fromStdString(Constants::APP_DRAW_FILE));
+
+	Toaster::getInstance().showToast(Translator::getInstance().translate("initializing"));
+
+	Configuration& configuration = Configuration::getInstance();
+	if (configuration.getPassword().length() == 0) {
+		PasswordDialog::getInstance().showDialog();
+	}
+
+	Shell::init(configuration.getPassword());
+
+	OpenRgbService::getInstance();
+	HardwareService::getInstance();
+	PerformanceService::getInstance();
+	SteamService::getInstance();
+
+	SocketServer::getInstance();
+
+	ApplicationService::init(execPath);
+
+	TrayIcon::init().show();
+
+	Logger::rem_tab();
+	logger.info("Application ready");
+
+	return app.exec();
+}
+
 int main(int argc, char** argv) {
 	if (argc < 2) {
-		std::set_terminate(terminateHandler);
-
-		auto execPath = getExecutablePath(argv[0]);
-
-		std::strncpy(argv[0], (Constants::APP_NAME + " v" + Constants::APP_VERSION).c_str(), std::strlen(argv[0]));
-		argv[0][std::strlen(argv[0])] = '\0';
-
-		std::cout << "Running application with PID " << Constants::PID << std::endl;
-
-		SingleInstance::getInstance().acquire();
-
-		if (Constants::DEV_MODE) {
-			std::cout << "Dev mode enabled" << std::endl;
-		}
-		std::cout << "Assets directory: " << Constants::ASSETS_DIR << std::endl;
-
-		LoggerProvider::initialize(Constants::LOG_FILE_NAME, Constants::LOG_DIR);
-		Logger logger{};
-
-		std::string title = "Starting " + Constants::APP_NAME;
-		title			  = StringUtils::leftPad(title, title.length() + (49 - title.length()) / 2);
-		title			  = StringUtils::rightPad(title, 49);
-
-		logger.info("###################################################");
-		logger.info("#{}#", title);
-		logger.info("###################################################");
-		logger.info("Version {}", Constants::APP_VERSION);
-		logger.info("Starting initialization");
-		Logger::add_tab();
-
-		Translator::getInstance();
-
-		logger.info("Creating QT application");
-		QApplication app(argc, argv);
-		app.setDesktopFileName(QString::fromStdString(Constants::APP_DRAW_FILE));
-
-		Toaster::getInstance().showToast(Translator::getInstance().translate("initializing"));
-
-		Configuration& configuration = Configuration::getInstance();
-		if (configuration.getPassword().length() == 0) {
-			PasswordDialog::getInstance().showDialog();
-		}
-
-		Shell::init(configuration.getPassword());
-
-		OpenRgbService::getInstance();
-		HardwareService::getInstance();
-		PerformanceService::getInstance();
-		SteamService::getInstance();
-
-		SocketServer::getInstance();
-
-		ApplicationService::init(execPath);
-
-		TrayIcon::init().show();
-
-		Logger::rem_tab();
-		logger.info("Application ready");
-
-		return app.exec();
+		return startGui(argc, argv);
 	} else {
-		if (argc > 2) {
-			std::cerr << "Wrong option count" << std::endl;
-			printHelp(argv[0]);
-			return 1;
-		}
-
 		std::string option = argv[1];
 		if (option == "-p") {
-			LoggerProvider::initialize();
-			RogPerfTunerClient::getInstance().nextProfile();
-			return 0;
+			nextProfile();
 		} else if (option == "-e") {
-			LoggerProvider::initialize();
-			RogPerfTunerClient::getInstance().nextEffect();
+			nextEffect();
 			return 0;
 		} else if (option == "-i") {
-			LoggerProvider::initialize();
-			RogPerfTunerClient::getInstance().increaseBrightness();
-			return 0;
+			increaseBrightness();
 		} else if (option == "-d") {
-			LoggerProvider::initialize();
-			RogPerfTunerClient::getInstance().decreaseBrightness();
-			return 0;
+			decreaseBrightness();
 		} else if (option == "-h") {
 			printHelp(argv[0]);
-			return 0;
 		} else {
 			std::cerr << "Invalid argument '" << option << "'" << std::endl;
 			printHelp(argv[0]);
 			return 1;
 		}
+
+		return 0;
 	}
 }

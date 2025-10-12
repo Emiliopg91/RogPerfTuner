@@ -89,23 +89,23 @@ ApplicationService::ApplicationService(std::optional<std::string> execPath) : Lo
 
 	logger.info("Creating helper scripts");
 	if (execPath.has_value()) {
-		if (!FileUtils::exists(Constants::BIN_DIR + "/performance")) {
-			FileUtils::mkdirs(Constants::BIN_DIR + "/performance");
+		if (!FileUtils::exists(Constants::BIN_PERFORMANCE_DIR)) {
+			FileUtils::mkdirs(Constants::BIN_PERFORMANCE_DIR);
 		}
-		createScriptFile(Constants::BIN_DIR + "/performance/nextProfile", *execPath, "-p");
+		createScriptFile(Constants::NEXT_PROFILE_PATH, *execPath, "-p");
 
-		if (!FileUtils::exists(Constants::BIN_DIR + "/rgb")) {
-			FileUtils::mkdirs(Constants::BIN_DIR + "/rgb");
+		if (!FileUtils::exists(Constants::BIN_RGB_DIR)) {
+			FileUtils::mkdirs(Constants::BIN_RGB_DIR);
 		}
-		createScriptFile(Constants::BIN_DIR + "/rgb/nextEffect", *execPath, "-e");
-		createScriptFile(Constants::BIN_DIR + "/rgb/increaseBrightness", *execPath, "-i");
-		createScriptFile(Constants::BIN_DIR + "/rgb/decreaseBrightness", *execPath, "-d");
+		createScriptFile(Constants::NEXT_EFFECT_PATH, *execPath, "-e");
+		createScriptFile(Constants::INCREASE_BRIGHTNESS_PATH, *execPath, "-i");
+		createScriptFile(Constants::DECREASE_BRIGHTNESS_PATH, *execPath, "-d");
 	}
 
-	if (FileUtils::exists(Constants::BIN_DIR + "/steam/flatpak")) {
-		FileUtils::remove(Constants::BIN_DIR + "/steam/flatpak");
+	if (FileUtils::exists(Constants::FLATPAK_WRAPPER_PATH)) {
+		FileUtils::remove(Constants::FLATPAK_WRAPPER_PATH);
 	}
-	FileUtils::createSymlink(Constants::BIN_DIR + "/steam/run", Constants::BIN_DIR + "/steam/flatpak");
+	FileUtils::createSymlink(Constants::STEAM_WRAPPER_PATH, Constants::FLATPAK_WRAPPER_PATH);
 
 	FileUtils::chmodRecursive(Constants::BIN_DIR, 0777);
 

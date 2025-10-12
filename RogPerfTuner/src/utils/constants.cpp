@@ -13,7 +13,7 @@ const pid_t Constants::PID = getpid();
 
 const std::string Constants::PLUGIN_VERSION = "1.2.4";
 
-const bool Constants::DEV_MODE = true;
+const bool Constants::DEV_MODE = false;
 
 const std::string Constants::HOME_DIR = std::getenv("HOME");
 
@@ -39,8 +39,6 @@ const std::string Constants::LAUNCHER_FILE				  = APP_NAME;
 const std::optional<std::string> Constants::APPIMAGE_FILE = std::nullopt;
 #endif
 
-const std::string Constants::WRAPPER_PATH = HOME_DIR + "/." + APP_NAME + "/bin/steam/run";
-
 const std::string Constants::LOG_FILE_NAME		  = APP_NAME;
 const std::string Constants::LOG_RUNNER_FILE_NAME = "Runner";
 const std::string Constants::LOG_ORGB_FILE_NAME	  = "OpenRGB";
@@ -61,37 +59,43 @@ const std::string Constants::ORGB_UDEV_PATH	   = ASSETS_DIR + "/OpenRGB/usr/lib/
 const std::string Constants::ORGB_PATH		   = ASSETS_DIR + "/OpenRGB/OpenRGB.sh";
 const std::string Constants::RCCDC_ASSET_PATH  = ASSETS_DIR + "/RccDeckyCompanion";
 
-const std::string Constants::AUTOSTART_FILE		 = HOME_DIR + "/.config/autostart/" + APP_NAME + ".desktop";
-const std::string Constants::APP_DRAW_FILE		 = HOME_DIR + "/.local/share/applications/" + APP_NAME + ".desktop";
-const std::string Constants::BIN_DIR			 = HOME_DIR + "/." + APP_NAME + "/bin";
-const std::string Constants::BIN_APPLICATION_DIR = HOME_DIR + "/." + APP_NAME + "/bin/application";
-const std::string Constants::CONFIG_DIR			 = HOME_DIR + "/." + APP_NAME + "/config";
-const std::string Constants::CONFIG_FILE		 = HOME_DIR + "/." + APP_NAME + "/config/config.yaml";
-const std::string Constants::ICONS_DIR			 = HOME_DIR + "/." + APP_NAME + "/icons";
-const std::string Constants::ICON_FILE			 = HOME_DIR + "/." + APP_NAME + "/icons/icon.svg";
-const std::string Constants::ICON_45_FILE		 = HOME_DIR + "/." + APP_NAME + "/icons/icon-45x45.png";
-const std::string Constants::LIB_DIR			 = HOME_DIR + "/." + APP_NAME + "/lib";
-const std::string Constants::LIB_VK_DIR			 = HOME_DIR + "/." + APP_NAME + "/lib/vk/icd.d/";
-const std::string Constants::LIB_OCL_DIR		 = HOME_DIR + "/." + APP_NAME + "/lib/ocl/icd.d/";
-const std::string Constants::LOG_DIR			 = HOME_DIR + "/." + APP_NAME + "/logs";
-const std::string Constants::LOG_OLD_DIR		 = HOME_DIR + "/." + APP_NAME + "/logs/old";
-const std::string Constants::USER_PLUGIN_DIR	 = HOME_DIR + "/." + APP_NAME + "/plugin";
-const std::string Constants::UPDATE_DIR			 = HOME_DIR + "/." + APP_NAME + "/update";
-const std::string Constants::UPDATE_FILE		 = HOME_DIR + "/." + APP_NAME + "/update/" + APP_NAME + ".AppImage";
-const std::string Constants::UPDATE_TMP_FILE	 = HOME_DIR + "/." + APP_NAME + "/update/" + APP_NAME + ".AppImage.tmp";
-const std::string Constants::RCDCC_SOCKET_PATH	 = HOME_DIR + "/homebrew/data/RCCDeckyCompanion/socket";
-const std::string Constants::PLUGINS_FOLDER		 = HOME_DIR + "/homebrew/plugins";
-const std::string Constants::RCCDC_PATH			 = HOME_DIR + "/homebrew/plugins/RCCDeckyCompanion";
-const std::string Constants::RCCDC_PACKAGE_FILE	 = HOME_DIR + "/homebrew/plugins/RCCDeckyCompanion/package.json";
-const std::string Constants::DECKY_SERVICE_PATH	 = HOME_DIR + "/homebrew/services/PluginLoader";
+const std::string Constants::AUTOSTART_FILE			  = HOME_DIR + "/.config/autostart/" + APP_NAME + ".desktop";
+const std::string Constants::APP_DRAW_FILE			  = HOME_DIR + "/.local/share/applications/" + APP_NAME + ".desktop";
+const std::string Constants::BIN_DIR				  = HOME_DIR + "/." + APP_NAME + "/bin";
+const std::string Constants::BIN_APPLICATION_DIR	  = HOME_DIR + "/." + APP_NAME + "/bin/application";
+const std::string Constants::BIN_PERFORMANCE_DIR	  = HOME_DIR + "/." + APP_NAME + "/bin/performance";
+const std::string Constants::NEXT_PROFILE_PATH		  = HOME_DIR + "/." + APP_NAME + "/bin/performance/nextProfile";
+const std::string Constants::BIN_RGB_DIR			  = HOME_DIR + "/." + APP_NAME + "/bin/rgb";
+const std::string Constants::DECREASE_BRIGHTNESS_PATH = HOME_DIR + "/." + APP_NAME + "/bin/rgb/decreaseBrightness";
+const std::string Constants::INCREASE_BRIGHTNESS_PATH = HOME_DIR + "/." + APP_NAME + "/bin/rgb/increaseBrightness";
+const std::string Constants::NEXT_EFFECT_PATH		  = HOME_DIR + "/." + APP_NAME + "/bin/rgb/nextEffect";
+const std::string Constants::STEAM_WRAPPER_PATH		  = HOME_DIR + "/." + APP_NAME + "/bin/steam/run";
+const std::string Constants::FLATPAK_WRAPPER_PATH	  = HOME_DIR + "/." + APP_NAME + "/bin/steam/flatpak";
+const std::string Constants::CONFIG_DIR				  = HOME_DIR + "/." + APP_NAME + "/config";
+const std::string Constants::CONFIG_FILE			  = HOME_DIR + "/." + APP_NAME + "/config/config.yaml";
+const std::string Constants::ICONS_DIR				  = HOME_DIR + "/." + APP_NAME + "/icons";
+const std::string Constants::ICON_FILE				  = HOME_DIR + "/." + APP_NAME + "/icons/icon.svg";
+const std::string Constants::ICON_45_FILE			  = HOME_DIR + "/." + APP_NAME + "/icons/icon-45x45.png";
+const std::string Constants::LIB_DIR				  = HOME_DIR + "/." + APP_NAME + "/lib";
+const std::string Constants::LIB_VK_DIR				  = HOME_DIR + "/." + APP_NAME + "/lib/vk/icd.d/";
+const std::string Constants::LIB_OCL_DIR			  = HOME_DIR + "/." + APP_NAME + "/lib/ocl/icd.d/";
+const std::string Constants::LOG_DIR				  = HOME_DIR + "/." + APP_NAME + "/logs";
+const std::string Constants::LOG_OLD_DIR			  = HOME_DIR + "/." + APP_NAME + "/logs/old";
+const std::string Constants::USER_PLUGIN_DIR		  = HOME_DIR + "/." + APP_NAME + "/plugin";
+const std::string Constants::UPDATE_DIR				  = HOME_DIR + "/." + APP_NAME + "/update";
+const std::string Constants::UPDATE_FILE			  = HOME_DIR + "/." + APP_NAME + "/update/" + APP_NAME + ".AppImage";
+const std::string Constants::UPDATE_TMP_FILE		  = HOME_DIR + "/." + APP_NAME + "/update/" + APP_NAME + ".AppImage.tmp";
+const std::string Constants::RCDCC_SOCKET_PATH		  = HOME_DIR + "/homebrew/data/RCCDeckyCompanion/socket";
+const std::string Constants::PLUGINS_FOLDER			  = HOME_DIR + "/homebrew/plugins";
+const std::string Constants::RCCDC_PATH				  = HOME_DIR + "/homebrew/plugins/RCCDeckyCompanion";
+const std::string Constants::RCCDC_PACKAGE_FILE		  = HOME_DIR + "/homebrew/plugins/RCCDeckyCompanion/package.json";
+const std::string Constants::DECKY_SERVICE_PATH		  = HOME_DIR + "/homebrew/services/PluginLoader";
 
 const std::string Constants::GAME_CFG	= "gameConfig";
 const std::string Constants::PERF_PROF	= "nexPerformanceProfile";
 const std::string Constants::DEC_BRIGHT = "decRgbBrightness";
 const std::string Constants::INC_BRIGHT = "incRgbBrightness";
 const std::string Constants::NEXT_EFF	= "nextRgbEffect";
-
-const int Constants::WS_PORT = 18158;
 
 const std::vector<std::string> Constants::RCCDC_REQUIRED_PIP = {"asyncio", "pyyaml"};
 

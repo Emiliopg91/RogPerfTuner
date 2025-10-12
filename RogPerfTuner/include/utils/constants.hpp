@@ -41,8 +41,15 @@ class Constants {
 	static const std::string APP_DRAW_FILE;
 	static const std::string BIN_DIR;
 	static const std::string BIN_APPLICATION_DIR;
+	static const std::string BIN_PERFORMANCE_DIR;
+	static const std::string NEXT_PROFILE_PATH;
+	static const std::string BIN_RGB_DIR;
+	static const std::string DECREASE_BRIGHTNESS_PATH;
+	static const std::string INCREASE_BRIGHTNESS_PATH;
+	static const std::string NEXT_EFFECT_PATH;
 	static const std::string LAUNCHER_FILE;
-	static const std::string WRAPPER_PATH;
+	static const std::string FLATPAK_WRAPPER_PATH;
+	static const std::string STEAM_WRAPPER_PATH;
 	static const std::string CONFIG_DIR;
 	static const std::string CONFIG_FILE;
 	static const std::string ICONS_DIR;
@@ -79,8 +86,6 @@ class Constants {
 	static const std::string NEXT_EFF;
 
 	static const std::string SOCKET_FILE;
-	static const int HTTP_PORT;
-	static const int WS_PORT;
 
 	static const std::vector<std::string> RCCDC_REQUIRED_PIP;
 	static const std::string FLATPAK_MANGOHUD;

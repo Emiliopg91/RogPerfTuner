@@ -118,7 +118,7 @@ void SteamService::onFirstGameRun(unsigned int gid, std::string name) {
 				}
 				pure_env += token;
 			} else {
-				if (token != Constants::WRAPPER_PATH) {
+				if (token != Constants::STEAM_WRAPPER_PATH) {
 					if (!wrappers.empty()) {
 						wrappers += " ";
 					}
@@ -144,7 +144,7 @@ void SteamService::onFirstGameRun(unsigned int gid, std::string name) {
 	configuration.getConfiguration().games[std::to_string(gid)] = entry;
 	configuration.saveConfig();
 
-	steamClient.setLaunchOptions(gid, Constants::WRAPPER_PATH + " %command%");
+	steamClient.setLaunchOptions(gid, Constants::STEAM_WRAPPER_PATH + " %command%");
 
 	QMetaObject::invokeMethod(
 		qApp,
