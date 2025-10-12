@@ -87,10 +87,10 @@ ApplicationService::ApplicationService(std::optional<std::string> execPath) : Lo
 	logger.info("Autoupdate not available for AUR package");
 #endif
 
+	Logger::add_tab();
+	logger.info("Creating helper scripts");
+	FileUtils::chmodRecursive(Constants::BIN_DIR, 0777);
 	if (execPath.has_value()) {
-		Logger::add_tab();
-		logger.info("Creating helper scripts");
-		FileUtils::chmodRecursive(Constants::BIN_DIR, 0777);
 		if (!FileUtils::exists(Constants::BIN_DIR + "/performance")) {
 			FileUtils::mkdirs(Constants::BIN_DIR + "/performance");
 		}
@@ -102,10 +102,15 @@ ApplicationService::ApplicationService(std::optional<std::string> execPath) : Lo
 		createScriptFile(Constants::BIN_DIR + "/rgb/nextEffect", *execPath, "-e");
 		createScriptFile(Constants::BIN_DIR + "/rgb/increaseBrightness", *execPath, "-i");
 		createScriptFile(Constants::BIN_DIR + "/rgb/decreaseBrightness", *execPath, "-d");
-
-		FileUtils::chmodRecursive(Constants::BIN_DIR, 0777);
-		Logger::rem_tab();
 	}
+
+	if (FileUtils::exists(Constants::BIN_DIR + "/steam/flatpak")) {
+		FileUtils::remove(Constants::BIN_DIR + "/steam/flatpak");
+	}
+	FileUtils::createSymlink(Constants::BIN_DIR + "/steam/run", Constants::BIN_DIR + "/steam/flatpak");
+
+	FileUtils::chmodRecursive(Constants::BIN_DIR, 0777);
+	Logger::rem_tab();
 
 	Logger::rem_tab();
 }

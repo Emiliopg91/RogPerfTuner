@@ -144,3 +144,14 @@ std::string FileUtils::md5(const std::string& path) {
 std::string FileUtils::md5(const std::filesystem::path& path) {
 	return Md5SumClient::getInstance().checksum(path);
 }
+
+void FileUtils::createSymlink(const std::string& target, const std::string& linkName) {
+	return createSymlink(std::filesystem::path(target), std::filesystem::path(linkName));
+}
+
+void FileUtils::createSymlink(const std::filesystem::path& target, const std::filesystem::path& linkName) {
+	if (std::filesystem::exists(linkName)) {
+		std::filesystem::remove(linkName);
+	}
+	std::filesystem::create_symlink(target, linkName);
+}

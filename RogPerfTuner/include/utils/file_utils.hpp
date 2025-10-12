@@ -24,6 +24,24 @@ class FileUtils {
 	static bool exists(const std::filesystem::path& path);
 
 	/**
+	 * @brief Create a symbolic link.
+	 *
+	 * @param target Path the symlink will point to.
+	 * @param linkName Name of the symlink to create.
+	 * @return true if the symlink was created successfully, false otherwise.
+	 */
+	static void createSymlink(const std::string& target, const std::string& linkName);
+
+	/**
+	 * @brief Create a symbolic link.
+	 *
+	 * @param target Path the symlink will point to.
+	 * @param linkName Name of the symlink to create.
+	 * @return true if the symlink was created successfully, false otherwise.
+	 */
+	static void createSymlink(const std::filesystem::path& target, const std::filesystem::path& linkName);
+
+	/**
 	 * @brief Create a Directory.
 	 *
 	 * Creates a directory at the specified path.

@@ -112,16 +112,9 @@ file(GLOB_RECURSE SOURCES_COMMUNICATION_MESSAGE
     "${CMAKE_CURRENT_SOURCE_DIR}/src/utils/time_utils.cpp"
 )
 
-add_executable(SteamRunner ${CMAKE_CURRENT_SOURCE_DIR}/src/scripts/steam/run.cpp ${SOURCES_SHELL} ${SOURCES_LOGGER} ${SOURCES_UTILS} ${SOURCES_COMMUNICATION_MESSAGE})
-target_include_directories(SteamRunner PRIVATE ${LIBSECRET_INCLUDE_DIRS})
-target_link_libraries(SteamRunner PRIVATE 
-    yaml-cpp::yaml-cpp
-    spdlog::spdlog
-)
-
-add_executable(FlatpakWrapper ${CMAKE_CURRENT_SOURCE_DIR}/src/scripts/steam/flatpak.cpp ${SOURCES_SHELL} ${SOURCES_LOGGER} ${SOURCES_UTILS} ${SOURCES_FLATPAK})
-target_include_directories(FlatpakWrapper PRIVATE ${LIBSECRET_INCLUDE_DIRS})
-target_link_libraries(FlatpakWrapper PRIVATE 
+add_executable(Wrapper ${CMAKE_CURRENT_SOURCE_DIR}/src/scripts/steam/wrapper.cpp ${SOURCES_SHELL} ${SOURCES_LOGGER} ${SOURCES_UTILS} ${SOURCES_FLATPAK} ${SOURCES_COMMUNICATION_MESSAGE})
+target_include_directories(Wrapper PRIVATE ${LIBSECRET_INCLUDE_DIRS})
+target_link_libraries(Wrapper PRIVATE 
     yaml-cpp::yaml-cpp
     spdlog::spdlog 
 )
