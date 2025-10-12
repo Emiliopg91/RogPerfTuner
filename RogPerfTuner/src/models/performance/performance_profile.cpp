@@ -46,11 +46,3 @@ PowerProfile PerformanceProfile::getPowerProfile() const {
 		return PowerProfile::Enum::PERFORMANCE;
 	}
 }
-
-SsdScheduler PerformanceProfile::getSsdQueueScheduler() const {
-	if (*this == PerformanceProfile::Enum::QUIET) {
-		return SsdScheduler::Enum::NOOP;
-	} else {
-		return SsdScheduler::Enum::MQ_DEADLINE;
-	}
-}

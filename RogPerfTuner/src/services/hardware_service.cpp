@@ -10,7 +10,6 @@
 #include "../../include/clients/dbus/linux/upower_client.hpp"
 #include "../../include/clients/file/boost_control_client.hpp"
 #include "../../include/clients/file/cpuinfo_client.hpp"
-#include "../../include/clients/file/ssd_scheduler_client.hpp"
 #include "../../include/clients/lib/lsusb_client.hpp"
 #include "../../include/clients/shell/switcherooctl_client.hpp"
 #include "../../include/events/event_bus.hpp"
@@ -121,16 +120,6 @@ HardwareService::HardwareService() : Loggable("HardwareService") {
 		}
 	}
 	Logger::rem_tab();
-
-	if (ssdSchedulerClient.available()) {
-		logger.info("Getting available SSD schedulers");
-		Logger::add_tab();
-		ssd_schedulers = ssdSchedulerClient.get_schedulers();
-		for (auto sched : ssd_schedulers) {
-			logger.info(sched.toString());
-		}
-		Logger::rem_tab();
-	}
 
 	if (platformClient.available()) {
 		logger.info("Getting battery charge limit");

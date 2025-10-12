@@ -11,7 +11,6 @@
 #include "../../include/clients/dbus/linux/power_profile_client.hpp"
 #include "../../include/clients/dbus/linux/upower_client.hpp"
 #include "../../include/clients/file/boost_control_client.hpp"
-#include "../../include/clients/file/ssd_scheduler_client.hpp"
 #include "../../include/clients/shell/asusctl_client.hpp"
 #include "../../include/clients/shell/cpupower_client.hpp"
 #include "../../include/clients/shell/scxctl_client.hpp"
@@ -147,7 +146,6 @@ class PerformanceService : public Singleton<PerformanceService>, Loggable {
 	NvBoostClient& nvBoostClient		   = NvBoostClient::getInstance();
 	NvTempClient& nvTempClient			   = NvTempClient::getInstance();
 	UPowerClient& uPowerClient			   = UPowerClient::getInstance();
-	SsdSchedulerClient& ssdSchedulerClient = SsdSchedulerClient::getInstance();
 	PowerProfileClient& powerProfileClient = PowerProfileClient::getInstance();
 	Toaster& toaster					   = Toaster::getInstance();
 	CpuPowerClient& cpuPowerClient		   = CpuPowerClient::getInstance();
@@ -162,7 +160,6 @@ class PerformanceService : public Singleton<PerformanceService>, Loggable {
 	void setPlatformProfile(const PerformanceProfile& profile);
 	void setFanCurves(const PerformanceProfile& profile);
 	void setBoost(const PerformanceProfile& profile);
-	void setSsdScheduler(PerformanceProfile& profile);
 	void setCpuGovernor(const PerformanceProfile& profile);
 	void setPowerProfile(PerformanceProfile& profile);
 	void setTdps(const PerformanceProfile& profile);

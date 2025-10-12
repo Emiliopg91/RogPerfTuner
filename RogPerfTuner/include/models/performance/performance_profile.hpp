@@ -5,7 +5,6 @@
 #include "../base/str_enum.hpp"
 #include "../performance/platform_profile.hpp"
 #include "../performance/power_profile.hpp"
-#include "../performance/ssd_scheduler.hpp"
 
 struct PerformanceProfileMeta {
 	enum class Enum { PERFORMANCE, BALANCED, QUIET } e;
@@ -28,8 +27,6 @@ class PerformanceProfile : public StrEnum<PerformanceProfile, PerformanceProfile
 	PlatformProfile getPlatformProfile() const;
 
 	PowerProfile getPowerProfile() const;
-
-	SsdScheduler getSsdQueueScheduler() const;
 
   private:
 	static constexpr std::array<PerformanceProfileMeta, 3> table{

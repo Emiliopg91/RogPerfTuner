@@ -13,7 +13,6 @@
 #include "../clients/dbus/linux/upower_client.hpp"
 #include "../clients/file/boost_control_client.hpp"
 #include "../clients/file/cpuinfo_client.hpp"
-#include "../clients/file/ssd_scheduler_client.hpp"
 #include "../clients/lib/lsusb_client.hpp"
 #include "../clients/shell/switcherooctl_client.hpp"
 #include "../events/event_bus.hpp"
@@ -21,7 +20,6 @@
 #include "../models/hardware/battery_charge_threshold.hpp"
 #include "../models/hardware/cpu_brand.hpp"
 #include "../models/hardware/usb_identifier.hpp"
-#include "../models/performance/ssd_scheduler.hpp"
 #include "../services/open_rgb_service.hpp"
 #include "../translator/translator.hpp"
 
@@ -106,7 +104,6 @@ class HardwareService : public Singleton<HardwareService>, Loggable {
 	NvTempClient& nvTempClient						 = NvTempClient::getInstance();
 	UPowerClient& uPowerClient						 = UPowerClient::getInstance();
 	CPUInfoClient& cpuInfoClient					 = CPUInfoClient::getInstance();
-	SsdSchedulerClient& ssdSchedulerClient			 = SsdSchedulerClient::getInstance();
 	BoostControlClient& boostControlClient			 = BoostControlClient::getInstance();
 	SwitcherooCtlClient& switcherooCtlClient		 = SwitcherooCtlClient::getInstance();
 	PanelOverdriveClient& panelOverdriveClient		 = PanelOverdriveClient::getInstance();
@@ -115,7 +112,6 @@ class HardwareService : public Singleton<HardwareService>, Loggable {
 	Configuration& configuration					 = Configuration::getInstance();
 
 	std::unordered_map<std::string, std::string> gpus;
-	std::vector<SsdScheduler> ssd_schedulers;
 	std::vector<UsbIdentifier> connectedDevices;
 
 	bool onBattery										= true;

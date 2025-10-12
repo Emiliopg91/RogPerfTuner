@@ -6,7 +6,6 @@
 #include "../../include/events/event_bus.hpp"
 #include "../../include/models/performance/cpu_governor.hpp"
 #include "../../include/models/performance/power_profile.hpp"
-#include "../../include/models/performance/ssd_scheduler.hpp"
 #include "../../include/utils/process_utils.hpp"
 #include "../../include/utils/string_utils.hpp"
 #include "../../include/utils/time_utils.hpp"
@@ -77,7 +76,6 @@ void PerformanceService::setPerformanceProfile(PerformanceProfile& profile, cons
 			setPlatformProfile(profile);
 			setBoost(profile);
 			setCpuGovernor(profile);
-			setSsdScheduler(profile);
 			setPowerProfile(profile);
 			setTdps(profile);
 			setTgp(profile);
@@ -168,20 +166,6 @@ void PerformanceService::setBoost(const PerformanceProfile&) {
 			boostControlClient.set_boost(enabled);
 		} catch (std::exception& e) {
 			logger.error("Error while setting CPU boost: {}", e.what());
-		}
-		Logger::rem_tab();
-	}
-}
-
-void PerformanceService::setSsdScheduler(PerformanceProfile& profile) {
-	if (ssdSchedulerClient.available()) {
-		SsdScheduler ssdScheduler = profile.getSsdQueueScheduler();
-		logger.info("SSD scheduler: {}", ssdScheduler.toName());
-		Logger::add_tab();
-		try {
-			ssdSchedulerClient.setScheduler(ssdScheduler);
-		} catch (std::exception& e) {
-			logger.error("Error while setting SSD scheduler: {}", e.what());
 		}
 		Logger::rem_tab();
 	}
