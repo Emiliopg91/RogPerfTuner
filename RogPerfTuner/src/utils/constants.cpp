@@ -13,7 +13,7 @@ const pid_t Constants::PID = getpid();
 
 const std::string Constants::PLUGIN_VERSION = "1.2.4";
 
-const bool Constants::DEV_MODE = false;
+const bool Constants::DEV_MODE = true;
 
 const std::string Constants::HOME_DIR = std::getenv("HOME");
 
@@ -26,7 +26,6 @@ const std::string Constants::ASSETS_DIR = [] {
 }();
 
 #ifndef IS_AURPKG
-const std::string Constants::WRAPPER_PATH				  = HOME_DIR + "/." + APP_NAME + "/bin/steam/run";
 const std::string Constants::LAUNCHER_FILE				  = HOME_DIR + "/." + APP_NAME + "/bin/application/launcher.sh";
 const std::optional<std::string> Constants::APPIMAGE_FILE = []() {
 	const char* appimage = std::getenv("APPIMAGE");
@@ -36,10 +35,11 @@ const std::optional<std::string> Constants::APPIMAGE_FILE = []() {
 	return appimage;
 }();
 #else
-const std::string Constants::WRAPPER_PATH				  = ASSETS_DIR + "/bin/steam/run";
 const std::string Constants::LAUNCHER_FILE				  = APP_NAME;
 const std::optional<std::string> Constants::APPIMAGE_FILE = std::nullopt;
 #endif
+
+const std::string Constants::WRAPPER_PATH = HOME_DIR + "/." + APP_NAME + "/bin/steam/run";
 
 const std::string Constants::LOG_FILE_NAME		  = APP_NAME;
 const std::string Constants::LOG_RUNNER_FILE_NAME = "Runner";

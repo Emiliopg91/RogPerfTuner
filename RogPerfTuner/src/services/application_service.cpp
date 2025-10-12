@@ -39,9 +39,6 @@ ApplicationService::ApplicationService(std::optional<std::string> execPath) : Lo
 		logger.info("Running from AppImage");
 		Logger::add_tab();
 
-		logger.info("Copying helper binaries");
-		FileUtils::copy(Constants::ASSETS_BIN_DIR, Constants::BIN_DIR);
-
 		if (!Constants::DEV_MODE) {
 			logger.info("Copying launcher script");
 			FileUtils::mkdirs(Constants::BIN_APPLICATION_DIR);
@@ -87,9 +84,11 @@ ApplicationService::ApplicationService(std::optional<std::string> execPath) : Lo
 	logger.info("Autoupdate not available for AUR package");
 #endif
 
+	logger.info("Copying helper binaries");
+	FileUtils::copy(Constants::ASSETS_BIN_DIR, Constants::BIN_DIR);
+
 	Logger::add_tab();
 	logger.info("Creating helper scripts");
-	FileUtils::chmodRecursive(Constants::BIN_DIR, 0777);
 	if (execPath.has_value()) {
 		if (!FileUtils::exists(Constants::BIN_DIR + "/performance")) {
 			FileUtils::mkdirs(Constants::BIN_DIR + "/performance");
