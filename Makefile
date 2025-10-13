@@ -113,7 +113,6 @@ package:
 	@cp resources/AppRun dist/appimage-fs/
 	@cp resources/RogPerfTuner.desktop dist/appimage-fs/rog-perf-tuner.desktop
 	@cp build/assets/icons/icon.svg dist/appimage-fs/icon.svg
-	@echo "Skipping AppImage creation"
 	@chmod 777 -R resources/appimagetool dist/appimage-fs
 	@rm -f dist/appimage-fs/usr/share/rog-perf-tuner/OpenRGB/usr/lib/*.so*
 	@ARCH=x86_64 VERSION=$$(cat resources/version) ./resources/appimagetool -u "gh-releases-zsync|Emiliopg91|RogPerfTuner|latest|RogPerfTuner.AppImage.zsync" -n dist/appimage-fs dist/RogPerfTuner.AppImage
