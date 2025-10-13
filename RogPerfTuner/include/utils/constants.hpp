@@ -48,6 +48,7 @@ class Constants {
 	static const std::string INCREASE_BRIGHTNESS_PATH;
 	static const std::string NEXT_EFFECT_PATH;
 	static const std::string LAUNCHER_FILE;
+	static const std::string BIN_STEAM_DIR;
 	static const std::string FLATPAK_WRAPPER_PATH;
 	static const std::string STEAM_WRAPPER_PATH;
 	static const std::string CONFIG_DIR;

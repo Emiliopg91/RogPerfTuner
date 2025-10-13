@@ -1,30 +1,19 @@
-#include <arpa/inet.h>
-#include <signal.h>
+#include <linux/prctl.h>
 #include <sys/prctl.h>
-#include <sys/socket.h>
-#include <sys/types.h>
-#include <sys/un.h>
 #include <sys/wait.h>
-#include <unistd.h>
 
-#include <cstdio>
 #include <cstdlib>
 #include <cstring>
-#include <ctime>
-#include <exception>
-#include <optional>
+#include <iostream>
 #include <sstream>
 #include <string>
-#include <thread>
-#include <vector>
 
+#include "../../../include/clients/shell/flatpak.hpp"
 #include "../../../include/clients/unix_socket/rog_perf_tuner_client.hpp"
-#include "../../../include/logger/logger.hpp"
 #include "../../../include/logger/logger_provider.hpp"
 #include "../../../include/shell/shell.hpp"
 #include "../../../include/utils/constants.hpp"
 #include "../../../include/utils/file_utils.hpp"
-#include "../../../include/utils/string_utils.hpp"
 
 void reader_thread(int fd, Logger logger, bool error) {
 	char buffer[4096];
@@ -148,7 +137,7 @@ int run_command(Logger& logger, const std::vector<std::string>& cmd, const std::
 	return exit_code;
 }
 
-int main(int argc, char* argv[]) {
+int runSteamWrapping(int argc, char* argv[]) {
 	LoggerProvider::initialize(Constants::LOG_RUNNER_FILE_NAME, Constants::LOG_DIR);
 
 	Logger logger{"Runner"};
@@ -265,8 +254,99 @@ int main(int argc, char* argv[]) {
 	int code = run_command(logger, command, wrappers, parameters);
 
 	if (bin.has_value()) {
-		FileUtils::move(*bin + ".bk", *bin);
+		try {
+			FileUtils::move(*bin + ".bk", *bin);
+		} catch (std::exception& e) {
+		}
 	}
 
 	return code;
+}
+
+int runFlatpakWrapping(int argc, char* argv[]) {
+	LoggerProvider::initialize();
+	std::cout << ">>> Running flatpak wrapper" << std::endl;
+
+	std::string exeDir = FileUtils::dirname(argv[0]);
+
+	const char* oldPath	 = std::getenv("PATH");
+	std::string path	 = oldPath ? oldPath : "";
+	std::string toRemove = exeDir + ":";
+	size_t found		 = path.find(toRemove);
+	if (found != std::string::npos) {
+		path.erase(found, toRemove.size());
+	}
+	setenv("PATH", path.c_str(), 1);
+
+	std::string command;
+	if (getenv("ORIG_FLATPAK_BIN")) {
+		command = getenv("ORIG_FLATPAK_BIN");
+	} else {
+		auto whichResult = Shell::getInstance().which(std::string("flatpak"));
+		if (!whichResult.has_value()) {
+			std::cerr << "Command " + std::string(argv[0]) + " not found" << std::endl;
+			exit(127);
+		}
+		command = whichResult.value();
+	}
+	std::cout << "flatpak -> " + command << std::endl;
+
+	bool isRun = false;
+	for (int i = 1; i < argc; i++) {
+		if (std::string(argv[i]) == "run") {
+			isRun = true;
+			break;
+		}
+	}
+
+	bool mangohudRequested = false;
+	if (isRun) {
+		const char* ofe = std::getenv("OVERRIDE_FLATPAK_ENV");
+		if (ofe) {
+			std::istringstream ss{std::string(ofe)};
+			std::string token;
+			while (std::getline(ss, token, ';')) {
+				const char* val = std::getenv(token.c_str());
+				if (val) {
+					command += " --env=" + token + "=" + val;
+					if (token == "MANGOHUD") {
+						mangohudRequested = true;
+					}
+				}
+			}
+		}
+	}
+
+	if (mangohudRequested) {
+		if (!FlatpakClient::getInstance().checkInstalled(Constants::FLATPAK_MANGOHUD, false)) {
+			std::cout << "MangoHud flatpak installation missing, attempting installation" << std::endl;
+			FlatpakClient::getInstance().install(Constants::FLATPAK_MANGOHUD, false);
+			FlatpakClient::getInstance().override(Constants::FLATPAK_MANGOHUD_OVERRIDE, false);
+			FlatpakClient::getInstance().override(Constants::FLATPAK_MANGOHUD_OVERRIDE, true);
+		}
+	}
+
+	for (int i = 1; i < argc; i++) {
+		command += " ";
+		command += argv[i];
+	}
+
+	// Mostrar y ejecutar
+	std::cout << ">>> Command:\n  " << command << std::endl;
+	int result = std::system(command.c_str());
+
+	return WEXITSTATUS(result);
+}
+
+void shiftArgv(int& argc, char** argv) {
+	if (argc <= 2) {
+		if (argc > 1) {
+			argv[1] = nullptr;
+			argc	= 1;
+		}
+		return;
+	}
+
+	std::memmove(&argv[1], &argv[2], (argc - 2 + 1) * sizeof(char*));
+	argc--;
 }

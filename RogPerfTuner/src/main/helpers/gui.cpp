@@ -1,24 +1,23 @@
-#include <unistd.h>
+#include <linux/limits.h>
 
 #include <QApplication>
 #include <iostream>
 
-#include "../include/clients/unix_socket/rog_perf_tuner_client.hpp"
-#include "../include/configuration/configuration.hpp"
-#include "../include/gui/password_dialog.hpp"
-#include "../include/gui/toaster.hpp"
-#include "../include/gui/tray_icon.hpp"
-#include "../include/logger/logger_provider.hpp"
-#include "../include/servers/socket_server.hpp"
-#include "../include/services/application_service.hpp"
-#include "../include/services/hardware_service.hpp"
-#include "../include/services/open_rgb_service.hpp"
-#include "../include/services/performance_service.hpp"
-#include "../include/services/steam_service.hpp"
-#include "../include/translator/translator.hpp"
-#include "../include/utils/constants.hpp"
-#include "../include/utils/single_instance.hpp"
-#include "../include/utils/string_utils.hpp"
+#include "../../../include/configuration/configuration.hpp"
+#include "../../../include/gui/password_dialog.hpp"
+#include "../../../include/gui/toaster.hpp"
+#include "../../../include/gui/tray_icon.hpp"
+#include "../../../include/logger/logger_provider.hpp"
+#include "../../../include/servers/socket_server.hpp"
+#include "../../../include/services/application_service.hpp"
+#include "../../../include/services/hardware_service.hpp"
+#include "../../../include/services/open_rgb_service.hpp"
+#include "../../../include/services/performance_service.hpp"
+#include "../../../include/services/steam_service.hpp"
+#include "../../../include/translator/translator.hpp"
+#include "../../../include/utils/constants.hpp"
+#include "../../../include/utils/single_instance.hpp"
+#include "../../../include/utils/string_utils.hpp"
 
 void terminateHandler() {
 	std::cerr << "Unhandled exception detected\n";
@@ -51,38 +50,6 @@ std::string getExecutablePath(const char* argv0) {
 	}
 
 	return input;
-}
-
-void printHelp(char* exec) {
-	std::cout << Constants::APP_NAME << std::endl;
-	std::cout << "  Usage: " << exec << " <option>" << std::endl;
-	std::cout << std::endl;
-	std::cout << "  Options:" << std::endl;
-	std::cout << "    -p: Next performance profile" << std::endl;
-	std::cout << "    -e: Next RGB effect" << std::endl;
-	std::cout << "    -i: Increase RGB brightness" << std::endl;
-	std::cout << "    -d: Decrease RGB brightness" << std::endl;
-	std::cout << "    -h: Show this menu" << std::endl;
-}
-
-void nextProfile() {
-	LoggerProvider::initialize();
-	RogPerfTunerClient::getInstance().nextProfile();
-}
-
-void nextEffect() {
-	LoggerProvider::initialize();
-	RogPerfTunerClient::getInstance().nextEffect();
-}
-
-void decreaseBrightness() {
-	LoggerProvider::initialize();
-	RogPerfTunerClient::getInstance().decreaseBrightness();
-}
-
-void increaseBrightness() {
-	LoggerProvider::initialize();
-	RogPerfTunerClient::getInstance().increaseBrightness();
 }
 
 int startGui(int argc, char** argv) {
@@ -146,30 +113,4 @@ int startGui(int argc, char** argv) {
 	logger.info("Application ready");
 
 	return app.exec();
-}
-
-int main(int argc, char** argv) {
-	if (argc < 2) {
-		return startGui(argc, argv);
-	} else {
-		std::string option = argv[1];
-		if (option == "-p") {
-			nextProfile();
-		} else if (option == "-e") {
-			nextEffect();
-			return 0;
-		} else if (option == "-i") {
-			increaseBrightness();
-		} else if (option == "-d") {
-			decreaseBrightness();
-		} else if (option == "-h") {
-			printHelp(argv[0]);
-		} else {
-			std::cerr << "Invalid argument '" << option << "'" << std::endl;
-			printHelp(argv[0]);
-			return 1;
-		}
-
-		return 0;
-	}
 }

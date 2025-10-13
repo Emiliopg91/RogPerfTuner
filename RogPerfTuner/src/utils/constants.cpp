@@ -13,7 +13,7 @@ const pid_t Constants::PID = getpid();
 
 const std::string Constants::PLUGIN_VERSION = "1.2.4";
 
-const bool Constants::DEV_MODE = false;
+const bool Constants::DEV_MODE = true;
 
 const std::string Constants::HOME_DIR = std::getenv("HOME");
 
@@ -69,6 +69,7 @@ const std::string Constants::BIN_RGB_DIR			  = HOME_DIR + "/." + APP_NAME + "/bi
 const std::string Constants::DECREASE_BRIGHTNESS_PATH = HOME_DIR + "/." + APP_NAME + "/bin/rgb/decreaseBrightness";
 const std::string Constants::INCREASE_BRIGHTNESS_PATH = HOME_DIR + "/." + APP_NAME + "/bin/rgb/increaseBrightness";
 const std::string Constants::NEXT_EFFECT_PATH		  = HOME_DIR + "/." + APP_NAME + "/bin/rgb/nextEffect";
+const std::string Constants::BIN_STEAM_DIR			  = HOME_DIR + "/." + APP_NAME + "/bin/steam";
 const std::string Constants::STEAM_WRAPPER_PATH		  = HOME_DIR + "/." + APP_NAME + "/bin/steam/run";
 const std::string Constants::FLATPAK_WRAPPER_PATH	  = HOME_DIR + "/." + APP_NAME + "/bin/steam/flatpak";
 const std::string Constants::CONFIG_DIR				  = HOME_DIR + "/." + APP_NAME + "/config";

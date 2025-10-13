@@ -83,31 +83,32 @@ ApplicationService::ApplicationService(std::optional<std::string> execPath) : Lo
 #else
 	logger.info("Autoupdate not available for AUR package");
 #endif
-
-	logger.info("Copying helper binaries");
-	FileUtils::copy(Constants::ASSETS_BIN_DIR, Constants::BIN_DIR);
-
-	logger.info("Creating helper scripts");
 	if (execPath.has_value()) {
-		if (!FileUtils::exists(Constants::BIN_PERFORMANCE_DIR)) {
-			FileUtils::mkdirs(Constants::BIN_PERFORMANCE_DIR);
+		logger.info("Creating helper scripts");
+
+		Logger::add_tab();
+
+		if (FileUtils::exists(Constants::BIN_DIR)) {
+			FileUtils::remove(Constants::BIN_DIR);
 		}
+		FileUtils::mkdirs(Constants::BIN_DIR);
+
+		FileUtils::mkdirs(Constants::BIN_PERFORMANCE_DIR);
 		createScriptFile(Constants::NEXT_PROFILE_PATH, *execPath, "-p");
 
-		if (!FileUtils::exists(Constants::BIN_RGB_DIR)) {
-			FileUtils::mkdirs(Constants::BIN_RGB_DIR);
-		}
+		FileUtils::mkdirs(Constants::BIN_RGB_DIR);
 		createScriptFile(Constants::NEXT_EFFECT_PATH, *execPath, "-e");
 		createScriptFile(Constants::INCREASE_BRIGHTNESS_PATH, *execPath, "-i");
 		createScriptFile(Constants::DECREASE_BRIGHTNESS_PATH, *execPath, "-d");
-	}
 
-	if (FileUtils::exists(Constants::FLATPAK_WRAPPER_PATH)) {
-		FileUtils::remove(Constants::FLATPAK_WRAPPER_PATH);
-	}
-	FileUtils::createSymlink(Constants::STEAM_WRAPPER_PATH, Constants::FLATPAK_WRAPPER_PATH);
+		FileUtils::mkdirs(Constants::BIN_STEAM_DIR);
+		createWrapperScriptFile(Constants::STEAM_WRAPPER_PATH, *execPath, "-r");
+		createWrapperScriptFile(Constants::FLATPAK_WRAPPER_PATH, *execPath, "-f");
 
-	FileUtils::chmodRecursive(Constants::BIN_DIR, 0777);
+		FileUtils::chmodRecursive(Constants::BIN_DIR, 0777);
+
+		Logger::rem_tab();
+	}
 
 	Logger::rem_tab();
 }
@@ -117,6 +118,20 @@ void ApplicationService::createScriptFile(std::string path, std::string execPath
 	script << "#!/bin/bash\n\n";
 	script << "set -e\n\n";
 	script << "\"" << execPath << "\" " << option << "\n";
+
+	FileUtils::writeFileContent(path, script.str());
+}
+
+void ApplicationService::createWrapperScriptFile(std::string path, std::string wrp, std::string option) {
+	std::ostringstream script;
+	script << "#!/usr/bin/env bash\n\n";
+	script << "set -e\n\n";
+	script << "TARGET=\"" << wrp << "\"\n\n";
+	script << "if [[ -f \"$TARGET\" && -x \"$TARGET\" ]]; then\n";
+	script << "    exec \"$TARGET\" " << option << " \"$@\"\n";
+	script << "else\n";
+	script << "    exec \"$@\"\n";
+	script << "fi\n";
 
 	FileUtils::writeFileContent(path, script.str());
 }

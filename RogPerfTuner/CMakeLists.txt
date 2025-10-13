@@ -37,7 +37,7 @@ pkg_check_modules(LIBSECRET REQUIRED libsecret-1)
 file(GLOB_RECURSE SOURCES_RCC
     "${CMAKE_CURRENT_SOURCE_DIR}/src/*.cpp"
 )
-list(FILTER SOURCES_RCC EXCLUDE REGEX ".*/src/scripts/.*")
+list(FILTER SOURCES_RCC EXCLUDE REGEX ".*/src/main/helpers/.*")
 
 file(GLOB_RECURSE HEADERS_RCC
     "${CMAKE_CURRENT_SOURCE_DIR}/include/*.hpp"
@@ -67,54 +67,3 @@ else()
     # ------------------------------
     target_link_libraries(RogPerfTuner PRIVATE httplib::httplib)
 endif()
-
-# ------------------------------
-# Scripts
-# ------------------------------
-file(GLOB_RECURSE SOURCES_SCT
-    "${CMAKE_CURRENT_SOURCE_DIR}/src/*.cpp"
-)
-list(FILTER SOURCES_SCT EXCLUDE REGEX ".*/src/scripts/.*")
-
-file(GLOB_RECURSE HEADERS_SCT
-    "${CMAKE_CURRENT_SOURCE_DIR}/include/*.hpp"
-)
-
-file(GLOB_RECURSE SOURCES_SHELL
-    "${CMAKE_CURRENT_SOURCE_DIR}/src/shell/*.cpp"
-)
-
-file(GLOB_RECURSE SOURCES_LOGGER
-    "${CMAKE_CURRENT_SOURCE_DIR}/src/logger/*.cpp"
-)
-
-file(GLOB_RECURSE SOURCES_FLATPAK
-    "${CMAKE_CURRENT_SOURCE_DIR}/src/clients/shell/flatpak.cpp"
-    "${CMAKE_CURRENT_SOURCE_DIR}/src/clients/shell/abstract/*.cpp"
-)
-
-file(GLOB_RECURSE SOURCES_UTILS
-    "${CMAKE_CURRENT_SOURCE_DIR}/src/clients/shell/abstract/*.cpp"
-    "${CMAKE_CURRENT_SOURCE_DIR}/src/clients/shell/md5_client.cpp"
-    "${CMAKE_CURRENT_SOURCE_DIR}/src/utils/constants.cpp"
-    "${CMAKE_CURRENT_SOURCE_DIR}/src/utils/file_utils.cpp"
-    "${CMAKE_CURRENT_SOURCE_DIR}/src/utils/string_utils.cpp"
-)
-
-file(GLOB_RECURSE SOURCES_COMMUNICATION_MESSAGE
-    "${CMAKE_CURRENT_SOURCE_DIR}/src/events/event_bus.cpp"
-    "${CMAKE_CURRENT_SOURCE_DIR}/src/models/others/communication_message.cpp"
-    "${CMAKE_CURRENT_SOURCE_DIR}/src/models/others/loggable.cpp"
-    "${CMAKE_CURRENT_SOURCE_DIR}/src/clients/unix_socket/abstract/abstract_unix_socket_client.cpp"
-    "${CMAKE_CURRENT_SOURCE_DIR}/src/clients/unix_socket/rog_perf_tuner_client.cpp"
-    "${CMAKE_CURRENT_SOURCE_DIR}/src/logger/*.cpp"
-    "${CMAKE_CURRENT_SOURCE_DIR}/src/shell/*.cpp"
-    "${CMAKE_CURRENT_SOURCE_DIR}/src/utils/time_utils.cpp"
-)
-
-add_executable(Wrapper ${CMAKE_CURRENT_SOURCE_DIR}/src/scripts/steam/wrapper.cpp ${SOURCES_SHELL} ${SOURCES_LOGGER} ${SOURCES_UTILS} ${SOURCES_FLATPAK} ${SOURCES_COMMUNICATION_MESSAGE})
-target_include_directories(Wrapper PRIVATE ${LIBSECRET_INCLUDE_DIRS})
-target_link_libraries(Wrapper PRIVATE 
-    yaml-cpp::yaml-cpp
-    spdlog::spdlog 
-)
