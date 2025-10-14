@@ -38,8 +38,6 @@ add_compile_options(
 if(IS_AURPKG)
     message(STATUS "Building for AUR package")
     message(STATUS "Autoupdater excluded")
-    message(STATUS "Using native optimizations")
-    add_compile_options(-march=native -mtune=native)
 else()
     add_subdirectory(submodules/httplib)
 endif()
