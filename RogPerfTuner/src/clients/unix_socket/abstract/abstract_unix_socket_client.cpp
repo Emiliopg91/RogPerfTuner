@@ -73,7 +73,7 @@ void AbstractUnixSocketClient::connectionLoop() {
 			continue;
 		}
 
-		eventBus.emit_event("unix.socket.event." + name + ".connect");
+		eventBus.emitUnixSocketEvent(name, "connect", {});
 		_connected.store(true);
 
 		if (writeThread.joinable()) {
@@ -101,6 +101,7 @@ void AbstractUnixSocketClient::connectionLoop() {
 					logger.debug("Lost connection");
 					stop(false);
 					_running = true;
+					eventBus.emitUnixSocketEvent(name, "disconnect", {});
 					TimeUtils::sleep(1000);
 					continue;
 				}
@@ -154,7 +155,7 @@ void AbstractUnixSocketClient::readLoop() {
 				ssize_t r = read(sock, &data[total_read], resp_len - total_read);
 				if (r <= 0) {
 					logger.debug("Server closed the connection");
-					eventBus.emit_event("unix.socket.event." + name + ".disconnect");
+					eventBus.emitUnixSocketEvent(name, "disconnect", {});
 					_connected.store(false);
 					break;
 				}
@@ -203,7 +204,9 @@ std::vector<std::any> AbstractUnixSocketClient::invoke(std::string method, std::
 	queue_cv.notify_one();
 
 	if (fut.wait_for(std::chrono::milliseconds(timeout_ms)) == std::future_status::timeout) {
-		logger.error("No response for {} after {} ms", method, timeout_ms);
+		if (method != "ping") {
+			logger.error("No response for {} after {} ms", method, timeout_ms);
+		}
 		throw std::runtime_error("UnixSocketTimeoutError");
 	}
 
@@ -217,22 +220,17 @@ std::vector<std::any> AbstractUnixSocketClient::invoke(std::string method, std::
 }
 
 void AbstractUnixSocketClient::handleEvent(CommunicationMessage msg) {
-	std::string eventName = "unix.socket.event." + name + "." + msg.name;
-	if (msg.data.empty()) {
-		eventBus.emit_event(eventName);
-	} else {
-		eventBus.emit_event(eventName, msg.data);
-	}
+	eventBus.emitUnixSocketEvent(name, msg.name, msg.data);
 }
 
 void AbstractUnixSocketClient::on_without_params(const std::string& evName, Callback&& callback) {
-	auto eventName = "unix.socket.event." + name + "." + evName;
-	eventBus.on_without_data(eventName, callback);
+	on_with_params(evName, [callback = std::move(callback)](CallbackParam) {
+		callback();
+	});
 }
 
 void AbstractUnixSocketClient::on_with_params(const std::string& evName, CallbackWithParams&& callback) {
-	auto eventName = "unix.socket.event." + name + "." + evName;
-	eventBus.on_with_data(eventName, std::move(callback));
+	eventBus.onUnixSocketEvent(name, evName, std::move(callback));
 }
 
 void AbstractUnixSocketClient::onConnect(Callback&& callback) {

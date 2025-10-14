@@ -137,8 +137,8 @@ HardwareService::HardwareService() : Loggable("HardwareService") {
 
 	if (uPowerClient.available()) {
 		onBattery = uPowerClient.isOnBattery();
-		uPowerClient.onBatteryChange([this](CallbackParam data) {
-			this->onBatteryEvent(std::any_cast<bool>(data[0]));
+		uPowerClient.onBatteryChange([this](CallbackAnyParam data) {
+			this->onBatteryEvent(std::any_cast<bool>(data));
 		});
 	}
 

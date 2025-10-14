@@ -4,7 +4,7 @@ bool UPowerClient::isOnBattery() {
 	return this->getProperty<bool>(QString("OnBattery"));
 }
 
-void UPowerClient::onBatteryChange(CallbackWithParams&& callback) {
+void UPowerClient::onBatteryChange(CallbackWithAnyParam&& callback) {
 	this->onPropertyChange("OnBattery", std::move(callback));
 }
 

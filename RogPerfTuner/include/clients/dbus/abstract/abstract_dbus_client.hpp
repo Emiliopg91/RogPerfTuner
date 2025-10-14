@@ -148,7 +148,7 @@ class AbstractDbusClient : public QObject {
 	 * @param propName The name of the property to monitor for changes.
 	 * @param callback The callback function to invoke when the property changes.
 	 */
-	void onPropertyChange(const std::string& propName, CallbackWithParams&& callback);
+	void onPropertyChange(const std::string& propName, CallbackWithAnyParam&& callback);
 
   private slots:
 	void onPropertiesChanged(const QString& iface, const QVariantMap& changedProps, const QStringList& invalidatedProps);

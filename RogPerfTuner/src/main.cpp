@@ -1,8 +1,22 @@
 #include <iostream>
 
-#include "./helpers/gui.cpp"
-#include "./helpers/rgb.cpp"
-#include "./helpers/wrapper.cpp"
+#include "../include/main/flatpak.hpp"
+#include "../include/main/gui.hpp"
+#include "../include/main/rgb.hpp"
+#include "../include/main/run.hpp"
+
+inline void shiftArgv(int& argc, char** argv) {
+	if (argc <= 2) {
+		if (argc > 1) {
+			argv[1] = nullptr;
+			argc	= 1;
+		}
+		return;
+	}
+
+	std::memmove(&argv[1], &argv[2], (argc - 2 + 1) * sizeof(char*));
+	argc--;
+}
 
 int main(int argc, char** argv) {
 	if (argc < 2) {

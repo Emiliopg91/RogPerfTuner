@@ -191,3 +191,43 @@ void EventBus::onBootSound(std::function<void(bool)>&& callback) {
 void EventBus::emitBootSound(bool value) {
 	this->emit_event(HARDWARE_SERVICE_BOOT_SOUND_CHANGED, {value});
 }
+
+void EventBus::emitDbusPropertyEvent(std::string interface, std::string property, std::any value) {
+	this->emit_event("dbus." + interface + ".property." + property, {value});
+}
+
+void EventBus::onDbusPropertyEvent(std::string interface, std::string property, CallbackWithAnyParam&& callback) {
+	this->on_with_data("dbus." + interface + ".property." + property, [cb = std::move(callback)](CallbackParam data) {
+		cb(data[0]);
+	});
+}
+
+void EventBus::emitDbusSignalEvent(std::string interface, std::string property) {
+	this->emit_event("dbus." + interface + ".signal." + property);
+}
+
+void EventBus::onDbusSignalEvent(std::string interface, std::string property, Callback&& callback) {
+	this->on_without_data("dbus." + interface + ".property." + property, [cb = std::move(callback)]() {
+		cb();
+	});
+}
+
+void EventBus::emitServerSocketEvent(std::string event, CallbackParam value) {
+	this->emit_event("socket.server.event." + event, value);
+}
+
+void EventBus::onServerSocketEvent(std::string event, CallbackWithParams&& callback) {
+	this->on_with_data("socket.server.event." + event, [cb = std::move(callback)](CallbackParam data) {
+		cb(data);
+	});
+}
+
+void EventBus::emitUnixSocketEvent(std::string name, std::string event, CallbackParam value) {
+	this->emit_event("unix.socket." + name + ".event." + event, value);
+}
+
+void EventBus::onUnixSocketEvent(std::string name, std::string event, CallbackWithParams&& callback) {
+	this->on_with_data("unix.socket." + name + ".event." + event, [cb = std::move(callback)](CallbackParam data) {
+		cb(data);
+	});
+}

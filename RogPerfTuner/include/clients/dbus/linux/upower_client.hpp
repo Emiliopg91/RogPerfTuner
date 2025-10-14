@@ -7,7 +7,7 @@ class UPowerClient : public AbstractDbusClient, public Singleton<UPowerClient> {
   public:
 	bool isOnBattery();
 
-	void onBatteryChange(CallbackWithParams&& callback);
+	void onBatteryChange(CallbackWithAnyParam&& callback);
 
   private:
 	friend class Singleton<UPowerClient>;

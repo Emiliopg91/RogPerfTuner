@@ -1,25 +1,27 @@
+#pragma once
+
 #include <linux/limits.h>
 
 #include <QApplication>
 #include <iostream>
 
-#include "../../../include/configuration/configuration.hpp"
-#include "../../../include/gui/password_dialog.hpp"
-#include "../../../include/gui/toaster.hpp"
-#include "../../../include/gui/tray_icon.hpp"
-#include "../../../include/logger/logger_provider.hpp"
-#include "../../../include/servers/socket_server.hpp"
-#include "../../../include/services/application_service.hpp"
-#include "../../../include/services/hardware_service.hpp"
-#include "../../../include/services/open_rgb_service.hpp"
-#include "../../../include/services/performance_service.hpp"
-#include "../../../include/services/steam_service.hpp"
-#include "../../../include/translator/translator.hpp"
-#include "../../../include/utils/constants.hpp"
-#include "../../../include/utils/single_instance.hpp"
-#include "../../../include/utils/string_utils.hpp"
+#include "../configuration/configuration.hpp"
+#include "../gui/password_dialog.hpp"
+#include "../gui/toaster.hpp"
+#include "../gui/tray_icon.hpp"
+#include "../logger/logger_provider.hpp"
+#include "../servers/socket_server.hpp"
+#include "../services/application_service.hpp"
+#include "../services/hardware_service.hpp"
+#include "../services/open_rgb_service.hpp"
+#include "../services/performance_service.hpp"
+#include "../services/steam_service.hpp"
+#include "../translator/translator.hpp"
+#include "../utils/constants.hpp"
+#include "../utils/single_instance.hpp"
+#include "../utils/string_utils.hpp"
 
-void terminateHandler() {
+inline void terminateHandler() {
 	std::cerr << "Unhandled exception detected\n";
 
 	std::exception_ptr exptr = std::current_exception();
@@ -37,7 +39,7 @@ void terminateHandler() {
 	std::abort();
 }
 
-std::string getExecutablePath(const char* argv0) {
+inline std::string getExecutablePath(const char* argv0) {
 	std::string input(argv0);
 
 	if (input.find('/') == std::string::npos) {
@@ -52,7 +54,7 @@ std::string getExecutablePath(const char* argv0) {
 	return input;
 }
 
-int startGui(int argc, char** argv) {
+inline int startGui(int argc, char** argv) {
 	std::set_terminate(terminateHandler);
 
 	auto execPath = getExecutablePath(argv[0]);

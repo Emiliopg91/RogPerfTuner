@@ -9,7 +9,6 @@
 
 #include <cstring>
 #include <filesystem>
-#include <iostream>
 
 #include "../../include/utils/file_utils.hpp"
 
@@ -156,13 +155,7 @@ void SocketServer::handleClient(int client_fd) {
 }
 
 void SocketServer::handleEvent(const CommunicationMessage& req) {
-	std::vector<std::any> data;
-
-	if (req.data.empty()) {
-		eventBus.emit_event("socket.server.event." + req.name);
-	} else {
-		eventBus.emit_event("socket.server.event." + req.name, req.data);
-	}
+	eventBus.emitServerSocketEvent(req.name, req.data);
 }
 
 void SocketServer::handleRequest(const int& clientFd, const CommunicationMessage& req) {
