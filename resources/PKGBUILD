@@ -27,7 +27,9 @@ depends=(
   'qt6-charts'
   'qt6-svg'
   'scx-scheds'
+  'spdlog'
   'upower'
+  'yaml-cpp'
 )
 makedepends=(
   'base-devel'

@@ -35,10 +35,6 @@ add_compile_options(
     -Wno-deprecated-literal-operator
 )
 
-add_subdirectory(submodules/spdlog)
-
-add_subdirectory(submodules/yaml)
-
 add_subdirectory(submodules/OpenRGB-cppSDK)
 
 add_subdirectory(RogPerfTuner)

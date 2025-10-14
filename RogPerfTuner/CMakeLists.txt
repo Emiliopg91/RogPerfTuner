@@ -25,6 +25,16 @@ endif()
 # ------------------------------
 find_package(Qt6 REQUIRED COMPONENTS Core DBus Gui Widgets Charts)
 
+# ------------------------------
+# Buscar paquetes de Qt6
+# ------------------------------
+find_package(spdlog REQUIRED)
+
+# ------------------------------
+# Buscar paquetes de Qt6
+# ------------------------------
+find_package(yaml-cpp REQUIRED)
+
 # ------------------------------ 
 # Buscar paquetes de libsecret-1
 # ------------------------------
