@@ -24,8 +24,22 @@ fi
 
 export PATH="${APPDIR}:${PATH}"
 export RCC_ASSETS_DIR="${APPDIR}/usr/share/rog-perf-tuner"
-#export LD_LIBRARY_PATH="$APPDIR/usr/lib:$LD_LIBRARY_PATH"
-#export QT_PLUGIN_PATH="$HERE/usr/lib/qt6/plugins"
+export LD_LIBRARY_PATH="$APPDIR/usr/lib:$LD_LIBRARY_PATH"
+
+for path in \
+    "/usr/lib/qt6/plugins" \
+    "/usr/lib64/qt6/plugins" \
+    "/usr/lib/x86_64-linux-gnu/qt6/plugins"
+do
+    if [ -d "$path" ]; then
+        case ":$QT_PLUGIN_PATH:" in
+            *":$path:"*) ;; 
+            *) export QT_PLUGIN_PATH="${QT_PLUGIN_PATH:+$QT_PLUGIN_PATH:}$path" ;;
+        esac
+        break
+    fi
+done
+
 
 
 BIN="$APPDIR/usr/bin/rog-perf-tuner"
