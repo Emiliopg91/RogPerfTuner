@@ -67,16 +67,6 @@ build() {
     export APPIMAGE_EXTRACT_AND_RUN=1
     unset SOURCE_DATE_EPOCH
 
-    case "$ARCH_LEVEL" in
-        x86-64-v3) export CXXFLAGS="-march=x86-64-v3" ;;
-        x86-64-v4) export CXXFLAGS="-march=x86-64-v4" ;;
-        zen4)      export CXXFLAGS="-march=znver4" ;;
-        native)    export CXXFLAGS="-march=native" ;;
-        ""|default|*) export CXXFLAGS="" ;;  # Por defecto
-    esac
-
-    echo "Using CXXFLAGS: $CXXFLAGS"
-
     cd "$srcdir/RogPerfTuner"
     IS_AURPKG=1 make release
 }

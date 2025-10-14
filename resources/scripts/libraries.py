@@ -5,7 +5,7 @@ import subprocess
 os.makedirs("dist/appimage-fs/usr/lib",exist_ok=True)
 
 binaries = [ "build/assets/OpenRGB/OpenRGB","dist/RogPerfTuner/RogPerfTuner"]
-excluded = ["/lib64/ld-linux-x86-64.so.2", "linux-vdso.so.1", "libc.so.6", "libm.so.6", "libgcc_s.so.1"]
+eccxcluded = ["/lib64/ld-linux-x86-64.so.2", "linux-vdso.so.1", "libc.so.6", "libm.so.6", "libgcc_s.so.1"]
 
 for binary in binaries:
     print(f"Libaries for binary {binary}:")
