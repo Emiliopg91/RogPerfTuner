@@ -11,7 +11,6 @@ clean:
 	@echo "######################### Cleaning workspace ##########################"
 	@echo "#######################################################################"
 	@rm -rf build dist .Debug .Release .qt CMakeCache.txt **/cmake_install.cmake CMakeFiles submodules/patches/*.diff.applied assets/scripts assets/bin assets/OpenRGB assets/RccDeckyCompanion **/CMakeFiles
-	@cd submodules/yaml && git reset --hard > /dev/null
 	@cd submodules/OpenRGB-cppSDK && git reset --hard > /dev/null && git submodule foreach git reset --hard > /dev/null
 	@cd submodules/OpenRGB && git reset --hard > /dev/null
 	@cd submodules/RccDeckyCompanion && git reset --hard > /dev/null
