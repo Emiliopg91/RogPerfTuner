@@ -22,33 +22,6 @@ export PATH="${APPDIR}:${PATH}"
 export RCC_ASSETS_DIR="${APPDIR}/usr/share/rog-perf-tuner"
 export LD_LIBRARY_PATH="$APPDIR/usr/lib:$LD_LIBRARY_PATH"
 
-found=false
-
-for path in \
-    "/usr/lib/qt6/plugins" \
-    "/usr/lib64/qt6/plugins" \
-    "/usr/lib/x86_64-linux-gnu/qt6/plugins"
-do
-    if [ -d "$path" ]; then
-        case ":$QT_PLUGIN_PATH:" in
-            *":$path:"*) ;; 
-            *) export QT_PLUGIN_PATH="${QT_PLUGIN_PATH:+$QT_PLUGIN_PATH:}$path" ;;
-        esac
-        found=true
-        break
-    fi
-done
-
-if [ "$found" = false ]; then
-    echo "⚠️  No Qt plugins directory found."
-    echo
-    echo "  In case of failure, set the environment variable QT_PLUGIN_PATH manually to point to your system's Qt plugins directory."
-    echo
-    echo "  Example:"
-    echo "    export QT_PLUGIN_PATH=/usr/lib/qt6/plugins"
-    echo
-fi
-
 BIN="$APPDIR/usr/bin/rog-perf-tuner"
 
 if [ $NUMBER_OF_ARGS -eq 0 ] ; then
