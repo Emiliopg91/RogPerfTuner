@@ -9,15 +9,22 @@
 #include "../../include/utils/file_utils.hpp"
 
 #ifndef IS_AURPKG
-#include "../../include/gui/toaster.hpp"
-#include "../../include/services/steam_service.hpp"
-#include "../../include/translator/translator.hpp"
-#include "../../include/utils/autoupdater.hpp"
 #endif
 
 ApplicationService::ApplicationService(std::optional<std::string> execPath) : Loggable("ApplicationService") {
 	logger.info("Initializing ApplicationService");
 	Logger::add_tab();
+
+	if (Constants::APPIMAGE_FILE.has_value()) {
+		if (!Constants::DEV_MODE) {
+			if (!FileUtils::exists(Constants::APP_DRAW_FILE)) {
+				logger.info("Creating menu entry");
+				Logger::add_tab();
+				FileUtils::writeFileContent(Constants::APP_DRAW_FILE, buildDesktopFile());
+				Logger::rem_tab();
+			}
+		}
+	}
 
 	logger.info("Copying icons");
 	FileUtils::copy(Constants::ASSET_ICONS_DIR, Constants::ICONS_DIR);
@@ -34,55 +41,6 @@ ApplicationService::ApplicationService(std::optional<std::string> execPath) : Lo
 	configuration.getConfiguration().application.appimage = Constants::APPIMAGE_FILE.has_value();
 	configuration.saveConfig();
 
-#ifndef IS_AURPKG
-	if (Constants::APPIMAGE_FILE.has_value()) {
-		logger.info("Running from AppImage");
-		Logger::add_tab();
-
-		if (!Constants::DEV_MODE) {
-			logger.info("Copying launcher script");
-			FileUtils::mkdirs(Constants::BIN_APPLICATION_DIR);
-			std::ostringstream ss;
-			ss << "#!/bin/bash\n"
-			   << "UPDATE_PATH=\"" << Constants::UPDATE_FILE << "\"\n"
-			   << "APPIMAGE_PATH=\"" << *Constants::APPIMAGE_FILE << "\"\n"
-			   << "\n"
-			   << "if [[ -f \"$UPDATE_PATH\" ]]; then\n"
-			   << "  mv \"$UPDATE_PATH\" \"$APPIMAGE_PATH\"\n"
-			   << "  chmod 755 \"$APPIMAGE_PATH\"\n"
-			   << "  rm \"$UPDATE_PATH\"\n"
-			   << "fi\n"
-			   << *Constants::APPIMAGE_FILE << "\n";
-			auto content = ss.str();
-			FileUtils::writeFileContent(Constants::LAUNCHER_FILE, content);
-
-			if (!FileUtils::exists(Constants::APP_DRAW_FILE)) {
-				logger.info("Creating menu entry");
-				FileUtils::writeFileContent(Constants::APP_DRAW_FILE, buildDesktopFile());
-			}
-		}
-
-		AutoUpdater::init(
-			[this]() {
-				logger.info("Applying update");
-				Logger::add_tab();
-				toaster.showToast(translator.translate("applying.update"));
-				shell.run_command("nohup bash -c \"sleep 1 && " + Constants::LAUNCHER_FILE + "\" > /dev/null 2>&1 &");
-				shutdown();
-				Logger::rem_tab();
-			},
-
-			[this]() {
-				return steamService.getRunningGames().empty();
-			});
-
-		FileUtils::mkdirs(Constants::UPDATE_DIR);
-
-		Logger::rem_tab();
-	}
-#else
-	logger.info("Autoupdate not available for AUR package");
-#endif
 	if (execPath.has_value()) {
 		logger.info("Creating helper scripts");
 
@@ -164,7 +122,7 @@ void ApplicationService::shutdown() {
 const std::string ApplicationService::buildDesktopFile() {
 	std::ostringstream ss;
 	ss << "[Desktop Entry]\n"
-	   << "Exec=" << Constants::LAUNCHER_FILE << "\n"
+	   << "Exec=" << Constants::APPIMAGE_FILE.value_or("rog-control-center") << "\n"
 	   << "Icon=" << Constants::ICON_45_FILE << "\n"
 	   << "WName=" << Constants::APP_NAME << "\n"
 	   << "Comment=An utility to manage Asus Rog laptop performance\n"

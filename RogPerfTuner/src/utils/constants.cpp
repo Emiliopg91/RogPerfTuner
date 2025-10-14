@@ -7,7 +7,7 @@
 
 const std::string Constants::APP_NAME = "RogPerfTuner";
 
-const std::string Constants::APP_VERSION = "4.4.4";
+const std::string Constants::APP_VERSION = "4.4.3";
 
 const pid_t Constants::PID = getpid();
 
@@ -26,7 +26,6 @@ const std::string Constants::ASSETS_DIR = [] {
 }();
 
 #ifndef IS_AURPKG
-const std::string Constants::LAUNCHER_FILE				  = HOME_DIR + "/." + APP_NAME + "/bin/application/launcher.sh";
 const std::optional<std::string> Constants::APPIMAGE_FILE = []() {
 	const char* appimage = std::getenv("APPIMAGE");
 	if (appimage == nullptr) {
@@ -35,7 +34,6 @@ const std::optional<std::string> Constants::APPIMAGE_FILE = []() {
 	return appimage;
 }();
 #else
-const std::string Constants::LAUNCHER_FILE				  = APP_NAME;
 const std::optional<std::string> Constants::APPIMAGE_FILE = std::nullopt;
 #endif
 
@@ -83,9 +81,6 @@ const std::string Constants::LIB_OCL_DIR			  = HOME_DIR + "/." + APP_NAME + "/li
 const std::string Constants::LOG_DIR				  = HOME_DIR + "/." + APP_NAME + "/logs";
 const std::string Constants::LOG_OLD_DIR			  = HOME_DIR + "/." + APP_NAME + "/logs/old";
 const std::string Constants::USER_PLUGIN_DIR		  = HOME_DIR + "/." + APP_NAME + "/plugin";
-const std::string Constants::UPDATE_DIR				  = HOME_DIR + "/." + APP_NAME + "/update";
-const std::string Constants::UPDATE_FILE			  = HOME_DIR + "/." + APP_NAME + "/update/" + APP_NAME + ".AppImage";
-const std::string Constants::UPDATE_TMP_FILE		  = HOME_DIR + "/." + APP_NAME + "/update/" + APP_NAME + ".AppImage.tmp";
 const std::string Constants::RCDCC_SOCKET_PATH		  = HOME_DIR + "/homebrew/data/RCCDeckyCompanion/socket";
 const std::string Constants::PLUGINS_FOLDER			  = HOME_DIR + "/homebrew/plugins";
 const std::string Constants::RCCDC_PATH				  = HOME_DIR + "/homebrew/plugins/RCCDeckyCompanion";

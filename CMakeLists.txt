@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.16)
 
-project(RogPerfTuner VERSION 4.4.4 LANGUAGES CXX)
+project(RogPerfTuner VERSION 4.4.3 LANGUAGES CXX)
 
 set(CMAKE_CXX_FLAGS_RELEASE "-DNDEBUG" CACHE STRING "" FORCE)
 
@@ -34,13 +34,6 @@ add_compile_options(
     -Wno-deprecated-copy 
     -Wno-deprecated-literal-operator
 )
-
-if(IS_AURPKG)
-    message(STATUS "Building for AUR package")
-    message(STATUS "Autoupdater excluded")
-else()
-    add_subdirectory(submodules/httplib)
-endif()
 
 add_subdirectory(submodules/spdlog)
 

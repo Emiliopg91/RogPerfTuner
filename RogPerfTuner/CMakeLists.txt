@@ -61,9 +61,4 @@ target_link_libraries(RogPerfTuner PRIVATE
 
 if(IS_AURPKG)
     add_compile_definitions(IS_AURPKG)
-else()
-    # ------------------------------
-    # Buscar paquetes de httplib
-    # ------------------------------
-    target_link_libraries(RogPerfTuner PRIVATE httplib::httplib)
 endif()

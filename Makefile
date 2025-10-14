@@ -11,7 +11,6 @@ clean:
 	@echo "######################### Cleaning workspace ##########################"
 	@echo "#######################################################################"
 	@rm -rf build dist .Debug .Release .qt CMakeCache.txt **/cmake_install.cmake CMakeFiles submodules/patches/*.diff.applied assets/scripts assets/bin assets/OpenRGB assets/RccDeckyCompanion **/CMakeFiles
-	@cd submodules/httplib && git reset --hard > /dev/null
 	@cd submodules/yaml && git reset --hard > /dev/null
 	@cd submodules/OpenRGB-cppSDK && git reset --hard > /dev/null && git submodule foreach git reset --hard > /dev/null
 	@cd submodules/OpenRGB && git reset --hard > /dev/null
@@ -25,9 +24,6 @@ config:
 	@echo "######################## Configuring compiler ########################"
 	@echo "#######################################################################"
 
-	@if [ ! -f "submodules/patches/httplib.diff.applied" ]; then \
-		cd submodules/httplib && git apply ../patches/httplib.diff && touch ../patches/httplib.diff.applied; \
-	fi
 	@if [ ! -f "submodules/patches/OpenRGB-cppSDK.diff.applied" ]; then \
 		cd submodules/OpenRGB-cppSDK && git apply ../patches/OpenRGB-cppSDK.diff && touch ../patches/OpenRGB-cppSDK.diff.applied; \
 	fi
