@@ -20,6 +20,7 @@
 #include "../utils/constants.hpp"
 #include "../utils/single_instance.hpp"
 #include "../utils/string_utils.hpp"
+#include "../utils/time_utils.hpp"
 
 inline void terminateHandler() {
 	std::cerr << "Unhandled exception detected\n";
@@ -55,6 +56,7 @@ inline std::string getExecutablePath(const char* argv0) {
 }
 
 inline int startGui(int argc, char** argv) {
+	auto t0 = TimeUtils::now();
 	std::set_terminate(terminateHandler);
 
 	auto execPath = getExecutablePath(argv[0]);
@@ -112,7 +114,9 @@ inline int startGui(int argc, char** argv) {
 	TrayIcon::init().show();
 
 	Logger::rem_tab();
-	logger.info("Application ready");
+
+	auto t1 = TimeUtils::now();
+	logger.info("Application ready after {} seconds", TimeUtils::getTimeDiff(t0, t1) / 1000.0);
 
 	return app.exec();
 }

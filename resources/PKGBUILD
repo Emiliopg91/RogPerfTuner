@@ -58,6 +58,21 @@ build() {
     export APPIMAGE_EXTRACT_AND_RUN=1
     unset SOURCE_DATE_EPOCH
 
+    clean_flags() {
+        echo "$1" \
+        | sed -E 's/(^| )-Wp,-D_FORTIFY_SOURCE=[0-9]+//g' \
+        | sed -E 's/(^| )-D_FORTIFY_SOURCE=[0-9]+//g' \
+        | sed -E 's/(^| )-O[0-9sfast]*//g' \
+        | tr -s ' ' \
+        | sed -E 's/-Wp, */-Wp,/g'
+    }
+
+    CFLAGS=$(clean_flags "$CFLAGS")
+    CXXFLAGS=$(clean_flags "$CXXFLAGS")
+
+    export CFLAGS="${CFLAGS}"
+    export CXXFLAGS="${CXXFLAGS}"
+
     cd "$srcdir/RogPerfTuner"
     IS_AURPKG=1 make release
 }
