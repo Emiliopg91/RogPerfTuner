@@ -109,10 +109,20 @@ package:
 	@cp resources/RogPerfTuner.desktop dist/appimage-fs/rog-perf-tuner.desktop
 	@cp build/assets/icons/icon.svg dist/appimage-fs/icon.svg
 	@chmod 777 -R resources/appimagetool dist/appimage-fs
-	@rm -f dist/appimage-fs/usr/share/rog-perf-tuner/OpenRGB/usr/lib/*.so*
 ifndef IS_AURPKG
-	@python resources/scripts/libraries.py
+	@export NO_STRIP=1 && export QMAKE=$$(which qmake6) && ./resources/linuxdeploy --appdir dist/appimage-fs --custom-apprun resources/AppRun --plugin qt && \
+	QT_PLUGIN_DIR=$$($$QMAKE -query QT_INSTALL_PLUGINS) && \
+	mkdir -p dist/appimage-fs/usr/plugins/platforms/ && \
+	cp -v $$QT_PLUGIN_DIR/platforms/libqwayland*.so dist/appimage-fs/usr/plugins/platforms/ 2>/dev/null || true && \
+	cp -vR $$QT_PLUGIN_DIR/wayland-decoration-client dist/appimage-fs/usr/plugins/ 2>/dev/null || true && \
+	cp -vR $$QT_PLUGIN_DIR/wayland-graphics-integration-client dist/appimage-fs/usr/plugins/ 2>/dev/null || true && \
+	cp -vR $$QT_PLUGIN_DIR/wayland-graphics-integration-server dist/appimage-fs/usr/plugins/ 2>/dev/null || true && \
+	cp -vR $$QT_PLUGIN_DIR/wayland-shell-integration dist/appimage-fs/usr/plugins/ 2>/dev/null || true && \
+	cp -vR $$QT_PLUGIN_DIR/styles dist/appimage-fs/usr/plugins/
+else
+	@rm -f dist/appimage-fs/usr/share/rog-perf-tuner/OpenRGB/usr/lib/*.so*
 endif
+	@chmod 777 -R dist
 	@ARCH=x86_64 VERSION=$$(cat resources/version) ./resources/appimagetool --comp zstd -u "gh-releases-zsync|Emiliopg91|RogPerfTuner|latest|RogPerfTuner.AppImage.zsync" -n dist/appimage-fs dist/RogPerfTuner.AppImage
 	@mv RogPerfTuner.AppImage.zsync dist
 
