@@ -110,6 +110,9 @@ package:
 	@cp build/assets/icons/icon.svg dist/appimage-fs/icon.svg
 	@chmod 777 -R resources/appimagetool dist/appimage-fs
 	@rm -f dist/appimage-fs/usr/share/rog-perf-tuner/OpenRGB/usr/lib/*.so*
+ifndef IS_AURPKG
+	@python resources/scripts/libraries.py
+endif
 	@ARCH=x86_64 VERSION=$$(cat resources/version) ./resources/appimagetool --comp zstd -u "gh-releases-zsync|Emiliopg91|RogPerfTuner|latest|RogPerfTuner.AppImage.zsync" -n dist/appimage-fs dist/RogPerfTuner.AppImage
 	@mv RogPerfTuner.AppImage.zsync dist
 

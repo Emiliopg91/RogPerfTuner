@@ -4,27 +4,11 @@ import sys
 
 import subprocess
 
-QT_PLUGIN_FOLDER = "dist/appimage-fs/usr/lib/qt6/plugins/platforms"
 
 os.makedirs("dist/appimage-fs/usr/lib",exist_ok=True)
 
 binaries = set([ "build/assets/OpenRGB/OpenRGB","dist/RogPerfTuner/RogPerfTuner"])
 excluded = ["/lib64/ld-linux-x86-64.so.2", "linux-vdso.so.1", "libc.so.6", "libm.so.6", "libgcc_s.so.1"]
-
-plugin_folder = ["/usr/lib/qt6/plugins", "/usr/lib/x86_64-linux-gnu/qt6/plugins", "/usr/lib64/qt6/plugins" ]
-for i in range(0,len(plugin_folder)):
-    f = plugin_folder[i]
-    if os.path.exists(f):
-        print(f"Copying QT plugins from {f}")
-        shutil.copytree(os.path.join(f,"platforms"), QT_PLUGIN_FOLDER)
-        break
-    if i==len(plugin_folder)-1:
-        print("QT plugins folder not found")
-        sys.exit(1)
-
-for plugin in os.listdir(QT_PLUGIN_FOLDER):
-    path=os.path.join(QT_PLUGIN_FOLDER,plugin)
-    binaries.add(path)
 
 for binary in binaries:
     output=subprocess.run(f"ldd {binary} | sort", shell=True, text=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE).stdout.strip()
