@@ -108,7 +108,7 @@ package:
 	@cp resources/AppRun dist/appimage-fs/
 	@cp resources/RogPerfTuner.desktop dist/appimage-fs/rog-perf-tuner.desktop
 	@cp build/assets/icons/icon.svg dist/appimage-fs/icon.svg
-	@chmod 777 -R resources/appimagetool dist/appimage-fs
+	@chmod 777 -R resources/appimagetool resources/linuxdeploy* dist/appimage-fs
 ifndef IS_AURPKG
 	@export NO_STRIP=1 && export QMAKE=$$(which qmake6) && ./resources/linuxdeploy --appdir dist/appimage-fs --custom-apprun resources/AppRun --plugin qt && \
 	QT_PLUGIN_DIR=$$($$QMAKE -query QT_INSTALL_PLUGINS) && \
