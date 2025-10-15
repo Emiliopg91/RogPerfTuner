@@ -41,7 +41,6 @@ makedepends=(
   'npm'
   'pkgconf'
   'pnpm'
-  'podman'
   'qtcreator'
   'unzip'
   'zip'
@@ -55,15 +54,6 @@ prepare() {
 
     cd "$srcdir/RogPerfTuner"
     git submodule update --init --recursive
-
-    export CONTAINERS_STORAGE_CONF=$srcdir/containers-storage.conf
-    cat > "$CONTAINERS_STORAGE_CONF" <<EOF
-[storage]
-driver = "vfs"
-runroot = "/tmp/containers/runroot"
-graphroot = "/tmp/containers/storage"
-EOF
-}
 
 build() {
     export APPIMAGE_EXTRACT_AND_RUN=1

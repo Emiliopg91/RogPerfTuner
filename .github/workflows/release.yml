@@ -25,7 +25,20 @@ jobs:
       - name: Install dependencies
         run: |
           sudo apt-get update
-          sudo apt-get install -y libfuse2
+          sudo apt-get install --no-install-recommends -y 
+            libfuse2 \
+            git \
+            build-essential \
+            qtcreator \
+            qtbase5-dev \
+            qtchooser \
+            qt5-qmake \
+            qtbase5-dev-tools \
+            libusb-1.0-0-dev \
+            libhidapi-dev \
+            pkgconf \
+            libmbedtls-dev \
+            qttools5-dev-tools
 
       - name: Compile
         run: |

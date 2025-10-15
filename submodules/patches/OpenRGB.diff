@@ -1,32 +1,64 @@
 diff --git a/Dockerfile b/Dockerfile
-index b0a17604..e75875d9 100644
+index b0a17604..d74f1a8e 100644
 --- a/Dockerfile
 +++ b/Dockerfile
-@@ -1,10 +1,9 @@
+@@ -1,26 +1,32 @@
 -# Use a base image with the required development tools
- FROM ubuntu:22.04
+-FROM ubuntu:22.04
++# Arch Linux base
++FROM archlinux:base
  
- ARG DEBIAN_FRONTEND=noninteractive
+-ARG DEBIAN_FRONTEND=noninteractive
++# Actualiza e instala dependencias (Qt5 + build + libs)
++RUN pacman -Syu --noconfirm && \
++    pacman -S --noconfirm --needed \
++      base-devel \
++      git \
++      qt5-base \
++      qt5-tools \
++      qt5-svg \
++      qt5-declarative \
++      libusb \
++      hidapi \
++      mbedtls \
++      pkgconf \
++      which \
++      coreutils && \
++    # Limpia caché de paquetes para reducir tamaño
++    pacman -Scc --noconfirm
  
- # Install essential packages and dependencies
+-# Install essential packages and dependencies
 -RUN apt-get update && apt-get install -y \
-+RUN apt-get update && apt-get install --no-install-recommends -y \
-     git \
-     build-essential \
-     qtcreator \
-@@ -20,7 +19,8 @@ RUN apt-get update && apt-get install -y \
-     && rm -rf /var/lib/apt/lists/*
+-    git \
+-    build-essential \
+-    qtcreator \
+-    qtbase5-dev \
+-    qtchooser \
+-    qt5-qmake \
+-    qtbase5-dev-tools \
+-    libusb-1.0-0-dev \
+-    libhidapi-dev \
+-    pkgconf \
+-    libmbedtls-dev \
+-    qttools5-dev-tools \
+-    && rm -rf /var/lib/apt/lists/*
++# (Opcional) alias para qmake
++RUN ln -s /usr/bin/qmake-qt5 /usr/local/bin/qmake
  
- # Set the default command to clone, build, and copy the binary
+-# Set the default command to clone, build, and copy the binary
 -CMD ["/bin/bash", "-c", "\
-+CMD bash -c "\
++# Comando por defecto: construir
++# Nota: si no creaste /input/build en tiempo de build, móntalo en runtime.
++CMD bash -lc '\
      cd /input/build && \
-+    export QMAKE_MAKEFLAGS=\"-j$(nproc)\" && \
-     qmake ../OpenRGB.pro && \
+-    qmake ../OpenRGB.pro && \
 -    make -j$(nproc)"]
-+    make -j$(nproc)"
++    export QMAKE_MAKEFLAGS="-j$(nproc)" && \
++    qmake-qt5 ../OpenRGB.pro && \
++    make -j"$(nproc)" \
++'
 diff --git a/OpenRGB.pro b/OpenRGB.pro
-index 3d938d61..2d2ba3c5 100644
+index 3d938d61..e9d4168d 100644
 --- a/OpenRGB.pro
 +++ b/OpenRGB.pro
 @@ -4,12 +4,6 @@
@@ -1110,31 +1142,23 @@ index 389e5fd1..00000000
 -    const char *            plugins_path = "plugins/";
 -};
 diff --git a/build.sh b/build.sh
-index ebc7370d..eac4304b 100755
+index ebc7370d..3ba09341 100755
 --- a/build.sh
 +++ b/build.sh
-@@ -1,9 +1,24 @@
+@@ -1,9 +1,15 @@
 -podman build -t openrgb-build .
 -rm -R ./build
+-mkdir build
+-podman run --rm --privileged --cpus=$(nproc) -v $(pwd):/input openrgb-build
 +#!/bin/sh
 +
-+# Detect which container runtime to use (prefer podman)
-+if command -v podman >/dev/null 2>&1; then
-+    CONTAINER=podman
-+elif command -v docker >/dev/null 2>&1; then
-+    CONTAINER=docker
-+else
-+    echo "Error: neither podman nor docker is installed."
-+    exit 1
-+fi
++rm -rf build
++mkdir -p build
++cd build
 +
-+echo "Using $CONTAINER..."
-+
-+$CONTAINER build -t openrgb-build .
-+rm -rf ./build
- mkdir build
--podman run --rm --privileged --cpus=$(nproc) -v $(pwd):/input openrgb-build
-+$CONTAINER run --rm --privileged --cpus=$(nproc) -v "$(pwd):/input" openrgb-build
++export QMAKE_MAKEFLAGS="-j$(nproc)" 
++qmake-qt5 ../OpenRGB.pro
++make -j"$(nproc)"
 +
  if [ -f ./build/openrgb ]; then
      ./OpenRGB.AppImage --appimage-extract

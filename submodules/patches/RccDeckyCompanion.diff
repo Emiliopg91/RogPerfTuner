@@ -27,3 +27,22 @@ index eddd44a..0000000
 -
 -echo "Generated backend"
 \ No newline at end of file
+diff --git a/cli/jobs/builder.py b/cli/jobs/builder.py
+index 72d51be..c5e08ee 100755
+--- a/cli/jobs/builder.py
++++ b/cli/jobs/builder.py
+@@ -32,13 +32,7 @@ class Builder:
+         self.build_dist_dir = os.path.join(self.plugin_dir, "dist")
+ 
+     def _check_container_runtime(self):
+-        if shutil.which("podman"):
+-            return "podman"
+-        elif shutil.which("docker"):
+-            return "docker"
+-        else:
+-            print("Error: Neither Docker nor Podman is installed.")
+-            exit(1)
++        pass
+ 
+     def _clean_directories(self):
+         print("  Cleaning workspace")
