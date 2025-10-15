@@ -1142,10 +1142,10 @@ index 389e5fd1..00000000
 -    const char *            plugins_path = "plugins/";
 -};
 diff --git a/build.sh b/build.sh
-index ebc7370d..3ba09341 100755
+index ebc7370d..d3d8d7b2 100755
 --- a/build.sh
 +++ b/build.sh
-@@ -1,9 +1,15 @@
+@@ -1,9 +1,28 @@
 -podman build -t openrgb-build .
 -rm -R ./build
 -mkdir build
@@ -1156,8 +1156,21 @@ index ebc7370d..3ba09341 100755
 +mkdir -p build
 +cd build
 +
++if [ -n "${QMAKE:-}" ] && command -v "$QMAKE" >/dev/null 2>&1; then
++  : # usar $QMAKE
++elif command -v qmake-qt5 >/dev/null 2>&1; then
++  QMAKE="qmake-qt5"
++elif command -v qmake >/dev/null 2>&1; then
++  QMAKE="qmake"
++elif command -v qmake6 >/dev/null 2>&1; then
++  QMAKE="qmake6"
++else
++  echo "ERROR: qmake (qmake-qt5/qmake/qmake6) not found in PATH." >&2
++  exit 1
++fi
++
 +export QMAKE_MAKEFLAGS="-j$(nproc)" 
-+qmake-qt5 ../OpenRGB.pro
++$QMAKE ../OpenRGB.pro
 +make -j"$(nproc)"
 +
  if [ -f ./build/openrgb ]; then
