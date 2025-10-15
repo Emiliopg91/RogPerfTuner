@@ -104,29 +104,7 @@ jobs:
       - name: Install dependencies
         run: |
           sudo apt-get update
-          sudo apt-get install --no-install-recommends -y \
-            build-essential \
-            clang \
-            clang-format \
-            cmake \
-            libfuse2 \
-            libhidapi-hidraw0 \
-            libqt5core5a \
-            libqt6charts6 \
-            libsecret-1-dev \
-            libspdlog-dev \
-            libudev-dev \
-            libyaml-cpp-dev \
-            libzstd-dev \
-            pkg-config \
-            qt6-base-dev \
-            qt6-charts-dev \
-            qt6-tools-dev \
-            qt6-tools-dev-tools \
-            qt6-wayland \
-            qt6-wayland-dev \
-            qt6-wayland-dev-tools \
-            zsync
+          sudo apt-get install --no-install-recommends -y libfuse2 libqt5core5a libhidapi-hidraw0 qt6-wayland qt6-base-dev qt6-charts-dev libqt6charts6 qt6-base-dev qt6-tools-dev qt6-tools-dev-tools build-essential cmake qtkeychain-qt6-dev pkg-config libudev-dev clang clang-format zsync
 
       - name: Configure project
         run: |
