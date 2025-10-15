@@ -1,8 +1,9 @@
 #include "../../include/configuration/configuration.hpp"
 
 #include <libsecret/secret.h>
+#include <qt6keychain/keychain.h>
 
-#include <cstdlib>
+#include <QEventLoop>
 #include <fstream>
 
 #include "../../include/logger/logger_provider.hpp"
@@ -51,63 +52,41 @@ void Configuration::saveConfig() {
 }
 
 std::string Configuration::getPassword() {
-	GError* error = nullptr;
+	const QString service = "rog-perf-tuner";
+	const QString key	  = "password";
 
-	const SecretSchema schema = {
-		"rog_control_center_password",	// name
-		SECRET_SCHEMA_NONE,				// flags
-		{								// attributes
-		 {"key", SECRET_SCHEMA_ATTRIBUTE_STRING},
-		 {NULL, (SecretSchemaAttributeType)0}},
-		0,
-		0,
-		0,
-		0,
-		0,
-		0,
-		0,
-		0  // reserved1..reserved7
-	};
+	QKeychain::ReadPasswordJob job(service);
+	job.setKey(key);
 
-	gchar* password = secret_password_lookup_sync(&schema, nullptr, &error, "key", "default", nullptr);
+	QEventLoop loop;
+	QObject::connect(&job, &QKeychain::Job::finished, &loop, &QEventLoop::quit);
+	job.start();
+	loop.exec();
 
-	if (error) {
-		std::string msg = "Error fetching password: " + std::string(error->message);
-		g_error_free(error);
-		throw new std::runtime_error(msg);
+	if (job.error()) {
+		logger.error("Error on password fetching: " + job.errorString().toStdString());
+		return "";
 	}
 
-	std::string result = password ? password : "";
-	g_free(password);
-	return result;
+	return job.textData().toStdString();
 }
 
 void Configuration::setPassword(const std::string& pss) {
-	GError* error = nullptr;
+	const QString service = "rog-perf-tuner";
+	const QString key	  = "password";
 
-	const SecretSchema schema = {
-		"rog_control_center_password",	// name
-		SECRET_SCHEMA_NONE,				// flags
-		{								// attributes
-		 {"key", SECRET_SCHEMA_ATTRIBUTE_STRING},
-		 {NULL, (SecretSchemaAttributeType)0}},
-		0,
-		0,
-		0,
-		0,
-		0,
-		0,
-		0,
-		0  // reserved1..reserved7
-	};
+	QKeychain::WritePasswordJob job(service);
+	job.setKey(key);
+	job.setTextData(QString::fromStdString(pss));
 
-	secret_password_store_sync(&schema, SECRET_COLLECTION_DEFAULT, "Password for RogPerfTuner", pss.c_str(), nullptr, &error, "key", "default",
-							   nullptr);
+	QEventLoop loop;
+	QObject::connect(&job, &QKeychain::Job::finished, &loop, &QEventLoop::quit);
+	job.start();
+	loop.exec();
 
-	if (error) {
-		std::string msg = "Error saving password: " + std::string(error->message);
-		g_error_free(error);
-		throw new std::runtime_error(msg);
+	if (job.error()) {
+		std::string msg = "Error saving password: " + job.errorString().toStdString();
+		throw std::runtime_error(msg);
 	}
 }
 

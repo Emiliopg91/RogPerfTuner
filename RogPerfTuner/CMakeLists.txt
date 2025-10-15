@@ -24,16 +24,7 @@ endif()
 # Buscar paquetes de Qt6
 # ------------------------------
 find_package(Qt6 REQUIRED COMPONENTS Core DBus Gui Widgets Charts)
-
-# ------------------------------
-# Buscar paquetes de Qt6
-# ------------------------------
-find_package(spdlog REQUIRED)
-
-# ------------------------------
-# Buscar paquetes de Qt6
-# ------------------------------
-find_package(yaml-cpp REQUIRED)
+find_package(Qt6Keychain REQUIRED)
 
 # ------------------------------ 
 # Buscar paquetes de libsecret-1
@@ -64,9 +55,9 @@ target_link_libraries(RogPerfTuner PRIVATE
     Qt6::Charts
     spdlog::spdlog 
     yaml-cpp::yaml-cpp
-    ${LIBSECRET_LIBRARIES}
-    udev
+    qt6keychain
     orgbsdk
+    udev
 )
 
 if(IS_AURPKG)

@@ -17,7 +17,6 @@ depends=(
   'hidapi'
   'libsecret'
   'libusb'
-  'mbedtls'
   'power-profiles-daemon'
   'python'
   'python-pip'
@@ -28,10 +27,9 @@ depends=(
   'qt6-base'
   'qt6-charts'
   'qt6-svg'
+  'qtkeychain-qt6'
   'scx-scheds'
-  'spdlog'
   'upower'
-  'yaml-cpp'
 )
 makedepends=(
   'base-devel'
