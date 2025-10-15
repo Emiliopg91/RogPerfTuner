@@ -32,8 +32,6 @@ jobs:
             qtcreator \
             qtbase5-dev \
             qtchooser \
-            qtbase5-dev \
-            qtchooser \
             qttools5-dev-tools \
             qt5-qmake \
             qtbase5-dev-tools \

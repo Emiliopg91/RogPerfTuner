@@ -56,6 +56,7 @@ prepare() {
 
     cd "$srcdir/RogPerfTuner"
     git submodule update --init --recursive
+}
 
 build() {
     export APPIMAGE_EXTRACT_AND_RUN=1

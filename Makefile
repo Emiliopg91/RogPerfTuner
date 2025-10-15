@@ -70,7 +70,7 @@ build_openrgb:
 		echo "#######################################################################" && \
 		echo "######################### Compiling OpenRGB ###########################" && \
 		echo "#######################################################################" && \
-		cd submodules/OpenRGB && ./build.sh \
+		cd submodules/OpenRGB && ./build.sh && \
 		./OpenRGB.AppImage --appimage-extract && mkdir -p ../../build/assets  && cp -r squashfs-root ../../build/assets/OpenRGB && \
 		cd ../../build/assets/OpenRGB && \
 		mv AppRun OpenRGB.sh && \
