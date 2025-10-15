@@ -1,6 +1,5 @@
 #include "../../include/configuration/configuration.hpp"
 
-#include <libsecret/secret.h>
 #include <qt6keychain/keychain.h>
 
 #include <QEventLoop>

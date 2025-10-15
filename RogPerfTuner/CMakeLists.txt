@@ -26,12 +26,6 @@ endif()
 find_package(Qt6 REQUIRED COMPONENTS Core DBus Gui Widgets Charts)
 find_package(Qt6Keychain REQUIRED)
 
-# ------------------------------ 
-# Buscar paquetes de libsecret-1
-# ------------------------------
-find_package(PkgConfig REQUIRED)
-pkg_check_modules(LIBSECRET REQUIRED libsecret-1)
-
 # ------------------------------
 # Ejecutable principal
 # ------------------------------
@@ -46,7 +40,6 @@ file(GLOB_RECURSE HEADERS_RCC
 
 add_executable(RogPerfTuner ${SOURCES_RCC} ${HEADERS_RCC})
 set_target_properties(RogPerfTuner PROPERTIES AUTOMOC ON)
-target_include_directories(RogPerfTuner PRIVATE ${LIBSECRET_INCLUDE_DIRS})
 target_link_libraries(RogPerfTuner PRIVATE 
     Qt6::Core
     Qt6::Gui
