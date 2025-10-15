@@ -32,6 +32,9 @@ jobs:
             qtcreator \
             qtbase5-dev \
             qtchooser \
+            qtbase5-dev \
+            qtchooser \
+            qttools5-dev-tools \
             qt5-qmake \
             qtbase5-dev-tools \
             libusb-1.0-0-dev \
@@ -39,6 +42,9 @@ jobs:
             pkgconf \
             libmbedtls-dev \
             qttools5-dev-tools
+            
+          qtchooser -l
+          qtchooser -run-tool=qmake -qt=5 --version
 
       - name: Compile
         run: |
