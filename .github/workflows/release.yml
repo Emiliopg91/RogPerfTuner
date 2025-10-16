@@ -98,7 +98,7 @@ jobs:
       - name: Install dependencies
         run: |
           sudo apt-get update
-          sudo apt-get install --no-install-recommends -y makepkg libfuse2 libqt5core5a libhidapi-hidraw0 qt6-wayland qt6-base-dev qt6-charts-dev libqt6charts6 qt6-base-dev qt6-tools-dev qt6-tools-dev-tools build-essential cmake qtkeychain-qt6-dev pkg-config libudev-dev clang clang-format zsync
+          sudo apt-get install --no-install-recommends -y libfuse2 libqt5core5a libhidapi-hidraw0 qt6-wayland qt6-base-dev qt6-charts-dev libqt6charts6 qt6-base-dev qt6-tools-dev qt6-tools-dev-tools build-essential cmake qtkeychain-qt6-dev pkg-config libudev-dev clang clang-format zsync
 
       - name: Configure project
         run: |
@@ -136,6 +136,17 @@ jobs:
         run: |
           echo "VERSION=$(cat resources/version)" >> $GITHUB_ENV
 
+      - name: Create tag
+        run: |
+          git tag "${{ env.VERSION }}"
+          make increase_version
+          git push origin main
+          git push origin main:develop --force
+          git checkout develop
+          git add CMakeLists.txt > /dev/null
+          git commit -m "[ci skip] Ready for next development iteration" > /dev/null
+          git push origin develop --force
+
       - name: Publish to AUR
         env:
           AUR_SSH_PRIVATE_KEY: ${{ secrets.AUR_SSH_PRIVATE_KEY }}
@@ -152,23 +163,12 @@ jobs:
 
           echo "Copying files..."
           cp ../dist/PKGBUILD .
-          makepkg --printsrcinfo > .SRCINFO
+          cp ../dist/.SRCINFO .
 
           echo "Committing changes..."
           git add PKGBUILD .SRCINFO
           git diff-index --quiet HEAD || git commit -m "Release ${GITHUB_REF_NAME}"
           git push
-
-      - name: Create tag
-        run: |
-          git tag "${{ env.VERSION }}"
-          make increase_version
-          git push origin main
-          git push origin main:develop --force
-          git checkout develop
-          git add CMakeLists.txt > /dev/null
-          git commit -m "[ci skip] Ready for next development iteration" > /dev/null
-          git push origin develop --force
 
       - name: Create GitHub release
         uses: softprops/action-gh-release@v2
