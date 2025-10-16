@@ -38,10 +38,6 @@ jobs:
               libhidapi-dev \
               pkgconf
 
-            
-          qtchooser -l
-          qtchooser -run-tool=qmake -qt=5 --version
-
       - name: Compile
         run: |
           make build_openrgb
