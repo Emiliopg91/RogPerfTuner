@@ -1414,10 +1414,10 @@ index 389e5fd1..00000000
 -    const char *            plugins_path = "plugins/";
 -};
 diff --git a/build.sh b/build.sh
-index ebc7370d..3a52c39a 100755
+index ebc7370d..c11108c9 100755
 --- a/build.sh
 +++ b/build.sh
-@@ -1,9 +1,15 @@
+@@ -1,9 +1,17 @@
 -podman build -t openrgb-build .
 -rm -R ./build
 -mkdir build
@@ -1429,6 +1429,8 @@ index ebc7370d..3a52c39a 100755
 -fi
 \ No newline at end of file
 +#!/bin/sh
++
++set -e
 +
 +rm -rf build squashfs-root
 +mkdir -p build
