@@ -58,7 +58,7 @@ index b0a17604..d74f1a8e 100644
 +    make -j"$(nproc)" \
 +'
 diff --git a/OpenRGB.pro b/OpenRGB.pro
-index 3d938d61..b8580d4e 100644
+index 3d938d61..de56e73d 100644
 --- a/OpenRGB.pro
 +++ b/OpenRGB.pro
 @@ -4,12 +4,6 @@
@@ -197,7 +197,7 @@ index 3d938d61..b8580d4e 100644
  }
  
  #-----------------------------------------------------------------------------------------------#
-@@ -270,547 +218,130 @@ TRANSLATIONS +=
+@@ -270,547 +218,125 @@ TRANSLATIONS +=
      qt/i18n/OpenRGB_zh_CN.ts                                                                    \
      qt/i18n/OpenRGB_zh_TW.ts                                                                    \
  
@@ -510,7 +510,6 @@ index 3d938d61..b8580d4e 100644
 -    }
 +INCLUDEPATH +=                                                                              \
 +dependencies/NVFC                                                                           \
-+/usr/include/mbedtls2/                                                                      \
  
 -    !defined(OPENRGB_SYSTEM_PLUGIN_DIRECTORY, var):OPENRGB_SYSTEM_PLUGIN_DIRECTORY =            \
 -        "$$PREFIX/lib/openrgb/plugins"                                                          \
@@ -547,10 +546,6 @@ index 3d938d61..b8580d4e 100644
 -        }
 -    }
 +LIBS +=                                                                                     \
-+-L/usr/lib/mbedtls2/                                                                        \
-+-lmbedx509                                                                                  \
-+-lmbedtls                                                                                   \
-+-lmbedcrypto                                                                                \
 +-ldl                                                                                        \
  
 -    #-------------------------------------------------------------------------------------------#
@@ -1419,7 +1414,7 @@ index 389e5fd1..00000000
 -    const char *            plugins_path = "plugins/";
 -};
 diff --git a/build.sh b/build.sh
-index ebc7370d..d3d8d7b2 100755
+index ebc7370d..7245f88f 100755
 --- a/build.sh
 +++ b/build.sh
 @@ -1,9 +1,28 @@
@@ -1427,9 +1422,15 @@ index ebc7370d..d3d8d7b2 100755
 -rm -R ./build
 -mkdir build
 -podman run --rm --privileged --cpus=$(nproc) -v $(pwd):/input openrgb-build
+-if [ -f ./build/openrgb ]; then
+-    ./OpenRGB.AppImage --appimage-extract
+-    cp ./build/openrgb squashfs-root/usr/bin/OpenRGB
+-    ./appimagetool squashfs-root/ ./OpenRGB.AppImage
+-fi
+\ No newline at end of file
 +#!/bin/sh
 +
-+rm -rf build
++rm -rf build squashfs-root
 +mkdir -p build
 +cd build
 +
@@ -1450,13 +1451,11 @@ index ebc7370d..d3d8d7b2 100755
 +$QMAKE ../OpenRGB.pro
 +make -j"$(nproc)"
 +
- if [ -f ./build/openrgb ]; then
-     ./OpenRGB.AppImage --appimage-extract
-     cp ./build/openrgb squashfs-root/usr/bin/OpenRGB
-     ./appimagetool squashfs-root/ ./OpenRGB.AppImage
--fi
-\ No newline at end of file
-+fi
++cd ..
++
++./OpenRGB.AppImage --appimage-extract
++cp ./build/openrgb squashfs-root/usr/bin/OpenRGB
++./appimagetool squashfs-root/ ./OpenRGB.AppImage
 diff --git a/dependencies/ColorWheel/ColorWheel.cpp b/dependencies/ColorWheel/ColorWheel.cpp
 deleted file mode 100644
 index 9a91c034..00000000
