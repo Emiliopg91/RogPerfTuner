@@ -147,6 +147,29 @@ jobs:
           git commit -m "[ci skip] Ready for next development iteration" > /dev/null
           git push origin develop --force
 
+      - name: Publish to AUR
+        env:
+          AUR_SSH_PRIVATE_KEY: ${{ secrets.AUR_SSH_PRIVATE_KEY }}
+        run: |
+          echo "Setting SSH key for AUR..."
+          mkdir -p ~/.ssh
+          echo "$AUR_SSH_PRIVATE_KEY" > ~/.ssh/aur
+          chmod 600 ~/.ssh/aur
+          echo -e "Host aur.archlinux.org\n\tIdentityFile ~/.ssh/aur\n\tUser aur\n\tStrictHostKeyChecking no" >> ~/.ssh/config
+
+          echo "Cloning AUR repository..."
+          git clone ssh://aur@aur.archlinux.org/rog-perf-tuner.git aur_repo
+          cd aur_repo
+
+          echo "Copying files..."
+          cp ../dist/PKGBUILD .
+          makepkg --printsrcinfo > .SRCINFO
+
+          echo "Committing changes..."
+          git add PKGBUILD .SRCINFO
+          git diff-index --quiet HEAD || git commit -m "Release ${GITHUB_REF_NAME}"
+          git push
+
       - name: Create GitHub release
         uses: softprops/action-gh-release@v2
         with:
