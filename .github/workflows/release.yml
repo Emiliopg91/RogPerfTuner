@@ -98,7 +98,7 @@ jobs:
       - name: Install dependencies
         run: |
           sudo apt-get update
-          sudo apt-get install --no-install-recommends -y libfuse2 libqt5core5a libhidapi-hidraw0 qt6-wayland qt6-base-dev qt6-charts-dev libqt6charts6 qt6-base-dev qt6-tools-dev qt6-tools-dev-tools build-essential cmake qtkeychain-qt6-dev pkg-config libudev-dev clang clang-format zsync
+          sudo apt-get install --no-install-recommends -y makepkg libfuse2 libqt5core5a libhidapi-hidraw0 qt6-wayland qt6-base-dev qt6-charts-dev libqt6charts6 qt6-base-dev qt6-tools-dev qt6-tools-dev-tools build-essential cmake qtkeychain-qt6-dev pkg-config libudev-dev clang clang-format zsync
 
       - name: Configure project
         run: |
@@ -147,7 +147,7 @@ jobs:
           git commit -m "[ci skip] Ready for next development iteration" > /dev/null
           git push origin develop --force
 
-      - name: Publish to AUR
+      - name: Publish to AURv
         env:
           AUR_SSH_PRIVATE_KEY: ${{ secrets.AUR_SSH_PRIVATE_KEY }}
         run: |
