@@ -76,7 +76,7 @@ build_openrgb:
 		mv AppRun OpenRGB.sh && \
 		mv AppRun.wrapped OpenRGB && \
 		sed -i 's/AppRun.wrapped/OpenRGB/g' OpenRGB.sh && \
-		rm usr/lib/libQt5Core.so.5 usr/lib/libQt5Gui.so.5 usr/lib/libQt5Svg.so.5 usr/lib/libQt5Widgets.so.5 usr/lib/libQt5XcbQpa.so.5 usr/lib/libxcb* usr/lib/libjpeg.so.62 usr/lib/libpng16.so.16 usr/bin/OpenRGB.exe; \
+		rm usr/lib/libQt5* usr/lib/libxcb* usr/lib/libjpeg.so.62 usr/lib/libpng16.so.16 usr/bin/OpenRGB.exe; \
 	fi
 
 build_rccdc:
@@ -109,11 +109,7 @@ package:
 	@cp resources/RogPerfTuner.desktop dist/appimage-fs/rog-perf-tuner.desktop
 	@cp build/assets/icons/icon.svg dist/appimage-fs/icon.svg
 	@chmod 777 -R resources/appimagetool dist/appimage-fs
-	@find dist/appimage-fs/usr/share/rog-perf-tuner/OpenRGB/usr/lib/ -type f -name '*.so*' \
-		! -name 'libmbedx509.so.1' \
-		! -name 'libmbedtls.so.14' \
-		! -name 'libmbedcrypto.so.7' \
-		-delete
+	@rm dist/appimage-fs/usr/share/rog-perf-tuner/OpenRGB/usr/lib/*.so*
 	@chmod 777 -R dist
 	@ARCH=x86_64 VERSION=$$(cat resources/version) ./resources/appimagetool --comp zstd -u "gh-releases-zsync|Emiliopg91|RogPerfTuner|latest|RogPerfTuner.AppImage.zsync" -n dist/appimage-fs dist/RogPerfTuner.AppImage
 	@mv RogPerfTuner.AppImage.zsync dist
