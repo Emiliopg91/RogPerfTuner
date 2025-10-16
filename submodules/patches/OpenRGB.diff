@@ -58,7 +58,7 @@ index b0a17604..d74f1a8e 100644
 +    make -j"$(nproc)" \
 +'
 diff --git a/OpenRGB.pro b/OpenRGB.pro
-index 3d938d61..e9d4168d 100644
+index 3d938d61..b8580d4e 100644
 --- a/OpenRGB.pro
 +++ b/OpenRGB.pro
 @@ -4,12 +4,6 @@
@@ -74,7 +74,29 @@ index 3d938d61..e9d4168d 100644
  
  #-----------------------------------------------------------------------------------------------#
  # Set compiler to use C++17 to make std::filesystem available                                   #
-@@ -102,10 +96,7 @@ CONTROLLER_CPP         -= $$CONTROLLER_CPP_MACOS
+@@ -36,10 +30,7 @@ TEMPLATE    = app
+ #-----------------------------------------------------------------------------------------------#
+ # Automatically generated build information                                                     #
+ #-----------------------------------------------------------------------------------------------#
+-win32:BUILDDATE         = $$system(date /t)
+-linux:BUILDDATE         = $$system(date -R -d "@${SOURCE_DATE_EPOCH:-$(date +%s)}")
+-freebsd:BUILDDATE       = $$system(date -j -R -r "${SOURCE_DATE_EPOCH:-$(date +%s)}")
+-macx:BUILDDATE          = $$system(date -j -R -r "${SOURCE_DATE_EPOCH:-$(date +%s)}")
++BUILDDATE               = $$system(date -R -d "@${SOURCE_DATE_EPOCH:-$(date +%s)}")
+ GIT_COMMIT_ID           = $$system(git log -n 1 --pretty=format:"%H")
+ GIT_COMMIT_DATE         = $$system(git log -n 1 --pretty=format:"%ci")
+ GIT_BRANCH              = $$system(git branch --show-current)
+@@ -74,8 +65,7 @@ CONTROLLER_INCLUDES = $$unique(CONTROLLER_INCLUDES)
+ 
+ #-----------------------------------------------------------------------------------------------#
+ # Remove OS-specific files from the overall controller headers and sources lists                #
+-# The suffixes _Windows, _Linux, _FreeBSD, and _MacOS are usable to denote that a file only     #
+-# applies to one or more OSes.  The suffixes may be combined such as <file>_Windows_Linux.cpp.  #
++# Only Linux files are included                                                                 #
+ #-----------------------------------------------------------------------------------------------#
+ CONTROLLER_H_WINDOWS    = $$files("Controllers/*_Windows*.h",   true)
+ CONTROLLER_CPP_WINDOWS  = $$files("Controllers/*_Windows*.cpp", true)
+@@ -102,10 +92,7 @@ CONTROLLER_CPP         -= $$CONTROLLER_CPP_MACOS
  INCLUDEPATH +=                                                                                  \
      $$CONTROLLER_INCLUDES                                                                       \
      $$GUI_INCLUDES                                                                              \
@@ -85,7 +107,7 @@ index 3d938d61..e9d4168d 100644
      dependencies/httplib                                                                        \
      dependencies/json/                                                                          \
      dependencies/mdns                                                                           \
-@@ -129,14 +120,12 @@ HEADERS +=
+@@ -129,14 +116,12 @@ HEADERS +=
      $$GUI_H                                                                                     \
      $$CONTROLLER_H                                                                              \
      Colors.h                                                                                    \
@@ -100,7 +122,7 @@ index 3d938d61..e9d4168d 100644
      ProfileManager.h                                                                            \
      ResourceManager.h                                                                           \
      SettingsManager.h                                                                           \
-@@ -168,36 +157,6 @@ HEADERS +=
+@@ -168,36 +153,6 @@ HEADERS +=
  SOURCES +=                                                                                      \
      $$GUI_CPP                                                                                   \
      $$CONTROLLER_CPP                                                                            \
@@ -137,7 +159,7 @@ index 3d938d61..e9d4168d 100644
      main.cpp                                                                                    \
      cli.cpp                                                                                     \
      dmiinfo/dmiinfo.cpp                                                                         \
-@@ -205,7 +164,6 @@ SOURCES +=
+@@ -205,7 +160,6 @@ SOURCES +=
      NetworkClient.cpp                                                                           \
      NetworkProtocol.cpp                                                                         \
      NetworkServer.cpp                                                                           \
@@ -145,7 +167,7 @@ index 3d938d61..e9d4168d 100644
      ProfileManager.cpp                                                                          \
      ResourceManager.cpp                                                                         \
      SPDAccessor.cpp                                                                             \
-@@ -226,9 +184,6 @@ SOURCES +=
+@@ -226,9 +180,6 @@ SOURCES +=
      RGBController/RGBControllerKeyNames.cpp                                                     \
      RGBController/RGBController_Network.cpp                                                     \
  
@@ -155,7 +177,27 @@ index 3d938d61..e9d4168d 100644
  #-----------------------------------------------------------------------------------------------#
  # General configuration to decide if in-tree dependencies are used or not
  #-----------------------------------------------------------------------------------------------#
-@@ -270,222 +225,6 @@ TRANSLATIONS +=
+@@ -237,15 +188,12 @@ RESOURCES +=
+ !system_libe131:INCLUDEPATH += dependencies/libe131/src/
+ 
+ #-----------------------------------------------------------------------------------------------#
+-# General configuration out-of-tree dependencies if in-tree are not used for systems
+-# who use pkg-config i.e. Unix-like. Also includes macOS as Homebrew uses pkg-config too.
++# General configuration out-of-tree dependencies if in-tree are not used                        #
+ #-----------------------------------------------------------------------------------------------#
+ 
+-unix {
+-    system_libe131 {
+-        CONFIG += link_pkgconfig
+-        PKGCONFIG += libe131
+-    }
++system_libe131 {
++    CONFIG += link_pkgconfig
++    PKGCONFIG += libe131
+ }
+ 
+ #-----------------------------------------------------------------------------------------------#
+@@ -270,547 +218,130 @@ TRANSLATIONS +=
      qt/i18n/OpenRGB_zh_CN.ts                                                                    \
      qt/i18n/OpenRGB_zh_TW.ts                                                                    \
  
@@ -378,26 +420,153 @@ index 3d938d61..e9d4168d 100644
  
  #-----------------------------------------------------------------------------------------------#
  # Linux-specific Configuration                                                                  #
-@@ -524,7 +263,8 @@ contains(QMAKE_PLATFORM, linux) {
+ #-----------------------------------------------------------------------------------------------#
+-contains(QMAKE_PLATFORM, linux) {
+-    CONFIG += link_pkgconfig
+-
+-    PKGCONFIG +=                                                                                \
+-    libusb-1.0
+-
+-    TARGET = $$lower($$TARGET)
+-
+-    HEADERS += $$CONTROLLER_H_LINUX
++CONFIG += link_pkgconfig
  
-     QT += dbus
+-    HEADERS +=                                                                                  \
+-    dependencies/NVFC/nvapi.h                                                                   \
+-    i2c_smbus/i2c_smbus_linux.h                                                                 \
+-    AutoStart/AutoStart-Linux.h                                                                 \
+-    SuspendResume/SuspendResume_Linux_FreeBSD.h                                                 \
++PKGCONFIG +=                                                                                \
++libusb-1.0
  
+-    INCLUDEPATH +=                                                                              \
+-    dependencies/NVFC                                                                           \
+-    /usr/include/mbedtls2/                                                                      \
++TARGET = $$lower($$TARGET)
+ 
+-    LIBS +=                                                                                     \
+-    -L/usr/lib/mbedtls2/                                                                        \
+-    -lmbedx509                                                                                  \
+-    -lmbedtls                                                                                   \
+-    -lmbedcrypto                                                                                \
+-    -ldl                                                                                        \
++HEADERS += $$CONTROLLER_H_LINUX
+ 
+-    COMPILER_VERSION = $$system($$QMAKE_CXX " -dumpversion")
+-    if (!versionAtLeast(COMPILER_VERSION, "9")) {
+-         LIBS += -lstdc++fs
+-    }
++HEADERS +=                                                                                  \
++dependencies/NVFC/nvapi.h                                                                   \
++i2c_smbus/i2c_smbus_linux.h                                                                 \
++AutoStart/AutoStart-Linux.h                                                                 \
++SuspendResume/SuspendResume_Linux_FreeBSD.h                                                 \
+ 
+-    QT += dbus
+-
 -    QMAKE_CXXFLAGS += -Wno-implicit-fallthrough -Wno-psabi
-+    QMAKE_CXXFLAGS += -Wno-implicit-fallthrough -Wno-psabi -Wno-unused-parameter -Wno-sign-compare -Wno-unused-variable -Wno-unused-result -Wno-class-memaccess -O3 -flto=auto -funroll-loops -fstrict-aliasing -ftree-vectorize -fprefetch-loop-arrays -fomit-frame-pointer -fno-math-errno
-+    QMAKE_LFLAGS += -s -flto=auto
- 
-     #-------------------------------------------------------------------------------------------#
-     # Determine which hidapi to use based on availability                                       #
-@@ -552,7 +292,6 @@ contains(QMAKE_PLATFORM, linux) {
-     SOURCES += $$CONTROLLER_CPP_LINUX
- 
-     SOURCES +=                                                                                  \
+-
+-    #-------------------------------------------------------------------------------------------#
+-    # Determine which hidapi to use based on availability                                       #
+-    #   Prefer hidraw backend, then libusb                                                      #
+-    #-------------------------------------------------------------------------------------------#
+-    packagesExist(hidapi-hidraw) {
+-        PKGCONFIG += hidapi-hidraw
+-
+-        #---------------------------------------------------------------------------------------#
+-        # hidapi-hidraw >= 0.10.1 supports USAGE/USAGE_PAGE                                     #
+-        # Define USE_HID_USAGE if hidapi-hidraw supports it                                     #
+-        #---------------------------------------------------------------------------------------#
+-        HIDAPI_HIDRAW_VERSION = $$system($$PKG_CONFIG --modversion hidapi-hidraw)
+-        if(versionAtLeast(HIDAPI_HIDRAW_VERSION, "0.10.1")) {
+-            DEFINES += USE_HID_USAGE
+-        }
+-    } else {
+-        packagesExist(hidapi-libusb) {
+-            PKGCONFIG += hidapi-libusb
+-        } else {
+-            PKGCONFIG += hidapi
+-        }
+-    }
+-
+-    SOURCES += $$CONTROLLER_CPP_LINUX
+-
+-    SOURCES +=                                                                                  \
 -    dependencies/hueplusplus-1.1.0/src/LinHttpHandler.cpp                                       \
-     dependencies/NVFC/nvapi.cpp                                                                 \
-     i2c_smbus/i2c_smbus_linux.cpp                                                               \
-     scsiapi/scsiapi_linux.c                                                                     \
-@@ -616,176 +355,6 @@ contains(QMAKE_PLATFORM, linux) {
-     INSTALLS += target desktop icon metainfo udev_rules
+-    dependencies/NVFC/nvapi.cpp                                                                 \
+-    i2c_smbus/i2c_smbus_linux.cpp                                                               \
+-    scsiapi/scsiapi_linux.c                                                                     \
+-    serial_port/find_usb_serial_port_linux.cpp                                                  \
+-    AutoStart/AutoStart-Linux.cpp                                                               \
+-    SuspendResume/SuspendResume_Linux_FreeBSD.cpp                                               \
+-
+-    #-------------------------------------------------------------------------------------------#
+-    # Set up install paths                                                                      #
+-    # These install paths are used for AppImage and .deb packaging                              #
+-    #-------------------------------------------------------------------------------------------#
+-    isEmpty(PREFIX) {
+-        PREFIX = /usr
+-    }
++INCLUDEPATH +=                                                                              \
++dependencies/NVFC                                                                           \
++/usr/include/mbedtls2/                                                                      \
+ 
+-    !defined(OPENRGB_SYSTEM_PLUGIN_DIRECTORY, var):OPENRGB_SYSTEM_PLUGIN_DIRECTORY =            \
+-        "$$PREFIX/lib/openrgb/plugins"                                                          \
+-
+-    DEFINES +=                                                                                  \
+-        OPENRGB_SYSTEM_PLUGIN_DIRECTORY=\\"\"\"$$OPENRGB_SYSTEM_PLUGIN_DIRECTORY\\"\"\"         \
+-
+-    #-------------------------------------------------------------------------------------------#
+-    # Custom target for dynamically created udev_rules                                          #
+-    #   Ordinarily you would add the 'udev_rules' target to both QMAKE_EXTRA_TARGETS to add a   #
+-    #   rule in the Makefile and PRE_TARGETDEPS to ensure it is a dependency of the TARGET      #
+-    #                                                                                           #
+-    #   ie. QMAKE_EXTRA_TARGETS += udev_rules                                                   #
+-    #       PRE_TARGETDEPS      += udev_rules                                                   #
+-    #-------------------------------------------------------------------------------------------#
+-    CONFIG(release, debug|release) {
+-        udev_rules.CONFIG       = no_check_exist
+-        udev_rules.target       = 60-openrgb.rules
+-        udev_rules.path         = $$PREFIX/lib/udev/rules.d/
+-
+-        exists($$udev_rules.target) {
+-            message($$udev_rules.target " - UDEV rules file exists. Removing from build")
+-            udev_rules.files    = $$udev_rules.target
+-        } else {
+-            message($$udev_rules.target " - UDEV rules file missing. Adding script to build")
+-            #-----------------------------------------------------------------------------------#
+-            # This is a compiler config flag to save the preproccessed .ii & .s                 #
+-            #   files so as to automatically process the UDEV rules and the Supported Devices   #
+-            #-----------------------------------------------------------------------------------#
+-            QMAKE_CXXFLAGS+=-save-temps
+-            QMAKE_CXXFLAGS-=-pipe
+-            udev_rules.extra    = $$PWD/scripts/build-udev-rules.sh $$PWD $$GIT_COMMIT_ID
+-            udev_rules.files    = $$OUT_PWD/60-openrgb.rules
+-        }
+-    }
++LIBS +=                                                                                     \
++-L/usr/lib/mbedtls2/                                                                        \
++-lmbedx509                                                                                  \
++-lmbedtls                                                                                   \
++-lmbedcrypto                                                                                \
++-ldl                                                                                        \
+ 
+-    #-------------------------------------------------------------------------------------------#
+-    # Add static files to installation                                                          #
+-    #-------------------------------------------------------------------------------------------#
+-    target.path=$$PREFIX/bin/
+-    desktop.path=$$PREFIX/share/applications/
+-    desktop.files+=qt/org.openrgb.OpenRGB.desktop
+-    icon.path=$$PREFIX/share/icons/hicolor/128x128/apps/
+-    icon.files+=qt/org.openrgb.OpenRGB.png
+-    metainfo.path=$$PREFIX/share/metainfo/
+-    metainfo.files+=qt/org.openrgb.OpenRGB.metainfo.xml
+-    INSTALLS += target desktop icon metainfo udev_rules
++COMPILER_VERSION = $$system($$QMAKE_CXX " -dumpversion")
++if (!versionAtLeast(COMPILER_VERSION, "9")) {
++     LIBS += -lstdc++fs
  }
  
 -#-----------------------------------------------------------------------------------------------#
@@ -431,7 +600,26 @@ index 3d938d61..e9d4168d 100644
 -    COMPILER_VERSION = $$system($$QMAKE_CXX " -dumpversion")
 -    if (!versionAtLeast(COMPILER_VERSION, "9")) {
 -         LIBS += -lstdc++fs
--    }
++QT += dbus
++
++QMAKE_CXXFLAGS += -Wno-implicit-fallthrough -Wno-psabi -Wno-unused-parameter -Wno-sign-compare -Wno-unused-variable -Wno-unused-result -Wno-class-memaccess -O3 -flto=auto -funroll-loops -fstrict-aliasing -ftree-vectorize -fprefetch-loop-arrays -fomit-frame-pointer -fno-math-errno
++QMAKE_LFLAGS += -s -flto=auto
++
++#-------------------------------------------------------------------------------------------#
++# Determine which hidapi to use based on availability                                       #
++#   Prefer hidraw backend, then libusb                                                      #
++#-------------------------------------------------------------------------------------------#
++packagesExist(hidapi-hidraw) {
++    PKGCONFIG += hidapi-hidraw
++
++    #---------------------------------------------------------------------------------------#
++    # hidapi-hidraw >= 0.10.1 supports USAGE/USAGE_PAGE                                     #
++    # Define USE_HID_USAGE if hidapi-hidraw supports it                                     #
++    #---------------------------------------------------------------------------------------#
++    HIDAPI_HIDRAW_VERSION = $$system($$PKG_CONFIG --modversion hidapi-hidraw)
++    if(versionAtLeast(HIDAPI_HIDRAW_VERSION, "0.10.1")) {
++        DEFINES += USE_HID_USAGE
+     }
 -
 -    QT += dbus
 -
@@ -449,13 +637,17 @@ index 3d938d61..e9d4168d 100644
 -        packagesExist(hidapi-hidraw>=0.10.1) {
 -            DEFINES += USE_HID_USAGE
 -        }
--    } else {
++} else {
++    packagesExist(hidapi-libusb) {
++        PKGCONFIG += hidapi-libusb
+     } else {
 -        packagesExist(hidapi-libusb) {
 -            PKGCONFIG += hidapi-libusb
 -        } else {
 -            PKGCONFIG += hidapi
 -        }
--    }
++        PKGCONFIG += hidapi
+     }
 -
 -    SOURCES += $$CONTROLLER_CPP_FREEBSD
 -
@@ -554,8 +746,8 @@ index 3d938d61..e9d4168d 100644
 -    info_plist.output = $$OUT_PWD/Info.plist
 -    QMAKE_SUBSTITUTES += info_plist
 -    QMAKE_INFO_PLIST = $$OUT_PWD/Info.plist
--}
--
+ }
+ 
 -#-----------------------------------------------------------------------------------------------#
 -# Apple Silicon (arm64) Homebrew installs at /opt/homebrew                                      #
 -#-----------------------------------------------------------------------------------------------#
@@ -568,11 +760,96 @@ index 3d938d61..e9d4168d 100644
 -
 -    LIBS +=                                                                                     \
 -    -L/opt/homebrew/lib                                                                         \
--}
++SOURCES += $$CONTROLLER_CPP_LINUX
++
++SOURCES +=                                                                                  \
++dependencies/NVFC/nvapi.cpp                                                                 \
++i2c_smbus/i2c_smbus_linux.cpp                                                               \
++scsiapi/scsiapi_linux.c                                                                     \
++serial_port/find_usb_serial_port_linux.cpp                                                  \
++AutoStart/AutoStart-Linux.cpp                                                               \
++SuspendResume/SuspendResume_Linux_FreeBSD.cpp                                               \
++
++#-------------------------------------------------------------------------------------------#
++# Set up install paths                                                                      #
++# These install paths are used for AppImage and .deb packaging                              #
++#-------------------------------------------------------------------------------------------#
++isEmpty(PREFIX) {
++    PREFIX = /usr
+ }
+ 
+-#-----------------------------------------------------------------------------------------------#
+-# Intel (x86_64) Homebrew installs at /usr/local/lib                                            #
+-#-----------------------------------------------------------------------------------------------#
+-macx:contains(QMAKE_HOST.arch, x86_64) {
+-    INCLUDEPATH +=                                                                              \
+-    dependencies/macUSPCIO                                                                      \
+-    /usr/local/include                                                                          \
+-    /usr/local/homebrew/include                                                                 \
 -
- #-----------------------------------------------------------------------------------------------#
- # Intel (x86_64) Homebrew installs at /usr/local/lib                                            #
- #-----------------------------------------------------------------------------------------------#
+-    SOURCES +=                                                                                  \
+-    i2c_smbus/i2c_smbus_i801.cpp                                                                \
+-    scsiapi/scsiapi_macos.c                                                                     \
+-
+-    HEADERS +=                                                                                  \
+-    dependencies/macUSPCIO/macUSPCIOAccess.h                                                    \
+-    i2c_smbus/i2c_smbus_i801.h                                                                  \
+-
+-    LIBS +=                                                                                     \
+-    -L/usr/local/lib                                                                            \
+-    -L/usr/local/homebrew/lib                                                                   \
+-
+-    DEFINES +=                                                                                  \
+-    _MACOSX_X86_X64                                                                             \
++!defined(OPENRGB_SYSTEM_PLUGIN_DIRECTORY, var):OPENRGB_SYSTEM_PLUGIN_DIRECTORY =            \
++    "$$PREFIX/lib/openrgb/plugins"                                                          \
++
++DEFINES +=                                                                                  \
++    OPENRGB_SYSTEM_PLUGIN_DIRECTORY=\\"\"\"$$OPENRGB_SYSTEM_PLUGIN_DIRECTORY\\"\"\"         \
++
++#-------------------------------------------------------------------------------------------#
++# Custom target for dynamically created udev_rules                                          #
++#   Ordinarily you would add the 'udev_rules' target to both QMAKE_EXTRA_TARGETS to add a   #
++#   rule in the Makefile and PRE_TARGETDEPS to ensure it is a dependency of the TARGET      #
++#                                                                                           #
++#   ie. QMAKE_EXTRA_TARGETS += udev_rules                                                   #
++#       PRE_TARGETDEPS      += udev_rules                                                   #
++#-------------------------------------------------------------------------------------------#
++CONFIG(release, debug|release) {
++    udev_rules.CONFIG       = no_check_exist
++    udev_rules.target       = 60-openrgb.rules
++    udev_rules.path         = $$PREFIX/lib/udev/rules.d/
++
++    exists($$udev_rules.target) {
++        message($$udev_rules.target " - UDEV rules file exists. Removing from build")
++        udev_rules.files    = $$udev_rules.target
++    } else {
++        message($$udev_rules.target " - UDEV rules file missing. Adding script to build")
++        #-----------------------------------------------------------------------------------#
++        # This is a compiler config flag to save the preproccessed .ii & .s                 #
++        #   files so as to automatically process the UDEV rules and the Supported Devices   #
++        #-----------------------------------------------------------------------------------#
++        QMAKE_CXXFLAGS+=-save-temps
++        QMAKE_CXXFLAGS-=-pipe
++        udev_rules.extra    = $$PWD/scripts/build-udev-rules.sh $$PWD $$GIT_COMMIT_ID
++        udev_rules.files    = $$OUT_PWD/60-openrgb.rules
++    }
+ }
+ 
+-DISTFILES += \
+-    debian/openrgb-udev.postinst \
+-    debian/openrgb.postinst
++#-------------------------------------------------------------------------------------------#
++# Add static files to installation                                                          #
++#-------------------------------------------------------------------------------------------#
++target.path=$$PREFIX/bin/
++desktop.path=$$PREFIX/share/applications/
++desktop.files+=qt/org.openrgb.OpenRGB.desktop
++icon.path=$$PREFIX/share/icons/hicolor/128x128/apps/
++icon.files+=qt/org.openrgb.OpenRGB.png
++metainfo.path=$$PREFIX/share/metainfo/
++metainfo.files+=qt/org.openrgb.OpenRGB.metainfo.xml
++INSTALLS += target desktop icon metainfo udev_rules
 diff --git a/PluginManager.cpp b/PluginManager.cpp
 deleted file mode 100644
 index dd4881f3..00000000
