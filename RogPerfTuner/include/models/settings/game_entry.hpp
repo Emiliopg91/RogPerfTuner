@@ -28,6 +28,8 @@ struct convert<GameEntry> {
 	static Node encode(const GameEntry& game) {
 		Node node;
 
+		node["name"] = game.name;
+
 		if (game.args && !game.args->empty()) {
 			node["args"] = *game.args;
 		}
@@ -38,7 +40,6 @@ struct convert<GameEntry> {
 			node["gpu"] = *game.gpu;
 		}
 		node["metrics"] = game.metrics_level.toString();
-		node["name"]	= game.name;
 		if (game.overlayId && !game.overlayId->empty()) {
 			node["overlayId"] = *game.overlayId;
 		}
