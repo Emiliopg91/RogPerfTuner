@@ -122,7 +122,7 @@ void ApplicationService::shutdown() {
 const std::string ApplicationService::buildDesktopFile() {
 	std::ostringstream ss;
 	ss << "[Desktop Entry]\n"
-	   << "Exec=" << Constants::APPIMAGE_FILE.value_or("rog-control-center") << "\n"
+	   << "Exec=" << Constants::APPIMAGE_FILE.value_or("rog-perf-tuner") << "\n"
 	   << "Icon=" << Constants::ICON_45_FILE << "\n"
 	   << "WName=" << Constants::APP_NAME << "\n"
 	   << "Comment=An utility to manage Asus Rog laptop performance\n"
