@@ -20,8 +20,7 @@
 
 - [Installation](#installation)
 
-  - [AppImage version](#appimage-version)
-  - [PKGBUILD version](#pkgbuild-version)
+  - [AUR](#aur)
   - [Steam and DeckyLoader integration](#steam-and-deckyloader-integration)
 
 - [Compatibility](#compatibility)

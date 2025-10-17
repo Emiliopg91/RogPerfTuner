@@ -1414,10 +1414,10 @@ index 389e5fd1..00000000
 -    const char *            plugins_path = "plugins/";
 -};
 diff --git a/build.sh b/build.sh
-index ebc7370d..f2a3c865 100755
+index ebc7370d..e4901f40 100755
 --- a/build.sh
 +++ b/build.sh
-@@ -1,9 +1,20 @@
+@@ -1,9 +1,21 @@
 -podman build -t openrgb-build .
 -rm -R ./build
 -mkdir build
@@ -1443,6 +1443,7 @@ index ebc7370d..f2a3c865 100755
 +cd ..
 +
 +chmod +x scripts/build-udev-rules.sh .
++./scripts/build-udev-rules.sh .
 +
 +./OpenRGB.AppImage --appimage-extract
 +cp ./build/openrgb squashfs-root/usr/bin/OpenRGB
