@@ -13,7 +13,7 @@ CurveEditor::CurveEditor(const std::string& profile, QWidget* parent) : QDialog(
 	setWindowTitle(QString::fromStdString(translator.translate(
 		"edit.fan.profile", {{"prof", StringUtils::toLowerCase(translator.translate("label.profile." + StringUtils::toUpperCase(profile)))}})));
 	setFixedSize(550, 550);
-	setWindowIcon(QIcon(QString::fromStdString(Constants::ICON_45_FILE)));
+	setWindowIcon(QIcon(QString::fromStdString(Constants::ASSET_ICON_45_FILE)));
 	setAttribute(Qt::WA_DeleteOnClose);
 	setWindowFlags(windowFlags() & ~Qt::WindowContextHelpButtonHint);
 

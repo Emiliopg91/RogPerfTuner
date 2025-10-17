@@ -5,36 +5,22 @@
 
 #include "../../include/utils/string_utils.hpp"
 
-const std::string Constants::APP_NAME = "RogPerfTuner";
-
-const std::string Constants::APP_VERSION = "4.5.0";
+#ifndef IS_AURPKG
+#include "../../include/utils/file_utils.hpp"
+#endif
 
 const pid_t Constants::PID = getpid();
 
+const std::string Constants::APP_NAME = "RogPerfTuner";
+
+const std::string Constants::APP_VERSION = "4.5.1";
+
 const std::string Constants::PLUGIN_VERSION = "1.2.4";
 
-const bool Constants::DEV_MODE = false;
-
-const std::string Constants::HOME_DIR = std::getenv("HOME");
-
-const std::string Constants::ASSETS_DIR = [] {
-	const char* dir = std::getenv("RCC_ASSETS_DIR");
-	if (!dir) {
-		dir = "/usr/share/rog-perf-tuner";
-	}
-	return std::string(dir);
-}();
-
 #ifndef IS_AURPKG
-const std::optional<std::string> Constants::APPIMAGE_FILE = []() {
-	const char* appimage = std::getenv("APPIMAGE");
-	if (appimage == nullptr) {
-		appimage = "";
-	}
-	return appimage;
-}();
+const std::string Constants::ASSETS_DIR = FileUtils::getCWD() + "/build/assets";
 #else
-const std::optional<std::string> Constants::APPIMAGE_FILE = std::nullopt;
+const std::string Constants::ASSETS_DIR = "/usr/share/rog-perf-tuner";
 #endif
 
 const std::string Constants::LOG_FILE_NAME		  = APP_NAME;
@@ -48,17 +34,17 @@ const std::string Constants::TMP_UDEV_PATH	   = "/tmp/60-openrgb.rules";
 const std::string Constants::LOCK_FILE		   = "/tmp/" + APP_NAME + ".lock";
 const std::string Constants::SOCKET_FILE	   = "/tmp/" + APP_NAME + ".sock";
 
-const std::string Constants::ASSETS_BIN_DIR	   = ASSETS_DIR + "/bin";
-const std::string Constants::TRANSLATIONS_FILE = ASSETS_DIR + "/translations.yaml";
-const std::string Constants::ASSET_ICONS_DIR   = ASSETS_DIR + "/icons";
-const std::string Constants::ASSET_ICON_FILE   = ASSETS_DIR + "/icons/icon.svg";
-const std::string Constants::ORGB_DIR		   = ASSETS_DIR + "/OpenRGB";
-const std::string Constants::ORGB_UDEV_PATH	   = ASSETS_DIR + "/OpenRGB/usr/lib/udev/rules.d/60-openrgb.rules";
-const std::string Constants::ORGB_PATH		   = ASSETS_DIR + "/OpenRGB/OpenRGB.sh";
-const std::string Constants::RCCDC_ASSET_PATH  = ASSETS_DIR + "/RccDeckyCompanion";
+const std::string Constants::ASSETS_BIN_DIR		= ASSETS_DIR + "/bin";
+const std::string Constants::TRANSLATIONS_FILE	= ASSETS_DIR + "/translations.yaml";
+const std::string Constants::ASSET_ICONS_DIR	= ASSETS_DIR + "/icons";
+const std::string Constants::ASSET_ICON_FILE	= ASSETS_DIR + "/icons/icon.svg";
+const std::string Constants::ASSET_ICON_45_FILE = ASSETS_DIR + "/icons/icon-45x45.png";
+const std::string Constants::ORGB_DIR			= ASSETS_DIR + "/OpenRGB";
+const std::string Constants::ORGB_UDEV_PATH		= ASSETS_DIR + "/OpenRGB/usr/lib/udev/rules.d/60-openrgb.rules";
+const std::string Constants::ORGB_PATH			= ASSETS_DIR + "/OpenRGB/OpenRGB.sh";
+const std::string Constants::RCCDC_ASSET_PATH	= ASSETS_DIR + "/RccDeckyCompanion";
 
-const std::string Constants::AUTOSTART_FILE			  = HOME_DIR + "/.config/autostart/" + APP_NAME + ".desktop";
-const std::string Constants::APP_DRAW_FILE			  = HOME_DIR + "/.local/share/applications/" + APP_NAME + ".desktop";
+const std::string Constants::HOME_DIR				  = std::getenv("HOME");
 const std::string Constants::BIN_DIR				  = HOME_DIR + "/." + APP_NAME + "/bin";
 const std::string Constants::BIN_APPLICATION_DIR	  = HOME_DIR + "/." + APP_NAME + "/bin/application";
 const std::string Constants::BIN_PERFORMANCE_DIR	  = HOME_DIR + "/." + APP_NAME + "/bin/performance";
@@ -72,15 +58,14 @@ const std::string Constants::STEAM_WRAPPER_PATH		  = HOME_DIR + "/." + APP_NAME 
 const std::string Constants::FLATPAK_WRAPPER_PATH	  = HOME_DIR + "/." + APP_NAME + "/bin/steam/flatpak";
 const std::string Constants::CONFIG_DIR				  = HOME_DIR + "/." + APP_NAME + "/config";
 const std::string Constants::CONFIG_FILE			  = HOME_DIR + "/." + APP_NAME + "/config/config.yaml";
-const std::string Constants::ICONS_DIR				  = HOME_DIR + "/." + APP_NAME + "/icons";
-const std::string Constants::ICON_FILE				  = HOME_DIR + "/." + APP_NAME + "/icons/icon.svg";
-const std::string Constants::ICON_45_FILE			  = HOME_DIR + "/." + APP_NAME + "/icons/icon-45x45.png";
 const std::string Constants::LIB_DIR				  = HOME_DIR + "/." + APP_NAME + "/lib";
 const std::string Constants::LIB_VK_DIR				  = HOME_DIR + "/." + APP_NAME + "/lib/vk/icd.d/";
 const std::string Constants::LIB_OCL_DIR			  = HOME_DIR + "/." + APP_NAME + "/lib/ocl/icd.d/";
 const std::string Constants::LOG_DIR				  = HOME_DIR + "/." + APP_NAME + "/logs";
 const std::string Constants::LOG_OLD_DIR			  = HOME_DIR + "/." + APP_NAME + "/logs/old";
 const std::string Constants::USER_PLUGIN_DIR		  = HOME_DIR + "/." + APP_NAME + "/plugin";
+const std::string Constants::AUTOSTART_FILE			  = HOME_DIR + "/.config/autostart/" + APP_NAME + ".desktop";
+const std::string Constants::APP_DRAW_FILE			  = HOME_DIR + "/.local/share/applications/" + APP_NAME + ".desktop";
 const std::string Constants::RCDCC_SOCKET_PATH		  = HOME_DIR + "/homebrew/data/RCCDeckyCompanion/socket";
 const std::string Constants::PLUGINS_FOLDER			  = HOME_DIR + "/homebrew/plugins";
 const std::string Constants::RCCDC_PATH				  = HOME_DIR + "/homebrew/plugins/RCCDeckyCompanion";

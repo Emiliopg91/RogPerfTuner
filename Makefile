@@ -114,24 +114,36 @@ package:
 	@ARCH=x86_64 VERSION=$$(cat resources/version) ./resources/appimagetool --comp zstd -u "gh-releases-zsync|Emiliopg91|RogPerfTuner|latest|RogPerfTuner.AppImage.zsync" -n dist/appimage-fs dist/RogPerfTuner.AppImage
 	@mv RogPerfTuner.AppImage.zsync dist
 
-ifndef IS_AURPKG
+release:
+	@rm -rf dist
+
+ifdef IS_AURPKG
+	@export BUILD_TYPE=Release
+	@make build BUILD_TYPE=Release
+else
+	@mkdir dist dist/test && chmod 777 -R dist
+
 	@echo "#######################################################################"
 	@echo "######################### Generating PKGBUILD #########################"
 	@echo "#######################################################################"
 	@cp resources/PKGBUILD dist/PKGBUILD
 	@python resources/scripts/pkgbuild.py
+	
+
+	@echo "#######################################################################"
+	@echo "############################# Running test ############################"
+	@echo "#######################################################################"
+	@cd dist/test &&  docker run --rm --name dockerbuilder \
+    --privileged \
+    -e SYNC_DATABASE=1 \
+    -v "$$(pwd)":/pkg \
+    cachyos/docker-makepkg-v3 "$$@"
 
 	@echo "#######################################################################"
 	@echo "########################### Updating README ###########################"
 	@echo "#######################################################################"
-endif
-
-release:
-	@rm -rf dist
-	@export BUILD_TYPE=Release
-	@make build BUILD_TYPE=Release
-	@make package
 	@python resources/scripts/readme.py 
+endif
 
 build_debug:
 	@make build BUILD_TYPE=Debug
@@ -140,7 +152,7 @@ run: build_debug
 	@touch /tmp/fake.AppImage
 	@echo "Running 'APPIMAGE=/tmp/fake.AppImage RCC_ASSETS_DIR=$(MAKEFILE_DIR)build/assets ./build/RogPerfTuner/RogPerfTuner'"
 	@echo ""
-	@APPIMAGE=/tmp/fake.AppImage RCC_MODE=DEV RCC_ASSETS_DIR=$(MAKEFILE_DIR)build/assets ./build/RogPerfTuner/RogPerfTuner
+	@RCC_ASSETS_DIR=$(MAKEFILE_DIR)build/assets ./build/RogPerfTuner/RogPerfTuner
 
 increase_version:
 	@awk '{if ($$0 ~ /project\(.*VERSION/) {match($$0, /([0-9]+)\.([0-9]+)\.([0-9]+)/, v); patch = v[3] + 1; sub(/[0-9]+\.[0-9]+\.[0-9]+/, v[1] "." v[2] "." patch);} print}' CMakeLists.txt > CMakeLists.txt.tmp && mv CMakeLists.txt.tmp CMakeLists.txt

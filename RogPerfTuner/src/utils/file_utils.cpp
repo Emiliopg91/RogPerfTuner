@@ -155,3 +155,7 @@ void FileUtils::createSymlink(const std::filesystem::path& target, const std::fi
 	}
 	std::filesystem::create_symlink(target, linkName);
 }
+
+std::string FileUtils::getCWD() {
+	return std::filesystem::current_path().string();
+}

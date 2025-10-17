@@ -15,35 +15,17 @@ ApplicationService::ApplicationService(std::optional<std::string> execPath) : Lo
 	logger.info("Initializing ApplicationService");
 	Logger::add_tab();
 
-	if (Constants::APPIMAGE_FILE.has_value()) {
-		if (!Constants::DEV_MODE) {
-			if (!FileUtils::exists(Constants::APP_DRAW_FILE)) {
-				logger.info("Creating menu entry");
-				Logger::add_tab();
-				FileUtils::writeFileContent(Constants::APP_DRAW_FILE, buildDesktopFile());
-				Logger::rem_tab();
-			}
-		}
-	}
-
-	logger.info("Copying icons");
-	FileUtils::copy(Constants::ASSET_ICONS_DIR, Constants::ICONS_DIR);
-
-	if (FileUtils::exists(Constants::AUTOSTART_FILE) &&
-		configuration.getConfiguration().application.appimage != Constants::APPIMAGE_FILE.has_value()) {
-		logger.info("Migrating autostart file");
+#ifdef IS_AURPKG
+	if (!FileUtils::exists(Constants::APP_DRAW_FILE)) {
+		logger.info("Creating menu entry");
 		Logger::add_tab();
-		setAutostart(false);
-		setAutostart(true);
+		FileUtils::writeFileContent(Constants::APP_DRAW_FILE, buildDesktopFile());
 		Logger::rem_tab();
 	}
-
-	configuration.getConfiguration().application.appimage = Constants::APPIMAGE_FILE.has_value();
-	configuration.saveConfig();
+#endif
 
 	if (execPath.has_value()) {
 		logger.info("Creating helper scripts");
-
 		Logger::add_tab();
 
 		if (FileUtils::exists(Constants::BIN_DIR)) {
@@ -69,6 +51,20 @@ ApplicationService::ApplicationService(std::optional<std::string> execPath) : Lo
 	}
 
 	Logger::rem_tab();
+}
+
+const std::string ApplicationService::buildDesktopFile() {
+	std::ostringstream ss;
+	ss << "[Desktop Entry]\n"
+	   << "Exec=rog-perf-tuner\n"
+	   << "Icon=" << Constants::ASSET_ICON_45_FILE << "\n"
+	   << "WName=" << Constants::APP_NAME << "\n"
+	   << "Comment=An utility to manage Asus Rog laptop performance\n"
+	   << "Path=\n"
+	   << "Terminal=False\n"
+	   << "Type=Application\n"
+	   << "Categories=Utility;\n";
+	return ss.str();
 }
 
 void ApplicationService::createScriptFile(std::string path, std::string execPath, std::string option) {
@@ -117,18 +113,4 @@ void ApplicationService::shutdown() {
 	Logger::rem_tab();
 	logger.info("Shutdown finished");
 	kill(Constants::PID, SIGTERM);
-}
-
-const std::string ApplicationService::buildDesktopFile() {
-	std::ostringstream ss;
-	ss << "[Desktop Entry]\n"
-	   << "Exec=" << Constants::APPIMAGE_FILE.value_or("rog-perf-tuner") << "\n"
-	   << "Icon=" << Constants::ICON_45_FILE << "\n"
-	   << "WName=" << Constants::APP_NAME << "\n"
-	   << "Comment=An utility to manage Asus Rog laptop performance\n"
-	   << "Path=\n"
-	   << "Terminal=False\n"
-	   << "Type=Application\n"
-	   << "Categories=Utility;\n";
-	return ss.str();
 }

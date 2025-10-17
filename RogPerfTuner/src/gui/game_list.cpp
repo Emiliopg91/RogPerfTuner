@@ -18,7 +18,7 @@ GameList::GameList(QWidget* parent, bool manage_parent) : QDialog(parent), manag
 
 	setWindowTitle(QString::fromStdString(translator.translate("game.performance.configuration")));
 	setFixedSize(500, 600);
-	setWindowIcon(QIcon(QString::fromStdString(Constants::ICON_45_FILE)));
+	setWindowIcon(QIcon(QString::fromStdString(Constants::ASSET_ICON_45_FILE)));
 	setAttribute(Qt::WA_DeleteOnClose);
 	setWindowFlags(windowFlags() & ~Qt::WindowContextHelpButtonHint);
 

@@ -7,9 +7,3 @@
 [submodule "submodules/RccDeckyCompanion"]
 	path = submodules/RccDeckyCompanion
 	url = https://github.com/Emiliopg91/RccDeckyCompanion
-[submodule "submodules/spdlog"]
-	path = submodules/spdlog
-	url = https://github.com/Emiliopg91/gabime-spdlog
-[submodule "submodules/yaml-cpp"]
-	path = submodules/yaml-cpp
-	url = https://github.com/Emiliopg91/jbeder-yaml-cpp

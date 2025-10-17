@@ -64,13 +64,9 @@ inline int startGui(int argc, char** argv) {
 	std::strncpy(argv[0], (Constants::APP_NAME + " v" + Constants::APP_VERSION).c_str(), std::strlen(argv[0]));
 	argv[0][std::strlen(argv[0])] = '\0';
 
+	SingleInstance::getInstance().acquire();
 	std::cout << "Running application with PID " << Constants::PID << std::endl;
 
-	SingleInstance::getInstance().acquire();
-
-	if (Constants::DEV_MODE) {
-		std::cout << "Dev mode enabled" << std::endl;
-	}
 	std::cout << "Assets directory: " << Constants::ASSETS_DIR << std::endl;
 
 	LoggerProvider::initialize(Constants::LOG_FILE_NAME, Constants::LOG_DIR);

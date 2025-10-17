@@ -445,28 +445,28 @@ TrayIcon::TrayIcon() : QObject(&MainWindow::getInstance()), tray_icon_(new QSyst
 
 	menu->addSeparator();
 
-	if (Constants::DEV_MODE) {
-		// -------------------------
-		// Settings submenu
-		// -------------------------
-		QMenu* settingsMenu = new QMenu("Settings", menu);
-		menu->insertMenu(nullptr, settingsMenu);
+#ifndef IS_AURPKG
+	// -------------------------
+	// Settings submenu
+	// -------------------------
+	QMenu* settingsMenu = new QMenu("Settings", menu);
+	menu->insertMenu(nullptr, settingsMenu);
 
-		QAction* openSettingsAct = new QAction("Open settings");
-		QObject::connect(openSettingsAct, &QAction::triggered, [this]() {
-			shell.run_command("xdg-open " + Constants::CONFIG_FILE);
-		});
-		settingsMenu->addAction(openSettingsAct);
+	QAction* openSettingsAct = new QAction("Open settings");
+	QObject::connect(openSettingsAct, &QAction::triggered, [this]() {
+		shell.run_command("xdg-open " + Constants::CONFIG_FILE);
+	});
+	settingsMenu->addAction(openSettingsAct);
 
-		QAction* reloadSettingsAct = new QAction("Reload settings");
-		QObject::connect(reloadSettingsAct, &QAction::triggered, [this]() {
-			configuration.loadConfig();
-		});
-		settingsMenu->addAction(reloadSettingsAct);
-		// -------------------------
-		// Settings submenu
-		// -------------------------
-	}
+	QAction* reloadSettingsAct = new QAction("Reload settings");
+	QObject::connect(reloadSettingsAct, &QAction::triggered, [this]() {
+		configuration.loadConfig();
+	});
+	settingsMenu->addAction(reloadSettingsAct);
+	// -------------------------
+	// Settings submenu
+	// -------------------------
+#endif
 
 	// -------------------------
 	// Main window

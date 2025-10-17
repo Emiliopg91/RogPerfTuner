@@ -55,7 +55,6 @@ if (
     version_pattern = re.compile(
         r'(const std::string Constants::APP_VERSION\s*=\s*")[^"]+(";)'
     )
-    dev_pattern = re.compile(r"(const bool Constants::DEV_MODE\s*=\s*)\w+(;)")
     plugin_pattern = re.compile(
         r'(const std::string Constants::PLUGIN_VERSION\s*=\s*")[^"]+(";)'
     )
@@ -65,12 +64,6 @@ if (
         if version_pattern.search(line):
             line = version_pattern.sub(
                 lambda m: f"{m.group(1)}{version}{m.group(2)}", line
-            )
-
-        if dev_pattern.search(line):
-            dev_value = "true" if os.path.exists(debug_file) else "false"
-            line = dev_pattern.sub(
-                lambda m: f"{m.group(1)}{dev_value}{m.group(2)}", line
             )
 
         if plugin_pattern.search(line):

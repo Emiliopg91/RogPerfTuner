@@ -218,4 +218,20 @@ class FileUtils {
 	 * @throws std::runtime_error If the file cannot be read or the hash cannot be computed.
 	 */
 	static std::string md5(const std::filesystem::path& path);
+
+	/**
+	 * @brief Retrieve the current working directory as an absolute path.
+	 *
+	 * Returns the process's current working directory as a std::string. The
+	 * implementation uses the underlying OS APIs (e.g., POSIX getcwd or
+	 * Windows GetCurrentDirectory) and returns a path suitable for file I/O.
+	 *
+	 * @return std::string Absolute path of the current working directory.
+	 *
+	 * @note The returned path may use the platform's native path separator.
+	 * @note The path is not guaranteed to be canonical with respect to symbolic
+	 *       links; call std::filesystem::canonical or equivalent if canonicalization
+	 *       is required.
+	 */
+	static std::string getCWD();
 };

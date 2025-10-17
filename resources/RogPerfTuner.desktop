@@ -1,7 +1,7 @@
 [Desktop Entry]
 Name=RogPerfTuner
 Comment=An utility to manage Asus Rog laptop performance and RGB lighting
-Exec=usr/bin/RogPerfTuner
+Exec=/usr/bin/rog-perf-tuner
 Icon=icon
 Terminal=false
 Type=Application

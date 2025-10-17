@@ -11,13 +11,10 @@ class Constants {
 	static const std::string APP_NAME;
 
 	const static std::string APP_VERSION;
-	const static std::optional<std::string> APPIMAGE_FILE;
 
 	const static pid_t PID;
 
 	const static std::string PLUGIN_VERSION;
-
-	const static bool DEV_MODE;
 
 	static const std::string HOME_DIR;
 
@@ -32,6 +29,8 @@ class Constants {
 	static const std::string ASSETS_BIN_DIR;
 	static const std::string ASSET_ICONS_DIR;
 	static const std::string ASSET_ICON_FILE;
+	static const std::string ASSET_ICON_45_FILE;
+
 	static const std::string ORGB_DIR;
 	static const std::string ORGB_UDEV_PATH;
 	static const std::string ORGB_PATH;
@@ -52,9 +51,6 @@ class Constants {
 	static const std::string STEAM_WRAPPER_PATH;
 	static const std::string CONFIG_DIR;
 	static const std::string CONFIG_FILE;
-	static const std::string ICONS_DIR;
-	static const std::string ICON_FILE;
-	static const std::string ICON_45_FILE;
 	static const std::string LIB_DIR;
 	static const std::string LIB_VK_DIR;
 	static const std::string LIB_OCL_DIR;

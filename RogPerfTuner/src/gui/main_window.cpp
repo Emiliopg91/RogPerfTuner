@@ -25,7 +25,7 @@ MainWindow::MainWindow(QWidget* parent) : QMainWindow(parent), _logger(new Logge
 	setWindowTitle(QString::fromStdString(Constants::APP_NAME + " | " + Constants::APP_VERSION));
 	setGeometry(0, 0, 350, 700);
 	setFixedSize(350, 700);
-	setWindowIcon(QIcon(QString::fromStdString(Constants::ICON_45_FILE)));
+	setWindowIcon(QIcon(QString::fromStdString(Constants::ASSET_ICON_45_FILE)));
 
 	QWidget* centralWidget	= new QWidget(this);
 	QVBoxLayout* mainLayout = new QVBoxLayout(centralWidget);
@@ -36,7 +36,7 @@ MainWindow::MainWindow(QWidget* parent) : QMainWindow(parent), _logger(new Logge
 	// Logo
 	// -------------------------
 	QLabel* imageLabel = new QLabel();
-	QPixmap pixmap(QString::fromStdString(Constants::ICON_FILE));
+	QPixmap pixmap(QString::fromStdString(Constants::ASSET_ICON_FILE));
 	QPixmap scaledPixmap = pixmap.scaled(140, 140, Qt::KeepAspectRatio, Qt::SmoothTransformation);
 	imageLabel->setPixmap(scaledPixmap);
 	imageLabel->setAlignment(Qt::AlignCenter);
@@ -233,7 +233,9 @@ MainWindow::MainWindow(QWidget* parent) : QMainWindow(parent), _logger(new Logge
 	// -------------------------
 	_autostart = new QCheckBox();
 	_autostart->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Preferred);
-	_autostart->setEnabled(!Constants::DEV_MODE);
+#ifndef IS_AURPKG
+	_autostart->setEnabled(false);
+#endif
 	_autostart->setChecked(applicationService.isAutostartEnabled());
 	connect(_autostart, &QCheckBox::toggled, this, &MainWindow::onAutostartChanged);
 	settingsLayout->addRow(_autostart, new QLabel(QString::fromStdString(translator.translate("autostart"))));

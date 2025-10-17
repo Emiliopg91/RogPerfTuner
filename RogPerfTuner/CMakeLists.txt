@@ -8,15 +8,11 @@ if(CMAKE_BUILD_TYPE STREQUAL "Release")
     set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -flto=full")
 endif()
 
-# ------------------------------
-# Buscar paquetes de Qt6
-# ------------------------------
 find_package(Qt6 REQUIRED COMPONENTS Core DBus Gui Widgets Charts)
 find_package(Qt6Keychain REQUIRED)
+find_package(spdlog REQUIRED)
+find_package(yaml-cpp REQUIRED)
 
-# ------------------------------
-# Ejecutable principal
-# ------------------------------
 file(GLOB_RECURSE SOURCES_RCC
     "${CMAKE_CURRENT_SOURCE_DIR}/src/*.cpp"
 )
