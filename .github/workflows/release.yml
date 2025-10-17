@@ -161,6 +161,10 @@ jobs:
           git clone ssh://aur@aur.archlinux.org/rog-perf-tuner.git aur_repo
           cd aur_repo
 
+          echo "Configuring Git identity..."
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+
           echo "Copying files..."
           cp ../dist/PKGBUILD .
           cp ../dist/.SRCINFO .
