@@ -112,7 +112,7 @@ Do you want something similar for Asus Rog Ally/Ally X? Check [AllyDeckyCompanio
 For full support of this application, run the following command to install the dependencies:
 
 ```bash
-sudo pacman -S --needed asusctl coreutils fuse2 hicolor-icon-theme hidapi libusb power-profiles-daemon python python-pip qt6-base qt6-charts qt6-svg qtkeychain-qt6 scx-scheds upower
+sudo pacman -S --needed 
 ```
 
 Once you installed those packages, you can run the AppImage with support for every feature.
