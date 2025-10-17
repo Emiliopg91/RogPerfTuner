@@ -9,9 +9,9 @@ cmake_file = os.path.abspath(os.path.dirname(__file__) + "/../../CMakeLists.txt"
 cmake_time = os.path.getmtime(cmake_file)
 
 plugin_file = os.path.abspath(
-    os.path.dirname(__file__) + "/../../build/assets/RccDeckyCompanion/package.json"
+    os.path.dirname(__file__) + "/../../submodules/RccDeckyCompanion/package.json"
 )
-plugin_time = os.path.getmtime(cmake_file)
+plugin_time = os.path.getmtime(plugin_file)
 
 version_file = os.path.abspath(os.path.dirname(__file__) + "/../../resources/version")
 

@@ -121,6 +121,8 @@ ifdef IS_AURPKG
 	@export BUILD_TYPE=Release
 	@make build BUILD_TYPE=Release
 else
+	@python resources/scripts/constants.py
+
 	@mkdir dist dist/test && chmod 777 -R dist
 
 	@echo "#######################################################################"
@@ -138,11 +140,6 @@ else
     -e SYNC_DATABASE=1 \
     -v "$$(pwd)":/pkg \
     cachyos/docker-makepkg-v3 "$$@"
-
-	@echo "#######################################################################"
-	@echo "########################### Updating README ###########################"
-	@echo "#######################################################################"
-	@python resources/scripts/readme.py 
 endif
 
 build_debug:

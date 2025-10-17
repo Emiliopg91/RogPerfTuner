@@ -101,26 +101,14 @@ Do you want something similar for Asus Rog Ally/Ally X? Check [AllyDeckyCompanio
 
 - [x] Start on boot
 
-- [x] AppImage or PKGBUILD for AUR
-
-- [x] Autoupdates for AppImage version
+- [x] PKGBUILD for AUR
 
 ## Installation
 
-### AppImage version
+### AUR
 
-For full support of this application, run the following command to install the dependencies:
-
-```bash
-sudo pacman -S --needed asusctl coreutils hicolor-icon-theme hidapi libusb power-profiles-daemon python python-pip qt6-base qt6-charts qt6-svg qtkeychain-qt6 scx-scheds spdlog upower yaml-cpp
-```
-
-Once you installed those packages, you can run the AppImage with support for every feature.
-
-### PKGBUILD version
-
-You can use any AUR helper (tested on yay and paru) to make a local installation of the package.
-That process performs installation of every dependency.
+AUR package is available as rog-perf-tuner.
+Install it using your favourite AUR helper and you'll get every dependency installed.
 
 ### Steam and DeckyLoader integration
 
