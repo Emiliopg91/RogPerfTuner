@@ -7,7 +7,7 @@
 
 const std::string Constants::APP_NAME = "RogPerfTuner";
 
-const std::string Constants::APP_VERSION = "4.5.0";
+const std::string Constants::APP_VERSION = "4.5.1";
 
 const pid_t Constants::PID = getpid();
 
