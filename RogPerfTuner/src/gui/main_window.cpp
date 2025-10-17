@@ -206,9 +206,10 @@ MainWindow::MainWindow(QWidget* parent) : QMainWindow(parent), _logger(new Logge
 		_bootSoundDropdown->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Preferred);
 
 		auto vals = std::array<bool, 2>{true, false};
-		for (auto v : vals) {
-			_bootSoundDropdown->addItem(("  " + translator.translate(v ? "enabled" : "disabled")).c_str(), v);
+		for (size_t i = 0; i < vals.size(); i++) {
+			_bootSoundDropdown->addItem(("  " + translator.translate(vals[i] ? "enabled" : "disabled")).c_str(), vals[i]);
 		}
+		onBootSoundEvent(hardwareService.getBootSound());
 
 		connect(_bootSoundDropdown, QOverload<int>::of(&QComboBox::currentIndexChanged), this, &MainWindow::onBootSoundChanged);
 		hardwareLayout->addRow(new QLabel(QString::fromStdString(translator.translate("boot.sound"))), _bootSoundDropdown);
