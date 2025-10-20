@@ -71,12 +71,9 @@ build_openrgb:
 		echo "######################### Compiling OpenRGB ###########################" && \
 		echo "#######################################################################" && \
 		cd submodules/OpenRGB && ./build.sh && \
-		./OpenRGB.AppImage --appimage-extract && mkdir -p ../../build/assets  && cp -r squashfs-root ../../build/assets/OpenRGB && \
-		cd ../../build/assets/OpenRGB && \
-		mv AppRun OpenRGB.sh && \
-		mv AppRun.wrapped OpenRGB && \
-		sed -i 's/AppRun.wrapped/OpenRGB/g' OpenRGB.sh && \
-		rm usr/lib/libQt5* usr/lib/libxcb* usr/lib/libjpeg.so.62 usr/lib/libpng16.so.16 usr/bin/OpenRGB.exe; \
+		mkdir -p ../../build/assets/OpenRGB && \
+		cp build/openrgb ../../build/assets/OpenRGB/openrgb && \
+		cp 60-openrgb.rules ../../build/assets/OpenRGB/60-openrgb.rules; \
 	fi
 
 build_rccdc:

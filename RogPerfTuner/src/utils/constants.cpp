@@ -40,8 +40,8 @@ const std::string Constants::ASSET_ICONS_DIR	= ASSETS_DIR + "/icons";
 const std::string Constants::ASSET_ICON_FILE	= ASSETS_DIR + "/icons/icon.svg";
 const std::string Constants::ASSET_ICON_45_FILE = ASSETS_DIR + "/icons/icon-45x45.png";
 const std::string Constants::ORGB_DIR			= ASSETS_DIR + "/OpenRGB";
-const std::string Constants::ORGB_UDEV_PATH		= ASSETS_DIR + "/OpenRGB/usr/lib/udev/rules.d/60-openrgb.rules";
-const std::string Constants::ORGB_PATH			= ASSETS_DIR + "/OpenRGB/OpenRGB.sh";
+const std::string Constants::ORGB_UDEV_PATH		= ASSETS_DIR + "/OpenRGB/60-openrgb.rules";
+const std::string Constants::ORGB_PATH			= ASSETS_DIR + "/OpenRGB/openrgb";
 const std::string Constants::RCCDC_ASSET_PATH	= ASSETS_DIR + "/RccDeckyCompanion";
 
 const std::string Constants::HOME_DIR				  = std::getenv("HOME");
