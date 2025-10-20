@@ -1,3 +1,365 @@
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+new file mode 100644
+index 00000000..a1448c12
+--- /dev/null
++++ b/CMakeLists.txt
+@@ -0,0 +1,356 @@
++cmake_minimum_required(VERSION 3.16)
++
++# ---------------------------------------------------------------------------------------
++# Project / version
++# ---------------------------------------------------------------------------------------
++project(OpenRGB
++  VERSION 0.9.1
++  LANGUAGES CXX C
++)
++
++# C++17 (std::filesystem)
++set(CMAKE_CXX_STANDARD 17)
++set(CMAKE_CXX_STANDARD_REQUIRED ON)
++set(CMAKE_CXX_EXTENSIONS OFF)
++
++set(TARGET_NAME openrgb)
++
++# ---------------------------------------------------------------------------------------
++# Qt setup
++# ---------------------------------------------------------------------------------------
++set(QT_NEEDED_COMPONENTS Widgets DBus LinguistTools)
++
++find_package(Qt6 QUIET COMPONENTS ${QT_NEEDED_COMPONENTS})
++if(Qt6_FOUND)
++  set(QT_PACKAGE Qt6)
++  add_compile_definitions(_QT6)
++else()
++  find_package(Qt5 REQUIRED COMPONENTS ${QT_NEEDED_COMPONENTS})
++  set(QT_PACKAGE Qt5)
++endif()
++
++set(CMAKE_AUTOMOC ON)
++set(CMAKE_AUTOUIC ON)
++set(CMAKE_AUTORCC ON)
++
++# ---------------------------------------------------------------------------------------
++# Build info (Git and date)
++# ---------------------------------------------------------------------------------------
++if(DEFINED ENV{SOURCE_DATE_EPOCH})
++  execute_process(
++    COMMAND bash -lc "date -R -d @${SOURCE_DATE_EPOCH}"
++    OUTPUT_VARIABLE BUILDDATE_RAW OUTPUT_STRIP_TRAILING_WHITESPACE
++  )
++else()
++  execute_process(
++    COMMAND bash -lc "date -R"
++    OUTPUT_VARIABLE BUILDDATE_RAW OUTPUT_STRIP_TRAILING_WHITESPACE
++  )
++endif()
++
++find_package(Git QUIET)
++if(GIT_FOUND)
++  execute_process(COMMAND ${GIT_EXECUTABLE} log -n 1 --pretty=format:%H
++                  WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
++                  OUTPUT_VARIABLE GIT_COMMIT_ID_RAW OUTPUT_STRIP_TRAILING_WHITESPACE)
++  execute_process(COMMAND ${GIT_EXECUTABLE} log -n 1 --pretty=format:%ci
++                  WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
++                  OUTPUT_VARIABLE GIT_COMMIT_DATE_RAW OUTPUT_STRIP_TRAILING_WHITESPACE)
++  execute_process(COMMAND ${GIT_EXECUTABLE} branch --show-current
++                  WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
++                  OUTPUT_VARIABLE GIT_BRANCH_RAW OUTPUT_STRIP_TRAILING_WHITESPACE)
++endif()
++
++if(NOT GIT_COMMIT_ID_RAW)
++  set(GIT_COMMIT_ID_RAW "unknown")
++endif()
++if(NOT GIT_COMMIT_DATE_RAW)
++  set(GIT_COMMIT_DATE_RAW "${BUILDDATE_RAW}")
++endif()
++if(NOT GIT_BRANCH_RAW)
++  set(GIT_BRANCH_RAW "unknown")
++endif()
++
++add_compile_definitions(
++  VERSION_STRING="${PROJECT_VERSION}"
++  BUILDDATE_STRING="${BUILDDATE_RAW}"
++  GIT_COMMIT_ID="${GIT_COMMIT_ID_RAW}"
++  GIT_COMMIT_DATE="${GIT_COMMIT_DATE_RAW}"
++  GIT_BRANCH="${GIT_BRANCH_RAW}"
++)
++
++# ---------------------------------------------------------------------------------------
++# Dependencies (libusb, libe131)
++# ---------------------------------------------------------------------------------------
++find_package(PkgConfig REQUIRED)
++pkg_check_modules(LIBUSB REQUIRED libusb-1.0)
++pkg_check_modules(LIBE131 libe131)
++set(USE_SYSTEM_LIBE131 ${LIBE131_FOUND})
++
++# ---------------------------------------------------------------------------------------
++# Includes
++# ---------------------------------------------------------------------------------------
++set(COMMON_INCLUDE_DIRS
++  ${CMAKE_SOURCE_DIR}
++  ${CMAKE_SOURCE_DIR}/dependencies/CRCpp
++  ${CMAKE_SOURCE_DIR}/dependencies/httplib
++  ${CMAKE_SOURCE_DIR}/dependencies/json
++  ${CMAKE_SOURCE_DIR}/dependencies/mdns
++  ${CMAKE_SOURCE_DIR}/dmiinfo
++  ${CMAKE_SOURCE_DIR}/hidapi_wrapper
++  ${CMAKE_SOURCE_DIR}/i2c_smbus
++  ${CMAKE_SOURCE_DIR}/i2c_tools
++  ${CMAKE_SOURCE_DIR}/interop
++  ${CMAKE_SOURCE_DIR}/net_port
++  ${CMAKE_SOURCE_DIR}/pci_ids
++  ${CMAKE_SOURCE_DIR}/scsiapi
++  ${CMAKE_SOURCE_DIR}/serial_port
++  ${CMAKE_SOURCE_DIR}/super_io
++  ${CMAKE_SOURCE_DIR}/AutoStart
++  ${CMAKE_SOURCE_DIR}/KeyboardLayoutManager
++  ${CMAKE_SOURCE_DIR}/RGBController
++  ${CMAKE_SOURCE_DIR}/qt
++  ${CMAKE_SOURCE_DIR}/SuspendResume
++  ${CMAKE_SOURCE_DIR}/dependencies/NVFC
++)
++
++# ---------------------------------------------------------------------------------------
++# Sources and headers
++# ---------------------------------------------------------------------------------------
++file(GLOB_RECURSE GUI_FORMS qt/*.ui)
++file(GLOB_RECURSE GUI_HEADERS qt/*.h)
++file(GLOB_RECURSE GUI_SOURCES qt/*.cpp)
++
++file(GLOB_RECURSE CTRL_HEADERS_ALL Controllers/*.h)
++file(GLOB_RECURSE CTRL_SOURCES_ALL Controllers/*.cpp)
++
++foreach(h ${CTRL_HEADERS_ALL})
++  if(h MATCHES "_Windows|_MacOS|_FreeBSD")
++    list(REMOVE_ITEM CTRL_HEADERS_ALL ${h})
++  endif()
++endforeach()
++foreach(s ${CTRL_SOURCES_ALL})
++  if(s MATCHES "_Windows|_MacOS|_FreeBSD")
++    list(REMOVE_ITEM CTRL_SOURCES_ALL ${s})
++  endif()
++endforeach()
++
++file(GLOB_RECURSE CTRL_HEADERS_LINUX Controllers/*_Linux*.h)
++file(GLOB_RECURSE CTRL_SOURCES_LINUX Controllers/*_Linux*.cpp)
++list(APPEND CTRL_HEADERS_ALL ${CTRL_HEADERS_LINUX})
++list(APPEND CTRL_SOURCES_ALL ${CTRL_SOURCES_LINUX})
++
++set(OTHER_HEADERS
++  Colors.h
++  dependencies/json/json.hpp
++  LogManager.h
++  NetworkClient.h
++  NetworkProtocol.h
++  NetworkServer.h
++  OpenRGBPluginInterface.h
++  ProfileManager.h
++  ResourceManager.h
++  SettingsManager.h
++  Detector.h
++  DeviceDetector.h
++  dmiinfo/dmiinfo.h
++  filesystem.h
++  hidapi_wrapper/hidapi_wrapper.h
++  i2c_smbus/i2c_smbus.h
++  i2c_tools/i2c_tools.h
++  interop/DeviceGuard.h
++  interop/DeviceGuardLock.h
++  interop/DeviceGuardManager.h
++  net_port/net_port.h
++  pci_ids/pci_ids.h
++  scsiapi/scsiapi.h
++  serial_port/find_usb_serial_port.h
++  serial_port/serial_port.h
++  StringUtils.h
++  super_io/super_io.h
++  SuspendResume/SuspendResume.h
++  AutoStart/AutoStart.h
++  KeyboardLayoutManager/KeyboardLayoutManager.h
++  RGBController/RGBController.h
++  RGBController/RGBController_Dummy.h
++  RGBController/RGBControllerKeyNames.h
++  RGBController/RGBController_Network.h
++  dependencies/NVFC/nvapi.h
++  i2c_smbus/i2c_smbus_linux.h
++  AutoStart/AutoStart-Linux.h
++  SuspendResume/SuspendResume_Linux_FreeBSD.h
++)
++
++set(OTHER_SOURCES
++  main.cpp
++  cli.cpp
++  dmiinfo/dmiinfo.cpp
++  LogManager.cpp
++  NetworkClient.cpp
++  NetworkProtocol.cpp
++  NetworkServer.cpp
++  ProfileManager.cpp
++  ResourceManager.cpp
++  SPDAccessor.cpp
++  SettingsManager.cpp
++  i2c_smbus/i2c_smbus.cpp
++  i2c_tools/i2c_tools.cpp
++  interop/DeviceGuard.cpp
++  interop/DeviceGuardLock.cpp
++  interop/DeviceGuardManager.cpp
++  net_port/net_port.cpp
++  serial_port/serial_port.cpp
++  StringUtils.cpp
++  super_io/super_io.cpp
++  AutoStart/AutoStart.cpp
++  KeyboardLayoutManager/KeyboardLayoutManager.cpp
++  RGBController/RGBController.cpp
++  RGBController/RGBController_Dummy.cpp
++  RGBController/RGBControllerKeyNames.cpp
++  RGBController/RGBController_Network.cpp
++  dependencies/NVFC/nvapi.cpp
++  i2c_smbus/i2c_smbus_linux.cpp
++  scsiapi/scsiapi_linux.c
++  serial_port/find_usb_serial_port_linux.cpp
++  AutoStart/AutoStart-Linux.cpp
++  SuspendResume/SuspendResume_Linux_FreeBSD.cpp
++)
++
++if(NOT USE_SYSTEM_LIBE131)
++  list(APPEND OTHER_SOURCES dependencies/libe131/src/e131.c)
++  list(APPEND COMMON_INCLUDE_DIRS ${CMAKE_SOURCE_DIR}/dependencies/libe131/src)
++endif()
++
++# ---------------------------------------------------------------------------------------
++# Translations
++# ---------------------------------------------------------------------------------------
++set(TRANSLATIONS
++  qt/i18n/OpenRGB_de_DE.ts
++  qt/i18n/OpenRGB_en_US.ts
++  qt/i18n/OpenRGB_en_AU.ts
++  qt/i18n/OpenRGB_en_GB.ts
++  qt/i18n/OpenRGB_es_ES.ts
++  qt/i18n/OpenRGB_fr_FR.ts
++  qt/i18n/OpenRGB_hr_HR.ts
++  qt/i18n/OpenRGB_it_IT.ts
++  qt/i18n/OpenRGB_ko_KR.ts
++  qt/i18n/OpenRGB_ms_MY.ts
++  qt/i18n/OpenRGB_pl_PL.ts
++  qt/i18n/OpenRGB_pt_BR.ts
++  qt/i18n/OpenRGB_ru_RU.ts
++  qt/i18n/OpenRGB_zh_CN.ts
++  qt/i18n/OpenRGB_zh_TW.ts
++)
++
++if(QT_PACKAGE STREQUAL "Qt6")
++  qt_add_translation(QM_FILES ${TRANSLATIONS})
++else()
++  QT5_ADD_TRANSLATION(QM_FILES ${TRANSLATIONS})
++endif()
++
++# ---------------------------------------------------------------------------------------
++# Executable
++# ---------------------------------------------------------------------------------------
++add_executable(${TARGET_NAME}
++  ${GUI_SOURCES}
++  ${CTRL_SOURCES_ALL}
++  ${OTHER_SOURCES}
++  ${GUI_HEADERS}
++  ${CTRL_HEADERS_ALL}
++  ${OTHER_HEADERS}
++  ${GUI_FORMS}
++  ${QM_FILES}
++)
++
++# ---------------------------------------------------------------------------------------
++# Include all controller subdirectories automatically
++# ---------------------------------------------------------------------------------------
++set(CONTROLLER_INCLUDE_DIRS "")
++foreach(header ${CTRL_HEADERS_ALL})
++  get_filename_component(DIR ${header} DIRECTORY)
++  list(APPEND CONTROLLER_INCLUDE_DIRS ${DIR})
++endforeach()
++list(REMOVE_DUPLICATES CONTROLLER_INCLUDE_DIRS)
++target_include_directories(${TARGET_NAME} PRIVATE ${CONTROLLER_INCLUDE_DIRS})
++
++target_include_directories(${TARGET_NAME} PRIVATE
++  ${COMMON_INCLUDE_DIRS}
++  ${LIBUSB_INCLUDE_DIRS}
++)
++
++target_link_libraries(${TARGET_NAME} PRIVATE
++  ${QT_PACKAGE}::Widgets
++  ${QT_PACKAGE}::DBus
++  ${LIBUSB_LIBRARIES}
++  dl
++)
++
++# ---------------------------------------------------------------------------------------
++# HIDAPI detection
++# ---------------------------------------------------------------------------------------
++find_package(hidapi QUIET COMPONENTS hidraw libusb)
++
++if(TARGET hidapi::hidraw)
++  message(STATUS "Using HIDAPI hidraw backend")
++  set(HIDAPI_TARGET hidapi::hidraw)
++elseif(TARGET hidapi::libusb)
++  message(STATUS "Using HIDAPI libusb backend")
++  set(HIDAPI_TARGET hidapi::libusb)
++elseif(TARGET hidapi::hidapi)
++  message(STATUS "Using generic HIDAPI backend")
++  set(HIDAPI_TARGET hidapi::hidapi)
++else()
++  message(WARNING "No system HIDAPI found — falling back to pkg-config")
++  find_package(PkgConfig REQUIRED)
++  pkg_check_modules(HIDAPI REQUIRED hidapi)
++  target_include_directories(${TARGET_NAME} PRIVATE ${HIDAPI_INCLUDE_DIRS})
++  set(HIDAPI_TARGET ${HIDAPI_LIBRARIES})
++endif()
++
++if(EXISTS "/usr/include/hidapi/hidapi.h")
++  target_include_directories(${TARGET_NAME} PRIVATE /usr/include/hidapi)
++endif()
++
++execute_process(
++  COMMAND bash -c "pkg-config --modversion hidapi-hidraw 2>/dev/null || echo 0.0.0"
++  OUTPUT_VARIABLE HIDAPI_HIDRAW_VERSION OUTPUT_STRIP_TRAILING_WHITESPACE
++)
++if(HIDAPI_HIDRAW_VERSION VERSION_GREATER_EQUAL 0.10.1)
++  add_compile_definitions(USE_HID_USAGE)
++endif()
++
++target_link_libraries(${TARGET_NAME} PRIVATE ${HIDAPI_TARGET})
++
++# ---------------------------------------------------------------------------------------
++# Optimization flags
++# ---------------------------------------------------------------------------------------
++if(CMAKE_CXX_COMPILER_ID MATCHES "GNU|Clang")
++  target_compile_options(${TARGET_NAME} PRIVATE
++    -Wno-implicit-fallthrough -Wno-psabi -Wno-unused-parameter
++    -Wno-sign-compare -Wno-unused-variable -Wno-unused-result -Wno-deprecated-declarations
++    -O3 -funroll-loops -fstrict-aliasing -ftree-vectorize -fprefetch-loop-arrays
++    -fomit-frame-pointer -fno-math-errno -save-temps
++  )
++  include(CheckIPOSupported)
++  check_ipo_supported(RESULT lto_ok OUTPUT lto_msg)
++  if(lto_ok)
++    set_property(TARGET ${TARGET_NAME} PROPERTY INTERPROCEDURAL_OPTIMIZATION TRUE)
++  endif()
++endif()
++
++# ---------------------------------------------------------------------------------------
++# Install paths
++# ---------------------------------------------------------------------------------------
++if(NOT DEFINED CMAKE_INSTALL_PREFIX)
++  set(CMAKE_INSTALL_PREFIX /usr CACHE PATH "Install prefix" FORCE)
++endif()
++
++set(OPENRGB_SYSTEM_PLUGIN_DIRECTORY "${CMAKE_INSTALL_PREFIX}/lib/openrgb/plugins")
++target_compile_definitions(${TARGET_NAME} PRIVATE
++  OPENRGB_SYSTEM_PLUGIN_DIRECTORY="${OPENRGB_SYSTEM_PLUGIN_DIRECTORY}"
++)
++
++install(TARGETS ${TARGET_NAME} RUNTIME DESTINATION bin)
++install(FILES qt/org.openrgb.OpenRGB.desktop DESTINATION share/applications)
++install(FILES qt/org.openrgb.OpenRGB.png DESTINATION share/icons/hicolor/128x128/apps)
++install(FILES qt/org.openrgb.OpenRGB.metainfo.xml DESTINATION share/metainfo)
 diff --git a/Dockerfile b/Dockerfile
 index b0a17604..d74f1a8e 100644
 --- a/Dockerfile

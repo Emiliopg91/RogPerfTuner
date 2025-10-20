@@ -136,7 +136,11 @@ else
     --privileged \
     -e SYNC_DATABASE=1 \
     -v "$$(pwd)":/pkg \
-    cachyos/docker-makepkg-v3 "$$@"
+    cachyos/docker-makepkg "$$@" && \
+	if ! ls *.zst >/dev/null 2>&1; then \
+		echo "makepkg test failed"; \
+		exit 1; \
+	fi
 endif
 
 build_debug:
