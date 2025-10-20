@@ -4561,10 +4561,10 @@ index cf9c8263..f6e31287 100644
 +	DetectDeviceMutex.unlock();
  }
 diff --git a/build.sh b/build.sh
-index ebc7370d..09128c8f 100755
+index ebc7370d..e6b8840f 100755
 --- a/build.sh
 +++ b/build.sh
-@@ -1,9 +1,16 @@
+@@ -1,9 +1,15 @@
 -podman build -t openrgb-build .
 -rm -R ./build
 -mkdir build
@@ -4583,9 +4583,8 @@ index ebc7370d..09128c8f 100755
 +mkdir -p build
 +cd build
 +
-+export QMAKE_MAKEFLAGS="-j$(nproc)" 
-+qmake6 ../OpenRGB.pro
-+make -j"$(nproc)"
++cmake -DCMAKE_BUILD_TYPE=Release -G Ninja ..
++cmake --build . -j$(nproc)
 +
 +cd ..
 +
