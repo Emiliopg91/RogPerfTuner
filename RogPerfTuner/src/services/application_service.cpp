@@ -58,6 +58,7 @@ const std::string ApplicationService::buildDesktopFile() {
 	ss << "[Desktop Entry]\n"
 	   << "Exec=rog-perf-tuner\n"
 	   << "Icon=" << Constants::ASSET_ICON_45_FILE << "\n"
+	   << "Name=" << Constants::APP_NAME << "\n"
 	   << "WName=" << Constants::APP_NAME << "\n"
 	   << "Comment=An utility to manage Asus Rog laptop performance\n"
 	   << "Path=\n"
