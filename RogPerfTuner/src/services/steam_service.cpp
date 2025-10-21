@@ -10,7 +10,7 @@
 #include "../../include/configuration/configuration.hpp"
 #include "../../include/events/event_bus.hpp"
 #include "../../include/gui/game_config_dialog.hpp"
-#ifdef IS_AURPKG
+#ifndef DEV_MODE
 #include "../../include/gui/yes_no_dialog.hpp"
 #endif
 #include "../../include/models/others/semantic_version.hpp"
@@ -191,7 +191,7 @@ void SteamService::installRccDC() {
 	try {
 		if (FileUtils::exists(Constants::DECKY_SERVICE_PATH)) {
 			if (!FileUtils::exists(Constants::RCCDC_PATH)) {
-#ifdef IS_AURPKG
+#ifndef DEV_MODE
 				if (!configuration.getConfiguration().application.askedInstallRccdc &&
 					YesNoDialog::showDialog(translator.translate("enable.decky.integration.title"),
 											translator.translate("enable.decky.integration.body"))) {
@@ -201,7 +201,7 @@ void SteamService::installRccDC() {
 					installPipDeps();
 					copyPlugin();
 					Logger::rem_tab();
-#ifdef IS_AURPKG
+#ifndef DEV_MODE
 				}
 #endif
 				configuration.getConfiguration().application.askedInstallRccdc = true;

@@ -37,6 +37,6 @@ target_link_libraries(RogPerfTuner PRIVATE
     udev
 )
 
-if(IS_AURPKG)
-    add_compile_definitions(IS_AURPKG)
+if(DEV_MODE)
+    add_compile_definitions(DEV_MODE)
 endif()

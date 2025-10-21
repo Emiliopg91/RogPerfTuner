@@ -80,7 +80,11 @@ inline int startGui(int argc, char** argv) {
 	logger.info("#{}#", title);
 	logger.info("###################################################");
 	logger.info("Version {}", Constants::APP_VERSION);
+#ifdef DEV_MODE
+	logger.info("Starting initialization in dev mode");
+#else
 	logger.info("Starting initialization");
+#endif
 	Logger::add_tab();
 
 	Translator::getInstance();

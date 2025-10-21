@@ -8,14 +8,14 @@
 #include "../../include/events/event_bus.hpp"
 #include "../../include/utils/file_utils.hpp"
 
-#ifndef IS_AURPKG
+#ifdef DEV_MODE
 #endif
 
 ApplicationService::ApplicationService(std::optional<std::string> execPath) : Loggable("ApplicationService") {
 	logger.info("Initializing ApplicationService");
 	Logger::add_tab();
 
-#ifdef IS_AURPKG
+#ifndef DEV_MODE
 	if (!FileUtils::exists(Constants::APP_DRAW_FILE)) {
 		logger.info("Creating menu entry");
 		Logger::add_tab();

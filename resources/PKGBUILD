@@ -85,7 +85,7 @@ build() {
     export CXXFLAGS="${CXXFLAGS}"
 
     cd "$srcdir/RogPerfTuner"
-    IS_AURPKG=1 make release
+    make pkgbuild
 }
 
 package() {

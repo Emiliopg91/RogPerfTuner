@@ -5,7 +5,7 @@
 
 #include "../../include/utils/string_utils.hpp"
 
-#ifndef IS_AURPKG
+#ifdef DEV_MODE
 #include "../../include/utils/file_utils.hpp"
 #endif
 
@@ -17,7 +17,7 @@ const std::string Constants::APP_VERSION = "4.5.9";
 
 const std::string Constants::PLUGIN_VERSION = "1.2.4";
 
-#ifndef IS_AURPKG
+#ifdef DEV_MODE
 const std::string Constants::ASSETS_DIR = FileUtils::getCWD() + "/build/assets";
 #else
 const std::string Constants::ASSETS_DIR = "/usr/share/rog-perf-tuner";
