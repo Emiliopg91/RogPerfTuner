@@ -3,7 +3,7 @@ new file mode 100644
 index 00000000..a1448c12
 --- /dev/null
 +++ b/CMakeLists.txt
-@@ -0,0 +1,356 @@
+@@ -0,0 +1,328 @@
 +cmake_minimum_required(VERSION 3.16)
 +
 +# ---------------------------------------------------------------------------------------
@@ -228,33 +228,6 @@ index 00000000..a1448c12
 +endif()
 +
 +# ---------------------------------------------------------------------------------------
-+# Translations
-+# ---------------------------------------------------------------------------------------
-+set(TRANSLATIONS
-+  qt/i18n/OpenRGB_de_DE.ts
-+  qt/i18n/OpenRGB_en_US.ts
-+  qt/i18n/OpenRGB_en_AU.ts
-+  qt/i18n/OpenRGB_en_GB.ts
-+  qt/i18n/OpenRGB_es_ES.ts
-+  qt/i18n/OpenRGB_fr_FR.ts
-+  qt/i18n/OpenRGB_hr_HR.ts
-+  qt/i18n/OpenRGB_it_IT.ts
-+  qt/i18n/OpenRGB_ko_KR.ts
-+  qt/i18n/OpenRGB_ms_MY.ts
-+  qt/i18n/OpenRGB_pl_PL.ts
-+  qt/i18n/OpenRGB_pt_BR.ts
-+  qt/i18n/OpenRGB_ru_RU.ts
-+  qt/i18n/OpenRGB_zh_CN.ts
-+  qt/i18n/OpenRGB_zh_TW.ts
-+)
-+
-+if(QT_PACKAGE STREQUAL "Qt6")
-+  qt_add_translation(QM_FILES ${TRANSLATIONS})
-+else()
-+  QT5_ADD_TRANSLATION(QM_FILES ${TRANSLATIONS})
-+endif()
-+
-+# ---------------------------------------------------------------------------------------
 +# Executable
 +# ---------------------------------------------------------------------------------------
 +add_executable(${TARGET_NAME}
@@ -265,7 +238,6 @@ index 00000000..a1448c12
 +  ${CTRL_HEADERS_ALL}
 +  ${OTHER_HEADERS}
 +  ${GUI_FORMS}
-+  ${QM_FILES}
 +)
 +
 +# ---------------------------------------------------------------------------------------
