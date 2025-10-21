@@ -22,7 +22,6 @@ class Constants {
 	static const std::string USR_SHARE_OCL_DIR;
 	static const std::string UDEV_RULES;
 	static const std::string USR_SHARE_VK_DIR;
-	static const std::string TMP_UDEV_PATH;
 	static const std::string LOCK_FILE;
 
 	static const std::string ASSETS_BIN_DIR;
@@ -31,7 +30,6 @@ class Constants {
 	static const std::string ASSET_ICON_45_FILE;
 
 	static const std::string ORGB_DIR;
-	static const std::string ORGB_UDEV_PATH;
 	static const std::string ORGB_PATH;
 	static const std::string RCCDC_ASSET_PATH;
 

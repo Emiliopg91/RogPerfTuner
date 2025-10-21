@@ -13,7 +13,7 @@ const pid_t Constants::PID = getpid();
 
 const std::string Constants::APP_NAME = "RogPerfTuner";
 
-const std::string Constants::APP_VERSION = "4.5.6";
+const std::string Constants::APP_VERSION = "4.5.7";
 
 const std::string Constants::PLUGIN_VERSION = "1.2.4";
 
@@ -28,9 +28,8 @@ const std::string Constants::LOG_RUNNER_FILE_NAME = "Runner";
 const std::string Constants::LOG_ORGB_FILE_NAME	  = "OpenRGB";
 
 const std::string Constants::USR_SHARE_OCL_DIR = "/etc/OpenCL/vendors/";
-const std::string Constants::UDEV_RULES		   = "/usr/lib/udev/rules.d/60-" + StringUtils::toLowerCase(APP_NAME) + ".rules";
 const std::string Constants::USR_SHARE_VK_DIR  = "/usr/share/vulkan/icd.d/";
-const std::string Constants::TMP_UDEV_PATH	   = "/tmp/60-openrgb.rules";
+const std::string Constants::UDEV_RULES		   = "/usr/lib/udev/rules.d/60-rog-perf-tuner.rules";
 const std::string Constants::LOCK_FILE		   = "/tmp/" + APP_NAME + ".lock";
 const std::string Constants::SOCKET_FILE	   = "/tmp/" + APP_NAME + ".sock";
 
@@ -40,7 +39,6 @@ const std::string Constants::ASSET_ICONS_DIR	= ASSETS_DIR + "/icons";
 const std::string Constants::ASSET_ICON_FILE	= ASSETS_DIR + "/icons/icon.svg";
 const std::string Constants::ASSET_ICON_45_FILE = ASSETS_DIR + "/icons/icon-45x45.png";
 const std::string Constants::ORGB_DIR			= ASSETS_DIR + "/OpenRGB";
-const std::string Constants::ORGB_UDEV_PATH		= ASSETS_DIR + "/OpenRGB/60-openrgb.rules";
 const std::string Constants::ORGB_PATH			= ASSETS_DIR + "/OpenRGB/openrgb";
 const std::string Constants::RCCDC_ASSET_PATH	= ASSETS_DIR + "/RccDeckyCompanion";
 

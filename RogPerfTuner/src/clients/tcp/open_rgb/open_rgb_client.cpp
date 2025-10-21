@@ -22,19 +22,6 @@
 #include "../../../../include/utils/time_utils.hpp"
 
 void OpenRgbClient::initialize() {
-	if (!FileUtils::exists(Constants::UDEV_RULES) || FileUtils::md5(Constants::ORGB_UDEV_PATH) != FileUtils::md5(Constants::Constants::UDEV_RULES)) {
-		logger.info("Configuring UDEV rules");
-		Logger::add_tab();
-
-		shell.run_command("cp " + Constants::ORGB_UDEV_PATH + " " + Constants::TMP_UDEV_PATH);
-		shell.run_elevated_command("mv " + Constants::TMP_UDEV_PATH + " " + Constants::UDEV_RULES + " && chmod 777 " + Constants::UDEV_RULES +
-								   " && udevadm control --reload-rules && udevadm trigger");
-
-		Logger::rem_tab();
-	} else {
-		logger.info("UDEV rules already configured");
-	}
-
 	logger.info("Reading UDEV files");
 	Logger::add_tab();
 	auto lines = StringUtils::splitLines(FileUtils::readFileContent(Constants::UDEV_RULES));
@@ -163,6 +150,7 @@ void OpenRgbClient::runner() {
 	}
 	env.push_back(nullptr);
 
+	FileUtils::remove(Constants::LOG_DIR + "/" + Constants::LOG_ORGB_FILE_NAME + ".log");
 	pid			  = shell.launch_process(Constants::ORGB_PATH.c_str(), argv.data(), env.data(),
 										 Constants::LOG_DIR + "/" + Constants::LOG_ORGB_FILE_NAME + ".log");
 	int exit_code = shell.wait_for(pid);

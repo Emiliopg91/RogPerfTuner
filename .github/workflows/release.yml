@@ -74,9 +74,10 @@ jobs:
           echo "Copying files..."
           cp ../dist/PKGBUILD .
           cp ../dist/.SRCINFO .
+          cp ../dist/rog-perf-tuner.install .
 
           echo "Committing changes..."
-          git add PKGBUILD .SRCINFO
+          git add PKGBUILD .SRCINFO rog-perf-tuner.install
           git diff-index --quiet HEAD || git commit -m "Release ${GITHUB_REF_NAME}"
           git push
 
@@ -87,6 +88,6 @@ jobs:
           name: ${{ env.VERSION }}
           files: |
             dist/PKGBUILD
-            dist/.SRCINFO
+            dist/rog-perf-tuner.install
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

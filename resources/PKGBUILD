@@ -53,6 +53,7 @@ makedepends=(
   'unzip'
   'zip'
 )
+install=rog-perf-tuner.install
 
 prepare() {
     if [[ ! -d "${HOME}/.local/share/pnpm" ]]; then
