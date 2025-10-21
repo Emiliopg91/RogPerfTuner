@@ -24,8 +24,8 @@ MainWindow::MainWindow(QWidget* parent) : QMainWindow(parent), _logger(new Logge
 	runningGames = steamService.getRunningGames().size();
 
 	setWindowTitle(QString::fromStdString(Constants::APP_NAME + " | " + Constants::APP_VERSION));
-	setGeometry(0, 0, 350, 730);
-	setFixedSize(350, 730);
+	setGeometry(0, 0, 350, 700);
+	setFixedSize(350, 700);
 	setWindowIcon(QIcon(QString::fromStdString(Constants::ASSET_ICON_45_FILE)));
 
 	QWidget* centralWidget	= new QWidget(this);
@@ -145,7 +145,7 @@ MainWindow::MainWindow(QWidget* parent) : QMainWindow(parent), _logger(new Logge
 	// Effect menu
 	// -------------------------
 	// -------------------------
-	// Brightness menu
+	// Brightness + Color menu
 	// -------------------------
 	_brightnessDropdown = new QComboBox();
 	_brightnessDropdown->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Preferred);
@@ -155,25 +155,26 @@ MainWindow::MainWindow(QWidget* parent) : QMainWindow(parent), _logger(new Logge
 	}
 	_brightnessDropdown->setCurrentIndex(_brightnessDropdown->findData(openRgbService.getCurrentBrightness().toInt()));
 	connect(_brightnessDropdown, QOverload<int>::of(&QComboBox::currentIndexChanged), this, &MainWindow::onBrightnessChange);
-	auraLayout->addRow(new QLabel(QString::fromStdString(translator.translate("brightness") + ":")), _brightnessDropdown);
-	// -------------------------
-	// Brightness menu
-	// -------------------------
-	// -------------------------
-	// Color menu
-	// -------------------------
+
 	_colorButton = new QPushButton();
 	_colorButton->setFixedSize(25, 25);
 	_colorButton->setStyleSheet(QString::fromStdString("background-color: " + (openRgbService.getColor().value_or(Color::Black.toHex()))));
 	_colorButton->setCursor(Qt::PointingHandCursor);
 	_colorButton->setEnabled(openRgbService.getColor().has_value());
 	connect(_colorButton, &QPushButton::clicked, this, &MainWindow::showColorPicker);
-	auraLayout->addRow(new QLabel(QString::fromStdString(translator.translate("color") + ":")), _colorButton);
-	// -------------------------
-	// Color menu
-	// -------------------------
+
+	auto brightnessColorLayout = new QHBoxLayout();
+	brightnessColorLayout->addWidget(_brightnessDropdown);
+	brightnessColorLayout->addWidget(_colorButton);
+	brightnessColorLayout->setSpacing(10);
+
+	auraLayout->addRow(new QLabel(QString::fromStdString(translator.translate("brightness") + ":")), brightnessColorLayout);
+
 	auraGroup->setLayout(auraLayout);
 	mainLayout->addWidget(auraGroup);
+	// -------------------------
+	// Brightness + Color menu
+	// -------------------------
 	// -------------------------
 	// Aura group
 	// -------------------------
