@@ -22,7 +22,7 @@ MainWindow::MainWindow(QWidget* parent) : QMainWindow(parent), _logger(new Logge
 	onBattery	 = uPowerClient.isOnBattery();
 	runningGames = steamService.getRunningGames().size();
 
-	setWindowTitle(QString::fromStdString(Constants::APP_NAME));
+	setWindowTitle(QString::fromStdString(Constants::APP_NAME + " | " + Constants::APP_VERSION));
 	setGeometry(0, 0, 350, 700);
 	setFixedSize(350, 700);
 	setWindowIcon(QIcon(QString::fromStdString(Constants::ASSET_ICON_45_FILE)));
