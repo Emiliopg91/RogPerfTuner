@@ -17,8 +17,10 @@ const std::string Constants::PLUGIN_VERSION = "1.2.4";
 
 #ifdef DEV_MODE
 const std::string Constants::ASSETS_DIR = FileUtils::getCWD() + "/build/assets";
+const std::string Constants::UDEV_RULES = ASSETS_DIR + "/OpenRGB/60-openrgb.rules";
 #else
 const std::string Constants::ASSETS_DIR = "/usr/share/rog-perf-tuner";
+const std::string Constants::UDEV_RULES = "/usr/lib/udev/rules.d/60-rog-perf-tuner.rules";
 #endif
 
 const std::string Constants::LOG_FILE_NAME		  = APP_NAME;
@@ -27,7 +29,6 @@ const std::string Constants::LOG_ORGB_FILE_NAME	  = "OpenRGB";
 
 const std::string Constants::USR_SHARE_OCL_DIR = "/etc/OpenCL/vendors/";
 const std::string Constants::USR_SHARE_VK_DIR  = "/usr/share/vulkan/icd.d/";
-const std::string Constants::UDEV_RULES		   = "/usr/lib/udev/rules.d/60-rog-perf-tuner.rules";
 const std::string Constants::LOCK_FILE		   = "/tmp/" + APP_NAME + ".lock";
 const std::string Constants::SOCKET_FILE	   = "/tmp/" + APP_NAME + ".sock";
 
