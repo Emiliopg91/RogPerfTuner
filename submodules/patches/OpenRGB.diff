@@ -1,9 +1,9 @@
 diff --git a/CMakeLists.txt b/CMakeLists.txt
 new file mode 100644
-index 00000000..a1448c12
+index 00000000..17e84771
 --- /dev/null
 +++ b/CMakeLists.txt
-@@ -0,0 +1,328 @@
+@@ -0,0 +1,339 @@
 +cmake_minimum_required(VERSION 3.16)
 +
 +# ---------------------------------------------------------------------------------------
@@ -298,6 +298,17 @@ index 00000000..a1448c12
 +endif()
 +
 +target_link_libraries(${TARGET_NAME} PRIVATE ${HIDAPI_TARGET})
++
++# ---------------------------------------------------------------------------------------
++# Remove -pipe from global flags (incompatible with -save-temps)
++# ---------------------------------------------------------------------------------------
++foreach(var CMAKE_C_FLAGS CMAKE_CXX_FLAGS CMAKE_C_FLAGS_RELEASE CMAKE_CXX_FLAGS_RELEASE
++            CMAKE_C_FLAGS_DEBUG CMAKE_CXX_FLAGS_DEBUG)
++  if(${var} MATCHES "-pipe")
++    string(REPLACE "-pipe" "" ${var} "${${var}}")
++    message(STATUS "Removed -pipe from ${var}: ${${var}}")
++  endif()
++endforeach()
 +
 +# ---------------------------------------------------------------------------------------
 +# Optimization flags
