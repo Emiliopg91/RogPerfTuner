@@ -234,7 +234,7 @@ MainWindow::MainWindow(QWidget* parent) : QMainWindow(parent), _logger(new Logge
 	// -------------------------
 	_autostart = new QCheckBox();
 	_autostart->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Preferred);
-#ifndef IS_AURPKG
+#ifdef DEV_MODE
 	_autostart->setEnabled(false);
 #endif
 	_autostart->setChecked(applicationService.isAutostartEnabled());

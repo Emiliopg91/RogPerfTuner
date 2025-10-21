@@ -27,7 +27,7 @@ config:
 		cd submodules/OpenRGB-cppSDK && git apply ../patches/OpenRGB-cppSDK.diff && touch ../patches/OpenRGB-cppSDK.diff.applied; \
 	fi
 	
-	@CXX=clang++ CC=clang cmake -B build -G Ninja -S . -DCMAKE_BUILD_TYPE=$(BUILD_TYPE) -DCMAKE_EXPORT_COMPILE_COMMANDS=ON $${IS_AURPKG:+-DIS_AURPKG=1}
+	@CXX=clang++ CC=clang cmake -B build -G Ninja -S . -DCMAKE_BUILD_TYPE=$(BUILD_TYPE) -DCMAKE_EXPORT_COMPILE_COMMANDS=ON $${DEV_MODE:+-DDEV_MODE=1}
 
 	@if [ ! -f "compile_commands.json" ]; then \
 		ln -s build/compile_commands.json .; \
@@ -111,27 +111,27 @@ package:
 	@ARCH=x86_64 VERSION=$$(cat resources/version) ./resources/appimagetool --comp zstd -u "gh-releases-zsync|Emiliopg91|RogPerfTuner|latest|RogPerfTuner.AppImage.zsync" -n dist/appimage-fs dist/RogPerfTuner.AppImage
 	@mv RogPerfTuner.AppImage.zsync dist
 
+
+pkgbuild:
+	@export BUILD_TYPE=Release
+	@make build BUILD_TYPE=Release
+
 release:
 	@rm -rf dist
 
-ifdef IS_AURPKG
-	@export BUILD_TYPE=Release
-	@make build BUILD_TYPE=Release
-else
-	@python resources/scripts/constants.py
-
 	@mkdir dist dist/test && chmod 777 -R dist
 
+	@python resources/scripts/constants.py
+
 	@echo "#######################################################################"
-	@echo "######################### Generating PKGBUILD #########################"
+	@echo "######################### Generating Release ##########################"
 	@echo "#######################################################################"
 	@cp resources/PKGBUILD dist/PKGBUILD
 	@cp resources/rog-perf-tuner.sh dist/rog-perf-tuner.install
 	@python resources/scripts/pkgbuild.py
-endif
 
 build_debug:
-	@make build BUILD_TYPE=Debug
+	@DEV_MODE=1 make build BUILD_TYPE=Debug
 
 run: build_debug
 	@touch /tmp/fake.AppImage
