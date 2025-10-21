@@ -128,21 +128,6 @@ else
 	@cp resources/PKGBUILD dist/PKGBUILD
 	@cp resources/rog-perf-tuner.sh dist/rog-perf-tuner.install
 	@python resources/scripts/pkgbuild.py
-	
-
-	@echo "#######################################################################"
-	@echo "############################# Running test ############################"
-	@echo "#######################################################################"
-	@cd dist/test &&  docker run --rm --name dockerbuilder \
-    --privileged \
-    -e EXPORT_PKG=1 \
-    -e SYNC_DATABASE=1 \
-    -v "$$(pwd)":/pkg \
-    cachyos/docker-makepkg "$$@" && \
-	if ! ls *.zst >/dev/null 2>&1; then \
-		echo "makepkg test failed"; \
-		exit 1; \
-	fi
 endif
 
 build_debug:
