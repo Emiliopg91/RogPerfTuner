@@ -85,15 +85,9 @@ user.canceled.operation:
 authentication.failed:
   en: Authentication failed
   es: Fallo de autenticación
-applying.update:
-  en: Applying update, please wait
-  es: Aplicando actualizacion, espere
 update.available:
-  en: Update availabe
-  es: Actualización disponible
-apply.now:
-  en: Apply now
-  es: Aplicar ahora
+  en: Update {version} available
+  es: Actualización {version} disponible
 initializing:
   en: Initializing application
   es: Inicializando aplicación

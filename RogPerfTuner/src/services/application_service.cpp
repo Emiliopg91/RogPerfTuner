@@ -1,12 +1,17 @@
 #include "../../include/services/application_service.hpp"
 
+#include <httplib.h>
 #include <signal.h>
 #include <unistd.h>
 
+#include <exception>
+#include <optional>
 #include <sstream>
 
 #include "../../include/events/event_bus.hpp"
+#include "../../include/models/others/semantic_version.hpp"
 #include "../../include/utils/file_utils.hpp"
+#include "../../include/utils/time_utils.hpp"
 
 #ifdef DEV_MODE
 #endif
@@ -114,4 +119,56 @@ void ApplicationService::shutdown() {
 	Logger::rem_tab();
 	logger.info("Shutdown finished");
 	kill(Constants::PID, SIGTERM);
+}
+
+void ApplicationService::startUpdateCheck() {
+	updateChecker = std::thread(&ApplicationService::lookForUpdates, this);
+	updateChecker.detach();
+}
+
+void ApplicationService::lookForUpdates() {
+	TimeUtils::sleep(5 * 1000);
+	httplib::SSLClient cli("aur.archlinux.org");
+	bool found = false;
+	while (true) {
+		logger.info("Looking for update");
+		Logger::add_tab();
+		try {
+			auto res = cli.Get("/rpc/?v=5&type=info&arg=rog-perf-tuner");
+
+			if (res && res->status == 200) {
+				YAML::Node root = YAML::Load(res->body);
+				auto version	= root["results"][0]["Version"].as<std::string>();
+				size_t pos		= version.find('-');
+				if (pos != std::string::npos) {
+					version = version.substr(0, pos);
+				}
+
+				SemanticVersion vA = SemanticVersion::parse(Constants::APP_VERSION);
+				SemanticVersion vR = SemanticVersion::parse(version);
+
+				if (vR > vA) {
+					logger.info("New version available: {}", version);
+					toaster.showToast(translator.translate("update.available", {{"version", version}}));
+					eventBus.emitUpdateAvailable(version);
+					found = true;
+					break;
+				}
+			}
+		} catch (std::exception& e) {
+			logger.error("Error on update check: {}", e.what());
+		}
+
+		if (!found) {
+			logger.info("No update found");
+		}
+
+		Logger::rem_tab();
+
+		TimeUtils::sleep(60 * 60 * 1000);
+	}
+}
+
+std::optional<std::string> ApplicationService::getLatestVersion() {
+	return std::nullopt;
 }

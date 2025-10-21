@@ -9,6 +9,7 @@
 #include <QFormLayout>
 #include <QGroupBox>
 #include <QLabel>
+#include <QStatusBar>
 #include <QVBoxLayout>
 #include <algorithm>
 #include <optional>
@@ -23,8 +24,8 @@ MainWindow::MainWindow(QWidget* parent) : QMainWindow(parent), _logger(new Logge
 	runningGames = steamService.getRunningGames().size();
 
 	setWindowTitle(QString::fromStdString(Constants::APP_NAME + " | " + Constants::APP_VERSION));
-	setGeometry(0, 0, 350, 700);
-	setFixedSize(350, 700);
+	setGeometry(0, 0, 350, 730);
+	setFixedSize(350, 730);
 	setWindowIcon(QIcon(QString::fromStdString(Constants::ASSET_ICON_45_FILE)));
 
 	QWidget* centralWidget	= new QWidget(this);
@@ -249,6 +250,16 @@ MainWindow::MainWindow(QWidget* parent) : QMainWindow(parent), _logger(new Logge
 	// Settings group
 	// -------------------------
 
+	// -------------------------
+	// Status bar
+	// -------------------------
+	statusBar = new QStatusBar(this);
+	statusBar->showMessage(QString::fromStdString("Application up to date"));
+	setStatusBar(statusBar);
+	// -------------------------
+	// Status bar
+	// -------------------------
+
 	setCentralWidget(centralWidget);
 	QScreen* screen = QApplication::screenAt(QCursor::pos());
 	if (screen) {
@@ -295,6 +306,14 @@ MainWindow::MainWindow(QWidget* parent) : QMainWindow(parent), _logger(new Logge
 	eventBus.onBootSound([this](bool value) {
 		onBootSoundEvent(value);
 	});
+
+	eventBus.onUpdateAvailable([this](std::string value) {
+		onUpdateAvailable(value);
+	});
+}
+
+void MainWindow::onUpdateAvailable(std::string value) {
+	statusBar->showMessage(translator.translate("update.available", {{"version", value}}).c_str());
 }
 
 void MainWindow::closeEvent(QCloseEvent* event) {

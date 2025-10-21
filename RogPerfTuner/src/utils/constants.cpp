@@ -3,8 +3,6 @@
 #include <limits.h>
 #include <unistd.h>
 
-#include "../../include/utils/string_utils.hpp"
-
 #ifdef DEV_MODE
 #include "../../include/utils/file_utils.hpp"
 #endif
@@ -13,7 +11,7 @@ const pid_t Constants::PID = getpid();
 
 const std::string Constants::APP_NAME = "RogPerfTuner";
 
-const std::string Constants::APP_VERSION = "4.5.9";
+const std::string Constants::APP_VERSION = "4.5.10";
 
 const std::string Constants::PLUGIN_VERSION = "1.2.4";
 

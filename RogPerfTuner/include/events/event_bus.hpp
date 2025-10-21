@@ -23,6 +23,28 @@ typedef std::function<void()> Callback;
 class EventBus : public Singleton<EventBus> {
   public:
 	/**
+	 * Emit a notification that a new software update is available.
+	 *
+	 * Broadcasts an "update available" event to all listeners/subscribers registered
+	 * with the event bus, carrying the provided version identifier.
+	 *
+	 * @param version
+	 *   A string identifying the new version.
+	 */
+	void emitUpdateAvailable(std::string version);
+
+	/**
+	 * @brief Register a handler to be invoked when an update becomes available.
+	 *
+	 * Registers a callback that will be invoked each time an update event is
+	 * emitted.
+	 *
+	 * @param callback Callable accepting a std::string; ownership of the callable
+	 *                 is transferred to the event bus (moved).
+	 */
+	void onUpdateAvailable(std::function<void(std::string)>&& callback);
+
+	/**
 	 * @brief Emits a server socket event with the specified event name and associated value.
 	 *
 	 * This function triggers an event on the server socket, passing the event name and a parameter
@@ -279,19 +301,20 @@ class EventBus : public Singleton<EventBus> {
 	 */
 	void emitScheduler(std::optional<std::string> scheduler);
 
-	inline const static constexpr std::string_view APPLICATION_STOP					   = "APPLICATION_STOP";
-	inline const static constexpr std::string_view UDEV_CLIENT_DEVICE_EVENT			   = "UDEV_CLIENT_DEVICE_EVENT";
-	inline const static constexpr std::string_view HARDWARE_SERVICE_USB_REMOVED		   = "HARDWARE_SERVICE_USB_REMOVED";
-	inline const static constexpr std::string_view HARDWARE_SERVICE_USB_ADDED		   = "HARDWARE_SERVICE_USB_ADDED";
-	inline const static constexpr std::string_view HARDWARE_SERVICE_ON_BATTERY		   = "HARDWARE_SERVICE_ON_BATTERY";
-	inline const static constexpr std::string_view HARDWARE_SERVICE_THRESHOLD_CHANGED  = "HARDWARE_SERVICE_THRESHOLD_CHANGED";
-	inline const static constexpr std::string_view HARDWARE_SERVICE_BOOT_SOUND_CHANGED = "HARDWARE_SERVICE_BOOT_SOUND_CHANGED";
-	inline const static constexpr std::string_view ORGB_SERVICE_ON_BRIGHTNESS		   = "ORGB_SERVICE_ON_BRIGHTNESS";
-	inline const static constexpr std::string_view ORGB_SERVICE_ON_EFFECT			   = "ORGB_SERVICE_ON_EFFECT";
-	inline const static constexpr std::string_view ORGB_SERVICE_ON_COLOR			   = "ORGB_SERVICE_ON_COLOR";
-	inline const static constexpr std::string_view PROFILE_SERVICE_ON_PROFILE		   = "PROFILE_SERVICE_ON_PROFILE";
-	inline const static constexpr std::string_view PROFILE_SERVICE_ON_SCHEDULER		   = "PROFILE_SERVICE_ON_SCHEDULER";
-	inline const static constexpr std::string_view STEAM_SERVICE_GAME_EVENT			   = "STEAM_SERVICE_GAME_EVENT";
+	inline const static constexpr std::string_view APPLICATION_STOP						= "APPLICATION_STOP";
+	inline const static constexpr std::string_view UDEV_CLIENT_DEVICE_EVENT				= "UDEV_CLIENT_DEVICE_EVENT";
+	inline const static constexpr std::string_view HARDWARE_SERVICE_USB_REMOVED			= "HARDWARE_SERVICE_USB_REMOVED";
+	inline const static constexpr std::string_view HARDWARE_SERVICE_USB_ADDED			= "HARDWARE_SERVICE_USB_ADDED";
+	inline const static constexpr std::string_view HARDWARE_SERVICE_ON_BATTERY			= "HARDWARE_SERVICE_ON_BATTERY";
+	inline const static constexpr std::string_view HARDWARE_SERVICE_THRESHOLD_CHANGED	= "HARDWARE_SERVICE_THRESHOLD_CHANGED";
+	inline const static constexpr std::string_view HARDWARE_SERVICE_BOOT_SOUND_CHANGED	= "HARDWARE_SERVICE_BOOT_SOUND_CHANGED";
+	inline const static constexpr std::string_view ORGB_SERVICE_ON_BRIGHTNESS			= "ORGB_SERVICE_ON_BRIGHTNESS";
+	inline const static constexpr std::string_view ORGB_SERVICE_ON_EFFECT				= "ORGB_SERVICE_ON_EFFECT";
+	inline const static constexpr std::string_view ORGB_SERVICE_ON_COLOR				= "ORGB_SERVICE_ON_COLOR";
+	inline const static constexpr std::string_view PROFILE_SERVICE_ON_PROFILE			= "PROFILE_SERVICE_ON_PROFILE";
+	inline const static constexpr std::string_view PROFILE_SERVICE_ON_SCHEDULER			= "PROFILE_SERVICE_ON_SCHEDULER";
+	inline const static constexpr std::string_view STEAM_SERVICE_GAME_EVENT				= "STEAM_SERVICE_GAME_EVENT";
+	inline const static constexpr std::string_view APPLICATION_SERVICE_UPDATE_AVAILABLE = "APPLICATION_SERVICE_UPDATE_AVAILABLE";
 
   private:
 	EventBus()							 = default;

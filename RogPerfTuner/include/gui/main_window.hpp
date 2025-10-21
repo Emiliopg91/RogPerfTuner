@@ -55,6 +55,8 @@ class MainWindow : public QMainWindow, public Singleton<MainWindow> {
 
 	void onBootSoundEvent(bool enabled);
 
+	void onUpdateAvailable(std::string value);
+
 	void onEffectChange();
 
 	void onBrightnessChange(int index);
@@ -89,4 +91,5 @@ class MainWindow : public QMainWindow, public Singleton<MainWindow> {
 	QComboBox* _thresholdDropdown;
 	QCheckBox* _autostart;
 	QComboBox* _bootSoundDropdown;
+	QStatusBar* statusBar;
 };

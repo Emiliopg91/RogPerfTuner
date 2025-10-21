@@ -8,6 +8,7 @@ if(CMAKE_BUILD_TYPE STREQUAL "Release")
     set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -flto=full")
 endif()
 
+find_package(httplib REQUIRED)
 find_package(Qt6 REQUIRED COMPONENTS Core DBus Gui Widgets Charts)
 find_package(Qt6Keychain REQUIRED)
 find_package(spdlog REQUIRED)
@@ -25,6 +26,7 @@ file(GLOB_RECURSE HEADERS_RCC
 add_executable(RogPerfTuner ${SOURCES_RCC} ${HEADERS_RCC})
 set_target_properties(RogPerfTuner PROPERTIES AUTOMOC ON)
 target_link_libraries(RogPerfTuner PRIVATE 
+    httplib::httplib
     Qt6::Core
     Qt6::Gui
     Qt6::Widgets

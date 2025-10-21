@@ -109,7 +109,7 @@ inline int startGui(int argc, char** argv) {
 
 	SocketServer::getInstance();
 
-	ApplicationService::init(execPath);
+	auto& applicationService = ApplicationService::init(execPath);
 
 	TrayIcon::init().show();
 
@@ -117,6 +117,7 @@ inline int startGui(int argc, char** argv) {
 
 	auto t1 = TimeUtils::now();
 	logger.info("Application ready after {} seconds", TimeUtils::getTimeDiff(t0, t1) / 1000.0);
+	applicationService.startUpdateCheck();
 
 	return app.exec();
 }

@@ -231,3 +231,13 @@ void EventBus::onUnixSocketEvent(std::string name, std::string event, CallbackWi
 		cb(data);
 	});
 }
+
+void EventBus::emitUpdateAvailable(std::string version) {
+	this->emit_event(APPLICATION_SERVICE_UPDATE_AVAILABLE, {version});
+}
+
+void EventBus::onUpdateAvailable(std::function<void(std::string)>&& callback) {
+	this->on_with_data(APPLICATION_SERVICE_UPDATE_AVAILABLE, [cb = std::move(callback)](CallbackParam data) {
+		cb(std::any_cast<std::string>(data[0]));
+	});
+}
