@@ -22,7 +22,7 @@ jobs:
           git config user.name "GitHub Actions"
           git config user.email "actions@github.com"
 
-      - name: Release and test
+      - name: Process release
         run: |
           make release
 
@@ -42,16 +42,14 @@ jobs:
         run: |
           echo "VERSION=$(cat resources/version)" >> $GITHUB_ENV
 
-      - name: Create tag
+      - name: Validate version
         run: |
-          git tag "${{ env.VERSION }}"
-          make increase_version
-          git push origin main
-          git push origin main:develop --force
-          git checkout develop
-          git add CMakeLists.txt > /dev/null
-          git commit -m "[ci skip] Ready for next development iteration" > /dev/null
-          git push origin develop --force
+          if git rev-parse "refs/tags/${VERSION}" >/dev/null 2>&1; then
+            echo "❌ Tag '${VERSION}' already exists. Please bump the version."
+            exit 1
+          else
+            echo "✅ Tag '${VERSION}' does not exist. Continuing..."
+          fi
 
       - name: Publish to AUR
         env:
@@ -80,6 +78,17 @@ jobs:
           git add PKGBUILD .SRCINFO rog-perf-tuner.install
           git diff-index --quiet HEAD || git commit -m "Release ${GITHUB_REF_NAME}"
           git push
+
+      - name: Create tag
+        run: |
+          git tag "${{ env.VERSION }}"
+          make increase_version
+          git push origin main
+          git push origin main:develop --force
+          git checkout develop
+          git add CMakeLists.txt > /dev/null
+          git commit -m "[ci skip] Ready for next development iteration" > /dev/null
+          git push origin develop --force
 
       - name: Create GitHub release
         uses: softprops/action-gh-release@v2
