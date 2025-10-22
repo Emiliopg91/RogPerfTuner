@@ -14,3 +14,11 @@ long TimeUtils::getTimeDiff(std::chrono::time_point<std::chrono::high_resolution
 void TimeUtils::sleep(long milliseconds) {
 	std::this_thread::sleep_for(std::chrono::milliseconds(milliseconds));
 }
+
+int64_t TimeUtils::fileTimeToEpoch(const std::filesystem::file_time_type& ftime) {
+	using namespace std::chrono;
+
+	auto sctp = time_point_cast<system_clock::duration>(ftime - std::filesystem::file_time_type::clock::now() + system_clock::now());
+
+	return duration_cast<seconds>(sctp.time_since_epoch()).count();
+}
