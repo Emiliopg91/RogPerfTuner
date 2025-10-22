@@ -255,7 +255,7 @@ MainWindow::MainWindow(QWidget* parent) : QMainWindow(parent), _logger(new Logge
 	// Status bar
 	// -------------------------
 	statusBar = new QStatusBar(this);
-	statusBar->showMessage(QString::fromStdString("Application up to date"));
+	statusBar->showMessage(QString::fromStdString(Constants::APP_VERSION));
 	setStatusBar(statusBar);
 	// -------------------------
 	// Status bar

@@ -119,7 +119,7 @@ pkgbuild:
 release:
 	@rm -rf dist
 
-	@mkdir dist dist/test && chmod 777 -R dist
+	@mkdir dist && chmod 777 -R dist
 
 	@python resources/scripts/constants.py
 
@@ -134,7 +134,7 @@ build_debug:
 	@DEV_MODE=1 make build BUILD_TYPE=Debug
 
 run: build_debug
-	@touch /tmp/fake.AppImage
+	@touch -t 201510220000 build/RogPerfTuner/RogPerfTuner
 	@echo "Running 'APPIMAGE=/tmp/fake.AppImage RCC_ASSETS_DIR=$(MAKEFILE_DIR)build/assets ./build/RogPerfTuner/RogPerfTuner'"
 	@echo ""
 	@RCC_ASSETS_DIR=$(MAKEFILE_DIR)build/assets ./build/RogPerfTuner/RogPerfTuner

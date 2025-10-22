@@ -101,11 +101,13 @@ with open(PKGBUILD_FILE, "w") as f:
     f.write(content)
     f.flush()
 
+"""
 if os.path.exists(PKGBUILD_TEST_FILE):
     os.unlink(PKGBUILD_TEST_FILE)
 with open(PKGBUILD_TEST_FILE, "w") as f:
     f.write(content.replace("#tag=$pkgver",""))
     f.flush()
+"""
 
 if os.path.exists(SRCINFO_FILE):
     os.unlink(SRCINFO_FILE)
