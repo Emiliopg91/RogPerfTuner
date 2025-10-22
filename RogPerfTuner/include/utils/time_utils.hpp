@@ -1,6 +1,7 @@
 #pragma once
 
 #include <chrono>
+#include <filesystem>
 
 class TimeUtils {
   private:
@@ -31,4 +32,11 @@ class TimeUtils {
 	 * @param milliseconds The number of milliseconds to sleep.
 	 */
 	static void sleep(long milliseconds);
+
+	/**
+	 * @brief Converts a filesystem file time to Unix epoch time in milliseconds.
+	 * @param ftime The file time obtained from std::filesystem operations (e.g., last_write_time).
+	 * @return The Unix epoch time in milliseconds since January 1, 1970 00:00:00 UTC.
+	 */
+	static int64_t fileTimeToEpoch(const std::filesystem::file_time_type& ftime);
 };

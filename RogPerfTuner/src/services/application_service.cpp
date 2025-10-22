@@ -30,6 +30,8 @@ ApplicationService::ApplicationService(std::optional<std::string> execPath) : Lo
 #endif
 
 	if (execPath.has_value()) {
+		this->execPath = *execPath;
+
 		logger.info("Creating helper scripts");
 		Logger::add_tab();
 
@@ -128,8 +130,11 @@ void ApplicationService::startUpdateCheck() {
 
 void ApplicationService::lookForUpdates() {
 	TimeUtils::sleep(5 * 1000);
+	int64_t currentExecTime = TimeUtils::fileTimeToEpoch(FileUtils::getMTime(this->execPath));
+
 	httplib::SSLClient cli("aur.archlinux.org");
 	bool found = false;
+
 	while (true) {
 		logger.info("Looking for update");
 		Logger::add_tab();
@@ -138,16 +143,10 @@ void ApplicationService::lookForUpdates() {
 
 			if (res && res->status == 200) {
 				YAML::Node root = YAML::Load(res->body);
-				auto version	= root["results"][0]["Version"].as<std::string>();
-				size_t pos		= version.find('-');
-				if (pos != std::string::npos) {
-					version = version.substr(0, pos);
-				}
+				auto relTime	= root["results"][0]["LastModified"].as<int64_t>();
 
-				SemanticVersion vA = SemanticVersion::parse(Constants::APP_VERSION);
-				SemanticVersion vR = SemanticVersion::parse(version);
-
-				if (vR > vA) {
+				if (relTime > currentExecTime) {
+					auto version = root["results"][0]["Version"].as<std::string>();
 					logger.info("New version available: {}", version);
 					toaster.showToast(translator.translate("update.available", {{"version", version}}));
 					eventBus.emitUpdateAvailable(version);

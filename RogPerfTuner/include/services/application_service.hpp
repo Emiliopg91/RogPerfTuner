@@ -43,6 +43,7 @@ class ApplicationService : public Singleton<ApplicationService>, Loggable {
 	friend class Singleton<ApplicationService>;
 	bool rccdcEnabled = false;
 	bool shuttingDown = false;
+	std::string execPath;
 	std::thread updateChecker;
 
 	Shell& shell				 = Shell::getInstance();
