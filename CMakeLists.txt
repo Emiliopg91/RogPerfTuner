@@ -10,18 +10,6 @@ if(NOT CMAKE_BUILD_TYPE)
 endif()
 if(CMAKE_BUILD_TYPE STREQUAL "Release")
     set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -s")
-
-    add_compile_options(
-        -funroll-loops
-        -fstrict-aliasing
-        -ftree-vectorize
-        -fno-math-errno
-    )
-
-    if(DEFINED ENV{USE_NATIVE_OPTIMIZATION})
-        message(STATUS "Native optimization enabled via environment variable.")
-        add_compile_options(-march=native)
-    endif()
 elseif(CMAKE_BUILD_TYPE STREQUAL "Debug")
     add_compile_options(-pg -O0 )
 endif()
