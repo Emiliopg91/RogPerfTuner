@@ -130,7 +130,7 @@ void ApplicationService::startUpdateCheck() {
 
 void ApplicationService::lookForUpdates() {
 	TimeUtils::sleep(5 * 1000);
-	int64_t currentExecTime = TimeUtils::fileTimeToEpoch(FileUtils::getMTime(this->execPath));
+	auto currentVersion = SemanticVersion::parse(Constants::APP_VERSION);
 
 	httplib::SSLClient cli("aur.archlinux.org");
 	bool found = false;
@@ -142,11 +142,11 @@ void ApplicationService::lookForUpdates() {
 			auto res = cli.Get("/rpc/?v=5&type=info&arg=rog-perf-tuner");
 
 			if (res && res->status == 200) {
-				YAML::Node root = YAML::Load(res->body);
-				auto relTime	= root["results"][0]["LastModified"].as<int64_t>();
+				YAML::Node root	   = YAML::Load(res->body);
+				auto version	   = root["results"][0]["Version"].as<std::string>();
+				auto latestVersion = SemanticVersion::parse(version);
 
-				if (relTime > currentExecTime) {
-					auto version = root["results"][0]["Version"].as<std::string>();
+				if (latestVersion > currentVersion) {
 					logger.info("New version available: {}", version);
 					toaster.showToast(translator.translate("update.available", {{"version", version}}));
 					eventBus.emitUpdateAvailable(version);
