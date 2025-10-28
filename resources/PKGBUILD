@@ -11,7 +11,7 @@ license=(
     'GPL2'
 )
 source=(
-    "git+https://github.com/Emiliopg91/RogPerfTuner.git#tag=$pkgver"
+    "git+https://github.com/Emiliopg91/RogPerfTuner.git#tag=$pkgver-$pkgrel"
 )
 sha256sums=(
     'SKIP'
