@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.16)
 
-project(RogPerfTuner VERSION 4.5.12 LANGUAGES CXX)
+project(RogPerfTuner VERSION 4.5.15 LANGUAGES CXX)
 
 set(CMAKE_CXX_FLAGS_RELEASE "-DNDEBUG" CACHE STRING "" FORCE)
 
