@@ -33,20 +33,23 @@ name, version = match.groups()
 if os.getenv("DEV_MODE", "0") == "1":
     version = version + "-dev"
 else:
-    try:
-        pkgbuild_path = os.path.abspath(
-            os.path.join(os.getenv("PWD"), "..", "PKGBUILD")
-        )
-        with open(pkgbuild_path, "r", encoding="utf-8") as f:
-            contenido = f.read()
+    if "RCC_VERSION" in os.environ:
+        version = os.getenv("RCC_VERSION")
+    else:
+        try:
+            pkgbuild_path = os.path.abspath(
+                os.path.join(os.getenv("PWD"), "..", "PKGBUILD")
+            )
+            with open(pkgbuild_path, "r", encoding="utf-8") as f:
+                contenido = f.read()
 
-        match = re.search(
-            r'^\s*pkgrel\s*=\s*("?)([\w\.\-]+)\1', contenido, re.MULTILINE
-        )
-        if match:
-            version = version + "-" + match.group(2)
-    except:
-        version = version + "-1"
+            match = re.search(
+                r'^\s*pkgrel\s*=\s*("?)([\w\.\-]+)\1', contenido, re.MULTILINE
+            )
+            if match:
+                version = version + "-" + match.group(2)
+        except:
+            version = version + "-1"
 
 with open(plugin_file, "r", encoding="utf-8") as f:
     plugin = json.load(f)
