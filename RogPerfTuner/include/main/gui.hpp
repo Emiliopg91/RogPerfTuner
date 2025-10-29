@@ -121,3 +121,7 @@ inline int startGui(int argc, char** argv) {
 
 	return app.exec();
 }
+
+inline int killInstance() {
+	return SingleInstance::getInstance().killRunningInstance() ? 0 : 1;
+}

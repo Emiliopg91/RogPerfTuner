@@ -1,3 +1,5 @@
+#include <pwd.h>
+
 #include <iostream>
 
 #include "../include/main/flatpak.hpp"
@@ -20,8 +22,33 @@ inline void shiftArgv(int& argc, char** argv) {
 
 int main(int argc, char** argv) {
 	if (geteuid() == 0) {
-		std::cerr << "This program must not be run as root (sudo). Please run it as a regular user." << std::endl;
-		return 1;
+		const char* sudo_user = std::getenv("SUDO_USER");
+		if (sudo_user) {
+			std::cout << "⚠️  This program must not be run as root. Relaunching as "
+					  << "\"" << sudo_user << "\"" << "..." << std::endl;
+
+			passwd* pw = getpwnam(sudo_user);
+			if (!pw) {
+				std::cerr << "Failed to retrieve information for user " << sudo_user << std::endl;
+				return 1;
+			}
+
+			std::string cmd = "sudo -u ";
+			cmd += sudo_user;
+			cmd += " ";
+
+			for (int i = 0; i < argc; ++i) {
+				cmd += "\"";
+				cmd += argv[i];
+				cmd += "\" ";
+			}
+
+			int ret = std::system(cmd.c_str());
+			return WEXITSTATUS(ret);
+		} else {
+			std::cerr << "This program must not be run as root (sudo). Please run it as a regular user." << std::endl;
+			return 1;
+		}
 	}
 
 	if (argc < 2) {
@@ -37,12 +64,14 @@ int main(int argc, char** argv) {
 			increaseBrightness();
 		} else if (option == "-d") {
 			decreaseBrightness();
+		} else if (option == "-k") {
+			return killInstance();
 		} else if (option == "-f") {
 			shiftArgv(argc, argv);
-			runFlatpakWrapping(argc, argv);
+			return runFlatpakWrapping(argc, argv);
 		} else if (option == "-r") {
 			shiftArgv(argc, argv);
-			runSteamWrapping(argc, argv);
+			return runSteamWrapping(argc, argv);
 		} else {
 			std::cerr << "Invalid argument '" << option << "'" << std::endl;
 			return 1;

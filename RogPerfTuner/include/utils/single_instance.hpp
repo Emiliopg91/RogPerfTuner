@@ -13,6 +13,8 @@ class SingleInstance : public Singleton<SingleInstance>, Loggable {
 	 */
 	void acquire();
 
+	bool killRunningInstance();
+
   private:
 	friend class Singleton<SingleInstance>;
 	SingleInstance() : Loggable("SingleInstance") {
