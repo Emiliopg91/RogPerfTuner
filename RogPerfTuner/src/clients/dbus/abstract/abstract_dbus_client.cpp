@@ -24,10 +24,25 @@ AbstractDbusClient::AbstractDbusClient(bool systemBus, const QString& service, c
 
 	iface_	   = new QDBusInterface(serviceName_, objectPath_, interfaceName_, bus_, this);
 	available_ = iface_->isValid();
-	if (!available_) {
-		if (required) {
-			throw std::runtime_error("Failed to create D-Bus interface: " + serviceName_.toStdString());
+	if (available_) {													  // Creamos un mensaje que llame a "Introspect" en el objeto remoto
+		QDBusMessage msg   = QDBusMessage::createMethodCall(service,	  // servicio remoto
+															objectPath_,  // objeto remoto
+															"org.freedesktop.DBus.Introspectable",	// interfaz estándar
+															"Introspect"							// método
+		  );
+		QDBusMessage reply = QDBusConnection::systemBus().call(msg, QDBus::Block, 200);
+
+		if (reply.type() == QDBusMessage::ErrorMessage) {
+			QString err = reply.errorName();
+			if (err != "org.freedesktop.DBus.Error.ServiceUnknown" && err != "org.freedesktop.DBus.Error.UnknownInterface" &&
+				err != "org.freedesktop.DBus.Error.UnknownMethod") {
+				available_ = false;
+			}
 		}
+	}
+
+	if (!available_ && required) {
+		throw std::runtime_error("Failed to create D-Bus interface: " + serviceName_.toStdString());
 	}
 
 	// === Conectar la señal de cambios de propiedades ===
