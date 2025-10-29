@@ -42,8 +42,12 @@ jobs:
             VERSION=$(grep -oP '(?<=VERSION )\d+\.\d+\.\d+' CMakeLists.txt)
           fi
 
+          RELEASE="${{ github.event.inputs.release }}"
+          TAG="${VERSION}-${RELEASE}"
+
           echo "VERSION=$VERSION" >> $GITHUB_ENV
-          echo "RELEASE=${{ github.event.inputs.release }}" >> $GITHUB_ENV
+          echo "RELEASE=$RELEASE" >> $GITHUB_ENV
+          echo "TAG=$TAG" >> $GITHUB_ENV
 
           git add .
           git commit -m "[ci skip] Version bump to '${VERSION}'"
@@ -91,7 +95,7 @@ jobs:
 
       - name: Create tag
         run: |
-          git tag "${{ env.VERSION }}"
+          git tag "${{ env.VERSION }}-${{ env.RELEASE }}"
           git push origin main
           git push origin main:develop --force
 
