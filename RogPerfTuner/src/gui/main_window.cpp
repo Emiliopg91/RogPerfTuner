@@ -2,6 +2,7 @@
 
 #include <qcombobox.h>
 #include <qcontainerfwd.h>
+#include <qlabel.h>
 #include <qpushbutton.h>
 
 #include <QApplication>
@@ -23,7 +24,7 @@ MainWindow::MainWindow(QWidget* parent) : QMainWindow(parent), _logger(new Logge
 	onBattery	 = uPowerClient.isOnBattery();
 	runningGames = steamService.getRunningGames().size();
 
-	setWindowTitle(QString::fromStdString(Constants::APP_NAME + " | " + Constants::APP_VERSION));
+	setWindowTitle(QString::fromStdString(Constants::APP_NAME));
 	setGeometry(0, 0, 350, 700);
 	setFixedSize(350, 700);
 	setWindowIcon(QIcon(QString::fromStdString(Constants::ASSET_ICON_45_FILE)));
@@ -254,8 +255,9 @@ MainWindow::MainWindow(QWidget* parent) : QMainWindow(parent), _logger(new Logge
 	// -------------------------
 	// Status bar
 	// -------------------------
-	statusBar = new QStatusBar(this);
-	statusBar->showMessage(QString::fromStdString(Constants::APP_VERSION));
+	statusBar	 = new QStatusBar(this);
+	versionLabel = new QLabel(Constants::APP_VERSION.c_str());
+	statusBar->addPermanentWidget(versionLabel);
 	setStatusBar(statusBar);
 	// -------------------------
 	// Status bar
@@ -314,7 +316,7 @@ MainWindow::MainWindow(QWidget* parent) : QMainWindow(parent), _logger(new Logge
 }
 
 void MainWindow::onUpdateAvailable(std::string value) {
-	statusBar->showMessage(translator.translate("update.available", {{"version", value}}).c_str());
+	versionLabel->setText(translator.translate("update.available", {{"version", value}}).c_str());
 }
 
 void MainWindow::closeEvent(QCloseEvent* event) {

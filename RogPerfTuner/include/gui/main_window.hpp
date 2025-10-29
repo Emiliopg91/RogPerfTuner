@@ -1,5 +1,7 @@
 #pragma once
 
+#include <qlabel.h>
+
 #include <QCheckBox>
 #include <QCloseEvent>
 #include <QComboBox>
@@ -92,4 +94,5 @@ class MainWindow : public QMainWindow, public Singleton<MainWindow> {
 	QCheckBox* _autostart;
 	QComboBox* _bootSoundDropdown;
 	QStatusBar* statusBar;
+	QLabel* versionLabel;
 };
