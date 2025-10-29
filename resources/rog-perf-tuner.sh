@@ -11,7 +11,11 @@ reload_udev_rules() {
 
 stop_application() {
     echo "  ⏹️ Stopping application if running..."
-    rog-perf-tuner -k
+    if [[ -n "$SUDO_USER" ]]; then
+        sudo -u "$SUDO_USER" rog-perf-tuner -k
+    else
+        rog-perf-tuner -k
+    fi
     return $?
 }
 
@@ -20,7 +24,11 @@ relaunch_application() {
     local status=$?
     if [[ $status -eq 0 ]]; then
         echo "  🚀 Relaunching application..."
-        nohup bash -c "sleep 2 && /usr/bin/rog-perf-tuner >/dev/null 2>&1 &" >/dev/null 2>&1 &
+        if [[ -n "$SUDO_USER" ]]; then
+            sudo -u "$SUDO_USER" nohup bash -c "rog-perf-tuner >/dev/null 2>&1 &" >/dev/null 2>&1 &
+        else
+            nohup bash -c "rog-perf-tuner >/dev/null 2>&1 &" >/dev/null 2>&1 &
+        fi
     fi
 }
 
