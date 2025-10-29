@@ -95,15 +95,15 @@ jobs:
 
       - name: Create tag
         run: |
-          git tag "${{ env.VERSION }}-${{ env.RELEASE }}"
+          git tag "${{ env.TAG }}"
           git push origin main
           git push origin main:develop --force
 
       - name: Create GitHub release
         uses: softprops/action-gh-release@v2
         with:
-          tag_name: ${{ env.VERSION }}
-          name: ${{ env.VERSION }}
+          tag_name: ${{ env.TAG }}
+          name: ${{ env.TAG }}
           files: |
             dist/PKGBUILD
             dist/rog-perf-tuner.install
