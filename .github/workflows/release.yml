@@ -52,7 +52,7 @@ jobs:
           if [[ -n $(git status --porcelain) ]]; then
             git add .
             git commit -m "[ci skip] Version bump to '${VERSION}'"
-          if
+          fi
 
       - name: Validate version
         run: |
