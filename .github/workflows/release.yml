@@ -49,8 +49,10 @@ jobs:
           echo "RELEASE=$RELEASE" >> $GITHUB_ENV
           echo "TAG=$TAG" >> $GITHUB_ENV
 
-          git add .
-          git commit -m "[ci skip] Version bump to '${VERSION}'"
+          if [[ -n $(git status --porcelain) ]]; then
+            git add .
+            git commit -m "[ci skip] Version bump to '${VERSION}'"
+          if
 
       - name: Validate version
         run: |
