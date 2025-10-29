@@ -99,5 +99,8 @@
         "qobject": "cpp"
     },
     "cmake.generator": "Ninja",
-    "cmake.buildDirectory": "${workspaceFolder}/build"
+    "cmake.buildDirectory": "${workspaceFolder}/build",
+    "github-actions.workflows.pinned.workflows": [
+        ".github/workflows/release.yml"
+    ]
 }

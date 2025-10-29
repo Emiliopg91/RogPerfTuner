@@ -2,6 +2,16 @@ name: Release
 
 on:
   workflow_dispatch:
+    inputs:
+      version:
+        description: "Version to publish"
+        required: false
+        type: string
+      release:
+        description: "Release version"
+        required: false
+        type: string
+        default: "1"
 
 jobs:
   compile_and_release:
@@ -20,34 +30,36 @@ jobs:
           git config user.name "GitHub Actions"
           git config user.email "actions@github.com"
 
-      - name: Process release
+      - name: Version bump
         run: |
-          make release
-
-          if [[ -n $(git status --porcelain "RogPerfTuner") ]]; then
-              changes=1
-              break
+          if [ -n "${{ github.event.inputs.version }}" ]; then
+            echo "Updating version in CMakeLists.txt to '${{ github.event.inputs.version }}'..."
+            sed -i -E "s/(project\\([^)]*VERSION )[0-9]+\\.[0-9]+\\.[0-9]+/\\1${{ github.event.inputs.version }}/" CMakeLists.txt
+            VERSION="${{ github.event.inputs.version }}"
+          else
+            echo "No version provided — running 'make increase_version'..."
+            make increase_version
+            VERSION=$(grep -oP '(?<=VERSION )\d+\.\d+\.\d+' CMakeLists.txt)
           fi
 
-          if [[ $changes -eq 1 ]]; then
-              echo "Committing pending files before release..."
-              git add .
-              git commit -m "[ci skip] Pending files before release"
-          fi
+          echo "VERSION=$VERSION" >> $GITHUB_ENV
+          echo "RELEASE=${{ github.event.inputs.release }}" >> $GITHUB_ENV
 
-      - name: Get version
-        id: get_version
-        run: |
-          echo "VERSION=$(cat resources/version)" >> $GITHUB_ENV
+          git add .
+          git commit -m "[ci skip] Version bump to '${VERSION}'"
 
       - name: Validate version
         run: |
-          if git rev-parse "refs/tags/${VERSION}" >/dev/null 2>&1; then
-            echo "❌ Tag '${VERSION}' already exists. Please bump the version."
+          if git rev-parse "refs/tags/${VERSION}-${RELEASE}" >/dev/null 2>&1; then
+            echo "❌ Tag '${VERSION}-${RELEASE}' already exists. Please bump the version."
             exit 1
           else
-            echo "✅ Tag '${VERSION}' does not exist. Continuing..."
+            echo "✅ Tag '${VERSION}-${RELEASE}' does not exist. Continuing..."
           fi
+
+      - name: Process release
+        run: |
+          make release
 
       - name: Publish to AUR
         env:
@@ -80,13 +92,8 @@ jobs:
       - name: Create tag
         run: |
           git tag "${{ env.VERSION }}"
-          make increase_version
           git push origin main
           git push origin main:develop --force
-          git checkout develop
-          git add CMakeLists.txt > /dev/null
-          git commit -m "[ci skip] Ready for next development iteration" > /dev/null
-          git push origin develop --force
 
       - name: Create GitHub release
         uses: softprops/action-gh-release@v2
