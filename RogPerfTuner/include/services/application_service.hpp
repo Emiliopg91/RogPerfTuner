@@ -39,6 +39,9 @@ class ApplicationService : public Singleton<ApplicationService>, Loggable {
 	 */
 	void startUpdateCheck();
 
+	bool enroll();
+	bool unenroll();
+
   private:
 	friend class Singleton<ApplicationService>;
 	bool rccdcEnabled = false;

@@ -1,10 +1,10 @@
 #include <iostream>
 
-#include "../include/main/app.hpp"
 #include "../include/main/flatpak.hpp"
 #include "../include/main/gui.hpp"
 #include "../include/main/rgb.hpp"
 #include "../include/main/run.hpp"
+#include "../include/services/application_service.hpp"
 
 inline void shiftArgv(int& argc, char** argv) {
 	if (argc <= 2) {
@@ -40,10 +40,8 @@ int main(int argc, char** argv) {
 			decreaseBrightness();
 		} else if (option == "-k") {
 			return killInstance();
-		} else if (option == "-n") {
-			enroll();
 		} else if (option == "-u") {
-			unenroll();
+			ApplicationService::init("").unenroll();
 		} else if (option == "-f") {
 			shiftArgv(argc, argv);
 			return runFlatpakWrapping(argc, argv);

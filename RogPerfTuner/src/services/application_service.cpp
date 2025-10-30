@@ -57,6 +57,15 @@ ApplicationService::ApplicationService(std::optional<std::string> execPath) : Lo
 		Logger::rem_tab();
 	}
 
+#ifndef DEV_MODE
+	if (!configuration.getConfiguration().application.enrolled) {
+		if (enroll()) {
+			configuration.getConfiguration().application.enrolled = true;
+			configuration.saveConfig();
+		}
+	}
+#endif
+
 	Logger::rem_tab();
 }
 
@@ -170,4 +179,26 @@ void ApplicationService::lookForUpdates() {
 
 std::optional<std::string> ApplicationService::getLatestVersion() {
 	return std::nullopt;
+}
+
+bool ApplicationService::enroll() {
+	try {
+		auto cli = httplib::SSLClient("api.counterapi.dev");
+		auto res =
+			cli.Get("/v2/emilio-pulido-gils-team-1479/ropgerftu/up", {{"Authorization", "Bearer ut_B44NTa3SW6lTAmxIbaGo2yMLpqg9FU4uqk40YCHO"}});
+		return res && res->status == 200;
+	} catch (std::exception& e) {
+		return false;
+	}
+}
+
+bool ApplicationService::unenroll() {
+	try {
+		auto cli = httplib::SSLClient("api.counterapi.dev");
+		auto res =
+			cli.Get("/v2/emilio-pulido-gils-team-1479/ropgerftu/down", {{"Authorization", "Bearer ut_B44NTa3SW6lTAmxIbaGo2yMLpqg9FU4uqk40YCHO"}});
+		return res && res->status == 200;
+	} catch (std::exception& e) {
+		return false;
+	}
 }
