@@ -1,5 +1,6 @@
 #include <iostream>
 
+#include "../include/main/app.hpp"
 #include "../include/main/flatpak.hpp"
 #include "../include/main/gui.hpp"
 #include "../include/main/rgb.hpp"
@@ -39,6 +40,10 @@ int main(int argc, char** argv) {
 			decreaseBrightness();
 		} else if (option == "-k") {
 			return killInstance();
+		} else if (option == "-n") {
+			enroll();
+		} else if (option == "-u") {
+			unenroll();
 		} else if (option == "-f") {
 			shiftArgv(argc, argv);
 			return runFlatpakWrapping(argc, argv);

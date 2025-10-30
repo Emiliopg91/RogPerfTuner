@@ -1,7 +1,12 @@
 #!/bin/bash
 
-UDEV_RULES="/usr/lib/udev/rules.d/60-rog-perf-tuner.rules"
-ASSETS_UDEV_RULES="/usr/share/rog-perf-tuner/OpenRGB/60-openrgb.rules"
+run_as_user() {
+    if [[ -n "$SUDO_USER" ]]; then
+        sudo -u "$SUDO_USER" "$@"
+    else
+        "$@"
+    fi
+}
 
 reload_udev_rules() {
     echo "  🔄 Reloading udev rules..."
@@ -9,29 +14,34 @@ reload_udev_rules() {
     udevadm trigger
 }
 
+enroll() {
+    run_as_user rog-perf-tuner -n
+}
+
+unenroll() {
+    run_as_user rog-perf-tuner -u
+}
+
 stop_application() {
     echo "  ⏹️  Stopping application if running..."
-    if [[ -n "$SUDO_USER" ]]; then
-        sudo -u "$SUDO_USER" rog-perf-tuner -k
-    else
-        rog-perf-tuner -k
-    fi
-    return $?
+    run_as_user rog-perf-tuner -k
 }
 
 post_install() {
-    echo "📦 Performing install actions..."
+    echo "📦 Performing post install actions..."
+    enroll
     reload_udev_rules
 }
 
 post_upgrade() {
-    echo "🔼 Performing update actions..."
+    echo "🔼 Performing post update actions..."
     reload_udev_rules
 }
 
 pre_remove() {
     echo "🗑️ Performing pre remove actions..."
     stop_application
+    unenroll
 }
 
 post_remove() {

@@ -57,18 +57,6 @@ ApplicationService::ApplicationService(std::optional<std::string> execPath) : Lo
 		Logger::rem_tab();
 	}
 
-	if (!configuration.getConfiguration().application.enroled) {
-		try {
-			httplib::SSLClient cli("api.counterapi.dev");
-			auto res = cli.Get("/v2/emilio-pulido-gils-team-1479/ropgerftu/up", {{"Authorization", "ut_B44NTa3SW6lTAmxIbaGo2yMLpqg9FU4uqk40YCHO"}});
-			if (res->status == 200) {
-				configuration.getConfiguration().application.enroled = true;
-				configuration.saveConfig();
-			}
-		} catch (std::exception& e) {
-		}
-	}
-
 	Logger::rem_tab();
 }
 
