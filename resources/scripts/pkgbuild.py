@@ -83,12 +83,20 @@ def generate_srcinfo(data, version):
 
     for key in scalar_keys:
         if key in data:
-            lines.append(f"\t{key} = {data[key]}")
+            line = f"\t{key} = {data[key]}"
+            for key2 in scalar_keys:
+                if key != key2:
+                    line = line.replace(f"${key2}", data[key2])
+            lines.append(line)
 
     for key in array_keys:
         if key in data:
             for item in data[key]:
-                lines.append(f"\t{key} = {item}")
+                line = f"\t{key} = {item}"
+                for key2 in scalar_keys:
+                    if key != key2:
+                        line = line.replace(f"${key2}", data[key2])
+                lines.append(line)
 
     # Paquete
     lines.append(f"\npkgname = {data.get('pkgname', 'unknown')}")
