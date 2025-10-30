@@ -14,10 +14,6 @@ reload_udev_rules() {
     udevadm trigger
 }
 
-enroll() {
-    run_as_user rog-perf-tuner -n
-}
-
 unenroll() {
     run_as_user rog-perf-tuner -u
 }
@@ -29,7 +25,6 @@ stop_application() {
 
 post_install() {
     echo "📦 Performing post install actions..."
-    enroll
     reload_udev_rules
 }
 
