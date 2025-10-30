@@ -37,6 +37,7 @@ depends=(
   'qtkeychain-qt6'
   'scx-scheds'
   'spdlog'
+  'switcheroo-control'
   'upower'
   'yaml-cpp'
 )
