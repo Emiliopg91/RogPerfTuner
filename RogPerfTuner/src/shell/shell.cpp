@@ -284,14 +284,7 @@ pid_t Shell::launch_in_terminal(const std::string& userCommand) {
 	argv.push_back(const_cast<char*>(cmd.c_str()));
 	argv.push_back(nullptr);
 
-	std::vector<std::string> envStrings = copyEnviron();
-	std::vector<char*> env;
-	for (auto& s : envStrings) {
-		env.push_back(s.data());
-	}
-	env.push_back(nullptr);
-
-	return launch_process((*which(argv[0])).data(), argv.data(), env.data());
+	return launch_process((*which(argv[0])).data(), argv.data(), environ);
 }
 
 uint8_t Shell::wait_for(pid_t pid) {

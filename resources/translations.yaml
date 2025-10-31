@@ -1,285 +1,380 @@
 performance:
   en: Performance
   es: Rendimiento
+  de: Leistung
 profile:
   en: Profile
   es: Perfil
+  de: Profil
 label.profile.PERFORMANCE:
   en: Performance
   es: Rendimiento
+  de: Leistung
 label.profile.BALANCED:
   en: Balanced
   es: Equilibrado
+  de: Ausgeglichen
 label.profile.QUIET:
   en: Quiet
   es: Silencioso
+  de: Leise
 effect:
   en: Effect
   es: Efecto
+  de: Effekt
 brightness:
   en: Brightness
   es: Brillo
+  de: Helligkeit
 label.brightness.MAX:
   en: Maximum
   es: Máximo
+  de: Maximal
 label.brightness.HIGH:
   en: High
   es: Alto
+  de: Hoch
 label.brightness.MEDIUM:
   en: Medium
   es: Medio
+  de: Mittel
 label.brightness.LOW:
   en: Low
   es: Bajo
+  de: Niedrig
 label.brightness.OFF:
   en: "Off"
   es: Apagado
+  de: Aus
 color:
   en: Color
   es: Color
+  de: Farbe
 color.select:
   en: Select color
   es: Seleccione color
+  de: Farbe auswählen
 hardware:
   en: Hardware
   es: Hardware
+  de: Hardware
 charge.threshold:
   en: Charge limit
   es: Límite de carga
+  de: Ladegrenze
 profile.applied:
   en: Profile {profile} applied succesfully
   es: Perfil {profile} aplicado con éxito
+  de: Profil {profile} erfolgreich angewendet
 applied.battery.threshold:
   en: Battery charge limit setted to {value}%
   es: Límite de carga de bateria establecido al {value}%
+  de: Ladegrenze der Batterie auf {value}% gesetzt
 open.ui:
   en: Show interface
   es: Mostrar interfaz
+  de: Oberfläche anzeigen
 open.logs:
   en: Open log file
   es: Abrir registro
+  de: Logdatei öffnen
 close:
   en: Quit
   es: Salir
+  de: Beenden
 select.color:
   en: Pick color
   es: Elegir color
+  de: Farbe wählen
 authentication.required:
   en: Authentication required
   es: Autenticación requerida
+  de: Authentifizierung erforderlich
 enter.sudo.password:
   en: Enter sudo password
   es: Introduzca contraseña sudo
+  de: Bitte Sudo-Passwort eingeben
 accept:
   en: Accept
   es: Aceptar
+  de: Akzeptieren
 cancel:
   en: Cancel
   es: Cancelar
+  de: Abbrechen
 canceled:
   en: Canceled
   es: Cancelado
+  de: Abgebrochen
 user.canceled.operation:
   en: User canceled operation
   es: El usuario canceló la operación
+  de: Benutzer hat den Vorgang abgebrochen
 authentication.failed:
   en: Authentication failed
   es: Fallo de autenticación
+  de: Authentifizierung fehlgeschlagen
 update.available:
   en: Update {version} available
   es: Actualización {version} disponible
+  de: Update {version} verfügbar
 update.application:
   en: Update to version {version}
   es: Actualizar a {version}
+  de: Auf Version {version} aktualisieren
 initializing:
   en: Initializing application
   es: Inicializando aplicación
+  de: Anwendung wird initialisiert
 boost:
   en: CPU Boost
   es: CPU Boost
+  de: CPU-Boost
 label.boost.AUTO:
   en: Auto
   es: Automatico
+  de: Automatisch
 label.boost.ON:
   en: Enabled
   es: Activado
+  de: Aktiviert
 label.boost.OFF:
   en: Disabled
   es: Desactivado
+  de: Deaktiviert
 games:
   en: Games
   es: Juegos
+  de: Spiele
 label.game.configure:
   en: Setup profiles
   es: Configurar perfiles
+  de: Profile einrichten
 profile.applied.for.game:
   en: Profile {profile} applied succesfully for {game}
   es: Perfil {profile} aplicado con éxito para {game}
+  de: Profil {profile} erfolgreich für {game} angewendet
 game.title:
   en: Game
   es: Juego
+  de: Spiel
 game.performance.configuration:
   en: Game performance configuration
   es: Configuracion de rendimiento de juegos
+  de: Spieleleistungs-Konfiguration
 label.dgpu.auto:
   en: Automatic
   es: Automatica
+  de: Automatisch
 label.dgpu.discrete:
   en: Discrete
   es: Dedicada
+  de: Dediziert
 used.gpu:
   en: GPU
   es: GPU
+  de: GPU
 metrics:
   en: Metrics
   es: Métricas
+  de: Metriken
 label.level:
   en: Level
   es: Nivel
+  de: Stufe
 label.level.no_display:
   en: Disabled
   es: Desactivado
+  de: Deaktiviert
 label.level.fps_only:
   en: Only FPS
   es: Solo FPS
+  de: Nur FPS
 label.level.horizontal:
   en: Horizontal
   es: Horizontal
+  de: Horizontal
 label.level.extended:
   en: Extended
   es: Extendido
+  de: Erweitert
 label.level.detailed:
   en: Detailed
   es: Detallado
+  de: Detailliert
 application:
   en: Application
   es: Aplicación
+  de: Anwendung
 autostart:
   en: Start on boot
   es: Iniciar automaticamente
+  de: Beim Start ausführen
 winesync:
   en: Synchronization
   es: Sincronización
+  de: Synchronisierung
 label.winesync.auto:
   en: Auto
   es: Auto
+  de: Auto
 label.winesync.ntsync:
   en: NTSync
   es: NTSync
+  de: NTSync
 label.winesync.esync:
   en: ESync
   es: ESync
+  de: ESync
 label.winesync.fsync:
   en: FSync
   es: FSync
+  de: FSync
 label.winesync.none:
   en: None
   es: "No"
+  de: Keine
 environment:
   en: Environment
   es: Entorno
+  de: Umgebung
 params:
   en: Parameters
   es: Parámetros
+  de: Parameter
 used.steamdeck:
   en: Mode
   es: Modo
+  de: Modus
 label.steamdeck.no:
   en: Computer
   es: Ordenador
+  de: Computer
 label.steamdeck.yes:
   en: SteamDeck
   es: SteamDeck
+  de: SteamDeck
 running:
   en: Running
   es: Ejecutando
+  de: Läuft
 settings:
   en: Settings
   es: Configuración
+  de: Einstellungen
 config.for.game:
   en: Game configuration
   es: Configuración de juego
+  de: Spielkonfiguration
 save.and.run:
   en: Save and launch
   es: Guardar y ejecutar
+  de: Speichern und starten
 confirmation.required:
   en: Confirmation required
   es: Confirmación necesaria
+  de: Bestätigung erforderlich
 run.with.default.config:
   en: Launch game with default configuration?
   es: "¿Lanzar juego con la configuración por defecto?"
+  de: Spiel mit Standardkonfiguration starten?
 configuration:
   en: Configuration
   es: Configuración
+  de: Konfiguration
 edit:
   en: Edit
   es: Editar
+  de: Bearbeiten
 save:
   en: Save
   es: Guardar
+  de: Speichern
 wrappers:
   en: Wrappers
   es: Wrappers
+  de: Wrapper
 pick.color:
   en: Pick color
   es: Selección de color
+  de: Farbe wählen
 select:
   en: Select
   es: Seleccionar
+  de: Auswählen
 scheduler:
   en: Scheduler
   es: Planificador
+  de: Scheduler
 label.scheduler.none:
   en: Default
   es: Predeterminado
+  de: Standard
 fan.curves:
   en: Cooling
   es: Refrigeración
+  de: Kühlung
 edit.curve:
   en: Edit curves
   es: Editar curvas
+  de: Kurven bearbeiten
 edit.fan.profile:
   en: Edit curves for {prof} profile
   es: Editar curvas para perfil {prof}
+  de: Kurven für Profil {prof} bearbeiten
 reset:
   en: Reset
   es: Restablecer
+  de: Zurücksetzen
 reset.default:
   en: Reset to default
   es: Valor por defecto
+  de: Auf Standard zurücksetzen
 apply.suggestion:
   en: Apply optimization
   es: Aplicar optimización
+  de: Optimierung anwenden
 enable.decky.integration.title:
   en: Enable Decky integration?
   es: "¿Habilitar integración con Decky?"
+  de: Decky-Integration aktivieren?
 enable.decky.integration.body:
   en: Decky plugin for Steam will enable integration between both applications in order to apply optimizations.
   es: El plugin de Decky para Steam habilitará la integración entre ambas aplicaciones para aplicar optimizaciones.
+  de: Das Decky-Plugin für Steam ermöglicht die Integration zwischen beiden Anwendungen, um Optimierungen anzuwenden.
 boot.sound:
   en: Boot sound
   es: Sonido de arranque
+  de: Startsound
 enabled:
   en: Enabled
   es: Activado
+  de: Aktiviert
 disabled:
   en: Disabled
   es: Desactivado
+  de: Deaktiviert
 logs:
   en: Logs
   es: Registros
+  de: Protokolle
 open.log:
   en: Open logs
   es: Abrir registros
+  de: Protokolle öffnen
 open.log.runner:
   en: Open runner logs
   es: Abrir registros del runner
+  de: Runner-Protokolle öffnen
 open.log.openrgb:
   en: Open OpenRGB logs
   es: Abrir registros de OpenRGB
+  de: OpenRGB-Protokolle öffnen
 update.in.progress:
   en: Update in progress..
   es: Actualización en curso...
+  de: Update läuft...
 press.enter.exit:
   en: Press enter to exit...
   es: "Pulsa enter para salir..."
+  de: Drücken Sie Enter zum Beenden...
