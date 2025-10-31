@@ -49,7 +49,17 @@ class Shell : public Singleton<Shell>, Loggable {
 	 * @param outFile
 	 * @return pid_t
 	 */
-	pid_t launch_process(const char* command, char* const argv[], char* const env[], std::optional<std::string> outFile = std::nullopt);
+	pid_t launch_process(const char* command, char* const argv[], char* const env[], std::optional<std::string> outFile = std::nullopt,
+						 bool detached = true);
+
+	/**
+	 * @brief Launch command in terminal.
+	 *
+	 * @param command
+	 * @param env
+	 * @return pid_t
+	 */
+	pid_t launch_in_terminal(const std::string& userCommand);
 
 	/**
 	 * @brief Wait for process finish.
@@ -95,6 +105,7 @@ class Shell : public Singleton<Shell>, Loggable {
 
 	BashSession normal_bash;
 	std::optional<BashSession> elevated_bash = std::nullopt;
+	std::optional<std::vector<const char*>> terminalCfg;
 
 	BashSession start_bash(const std::vector<std::string>& args, const std::string& initial_input = "");
 	void close_bash(BashSession& session);

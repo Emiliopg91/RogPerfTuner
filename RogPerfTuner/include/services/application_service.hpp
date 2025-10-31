@@ -5,6 +5,7 @@
 #include "../events/event_bus.hpp"
 #include "../services/steam_service.hpp"
 #include "../translator/translator.hpp"
+#include "performance_service.hpp"
 
 class ApplicationService : public Singleton<ApplicationService>, Loggable {
   public:
@@ -42,6 +43,8 @@ class ApplicationService : public Singleton<ApplicationService>, Loggable {
 	bool enroll();
 	bool unenroll();
 
+	void applyUpdate();
+
   private:
 	friend class Singleton<ApplicationService>;
 	bool rccdcEnabled = false;
@@ -49,12 +52,13 @@ class ApplicationService : public Singleton<ApplicationService>, Loggable {
 	std::string execPath;
 	std::thread updateChecker;
 
-	Shell& shell				 = Shell::getInstance();
-	EventBus& eventBus			 = EventBus::getInstance();
-	SteamService& steamService	 = SteamService::getInstance();
-	Translator& translator		 = Translator::getInstance();
-	Toaster& toaster			 = Toaster::getInstance();
-	Configuration& configuration = Configuration::getInstance();
+	Shell& shell						   = Shell::getInstance();
+	EventBus& eventBus					   = EventBus::getInstance();
+	SteamService& steamService			   = SteamService::getInstance();
+	Translator& translator				   = Translator::getInstance();
+	Toaster& toaster					   = Toaster::getInstance();
+	Configuration& configuration		   = Configuration::getInstance();
+	PerformanceService& performanceService = PerformanceService::getInstance();
 
 	const std::string buildDesktopFile();
 	void createScriptFile(std::string path, std::string execPath, std::string option);

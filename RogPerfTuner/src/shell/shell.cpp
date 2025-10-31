@@ -7,6 +7,8 @@
 
 #include <algorithm>
 #include <cstring>
+#include <optional>
+#include <stdexcept>
 
 #include "../../include/utils/string_utils.hpp"
 
@@ -16,6 +18,64 @@ void set_nonblocking(int fd) {
 	fcntl(fd, F_SETFL, flags | O_NONBLOCK);
 }
 }  // namespace
+
+Shell::Shell(const std::string& sudo_password) : Loggable("Shell") {
+	logger.info("Initializing shells");
+	Logger::add_tab();
+
+	logger.info("Initializing terminal");
+	Logger::add_tab();
+	const std::unordered_map<std::string, std::vector<const char*>> terminals = {
+		{"alacritty", {"alacritty", "-e", nullptr}},
+		{"foot", {"foot", nullptr}},
+		{"ghostty", {"ghostty", "-e", nullptr}},
+		{"kgx", {"kgx", "--wait", "-e", nullptr}},
+		{"gnome-terminal", {"gnome-terminal", "--wait", "--", nullptr}},
+		{"kitty", {"kitty", nullptr}},
+		{"konsole", {"konsole", "-e", nullptr}},
+		{"lxterminal", {"lxterminal", "-e", nullptr}},
+		{"rio", {"rio", "-e", nullptr}},
+		{"st", {"st", nullptr}},
+		{"xfce4-terminal", {"xfce4-terminal", "--disable-server", "--command", nullptr}},
+		{"xterm", {"xterm", "-e", nullptr}}};
+
+	terminalCfg = std::nullopt;
+	for (const auto& [term, args] : terminals) {
+		std::string check = "command -v " + term + " >/dev/null 2>&1";
+		if (system(check.c_str()) == 0) {
+			logger.info("Using terminal {}", term);
+			terminalCfg = args;
+			break;
+		}
+	}
+
+	if (!terminalCfg.has_value()) {
+		logger.warn("No terminal emulator found");
+	}
+
+	Logger::rem_tab();
+
+	logger.info("Initializing standard");
+	Logger::add_tab();
+	normal_bash = start_bash({"bash"});
+	Logger::rem_tab();
+
+	if (!sudo_password.empty()) {
+		logger.info("Initializing admin");
+		Logger::add_tab();
+		elevated_bash = start_bash({"sudo", "-kS", "bash"}, sudo_password + "\n");
+		Logger::rem_tab();
+	}
+
+	Logger::rem_tab();
+}
+
+Shell::~Shell() {
+	close_bash(normal_bash);
+	if (elevated_bash.has_value()) {
+		close_bash(elevated_bash.value());
+	}
+}
 
 Shell::BashSession Shell::start_bash(const std::vector<std::string>& args, const std::string& initial_input) {
 	int in_pipe[2], out_pipe[2], err_pipe[2];
@@ -145,32 +205,6 @@ CommandResult Shell::send_command(BashSession& session, bool elevated, const std
 	return {exit_code, out, err};
 }
 
-Shell::Shell(const std::string& sudo_password) : Loggable("Shell") {
-	logger.info("Initializing shells");
-	Logger::add_tab();
-
-	logger.info("Initializing standard");
-	Logger::add_tab();
-	normal_bash = start_bash({"bash"});
-	Logger::rem_tab();
-
-	if (!sudo_password.empty()) {
-		logger.info("Initializing admin");
-		Logger::add_tab();
-		elevated_bash = start_bash({"sudo", "-kS", "bash"}, sudo_password + "\n");
-		Logger::rem_tab();
-	}
-
-	Logger::rem_tab();
-}
-
-Shell::~Shell() {
-	close_bash(normal_bash);
-	if (elevated_bash.has_value()) {
-		close_bash(elevated_bash.value());
-	}
-}
-
 CommandResult Shell::run_command(const std::string& cmd, bool check) {
 	return send_command(normal_bash, false, cmd, check);
 }
@@ -190,7 +224,7 @@ std::vector<std::string> Shell::copyEnviron() {
 	return envCopy;
 }
 
-pid_t Shell::launch_process(const char* command, char* const argv[], char* const env[], std::optional<std::string> outFile) {
+pid_t Shell::launch_process(const char* command, char* const argv[], char* const env[], std::optional<std::string> outFile, bool detached) {
 	std::string cmd_str = command;
 	cmd_str += " ";
 
@@ -218,7 +252,9 @@ pid_t Shell::launch_process(const char* command, char* const argv[], char* const
 			}
 			close(fd);
 		}
-		prctl(PR_SET_PDEATHSIG, SIGTERM);
+		if (!detached) {
+			prctl(PR_SET_PDEATHSIG, SIGTERM);
+		}
 		execve(command, argv, env);
 		logger.error("Error on process launch: {}", std::strerror(errno));
 		_exit(1);
@@ -227,6 +263,32 @@ pid_t Shell::launch_process(const char* command, char* const argv[], char* const
 	logger.debug("Launched with PID {}", pid);
 
 	return pid;
+}
+
+pid_t Shell::launch_in_terminal(const std::string& userCommand) {
+	if (!terminalCfg.has_value()) {
+		throw std::runtime_error("No terminal emulator available");
+	}
+
+	std::vector<char*> argv;
+	for (const char* arg : *terminalCfg) {
+		if (arg) {
+			argv.push_back(const_cast<char*>(arg));
+		}
+	}
+	argv.push_back(const_cast<char*>("/bin/bash"));
+	argv.push_back(const_cast<char*>("-c"));
+	argv.push_back(const_cast<char*>(userCommand.c_str()));
+	argv.push_back(nullptr);
+
+	std::vector<std::string> envStrings = copyEnviron();
+	std::vector<char*> env;
+	for (auto& s : envStrings) {
+		env.push_back(s.data());
+	}
+	env.push_back(nullptr);
+
+	return launch_process((*which(argv[0])).data(), argv.data(), env.data());
 }
 
 uint8_t Shell::wait_for(pid_t pid) {

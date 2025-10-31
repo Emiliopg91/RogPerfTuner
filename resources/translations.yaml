@@ -88,6 +88,9 @@ authentication.failed:
 update.available:
   en: Update {version} available
   es: Actualización {version} disponible
+update.application:
+  en: Update to version {version}
+  es: Actualizar a {version}
 initializing:
   en: Initializing application
   es: Inicializando aplicación

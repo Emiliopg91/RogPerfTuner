@@ -316,7 +316,21 @@ MainWindow::MainWindow(QWidget* parent) : QMainWindow(parent), _logger(new Logge
 }
 
 void MainWindow::onUpdateAvailable(std::string value) {
-	versionLabel->setText(translator.translate("update.available", {{"version", value}}).c_str());
+	versionLabel->setText("");
+
+	QMetaObject::invokeMethod(
+		this,
+		[=, this]() {
+			updateButton = new QPushButton(translator.translate("update.application", {{"version", value}}).c_str());
+			updateButton->setCursor(Qt::PointingHandCursor);
+			updateButton->setFlat(true);
+			statusBar->addPermanentWidget(updateButton);
+
+			QObject::connect(updateButton, &QPushButton::clicked, [this]() {
+				applicationService.applyUpdate();
+			});
+		},
+		Qt::QueuedConnection);
 }
 
 void MainWindow::closeEvent(QCloseEvent* event) {

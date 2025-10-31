@@ -95,4 +95,5 @@ class MainWindow : public QMainWindow, public Singleton<MainWindow> {
 	QComboBox* _bootSoundDropdown;
 	QStatusBar* statusBar;
 	QLabel* versionLabel;
+	QPushButton* updateButton;
 };

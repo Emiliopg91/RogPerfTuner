@@ -1,0 +1,259 @@
+Found instance with pid 55015, killing...
+Found instance with pid 63505, killing...
+Running application with PID 71519
+Assets directory: /usr/share/rog-perf-tuner
+[2025-10-31 10:49:59.400][info   ][Default             ] ###################################################
+[2025-10-31 10:49:59.400][info   ][Default             ] #              Starting RogPerfTuner              #
+[2025-10-31 10:49:59.400][info   ][Default             ] ###################################################
+[2025-10-31 10:49:59.400][info   ][Default             ] Version 4.5.24-1
+[2025-10-31 10:49:59.400][info   ][Default             ] Starting initialization
+[2025-10-31 10:49:59.401][info   ][Default             ]   Creating QT application
+[2025-10-31 10:49:59.471][info   ][Configuration       ]   Configuration loaded
+[2025-10-31 10:49:59.476][info   ][Shell               ]   Initializing shells
+[2025-10-31 10:49:59.476][info   ][Shell               ]     Initializing standard
+[2025-10-31 10:49:59.477][info   ][Shell               ]     Initializing admin
+[2025-10-31 10:49:59.479][info   ][OpenRgbService      ]   Initializing OpenRgbService
+[2025-10-31 10:49:59.479][info   ][OpenRgbClient       ]     Reading UDEV files
+[2025-10-31 10:49:59.481][info   ][OpenRgbClient       ]     Starting OpenRgbClient
+[2025-10-31 10:49:59.481][debug  ][Shell               ]       Running command 'asusctl aura static -c 000000'
+[2025-10-31 10:49:59.527][debug  ][Shell               ]       Command finished with code '0'
+[2025-10-31 10:49:59.527][info   ][OpenRgbClient       ]       Starting OpenRGB server
+[2025-10-31 10:49:59.527][debug  ][Shell               ]         Launching process: /usr/share/rog-perf-tuner/OpenRGB/openrgb --server-host localhost --server-port 42693 -v 
+[2025-10-31 10:49:59.528][debug  ][Shell               ]         Launched with PID 71577
+[2025-10-31 10:49:59.677][info   ][OpenRgbClient       ]         OpenRgb server ready
+[2025-10-31 10:49:59.677][info   ][OpenRgbClient       ]       Connecting to server
+[2025-10-31 10:49:59.678][info   ][OpenRgbClient       ]         Connected
+[2025-10-31 10:49:59.678][info   ][OpenRgbClient       ]       Getting available devices
+[2025-10-31 10:49:59.925][info   ][OpenRgbClient       ]         ASUS ROG Balteus Qi
+[2025-10-31 10:49:59.925][info   ][OpenRgbClient       ]         ASUS ROG Strix Scope II 96 RX Wireless USB
+[2025-10-31 10:49:59.925][info   ][OpenRgbClient       ]         Asus ROG Chakram X USB
+[2025-10-31 10:49:59.925][info   ][OpenRgbClient       ]         G614JZ
+[2025-10-31 10:49:59.925][info   ][OpenRgbService      ]     Applying aura settings
+[2025-10-31 10:49:59.925][info   ][DigitalRainEffect   ]       Starting effect 'Digital rain' with max brightness and color #00FF00
+[2025-10-31 10:49:59.926][info   ][OpenRgbService      ]     Aura applied after 0 ms
+[2025-10-31 10:49:59.928][debug  ][Shell               ]   Running command 'ls /proc/cpuinfo'
+[2025-10-31 10:49:59.929][debug  ][Shell               ]   Command finished with code '0'
+[2025-10-31 10:49:59.929][debug  ][Shell               ]   Running command 'ls /sys/devices/system/cpu/intel_pstate/no_turbo'
+[2025-10-31 10:49:59.930][debug  ][Shell               ]   Command finished with code '0'
+[2025-10-31 10:49:59.933][info   ][HardwareService     ]   Initializing HardwareService
+[2025-10-31 10:49:59.933][info   ][HardwareService     ]     Detecting CPU
+[2025-10-31 10:49:59.933][debug  ][Shell               ]       Running command 'cat /proc/cpuinfo | head -n5'
+[2025-10-31 10:49:59.934][debug  ][Shell               ]       Command finished with code '0'
+[2025-10-31 10:49:59.934][info   ][HardwareService     ]       13th Gen Intel(R) Core(TM) i9-13980HX
+[2025-10-31 10:49:59.934][info   ][HardwareService     ]         TDP control available
+[2025-10-31 10:49:59.934][info   ][HardwareService     ]         Boost control available
+[2025-10-31 10:49:59.934][info   ][HardwareService     ]     Detecting GPUs
+[2025-10-31 10:49:59.934][debug  ][Shell               ]       Running command 'switcherooctl'
+[2025-10-31 10:49:59.988][debug  ][Shell               ]       Command finished with code '0'
+[2025-10-31 10:49:59.988][info   ][HardwareService     ]       Intel Corporation Raptor Lake-S UHD Graphics
+[2025-10-31 10:49:59.988][info   ][HardwareService     ]       NVIDIA Corporation AD104M [GeForce RTX™ 4080 Max-Q / Mobile]
+[2025-10-31 10:49:59.988][info   ][HardwareService     ]         Dynamic boost control available
+[2025-10-31 10:49:59.988][info   ][HardwareService     ]         Throttle temperature control available
+[2025-10-31 10:49:59.988][info   ][HardwareService     ]     Getting battery charge limit
+[2025-10-31 10:49:59.990][info   ][HardwareService     ]       75 %
+[2025-10-31 10:49:59.996][info   ][HardwareService     ]     Panel Overdrive: Disabled
+[2025-10-31 10:50:00.005][info   ][ScxCtlClient        ]   Initializing ScxCtlClient
+[2025-10-31 10:50:00.005][info   ][ScxCtlClient        ]     Available schedulers:
+[2025-10-31 10:50:00.005][debug  ][Shell               ]       Running command 'scxctl list'
+[2025-10-31 10:50:00.007][debug  ][Shell               ]       Command finished with code '0'
+[2025-10-31 10:50:00.007][info   ][ScxCtlClient        ]       bpfland, cosmos, flash, lavd, p2dq, rustland, rusty, tickless
+[2025-10-31 10:50:00.007][debug  ][Shell               ]     Running command 'scxctl get'
+[2025-10-31 10:50:00.009][debug  ][Shell               ]     Command finished with code '0'
+[2025-10-31 10:50:00.009][info   ][ScxCtlClient        ]     No active scheduler
+[2025-10-31 10:50:00.009][info   ][PerformanceService  ]   Initializing PerformanceService
+[2025-10-31 10:50:00.009][info   ][PerformanceService  ]     Laptop on AC mode
+[2025-10-31 10:50:00.010][info   ][PerformanceService  ]     Setting QUIET profile
+[2025-10-31 10:50:00.010][info   ][PerformanceService  ]       Platform profile: LOW_POWER
+[2025-10-31 10:50:00.054][info   ][PerformanceService  ]       CPU boost: ON
+[2025-10-31 10:50:00.054][debug  ][Shell               ]         Running admin command 'echo '0' | tee /sys/devices/system/cpu/intel_pstate/no_turbo'
+[2025-10-31 10:50:00.055][debug  ][Shell               ]         Command finished with code '0'
+[2025-10-31 10:50:00.055][info   ][PerformanceService  ]       CPU governor: POWERSAVE
+[2025-10-31 10:50:00.055][debug  ][Shell               ]         Running admin command 'cpupower frequency-set -g powersave'
+[2025-10-31 10:50:00.057][debug  ][Shell               ]         Command finished with code '0'
+[2025-10-31 10:50:00.057][info   ][PerformanceService  ]       Power profile: POWERSAVER
+[2025-10-31 10:50:00.079][info   ][PerformanceService  ]       TDP values
+[2025-10-31 10:50:00.082][info   ][PerformanceService  ]         PL1: 77W
+[2025-10-31 10:50:00.117][info   ][PerformanceService  ]         PL2: 122W
+[2025-10-31 10:50:00.147][info   ][PerformanceService  ]       Nvidia GPU
+[2025-10-31 10:50:00.148][info   ][PerformanceService  ]         Dynamic Boost: 5W
+[2025-10-31 10:50:00.181][info   ][PerformanceService  ]         Throttle temp: 87ºC
+[2025-10-31 10:50:00.186][info   ][PerformanceService  ]       Fan profile: LOW_POWER
+[2025-10-31 10:50:00.186][debug  ][Shell               ]         Running command 'asusctl fan-curve --mod-profile Balanced --enable-fan-curves false'
+[2025-10-31 10:50:00.280][debug  ][Shell               ]         Command finished with code '0'
+[2025-10-31 10:50:00.280][debug  ][Shell               ]         Running command 'asusctl fan-curve --mod-profile Performance --enable-fan-curves false'
+[2025-10-31 10:50:00.368][debug  ][Shell               ]         Command finished with code '0'
+[2025-10-31 10:50:00.368][debug  ][Shell               ]         Running command 'asusctl fan-curve --mod-profile Quiet --enable-fan-curves false'
+[2025-10-31 10:50:00.457][debug  ][Shell               ]         Command finished with code '0'
+[2025-10-31 10:50:00.457][info   ][PerformanceService  ]         CPU: 63c:0% 63c:0% 67c:9% 71c:12% 75c:16% 75c:16% 79c:28% 83c:36%
+[2025-10-31 10:50:00.457][debug  ][Shell               ]         Running command 'asusctl fan-curve --mod-profile Quiet --fan CPU --data 63c:0%,63c:0%,67c:9%,71c:12%,75c:16%,75c:16%,79c:28%,83c:36%'
+[2025-10-31 10:50:00.539][debug  ][Shell               ]         Command finished with code '0'
+[2025-10-31 10:50:00.539][info   ][PerformanceService  ]         GPU: 63c:0% 63c:0% 67c:14% 71c:16% 75c:24% 75c:24% 79c:34% 83c:42%
+[2025-10-31 10:50:00.539][debug  ][Shell               ]         Running command 'asusctl fan-curve --mod-profile Quiet --fan GPU --data 63c:0%,63c:0%,67c:14%,71c:16%,75c:24%,75c:24%,79c:34%,83c:42%'
+[2025-10-31 10:50:00.614][debug  ][Shell               ]         Command finished with code '0'
+[2025-10-31 10:50:00.614][info   ][PerformanceService  ]         MID: 63c:0% 63c:0% 67c:6% 71c:24% 75c:24% 75c:24% 79c:24% 83c:32%
+[2025-10-31 10:50:00.614][debug  ][Shell               ]         Running command 'asusctl fan-curve --mod-profile Quiet --fan MID --data 63c:0%,63c:0%,67c:6%,71c:24%,75c:24%,75c:24%,79c:24%,83c:32%'
+[2025-10-31 10:50:00.668][debug  ][Shell               ]         Command finished with code '0'
+[2025-10-31 10:50:00.668][debug  ][Shell               ]         Running command 'asusctl fan-curve --mod-profile Quiet --enable-fan-curves true'
+[2025-10-31 10:50:00.743][debug  ][Shell               ]         Command finished with code '0'
+[2025-10-31 10:50:00.745][info   ][PerformanceService  ]     Profile setted succesfully
+[2025-10-31 10:50:00.771][info   ][SteamService        ]   Initializing SteamService
+[2025-10-31 10:50:00.772][info   ][SteamService        ]     Plugin up to date
+[2025-10-31 10:50:00.773][info   ][SocketServer        ]   Initializing socket server
+[2025-10-31 10:50:00.773][info   ][SocketServer        ]     Socket server started on /tmp/RogPerfTuner.sock
+[2025-10-31 10:50:00.773][info   ][ApplicationService  ]   Initializing ApplicationService
+[2025-10-31 10:50:00.773][info   ][ApplicationService  ]     Creating helper scripts
+[2025-10-31 10:50:01.042][info   ][Default             ] Application ready after 1.641 seconds
+[2025-10-31 10:50:06.043][info   ][ApplicationService  ] Looking for update
+[2025-10-31 10:50:06.329][info   ][ApplicationService  ]   No update found
+[2025-10-31 10:50:27.842][info   ][ApplicationService  ] Starting application shutdown
+[2025-10-31 10:50:27.842][info   ][OpenRgbClient       ]   Stopping OpenRgbClient
+[2025-10-31 10:50:27.842][info   ][DigitalRainEffect   ]     Stopping effect
+[2025-10-31 10:50:27.898][info   ][DigitalRainEffect   ]     Effect finished
+[2025-10-31 10:50:27.998][info   ][OpenRgbClient       ]     Stopping OpenRGB server
+[2025-10-31 10:50:27.998][debug  ][Shell               ]       Running admin command 'kill -9 71577'
+[2025-10-31 10:50:27.999][debug  ][Shell               ]       Command finished with code '0'
+[2025-10-31 10:50:28.000][info   ][OpenRgbClient       ]       Command finished with exit code 137
+[2025-10-31 10:50:28.000][info   ][OpenRgbClient       ]       OpenRGB server killed
+[2025-10-31 10:50:28.001][info   ][PerformanceService  ]   Setting PERFORMANCE profile
+[2025-10-31 10:50:28.001][info   ][PerformanceService  ]     Platform profile: PERFORMANCE
+[2025-10-31 10:50:28.057][info   ][PerformanceService  ]     CPU boost: ON
+[2025-10-31 10:50:28.057][debug  ][Shell               ]       Running admin command 'echo '0' | tee /sys/devices/system/cpu/intel_pstate/no_turbo'
+[2025-10-31 10:50:28.058][debug  ][Shell               ]       Command finished with code '0'
+[2025-10-31 10:50:28.058][info   ][PerformanceService  ]     CPU governor: PERFORMANCE
+[2025-10-31 10:50:28.058][debug  ][Shell               ]       Running admin command 'cpupower frequency-set -g performance'
+[2025-10-31 10:50:28.061][debug  ][Shell               ]       Command finished with code '0'
+[2025-10-31 10:50:28.061][info   ][PerformanceService  ]     Power profile: PERFORMANCE
+[2025-10-31 10:50:28.084][info   ][PerformanceService  ]     TDP values
+[2025-10-31 10:50:28.085][info   ][PerformanceService  ]       PL1: 140W
+[2025-10-31 10:50:28.112][info   ][PerformanceService  ]       PL2: 175W
+[2025-10-31 10:50:28.139][info   ][PerformanceService  ]     Nvidia GPU
+[2025-10-31 10:50:28.139][info   ][PerformanceService  ]       Dynamic Boost: 25W
+[2025-10-31 10:50:28.167][info   ][PerformanceService  ]       Throttle temp: 87ºC
+[2025-10-31 10:50:28.168][info   ][PerformanceService  ]     Fan profile: PERFORMANCE
+[2025-10-31 10:50:28.168][debug  ][Shell               ]       Running command 'asusctl fan-curve --mod-profile Balanced --enable-fan-curves false'
+[2025-10-31 10:50:28.210][debug  ][Shell               ]       Command finished with code '0'
+[2025-10-31 10:50:28.210][debug  ][Shell               ]       Running command 'asusctl fan-curve --mod-profile Performance --enable-fan-curves false'
+[2025-10-31 10:50:28.248][debug  ][Shell               ]       Command finished with code '0'
+[2025-10-31 10:50:28.248][debug  ][Shell               ]       Running command 'asusctl fan-curve --mod-profile Quiet --enable-fan-curves false'
+[2025-10-31 10:50:28.286][debug  ][Shell               ]       Command finished with code '0'
+[2025-10-31 10:50:28.286][info   ][PerformanceService  ]       CPU: 40c:12% 63c:16% 67c:28% 71c:40% 75c:50% 79c:60% 83c:78% 87c:99%
+[2025-10-31 10:50:28.286][debug  ][Shell               ]       Running command 'asusctl fan-curve --mod-profile Performance --fan CPU --data 40c:12%,63c:16%,67c:28%,71c:40%,75c:50%,79c:60%,83c:78%,87c:99%'
+[2025-10-31 10:50:28.324][debug  ][Shell               ]       Command finished with code '0'
+[2025-10-31 10:50:28.324][info   ][PerformanceService  ]       GPU: 40c:16% 63c:24% 67c:34% 71c:48% 75c:56% 79c:72% 83c:88% 87c:100%
+[2025-10-31 10:50:28.324][debug  ][Shell               ]       Running command 'asusctl fan-curve --mod-profile Performance --fan GPU --data 40c:16%,63c:24%,67c:34%,71c:48%,75c:56%,79c:72%,83c:88%,87c:100%'
+[2025-10-31 10:50:28.362][debug  ][Shell               ]       Command finished with code '0'
+[2025-10-31 10:50:28.362][info   ][PerformanceService  ]       MID: 40c:6% 63c:24% 67c:24% 71c:40% 75c:48% 79c:50% 83c:50% 87c:50%
+[2025-10-31 10:50:28.362][debug  ][Shell               ]       Running command 'asusctl fan-curve --mod-profile Performance --fan MID --data 40c:6%,63c:24%,67c:24%,71c:40%,75c:48%,79c:50%,83c:50%,87c:50%'
+[2025-10-31 10:50:28.402][debug  ][Shell               ]       Command finished with code '0'
+[2025-10-31 10:50:28.402][debug  ][Shell               ]       Running command 'asusctl fan-curve --mod-profile Performance --enable-fan-curves true'
+[2025-10-31 10:50:28.440][debug  ][Shell               ]       Command finished with code '0'
+[2025-10-31 10:50:28.440][info   ][PerformanceService  ]   Profile setted succesfully
+[2025-10-31 10:50:28.440][info   ][SocketServer        ]   Stopping socket server
+[2025-10-31 10:50:28.441][info   ][SocketServer        ]   Socket server stopped
+[2025-10-31 10:50:28.441][info   ][ApplicationService  ] Shutdown finished
+Found instance with pid 73081, killing...
+Running application with PID 81071
+Assets directory: /usr/share/rog-perf-tuner
+[2025-10-31 10:54:30.203][info   ][Default             ] ###################################################
+[2025-10-31 10:54:30.203][info   ][Default             ] #              Starting RogPerfTuner              #
+[2025-10-31 10:54:30.203][info   ][Default             ] ###################################################
+[2025-10-31 10:54:30.203][info   ][Default             ] Version 4.5.24-1
+[2025-10-31 10:54:30.203][info   ][Default             ] Starting initialization
+[2025-10-31 10:54:30.203][info   ][Default             ]   Creating QT application
+[2025-10-31 10:54:30.358][info   ][Configuration       ]   Configuration loaded
+[2025-10-31 10:54:30.361][info   ][Shell               ]   Initializing shells
+[2025-10-31 10:54:30.361][info   ][Shell               ]     Initializing standard
+[2025-10-31 10:54:30.362][info   ][Shell               ]     Initializing admin
+[2025-10-31 10:54:30.365][info   ][OpenRgbService      ]   Initializing OpenRgbService
+[2025-10-31 10:54:30.365][info   ][OpenRgbClient       ]     Reading UDEV files
+[2025-10-31 10:54:30.366][info   ][OpenRgbClient       ]     Starting OpenRgbClient
+[2025-10-31 10:54:30.366][debug  ][Shell               ]       Running command 'asusctl aura static -c 000000'
+[2025-10-31 10:54:30.411][debug  ][Shell               ]       Command finished with code '0'
+[2025-10-31 10:54:30.411][info   ][OpenRgbClient       ]       Starting OpenRGB server
+[2025-10-31 10:54:30.411][debug  ][Shell               ]         Launching process: /usr/share/rog-perf-tuner/OpenRGB/openrgb --server-host localhost --server-port 40315 -v 
+[2025-10-31 10:54:30.412][debug  ][Shell               ]         Launched with PID 81126
+[2025-10-31 10:54:30.561][info   ][OpenRgbClient       ]         OpenRgb server ready
+[2025-10-31 10:54:30.561][info   ][OpenRgbClient       ]       Connecting to server
+[2025-10-31 10:54:30.562][info   ][OpenRgbClient       ]         Connected
+[2025-10-31 10:54:30.562][info   ][OpenRgbClient       ]       Getting available devices
+[2025-10-31 10:54:30.809][info   ][OpenRgbClient       ]         ASUS ROG Balteus Qi
+[2025-10-31 10:54:30.809][info   ][OpenRgbClient       ]         ASUS ROG Strix Scope II 96 RX Wireless USB
+[2025-10-31 10:54:30.809][info   ][OpenRgbClient       ]         Asus ROG Chakram X USB
+[2025-10-31 10:54:30.809][info   ][OpenRgbClient       ]         G614JZ
+[2025-10-31 10:54:30.809][info   ][OpenRgbService      ]     Applying aura settings
+[2025-10-31 10:54:30.809][info   ][DigitalRainEffect   ]       Starting effect 'Digital rain' with max brightness and color #00FF00
+[2025-10-31 10:54:30.810][info   ][OpenRgbService      ]     Aura applied after 0 ms
+[2025-10-31 10:54:30.812][debug  ][Shell               ]   Running command 'ls /proc/cpuinfo'
+[2025-10-31 10:54:30.813][debug  ][Shell               ]   Command finished with code '0'
+[2025-10-31 10:54:30.813][debug  ][Shell               ]   Running command 'ls /sys/devices/system/cpu/intel_pstate/no_turbo'
+[2025-10-31 10:54:30.814][debug  ][Shell               ]   Command finished with code '0'
+[2025-10-31 10:54:30.816][info   ][HardwareService     ]   Initializing HardwareService
+[2025-10-31 10:54:30.816][info   ][HardwareService     ]     Detecting CPU
+[2025-10-31 10:54:30.816][debug  ][Shell               ]       Running command 'cat /proc/cpuinfo | head -n5'
+[2025-10-31 10:54:30.817][debug  ][Shell               ]       Command finished with code '0'
+[2025-10-31 10:54:30.817][info   ][HardwareService     ]       13th Gen Intel(R) Core(TM) i9-13980HX
+[2025-10-31 10:54:30.817][info   ][HardwareService     ]         TDP control available
+[2025-10-31 10:54:30.817][info   ][HardwareService     ]         Boost control available
+[2025-10-31 10:54:30.817][info   ][HardwareService     ]     Detecting GPUs
+[2025-10-31 10:54:30.817][debug  ][Shell               ]       Running command 'switcherooctl'
+[2025-10-31 10:54:30.869][debug  ][Shell               ]       Command finished with code '0'
+[2025-10-31 10:54:30.869][info   ][HardwareService     ]       Intel Corporation Raptor Lake-S UHD Graphics
+[2025-10-31 10:54:30.869][info   ][HardwareService     ]       NVIDIA Corporation AD104M [GeForce RTX™ 4080 Max-Q / Mobile]
+[2025-10-31 10:54:30.870][info   ][HardwareService     ]         Dynamic boost control available
+[2025-10-31 10:54:30.870][info   ][HardwareService     ]         Throttle temperature control available
+[2025-10-31 10:54:30.870][info   ][HardwareService     ]     Getting battery charge limit
+[2025-10-31 10:54:30.871][info   ][HardwareService     ]       75 %
+[2025-10-31 10:54:30.876][info   ][HardwareService     ]     Panel Overdrive: Disabled
+[2025-10-31 10:54:30.885][info   ][ScxCtlClient        ]   Initializing ScxCtlClient
+[2025-10-31 10:54:30.885][info   ][ScxCtlClient        ]     Available schedulers:
+[2025-10-31 10:54:30.885][debug  ][Shell               ]       Running command 'scxctl list'
+[2025-10-31 10:54:30.887][debug  ][Shell               ]       Command finished with code '0'
+[2025-10-31 10:54:30.887][info   ][ScxCtlClient        ]       bpfland, cosmos, flash, lavd, p2dq, rustland, rusty, tickless
+[2025-10-31 10:54:30.887][debug  ][Shell               ]     Running command 'scxctl get'
+[2025-10-31 10:54:30.889][debug  ][Shell               ]     Command finished with code '0'
+[2025-10-31 10:54:30.889][info   ][ScxCtlClient        ]     No active scheduler
+[2025-10-31 10:54:30.889][info   ][PerformanceService  ]   Initializing PerformanceService
+[2025-10-31 10:54:30.889][info   ][PerformanceService  ]     Laptop on AC mode
+[2025-10-31 10:54:30.890][info   ][PerformanceService  ]     Setting QUIET profile
+[2025-10-31 10:54:30.890][info   ][PerformanceService  ]       Platform profile: LOW_POWER
+[2025-10-31 10:54:30.934][info   ][PerformanceService  ]       CPU boost: ON
+[2025-10-31 10:54:30.934][debug  ][Shell               ]         Running admin command 'echo '0' | tee /sys/devices/system/cpu/intel_pstate/no_turbo'
+[2025-10-31 10:54:30.935][debug  ][Shell               ]         Command finished with code '0'
+[2025-10-31 10:54:30.935][info   ][PerformanceService  ]       CPU governor: POWERSAVE
+[2025-10-31 10:54:30.935][debug  ][Shell               ]         Running admin command 'cpupower frequency-set -g powersave'
+[2025-10-31 10:54:30.937][debug  ][Shell               ]         Command finished with code '0'
+[2025-10-31 10:54:30.937][info   ][PerformanceService  ]       Power profile: POWERSAVER
+[2025-10-31 10:54:30.958][info   ][PerformanceService  ]       TDP values
+[2025-10-31 10:54:30.961][info   ][PerformanceService  ]         PL1: 77W
+[2025-10-31 10:54:30.997][info   ][PerformanceService  ]         PL2: 122W
+[2025-10-31 10:54:31.028][info   ][PerformanceService  ]       Nvidia GPU
+[2025-10-31 10:54:31.030][info   ][PerformanceService  ]         Dynamic Boost: 5W
+[2025-10-31 10:54:31.063][info   ][PerformanceService  ]         Throttle temp: 87ºC
+[2025-10-31 10:54:31.067][info   ][PerformanceService  ]       Fan profile: LOW_POWER
+[2025-10-31 10:54:31.067][debug  ][Shell               ]         Running command 'asusctl fan-curve --mod-profile Balanced --enable-fan-curves false'
+[2025-10-31 10:54:31.157][debug  ][Shell               ]         Command finished with code '0'
+[2025-10-31 10:54:31.157][debug  ][Shell               ]         Running command 'asusctl fan-curve --mod-profile Performance --enable-fan-curves false'
+[2025-10-31 10:54:31.242][debug  ][Shell               ]         Command finished with code '0'
+[2025-10-31 10:54:31.242][debug  ][Shell               ]         Running command 'asusctl fan-curve --mod-profile Quiet --enable-fan-curves false'
+[2025-10-31 10:54:31.329][debug  ][Shell               ]         Command finished with code '0'
+[2025-10-31 10:54:31.329][info   ][PerformanceService  ]         CPU: 63c:0% 63c:0% 67c:9% 71c:12% 75c:16% 75c:16% 79c:28% 83c:36%
+[2025-10-31 10:54:31.329][debug  ][Shell               ]         Running command 'asusctl fan-curve --mod-profile Quiet --fan CPU --data 63c:0%,63c:0%,67c:9%,71c:12%,75c:16%,75c:16%,79c:28%,83c:36%'
+[2025-10-31 10:54:31.405][debug  ][Shell               ]         Command finished with code '0'
+[2025-10-31 10:54:31.405][info   ][PerformanceService  ]         GPU: 63c:0% 63c:0% 67c:14% 71c:16% 75c:24% 75c:24% 79c:34% 83c:42%
+[2025-10-31 10:54:31.405][debug  ][Shell               ]         Running command 'asusctl fan-curve --mod-profile Quiet --fan GPU --data 63c:0%,63c:0%,67c:14%,71c:16%,75c:24%,75c:24%,79c:34%,83c:42%'
+[2025-10-31 10:54:31.474][debug  ][Shell               ]         Command finished with code '0'
+[2025-10-31 10:54:31.474][info   ][PerformanceService  ]         MID: 63c:0% 63c:0% 67c:6% 71c:24% 75c:24% 75c:24% 79c:24% 83c:32%
+[2025-10-31 10:54:31.474][debug  ][Shell               ]         Running command 'asusctl fan-curve --mod-profile Quiet --fan MID --data 63c:0%,63c:0%,67c:6%,71c:24%,75c:24%,75c:24%,79c:24%,83c:32%'
+[2025-10-31 10:54:31.527][debug  ][Shell               ]         Command finished with code '0'
+[2025-10-31 10:54:31.527][debug  ][Shell               ]         Running command 'asusctl fan-curve --mod-profile Quiet --enable-fan-curves true'
+[2025-10-31 10:54:31.604][debug  ][Shell               ]         Command finished with code '0'
+[2025-10-31 10:54:31.605][info   ][PerformanceService  ]     Profile setted succesfully
+[2025-10-31 10:54:31.637][info   ][SteamService        ]   Initializing SteamService
+[2025-10-31 10:54:31.637][info   ][SteamService        ]     Plugin up to date
+[2025-10-31 10:54:31.639][info   ][SocketServer        ]   Initializing socket server
+[2025-10-31 10:54:31.639][info   ][SocketServer        ]     Socket server started on /tmp/RogPerfTuner.sock
+[2025-10-31 10:54:31.639][info   ][ApplicationService  ]   Initializing ApplicationService
+[2025-10-31 10:54:31.639][info   ][ApplicationService  ]     Creating helper scripts
+[2025-10-31 10:54:31.945][info   ][Default             ] Application ready after 1.742 seconds
+[2025-10-31 10:54:36.946][info   ][ApplicationService  ] Looking for update
+[2025-10-31 10:54:37.253][info   ][ApplicationService  ]   No update found

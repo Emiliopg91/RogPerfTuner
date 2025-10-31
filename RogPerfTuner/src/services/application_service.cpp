@@ -200,3 +200,24 @@ bool ApplicationService::unenroll() {
 		return false;
 	}
 }
+
+void ApplicationService::applyUpdate() {
+	const std::vector<const char*> helpers = std::vector({"paru", "yay"});
+
+	std::optional<std::string> helper = std::nullopt;
+	for (const auto& h : helpers) {
+		const auto abs = shell.which(h);
+		if (abs.has_value()) {
+			helper = *abs;
+			break;
+		}
+	}
+
+	if (helper.has_value()) {
+		PerformanceProfile p = PerformanceProfile::Enum::PERFORMANCE;
+		performanceService.setPerformanceProfile(p, true, true, false);
+		const auto result = shell.wait_for(shell.launch_in_terminal(fmt::format("{} -S {}", *helper, Constants::EXEC_NAME)));
+		const auto w	  = *shell.which("nohup");
+		shell.launch_process(w.data(), (char* const[]){const_cast<char*>("nohup"), const_cast<char*>("rog-perf-tuner"), nullptr}, environ);
+	}
+}
