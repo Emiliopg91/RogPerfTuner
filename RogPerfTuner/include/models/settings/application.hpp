@@ -23,7 +23,7 @@ struct convert<Application> {
 			app.askedInstallRccdc = node["askedInstallRccdc"].as<bool>();
 		}
 		if (node["enrolled"]) {
-			app.askedInstallRccdc = node["enrolled"].as<bool>();
+			app.enrolled = node["enrolled"].as<bool>();
 		}
 		return true;
 	}
