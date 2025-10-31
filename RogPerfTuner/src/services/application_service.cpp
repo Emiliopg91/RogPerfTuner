@@ -216,8 +216,7 @@ void ApplicationService::applyUpdate() {
 	if (helper.has_value()) {
 		PerformanceProfile p = PerformanceProfile::Enum::PERFORMANCE;
 		performanceService.setPerformanceProfile(p, true, true, false);
-		const auto result = shell.wait_for(shell.launch_in_terminal(fmt::format("{} -S {}", *helper, Constants::EXEC_NAME)));
-		const auto w	  = *shell.which("nohup");
-		shell.launch_process(w.data(), (char* const[]){const_cast<char*>("nohup"), const_cast<char*>("rog-perf-tuner"), nullptr}, environ);
+		const auto result =
+			shell.wait_for(shell.launch_in_terminal(fmt::format("{} -S {} && nohup {}", *helper, Constants::EXEC_NAME, Constants::EXEC_NAME)));
 	}
 }
