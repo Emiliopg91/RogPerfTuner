@@ -227,7 +227,8 @@ void ApplicationService::applyUpdate() {
 
 		logger.info("Launching update command...");
 		Logger::add_tab();
-		shell.wait_for(shell.launch_in_terminal(fmt::format("{} -S {}; exit", *helper, Constants::EXEC_NAME, Constants::EXEC_NAME)));
+		shell.wait_for(shell.launch_in_terminal(
+			fmt::format("{} -S {}; read -p \"{}\"; exit", *helper, Constants::EXEC_NAME, translator.translate("press.enter.exit"))));
 		Logger::rem_tab();
 
 		logger.info("Relaunching application...");

@@ -280,3 +280,6 @@ open.log.openrgb:
 update.in.progress:
   en: Update in progress..
   es: Actualización en curso...
+press.enter.exit:
+  en: Press enter to exit...
+  es: "Pulsa enter para salir..."
