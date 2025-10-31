@@ -104,39 +104,40 @@ def generate_srcinfo(data, version):
     return ("\n".join(lines) + "\n").replace("$pkgver", version)
 
 
-content = Path(CMAKE_FILE).read_text(encoding="utf-8")
-match = re.search(
-    r"project\s*\(\s*([A-Za-z0-9_]+)\s+VERSION\s+([0-9]+\.[0-9]+\.[0-9]+)",
-    content,
-    re.IGNORECASE,
-)
+if __name__ == "__main__":
+    content = Path(CMAKE_FILE).read_text(encoding="utf-8")
+    match = re.search(
+        r"project\s*\(\s*([A-Za-z0-9_]+)\s+VERSION\s+([0-9]+\.[0-9]+\.[0-9]+)",
+        content,
+        re.IGNORECASE,
+    )
 
-name, version = match.groups()
-version = os.getenv("VERSION", version)
-release = os.getenv("RELEASE", "1")
+    name, version = match.groups()
+    version = os.getenv("VERSION", version)
+    release = os.getenv("RELEASE", "1")
 
-with open(PKGBUILD_FILE, "r") as f:
-    content = f.read()
+    with open(PKGBUILD_FILE, "r") as f:
+        content = f.read()
 
-content = content.replace("pkgver=<version>", f"pkgver={version}")
-content = content.replace("pkgrel=<release>", f"pkgrel={release}")
+    content = content.replace("pkgver=<version>", f"pkgver={version}")
+    content = content.replace("pkgrel=<release>", f"pkgrel={release}")
 
-if os.path.exists(PKGBUILD_FILE):
-    os.unlink(PKGBUILD_FILE)
-with open(PKGBUILD_FILE, "w") as f:
-    f.write(content)
-    f.flush()
+    if os.path.exists(PKGBUILD_FILE):
+        os.unlink(PKGBUILD_FILE)
+    with open(PKGBUILD_FILE, "w") as f:
+        f.write(content)
+        f.flush()
 
-"""
-if os.path.exists(PKGBUILD_TEST_FILE):
-    os.unlink(PKGBUILD_TEST_FILE)
-with open(PKGBUILD_TEST_FILE, "w") as f:
-    f.write(content.replace("#tag=$pkgver",""))
-    f.flush()
-"""
+    """
+    if os.path.exists(PKGBUILD_TEST_FILE):
+        os.unlink(PKGBUILD_TEST_FILE)
+    with open(PKGBUILD_TEST_FILE, "w") as f:
+        f.write(content.replace("#tag=$pkgver",""))
+        f.flush()
+    """
 
-if os.path.exists(SRCINFO_FILE):
-    os.unlink(SRCINFO_FILE)
+    if os.path.exists(SRCINFO_FILE):
+        os.unlink(SRCINFO_FILE)
 
-with open(SRCINFO_FILE, "w", encoding="utf-8") as f:
-    f.write(generate_srcinfo(parse_pkgbuild(PKGBUILD_FILE), version))
+    with open(SRCINFO_FILE, "w", encoding="utf-8") as f:
+        f.write(generate_srcinfo(parse_pkgbuild(PKGBUILD_FILE), version))

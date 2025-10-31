@@ -2,6 +2,7 @@ import os
 import json
 from pathlib import Path
 import re
+from pkgbuild import parse_pkgbuild
 
 print("Generating constants preloads")
 
@@ -22,6 +23,10 @@ constants_file = os.path.abspath(
     os.path.dirname(__file__) + "/../../RogPerfTuner/src/utils/constants.cpp"
 )
 constants_time = os.path.getmtime(constants_file)
+
+pkgbuild_file = os.path.abspath(
+    os.path.join(os.path.dirname(__file__), "..", "PKGBUILD")
+)
 
 content = Path(cmake_file).read_text(encoding="utf-8")
 match = re.search(
@@ -63,6 +68,9 @@ if (
     plugin_pattern = re.compile(
         r'(const std::string Constants::PLUGIN_VERSION\s*=\s*")[^"]+(";)'
     )
+    exec_name_pattern = re.compile = re.compile(
+        r'(const std::string Constants::EXEC_NAME\s*=\s*")[^"]+(";)'
+    )
 
     new_lines = []
     for line in lines:
@@ -74,6 +82,12 @@ if (
         if plugin_pattern.search(line):
             line = plugin_pattern.sub(
                 lambda m: f"{m.group(1)}{plugin_version}{m.group(2)}", line
+            )
+
+        if exec_name_pattern.search(line):
+            line = exec_name_pattern.sub(
+                lambda m: f"{m.group(1)}{parse_pkgbuild(pkgbuild_file)["pkgname"]}{m.group(2)}",
+                line,
             )
 
         new_lines.append(line)
