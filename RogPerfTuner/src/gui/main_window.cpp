@@ -322,12 +322,35 @@ void MainWindow::onUpdateAvailable(std::string value) {
 		this,
 		[=, this]() {
 			updateButton = new QPushButton(translator.translate("update.application", {{"version", value}}).c_str());
-			updateButton->setCursor(Qt::PointingHandCursor);
 			updateButton->setFlat(true);
+			updateButton->setStyleSheet("QPushButton {"
+										"  padding: 0;"
+										"  margin: 0;"
+										"  border: none;"
+										"  background: transparent;"
+										"}"
+										"QPushButton:hover {"
+										"  border: none;"
+										"  background: transparent;"
+										"}"
+										"QPushButton:focus {"
+										"  outline: none;"
+										"  border: none;"
+										"}"
+										"QPushButton:pressed {"
+										"  border: none;"
+										"  background: transparent;"
+										"}");
+			updateButton->setCursor(Qt::PointingHandCursor);
 			statusBar->addPermanentWidget(updateButton);
 
 			QObject::connect(updateButton, &QPushButton::clicked, [this]() {
-				applicationService.applyUpdate();
+				versionLabel->setText(translator.translate("update.in.progress").c_str());
+				statusBar->removeWidget(updateButton);
+
+				std::thread([this]() {
+					applicationService.applyUpdate();
+				}).detach();
 			});
 		},
 		Qt::QueuedConnection);

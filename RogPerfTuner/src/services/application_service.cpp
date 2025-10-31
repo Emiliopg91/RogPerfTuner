@@ -4,6 +4,7 @@
 #include <signal.h>
 #include <unistd.h>
 
+#include <cstddef>
 #include <exception>
 #include <optional>
 #include <sstream>
@@ -202,6 +203,9 @@ bool ApplicationService::unenroll() {
 }
 
 void ApplicationService::applyUpdate() {
+	logger.info("Applying update...");
+	Logger::add_tab();
+
 	const std::vector<const char*> helpers = std::vector({"paru", "yay"});
 
 	std::optional<std::string> helper = std::nullopt;
@@ -214,9 +218,26 @@ void ApplicationService::applyUpdate() {
 	}
 
 	if (helper.has_value()) {
+		logger.info("Using {} as AUR helper", *helper);
+		Logger::add_tab();
+
 		PerformanceProfile p = PerformanceProfile::Enum::PERFORMANCE;
 		performanceService.setPerformanceProfile(p, true, true, false);
-		shell.wait_for(shell.launch_in_terminal(fmt::format("{} -S {} && {{ nohup {} >/dev/null 2>&1 & disown; exit; }} || exec bash", *helper,
-															Constants::EXEC_NAME, Constants::EXEC_NAME)));
+
+		logger.info("Launching update command...");
+		Logger::add_tab();
+		shell.wait_for(shell.launch_in_terminal(fmt::format("{} -S {}; exit", *helper, Constants::EXEC_NAME, Constants::EXEC_NAME)));
+		Logger::rem_tab();
+
+		logger.info("Relaunching application...");
+		const auto abs_path = *shell.which(Constants::EXEC_NAME);
+		shell.launch_process(abs_path.c_str(), (char* const[]){(char*)abs_path.c_str(), NULL}, environ);
+		Logger::rem_tab();
+
+		Logger::rem_tab();
+	} else {
+		logger.info("No AUR helper found");
 	}
+
+	Logger::rem_tab();
 }
