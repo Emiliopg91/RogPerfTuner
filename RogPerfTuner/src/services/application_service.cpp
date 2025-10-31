@@ -216,7 +216,7 @@ void ApplicationService::applyUpdate() {
 	if (helper.has_value()) {
 		PerformanceProfile p = PerformanceProfile::Enum::PERFORMANCE;
 		performanceService.setPerformanceProfile(p, true, true, false);
-		const auto result =
-			shell.wait_for(shell.launch_in_terminal(fmt::format("{} -S {} && nohup {}", *helper, Constants::EXEC_NAME, Constants::EXEC_NAME)));
+		shell.wait_for(shell.launch_in_terminal(fmt::format("{} -S {} && {{ nohup {} >/dev/null 2>&1 & disown; exit; }} || exec bash", *helper,
+															Constants::EXEC_NAME, Constants::EXEC_NAME)));
 	}
 }

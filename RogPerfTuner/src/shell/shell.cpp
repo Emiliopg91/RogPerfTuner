@@ -31,12 +31,12 @@ Shell::Shell(const std::string& sudo_password) : Loggable("Shell") {
 		{"ghostty", {"ghostty", "-e", nullptr}},
 		{"kgx", {"kgx", "--wait", "-e", nullptr}},
 		{"gnome-terminal", {"gnome-terminal", "--wait", "--", nullptr}},
-		{"kitty", {"kitty", nullptr}},
-		{"konsole", {"konsole", "-e", nullptr}},
-		{"lxterminal", {"lxterminal", "-e", nullptr}},
+		{"kitty", {"kitty", "--hold=no", nullptr}},
+		{"konsole", {"konsole", "-e", nullptr}},  // cierre garantizado si el comando termina con "; exit"
+		{"lxterminal", {"lxterminal", "--command", nullptr}},
 		{"rio", {"rio", "-e", nullptr}},
 		{"st", {"st", nullptr}},
-		{"xfce4-terminal", {"xfce4-terminal", "--disable-server", "--command", nullptr}},
+		{"xfce4-terminal", {"xfce4-terminal", "--disable-server", "--hold=no", "--command", nullptr}},
 		{"xterm", {"xterm", "-e", nullptr}}};
 
 	terminalCfg = std::nullopt;
@@ -276,9 +276,12 @@ pid_t Shell::launch_in_terminal(const std::string& userCommand) {
 			argv.push_back(const_cast<char*>(arg));
 		}
 	}
+
+	auto cmd = userCommand;
+
 	argv.push_back(const_cast<char*>("/bin/bash"));
 	argv.push_back(const_cast<char*>("-c"));
-	argv.push_back(const_cast<char*>(userCommand.c_str()));
+	argv.push_back(const_cast<char*>(cmd.c_str()));
 	argv.push_back(nullptr);
 
 	std::vector<std::string> envStrings = copyEnviron();
