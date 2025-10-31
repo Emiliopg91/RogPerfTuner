@@ -8,6 +8,7 @@
 class Constants {
   public:
 	static const std::string APP_NAME;
+	static const std::string EXEC_NAME;
 
 	const static std::string APP_VERSION;
 
@@ -88,4 +89,8 @@ class Constants {
 	static const std::string RCDCC_SOCKET_PATH;
 
 	static const std::string TRANSLATIONS_FILE;
+
+	static const std::string COUNTER_API_HOST;
+	static const std::string COUNTER_API_URL;
+	static const std::string COUNTER_API_SV;
 };

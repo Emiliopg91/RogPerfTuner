@@ -9,7 +9,8 @@
 
 const pid_t Constants::PID = getpid();
 
-const std::string Constants::APP_NAME = "RogPerfTuner";
+const std::string Constants::APP_NAME  = "RogPerfTuner";
+const std::string Constants::EXEC_NAME = "rog-perf-tuner";
 
 const std::string Constants::APP_VERSION = "4.5.23-dev";
 
@@ -19,8 +20,8 @@ const std::string Constants::PLUGIN_VERSION = "1.2.4";
 const std::string Constants::ASSETS_DIR = FileUtils::getCWD() + "/build/assets";
 const std::string Constants::UDEV_RULES = ASSETS_DIR + "/OpenRGB/60-openrgb.rules";
 #else
-const std::string Constants::ASSETS_DIR = "/usr/share/rog-perf-tuner";
-const std::string Constants::UDEV_RULES = "/usr/lib/udev/rules.d/60-rog-perf-tuner.rules";
+const std::string Constants::ASSETS_DIR = "/usr/share/" + EXEC_NAME;
+const std::string Constants::UDEV_RULES = "/usr/lib/udev/rules.d/60-" + EXEC_NAME + ".rules";
 #endif
 
 const std::string Constants::LOG_FILE_NAME		  = APP_NAME;
@@ -81,3 +82,7 @@ const std::string Constants::FLATPAK_MANGOHUD		   = "org.freedesktop.Platform.Vu
 const std::string Constants::FLATPAK_MANGOHUD_OVERRIDE = "--filesystem=xdg-config/MangoHud:ro";
 
 const std::string Constants::LOGGER_PATTERN = "[%Y-%m-%d %H:%M:%S.%e][%-7l][%n] %v";
+
+const std::string Constants::COUNTER_API_HOST = "api.counterapi.dev";
+const std::string Constants::COUNTER_API_URL  = "/v2/emilio-pulido-gils-team-1479/ropgerftu";
+const std::string Constants::COUNTER_API_SV	  = "ut_B44NTa3SW6lTAmxIbaGo2yMLpqg9FU4uqk40YCHO";

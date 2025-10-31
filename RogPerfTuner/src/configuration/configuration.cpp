@@ -51,7 +51,7 @@ void Configuration::saveConfig() {
 }
 
 std::string Configuration::getPassword() {
-	const QString service = "rog-perf-tuner";
+	const QString service = Constants::EXEC_NAME.c_str();
 	const QString key	  = "password";
 
 	QKeychain::ReadPasswordJob job(service);
@@ -71,7 +71,7 @@ std::string Configuration::getPassword() {
 }
 
 void Configuration::setPassword(const std::string& pss) {
-	const QString service = "rog-perf-tuner";
+	const QString service = Constants::EXEC_NAME.c_str();
 	const QString key	  = "password";
 
 	QKeychain::WritePasswordJob job(service);

@@ -72,7 +72,7 @@ ApplicationService::ApplicationService(std::optional<std::string> execPath) : Lo
 const std::string ApplicationService::buildDesktopFile() {
 	std::ostringstream ss;
 	ss << "[Desktop Entry]\n"
-	   << "Exec=rog-perf-tuner\n"
+	   << "Exec=" << Constants::EXEC_NAME << "\n"
 	   << "Icon=" << Constants::ASSET_ICON_45_FILE << "\n"
 	   << "Name=" << Constants::APP_NAME << "\n"
 	   << "WName=" << Constants::APP_NAME << "\n"
@@ -148,7 +148,7 @@ void ApplicationService::lookForUpdates() {
 		logger.info("Looking for update");
 		Logger::add_tab();
 		try {
-			auto res = cli.Get("/rpc/?v=5&type=info&arg=rog-perf-tuner");
+			auto res = cli.Get("/rpc/?v=5&type=info&arg=" + Constants::EXEC_NAME);
 
 			if (res && res->status == 200) {
 				YAML::Node root	   = YAML::Load(res->body);
@@ -183,9 +183,8 @@ std::optional<std::string> ApplicationService::getLatestVersion() {
 
 bool ApplicationService::enroll() {
 	try {
-		auto cli = httplib::SSLClient("api.counterapi.dev");
-		auto res =
-			cli.Get("/v2/emilio-pulido-gils-team-1479/ropgerftu/up", {{"Authorization", "Bearer ut_B44NTa3SW6lTAmxIbaGo2yMLpqg9FU4uqk40YCHO"}});
+		auto cli = httplib::SSLClient(Constants::COUNTER_API_HOST);
+		auto res = cli.Get(Constants::COUNTER_API_URL + "/up", {{"Authorization", "Bearer " + Constants::COUNTER_API_SV}});
 		return res && res->status == 200;
 	} catch (std::exception& e) {
 		return false;
@@ -194,9 +193,8 @@ bool ApplicationService::enroll() {
 
 bool ApplicationService::unenroll() {
 	try {
-		auto cli = httplib::SSLClient("api.counterapi.dev");
-		auto res =
-			cli.Get("/v2/emilio-pulido-gils-team-1479/ropgerftu/down", {{"Authorization", "Bearer ut_B44NTa3SW6lTAmxIbaGo2yMLpqg9FU4uqk40YCHO"}});
+		auto cli = httplib::SSLClient(Constants::COUNTER_API_HOST);
+		auto res = cli.Get(Constants::COUNTER_API_URL + "/down", {{"Authorization", "Bearer " + Constants::COUNTER_API_SV}});
 		return res && res->status == 200;
 	} catch (std::exception& e) {
 		return false;
