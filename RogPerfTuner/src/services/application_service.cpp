@@ -60,6 +60,7 @@ ApplicationService::ApplicationService(std::optional<std::string> execPath) : Lo
 
 #ifndef DEV_MODE
 	if (!configuration.getConfiguration().application.enrolled) {
+		logger.info("Enrolling application");
 		if (enroll()) {
 			configuration.getConfiguration().application.enrolled = true;
 			configuration.saveConfig();
