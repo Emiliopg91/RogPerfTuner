@@ -26,7 +26,7 @@ config:
 	@if [ ! -f "submodules/patches/OpenRGB-cppSDK.diff.applied" ]; then \
 		cd submodules/OpenRGB-cppSDK && git apply ../patches/OpenRGB-cppSDK.diff && touch ../patches/OpenRGB-cppSDK.diff.applied; \
 	fi
-
+	
 	@if command -v paru >/dev/null 2>&1; then \
 		export AUR_HELPER=paru; \
     elif command -v yay >/dev/null 2>&1; then \
