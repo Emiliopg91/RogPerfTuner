@@ -117,7 +117,10 @@ inline int startGui(int argc, char** argv) {
 
 	auto t1 = TimeUtils::now();
 	logger.info("Application ready after {} seconds", TimeUtils::getTimeDiff(t0, t1) / 1000.0);
+
+#ifdef AUR_HELPER
 	applicationService.startUpdateCheck();
+#endif
 
 	return app.exec();
 }

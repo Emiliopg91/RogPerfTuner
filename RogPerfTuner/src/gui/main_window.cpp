@@ -310,11 +310,14 @@ MainWindow::MainWindow(QWidget* parent) : QMainWindow(parent), _logger(new Logge
 		onBootSoundEvent(value);
 	});
 
+#ifdef AUR_HELPER
 	eventBus.onUpdateAvailable([this](std::string value) {
 		onUpdateAvailable(value);
 	});
+#endif
 }
 
+#ifdef AUR_HELPER
 void MainWindow::onUpdateAvailable(std::string value) {
 	versionLabel->setText("");
 
@@ -355,6 +358,7 @@ void MainWindow::onUpdateAvailable(std::string value) {
 		},
 		Qt::QueuedConnection);
 }
+#endif
 
 void MainWindow::closeEvent(QCloseEvent* event) {
 	event->ignore();

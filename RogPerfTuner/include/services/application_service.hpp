@@ -2,6 +2,10 @@
 
 #include <thread>
 
+#ifdef AUR_HELPER
+#include "../clients/shell/aur_helper_client.hpp"
+#endif
+
 #include "../events/event_bus.hpp"
 #include "../services/steam_service.hpp"
 #include "../translator/translator.hpp"
@@ -31,6 +35,7 @@ class ApplicationService : public Singleton<ApplicationService>, Loggable {
 	 */
 	void setAutostart(bool enabled);
 
+#ifdef AUR_HELPER
 	/**
 	 * @brief Initiates an asynchronous check for application updates.
 	 *
@@ -40,10 +45,8 @@ class ApplicationService : public Singleton<ApplicationService>, Loggable {
 	 */
 	void startUpdateCheck();
 
-	bool enroll();
-	bool unenroll();
-
 	void applyUpdate();
+#endif
 
   private:
 	friend class Singleton<ApplicationService>;
@@ -63,8 +66,11 @@ class ApplicationService : public Singleton<ApplicationService>, Loggable {
 	const std::string buildDesktopFile();
 	void createScriptFile(std::string path, std::string execPath, std::string option);
 	void createWrapperScriptFile(std::string path, std::string execPath, std::string option);
+
+#ifdef AUR_HELPER
+	AurHelperClient& aurHelperClient = AurHelperClient::getInstance();
 	void lookForUpdates();
-	std::optional<std::string> getLatestVersion();
+#endif
 
 	ApplicationService(std::optional<std::string> execPath);
 };

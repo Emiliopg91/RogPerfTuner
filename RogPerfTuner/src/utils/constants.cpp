@@ -12,7 +12,7 @@ const pid_t Constants::PID = getpid();
 const std::string Constants::APP_NAME  = "RogPerfTuner";
 const std::string Constants::EXEC_NAME = "rog-perf-tuner";
 
-const std::string Constants::APP_VERSION = "4.6.5-dev";
+const std::string Constants::APP_VERSION = "4.6.5-1";
 
 const std::string Constants::PLUGIN_VERSION = "1.2.4";
 

@@ -40,8 +40,6 @@ int main(int argc, char** argv) {
 			decreaseBrightness();
 		} else if (option == "-k") {
 			return killInstance();
-		} else if (option == "-u") {
-			ApplicationService::init("").unenroll();
 		} else if (option == "-f") {
 			shiftArgv(argc, argv);
 			return runFlatpakWrapping(argc, argv);

@@ -1,6 +1,5 @@
 #include "../../include/services/application_service.hpp"
 
-#include <httplib.h>
 #include <signal.h>
 #include <unistd.h>
 
@@ -57,16 +56,6 @@ ApplicationService::ApplicationService(std::optional<std::string> execPath) : Lo
 
 		Logger::rem_tab();
 	}
-
-#ifndef DEV_MODE
-	if (!configuration.getConfiguration().application.enrolled) {
-		logger.info("Enrolling application");
-		if (enroll()) {
-			configuration.getConfiguration().application.enrolled = true;
-			configuration.saveConfig();
-		}
-	}
-#endif
 
 	Logger::rem_tab();
 }
@@ -134,6 +123,7 @@ void ApplicationService::shutdown() {
 	kill(Constants::PID, SIGTERM);
 }
 
+#ifdef AUR_HELPER
 void ApplicationService::startUpdateCheck() {
 	updateChecker = std::thread(&ApplicationService::lookForUpdates, this);
 	updateChecker.detach();
@@ -143,27 +133,21 @@ void ApplicationService::lookForUpdates() {
 	TimeUtils::sleep(5 * 1000);
 	auto currentVersion = SemanticVersion::parse(Constants::APP_VERSION);
 
-	httplib::SSLClient cli("aur.archlinux.org");
 	bool found = false;
 
 	while (true) {
 		logger.info("Looking for update");
 		Logger::add_tab();
 		try {
-			auto res = cli.Get("/rpc/?v=5&type=info&arg=" + Constants::EXEC_NAME);
+			auto version	   = aurHelperClient.getVersion(Constants::EXEC_NAME);
+			auto latestVersion = SemanticVersion::parse(version);
 
-			if (res && res->status == 200) {
-				YAML::Node root	   = YAML::Load(res->body);
-				auto version	   = root["results"][0]["Version"].as<std::string>();
-				auto latestVersion = SemanticVersion::parse(version);
-
-				if (latestVersion > currentVersion) {
-					logger.info("New version available: {}", version);
-					toaster.showToast(translator.translate("update.available", {{"version", version}}));
-					eventBus.emitUpdateAvailable(version);
-					found = true;
-					break;
-				}
+			if (latestVersion > currentVersion) {
+				logger.info("New version available: {}", version);
+				toaster.showToast(translator.translate("update.available", {{"version", version}}));
+				eventBus.emitUpdateAvailable(version);
+				found = true;
+				break;
 			}
 		} catch (std::exception& e) {
 			logger.error("Error on update check: {}", e.what());
@@ -179,67 +163,23 @@ void ApplicationService::lookForUpdates() {
 	}
 }
 
-std::optional<std::string> ApplicationService::getLatestVersion() {
-	return std::nullopt;
-}
-
-bool ApplicationService::enroll() {
-	try {
-		auto cli = httplib::SSLClient(Constants::COUNTER_API_HOST);
-		auto res = cli.Get(Constants::COUNTER_API_URL + "/up", {{"Authorization", "Bearer " + Constants::COUNTER_API_SV}});
-		return res && res->status == 200;
-	} catch (std::exception& e) {
-		return false;
-	}
-}
-
-bool ApplicationService::unenroll() {
-	try {
-		auto cli = httplib::SSLClient(Constants::COUNTER_API_HOST);
-		auto res = cli.Get(Constants::COUNTER_API_URL + "/down", {{"Authorization", "Bearer " + Constants::COUNTER_API_SV}});
-		return res && res->status == 200;
-	} catch (std::exception& e) {
-		return false;
-	}
-}
-
 void ApplicationService::applyUpdate() {
 	logger.info("Applying update...");
 	Logger::add_tab();
 
-	const std::vector<const char*> helpers = std::vector({"paru", "yay"});
+	PerformanceProfile p = PerformanceProfile::Enum::PERFORMANCE;
+	performanceService.setPerformanceProfile(p, true, true, false);
 
-	std::optional<std::string> helper = std::nullopt;
-	for (const auto& h : helpers) {
-		const auto abs = shell.which(h);
-		if (abs.has_value()) {
-			helper = *abs;
-			break;
-		}
-	}
+	logger.info("Launching update command...");
+	Logger::add_tab();
+	aurHelperClient.install(Constants::EXEC_NAME);
+	Logger::rem_tab();
 
-	if (helper.has_value()) {
-		logger.info("Using {} as AUR helper", *helper);
-		Logger::add_tab();
-
-		PerformanceProfile p = PerformanceProfile::Enum::PERFORMANCE;
-		performanceService.setPerformanceProfile(p, true, true, false);
-
-		logger.info("Launching update command...");
-		Logger::add_tab();
-		shell.wait_for(shell.launch_in_terminal(
-			fmt::format("{} -S {}; read -p \"{}\"; exit", *helper, Constants::EXEC_NAME, translator.translate("press.enter.exit"))));
-		Logger::rem_tab();
-
-		logger.info("Relaunching application...");
-		const auto abs_path = *shell.which(Constants::EXEC_NAME);
-		shell.launch_process(abs_path.c_str(), (char* const[]){(char*)abs_path.c_str(), NULL}, environ);
-		Logger::rem_tab();
-
-		Logger::rem_tab();
-	} else {
-		logger.info("No AUR helper found");
-	}
+	logger.info("Relaunching application...");
+	const auto abs_path = *shell.which(Constants::EXEC_NAME);
+	shell.launch_process(abs_path.c_str(), (char* const[]){(char*)abs_path.c_str(), NULL}, environ);
+	Logger::rem_tab();
 
 	Logger::rem_tab();
 }
+#endif

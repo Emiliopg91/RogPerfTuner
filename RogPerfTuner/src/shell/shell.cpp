@@ -108,6 +108,9 @@ Shell::BashSession Shell::start_bash(const std::vector<std::string>& args, const
 		}
 		argv_exec.push_back(nullptr);
 
+		setenv("LANG", "C", 1);
+		setenv("LC_ALL", "C", 1);
+
 		execvp(argv_exec[0], argv_exec.data());
 		logger.error("Error on process launch: {}", std::strerror(errno));
 		_exit(127);
