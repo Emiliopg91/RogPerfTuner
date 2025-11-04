@@ -12,7 +12,7 @@ clean:
 	@echo "#######################################################################"
 	@rm -rf build dist .Debug .Release .qt CMakeCache.txt **/cmake_install.cmake CMakeFiles submodules/patches/*.diff.applied assets/scripts assets/bin assets/OpenRGB assets/RccDeckyCompanion **/CMakeFiles
 	@cd submodules/OpenRGB-cppSDK && git reset --hard > /dev/null && git submodule foreach git reset --hard > /dev/null
-	@cd submodules/OpenRGB && git reset --hard > /dev/null && rm -f CMakeLists.txt
+	@cd submodules/OpenRGB && git reset --hard > /dev/null && git clean -fdx > /dev/null && rm -f CMakeLists.txt
 	@cd submodules/RccDeckyCompanion && git reset --hard > /dev/null
 	@rm -Rf dist logs out build
 
@@ -77,7 +77,7 @@ build_openrgb:
 		echo "#######################################################################" && \
 		cd submodules/OpenRGB && ./build.sh && \
 		mkdir -p ../../build/assets/OpenRGB && \
-		cp build/openrgb ../../build/assets/OpenRGB/openrgb && \
+		cp build/OpenRGB ../../build/assets/OpenRGB/openrgb && \
 		cp 60-openrgb.rules ../../build/assets/OpenRGB/60-openrgb.rules; \
 	fi
 
@@ -140,7 +140,7 @@ build_debug:
 
 run: build_debug
 	@touch -t 201510220000 build/RogPerfTuner/RogPerfTuner
-	@echo "Running 'APPIMAGE=/tmp/fake.AppImage RCC_ASSETS_DIR=$(MAKEFILE_DIR)build/assets ./build/RogPerfTuner/RogPerfTuner'"
+	@echo "Running 'RCC_ASSETS_DIR=$(MAKEFILE_DIR)build/assets ./build/RogPerfTuner/RogPerfTuner'"
 	@echo ""
 	@RCC_ASSETS_DIR=$(MAKEFILE_DIR)build/assets ./build/RogPerfTuner/RogPerfTuner
 

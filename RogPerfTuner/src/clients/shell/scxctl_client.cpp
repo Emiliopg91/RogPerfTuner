@@ -30,6 +30,8 @@ ScxCtlClient::ScxCtlClient() : AbstractCmdClient("scxctl", "ScxCtlClient") {
 		logger.info(StringUtils::join(schedulers, ", "));
 		Logger::rem_tab();
 
+		logger.info("Getting current scheduler");
+		Logger::add_tab();
 		auto currentStr = run_command("get").stdout_str;
 		size_t pos		= currentStr.find(' ');
 		currentStr		= currentStr.substr(pos + 1);
@@ -42,6 +44,7 @@ ScxCtlClient::ScxCtlClient() : AbstractCmdClient("scxctl", "ScxCtlClient") {
 		} else {
 			logger.info("Currently using {} scheduler", current.value());
 		}
+		Logger::rem_tab();
 
 		Logger::rem_tab();
 	}
