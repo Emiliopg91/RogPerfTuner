@@ -1,0 +1,6 @@
+- version: 4.7.1-1
+  features:
+    - New version of Decky plugin
+    - Games artwork in list and settings view
+  fixes:
+    - Hide OpenRGB warning on compile related to usage of --pipe and --save-temps

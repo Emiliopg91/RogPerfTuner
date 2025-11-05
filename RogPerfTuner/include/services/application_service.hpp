@@ -35,6 +35,8 @@ class ApplicationService : public Singleton<ApplicationService>, Loggable {
 	 */
 	void setAutostart(bool enabled);
 
+	std::optional<std::string> getChangeLog();
+
 #ifdef AUR_HELPER
 	/**
 	 * @brief Initiates an asynchronous check for application updates.

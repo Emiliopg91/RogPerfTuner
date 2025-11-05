@@ -2,15 +2,19 @@
 
 #include <signal.h>
 #include <unistd.h>
+#include <yaml-cpp/node/parse.h>
 
 #include <cstddef>
 #include <exception>
 #include <optional>
 #include <sstream>
+#include <vector>
 
 #include "../../include/events/event_bus.hpp"
+#include "../../include/models/others/release_entry.hpp"
 #include "../../include/models/others/semantic_version.hpp"
 #include "../../include/utils/file_utils.hpp"
+#include "../../include/utils/net_utils.hpp"
 #include "../../include/utils/time_utils.hpp"
 
 #ifdef DEV_MODE
@@ -55,6 +59,13 @@ ApplicationService::ApplicationService(std::optional<std::string> execPath) : Lo
 		FileUtils::chmodRecursive(Constants::BIN_DIR, 0777);
 
 		Logger::rem_tab();
+
+		const auto currentVersion = configuration.getConfiguration().application.currentVersion;
+		if (currentVersion != Constants::APP_VERSION) {
+			configuration.getConfiguration().application.previousVersion = configuration.getConfiguration().application.currentVersion;
+			configuration.getConfiguration().application.currentVersion	 = Constants::APP_VERSION;
+			configuration.saveConfig();
+		}
 	}
 
 	Logger::rem_tab();
@@ -183,3 +194,60 @@ void ApplicationService::applyUpdate() {
 	Logger::rem_tab();
 }
 #endif
+
+std::optional<std::string> ApplicationService::getChangeLog() {
+	try {
+		const auto changelogYml = NetUtils::fetch(Constants::CHANGELOG_URL);
+		YAML::Node root			= YAML::Load(changelogYml);
+
+		if (!root.IsSequence()) {
+			logger.error("Invalid changelog format");
+			return std::nullopt;
+		}
+
+		const SemanticVersion currentSV = SemanticVersion::parse(Constants::APP_VERSION);
+
+		std::vector<std::string> fixes;
+		std::vector<std::string> features;
+
+		std::vector<ReleaseEntry> releases = root.as<std::vector<ReleaseEntry>>();
+		for (const auto& release : releases) {
+			const auto version	 = release.version;
+			const auto versionSV = SemanticVersion::parse(version);
+
+			if (versionSV > currentSV) {
+				for (const auto& f : release.features) {
+					features.emplace_back(f);
+				}
+
+				for (const auto& f : release.fixes) {
+					fixes.emplace_back(f);
+				}
+			}
+		}
+
+		std::ostringstream sb;
+		sb << fmt::format("<h1>Changelog from {} (current version) to {} (latest version)</h1>\n", Constants::APP_VERSION, releases[0].version);
+		sb << "\t<div style=\"margin-left:20px\">\n";
+
+		sb << "\t\t<h2>New features</h2>\n";
+		sb << "\t\t<ul>\n";
+		for (const auto& f : features) {
+			sb << fmt::format("\t\t\t<li>{}</li>\n", f);
+		}
+		sb << "\t\t</ul>\n";
+
+		sb << "\t\t<h2>Fixes and improvements</h2>\n";
+		sb << "\t\t<ul>\n";
+		for (const auto& f : fixes) {
+			sb << fmt::format("\t\t\t<li>{}</li>\n", f);
+		}
+		sb << "\t\t</ul>\n";
+
+		sb << "\t</div>\n";
+
+		return sb.str();
+	} catch (std::exception& e) {
+		return std::nullopt;
+	}
+}

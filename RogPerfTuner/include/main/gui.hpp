@@ -122,6 +122,8 @@ inline int startGui(int argc, char** argv) {
 	applicationService.startUpdateCheck();
 #endif
 
+	logger.error(*applicationService.getChangeLog());
+
 	return app.exec();
 }
 

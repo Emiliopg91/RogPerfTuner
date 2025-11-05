@@ -12,7 +12,7 @@ const pid_t Constants::PID = getpid();
 const std::string Constants::APP_NAME  = "RogPerfTuner";
 const std::string Constants::EXEC_NAME = "rog-perf-tuner";
 
-const std::string Constants::APP_VERSION = "4.7.0-dev";
+const std::string Constants::APP_VERSION = "4.7.0-1";
 
 const std::string Constants::PLUGIN_VERSION = "1.2.5";
 
@@ -34,13 +34,13 @@ const std::string Constants::LOCK_FILE		   = "/tmp/" + APP_NAME + ".lock";
 const std::string Constants::SOCKET_FILE	   = "/tmp/" + APP_NAME + ".sock";
 
 const std::string Constants::ASSETS_BIN_DIR		= ASSETS_DIR + "/bin";
-const std::string Constants::TRANSLATIONS_FILE	= ASSETS_DIR + "/translations.yaml";
 const std::string Constants::ASSET_ICONS_DIR	= ASSETS_DIR + "/icons";
 const std::string Constants::ASSET_ICON_FILE	= ASSETS_DIR + "/icons/icon.svg";
 const std::string Constants::ASSET_ICON_45_FILE = ASSETS_DIR + "/icons/icon-45x45.png";
 const std::string Constants::ORGB_DIR			= ASSETS_DIR + "/OpenRGB";
 const std::string Constants::ORGB_PATH			= ASSETS_DIR + "/OpenRGB/openrgb";
 const std::string Constants::RCCDC_ASSET_PATH	= ASSETS_DIR + "/RccDeckyCompanion";
+const std::string Constants::TRANSLATIONS_FILE	= ASSETS_DIR + "/translations.yaml";
 
 const std::string Constants::HOME_DIR				  = std::getenv("HOME");
 const std::string Constants::BIN_DIR				  = HOME_DIR + "/." + APP_NAME + "/bin";
@@ -85,6 +85,4 @@ const std::string Constants::FLATPAK_MANGOHUD_OVERRIDE = "--filesystem=xdg-confi
 
 const std::string Constants::LOGGER_PATTERN = "[%Y-%m-%d %H:%M:%S.%e][%-7l][%n] %v";
 
-const std::string Constants::COUNTER_API_HOST = "api.counterapi.dev";
-const std::string Constants::COUNTER_API_URL  = "/v2/emilio-pulido-gils-team-1479/ropgerftu";
-const std::string Constants::COUNTER_API_SV	  = "ut_B44NTa3SW6lTAmxIbaGo2yMLpqg9FU4uqk40YCHO";
+const std::string Constants::CHANGELOG_URL = "https://raw.githubusercontent.com/Emiliopg91/RogPerfTuner/main/resources/changelog.yaml";

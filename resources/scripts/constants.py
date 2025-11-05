@@ -36,10 +36,7 @@ match = re.search(
 )
 
 name, version = match.groups()
-if os.getenv("DEV_MODE", "0") == "1":
-    version = version + "-dev"
-else:
-    version = os.getenv("RCC_VERSION", version + "-1")
+version = os.getenv("RCC_VERSION", version + "-1")
 
 with open(plugin_file, "r", encoding="utf-8") as f:
     plugin = json.load(f)
