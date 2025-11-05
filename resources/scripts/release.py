@@ -22,30 +22,45 @@ CHANGELOG_MD_FILE = os.path.abspath(
 )
 
 
-def generate_changelog():
+def generate_changelog(rel_version, rel_release):
     with open(CHANGELOG_YAML_FILE, "r", encoding="utf-8") as f:
         releases = yaml.safe_load(f)
 
-    lines: list[str] = []
-    lines.append(f"# Changelog for {releases[0].get("version")}")
+    if os.path.exists(CHANGELOG_MD_FILE):
+        os.unlink(CHANGELOG_MD_FILE)
 
-    if releases[0].get("features") is not None and len(releases[0].get("features")) > 0:
-        lines.append("## New features")
-        for f in releases[0].get("features"):
-            lines.append(f"- {f}")
+    lines: list[str] = ["No changelog available"]
 
-    if (
-        releases[0].get("improvements") is not None
-        and len(releases[0].get("improvements")) > 0
-    ):
-        lines.append("## Improvements")
-        for f in releases[0].get("improvements"):
-            lines.append(f"- {f}")
+    for i in range(len(releases)):
+        if releases[i].get("version") == f"{rel_version}-{rel_release}":
+            lines.clear()
+            lines.append(f"# Changelog for {releases[i].get("version")}")
 
-    if releases[0].get("fixes") is not None and len(releases[0].get("fixes")) > 0:
-        lines.append("## Bug fixes")
-        for f in releases[0].get("fixes"):
-            lines.append(f"- {f}")
+            if (
+                releases[i].get("features") is not None
+                and len(releases[i].get("features")) > 0
+            ):
+                lines.append("## New features")
+                for f in releases[i].get("features"):
+                    lines.append(f"- {f}")
+
+            if (
+                releases[i].get("improvements") is not None
+                and len(releases[i].get("improvements")) > 0
+            ):
+                lines.append("## Improvements")
+                for f in releases[i].get("improvements"):
+                    lines.append(f"- {f}")
+
+            if (
+                releases[i].get("fixes") is not None
+                and len(releases[i].get("fixes")) > 0
+            ):
+                lines.append("## Bug fixes")
+                for f in releases[i].get("fixes"):
+                    lines.append(f"- {f}")
+
+            break
 
     with open(CHANGELOG_MD_FILE, "w", encoding="utf-8") as f:
         f.write("\n".join(lines))
@@ -178,4 +193,4 @@ if __name__ == "__main__":
     with open(SRCINFO_FILE, "w", encoding="utf-8") as f:
         f.write(generate_srcinfo(parse_pkgbuild(PKGBUILD_FILE), version))
 
-    generate_changelog()
+    generate_changelog(version, release)
