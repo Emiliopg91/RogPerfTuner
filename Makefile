@@ -130,7 +130,7 @@ release:
 	@echo "#######################################################################"
 	@cp resources/PKGBUILD dist/PKGBUILD
 	@cp resources/rog-perf-tuner.sh dist/rog-perf-tuner.install
-	@python resources/scripts/pkgbuild.py
+	@python resources/scripts/release.py
 
 build_debug:
 	@DEV_MODE=1 make build BUILD_TYPE=Debug

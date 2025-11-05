@@ -2,7 +2,7 @@ import os
 import json
 from pathlib import Path
 import re
-from pkgbuild import parse_pkgbuild
+from release import parse_pkgbuild
 
 print("Generating constants preloads")
 

@@ -106,6 +106,7 @@ jobs:
         with:
           tag_name: ${{ env.TAG }}
           name: ${{ env.TAG }}
+          body_path: dist/changelog.md
           files: |
             dist/PKGBUILD
             dist/rog-perf-tuner.install

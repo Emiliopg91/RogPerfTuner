@@ -1,6 +1,6 @@
 import os
 import re
-import shlex
+import yaml
 from pathlib import Path
 
 PKGBUILD_FILE = os.path.abspath(
@@ -13,6 +13,42 @@ SRCINFO_FILE = os.path.abspath(
     os.path.join(os.path.dirname(__file__), "..", "..", "dist", ".SRCINFO")
 )
 CMAKE_FILE = os.path.abspath(os.path.dirname(__file__) + "/../../CMakeLists.txt")
+
+CHANGELOG_YAML_FILE = os.path.abspath(
+    os.path.join(os.path.dirname(__file__), "..", "changelog.yaml")
+)
+CHANGELOG_MD_FILE = os.path.abspath(
+    os.path.join(os.path.dirname(__file__), "..", "..", "dist", "changelog.md")
+)
+
+
+def generate_changelog():
+    with open(CHANGELOG_YAML_FILE, "r", encoding="utf-8") as f:
+        releases = yaml.safe_load(f)
+
+    lines: list[str] = []
+    lines.append(f"# Changelog for {releases[0].get("version")}")
+
+    if releases[0].get("features") is not None and len(releases[0].get("features")) > 0:
+        lines.append("## New features")
+        for f in releases[0].get("features"):
+            lines.append(f"- {f}")
+
+    if (
+        releases[0].get("improvements") is not None
+        and len(releases[0].get("improvements")) > 0
+    ):
+        lines.append("## Improvements")
+        for f in releases[0].get("improvements"):
+            lines.append(f"- {f}")
+
+    if releases[0].get("fixes") is not None and len(releases[0].get("fixes")) > 0:
+        lines.append("## Bug fixes")
+        for f in releases[0].get("fixes"):
+            lines.append(f"- {f}")
+
+    with open(CHANGELOG_MD_FILE, "w", encoding="utf-8") as f:
+        f.write("\n".join(lines))
 
 
 def parse_pkgbuild(path):
@@ -141,3 +177,5 @@ if __name__ == "__main__":
 
     with open(SRCINFO_FILE, "w", encoding="utf-8") as f:
         f.write(generate_srcinfo(parse_pkgbuild(PKGBUILD_FILE), version))
+
+    generate_changelog()

@@ -1,3 +1,7 @@
+- version: 4.7.1-2
+  improvements:
+    - Changelog for releases
+
 - version: 4.7.1-1
   features:
     - New version of Decky plugin
@@ -5,6 +9,7 @@
     - Showing changelog when update is available
   improvements:
     - Hide OpenRGB warning on compile related to usage of --pipe and --save-temps
+
 - version: 4.7.0-2
   fixes:
     - Prevent RGB hangs when reconnecting devices
