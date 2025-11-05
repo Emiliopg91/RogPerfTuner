@@ -159,3 +159,31 @@ void FileUtils::createSymlink(const std::filesystem::path& target, const std::fi
 std::string FileUtils::getCWD() {
 	return std::filesystem::current_path().string();
 }
+
+std::vector<std::string> FileUtils::listDirectory(const std::filesystem::path& path) {
+	std::vector<std::string> entries;
+	for (const auto& entry : std::filesystem::directory_iterator(path)) {
+		entries.push_back(entry.path().filename().string());
+	}
+	return entries;
+}
+
+std::vector<std::string> FileUtils::listDirectory(const std::string& path) {
+	return listDirectory(std::filesystem::path(path));
+}
+
+bool FileUtils::isDirectory(const std::filesystem::path& path) {
+	return std::filesystem::is_directory(path);
+}
+
+bool FileUtils::isDirectory(const std::string& path) {
+	return isDirectory(std::filesystem::path(path));
+}
+
+bool FileUtils::isFile(const std::filesystem::path& path) {
+	return std::filesystem::is_regular_file(path);
+}
+
+bool FileUtils::isFile(const std::string& path) {
+	return isFile(std::filesystem::path(path));
+}

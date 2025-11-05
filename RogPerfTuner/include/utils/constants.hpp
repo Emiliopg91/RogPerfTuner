@@ -60,6 +60,7 @@ class Constants {
 	static const std::string PLUGINS_FOLDER;
 	static const std::string RCCDC_PATH;
 	static const std::string RCCDC_PACKAGE_FILE;
+	static const std::string STEAM_USERDATA_PATH;
 	static const std::string DECKY_SERVICE_PATH;
 
 	static const std::string LOG_FILE_NAME;

@@ -1,5 +1,7 @@
 #include "../../include/gui/game_config_dialog.hpp"
 
+#include <qcontainerfwd.h>
+
 #include <QLabel>
 #include <QLineEdit>
 #include <QMessageBox>
@@ -7,32 +9,52 @@
 #include <optional>
 
 #include "../../include/gui/yes_no_dialog.hpp"
+#include "../../include/utils/file_utils.hpp"
 #include "../../include/utils/string_utils.hpp"
 
 GameConfigDialog::GameConfigDialog(unsigned int gid, bool runAfterSave, QWidget* parent)
 	: Loggable("GameConfigDialog"), QDialog(parent), gid(gid), runAfterSave(runAfterSave) {
 	Logger::add_tab();
 	setWindowTitle(QString::fromStdString(translator.translate("config.for.game", {{"game", ""}})));
-	setFixedSize(400, 350);
+	setFixedSize(400, 400);
 
 	gameEntry = configuration.getConfiguration().games[std::to_string(gid)];
 
 	windowLayout = new QFormLayout();
 	windowLayout->setAlignment(Qt::AlignTop);
 
+	QVBoxLayout* headerLayout = new QVBoxLayout();
+	headerLayout->setAlignment(Qt::AlignCenter);
+
+	/*auto userIds = FileUtils::listDirectory(Constants::STEAM_USERDATA_PATH);
+	for (const auto& userId : userIds) {
+		auto path = fmt::format("{}/{}/config/grid/{}_hero.png", Constants::STEAM_USERDATA_PATH, userId, gid);
+		if (FileUtils::exists(path)) {
+			QPixmap gameIcon(QString::fromStdString(path));
+			int targetSize	   = 300;
+			QPixmap scaledIcon = gameIcon.scaled(targetSize, targetSize, Qt::KeepAspectRatio, Qt::SmoothTransformation);
+
+			QLabel* imageLabel = new QLabel();
+			imageLabel->setPixmap(scaledIcon);
+			imageLabel->setAlignment(Qt::AlignCenter);
+
+			headerLayout->addWidget(imageLabel);
+			setFixedSize(400, 500);
+			break;
+		}
+	}*/
+
 	QLabel* titleLabel = new QLabel(QString::fromStdString(gameEntry.name));
 	QFont titleFont	   = titleLabel->font();
 	titleFont.setPointSize(titleFont.pointSize() + 2);
 	titleFont.setBold(true);
 	titleLabel->setFont(titleFont);
-
 	titleLabel->setAlignment(Qt::AlignCenter);
 
-	QHBoxLayout* titleLayout = new QHBoxLayout();
-	titleLayout->addWidget(titleLabel);
-	windowLayout->addRow(titleLayout);
+	headerLayout->addWidget(titleLabel);
 
-	// --- Grupo (sin título)
+	windowLayout->addRow(headerLayout);
+
 	group  = new QGroupBox();
 	layout = new QFormLayout();
 

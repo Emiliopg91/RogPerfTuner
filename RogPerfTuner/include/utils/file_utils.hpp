@@ -2,6 +2,7 @@
 
 #include <filesystem>
 #include <string>
+#include <vector>
 
 class FileUtils {
   private:
@@ -234,4 +235,16 @@ class FileUtils {
 	 *       is required.
 	 */
 	static std::string getCWD();
+
+	// Lista los elementos (nombres) de un directorio
+	static std::vector<std::string> listDirectory(const std::filesystem::path& path);
+	static std::vector<std::string> listDirectory(const std::string& path);
+
+	// Comprueba si una ruta es un directorio
+	static bool isDirectory(const std::filesystem::path& path);
+	static bool isDirectory(const std::string& path);
+
+	// Comprueba si una ruta es un fichero regular
+	static bool isFile(const std::filesystem::path& path);
+	static bool isFile(const std::string& path);
 };

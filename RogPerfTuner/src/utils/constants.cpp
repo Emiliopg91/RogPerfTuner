@@ -64,6 +64,7 @@ const std::string Constants::LOG_OLD_DIR			  = HOME_DIR + "/." + APP_NAME + "/lo
 const std::string Constants::USER_PLUGIN_DIR		  = HOME_DIR + "/." + APP_NAME + "/plugin";
 const std::string Constants::AUTOSTART_FILE			  = HOME_DIR + "/.config/autostart/" + APP_NAME + ".desktop";
 const std::string Constants::APP_DRAW_FILE			  = HOME_DIR + "/.local/share/applications/" + APP_NAME + ".desktop";
+const std::string Constants::STEAM_USERDATA_PATH	  = HOME_DIR + "/.steam/steam/userdata";
 const std::string Constants::RCDCC_SOCKET_PATH		  = HOME_DIR + "/homebrew/data/RCCDeckyCompanion/socket";
 const std::string Constants::PLUGINS_FOLDER			  = HOME_DIR + "/homebrew/plugins";
 const std::string Constants::RCCDC_PATH				  = HOME_DIR + "/homebrew/plugins/RCCDeckyCompanion";
