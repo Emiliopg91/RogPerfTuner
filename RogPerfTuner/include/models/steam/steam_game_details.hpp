@@ -9,6 +9,7 @@ struct SteamGameDetails {
 	std::string name;
 	bool is_steam_app = true;
 	std::string launch_opts;
+	std::string icon_hash = "";
 	std::string compat_tool;
 	bool is_shortcut;
 };
@@ -22,6 +23,7 @@ struct convert<SteamGameDetails> {
 		node["name"]		 = g.name;
 		node["is_steam_app"] = g.is_steam_app;
 		node["launch_opts"]	 = g.launch_opts;
+		node["icon_hash"]	 = g.icon_hash;
 		node["compat_tool"]	 = g.compat_tool;
 		node["is_shortcut"]	 = g.is_shortcut;
 		return node;
@@ -35,6 +37,7 @@ struct convert<SteamGameDetails> {
 		g.appid		   = node["appid"] ? node["appid"].as<uint32_t>() : 0;
 		g.name		   = node["name"] ? node["name"].as<std::string>() : "";
 		g.is_steam_app = node["is_steam_app"] ? node["is_steam_app"].as<bool>() : true;
+		g.icon_hash	   = node["icon_hash"] ? node["icon_hash"].as<std::string>() : "";
 		g.launch_opts  = node["launch_opts"] ? node["launch_opts"].as<std::string>() : "%command%";
 		g.compat_tool  = node["compat_tool"] ? node["compat_tool"].as<std::string>() : "";
 		g.is_shortcut  = node["is_shortcut"] ? node["is_shortcut"].as<bool>() : false;

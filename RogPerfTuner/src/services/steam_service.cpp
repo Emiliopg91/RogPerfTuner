@@ -19,6 +19,7 @@
 #include "../../include/services/open_rgb_service.hpp"
 #include "../../include/services/performance_service.hpp"
 #include "../../include/utils/file_utils.hpp"
+#include "../../include/utils/net_utils.hpp"
 #include "../../include/utils/process_utils.hpp"
 #include "../../include/utils/string_utils.hpp"
 #include "../../include/utils/time_utils.hpp"
@@ -50,6 +51,10 @@ const std::unordered_map<std::string, GameEntry>& SteamService::getGames() {
 SteamService::SteamService() : Loggable("SteamService") {
 	logger.info("Initializing SteamService");
 	Logger::add_tab();
+
+	if (!FileUtils::exists(Constants::LOGOS_DIR)) {
+		FileUtils::mkdirs(Constants::LOGOS_DIR);
+	}
 
 	if (steamClient.connected()) {
 		onConnect(true);
@@ -145,6 +150,42 @@ void SteamService::onFirstGameRun(unsigned int gid, std::string name) {
 					wrappers};
 	configuration.getConfiguration().games[std::to_string(gid)] = entry;
 	configuration.saveConfig();
+
+	auto userIds = FileUtils::listDirectory(Constants::STEAM_USERDATA_PATH);
+	for (const auto& userId : userIds) {
+		auto path = fmt::format("{}/{}/config/grid/{}_logo.png", Constants::STEAM_USERDATA_PATH, userId, gid);
+		if (FileUtils::exists(path)) {
+			FileUtils::copy(path, fmt::format("{}/{}_logo.png", Constants::LOGOS_DIR, gid));
+			break;
+		}
+	}
+	for (const auto& userId : userIds) {
+		auto path = fmt::format("{}/{}/config/grid/{}_hero.png", Constants::STEAM_USERDATA_PATH, userId, gid);
+		if (FileUtils::exists(path)) {
+			FileUtils::copy(path, fmt::format("{}/{}_hero.png", Constants::LOGOS_DIR, gid));
+			break;
+		}
+	}
+
+	if (!details.icon_hash.empty()) {
+		auto icon = getIcon(gid);
+		if (!icon.has_value()) {
+			try {
+				NetUtils::download(
+					fmt::format("https://cdn.cloudflare.steamstatic.com/steamcommunity/public/images/apps/{}/{}.jpg", gid, details.icon_hash),
+					fmt::format("{}/{}_logo.jpg", Constants::LOGOS_DIR, gid));
+			} catch (std::exception& e) {
+			}
+		}
+	}
+	auto banner = getBanner(gid);
+	if (!banner.has_value()) {
+		try {
+			NetUtils::download(fmt::format("https://cdn.cloudflare.steamstatic.com/steam/apps/{}/header.jpg", gid),
+							   fmt::format("{}/{}_hero.jpg", Constants::LOGOS_DIR, gid));
+		} catch (std::exception& e) {
+		}
+	}
 
 	steamClient.setLaunchOptions(gid, Constants::STEAM_WRAPPER_PATH + " %command%");
 
@@ -437,4 +478,23 @@ const SteamGameConfig SteamService::getConfiguration(const std::string& gid) {
 
 std::string SteamService::encodeAppId(uint32_t appid) {
 	return std::to_string((static_cast<uint64_t>(appid) << 32) | 0x02000000ULL);
+}
+
+std::optional<std::string> SteamService::getImagePath(uint gid, std::string sufix) {
+	const std::vector<std::string> extensions = {"jpg", "png"};
+	for (auto ext : extensions) {
+		auto path = fmt::format("{}/{}{}.{}", Constants::LOGOS_DIR, gid, sufix, ext);
+		if (FileUtils::exists(path)) {
+			return path;
+		}
+	}
+	return std::nullopt;
+}
+
+std::optional<std::string> SteamService::getIcon(uint gid) {
+	return getImagePath(gid, "_logo");
+}
+
+std::optional<std::string> SteamService::getBanner(uint gid) {
+	return getImagePath(gid, "_hero");
 }

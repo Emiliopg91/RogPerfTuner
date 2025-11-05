@@ -36,6 +36,7 @@ class SteamService : public Singleton<SteamService>, Loggable {
 	void installRccDC();
 	void copyPlugin();
 	void installPipDeps();
+	std::optional<std::string> getImagePath(uint gid, std::string sufix);
 	bool checkIfRequiredInstallation();
 	std::string encodeAppId(uint32_t appid);
 
@@ -91,4 +92,8 @@ class SteamService : public Singleton<SteamService>, Loggable {
 	 * @param id The game ID as a string.
 	 */
 	void launchGame(const std::string& id);
+
+	std::optional<std::string> getIcon(uint gid);
+
+	std::optional<std::string> getBanner(uint gid);
 };

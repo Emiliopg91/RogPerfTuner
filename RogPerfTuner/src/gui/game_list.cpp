@@ -81,14 +81,10 @@ GameList::GameList(QWidget* parent, bool manage_parent) : QDialog(parent), manag
 		QTableWidgetItem* item = new QTableWidgetItem(
 			QString::fromStdString(gameCfg[std::to_string(appid)].name + (isRunning ? " (" + translator.translate("running") + "...)" : "")));
 
-		/*auto userIds = FileUtils::listDirectory(Constants::STEAM_USERDATA_PATH);
-		for (const auto& userId : userIds) {
-			auto path = fmt::format("{}/{}/config/grid/{}_logo.png", Constants::STEAM_USERDATA_PATH, userId, appid);
-			if (FileUtils::exists(path)) {
-				item->setIcon(QIcon(QString::fromStdString(path)));
-				break;
-			}
-		}*/
+		auto iconPath = steamService.getIcon(appid);
+		if (iconPath.has_value()) {
+			item->setIcon(QIcon(QString::fromStdString(*iconPath)));
+		}
 
 		item->setFlags(Qt::ItemIsEnabled);
 		item->setToolTip(QString::number(appid));

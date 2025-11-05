@@ -26,23 +26,19 @@ GameConfigDialog::GameConfigDialog(unsigned int gid, bool runAfterSave, QWidget*
 	QVBoxLayout* headerLayout = new QVBoxLayout();
 	headerLayout->setAlignment(Qt::AlignCenter);
 
-	/*auto userIds = FileUtils::listDirectory(Constants::STEAM_USERDATA_PATH);
-	for (const auto& userId : userIds) {
-		auto path = fmt::format("{}/{}/config/grid/{}_hero.png", Constants::STEAM_USERDATA_PATH, userId, gid);
-		if (FileUtils::exists(path)) {
-			QPixmap gameIcon(QString::fromStdString(path));
-			int targetSize	   = 300;
-			QPixmap scaledIcon = gameIcon.scaled(targetSize, targetSize, Qt::KeepAspectRatio, Qt::SmoothTransformation);
+	auto iconPath = steamService.getBanner(gid);
+	if (iconPath.has_value()) {
+		QPixmap gameIcon(QString::fromStdString(*iconPath));
+		int targetSize	   = 300;
+		QPixmap scaledIcon = gameIcon.scaled(targetSize, targetSize, Qt::KeepAspectRatio, Qt::SmoothTransformation);
 
-			QLabel* imageLabel = new QLabel();
-			imageLabel->setPixmap(scaledIcon);
-			imageLabel->setAlignment(Qt::AlignCenter);
+		QLabel* imageLabel = new QLabel();
+		imageLabel->setPixmap(scaledIcon);
+		imageLabel->setAlignment(Qt::AlignCenter);
 
-			headerLayout->addWidget(imageLabel);
-			setFixedSize(400, 500);
-			break;
-		}
-	}*/
+		headerLayout->addWidget(imageLabel);
+		setFixedSize(400, 500);
+	}
 
 	QLabel* titleLabel = new QLabel(QString::fromStdString(gameEntry.name));
 	QFont titleFont	   = titleLabel->font();

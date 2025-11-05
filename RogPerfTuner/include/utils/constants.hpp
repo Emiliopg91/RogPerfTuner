@@ -49,6 +49,7 @@ class Constants {
 	static const std::string STEAM_WRAPPER_PATH;
 	static const std::string CONFIG_DIR;
 	static const std::string CONFIG_FILE;
+	static const std::string LOGOS_DIR;
 	static const std::string LIB_DIR;
 	static const std::string LIB_VK_DIR;
 	static const std::string LIB_OCL_DIR;

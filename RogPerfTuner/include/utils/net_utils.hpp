@@ -1,5 +1,7 @@
 #pragma once
 
+#include <string>
+
 class NetUtils {
   public:
 	/**
@@ -16,4 +18,6 @@ class NetUtils {
 	 * @return An available port number.
 	 */
 	static int getRandomFreePort();
+
+	static void download(std::string url, std::string dst);
 };

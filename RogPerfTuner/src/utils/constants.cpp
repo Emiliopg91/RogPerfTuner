@@ -14,7 +14,7 @@ const std::string Constants::EXEC_NAME = "rog-perf-tuner";
 
 const std::string Constants::APP_VERSION = "4.7.0-dev";
 
-const std::string Constants::PLUGIN_VERSION = "1.2.4";
+const std::string Constants::PLUGIN_VERSION = "1.2.5";
 
 #ifdef DEV_MODE
 const std::string Constants::ASSETS_DIR = FileUtils::getCWD() + "/build/assets";
@@ -56,6 +56,7 @@ const std::string Constants::STEAM_WRAPPER_PATH		  = HOME_DIR + "/." + APP_NAME 
 const std::string Constants::FLATPAK_WRAPPER_PATH	  = HOME_DIR + "/." + APP_NAME + "/bin/steam/flatpak";
 const std::string Constants::CONFIG_DIR				  = HOME_DIR + "/." + APP_NAME + "/config";
 const std::string Constants::CONFIG_FILE			  = HOME_DIR + "/." + APP_NAME + "/config/config.yaml";
+const std::string Constants::LOGOS_DIR				  = HOME_DIR + "/." + APP_NAME + "/logos";
 const std::string Constants::LIB_DIR				  = HOME_DIR + "/." + APP_NAME + "/lib";
 const std::string Constants::LIB_VK_DIR				  = HOME_DIR + "/." + APP_NAME + "/lib/vk/icd.d/";
 const std::string Constants::LIB_OCL_DIR			  = HOME_DIR + "/." + APP_NAME + "/lib/ocl/icd.d/";
