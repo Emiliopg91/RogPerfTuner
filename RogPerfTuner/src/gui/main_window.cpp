@@ -15,6 +15,7 @@
 #include <algorithm>
 #include <optional>
 
+#include "../../include/gui/changelog_view.hpp"
 #include "../../include/gui/fan_curve_editor.hpp"
 #include "../../include/gui/game_list.hpp"
 #include "../../include/utils/string_utils.hpp"
@@ -351,9 +352,9 @@ void MainWindow::onUpdateAvailable(std::string value) {
 				versionLabel->setText(translator.translate("update.in.progress").c_str());
 				statusBar->removeWidget(updateButton);
 
-				std::thread([this]() {
-					applicationService.applyUpdate();
-				}).detach();
+				auto* changelog = new ChangelogView(this);		// crea en heap
+				changelog->setAttribute(Qt::WA_DeleteOnClose);	// se autodestruye al cerrar
+				changelog->show();
 			});
 		},
 		Qt::QueuedConnection);

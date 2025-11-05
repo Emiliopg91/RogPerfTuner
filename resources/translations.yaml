@@ -378,3 +378,15 @@ press.enter.exit:
   en: Press enter to exit...
   es: "Pulsa enter para salir..."
   de: Drücken Sie Enter zum Beenden...
+changelog:
+  en: Changelog
+  es: Registro de cambios
+  de: Änderungsprotokoll
+update.now:
+  en: Update now
+  es: Actualizar ahora
+  de: Jetzt aktualisieren
+no.changelog.available:
+  en: No changelog available
+  es: No hay registro de cambios disponible
+  de: Kein Änderungsprotokoll verfügbar
