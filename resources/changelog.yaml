@@ -2,7 +2,9 @@
   features:
     - New version of Decky plugin
     - Games artwork in list and settings view
+    - Showing changelog when update is available
   improvements:
     - Hide OpenRGB warning on compile related to usage of --pipe and --save-temps
+- version: 4.7.0-2
   fixes:
-    - Prevent hangs when reconnecting devices
+    - Prevent RGB hangs when reconnecting devices

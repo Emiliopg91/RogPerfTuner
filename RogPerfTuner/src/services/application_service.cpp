@@ -207,8 +207,9 @@ std::optional<std::string> ApplicationService::getChangeLog() {
 
 		const SemanticVersion currentSV = SemanticVersion::parse(Constants::APP_VERSION);
 
-		std::vector<std::string> fixes;
 		std::vector<std::string> features;
+		std::vector<std::string> fixes;
+		std::vector<std::string> improvements;
 
 		std::vector<ReleaseEntry> releases = root.as<std::vector<ReleaseEntry>>();
 		for (const auto& release : releases) {
@@ -222,6 +223,10 @@ std::optional<std::string> ApplicationService::getChangeLog() {
 
 				for (const auto& f : release.fixes) {
 					fixes.emplace_back(f);
+				}
+
+				for (const auto& f : release.improvements) {
+					improvements.emplace_back(f);
 				}
 			}
 		}
@@ -237,7 +242,14 @@ std::optional<std::string> ApplicationService::getChangeLog() {
 		}
 		sb << "\t\t</ul>\n";
 
-		sb << "\t\t<h2 style=\"margin-bottom: 0px;\">Fixes and improvements</h2>\n";
+		sb << "\t\t<h2 style=\"margin-bottom: 0px;\">Improvements</h2>\n";
+		sb << "\t\t<ul style=\"margin-top: 5px;\">\n";
+		for (const auto& f : improvements) {
+			sb << fmt::format("\t\t\t<li>{}</li>\n", f);
+		}
+		sb << "\t\t</ul>\n";
+
+		sb << "\t\t<h2 style=\"margin-bottom: 0px;\">Bug fixes</h2>\n";
 		sb << "\t\t<ul style=\"margin-top: 5px;\">\n";
 		for (const auto& f : fixes) {
 			sb << fmt::format("\t\t\t<li>{}</li>\n", f);
