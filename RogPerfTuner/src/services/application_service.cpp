@@ -230,15 +230,15 @@ std::optional<std::string> ApplicationService::getChangeLog() {
 		sb << fmt::format("<h1>Changelog from {} (current version) to {} (latest version)</h1>\n", Constants::APP_VERSION, releases[0].version);
 		sb << "\t<div style=\"margin-left:20px\">\n";
 
-		sb << "\t\t<h2>New features</h2>\n";
-		sb << "\t\t<ul>\n";
+		sb << "\t\t<h2 style=\"margin-bottom: 0px;\">New features</h2>\n";
+		sb << "\t\t<ul style=\"margin-top: 5px;\">\n";
 		for (const auto& f : features) {
 			sb << fmt::format("\t\t\t<li>{}</li>\n", f);
 		}
 		sb << "\t\t</ul>\n";
 
-		sb << "\t\t<h2>Fixes and improvements</h2>\n";
-		sb << "\t\t<ul>\n";
+		sb << "\t\t<h2 style=\"margin-bottom: 0px;\">Fixes and improvements</h2>\n";
+		sb << "\t\t<ul style=\"margin-top: 5px;\">\n";
 		for (const auto& f : fixes) {
 			sb << fmt::format("\t\t\t<li>{}</li>\n", f);
 		}
