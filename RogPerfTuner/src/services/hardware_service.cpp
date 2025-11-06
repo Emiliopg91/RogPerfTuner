@@ -36,15 +36,6 @@ HardwareService::HardwareService() : Loggable("HardwareService") {
 			line = line.substr(pos + 2);
 			logger.info(line);
 		}
-
-		Logger::add_tab();
-		if (pl1SpdClient.available()) {
-			logger.info("TDP control available");
-		}
-		if (boostControlClient.available()) {
-			logger.info("Boost control available");
-		}
-		Logger::rem_tab();
 	} else if (StringUtils::isSubstring("AuthenticAMD", cpuinfo_out)) {
 		cpu		   = CpuBrand::Enum::AMD;
 		auto lines = StringUtils::splitLines(cpuinfo_out);
@@ -55,6 +46,15 @@ HardwareService::HardwareService() : Loggable("HardwareService") {
 			logger.info(line);
 		}
 	}
+
+	Logger::add_tab();
+	if (pl1SpdClient.available()) {
+		logger.info("TDP control available");
+	}
+	if (boostControlClient.available()) {
+		logger.info("Boost control available");
+	}
+	Logger::rem_tab();
 
 	Logger::rem_tab();
 

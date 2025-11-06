@@ -1,5 +1,6 @@
 #include "../../../../../include/clients/file/firmware/asus-armoury/armoury_base_client.hpp"
 
+#include <stdexcept>
 #include <string>
 
 #include "../../../../../include/utils/file_utils.hpp"
@@ -10,10 +11,17 @@ ArmouryBaseClient::ArmouryBaseClient(std::string attribute, bool required)
 }
 
 int ArmouryBaseClient::getCurrentValue() {
-	return std::stoi(read());
+	return stoi(read());
 }
 
 void ArmouryBaseClient::setCurrentValue(int value) {
+	auto min = getMinValue();
+	auto max = getMaxValue();
+
+	if (value < min || value > max) {
+		throw std::runtime_error(fmt::format("Value {} outside of range [{},{}]", value, min, max));
+	}
+
 	write(std::to_string(value));
 }
 
