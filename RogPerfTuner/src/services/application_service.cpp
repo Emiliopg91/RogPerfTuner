@@ -216,8 +216,9 @@ std::optional<std::string> ApplicationService::getChangeLog() {
 		for (const auto& release : releases) {
 			const auto version	 = release.version;
 			const auto versionSV = SemanticVersion::parse(version);
-
 			if (versionSV > currentSV) {
+				logger.error("{}>{}, aplica {} features, {} fixes, {} improvements", version, Constants::APP_VERSION, release.features.size(),
+							 release.fixes.size(), release.improvements.size());
 				for (const auto& f : release.features) {
 					features.emplace_back(f);
 				}
@@ -232,7 +233,7 @@ std::optional<std::string> ApplicationService::getChangeLog() {
 			}
 		}
 
-		if (!features.empty() && !improvements.empty() && !fixes.empty()) {
+		if (!features.empty() || !improvements.empty() || !fixes.empty()) {
 			std::ostringstream sb;
 			sb << fmt::format("<h1>Changelog from {} (current version) to {} (latest version)</h1>\n", Constants::APP_VERSION, releases[0].version);
 			sb << "\t<div style=\"margin-left:20px\">\n";
