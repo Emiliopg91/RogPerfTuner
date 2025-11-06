@@ -24,9 +24,11 @@ options=(
 depends=(
   'asusctl'
   'coreutils'
+  'cpp-httplib-compiled'
   'hicolor-icon-theme'
   'hidapi'
   'libusb'
+  'nlohmann-json'
   'power-profiles-daemon'
   'python'
   'python-pip'
