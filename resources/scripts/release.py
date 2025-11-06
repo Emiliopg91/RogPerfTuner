@@ -34,13 +34,12 @@ def generate_changelog(rel_version, rel_release):
     for i in range(len(releases)):
         if releases[i].get("version") == f"{rel_version}-{rel_release}":
             lines.clear()
-            lines.append(f"# Changelog for {releases[i].get("version")}")
 
             if (
                 releases[i].get("features") is not None
                 and len(releases[i].get("features")) > 0
             ):
-                lines.append("## New features")
+                lines.append("# New features")
                 for f in releases[i].get("features"):
                     lines.append(f"- {f}")
 
@@ -48,7 +47,7 @@ def generate_changelog(rel_version, rel_release):
                 releases[i].get("improvements") is not None
                 and len(releases[i].get("improvements")) > 0
             ):
-                lines.append("## Improvements")
+                lines.append("# Improvements")
                 for f in releases[i].get("improvements"):
                     lines.append(f"- {f}")
 
@@ -56,7 +55,7 @@ def generate_changelog(rel_version, rel_release):
                 releases[i].get("fixes") is not None
                 and len(releases[i].get("fixes")) > 0
             ):
-                lines.append("## Bug fixes")
+                lines.append("# Bug fixes")
                 for f in releases[i].get("fixes"):
                     lines.append(f"- {f}")
 
