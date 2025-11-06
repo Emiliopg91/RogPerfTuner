@@ -1,3 +1,8 @@
+- version: 4.8.1-1
+  improvements:
+    - Battery charge limit moved from DBus to file
+    - Refactor to ensure code quality
+
 - version: 4.8.0-2
   fixes:
     - Missing cpp-httplib-compiled and nlohmann-json dependencies
