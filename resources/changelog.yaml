@@ -1,3 +1,9 @@
+- version: 4.8.2-1
+  improvements:
+    - UI auto-adjustment
+  fixes:
+    - Battery limit error if not supported
+
 - version: 4.8.1-1
   improvements:
     - Battery charge limit moved from DBus to file
