@@ -26,8 +26,6 @@ MainWindow::MainWindow(QWidget* parent) : QMainWindow(parent), _logger(new Logge
 	runningGames = steamService.getRunningGames().size();
 
 	setWindowTitle(QString::fromStdString(Constants::APP_NAME));
-	setGeometry(0, 0, 350, 700);
-	setFixedSize(350, 700);
 	setWindowIcon(QIcon(QString::fromStdString(Constants::ASSET_ICON_45_FILE)));
 
 	QWidget* centralWidget	= new QWidget(this);
@@ -297,6 +295,10 @@ MainWindow::MainWindow(QWidget* parent) : QMainWindow(parent), _logger(new Logge
 	// -------------------------
 
 	setCentralWidget(centralWidget);
+
+	adjustSize();
+	setFixedSize(size());
+
 	QScreen* screen = QApplication::screenAt(QCursor::pos());
 	if (screen) {
 		QRect screenGeometry = screen->availableGeometry();

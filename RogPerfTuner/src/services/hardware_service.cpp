@@ -136,7 +136,7 @@ HardwareService::HardwareService() : Loggable("HardwareService") {
 	}
 	Logger::rem_tab();
 
-	if (platformClient.available()) {
+	if (batteryChargeLimitClient.available()) {
 		logger.info("Getting battery charge limit");
 		Logger::add_tab();
 		charge_limit = configuration.getConfiguration().platform.chargeLimit;

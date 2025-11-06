@@ -16,7 +16,6 @@ GameConfigDialog::GameConfigDialog(unsigned int gid, bool runAfterSave, QWidget*
 	: Loggable("GameConfigDialog"), QDialog(parent), gid(gid), runAfterSave(runAfterSave) {
 	Logger::add_tab();
 	setWindowTitle(QString::fromStdString(translator.translate("config.for.game", {{"game", ""}})));
-	setFixedSize(400, 400);
 
 	gameEntry = configuration.getConfiguration().games[std::to_string(gid)];
 
@@ -37,7 +36,6 @@ GameConfigDialog::GameConfigDialog(unsigned int gid, bool runAfterSave, QWidget*
 		imageLabel->setAlignment(Qt::AlignCenter);
 
 		headerLayout->addWidget(imageLabel);
-		setFixedSize(400, 500);
 	}
 
 	QLabel* titleLabel = new QLabel(QString::fromStdString(gameEntry.name));
@@ -160,6 +158,9 @@ GameConfigDialog::GameConfigDialog(unsigned int gid, bool runAfterSave, QWidget*
 	group->setLayout(layout);
 	windowLayout->addWidget(group);
 	setLayout(windowLayout);
+
+	adjustSize();
+	setFixedSize(size());
 }
 
 void GameConfigDialog::onAccept() {
