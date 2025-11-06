@@ -2,6 +2,8 @@
   improvements:
     - Battery charge limit moved from DBus to file
     - Refactor to ensure code quality
+  fixes:
+    - Restored Gaming effect functionality on laptops
 
 - version: 4.8.0-2
   fixes:
