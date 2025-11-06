@@ -17,10 +17,8 @@ void GamingEffect::apply_effect(const DeviceList& devices) {
 		std::vector<Color> colors(dev.leds.size(), MAIN_COLOR);
 		size_t offset = 0;
 
-		std::cout << dev.name << " - " << static_cast<uint32_t>(dev.type) << std::endl;
 		if (dev.type == DeviceType::Keyboard || dev.type == DeviceType::Laptop) {
 			for (auto& led : dev.leds) {
-				std::cout << "  " << led.name << std::endl;
 				for (auto& pair : COLOR_MATCHING) {
 					if (std::regex_match(led.name, pair.first)) {
 						colors[offset + led.idx] = pair.second;
