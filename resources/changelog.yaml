@@ -1,3 +1,9 @@
+- version: 4.8.0-1
+  features:
+    - Support for AMD CPUs and GPUs
+  improvements:
+    - DBus armoury interface migrated to asus-armoury module firmware-attributes
+
 - version: 4.7.1-2
   improvements:
     - Changelog for releases
