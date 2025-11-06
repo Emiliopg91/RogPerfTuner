@@ -4,7 +4,7 @@
   improvements:
     - DBus armoury interface migrated to asus-armoury module firmware-attributes
 
-- version: 4.7.1-2
+- version: 4.7.2-1
   improvements:
     - Changelog for releases
 
