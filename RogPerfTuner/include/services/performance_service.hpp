@@ -3,14 +3,15 @@
 #include <mutex>
 #include <optional>
 
-#include "../../include/clients/dbus/asus/armoury/intel/pl1_spd_client.hpp"
-#include "../../include/clients/dbus/asus/armoury/intel/pl2_sppt_client.hpp"
-#include "../../include/clients/dbus/asus/armoury/nvidia/nv_boost_client.hpp"
-#include "../../include/clients/dbus/asus/armoury/nvidia/nv_temp_client.hpp"
 #include "../../include/clients/dbus/asus/core/platform_client.hpp"
 #include "../../include/clients/dbus/linux/power_profile_client.hpp"
 #include "../../include/clients/dbus/linux/upower_client.hpp"
 #include "../../include/clients/file/boost_control_client.hpp"
+#include "../../include/clients/file/firmware/asus-armoury/intel/pl1_spd_client.hpp"
+#include "../../include/clients/file/firmware/asus-armoury/intel/pl2_sppt_client.hpp"
+#include "../../include/clients/file/firmware/asus-armoury/intel/pl3_fppt_client.hpp"
+#include "../../include/clients/file/firmware/asus-armoury/nvidia/nv_boost_client.hpp"
+#include "../../include/clients/file/firmware/asus-armoury/nvidia/nv_temp_client.hpp"
 #include "../../include/clients/shell/asusctl_client.hpp"
 #include "../../include/clients/shell/cpupower_client.hpp"
 #include "../../include/clients/shell/scxctl_client.hpp"
@@ -143,6 +144,7 @@ class PerformanceService : public Singleton<PerformanceService>, Loggable {
 	PlatformClient& platformClient		   = PlatformClient::getInstance();
 	Pl1SpdClient& pl1SpdClient			   = Pl1SpdClient::getInstance();
 	Pl2SpptClient& pl2SpptClient		   = Pl2SpptClient::getInstance();
+	Pl3FpptClient& pl3FpptClient		   = Pl3FpptClient::getInstance();
 	NvBoostClient& nvBoostClient		   = NvBoostClient::getInstance();
 	NvTempClient& nvTempClient			   = NvTempClient::getInstance();
 	UPowerClient& uPowerClient			   = UPowerClient::getInstance();
@@ -169,6 +171,8 @@ class PerformanceService : public Singleton<PerformanceService>, Loggable {
 	int batteryIntelPl1Spl(PerformanceProfile profile);
 	int acIntelPl2Sppt(PerformanceProfile profile);
 	int batteryIntelPl2Sppt(PerformanceProfile profile);
+	int acIntelPl3Fppt(PerformanceProfile profile);
+	int batteryIntelPl3Fppt(PerformanceProfile profile);
 	int acNvBoost(PerformanceProfile profile);
 	int batteryNvBoost(PerformanceProfile profile);
 	int acNvTemp();
