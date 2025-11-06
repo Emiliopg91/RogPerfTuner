@@ -758,34 +758,35 @@ index 2deb0b2..6905797 100644
 -#endif // OPENRGB_COLOR_INCLUDED
 +#endif	// OPENRGB_COLOR_INCLUDED
 diff --git a/include/OpenRGB/DeviceInfo.hpp b/include/OpenRGB/DeviceInfo.hpp
-index 6f15b55..63de2dc 100644
+index 6f15b55..dc66ed5 100644
 --- a/include/OpenRGB/DeviceInfo.hpp
 +++ b/include/OpenRGB/DeviceInfo.hpp
-@@ -8,448 +8,435 @@
+@@ -8,259 +8,240 @@
  #ifndef OPENRGB_DEVICE_INCLUDED
  #define OPENRGB_DEVICE_INCLUDED
  
 -
- #include "Exceptions.hpp"
- 
- #include "Color.hpp"
- 
+-#include "Exceptions.hpp"
+-
+-#include "Color.hpp"
+-
++#include <memory>  // unique_ptr<Device>
  #include <string>
  #include <vector>
 -#include <memory>  // unique_ptr<Device>
--
--
--namespace orgb {
--
--
--//======================================================================================================================
--//  enums
-+#include <memory> // unique_ptr<Device>
  
--/// Type of device with RGB LEDs
++#include "Color.hpp"
++#include "Exceptions.hpp"
+ 
+ namespace orgb {
+ 
+-
+ //======================================================================================================================
+ //  enums
+ 
+ /// Type of device with RGB LEDs
 -enum class DeviceType : uint32_t
-+namespace orgb
- {
+-{
 -	Motherboard   = 0,
 -	DRAM          = 1,
 -	GPU           = 2,
@@ -800,11 +801,34 @@ index 6f15b55..63de2dc 100644
 -	Light         = 11,
 -    Speaker       = 12,
 -    Virtual       = 13,
--	Unknown,
--};
++enum class DeviceType : uint32_t {
++	Motherboard	 = 0,
++	DRAM		 = 1,
++	GPU			 = 2,
++	Cooler		 = 3,
++	LedStrip	 = 4,
++	Keyboard	 = 5,
++	Mouse		 = 6,
++	MouseMat	 = 7,
++	Headset		 = 8,
++	HeadsetStand = 9,
++	Gamepad		 = 10,
++	Light		 = 11,
++	Speaker		 = 12,
++	Virtual		 = 13,
++	Storage		 = 14,
++	Case		 = 15,
++	Microphone	 = 16,
++	Accesory	 = 17,
++	Keypad		 = 18,
++	Laptop		 = 19,
++	Monitor		 = 20,
+ 	Unknown,
+ };
 -const char * enumString( DeviceType ) noexcept;
--
--/// Which features the mode supports
++const char* enumString(DeviceType) noexcept;
+ 
+ /// Which features the mode supports
 -enum ModeFlags : uint32_t
 -{
 -	HasSpeed              = (1 << 0),  ///< the speed attribute in ModeDescription is present
@@ -815,10 +839,20 @@ index 6f15b55..63de2dc 100644
 -	HasPerLedColor        = (1 << 5),  ///< the color_mode attribute in ModeDescription can be set to PerLed
 -	HasModeSpecificColor  = (1 << 6),  ///< the color_mode attribute in ModeDescription can be set to ModeSpecific
 -	HasRandomColor        = (1 << 7),  ///< the color_mode attribute in ModeDescription can be set to Random
--};
++enum ModeFlags : uint32_t {
++	HasSpeed			 = (1 << 0),  ///< the speed attribute in ModeDescription is present
++	HasDirectionLR		 = (1 << 1),  ///< the direction attribute in ModeDescription can have Left or Right values
++	HasDirectionUD		 = (1 << 2),  ///< the direction attribute in ModeDescription can have Up or Down values
++	HasDirectionHV		 = (1 << 3),  ///< the direction attribute in ModeDescription can have Horizontal or Vertical values
++	HasBrightness		 = (1 << 4),  ///< the brightness attribute in ModeDescription is present
++	HasPerLedColor		 = (1 << 5),  ///< the color_mode attribute in ModeDescription can be set to PerLed
++	HasModeSpecificColor = (1 << 6),  ///< the color_mode attribute in ModeDescription can be set to ModeSpecific
++	HasRandomColor		 = (1 << 7),  ///< the color_mode attribute in ModeDescription can be set to Random
+ };
 -std::string modeFlagsToString( uint32_t flags );
--
--/// Direction of the color effect
++std::string modeFlagsToString(uint32_t flags);
+ 
+ /// Direction of the color effect
 -enum class Direction : uint32_t
 -{
 -	Left        = 0,
@@ -827,106 +861,150 @@ index 6f15b55..63de2dc 100644
 -	Down        = 3,
 -	Horizontal  = 4,
 -	Vertical    = 5,
--};
++enum class Direction : uint32_t {
++	Left	   = 0,
++	Right	   = 1,
++	Up		   = 2,
++	Down	   = 3,
++	Horizontal = 4,
++	Vertical   = 5,
+ };
 -const char * enumString( Direction ) noexcept;
--
--/// How the colors of a mode are set
++const char* enumString(Direction) noexcept;
+ 
+ /// How the colors of a mode are set
 -enum class ColorMode : uint32_t
 -{
 -	None          = 0,  ///< mode has no colors
 -	PerLed        = 1,  ///< mode has per LED colors
 -	ModeSpecific  = 2,  ///< mode specific colors
 -	Random        = 3,  ///< mode has random colors
--};
++enum class ColorMode : uint32_t {
++	None		 = 0,  ///< mode has no colors
++	PerLed		 = 1,  ///< mode has per LED colors
++	ModeSpecific = 2,  ///< mode specific colors
++	Random		 = 3,  ///< mode has random colors
+ };
 -const char * enumString( ColorMode ) noexcept;
--
--/// Type of RGB zone
++const char* enumString(ColorMode) noexcept;
+ 
+ /// Type of RGB zone
 -enum class ZoneType : uint32_t
 -{
 -	Single  = 0,
 -	Linear  = 1,
 -	Matrix  = 2,
--};
++enum class ZoneType : uint32_t {
++	Single = 0,
++	Linear = 1,
++	Matrix = 2,
+ };
 -const char * enumString( ZoneType ) noexcept;
 -
--
--//======================================================================================================================
--/// Represents a particular LED on an RGB device.
--
++const char* enumString(ZoneType) noexcept;
+ 
+ //======================================================================================================================
+ /// Represents a particular LED on an RGB device.
+ 
 -class LED
 -{
 -
 - public:
 -
--	// metadata
++class LED {
++  public:
+ 	// metadata
 -	const uint32_t idx;        ///< index of this LED in the device's list of LEDs
--	const uint32_t parentIdx;  ///< index of the parent device in the device list
--
--	// LED description
++	const uint32_t idx;		   ///< index of this LED in the device's list of LEDs
+ 	const uint32_t parentIdx;  ///< index of the parent device in the device list
+ 
+ 	// LED description
 -	const std::string  name;
 -	const uint32_t     value;  ///< device-specific value
 -
 - private:  // for internal use only
--
--	friend struct protocol;
--	LED();
++	const std::string name;
++	const uint32_t value;  ///< device-specific value
+ 
++  private:	// for internal use only
+ 	friend struct protocol;
+ 	LED();
 -	size_t calcSize( uint32_t protocolVersion ) const noexcept;
 -	void serialize( own::BinaryOutputStream & stream, uint32_t protocolVersion ) const;
 -	bool deserialize( own::BinaryInputStream & stream, uint32_t protocolVersion, uint32_t idx, uint32_t parentIdx ) noexcept;
 -
--};
++	size_t calcSize(uint32_t protocolVersion) const noexcept;
++	void serialize(own::BinaryOutputStream& stream, uint32_t protocolVersion) const;
++	bool deserialize(own::BinaryInputStream& stream, uint32_t protocolVersion, uint32_t idx, uint32_t parentIdx) noexcept;
+ };
  
-+	//======================================================================================================================
-+	//  enums
- 
--//======================================================================================================================
--/// Represents a group of LEDs on an RGB device. Only some devices have zones.
 -
+ //======================================================================================================================
+ /// Represents a group of LEDs on an RGB device. Only some devices have zones.
+ 
 -class Zone
 -{
 -
 - public:
 -
--	// metadata
++class Zone {
++  public:
+ 	// metadata
 -	const uint32_t idx;        ///< index of this zone in the device's list of zones
--	const uint32_t parentIdx;  ///< index of the parent device in the device list
--
--	// zone description
++	const uint32_t idx;		   ///< index of this zone in the device's list of zones
+ 	const uint32_t parentIdx;  ///< index of the parent device in the device list
+ 
+ 	// zone description
 -	const std::string  name;
 -	const ZoneType     type;
 -	const uint32_t     leds_min;       ///< minimum size of the zone
 -	const uint32_t     leds_max;       ///< maximum size of the zone
 -	const uint32_t     leds_count;     ///< current size of the zone
--	// optional
++	const std::string name;
++	const ZoneType type;
++	const uint32_t leds_min;	///< minimum size of the zone
++	const uint32_t leds_max;	///< maximum size of the zone
++	const uint32_t leds_count;	///< current size of the zone
+ 	// optional
 -	const uint32_t     matrix_height;  ///< if the zone type is matrix, this is its height
 -	const uint32_t     matrix_width;   ///< if the zone type is matrix, this is its width
 -	const std::vector< uint32_t >  matrix_values;  ///< TODO: what is this?
 -
 - private:  // for internal use only
--
--	friend struct protocol;
--	Zone();
++	const uint32_t matrix_height;				///< if the zone type is matrix, this is its height
++	const uint32_t matrix_width;				///< if the zone type is matrix, this is its width
++	const std::vector<uint32_t> matrix_values;	///< TODO: what is this?
+ 
++  private:	// for internal use only
+ 	friend struct protocol;
+ 	Zone();
 -	size_t calcSize( uint32_t protocolVersion ) const noexcept;
 -	void serialize( own::BinaryOutputStream & stream, uint32_t protocolVersion ) const;
 -	bool deserialize( own::BinaryInputStream & stream, uint32_t protocolVersion, uint32_t idx, uint32_t parentIdx ) noexcept;
 -
--};
++	size_t calcSize(uint32_t protocolVersion) const noexcept;
++	void serialize(own::BinaryOutputStream& stream, uint32_t protocolVersion) const;
++	bool deserialize(own::BinaryInputStream& stream, uint32_t protocolVersion, uint32_t idx, uint32_t parentIdx) noexcept;
+ };
+ 
 -
--
--//======================================================================================================================
--/// Represents a color mode of an RGB device, like "breathing", "flashing", "rainbow" or "direct".
--
+ //======================================================================================================================
+ /// Represents a color mode of an RGB device, like "breathing", "flashing", "rainbow" or "direct".
+ 
 -class Mode
 -{
 -
 - public:
 -
--	// metadata
++class Mode {
++  public:
+ 	// metadata
 -	const uint32_t idx;        ///< index of this mode in the device's list of modes
--	const uint32_t parentIdx;  ///< index of the parent device in the device list
--
--	// Attributes that are not marked with const are the mode parameters that can be set,
--	// others are just informational and need to remain constant.
++	const uint32_t idx;		   ///< index of this mode in the device's list of modes
+ 	const uint32_t parentIdx;  ///< index of the parent device in the device list
+ 
+ 	// Attributes that are not marked with const are the mode parameters that can be set,
+ 	// others are just informational and need to remain constant.
 -	const std::string  name;
 -	const uint32_t     value;           ///< device-specific value
 -	const uint32_t     flags;           ///< see ModeFlags for possible bit flags
@@ -940,12 +1018,29 @@ index 6f15b55..63de2dc 100644
 -	/** This attribute is enabled only if ModeFlags::HasSpeed is set, otherwise it's uninitialized.
 -	  * The possible values are determined by #speed_min and #speed_max. */
 -	      uint32_t      speed;
--	/// Brightness of the lights.
--	/** This attribute is enabled only if ModeFlags::HasBrightness is set, otherwise it's uninitialized.
++	const std::string name;
++	const uint32_t value;	   ///< device-specific value
++	const uint32_t flags;	   ///< see ModeFlags for possible bit flags
++	const uint32_t speed_min;  ///< minimum speed value, this attribute is valid only if ModeFlags::HasSpeed is set, otherwise it's uninitialized
++	const uint32_t speed_max;  ///< maximum speed value, this attribute is valid only if ModeFlags::HasSpeed is set, otherwise it's uninitialized
++	const uint32_t
++		brightness_min;	 ///< minimum brightness value, this attribute is valid only if ModeFlags::HasBrightness is set, otherwise it's uninitialized
++	const uint32_t
++		brightness_max;	 ///< maximum brightness value, this attribute is valid only if ModeFlags::HasBrightness is set, otherwise it's uninitialized
++	const uint32_t colors_min;	///< minimum number of mode colors
++	const uint32_t colors_max;	///< maximum number of mode colors
++								/// Speed of the effect.
++								/** This attribute is enabled only if ModeFlags::HasSpeed is set, otherwise it's uninitialized.
++								 * The possible values are determined by #speed_min and #speed_max. */
++	uint32_t speed;
+ 	/// Brightness of the lights.
+ 	/** This attribute is enabled only if ModeFlags::HasBrightness is set, otherwise it's uninitialized.
 -	  * The possible values are determined by #brightness_min and #brightness_max. */
 -	      uint32_t      brightness;
--	/// Direction of the color effect.
--	/** This attribute is enabled only if any of ModeFlags::HasDirectionXY is set in #flags, otherwise it's uninitialized.
++	 * The possible values are determined by #brightness_min and #brightness_max. */
++	uint32_t brightness;
+ 	/// Direction of the color effect.
+ 	/** This attribute is enabled only if any of ModeFlags::HasDirectionXY is set in #flags, otherwise it's uninitialized.
 -	  * The possible values are also determined by #flags. */
 -	      Direction     direction;
 -	const ColorMode     color_mode;  ///< how the colors of a mode are set
@@ -953,31 +1048,43 @@ index 6f15b55..63de2dc 100644
 -	      std::vector< Color >  colors;
 -
 - private:  // for internal use only
--
--	friend struct protocol;
--	friend class Device;
--	friend struct UpdateMode;
--	friend struct SaveMode;
--	Mode();
++	 * The possible values are also determined by #flags. */
++	Direction direction;
++	const ColorMode color_mode;	 ///< how the colors of a mode are set
++								 /// Mode-specific list of colors.
++	std::vector<Color> colors;
+ 
++  private:	// for internal use only
+ 	friend struct protocol;
+ 	friend class Device;
+ 	friend struct UpdateMode;
+ 	friend struct SaveMode;
+ 	Mode();
 -	size_t calcSize( uint32_t protocolVersion ) const noexcept;
 -	void serialize( own::BinaryOutputStream & stream, uint32_t protocolVersion ) const;
 -	bool deserialize( own::BinaryInputStream & stream, uint32_t protocolVersion, uint32_t idx, uint32_t parentIdx ) noexcept;
 -
--};
++	size_t calcSize(uint32_t protocolVersion) const noexcept;
++	void serialize(own::BinaryOutputStream& stream, uint32_t protocolVersion) const;
++	bool deserialize(own::BinaryInputStream& stream, uint32_t protocolVersion, uint32_t idx, uint32_t parentIdx) noexcept;
+ };
+ 
 -
--
--//======================================================================================================================
--/// Represents an RGB-capable device. Device can have modes, zones and individual LEDs.
--
+ //======================================================================================================================
+ /// Represents an RGB-capable device. Device can have modes, zones and individual LEDs.
+ 
 -class Device
 -{
 -
 - public:
 -
--	// metadata
++class Device {
++  public:
+ 	// metadata
 -	const uint32_t idx;  ///< index of this device in the device list
--
--	// device description
++	const uint32_t idx;	 ///< index of this device in the device list
+ 
+ 	// device description
 -	const DeviceType   type;
 -	const std::string  name;
 -	const std::string  vendor;
@@ -986,167 +1093,160 @@ index 6f15b55..63de2dc 100644
 -	const std::string  serial;
 -	const std::string  location;
 -	const uint32_t     active_mode;
--
--	// device subobjects
++	const DeviceType type;
++	const std::string name;
++	const std::string vendor;
++	const std::string description;
++	const std::string version;
++	const std::string serial;
++	const std::string location;
++	const uint32_t active_mode;
+ 
+ 	// device subobjects
 -	const std::vector< Mode > modes;
 -	const std::vector< Zone > zones;
 -	const std::vector< LED >  leds;
 -	const std::vector< Color > colors;
 -
 - public:
--
--	/// Finds the first mode with a specific name.
--	/** \returns nullptr when mode with this name is not found. */
++	const std::vector<Mode> modes;
++	const std::vector<Zone> zones;
++	const std::vector<LED> leds;
++	const std::vector<Color> colors;
++	bool enabled = true;
+ 
++  public:
+ 	/// Finds the first mode with a specific name.
+ 	/** \returns nullptr when mode with this name is not found. */
 -	const Mode * findMode( const std::string & name ) const noexcept
 -	{
 -		for (const auto & mode : modes)
 -			if (mode.name == name)
--				return &mode;
--		return nullptr;
--	}
--
--	/// Finds the first zone with a specific name.
--	/** \returns nullptr when zone with this name is not found. */
++	const Mode* findMode(const std::string& name) const noexcept {
++		for (const auto& mode : modes) {
++			if (mode.name == name) {
+ 				return &mode;
++			}
++		}
+ 		return nullptr;
+ 	}
+ 
+ 	/// Finds the first zone with a specific name.
+ 	/** \returns nullptr when zone with this name is not found. */
 -	const Zone * findZone( const std::string & name ) const noexcept
-+	/// Type of device with RGB LEDs
-+	enum class DeviceType : uint32_t
- 	{
+-	{
 -		for (const auto & zone : zones)
 -			if (zone.name == name)
--				return &zone;
--		return nullptr;
--	}
--
--	/// Finds the first LED with a specific name.
--	/** \returns nullptr when LED with this name is not found. */
++	const Zone* findZone(const std::string& name) const noexcept {
++		for (const auto& zone : zones) {
++			if (zone.name == name) {
+ 				return &zone;
++			}
++		}
+ 		return nullptr;
+ 	}
+ 
+ 	/// Finds the first LED with a specific name.
+ 	/** \returns nullptr when LED with this name is not found. */
 -	const LED * findLED( const std::string & name ) const noexcept
-+		Motherboard = 0,
-+		DRAM = 1,
-+		GPU = 2,
-+		Cooler = 3,
-+		LedStrip = 4,
-+		Keyboard = 5,
-+		Mouse = 6,
-+		MouseMat = 7,
-+		Headset = 8,
-+		HeadsetStand = 9,
-+		Gamepad = 10,
-+		Light = 11,
-+		Speaker = 12,
-+		Virtual = 13,
-+		Unknown,
-+	};
-+	const char *enumString(DeviceType) noexcept;
-+
-+	/// Which features the mode supports
-+	enum ModeFlags : uint32_t
- 	{
+-	{
 -		for (const auto & led : leds)
 -			if (led.name == name)
--				return &led;
--		return nullptr;
--	}
--
--#ifndef NO_EXCEPTIONS
--
--	/// Exception-throwing variant of findModeX( const std::string & ) const.
--	/** \throws NotFound when mode with this name is not found. */
++	const LED* findLED(const std::string& name) const noexcept {
++		for (const auto& led : leds) {
++			if (led.name == name) {
+ 				return &led;
++			}
++		}
+ 		return nullptr;
+ 	}
+ 
+@@ -268,133 +249,166 @@ class Device
+ 
+ 	/// Exception-throwing variant of findModeX( const std::string & ) const.
+ 	/** \throws NotFound when mode with this name is not found. */
 -	const Mode & findModeX( const std::string & name ) const
-+		HasSpeed = (1 << 0),			 ///< the speed attribute in ModeDescription is present
-+		HasDirectionLR = (1 << 1),		 ///< the direction attribute in ModeDescription can have Left or Right values
-+		HasDirectionUD = (1 << 2),		 ///< the direction attribute in ModeDescription can have Up or Down values
-+		HasDirectionHV = (1 << 3),		 ///< the direction attribute in ModeDescription can have Horizontal or Vertical values
-+		HasBrightness = (1 << 4),		 ///< the brightness attribute in ModeDescription is present
-+		HasPerLedColor = (1 << 5),		 ///< the color_mode attribute in ModeDescription can be set to PerLed
-+		HasModeSpecificColor = (1 << 6), ///< the color_mode attribute in ModeDescription can be set to ModeSpecific
-+		HasRandomColor = (1 << 7),		 ///< the color_mode attribute in ModeDescription can be set to Random
-+	};
-+	std::string modeFlagsToString(uint32_t flags);
-+
-+	/// Direction of the color effect
-+	enum class Direction : uint32_t
- 	{
+-	{
 -		for (const auto & mode : modes)
 -			if (mode.name == name)
--				return mode;
++	const Mode& findModeX(const std::string& name) const {
++		for (const auto& mode : modes) {
++			if (mode.name == name) {
+ 				return mode;
 -		throw NotFound( "Mode of such name was not found" );
--	}
--
--	/// Exception-throwing variant of findZoneX( const std::string & ) const.
--	/** \throws NotFound when zone with this name is not found. */
++			}
++		}
++		throw NotFound("Mode of such name was not found");
+ 	}
+ 
+ 	/// Exception-throwing variant of findZoneX( const std::string & ) const.
+ 	/** \throws NotFound when zone with this name is not found. */
 -	const Zone & findZoneX( const std::string & name ) const
-+		Left = 0,
-+		Right = 1,
-+		Up = 2,
-+		Down = 3,
-+		Horizontal = 4,
-+		Vertical = 5,
-+	};
-+	const char *enumString(Direction) noexcept;
-+
-+	/// How the colors of a mode are set
-+	enum class ColorMode : uint32_t
- 	{
+-	{
 -		for (const auto & zone : zones)
 -			if (zone.name == name)
--				return zone;
++	const Zone& findZoneX(const std::string& name) const {
++		for (const auto& zone : zones) {
++			if (zone.name == name) {
+ 				return zone;
 -		throw NotFound( "Zone of such name was not found" );
--	}
--
--	/// Exception-throwing variant of findLEDX( const std::string & ) const.
--	/** \throws NotFound when LED with this name is not found. */
++			}
++		}
++		throw NotFound("Zone of such name was not found");
+ 	}
+ 
+ 	/// Exception-throwing variant of findLEDX( const std::string & ) const.
+ 	/** \throws NotFound when LED with this name is not found. */
 -	const LED & findLEDX( const std::string & name ) const
-+		None = 0,		  ///< mode has no colors
-+		PerLed = 1,		  ///< mode has per LED colors
-+		ModeSpecific = 2, ///< mode specific colors
-+		Random = 3,		  ///< mode has random colors
-+	};
-+	const char *enumString(ColorMode) noexcept;
-+
-+	/// Type of RGB zone
-+	enum class ZoneType : uint32_t
- 	{
+-	{
 -		for (const auto & led : leds)
 -			if (led.name == name)
--				return led;
++	const LED& findLEDX(const std::string& name) const {
++		for (const auto& led : leds) {
++			if (led.name == name) {
+ 				return led;
 -		throw NotFound( "LED of such name was not found" );
--	}
-+		Single = 0,
-+		Linear = 1,
-+		Matrix = 2,
-+	};
-+	const char *enumString(ZoneType) noexcept;
++			}
++		}
++		throw NotFound("LED of such name was not found");
+ 	}
  
 -#endif // NO_EXCEPTIONS
 -
 - private:  // for internal use only
--
--	friend struct ReplyControllerData;
++#endif	// NO_EXCEPTIONS
+ 
++  private:	// for internal use only
+ 	friend struct ReplyControllerData;
 -	size_t calcSize( uint32_t protocolVersion ) const noexcept;
 -	void serialize( own::BinaryOutputStream & stream, uint32_t protocolVersion ) const;
 -	bool deserialize( own::BinaryInputStream & stream, uint32_t protocolVersion, uint32_t deviceIdx ) noexcept;
--
--	friend class DeviceList;
--	friend class Client;
--	Device();
++	size_t calcSize(uint32_t protocolVersion) const noexcept;
++	void serialize(own::BinaryOutputStream& stream, uint32_t protocolVersion) const;
++	bool deserialize(own::BinaryInputStream& stream, uint32_t protocolVersion, uint32_t deviceIdx) noexcept;
+ 
+ 	friend class DeviceList;
+ 	friend class Client;
+ 	Device();
 -	Device( const Device & other ) = default;
 -	Device( Device && other ) = default;
 -
--};
-+	//======================================================================================================================
-+	/// Represents a particular LED on an RGB device.
++	Device(const Device& other) = default;
++	Device(Device&& other)		= default;
+ };
  
-+	class LED
-+	{
- 
--//======================================================================================================================
--/** Convenience wrapper around iterator to container of pointers
--  * that skips the additional needed dereference and returns a reference directly. */
 -
+ //======================================================================================================================
+ /** Convenience wrapper around iterator to container of pointers
+-  * that skips the additional needed dereference and returns a reference directly. */
++ * that skips the additional needed dereference and returns a reference directly. */
+ 
 -template< typename IterType >
 -class PointerIterator
 -{
--	IterType _origIter;
++template <typename IterType>
++class PointerIterator {
+ 	IterType _origIter;
 - public:
 -	PointerIterator( const IterType & origIter ) : _origIter( origIter ) {}
 -	auto operator*() -> decltype( **_origIter ) const { return **_origIter; }
@@ -1156,447 +1256,234 @@ index 6f15b55..63de2dc 100644
 -	friend bool operator==(const PointerIterator & a, const PointerIterator & b) { return a._origIter == b._origIter; }
 -	friend bool operator!=(const PointerIterator & a, const PointerIterator & b) { return a._origIter != b._origIter; }
 -};
--
-+	public:
-+		// metadata
-+		const uint32_t idx;		  ///< index of this LED in the device's list of LEDs
-+		const uint32_t parentIdx; ///< index of the parent device in the device list
  
--//======================================================================================================================
--/// Searchable list of all RGB-capable devices detected by OpenRGB.
-+		// LED description
-+		const std::string name;
-+		const uint32_t value; ///< device-specific value
++  public:
++	PointerIterator(const IterType& origIter) : _origIter(origIter) {
++	}
++	auto operator*() -> decltype(**_origIter) const {
++		return **_origIter;
++	}
++	auto operator->() -> decltype(*_origIter) const {
++		return *_origIter;
++	}
++	PointerIterator& operator++() {
++		++_origIter;
++		return *this;
++	}
++	PointerIterator operator++(int) {
++		auto tmp = *this;
++		++_origIter;
++		return tmp;
++	}
++	friend bool operator==(const PointerIterator& a, const PointerIterator& b) {
++		return a._origIter == b._origIter;
++	}
++	friend bool operator!=(const PointerIterator& a, const PointerIterator& b) {
++		return a._origIter != b._origIter;
++	}
++};
+ 
+ //======================================================================================================================
+ /// Searchable list of all RGB-capable devices detected by OpenRGB.
  
 -class DeviceList
 -{
-+	private: // for internal use only
-+		friend struct protocol;
-+		LED();
-+		size_t calcSize(uint32_t protocolVersion) const noexcept;
-+		void serialize(own::BinaryOutputStream &stream, uint32_t protocolVersion) const;
-+		bool deserialize(own::BinaryInputStream &stream, uint32_t protocolVersion, uint32_t idx, uint32_t parentIdx) noexcept;
-+	};
- 
--	// Pointers are more practical here, because they are faster to move and we can easily wrap them arround in the API
+-
++class DeviceList {
+ 	// Pointers are more practical here, because they are faster to move and we can easily wrap them arround in the API
 -	using DeviceListType = std::vector< std::unique_ptr< Device > >;
--	DeviceListType _list;
-+	//======================================================================================================================
-+	/// Represents a group of LEDs on an RGB device. Only some devices have zones.
++	using DeviceListType = std::vector<std::unique_ptr<Device>>;
+ 	DeviceListType _list;
  
 - public:
-+	class Zone
-+	{
- 
+-
 -	size_t size() const noexcept { return _list.size(); }
-+	public:
-+		// metadata
-+		const uint32_t idx;		  ///< index of this zone in the device's list of zones
-+		const uint32_t parentIdx; ///< index of the parent device in the device list
-+
-+		// zone description
-+		const std::string name;
-+		const ZoneType type;
-+		const uint32_t leds_min;   ///< minimum size of the zone
-+		const uint32_t leds_max;   ///< maximum size of the zone
-+		const uint32_t leds_count; ///< current size of the zone
-+		// optional
-+		const uint32_t matrix_height;			   ///< if the zone type is matrix, this is its height
-+		const uint32_t matrix_width;			   ///< if the zone type is matrix, this is its width
-+		const std::vector<uint32_t> matrix_values; ///< TODO: what is this?
-+
-+	private: // for internal use only
-+		friend struct protocol;
-+		Zone();
-+		size_t calcSize(uint32_t protocolVersion) const noexcept;
-+		void serialize(own::BinaryOutputStream &stream, uint32_t protocolVersion) const;
-+		bool deserialize(own::BinaryInputStream &stream, uint32_t protocolVersion, uint32_t idx, uint32_t parentIdx) noexcept;
-+	};
-+
-+	//======================================================================================================================
-+	/// Represents a color mode of an RGB device, like "breathing", "flashing", "rainbow" or "direct".
-+
-+	class Mode
-+	{
++  public:
++	size_t size() const noexcept {
++		return _list.size();
++	}
  
--	/// Use this if you intend to populate the DeviceList manually using individual calls to Client::requestDeviceInfo().
+ 	/// Use this if you intend to populate the DeviceList manually using individual calls to Client::requestDeviceInfo().
 -	void append( std::unique_ptr< Device > && device )  { _list.push_back( std::move(device) ); }
-+	public:
-+		// metadata
-+		const uint32_t idx;		  ///< index of this mode in the device's list of modes
-+		const uint32_t parentIdx; ///< index of the parent device in the device list
-+
-+		// Attributes that are not marked with const are the mode parameters that can be set,
-+		// others are just informational and need to remain constant.
-+		const std::string name;
-+		const uint32_t value;		   ///< device-specific value
-+		const uint32_t flags;		   ///< see ModeFlags for possible bit flags
-+		const uint32_t speed_min;	   ///< minimum speed value, this attribute is valid only if ModeFlags::HasSpeed is set, otherwise it's uninitialized
-+		const uint32_t speed_max;	   ///< maximum speed value, this attribute is valid only if ModeFlags::HasSpeed is set, otherwise it's uninitialized
-+		const uint32_t brightness_min; ///< minimum brightness value, this attribute is valid only if ModeFlags::HasBrightness is set, otherwise it's uninitialized
-+		const uint32_t brightness_max; ///< maximum brightness value, this attribute is valid only if ModeFlags::HasBrightness is set, otherwise it's uninitialized
-+		const uint32_t colors_min;	   ///< minimum number of mode colors
-+		const uint32_t colors_max;	   ///< maximum number of mode colors
-+									   /// Speed of the effect.
-+									   /** This attribute is enabled only if ModeFlags::HasSpeed is set, otherwise it's uninitialized.
-+										* The possible values are determined by #speed_min and #speed_max. */
-+		uint32_t speed;
-+		/// Brightness of the lights.
-+		/** This attribute is enabled only if ModeFlags::HasBrightness is set, otherwise it's uninitialized.
-+		 * The possible values are determined by #brightness_min and #brightness_max. */
-+		uint32_t brightness;
-+		/// Direction of the color effect.
-+		/** This attribute is enabled only if any of ModeFlags::HasDirectionXY is set in #flags, otherwise it's uninitialized.
-+		 * The possible values are also determined by #flags. */
-+		Direction direction;
-+		const ColorMode color_mode; ///< how the colors of a mode are set
-+									/// Mode-specific list of colors.
-+		std::vector<Color> colors;
-+
-+	private: // for internal use only
-+		friend struct protocol;
-+		friend class Device;
-+		friend struct UpdateMode;
-+		friend struct SaveMode;
-+		Mode();
-+		size_t calcSize(uint32_t protocolVersion) const noexcept;
-+		void serialize(own::BinaryOutputStream &stream, uint32_t protocolVersion) const;
-+		bool deserialize(own::BinaryInputStream &stream, uint32_t protocolVersion, uint32_t idx, uint32_t parentIdx) noexcept;
-+	};
-+
-+	//======================================================================================================================
-+	/// Represents an RGB-capable device. Device can have modes, zones and individual LEDs.
-+
-+	class Device
-+	{
++	void append(std::unique_ptr<Device>&& device) {
++		_list.push_back(std::move(device));
++	}
  
--	/// Use this to update your DeviceList after the call to Client::requestDeviceInfo().
+ 	/// Use this to update your DeviceList after the call to Client::requestDeviceInfo().
 -	void replace( uint32_t deviceIdx, std::unique_ptr< Device > && device )  { _list[ deviceIdx ] = std::move(device); }
-+	public:
-+		// metadata
-+		const uint32_t idx; ///< index of this device in the device list
-+
-+		// device description
-+		const DeviceType type;
-+		const std::string name;
-+		const std::string vendor;
-+		const std::string description;
-+		const std::string version;
-+		const std::string serial;
-+		const std::string location;
-+		const uint32_t active_mode;
-+
-+		// device subobjects
-+		const std::vector<Mode> modes;
-+		const std::vector<Zone> zones;
-+		const std::vector<LED> leds;
-+		const std::vector<Color> colors;
-+		bool enabled = true;
-+
-+	public:
-+		/// Finds the first mode with a specific name.
-+		/** \returns nullptr when mode with this name is not found. */
-+		const Mode *findMode(const std::string &name) const noexcept
-+		{
-+			for (const auto &mode : modes)
-+				if (mode.name == name)
-+					return &mode;
-+			return nullptr;
-+		}
-+
-+		/// Finds the first zone with a specific name.
-+		/** \returns nullptr when zone with this name is not found. */
-+		const Zone *findZone(const std::string &name) const noexcept
-+		{
-+			for (const auto &zone : zones)
-+				if (zone.name == name)
-+					return &zone;
-+			return nullptr;
-+		}
-+
-+		/// Finds the first LED with a specific name.
-+		/** \returns nullptr when LED with this name is not found. */
-+		const LED *findLED(const std::string &name) const noexcept
-+		{
-+			for (const auto &led : leds)
-+				if (led.name == name)
-+					return &led;
-+			return nullptr;
-+		}
++	void replace(uint32_t deviceIdx, std::unique_ptr<Device>&& device) {
++		_list[deviceIdx] = std::move(device);
++	}
  
 -	void clear() noexcept  { _list.clear(); }
-+#ifndef NO_EXCEPTIONS
++	void clear() noexcept {
++		_list.clear();
++	}
  
 -	PointerIterator< DeviceListType::const_iterator > begin() const noexcept  { return _list.begin(); }
 -	PointerIterator< DeviceListType::const_iterator > end() const noexcept    { return _list.end(); }
-+		/// Exception-throwing variant of findModeX( const std::string & ) const.
-+		/** \throws NotFound when mode with this name is not found. */
-+		const Mode &findModeX(const std::string &name) const
-+		{
-+			for (const auto &mode : modes)
-+				if (mode.name == name)
-+					return mode;
-+			throw NotFound("Mode of such name was not found");
-+		}
-+
-+		/// Exception-throwing variant of findZoneX( const std::string & ) const.
-+		/** \throws NotFound when zone with this name is not found. */
-+		const Zone &findZoneX(const std::string &name) const
-+		{
-+			for (const auto &zone : zones)
-+				if (zone.name == name)
-+					return zone;
-+			throw NotFound("Zone of such name was not found");
-+		}
-+
-+		/// Exception-throwing variant of findLEDX( const std::string & ) const.
-+		/** \throws NotFound when LED with this name is not found. */
-+		const LED &findLEDX(const std::string &name) const
-+		{
-+			for (const auto &led : leds)
-+				if (led.name == name)
-+					return led;
-+			throw NotFound("LED of such name was not found");
-+		}
++	PointerIterator<DeviceListType::const_iterator> begin() const noexcept {
++		return _list.begin();
++	}
++	PointerIterator<DeviceListType::const_iterator> end() const noexcept {
++		return _list.end();
++	}
  
 -	const Device & operator[]( uint32_t deviceIdx ) const noexcept { return *_list[ deviceIdx ]; }
-+#endif // NO_EXCEPTIONS
++	const Device& operator[](uint32_t deviceIdx) const noexcept {
++		return *_list[deviceIdx];
++	}
  
--	/// Iterate over all devices of specific type.
++	const DeviceListType& devices() const {
++		return _list;  // referencia constante
++	}
+ 	/// Iterate over all devices of specific type.
 -	template< typename FuncType >
 -	void forEach( DeviceType deviceType, FuncType loopBody ) const
 -	{
 -		for (const Device & device : *this)
 -			if (device.type == deviceType)
 -				loopBody( device );
--	}
--
--	/// Iterate over all devices of specific vendor.
++	template <typename FuncType>
++	void forEach(DeviceType deviceType, FuncType loopBody) const {
++		for (const Device& device : *this) {
++			if (device.type == deviceType) {
++				loopBody(device);
++			}
++		}
+ 	}
+ 
+ 	/// Iterate over all devices of specific vendor.
 -	template< typename FuncType >
 -	void forEach( const std::string & vendor, FuncType loopBody ) const
-+	private: // for internal use only
-+		friend struct ReplyControllerData;
-+		size_t calcSize(uint32_t protocolVersion) const noexcept;
-+		void serialize(own::BinaryOutputStream &stream, uint32_t protocolVersion) const;
-+		bool deserialize(own::BinaryInputStream &stream, uint32_t protocolVersion, uint32_t deviceIdx) noexcept;
-+
-+		friend class DeviceList;
-+		friend class Client;
-+		Device();
-+		Device(const Device &other) = default;
-+		Device(Device &&other) = default;
-+	};
-+
-+	//======================================================================================================================
-+	/** Convenience wrapper around iterator to container of pointers
-+	 * that skips the additional needed dereference and returns a reference directly. */
-+
-+	template <typename IterType>
-+	class PointerIterator
- 	{
+-	{
 -		for (const Device & device : *this)
 -			if (device.vendor == vendor)
 -				loopBody( device );
--	}
--
--	/// Finds the first device of specific type.
--	/** \returns nullptr when device of this type is not found */
++	template <typename FuncType>
++	void forEach(const std::string& vendor, FuncType loopBody) const {
++		for (const Device& device : *this) {
++			if (device.vendor == vendor) {
++				loopBody(device);
++			}
++		}
+ 	}
+ 
+ 	/// Finds the first device of specific type.
+ 	/** \returns nullptr when device of this type is not found */
 -	const Device * find( DeviceType deviceType ) const noexcept
-+		IterType _origIter;
-+
-+	public:
-+		PointerIterator(const IterType &origIter) : _origIter(origIter) {}
-+		auto operator*() -> decltype(**_origIter) const { return **_origIter; }
-+		auto operator->() -> decltype(*_origIter) const { return *_origIter; }
-+		PointerIterator &operator++()
-+		{
-+			++_origIter;
-+			return *this;
-+		}
-+		PointerIterator operator++(int)
-+		{
-+			auto tmp = *this;
-+			++_origIter;
-+			return tmp;
-+		}
-+		friend bool operator==(const PointerIterator &a, const PointerIterator &b) { return a._origIter == b._origIter; }
-+		friend bool operator!=(const PointerIterator &a, const PointerIterator &b) { return a._origIter != b._origIter; }
-+	};
-+
-+	//======================================================================================================================
-+	/// Searchable list of all RGB-capable devices detected by OpenRGB.
-+
-+	class DeviceList
- 	{
+-	{
 -		for (const Device & device : *this)
 -			if (device.type == deviceType)
--				return &device;
--		return nullptr;
--	}
--
--	/// Finds the first device with a specific name.
--	/** \returns nullptr when device with this name is not found */
++	const Device* find(DeviceType deviceType) const noexcept {
++		for (const Device& device : *this) {
++			if (device.type == deviceType) {
+ 				return &device;
++			}
++		}
+ 		return nullptr;
+ 	}
+ 
+ 	/// Finds the first device with a specific name.
+ 	/** \returns nullptr when device with this name is not found */
 -	const Device * find( const std::string & deviceName ) const noexcept
 -	{
 -		for (const Device & device : *this)
 -			if (device.name == deviceName)
--				return &device;
--		return nullptr;
--	}
-+
-+		// Pointers are more practical here, because they are faster to move and we can easily wrap them arround in the API
-+		using DeviceListType = std::vector<std::unique_ptr<Device>>;
-+		DeviceListType _list;
-+
-+	public:
-+		size_t size() const noexcept { return _list.size(); }
-+
-+		/// Use this if you intend to populate the DeviceList manually using individual calls to Client::requestDeviceInfo().
-+		void append(std::unique_ptr<Device> &&device) { _list.push_back(std::move(device)); }
-+
-+		/// Use this to update your DeviceList after the call to Client::requestDeviceInfo().
-+		void replace(uint32_t deviceIdx, std::unique_ptr<Device> &&device) { _list[deviceIdx] = std::move(device); }
-+
-+		void clear() noexcept { _list.clear(); }
-+
-+		PointerIterator<DeviceListType::const_iterator> begin() const noexcept { return _list.begin(); }
-+		PointerIterator<DeviceListType::const_iterator> end() const noexcept { return _list.end(); }
-+
-+		const Device &operator[](uint32_t deviceIdx) const noexcept { return *_list[deviceIdx]; }
-+
-+		const DeviceListType &devices() const
-+		{
-+			return _list; // referencia constante
++	const Device* find(const std::string& deviceName) const noexcept {
++		for (const Device& device : *this) {
++			if (device.name == deviceName) {
+ 				return &device;
++			}
 +		}
-+		/// Iterate over all devices of specific type.
-+		template <typename FuncType>
-+		void forEach(DeviceType deviceType, FuncType loopBody) const
-+		{
-+			for (const Device &device : *this)
-+				if (device.type == deviceType)
-+					loopBody(device);
-+		}
-+
-+		/// Iterate over all devices of specific vendor.
-+		template <typename FuncType>
-+		void forEach(const std::string &vendor, FuncType loopBody) const
-+		{
-+			for (const Device &device : *this)
-+				if (device.vendor == vendor)
-+					loopBody(device);
-+		}
-+
-+		/// Finds the first device of specific type.
-+		/** \returns nullptr when device of this type is not found */
-+		const Device *find(DeviceType deviceType) const noexcept
-+		{
-+			for (const Device &device : *this)
-+				if (device.type == deviceType)
-+					return &device;
-+			return nullptr;
-+		}
-+
-+		/// Finds the first device with a specific name.
-+		/** \returns nullptr when device with this name is not found */
-+		const Device *find(const std::string &deviceName) const noexcept
-+		{
-+			for (const Device &device : *this)
-+				if (device.name == deviceName)
-+					return &device;
-+			return nullptr;
-+		}
+ 		return nullptr;
+ 	}
  
- #ifndef NO_EXCEPTIONS
+@@ -402,54 +416,54 @@ class DeviceList
  
--	/// Exception-throwing variant of find( DeviceType ) const
--	/** \throws NotFound when device of this type is not found */
+ 	/// Exception-throwing variant of find( DeviceType ) const
+ 	/** \throws NotFound when device of this type is not found */
 -	const Device & findX( DeviceType deviceType ) const
 -	{
 -		for (const Device & device : *this)
 -			if (device.type == deviceType)
--				return device;
++	const Device& findX(DeviceType deviceType) const {
++		for (const Device& device : *this) {
++			if (device.type == deviceType) {
+ 				return device;
 -		throw NotFound( "Device of such type was not found" );
--	}
--
--	/// Exception-throwing variant of find( const std::string & ) const.
--	/** \throws NotFound when device with this name is not found */
++			}
++		}
++		throw NotFound("Device of such type was not found");
+ 	}
+ 
+ 	/// Exception-throwing variant of find( const std::string & ) const.
+ 	/** \throws NotFound when device with this name is not found */
 -	const Device & findX( const std::string & deviceName ) const
 -	{
 -		for (const Device & device : *this)
 -			if (device.name == deviceName)
--				return device;
++	const Device& findX(const std::string& deviceName) const {
++		for (const Device& device : *this) {
++			if (device.name == deviceName) {
+ 				return device;
 -		throw NotFound( "Device of such name was not found" );
--	}
-+		/// Exception-throwing variant of find( DeviceType ) const
-+		/** \throws NotFound when device of this type is not found */
-+		const Device &findX(DeviceType deviceType) const
-+		{
-+			for (const Device &device : *this)
-+				if (device.type == deviceType)
-+					return device;
-+			throw NotFound("Device of such type was not found");
++			}
 +		}
-+
-+		/// Exception-throwing variant of find( const std::string & ) const.
-+		/** \throws NotFound when device with this name is not found */
-+		const Device &findX(const std::string &deviceName) const
-+		{
-+			for (const Device &device : *this)
-+				if (device.name == deviceName)
-+					return device;
-+			throw NotFound("Device of such name was not found");
-+		}
++		throw NotFound("Device of such name was not found");
+ 	}
  
- #endif // NO_EXCEPTIONS
- 
-- private:  // for internal use only
+-#endif // NO_EXCEPTIONS
 -
--	// this should only be used by the Client when constructing the list from the server response
--	friend class Client;
+- private:  // for internal use only
++#endif	// NO_EXCEPTIONS
+ 
++  private:	// for internal use only
+ 	// this should only be used by the Client when constructing the list from the server response
+ 	friend class Client;
 -	void reserve( size_t newSize )   { _list.reserve( newSize ); }
 -	void append( Device && device )  { _list.emplace_back( new Device( std::move(device) ) ); }
 -
--};
--
-+	private: // for internal use only
-+		// this should only be used by the Client when constructing the list from the server response
-+		friend class Client;
-+		void reserve(size_t newSize) { _list.reserve(newSize); }
-+		void append(Device &&device) { _list.emplace_back(new Device(std::move(device))); }
-+	};
++	void reserve(size_t newSize) {
++		_list.reserve(newSize);
++	}
++	void append(Device&& device) {
++		_list.emplace_back(new Device(std::move(device)));
++	}
+ };
  
--//======================================================================================================================
--//  printing utils
 -
+ //======================================================================================================================
+ //  printing utils
+ 
 -void print( const Device & device, unsigned int indentLevel = 0 );
 -void print( const Mode & mode, unsigned int indentLevel = 0 );
 -void print( const Zone & zone, unsigned int indentLevel = 0 );
 -void print( const LED & led, unsigned int indentLevel = 0 );
-+	//======================================================================================================================
-+	//  printing utils
- 
+-
 -void print( std::ostream & os, const Device & device, unsigned int indentLevel = 0 );
 -void print( std::ostream & os, const Mode & mode, unsigned int indentLevel = 0 );
 -void print( std::ostream & os, const Zone & zone, unsigned int indentLevel = 0 );
 -void print( std::ostream & os, const LED & led, unsigned int indentLevel = 0 );
-+	void print(const Device &device, unsigned int indentLevel = 0);
-+	void print(const Mode &mode, unsigned int indentLevel = 0);
-+	void print(const Zone &zone, unsigned int indentLevel = 0);
-+	void print(const LED &led, unsigned int indentLevel = 0);
++void print(const Device& device, unsigned int indentLevel = 0);
++void print(const Mode& mode, unsigned int indentLevel = 0);
++void print(const Zone& zone, unsigned int indentLevel = 0);
++void print(const LED& led, unsigned int indentLevel = 0);
  
-+	void print(std::ostream &os, const Device &device, unsigned int indentLevel = 0);
-+	void print(std::ostream &os, const Mode &mode, unsigned int indentLevel = 0);
-+	void print(std::ostream &os, const Zone &zone, unsigned int indentLevel = 0);
-+	void print(std::ostream &os, const LED &led, unsigned int indentLevel = 0);
++void print(std::ostream& os, const Device& device, unsigned int indentLevel = 0);
++void print(std::ostream& os, const Mode& mode, unsigned int indentLevel = 0);
++void print(std::ostream& os, const Zone& zone, unsigned int indentLevel = 0);
++void print(std::ostream& os, const LED& led, unsigned int indentLevel = 0);
  
--//======================================================================================================================
+ //======================================================================================================================
+ 
++}  // namespace orgb
+ 
+-} // namespace orgb
 -
-+	//======================================================================================================================
- 
- } // namespace orgb
- 
 -
- #endif // OPENRGB_DEVICE_INCLUDED
+-#endif // OPENRGB_DEVICE_INCLUDED
++#endif	// OPENRGB_DEVICE_INCLUDED
 diff --git a/src/Client.cpp b/src/Client.cpp
 index 9bc8fde..77b4736 100644
 --- a/src/Client.cpp
@@ -3674,6 +3561,1201 @@ index 6163aeb..a495cfa 100644
  }
  
 -
+ //======================================================================================================================
+ 
+-
+-} // namespace orgb
++}  // namespace orgb
+diff --git a/src/DeviceInfo.cpp b/src/DeviceInfo.cpp
+index 106120a..a047de0 100644
+--- a/src/DeviceInfo.cpp
++++ b/src/DeviceInfo.cpp
+@@ -5,15 +5,14 @@
+ // Description: data structures containing device information
+ //======================================================================================================================
+ 
+-#include <OpenRGB/DeviceInfo.hpp>
++#include <CppUtils-Essential/BinaryStream.hpp>
+ #include <CppUtils-Essential/Essential.hpp>
++#include <OpenRGB/DeviceInfo.hpp>
+ 
+-#include "ProtocolCommon.hpp"
+ #include "MiscUtils.hpp"
+-
+-#include <CppUtils-Essential/BinaryStream.hpp>
+-using own::BinaryOutputStream;
++#include "ProtocolCommon.hpp"
+ using own::BinaryInputStream;
++using own::BinaryOutputStream;
+ #include <CppUtils-Essential/LangUtils.hpp>
+ using own::unconst;
+ 
+@@ -22,50 +21,32 @@ using std::string;
+ #include <sstream>
+ using std::ostringstream;  // flags to string
+ 
+-
+ namespace orgb {
+ 
+-
+ //======================================================================================================================
+ //  enum strings
+ 
+-const char * enumString( DeviceType type ) noexcept
+-{
+-	static const char * const DeviceTypeStr [] =
+-	{
+-		"Motherboard",
+-		"DRAM",
+-		"GPU",
+-		"Cooler",
+-		"LedStrip",
+-		"Keyboard",
+-		"Mouse",
+-		"MouseMat",
+-		"Headset",
+-		"HeadsetStand",
+-		"Gamepad",
+-		"Light",
+-		"Speaker",
+-		"Virtual",
+-		"Unknown",
++const char* enumString(DeviceType type) noexcept {
++	static const char* const DeviceTypeStr[] = {
++		"Motherboard", "DRAM",	  "GPU",	 "Cooler",	"LedStrip", "Keyboard",	  "Mouse",	  "MouseMat", "Headset", "HeadsetStand", "Gamepad",
++		"Light",	   "Speaker", "Virtual", "Storage", "Case",		"Microphone", "Accesory", "Keypad",	  "Laptop",	 "Monitor",		 "Unknown",
+ 	};
+-	static_assert( size_t(DeviceType::Unknown) + 1 == fut::size(DeviceTypeStr), "update the DeviceTypeStr" );
++	static_assert(size_t(DeviceType::Unknown) + 1 == fut::size(DeviceTypeStr), "update the DeviceTypeStr");
+ 
+ 	// Collapse everything else than known classes to Unknown
+ 	// in case the server adds some classes without increasing protocol version.
+-	if (size_t( type ) < size_t( DeviceType::Unknown ))
+-		return DeviceTypeStr[ size_t( type ) ];
+-	else
+-		return DeviceTypeStr[ size_t( DeviceType::Unknown ) ];
++	if (size_t(type) < size_t(DeviceType::Unknown)) {
++		return DeviceTypeStr[size_t(type)];
++	} else {
++		return DeviceTypeStr[size_t(DeviceType::Unknown)];
++	}
+ }
+ 
+-string modeFlagsToString( uint32_t flags )
+-{
++string modeFlagsToString(uint32_t flags) {
+ 	ostringstream oss;
+ 
+ 	bool isFirst = true;
+-	auto addFlag = [ &isFirst, &oss ]( const char * flagStr )
+-	{
++	auto addFlag = [&isFirst, &oss](const char* flagStr) {
+ 		if (isFirst) {
+ 			isFirst = false;
+ 		} else {
+@@ -74,79 +55,78 @@ string modeFlagsToString( uint32_t flags )
+ 		oss << flagStr;
+ 	};
+ 
+-	if (flags & ModeFlags::HasSpeed)
+-		addFlag( "HasSpeed" );
+-	if (flags & ModeFlags::HasDirectionLR)
+-		addFlag( "HasDirectionLR" );
+-	if (flags & ModeFlags::HasDirectionUD)
+-		addFlag( "HasDirectionUD" );
+-	if (flags & ModeFlags::HasDirectionHV)
+-		addFlag( "HasDirectionHV" );
+-	if (flags & ModeFlags::HasBrightness)
+-		addFlag( "HasBrightness" );
+-	if (flags & ModeFlags::HasPerLedColor)
+-		addFlag( "HasPerLedColor" );
+-	if (flags & ModeFlags::HasModeSpecificColor)
+-		addFlag( "HasModeSpecificColor" );
+-	if (flags & ModeFlags::HasRandomColor)
+-		addFlag( "HasRandomColor" );
++	if (flags & ModeFlags::HasSpeed) {
++		addFlag("HasSpeed");
++	}
++	if (flags & ModeFlags::HasDirectionLR) {
++		addFlag("HasDirectionLR");
++	}
++	if (flags & ModeFlags::HasDirectionUD) {
++		addFlag("HasDirectionUD");
++	}
++	if (flags & ModeFlags::HasDirectionHV) {
++		addFlag("HasDirectionHV");
++	}
++	if (flags & ModeFlags::HasBrightness) {
++		addFlag("HasBrightness");
++	}
++	if (flags & ModeFlags::HasPerLedColor) {
++		addFlag("HasPerLedColor");
++	}
++	if (flags & ModeFlags::HasModeSpecificColor) {
++		addFlag("HasModeSpecificColor");
++	}
++	if (flags & ModeFlags::HasRandomColor) {
++		addFlag("HasRandomColor");
++	}
+ 
+ 	return oss.str();
+ }
+ 
+-const char * enumString( Direction dir ) noexcept
+-{
+-	static const char * const DirectionStr [] =
+-	{
+-		"Left",
+-		"Right",
+-		"Up",
+-		"Down",
+-		"Horizontal",
+-		"Vertical",
++const char* enumString(Direction dir) noexcept {
++	static const char* const DirectionStr[] = {
++		"Left", "Right", "Up", "Down", "Horizontal", "Vertical",
+ 	};
+-	static_assert( size_t(Direction::Vertical) + 1 == fut::size(DirectionStr), "update the DirectionStr" );
++	static_assert(size_t(Direction::Vertical) + 1 == fut::size(DirectionStr), "update the DirectionStr");
+ 
+-	if (size_t( dir ) <= size_t( Direction::Vertical ))
+-		return DirectionStr[ size_t( dir ) ];
+-	else
++	if (size_t(dir) <= size_t(Direction::Vertical)) {
++		return DirectionStr[size_t(dir)];
++	} else {
+ 		return "<invalid>";
++	}
+ }
+ 
+-const char * enumString( ColorMode mode ) noexcept
+-{
+-	static const char * const ColorModeStr [] =
+-	{
++const char* enumString(ColorMode mode) noexcept {
++	static const char* const ColorModeStr[] = {
+ 		"None",
+ 		"PerLed",
+ 		"ModeSpecific",
+ 		"Random",
+ 	};
+-	static_assert( size_t(ColorMode::Random) + 1 == fut::size(ColorModeStr), "update the ColorModeStr" );
++	static_assert(size_t(ColorMode::Random) + 1 == fut::size(ColorModeStr), "update the ColorModeStr");
+ 
+-	if (size_t( mode ) <= size_t( ColorMode::Random ) )
+-		return ColorModeStr[ size_t( mode ) ];
+-	else
++	if (size_t(mode) <= size_t(ColorMode::Random)) {
++		return ColorModeStr[size_t(mode)];
++	} else {
+ 		return "<invalid>";
++	}
+ }
+ 
+-const char * enumString( ZoneType type ) noexcept
+-{
+-	static const char * const ZoneTypeStr [] =
+-	{
++const char* enumString(ZoneType type) noexcept {
++	static const char* const ZoneTypeStr[] = {
+ 		"Single",
+ 		"Linear",
+ 		"Matrix",
+ 	};
+-	static_assert( size_t(ZoneType::Matrix) + 1 == fut::size(ZoneTypeStr), "update the ZoneTypeStr" );
++	static_assert(size_t(ZoneType::Matrix) + 1 == fut::size(ZoneTypeStr), "update the ZoneTypeStr");
+ 
+-	if (size_t( type ) <= size_t( ZoneType::Matrix ))
+-		return ZoneTypeStr[ size_t( type ) ];
+-	else
++	if (size_t(type) <= size_t(ZoneType::Matrix)) {
++		return ZoneTypeStr[size_t(type)];
++	} else {
+ 		return "<invalid>";
++	}
+ }
+ 
+-
+ //======================================================================================================================
+ //  enum validation
+ 
+@@ -155,570 +135,580 @@ const char * enumString( ZoneType type ) noexcept
+ 	return size_t( type ) <= size_t( DeviceType::Unknown );
+ }*/
+ 
+-static bool isValidDirection( Direction dir, uint32_t modeFlags )
+-{
+-	bool allowedDirections [ size_t( Direction::Vertical ) + 1 ] = {0};
+-	bool hasAnyDirections = false;
++static bool isValidDirection(Direction dir, uint32_t modeFlags) {
++	bool allowedDirections[size_t(Direction::Vertical) + 1] = {0};
++	bool hasAnyDirections									= false;
+ 
+-	if (modeFlags & ModeFlags::HasDirectionLR)
+-	{
+-		hasAnyDirections = true;
+-		allowedDirections[ size_t( Direction::Left ) ] = true;
+-		allowedDirections[ size_t( Direction::Right ) ] = true;
++	if (modeFlags & ModeFlags::HasDirectionLR) {
++		hasAnyDirections							= true;
++		allowedDirections[size_t(Direction::Left)]	= true;
++		allowedDirections[size_t(Direction::Right)] = true;
+ 	}
+-	if (modeFlags & ModeFlags::HasDirectionUD)
+-	{
+-		hasAnyDirections = true;
+-		allowedDirections[ size_t( Direction::Up ) ] = true;
+-		allowedDirections[ size_t( Direction::Down ) ] = true;
++	if (modeFlags & ModeFlags::HasDirectionUD) {
++		hasAnyDirections						   = true;
++		allowedDirections[size_t(Direction::Up)]   = true;
++		allowedDirections[size_t(Direction::Down)] = true;
+ 	}
+-	if (modeFlags & ModeFlags::HasDirectionHV)
+-	{
+-		hasAnyDirections = true;
+-		allowedDirections[ size_t( Direction::Horizontal ) ] = true;
+-		allowedDirections[ size_t( Direction::Vertical ) ] = true;
++	if (modeFlags & ModeFlags::HasDirectionHV) {
++		hasAnyDirections								 = true;
++		allowedDirections[size_t(Direction::Horizontal)] = true;
++		allowedDirections[size_t(Direction::Vertical)]	 = true;
+ 	}
+ 
+ 	// in case no direction flag is active, direction will be uninitialized value, so it can be anything
+-	if (!hasAnyDirections)
+-	{
++	if (!hasAnyDirections) {
+ 		return true;
+ 	}
+ 
+-	return allowedDirections[ size_t( dir ) ] == true;
++	return allowedDirections[size_t(dir)] == true;
+ }
+ 
+-static bool isValidColorMode( ColorMode mode )
+-{
+-	return size_t( mode ) <= size_t( ColorMode::Random );
++static bool isValidColorMode(ColorMode mode) {
++	return size_t(mode) <= size_t(ColorMode::Random);
+ }
+ 
+-static bool isValidZoneType( ZoneType type )
+-{
+-	return size_t( type ) <= size_t( ZoneType::Matrix );
++static bool isValidZoneType(ZoneType type) {
++	return size_t(type) <= size_t(ZoneType::Matrix);
+ }
+ 
+-
+ //======================================================================================================================
+ //  LED
+ 
+-LED::LED()
+-:
+-	idx(),
+-	parentIdx(),
+-	name(),
+-	value()
+-{}
++LED::LED() : idx(), parentIdx(), name(), value() {
++}
+ 
+-size_t LED::calcSize( uint32_t /*protocolVersion*/ ) const noexcept
+-{
++size_t LED::calcSize(uint32_t /*protocolVersion*/) const noexcept {
+ 	size_t size = 0;
+ 
+-	size += protocol::sizeofString( name );
+-	size += sizeof( value );
++	size += protocol::sizeofString(name);
++	size += sizeof(value);
+ 
+ 	return size;
+ }
+ 
+-void LED::serialize( BinaryOutputStream & stream, uint32_t /*protocolVersion*/ ) const
+-{
+-	protocol::writeString( stream, name );
++void LED::serialize(BinaryOutputStream& stream, uint32_t /*protocolVersion*/) const {
++	protocol::writeString(stream, name);
+ 	stream << value;
+ }
+ 
+-bool LED::deserialize( BinaryInputStream & stream, uint32_t /*protocolVersion*/, uint32_t idx, uint32_t parentIdx ) noexcept
+-{
++bool LED::deserialize(BinaryInputStream& stream, uint32_t /*protocolVersion*/, uint32_t idx, uint32_t parentIdx) noexcept {
+ 	// This hack with const casts allows us to restrict the user from changing attributes that are a static description
+ 	// and allow him to change only the parameters that are meant to be changed.
+ 
+ 	// fill in our metadata
+-	unconst( this->idx ) = idx;
+-	unconst( this->parentIdx ) = parentIdx;
++	unconst(this->idx)		 = idx;
++	unconst(this->parentIdx) = parentIdx;
+ 
+-	protocol::readString( stream, unconst( name ) );
+-	stream >> unconst( value );
++	protocol::readString(stream, unconst(name));
++	stream >> unconst(value);
+ 
+ 	return !stream.failed();
+ }
+ 
+-void print( const LED & led, unsigned int indentLevel )
+-{
+-	indent( indentLevel ); printf( "[%u] = { name = \"%s\"; value = %u },\n", led.idx, led.name.c_str(), led.value );
++void print(const LED& led, unsigned int indentLevel) {
++	indent(indentLevel);
++	printf("[%u] = { name = \"%s\"; value = %u },\n", led.idx, led.name.c_str(), led.value);
+ }
+ 
+-void print( std::ostream & os, const LED & led, unsigned int indentLevel )
+-{
+-	indent( os, indentLevel ); os << "["<<led.idx<<"] = { name = \""<<led.name<<"\"; value = "<<led.value<<" },\n";
++void print(std::ostream& os, const LED& led, unsigned int indentLevel) {
++	indent(os, indentLevel);
++	os << "[" << led.idx << "] = { name = \"" << led.name << "\"; value = " << led.value << " },\n";
+ }
+ 
+-
+ //======================================================================================================================
+ //  Zone
+ 
+-Zone::Zone()
+-:
+-	idx(),
+-	parentIdx(),
+-	name(),
+-	type(),
+-	leds_min(),
+-	leds_max(),
+-	leds_count(),
+-	matrix_height(),
+-	matrix_width(),
+-	matrix_values()
+-{}
+-
+-size_t Zone::calcSize( uint32_t /*protocolVersion*/ ) const noexcept
+-{
+-	size_t size = 0;
++Zone::Zone() : idx(), parentIdx(), name(), type(), leds_min(), leds_max(), leds_count(), matrix_height(), matrix_width(), matrix_values() {
++}
+ 
+-	size += protocol::sizeofString( name );
+-	size += sizeof( type );
+-	size += sizeof( leds_min );
+-	size += sizeof( leds_max );
+-	size += sizeof( leds_count );
++size_t Zone::calcSize(uint32_t /*protocolVersion*/) const noexcept {
++	size_t size = 0;
+ 
+-	size += sizeof( uint16_t );  // length of the optional matrix block
+-	if (matrix_values.size() > 0)
+-	{
+-		size += sizeof( matrix_height );
+-		size += sizeof( matrix_width );
+-		size += own::sizeofVector( matrix_values );
++	size += protocol::sizeofString(name);
++	size += sizeof(type);
++	size += sizeof(leds_min);
++	size += sizeof(leds_max);
++	size += sizeof(leds_count);
++
++	size += sizeof(uint16_t);  // length of the optional matrix block
++	if (matrix_values.size() > 0) {
++		size += sizeof(matrix_height);
++		size += sizeof(matrix_width);
++		size += own::sizeofVector(matrix_values);
+ 	}
+ 
+ 	return size;
+ }
+ 
+-void Zone::serialize( BinaryOutputStream & stream, uint32_t /*protocolVersion*/ ) const
+-{
+-	protocol::writeString( stream, name );
++void Zone::serialize(BinaryOutputStream& stream, uint32_t /*protocolVersion*/) const {
++	protocol::writeString(stream, name);
+ 	stream << type;
+ 	stream << leds_min;
+ 	stream << leds_max;
+ 	stream << leds_count;
+ 
+-	uint16_t matrix_length = uint16_t(
+-		matrix_values.size() > 0
+-			? sizeof( matrix_height ) + sizeof( matrix_width ) + own::sizeofVector( matrix_values )
+-			: 0
+-	);
++	uint16_t matrix_length = uint16_t(matrix_values.size() > 0 ? sizeof(matrix_height) + sizeof(matrix_width) + own::sizeofVector(matrix_values) : 0);
+ 	stream << matrix_length;  // length of the optional matrix block
+-	if (matrix_length > 0)
+-	{
++	if (matrix_length > 0) {
+ 		stream << matrix_height;
+ 		stream << matrix_width;
+-		for (auto val : matrix_values)
+-		{
++		for (auto val : matrix_values) {
+ 			stream << val;
+ 		}
+ 	}
+ }
+ 
+-bool Zone::deserialize( BinaryInputStream & stream, uint32_t /*protocolVersion*/, uint32_t idx, uint32_t parentIdx ) noexcept
+-{
++bool Zone::deserialize(BinaryInputStream& stream, uint32_t /*protocolVersion*/, uint32_t idx, uint32_t parentIdx) noexcept {
+ 	// This hack with const casts allows us to restrict the user from changing attributes that are a static description
+ 	// and allow him to change only the parameters that are meant to be changed.
+ 
+ 	// fill in our metadata
+-	unconst( this->idx ) = idx;
+-	unconst( this->parentIdx ) = parentIdx;
++	unconst(this->idx)		 = idx;
++	unconst(this->parentIdx) = parentIdx;
+ 
+-	protocol::readString( stream, unconst( name ) );
+-	stream >> unconst( type );
+-	stream >> unconst( leds_min );
+-	stream >> unconst( leds_max );
+-	stream >> unconst( leds_count );
++	protocol::readString(stream, unconst(name));
++	stream >> unconst(type);
++	stream >> unconst(leds_min);
++	stream >> unconst(leds_max);
++	stream >> unconst(leds_count);
+ 
+ 	uint16_t matrix_length;
+ 	stream >> matrix_length;
+-	if (matrix_length > 0)
+-	{
+-		stream >> unconst( matrix_height );
+-		stream >> unconst( matrix_width );
++	if (matrix_length > 0) {
++		stream >> unconst(matrix_height);
++		stream >> unconst(matrix_width);
+ 		size_t matrixSize = matrix_height * matrix_width;
+-		unconst( matrix_values ).resize( matrixSize );
+-		for (size_t i = 0; i < matrixSize; ++i)
+-		{
+-			stream >> unconst( matrix_values )[i];
++		unconst(matrix_values).resize(matrixSize);
++		for (size_t i = 0; i < matrixSize; ++i) {
++			stream >> unconst(matrix_values)[i];
+ 		}
+ 	}
+ 
+-	if (!isValidZoneType( type ))
++	if (!isValidZoneType(type)) {
+ 		stream.setFailed();
++	}
+ 
+ 	return !stream.failed();
+ }
+ 
+-void print( const Zone & zone, unsigned int indentLevel )
+-{
+-	indent( indentLevel ); printf( "[%u] = {\n", zone.idx );
+-	indent( indentLevel + 1 ); printf( "name = \"%s\";\n", zone.name.c_str() );
+-	indent( indentLevel + 1 ); printf( "type = %s;\n", enumString( zone.type ) );
+-	indent( indentLevel + 1 ); printf( "leds_min = %u;\n", zone.leds_min );
+-	indent( indentLevel + 1 ); printf( "leds_max = %u;\n", zone.leds_max );
+-	indent( indentLevel + 1 ); printf( "leds_count = %u;\n", zone.leds_count );
+-	indent( indentLevel + 1 ); printf( "matrix_height = %u;\n", zone.matrix_height );
+-	indent( indentLevel + 1 ); printf( "matrix_width = %u;\n", zone.matrix_width );
+-	indent( indentLevel ); printf( "},\n" );
+-}
+-
+-void print( std::ostream & os, const Zone & zone, unsigned int indentLevel )
+-{
+-	indent( os, indentLevel ); os << "["<<zone.idx<<"] = {\n";
+-	indent( os, indentLevel + 1 ); os << "name = \""<<zone.name.c_str()<<"\";\n";
+-	indent( os, indentLevel + 1 ); os << "type = "<<enumString( zone.type )<<";\n";
+-	indent( os, indentLevel + 1 ); os << "leds_min = "<<zone.leds_min<<";\n";
+-	indent( os, indentLevel + 1 ); os << "leds_max = "<<zone.leds_max<<";\n";
+-	indent( os, indentLevel + 1 ); os << "leds_count = "<<zone.leds_count<<";\n";
+-	indent( os, indentLevel + 1 ); os << "matrix_height = "<<zone.matrix_height<<";\n";
+-	indent( os, indentLevel + 1 ); os << "matrix_width = "<<zone.matrix_width<<";\n";
+-	indent( os, indentLevel ); os << "},\n";
++void print(const Zone& zone, unsigned int indentLevel) {
++	indent(indentLevel);
++	printf("[%u] = {\n", zone.idx);
++	indent(indentLevel + 1);
++	printf("name = \"%s\";\n", zone.name.c_str());
++	indent(indentLevel + 1);
++	printf("type = %s;\n", enumString(zone.type));
++	indent(indentLevel + 1);
++	printf("leds_min = %u;\n", zone.leds_min);
++	indent(indentLevel + 1);
++	printf("leds_max = %u;\n", zone.leds_max);
++	indent(indentLevel + 1);
++	printf("leds_count = %u;\n", zone.leds_count);
++	indent(indentLevel + 1);
++	printf("matrix_height = %u;\n", zone.matrix_height);
++	indent(indentLevel + 1);
++	printf("matrix_width = %u;\n", zone.matrix_width);
++	indent(indentLevel);
++	printf("},\n");
+ }
+ 
++void print(std::ostream& os, const Zone& zone, unsigned int indentLevel) {
++	indent(os, indentLevel);
++	os << "[" << zone.idx << "] = {\n";
++	indent(os, indentLevel + 1);
++	os << "name = \"" << zone.name.c_str() << "\";\n";
++	indent(os, indentLevel + 1);
++	os << "type = " << enumString(zone.type) << ";\n";
++	indent(os, indentLevel + 1);
++	os << "leds_min = " << zone.leds_min << ";\n";
++	indent(os, indentLevel + 1);
++	os << "leds_max = " << zone.leds_max << ";\n";
++	indent(os, indentLevel + 1);
++	os << "leds_count = " << zone.leds_count << ";\n";
++	indent(os, indentLevel + 1);
++	os << "matrix_height = " << zone.matrix_height << ";\n";
++	indent(os, indentLevel + 1);
++	os << "matrix_width = " << zone.matrix_width << ";\n";
++	indent(os, indentLevel);
++	os << "},\n";
++}
+ 
+ //======================================================================================================================
+ //  Mode
+ 
+ Mode::Mode()
+-:
+-	idx(),
+-	parentIdx(),
+-	name(),
+-	value(),
+-	flags(),
+-	speed_min(),
+-	speed_max(),
+-	brightness_min(),
+-	brightness_max(),
+-	colors_min(),
+-	colors_max(),
+-	speed(),
+-	brightness(),
+-	direction(),
+-	color_mode(),
+-	colors()
+-{}
+-
+-size_t Mode::calcSize( uint32_t protocolVersion ) const noexcept
+-{
++	: idx(),
++	  parentIdx(),
++	  name(),
++	  value(),
++	  flags(),
++	  speed_min(),
++	  speed_max(),
++	  brightness_min(),
++	  brightness_max(),
++	  colors_min(),
++	  colors_max(),
++	  speed(),
++	  brightness(),
++	  direction(),
++	  color_mode(),
++	  colors() {
++}
++
++size_t Mode::calcSize(uint32_t protocolVersion) const noexcept {
+ 	size_t size = 0;
+ 
+-	size += protocol::sizeofString( name );
+-	size += sizeof( value );
+-	size += sizeof( flags );
+-	size += sizeof( speed_min );
+-	size += sizeof( speed_max );
+-	if (protocolVersion >= 3)
+-	{
+-		size += sizeof( brightness_min );
+-		size += sizeof( brightness_max );
+-	}
+-	size += sizeof( colors_min );
+-	size += sizeof( colors_max );
+-	size += sizeof( speed );
+-	if (protocolVersion >= 3)
+-	{
+-		size += sizeof( brightness );
+-	}
+-	size += sizeof( direction );
+-	size += sizeof( color_mode );
+-	size += protocol::sizeofArray( colors );
++	size += protocol::sizeofString(name);
++	size += sizeof(value);
++	size += sizeof(flags);
++	size += sizeof(speed_min);
++	size += sizeof(speed_max);
++	if (protocolVersion >= 3) {
++		size += sizeof(brightness_min);
++		size += sizeof(brightness_max);
++	}
++	size += sizeof(colors_min);
++	size += sizeof(colors_max);
++	size += sizeof(speed);
++	if (protocolVersion >= 3) {
++		size += sizeof(brightness);
++	}
++	size += sizeof(direction);
++	size += sizeof(color_mode);
++	size += protocol::sizeofArray(colors);
+ 
+ 	return size;
+ }
+ 
+-void Mode::serialize( BinaryOutputStream & stream, uint32_t protocolVersion ) const
+-{
+-	protocol::writeString( stream, name );
++void Mode::serialize(BinaryOutputStream& stream, uint32_t protocolVersion) const {
++	protocol::writeString(stream, name);
+ 	stream << value;
+ 	stream << flags;
+ 	stream << speed_min;
+ 	stream << speed_max;
+-	if (protocolVersion >= 3)
+-	{
++	if (protocolVersion >= 3) {
+ 		stream << brightness_min;
+ 		stream << brightness_max;
+ 	}
+ 	stream << colors_min;
+ 	stream << colors_max;
+ 	stream << speed;
+-	if (protocolVersion >= 3)
+-	{
++	if (protocolVersion >= 3) {
+ 		stream << brightness;
+ 	}
+ 	stream << direction;
+ 	stream << color_mode;
+-	protocol::writeArray( stream, colors );
++	protocol::writeArray(stream, colors);
+ }
+ 
+-bool Mode::deserialize( BinaryInputStream & stream, uint32_t protocolVersion, uint32_t idx, uint32_t parentIdx ) noexcept
+-{
++bool Mode::deserialize(BinaryInputStream& stream, uint32_t protocolVersion, uint32_t idx, uint32_t parentIdx) noexcept {
+ 	// This hack with const casts allows us to restrict the user from changing attributes that are a static description
+ 	// and allow him to change only the parameters that are meant to be changed.
+ 
+ 	// fill in our metadata
+-	unconst( this->idx ) = idx;
+-	unconst( this->parentIdx ) = parentIdx;
+-
+-	protocol::readString( stream, unconst( name ) );
+-	stream >> unconst( value );
+-	stream >> unconst( flags );
+-	stream >> unconst( speed_min );
+-	stream >> unconst( speed_max );
+-	if (protocolVersion >= 3)
+-	{
+-		stream >> unconst( brightness_min );
+-		stream >> unconst( brightness_max );
+-	}
+-	stream >> unconst( colors_min );
+-	stream >> unconst( colors_max );
++	unconst(this->idx)		 = idx;
++	unconst(this->parentIdx) = parentIdx;
++
++	protocol::readString(stream, unconst(name));
++	stream >> unconst(value);
++	stream >> unconst(flags);
++	stream >> unconst(speed_min);
++	stream >> unconst(speed_max);
++	if (protocolVersion >= 3) {
++		stream >> unconst(brightness_min);
++		stream >> unconst(brightness_max);
++	}
++	stream >> unconst(colors_min);
++	stream >> unconst(colors_max);
+ 	stream >> speed;
+-	if (protocolVersion >= 3)
+-	{
+-		stream >> unconst( brightness );
++	if (protocolVersion >= 3) {
++		stream >> unconst(brightness);
+ 	}
+ 	stream >> direction;
+-	stream >> unconst( color_mode );
+-	protocol::readArray( stream, colors );
++	stream >> unconst(color_mode);
++	protocol::readArray(stream, colors);
+ 
+-	if (!isValidDirection( direction, flags ))
++	if (!isValidDirection(direction, flags)) {
+ 		stream.setFailed();
+-	if (!isValidColorMode( color_mode ))
++	}
++	if (!isValidColorMode(color_mode)) {
+ 		stream.setFailed();
++	}
+ 
+ 	return !stream.failed();
+ }
+ 
+-void print( const Mode & mode, unsigned int indentLevel )
+-{
+-	indent( indentLevel ); printf( "[%u] = {\n", mode.idx );
+-	indent( indentLevel + 1 ); printf( "name = \"%s\";\n", mode.name.c_str() );
+-	indent( indentLevel + 1 ); printf( "value = %u;\n", mode.value );
+-	indent( indentLevel + 1 ); printf( "flags = %s;\n", modeFlagsToString( mode.flags ).c_str() );
+-	indent( indentLevel + 1 ); printf( "direction = %s;\n", enumString( mode.direction ) );
+-	indent( indentLevel + 1 ); printf( "speed_min = %u;\n", mode.speed_min );
+-	indent( indentLevel + 1 ); printf( "speed_max = %u;\n", mode.speed_max );
+-	indent( indentLevel + 1 ); printf( "speed = %u;\n", mode.speed );
+-	indent( indentLevel + 1 ); printf( "brightness_min = %u;\n", mode.brightness_min );
+-	indent( indentLevel + 1 ); printf( "brightness_max = %u;\n", mode.brightness_max );
+-	indent( indentLevel + 1 ); printf( "brightness = %u;\n", mode.brightness );
+-	indent( indentLevel + 1 ); printf( "colors_min = %u;\n", mode.colors_min );
+-	indent( indentLevel + 1 ); printf( "colors_max = %u;\n", mode.colors_max );
+-	indent( indentLevel + 1 ); printf( "color_mode = %s;\n", enumString( mode.color_mode ) );
+-	indent( indentLevel + 1 ); printf( "colors = {\n" );
+-	for (Color color : mode.colors)
+-	{
+-		indent( indentLevel + 2 ); print( color ); puts(",");
+-	}
+-	indent( indentLevel + 1 ); printf( "};\n" );
+-	indent( indentLevel ); printf( "},\n" );
+-}
+-
+-void print( std::ostream & os, const Mode & mode, unsigned int indentLevel )
+-{
+-	indent( os, indentLevel ); os << "["<<mode.idx<<"] = {\n";
+-	indent( os, indentLevel + 1 ); os << "name = \""<<mode.name<<"\";\n";
+-	indent( os, indentLevel + 1 ); os << "value = "<<mode.value<<";\n";
+-	indent( os, indentLevel + 1 ); os << "flags = "<<modeFlagsToString( mode.flags )<<";\n";
+-	indent( os, indentLevel + 1 ); os << "direction = "<<enumString( mode.direction )<<";\n";
+-	indent( os, indentLevel + 1 ); os << "speed_min = "<<mode.speed_min<<";\n";
+-	indent( os, indentLevel + 1 ); os << "speed_max = "<<mode.speed_max<<";\n";
+-	indent( os, indentLevel + 1 ); os << "speed = "<<mode.speed<<";\n";
+-	indent( os, indentLevel + 1 ); os << "brightness_min = "<<mode.brightness_min<<";\n";
+-	indent( os, indentLevel + 1 ); os << "brightness_max = "<<mode.brightness_max<<";\n";
+-	indent( os, indentLevel + 1 ); os << "brightness = "<<mode.brightness<<";\n";
+-	indent( os, indentLevel + 1 ); os << "colors_min = "<<mode.colors_min<<";\n";
+-	indent( os, indentLevel + 1 ); os << "colors_max = "<<mode.colors_max<<";\n";
+-	indent( os, indentLevel + 1 ); os << "color_mode = "<<enumString( mode.color_mode )<<";\n";
+-	indent( os, indentLevel + 1 ); os << "colors = {\n";
+-	for (Color color : mode.colors)
+-	{
+-		indent( os, indentLevel + 2 ); os << color << ",\n";
+-	}
+-	indent( os, indentLevel + 1 ); os << "};\n";
+-	indent( os, indentLevel ); os << "},\n";
++void print(const Mode& mode, unsigned int indentLevel) {
++	indent(indentLevel);
++	printf("[%u] = {\n", mode.idx);
++	indent(indentLevel + 1);
++	printf("name = \"%s\";\n", mode.name.c_str());
++	indent(indentLevel + 1);
++	printf("value = %u;\n", mode.value);
++	indent(indentLevel + 1);
++	printf("flags = %s;\n", modeFlagsToString(mode.flags).c_str());
++	indent(indentLevel + 1);
++	printf("direction = %s;\n", enumString(mode.direction));
++	indent(indentLevel + 1);
++	printf("speed_min = %u;\n", mode.speed_min);
++	indent(indentLevel + 1);
++	printf("speed_max = %u;\n", mode.speed_max);
++	indent(indentLevel + 1);
++	printf("speed = %u;\n", mode.speed);
++	indent(indentLevel + 1);
++	printf("brightness_min = %u;\n", mode.brightness_min);
++	indent(indentLevel + 1);
++	printf("brightness_max = %u;\n", mode.brightness_max);
++	indent(indentLevel + 1);
++	printf("brightness = %u;\n", mode.brightness);
++	indent(indentLevel + 1);
++	printf("colors_min = %u;\n", mode.colors_min);
++	indent(indentLevel + 1);
++	printf("colors_max = %u;\n", mode.colors_max);
++	indent(indentLevel + 1);
++	printf("color_mode = %s;\n", enumString(mode.color_mode));
++	indent(indentLevel + 1);
++	printf("colors = {\n");
++	for (Color color : mode.colors) {
++		indent(indentLevel + 2);
++		print(color);
++		puts(",");
++	}
++	indent(indentLevel + 1);
++	printf("};\n");
++	indent(indentLevel);
++	printf("},\n");
+ }
+ 
++void print(std::ostream& os, const Mode& mode, unsigned int indentLevel) {
++	indent(os, indentLevel);
++	os << "[" << mode.idx << "] = {\n";
++	indent(os, indentLevel + 1);
++	os << "name = \"" << mode.name << "\";\n";
++	indent(os, indentLevel + 1);
++	os << "value = " << mode.value << ";\n";
++	indent(os, indentLevel + 1);
++	os << "flags = " << modeFlagsToString(mode.flags) << ";\n";
++	indent(os, indentLevel + 1);
++	os << "direction = " << enumString(mode.direction) << ";\n";
++	indent(os, indentLevel + 1);
++	os << "speed_min = " << mode.speed_min << ";\n";
++	indent(os, indentLevel + 1);
++	os << "speed_max = " << mode.speed_max << ";\n";
++	indent(os, indentLevel + 1);
++	os << "speed = " << mode.speed << ";\n";
++	indent(os, indentLevel + 1);
++	os << "brightness_min = " << mode.brightness_min << ";\n";
++	indent(os, indentLevel + 1);
++	os << "brightness_max = " << mode.brightness_max << ";\n";
++	indent(os, indentLevel + 1);
++	os << "brightness = " << mode.brightness << ";\n";
++	indent(os, indentLevel + 1);
++	os << "colors_min = " << mode.colors_min << ";\n";
++	indent(os, indentLevel + 1);
++	os << "colors_max = " << mode.colors_max << ";\n";
++	indent(os, indentLevel + 1);
++	os << "color_mode = " << enumString(mode.color_mode) << ";\n";
++	indent(os, indentLevel + 1);
++	os << "colors = {\n";
++	for (Color color : mode.colors) {
++		indent(os, indentLevel + 2);
++		os << color << ",\n";
++	}
++	indent(os, indentLevel + 1);
++	os << "};\n";
++	indent(os, indentLevel);
++	os << "},\n";
++}
+ 
+ //======================================================================================================================
+ //  Device
+ 
+ Device::Device()
+-:
+-	idx(),
+-	type(),
+-	name(),
+-	vendor(),
+-	description(),
+-	version(),
+-	serial(),
+-	location(),
+-	active_mode(),
+-	modes(),
+-	zones(),
+-	leds(),
+-	colors()
+-{}
+-
+-size_t Device::calcSize( uint32_t protocolVersion ) const noexcept
+-{
++	: idx(), type(), name(), vendor(), description(), version(), serial(), location(), active_mode(), modes(), zones(), leds(), colors() {
++}
++
++size_t Device::calcSize(uint32_t protocolVersion) const noexcept {
+ 	size_t size = 0;
+ 
+-	size += sizeof( type );
+-	size += protocol::sizeofString( name );
+-	size += protocol::sizeofString( vendor );
+-	size += protocol::sizeofString( description );
+-	size += protocol::sizeofString( version );
+-	size += protocol::sizeofString( serial );
+-	size += protocol::sizeofString( location );
++	size += sizeof(type);
++	size += protocol::sizeofString(name);
++	size += protocol::sizeofString(vendor);
++	size += protocol::sizeofString(description);
++	size += protocol::sizeofString(version);
++	size += protocol::sizeofString(serial);
++	size += protocol::sizeofString(location);
+ 
+-	size += sizeof( active_mode );
+-	size += protocol::sizeofArray( modes, protocolVersion );
+-	size += protocol::sizeofArray( zones, protocolVersion );
+-	size += protocol::sizeofArray( leds, protocolVersion );
+-	size += protocol::sizeofArray( colors );
++	size += sizeof(active_mode);
++	size += protocol::sizeofArray(modes, protocolVersion);
++	size += protocol::sizeofArray(zones, protocolVersion);
++	size += protocol::sizeofArray(leds, protocolVersion);
++	size += protocol::sizeofArray(colors);
+ 
+ 	return size;
+ }
+ 
+-void Device::serialize( BinaryOutputStream & stream, uint32_t protocolVersion ) const
+-{
++void Device::serialize(BinaryOutputStream& stream, uint32_t protocolVersion) const {
+ 	stream << type;
+-	protocol::writeString( stream, name );
+-	protocol::writeString( stream, vendor );
+-	protocol::writeString( stream, description );
+-	protocol::writeString( stream, version );
+-	protocol::writeString( stream, serial );
+-	protocol::writeString( stream, location );
+-
+-	stream << uint16_t( modes.size() );  // the size is not directly before the array, so it must be written manually
++	protocol::writeString(stream, name);
++	protocol::writeString(stream, vendor);
++	protocol::writeString(stream, description);
++	protocol::writeString(stream, version);
++	protocol::writeString(stream, serial);
++	protocol::writeString(stream, location);
++
++	stream << uint16_t(modes.size());  // the size is not directly before the array, so it must be written manually
+ 	stream << active_mode;
+-	for (const Mode & mode : modes)
+-	{
+-		mode.serialize( stream, protocolVersion );
++	for (const Mode& mode : modes) {
++		mode.serialize(stream, protocolVersion);
+ 	}
+-	protocol::writeArray( stream, zones, protocolVersion );
+-	protocol::writeArray( stream, leds, protocolVersion );
+-	protocol::writeArray( stream, colors );
++	protocol::writeArray(stream, zones, protocolVersion);
++	protocol::writeArray(stream, leds, protocolVersion);
++	protocol::writeArray(stream, colors);
+ }
+ 
+-bool Device::deserialize( BinaryInputStream & stream, uint32_t protocolVersion, uint32_t deviceIdx ) noexcept
+-{
++bool Device::deserialize(BinaryInputStream& stream, uint32_t protocolVersion, uint32_t deviceIdx) noexcept {
+ 	// This hack with const casts allows us to restrict the user from changing attributes that are a static description
+ 	// and allow him to change only the parameters that are meant to be changed.
+ 
+ 	// fill in our metadata
+-	unconst( idx ) = deviceIdx;
++	unconst(idx) = deviceIdx;
+ 
+-	stream >> unconst( type );
+-	protocol::readString( stream, unconst( name ) );
+-	protocol::readString( stream, unconst( vendor ) );
+-	protocol::readString( stream, unconst( description ) );
+-	protocol::readString( stream, unconst( version ) );
+-	protocol::readString( stream, unconst( serial ) );
+-	protocol::readString( stream, unconst( location ) );
++	stream >> unconst(type);
++	protocol::readString(stream, unconst(name));
++	protocol::readString(stream, unconst(vendor));
++	protocol::readString(stream, unconst(description));
++	protocol::readString(stream, unconst(version));
++	protocol::readString(stream, unconst(serial));
++	protocol::readString(stream, unconst(location));
+ 
+ 	uint16_t num_modes;
+ 	stream >> num_modes;  // the size is not directly before the array, so it must be read manually
+-	stream >> unconst( active_mode );
+-	unconst( modes ).reserve( num_modes );
+-	for (uint32_t modeIdx = 0; modeIdx < num_modes; ++modeIdx)
+-	{
++	stream >> unconst(active_mode);
++	unconst(modes).reserve(num_modes);
++	for (uint32_t modeIdx = 0; modeIdx < num_modes; ++modeIdx) {
+ 		Mode mode;
+-		if (!mode.deserialize( stream, protocolVersion, modeIdx, deviceIdx ))
++		if (!mode.deserialize(stream, protocolVersion, modeIdx, deviceIdx)) {
+ 			return false;
+-		unconst( modes ).emplace_back( move(mode) );
++		}
++		unconst(modes).emplace_back(move(mode));
+ 	}
+-	protocol::readArray( stream, unconst( zones ), protocolVersion, deviceIdx );
+-	protocol::readArray( stream, unconst( leds ), protocolVersion, deviceIdx );
+-	protocol::readArray( stream, unconst( colors ) );
++	protocol::readArray(stream, unconst(zones), protocolVersion, deviceIdx);
++	protocol::readArray(stream, unconst(leds), protocolVersion, deviceIdx);
++	protocol::readArray(stream, unconst(colors));
+ 
+ 	// Let's tolerate invalid device classes in case the server adds some without increasing protocol version
+-	//if (!isValidDeviceType( type ))
++	// if (!isValidDeviceType( type ))
+ 	//	stream.setFailed();
+ 
+ 	return !stream.failed();
+ }
+ 
+-void print( const Device & device, unsigned int indentLevel )
+-{
+-	indent( indentLevel ); printf( "[%u] = {\n", device.idx );
+-	indent( indentLevel + 1 ); printf( "name = \"%s\";\n", device.name.c_str() );
+-	indent( indentLevel + 1 ); printf( "type = %s;\n", enumString( device.type ) );
+-	indent( indentLevel + 1 ); printf( "vendor = \"%s\";\n", device.vendor.c_str() );
+-	indent( indentLevel + 1 ); printf( "description = \"%s\";\n", device.description.c_str() );
+-	indent( indentLevel + 1 ); printf( "version = \"%s\";\n", device.version.c_str() );
+-	indent( indentLevel + 1 ); printf( "serial = \"%s\";\n", device.serial.c_str() );
+-	indent( indentLevel + 1 ); printf( "location = \"%s\";\n", device.location.c_str() );
+-	indent( indentLevel + 1 ); printf( "active_mode = %u;\n", device.active_mode );
+-	indent( indentLevel + 1 ); printf( "modes = {\n" );
+-	for (const Mode & mode : device.modes)
+-	{
+-		print( mode, indentLevel + 2 );
+-	}
+-	indent( indentLevel + 1 ); printf( "};\n" );
+-	indent( indentLevel + 1 ); printf( "zones = {\n" );
+-	for (const Zone & zone : device.zones)
+-	{
+-		print( zone, indentLevel + 2 );
+-	}
+-	indent( indentLevel + 1 ); printf( "};\n" );
+-	indent( indentLevel + 1 ); printf( "leds = {\n" );
+-	for (const LED & led : device.leds)
+-	{
+-		print( led, indentLevel + 2 );
+-	}
+-	indent( indentLevel + 1 ); printf( "};\n" );
+-	indent( indentLevel + 1 ); printf( "colors = {\n" );
+-	for (Color color : device.colors)
+-	{
+-		indent( indentLevel + 2 ); print( color ); puts(",");
+-	}
+-	indent( indentLevel + 1 ); printf( "};\n" );
+-	indent( indentLevel ); printf( "},\n" );
+-}
+-
+-void print( std::ostream & os, const Device & device, unsigned int indentLevel )
+-{
+-	indent( os, indentLevel ); os << "["<<device.idx<<"] = {\n";
+-	indent( os, indentLevel + 1 ); os << "name = \""<<device.name<<"\";\n";
+-	indent( os, indentLevel + 1 ); os << "type = "<<enumString( device.type )<<";\n";
+-	indent( os, indentLevel + 1 ); os << "vendor = \""<<device.vendor<<"\";\n";
+-	indent( os, indentLevel + 1 ); os << "description = \""<<device.description<<"\";\n";
+-	indent( os, indentLevel + 1 ); os << "version = \""<<device.version<<"\";\n";
+-	indent( os, indentLevel + 1 ); os << "serial = \""<<device.serial<<"\";\n";
+-	indent( os, indentLevel + 1 ); os << "location = \""<<device.location<<"\";\n";
+-	indent( os, indentLevel + 1 ); os << "active_mode = "<<device.active_mode<<";\n";
+-	indent( os, indentLevel + 1 ); os << "modes = {\n";
+-	for (const Mode & mode : device.modes)
+-	{
+-		print( os, mode, indentLevel + 2 );
+-	}
+-	indent( os, indentLevel + 1 ); os << "};\n";
+-	indent( os, indentLevel + 1 ); os << "zones = {\n";
+-	for (const Zone & zone : device.zones)
+-	{
+-		print( os, zone, indentLevel + 2 );
+-	}
+-	indent( os, indentLevel + 1 ); os << "};\n";
+-	indent( os, indentLevel + 1 ); os << "leds = {\n";
+-	for (const LED & led : device.leds)
+-	{
+-		print( os, led, indentLevel + 2 );
+-	}
+-	indent( os, indentLevel + 1 ); os << "};\n";
+-	indent( os, indentLevel + 1 ); os << "colors = {\n";
+-	for (Color color : device.colors)
+-	{
+-		indent( os, indentLevel + 2 ); os << color << ",\n";
+-	}
+-	indent( os, indentLevel + 1 ); os << "};\n";
+-	indent( os, indentLevel ); os << "},\n";
++void print(const Device& device, unsigned int indentLevel) {
++	indent(indentLevel);
++	printf("[%u] = {\n", device.idx);
++	indent(indentLevel + 1);
++	printf("name = \"%s\";\n", device.name.c_str());
++	indent(indentLevel + 1);
++	printf("type = %s;\n", enumString(device.type));
++	indent(indentLevel + 1);
++	printf("vendor = \"%s\";\n", device.vendor.c_str());
++	indent(indentLevel + 1);
++	printf("description = \"%s\";\n", device.description.c_str());
++	indent(indentLevel + 1);
++	printf("version = \"%s\";\n", device.version.c_str());
++	indent(indentLevel + 1);
++	printf("serial = \"%s\";\n", device.serial.c_str());
++	indent(indentLevel + 1);
++	printf("location = \"%s\";\n", device.location.c_str());
++	indent(indentLevel + 1);
++	printf("active_mode = %u;\n", device.active_mode);
++	indent(indentLevel + 1);
++	printf("modes = {\n");
++	for (const Mode& mode : device.modes) {
++		print(mode, indentLevel + 2);
++	}
++	indent(indentLevel + 1);
++	printf("};\n");
++	indent(indentLevel + 1);
++	printf("zones = {\n");
++	for (const Zone& zone : device.zones) {
++		print(zone, indentLevel + 2);
++	}
++	indent(indentLevel + 1);
++	printf("};\n");
++	indent(indentLevel + 1);
++	printf("leds = {\n");
++	for (const LED& led : device.leds) {
++		print(led, indentLevel + 2);
++	}
++	indent(indentLevel + 1);
++	printf("};\n");
++	indent(indentLevel + 1);
++	printf("colors = {\n");
++	for (Color color : device.colors) {
++		indent(indentLevel + 2);
++		print(color);
++		puts(",");
++	}
++	indent(indentLevel + 1);
++	printf("};\n");
++	indent(indentLevel);
++	printf("},\n");
+ }
+ 
++void print(std::ostream& os, const Device& device, unsigned int indentLevel) {
++	indent(os, indentLevel);
++	os << "[" << device.idx << "] = {\n";
++	indent(os, indentLevel + 1);
++	os << "name = \"" << device.name << "\";\n";
++	indent(os, indentLevel + 1);
++	os << "type = " << enumString(device.type) << ";\n";
++	indent(os, indentLevel + 1);
++	os << "vendor = \"" << device.vendor << "\";\n";
++	indent(os, indentLevel + 1);
++	os << "description = \"" << device.description << "\";\n";
++	indent(os, indentLevel + 1);
++	os << "version = \"" << device.version << "\";\n";
++	indent(os, indentLevel + 1);
++	os << "serial = \"" << device.serial << "\";\n";
++	indent(os, indentLevel + 1);
++	os << "location = \"" << device.location << "\";\n";
++	indent(os, indentLevel + 1);
++	os << "active_mode = " << device.active_mode << ";\n";
++	indent(os, indentLevel + 1);
++	os << "modes = {\n";
++	for (const Mode& mode : device.modes) {
++		print(os, mode, indentLevel + 2);
++	}
++	indent(os, indentLevel + 1);
++	os << "};\n";
++	indent(os, indentLevel + 1);
++	os << "zones = {\n";
++	for (const Zone& zone : device.zones) {
++		print(os, zone, indentLevel + 2);
++	}
++	indent(os, indentLevel + 1);
++	os << "};\n";
++	indent(os, indentLevel + 1);
++	os << "leds = {\n";
++	for (const LED& led : device.leds) {
++		print(os, led, indentLevel + 2);
++	}
++	indent(os, indentLevel + 1);
++	os << "};\n";
++	indent(os, indentLevel + 1);
++	os << "colors = {\n";
++	for (Color color : device.colors) {
++		indent(os, indentLevel + 2);
++		os << color << ",\n";
++	}
++	indent(os, indentLevel + 1);
++	os << "};\n";
++	indent(os, indentLevel);
++	os << "},\n";
++}
+ 
  //======================================================================================================================
  
 -
