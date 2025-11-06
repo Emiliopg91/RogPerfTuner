@@ -2,9 +2,6 @@
 
 #include <exception>
 
-#include "../../include/clients/dbus/asus/armoury/intel/pl1_spd_client.hpp"
-#include "../../include/clients/dbus/asus/armoury/nvidia/nv_boost_client.hpp"
-#include "../../include/clients/dbus/asus/armoury/nvidia/nv_temp_client.hpp"
 #include "../../include/clients/dbus/asus/core/platform_client.hpp"
 #include "../../include/clients/dbus/linux/power_management_kb_brightness.hpp"
 #include "../../include/clients/dbus/linux/upower_client.hpp"
@@ -39,18 +36,26 @@ HardwareService::HardwareService() : Loggable("HardwareService") {
 			line = line.substr(pos + 2);
 			logger.info(line);
 		}
-	}
 
-	Logger::add_tab();
-	if (cpu == CpuBrand::Enum::INTEL) {
+		Logger::add_tab();
 		if (pl1SpdClient.available()) {
 			logger.info("TDP control available");
 		}
 		if (boostControlClient.available()) {
 			logger.info("Boost control available");
 		}
+		Logger::rem_tab();
+	} else if (StringUtils::isSubstring("AuthenticAMD", cpuinfo_out)) {
+		cpu		   = CpuBrand::Enum::AMD;
+		auto lines = StringUtils::splitLines(cpuinfo_out);
+		auto line  = lines[lines.size() - 1];
+		auto pos   = line.find(":");
+		if (pos != std::string::npos) {
+			line = line.substr(pos + 2);
+			logger.info(line);
+		}
 	}
-	Logger::rem_tab();
+
 	Logger::rem_tab();
 
 	logger.info("Detecting GPUs");
@@ -59,7 +64,8 @@ HardwareService::HardwareService() : Loggable("HardwareService") {
 	for (auto gpu : detected_gpus) {
 		logger.info(gpu.name);
 		if (!gpu.default_flag) {
-			auto brand = static_cast<GpuBrand>(GpuBrand::fromString(StringUtils::toLowerCase(StringUtils::split(gpu.name, ' ')[0])));
+			auto replaced_name = StringUtils::replace(gpu.name, "Advanced Micro Devices, Inc.", "AMD");
+			auto brand		   = static_cast<GpuBrand>(GpuBrand::fromString(StringUtils::toLowerCase(StringUtils::split(replaced_name, ' ')[0])));
 			std::string env;
 			if (!gpu.environment.empty()) {
 				for (auto gpu_env : gpu.environment) {

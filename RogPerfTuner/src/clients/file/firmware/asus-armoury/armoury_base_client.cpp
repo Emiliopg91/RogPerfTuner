@@ -1,0 +1,43 @@
+#include "../../../../../include/clients/file/firmware/asus-armoury/armoury_base_client.hpp"
+
+#include <string>
+
+#include "../../../../../include/utils/file_utils.hpp"
+
+ArmouryBaseClient::ArmouryBaseClient(std::string attribute, bool required)
+	: AbstractFileClient("/sys/class/firmware-attributes/asus-armoury/attributes/" + attribute + "/current_value", attribute, true, required),
+	  attributePath("/sys/class/firmware-attributes/asus-armoury/attributes/" + attribute) {
+}
+
+int ArmouryBaseClient::getCurrentValue() {
+	return std::stoi(read());
+}
+
+void ArmouryBaseClient::setCurrentValue(int value) {
+	write(std::to_string(value));
+}
+
+int ArmouryBaseClient::getMaxValue() {
+	if (FileUtils::exists(attributePath + "/max_value")) {
+		return stoi(FileUtils::readFileContent(attributePath + "/max_value"));
+	}
+	if (FileUtils::exists(attributePath + "/possible_values")) {
+		const auto splitted = StringUtils::split(FileUtils::readFileContent(attributePath + "/possible_values"), ';');
+		return stoi(splitted[splitted.size() - 1]);
+	}
+	return 0;
+}
+
+int ArmouryBaseClient::getMinValue() {
+	if (FileUtils::exists(attributePath + "/min_value")) {
+		return stoi(FileUtils::readFileContent(attributePath + "/min_value"));
+	}
+	if (FileUtils::exists(attributePath + "/possible_values")) {
+		return stoi(StringUtils::split(FileUtils::readFileContent(attributePath + "/possible_values"), ';')[0]);
+	}
+	return 0;
+}
+
+bool ArmouryBaseClient::available() {
+	return AbstractFileClient::available();
+}

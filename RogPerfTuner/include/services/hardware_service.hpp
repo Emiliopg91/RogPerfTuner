@@ -2,17 +2,18 @@
 
 #include <mutex>
 
-#include "../clients/dbus/asus/armoury/intel/pl1_spd_client.hpp"
-#include "../clients/dbus/asus/armoury/intel/pl2_sppt_client.hpp"
-#include "../clients/dbus/asus/armoury/nvidia/nv_boost_client.hpp"
-#include "../clients/dbus/asus/armoury/nvidia/nv_temp_client.hpp"
-#include "../clients/dbus/asus/armoury/other/boot_sound_client.hpp"
-#include "../clients/dbus/asus/armoury/other/panel_overdrive_client.hpp"
 #include "../clients/dbus/asus/core/platform_client.hpp"
 #include "../clients/dbus/linux/power_management_kb_brightness.hpp"
 #include "../clients/dbus/linux/upower_client.hpp"
 #include "../clients/file/boost_control_client.hpp"
 #include "../clients/file/cpuinfo_client.hpp"
+#include "../clients/file/firmware/asus-armoury/intel/pl1_spd_client.hpp"
+#include "../clients/file/firmware/asus-armoury/intel/pl2_sppt_client.hpp"
+#include "../clients/file/firmware/asus-armoury/intel/pl3_fppt_client.hpp"
+#include "../clients/file/firmware/asus-armoury/nvidia/nv_boost_client.hpp"
+#include "../clients/file/firmware/asus-armoury/nvidia/nv_temp_client.hpp"
+#include "../clients/file/firmware/asus-armoury/other/boot_sound_client.hpp"
+#include "../clients/file/firmware/asus-armoury/other/panel_overdrive_client.hpp"
 #include "../clients/lib/lsusb_client.hpp"
 #include "../clients/shell/switcherooctl_client.hpp"
 #include "../events/event_bus.hpp"
@@ -100,6 +101,7 @@ class HardwareService : public Singleton<HardwareService>, Loggable {
 	BootSoundClient& bootSoundClient				 = BootSoundClient::getInstance();
 	Pl1SpdClient& pl1SpdClient						 = Pl1SpdClient::getInstance();
 	Pl2SpptClient& pl2SpptClient					 = Pl2SpptClient::getInstance();
+	Pl3FpptClient& pl3FpptClient					 = Pl3FpptClient::getInstance();
 	NvBoostClient& nvBoostClient					 = NvBoostClient::getInstance();
 	NvTempClient& nvTempClient						 = NvTempClient::getInstance();
 	UPowerClient& uPowerClient						 = UPowerClient::getInstance();

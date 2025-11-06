@@ -1,11 +1,10 @@
 #pragma once
 
-#include "../../../../models/others/loggable.hpp"
-#include "../asus_base_client.hpp"
+#include "../../abstract/abstract_file_client.hpp"
 
-class ArmouryBaseClient : public AsusBaseClient, Loggable {
+class ArmouryBaseClient : private AbstractFileClient {
   public:
-	ArmouryBaseClient(std::string object_path_sufix, bool required = false);
+	ArmouryBaseClient(std::string attribute, bool required = false);
 
 	/**
 	 * @brief Retrieves the minimum value supported or configured by the client.
@@ -36,4 +35,9 @@ class ArmouryBaseClient : public AsusBaseClient, Loggable {
 	 * @param value The new value to set.
 	 */
 	void setCurrentValue(int value);
+
+	bool available();
+
+  private:
+	std::string attributePath;
 };

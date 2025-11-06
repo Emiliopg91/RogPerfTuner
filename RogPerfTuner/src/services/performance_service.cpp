@@ -204,26 +204,33 @@ void PerformanceService::setPowerProfile(PerformanceProfile& profile) {
 }
 
 void PerformanceService::setTdps(const PerformanceProfile& profile) {
-	if (pl1SpdClient.available()) {
-		logger.info("TDP values");
-		Logger::add_tab();
-
-		auto pl1 = onBattery ? batteryIntelPl1Spl(profile) : acIntelPl1Spl(profile);
-		logger.info("PL1: {}W", pl1);
-		try {
+	try {
+		if (pl1SpdClient.available()) {
+			logger.info("TDP values");
+			Logger::add_tab();
+			auto pl1 = onBattery ? batteryIntelPl1Spl(profile) : acIntelPl1Spl(profile);
+			logger.info("PL1: {}W", pl1);
 			pl1SpdClient.setCurrentValue(pl1);
 			TimeUtils::sleep(25);
+
 			if (pl2SpptClient.available()) {
 				auto pl2 = onBattery ? batteryIntelPl2Sppt(profile) : acIntelPl2Sppt(profile);
 				logger.info("PL2: {}W", pl2);
-				TimeUtils::sleep(25);
 				pl2SpptClient.setCurrentValue(pl2);
+				TimeUtils::sleep(25);
 			}
-		} catch (std::exception& e) {
-			logger.error("Error setting CPU TDPs: {}", e.what());
-		}
 
-		Logger::rem_tab();
+			if (pl3FpptClient.available()) {
+				auto pl3 = onBattery ? batteryIntelPl3Fppt(profile) : acIntelPl3Fppt(profile);
+				logger.info("PL3: {}W", pl3);
+				pl3FpptClient.setCurrentValue(pl3);
+				TimeUtils::sleep(25);
+			}
+
+			Logger::rem_tab();
+		}
+	} catch (std::exception& e) {
+		logger.error("Error setting CPU TDPs: {}", e.what());
 	}
 }
 
@@ -298,7 +305,6 @@ int PerformanceService::acIntelPl1Spl(PerformanceProfile profile) {
 }
 
 int PerformanceService::batteryIntelPl1Spl(PerformanceProfile profile) {
-	int acVal	 = acIntelPl1Spl(profile);
 	auto& client = Pl1SpdClient::getInstance();
 	return acTdpToBatteryTdp(acIntelPl1Spl(profile), client.getMinValue());
 }
@@ -314,18 +320,42 @@ int PerformanceService::acIntelPl2Sppt(PerformanceProfile profile) {
 		return client.getMaxValue();
 	}
 	if (profile == PerformanceProfile::Enum::BALANCED) {
-		return client.getMaxValue() * 0.85;	 // modificar
+		return client.getMaxValue() * 0.85;
 	}
 	if (profile == PerformanceProfile::Enum::QUIET) {
-		return client.getMaxValue() * 0.7;	// modificar
+		return client.getMaxValue() * 0.7;
 	}
 
 	return client.getCurrentValue();
 }
 
 int PerformanceService::batteryIntelPl2Sppt(PerformanceProfile profile) {
-	int acVal	 = acIntelPl2Sppt(profile);
 	auto& client = Pl2SpptClient::getInstance();
+	return acTdpToBatteryTdp(acIntelPl2Sppt(profile), client.getMinValue());
+}
+
+int PerformanceService::acIntelPl3Fppt(PerformanceProfile profile) {
+	auto& client = Pl2SpptClient::getInstance();
+
+	if (!acBoost()) {
+		return acIntelPl1Spl(profile);
+	}
+
+	if (profile == PerformanceProfile::Enum::PERFORMANCE) {
+		return client.getMaxValue();
+	}
+	if (profile == PerformanceProfile::Enum::BALANCED) {
+		return client.getMaxValue() * 0.9;
+	}
+	if (profile == PerformanceProfile::Enum::QUIET) {
+		return client.getMaxValue() * 0.8;
+	}
+
+	return client.getCurrentValue();
+}
+
+int PerformanceService::batteryIntelPl3Fppt(PerformanceProfile profile) {
+	auto& client = Pl3FpptClient::getInstance();
 	return acTdpToBatteryTdp(acIntelPl2Sppt(profile), client.getMinValue());
 }
 
