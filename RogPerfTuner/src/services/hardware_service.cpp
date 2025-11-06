@@ -83,9 +83,14 @@ HardwareService::HardwareService() : Loggable("HardwareService") {
 			}
 			FileUtils::mkdirs(Constants::LIB_OCL_DIR);
 
+			GpuBrand brandGpu = GpuBrand::Enum::AMD;
+
 			std::vector<std::string> vkIcd;
-			std::vector<std::string> vkIcdVariants = {brand.toString() + "_icd.json", brand.toString() + "_icd.i686.json",
-													  brand.toString() + "_icd.x86_64.json"};
+			auto icdName = brand.toString();
+			if (icdName == brandGpu.toString()) {
+				icdName = "radeon";
+			}
+			std::vector<std::string> vkIcdVariants = {icdName + "_icd.json", icdName + "_icd.i686.json", icdName + "_icd.x86_64.json"};
 			for (auto var : vkIcdVariants) {
 				if (FileUtils::exists(Constants::USR_SHARE_VK_DIR + var)) {
 					FileUtils::copy(Constants::USR_SHARE_VK_DIR + var, Constants::LIB_VK_DIR + var);
@@ -105,9 +110,13 @@ HardwareService::HardwareService() : Loggable("HardwareService") {
 				env = env + "VK_ICD_FILENAMES=" + oss.str() + " ";
 			}
 
-			if (FileUtils::exists(Constants::USR_SHARE_OCL_DIR + brand.toString() + ".icd")) {
-				FileUtils::copy(Constants::USR_SHARE_OCL_DIR + brand.toString() + ".icd", Constants::LIB_OCL_DIR + brand.toString() + ".icd");
-				env = env + "OCL_ICD_FILENAMES=" + Constants::LIB_OCL_DIR + brand.toString() + ".icd" + " ";
+			icdName = brand.toString();
+			if (icdName == brandGpu.toString()) {
+				icdName = "amdocl64";
+			}
+			if (FileUtils::exists(Constants::USR_SHARE_OCL_DIR + icdName + ".icd")) {
+				FileUtils::copy(Constants::USR_SHARE_OCL_DIR + icdName + ".icd", Constants::LIB_OCL_DIR + icdName + ".icd");
+				env = env + "OCL_ICD_FILENAMES=" + Constants::LIB_OCL_DIR + icdName + ".icd" + " ";
 			}
 			env					   = StringUtils::trim(env);
 			gpus[brand.toString()] = env;
