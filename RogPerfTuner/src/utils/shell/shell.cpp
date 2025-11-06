@@ -1,4 +1,4 @@
-#include "../../include/shell/shell.hpp"
+#include "../../../include/utils/shell/shell.hpp"
 
 #include <fcntl.h>
 #include <sys/prctl.h>
@@ -10,7 +10,7 @@
 #include <optional>
 #include <stdexcept>
 
-#include "../../include/utils/string_utils.hpp"
+#include "../../../include/utils/string_utils.hpp"
 
 namespace {
 void set_nonblocking(int fd) {

@@ -9,10 +9,10 @@
 #include <string>
 
 #include "../clients/unix_socket/rog_perf_tuner_client.hpp"
-#include "../logger/logger_provider.hpp"
-#include "../shell/shell.hpp"
 #include "../utils/constants.hpp"
 #include "../utils/file_utils.hpp"
+#include "../utils/logger/logger_provider.hpp"
+#include "../utils/shell/shell.hpp"
 
 inline int run_command(Logger& logger, const std::vector<std::string>& cmd, const std::vector<std::string>& wrappers, const std::string& parameters) {
 	std::vector<std::string> args;

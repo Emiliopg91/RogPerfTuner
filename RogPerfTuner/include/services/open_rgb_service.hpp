@@ -5,10 +5,10 @@
 
 #include "../clients/dbus/linux/upower_client.hpp"
 #include "../clients/tcp/open_rgb/open_rgb_client.hpp"
-#include "../configuration/configuration.hpp"
-#include "../events/event_bus.hpp"
 #include "../models/hardware/rgb_brightness.hpp"
 #include "../models/hardware/usb_identifier.hpp"
+#include "../utils/configuration/configuration.hpp"
+#include "../utils/events/event_bus.hpp"
 
 class OpenRgbService : public Singleton<OpenRgbService>, Loggable {
   public:

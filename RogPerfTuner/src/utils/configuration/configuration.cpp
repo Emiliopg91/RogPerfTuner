@@ -1,13 +1,13 @@
-#include "../../include/configuration/configuration.hpp"
+#include "../../../include/utils/configuration/configuration.hpp"
 
 #include <qt6keychain/keychain.h>
 
 #include <QEventLoop>
 #include <fstream>
 
-#include "../../include/logger/logger_provider.hpp"
-#include "../../include/utils/constants.hpp"
-#include "../../include/utils/file_utils.hpp"
+#include "../../../include/utils/constants.hpp"
+#include "../../../include/utils/file_utils.hpp"
+#include "../../../include/utils/logger/logger_provider.hpp"
 #include "yaml-cpp/node/parse.h"
 
 void Configuration::loadConfig() {

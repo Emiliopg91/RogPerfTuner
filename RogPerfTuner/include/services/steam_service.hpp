@@ -2,8 +2,8 @@
 
 #include "../clients/shell/pip_client.hpp"
 #include "../clients/unix_socket/steam_client.hpp"
-#include "../configuration/configuration.hpp"
 #include "../models/steam/steam_game_config.hpp"
+#include "../utils/configuration/configuration.hpp"
 #include "./hardware_service.hpp"
 #include "./open_rgb_service.hpp"
 #include "./performance_service.hpp"

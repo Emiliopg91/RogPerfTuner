@@ -14,9 +14,9 @@
 #include <string>
 #include <vector>
 
-#include "../models/others/command_result.hpp"
-#include "../models/others/loggable.hpp"
-#include "../models/others/singleton.hpp"
+#include "../../models/others/command_result.hpp"
+#include "../../models/others/loggable.hpp"
+#include "../../models/others/singleton.hpp"
 
 class Shell : public Singleton<Shell>, Loggable {
   public:

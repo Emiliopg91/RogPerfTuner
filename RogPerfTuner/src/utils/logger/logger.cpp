@@ -1,7 +1,7 @@
-#include "../../include/logger/logger.hpp"
+#include "../../../include/utils/logger/logger.hpp"
 
-#include "../../include/logger/logger_provider.hpp"
-#include "../../include/utils/string_utils.hpp"
+#include "../../../include/utils/logger/logger_provider.hpp"
+#include "../../../include/utils/string_utils.hpp"
 
 void Logger::setLevel(std::string levelStr) {
 	setLevel(spdlog::level::from_str(StringUtils::toLowerCase(levelStr)));

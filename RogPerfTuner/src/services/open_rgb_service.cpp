@@ -3,9 +3,9 @@
 #include <optional>
 
 #include "../../include/clients/tcp/open_rgb/open_rgb_client.hpp"
-#include "../../include/configuration/configuration.hpp"
-#include "../../include/events/event_bus.hpp"
 #include "../../include/models/hardware/usb_identifier.hpp"
+#include "../../include/utils/configuration/configuration.hpp"
+#include "../../include/utils/events/event_bus.hpp"
 #include "../../include/utils/time_utils.hpp"
 
 OpenRgbService::OpenRgbService() : Loggable("OpenRgbService") {

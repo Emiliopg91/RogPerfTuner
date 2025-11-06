@@ -2,7 +2,7 @@
 #pragma once
 
 #include "../../models/others/singleton.hpp"
-#include "../../translator/translator.hpp"
+#include "../../utils/translator/translator.hpp"
 #include "abstract/abstract_cmd_client.hpp"
 
 class AurHelperClient : public AbstractCmdClient, public Singleton<AurHelperClient> {

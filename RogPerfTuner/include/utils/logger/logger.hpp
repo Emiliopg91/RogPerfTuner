@@ -10,7 +10,7 @@
 
 #include <spdlog/spdlog.h>
 
-#include "../utils/string_utils.hpp"
+#include "../../utils/string_utils.hpp"
 #include "spdlog/common.h"
 
 template <typename... Args>

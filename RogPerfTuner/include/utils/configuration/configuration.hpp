@@ -1,8 +1,8 @@
 #pragma once
 
-#include "../models/others/loggable.hpp"
-#include "../models/others/singleton.hpp"
-#include "../models/settings/root_config.hpp"
+#include "../../models/others/loggable.hpp"
+#include "../../models/others/singleton.hpp"
+#include "../../models/settings/root_config.hpp"
 
 class Configuration : public Singleton<Configuration>, Loggable {
   public:

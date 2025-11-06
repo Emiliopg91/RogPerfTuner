@@ -10,9 +10,9 @@
 #include <sstream>
 #include <vector>
 
-#include "../../include/events/event_bus.hpp"
 #include "../../include/models/others/release_entry.hpp"
 #include "../../include/models/others/semantic_version.hpp"
+#include "../../include/utils/events/event_bus.hpp"
 #include "../../include/utils/file_utils.hpp"
 #include "../../include/utils/net_utils.hpp"
 #include "../../include/utils/time_utils.hpp"

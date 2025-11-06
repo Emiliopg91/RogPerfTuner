@@ -5,7 +5,7 @@
 #include <QtWidgets>
 
 #include "../services/performance_service.hpp"
-#include "../translator/translator.hpp"
+#include "../utils/translator/translator.hpp"
 #include "fan_curve_view.hpp"
 
 class CurveEditor : public QDialog {

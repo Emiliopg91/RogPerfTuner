@@ -1,5 +1,5 @@
 #pragma once
-#include "../../logger/logger.hpp"
+#include "../../utils/logger/logger.hpp"
 
 class Loggable {
   public:

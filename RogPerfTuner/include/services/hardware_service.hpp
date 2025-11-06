@@ -17,13 +17,13 @@
 #include "../clients/file/firmware/asus-armoury/other/panel_overdrive_client.hpp"
 #include "../clients/lib/lsusb_client.hpp"
 #include "../clients/shell/switcherooctl_client.hpp"
-#include "../events/event_bus.hpp"
 #include "../gui/toaster.hpp"
 #include "../models/hardware/battery_charge_threshold.hpp"
 #include "../models/hardware/cpu_brand.hpp"
 #include "../models/hardware/usb_identifier.hpp"
 #include "../services/open_rgb_service.hpp"
-#include "../translator/translator.hpp"
+#include "../utils/events/event_bus.hpp"
+#include "../utils/translator/translator.hpp"
 
 class HardwareService : public Singleton<HardwareService>, Loggable {
   public:

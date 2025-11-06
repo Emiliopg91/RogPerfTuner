@@ -9,16 +9,16 @@
 #include "../../include/clients/file/cpuinfo_client.hpp"
 #include "../../include/clients/lib/lsusb_client.hpp"
 #include "../../include/clients/shell/switcherooctl_client.hpp"
-#include "../../include/events/event_bus.hpp"
 #include "../../include/gui/toaster.hpp"
 #include "../../include/models/hardware/battery_charge_threshold.hpp"
 #include "../../include/models/hardware/cpu_brand.hpp"
 #include "../../include/models/hardware/gpu_brand.hpp"
 #include "../../include/services/open_rgb_service.hpp"
-#include "../../include/translator/translator.hpp"
+#include "../../include/utils/events/event_bus.hpp"
 #include "../../include/utils/file_utils.hpp"
 #include "../../include/utils/string_utils.hpp"
 #include "../../include/utils/time_utils.hpp"
+#include "../../include/utils/translator/translator.hpp"
 
 HardwareService::HardwareService() : Loggable("HardwareService") {
 	logger.info("Initializing HardwareService");

@@ -7,9 +7,9 @@
 #include <string>
 #include <thread>
 
-#include "../../include/configuration/configuration.hpp"
-#include "../../include/events/event_bus.hpp"
 #include "../../include/gui/game_config_dialog.hpp"
+#include "../../include/utils/configuration/configuration.hpp"
+#include "../../include/utils/events/event_bus.hpp"
 #ifndef DEV_MODE
 #include "../../include/gui/yes_no_dialog.hpp"
 #endif

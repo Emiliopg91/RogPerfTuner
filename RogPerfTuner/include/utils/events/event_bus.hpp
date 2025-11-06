@@ -8,11 +8,11 @@
 #include <unordered_map>
 #include <vector>
 
-#include "../models/hardware/battery_charge_threshold.hpp"
-#include "../models/hardware/rgb_brightness.hpp"
-#include "../models/hardware/usb_identifier.hpp"
-#include "../models/others/singleton.hpp"
-#include "../models/performance/performance_profile.hpp"
+#include "../../models/hardware/battery_charge_threshold.hpp"
+#include "../../models/hardware/rgb_brightness.hpp"
+#include "../../models/hardware/usb_identifier.hpp"
+#include "../../models/others/singleton.hpp"
+#include "../../models/performance/performance_profile.hpp"
 
 typedef std::vector<std::any> CallbackParam;
 typedef std::any CallbackAnyParam;

@@ -6,7 +6,7 @@
 #include <fstream>
 #include <stdexcept>
 
-#include "../../include/logger/logger.hpp"
+#include "../../include/utils/logger/logger.hpp"
 #include "httplib.h"
 
 bool NetUtils::isPortFree(int port) {

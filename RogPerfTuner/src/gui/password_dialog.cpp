@@ -4,8 +4,8 @@
 #include <QProcess>
 #include <QVBoxLayout>
 
-#include "../../include/configuration/configuration.hpp"
-#include "../../include/translator/translator.hpp"
+#include "../../include/utils/configuration/configuration.hpp"
+#include "../../include/utils/translator/translator.hpp"
 
 bool PasswordDialog::showDialog() {
 	if (exec() == QDialog::Accepted) {

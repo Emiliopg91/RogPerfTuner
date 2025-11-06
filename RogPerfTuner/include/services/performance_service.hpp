@@ -16,11 +16,11 @@
 #include "../../include/clients/shell/cpupower_client.hpp"
 #include "../../include/clients/shell/scxctl_client.hpp"
 #include "../../include/gui/toaster.hpp"
-#include "../configuration/configuration.hpp"
-#include "../events/event_bus.hpp"
 #include "../models/performance/performance_profile.hpp"
-#include "../shell/shell.hpp"
-#include "../translator/translator.hpp"
+#include "../utils/configuration/configuration.hpp"
+#include "../utils/events/event_bus.hpp"
+#include "../utils/shell/shell.hpp"
+#include "../utils/translator/translator.hpp"
 
 class PerformanceService : public Singleton<PerformanceService>, Loggable {
   public:

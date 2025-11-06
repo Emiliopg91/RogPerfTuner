@@ -7,8 +7,6 @@
 #include <QSystemTrayIcon>
 #include <optional>
 
-#include "../configuration/configuration.hpp"
-#include "../events/event_bus.hpp"
 #include "../models/hardware/battery_charge_threshold.hpp"
 #include "../models/hardware/rgb_brightness.hpp"
 #include "../models/performance/performance_profile.hpp"
@@ -16,7 +14,9 @@
 #include "../services/hardware_service.hpp"
 #include "../services/open_rgb_service.hpp"
 #include "../services/performance_service.hpp"
-#include "../translator/translator.hpp"
+#include "../utils/configuration/configuration.hpp"
+#include "../utils/events/event_bus.hpp"
+#include "../utils/translator/translator.hpp"
 
 class TrayIcon : public QObject, public Singleton<TrayIcon> {
 	Q_OBJECT

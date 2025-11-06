@@ -3,7 +3,7 @@
 #include <string>
 
 #include "../../../models/others/loggable.hpp"
-#include "../../../shell/shell.hpp"
+#include "../../../utils/shell/shell.hpp"
 
 class AbstractCmdClient : public Loggable {
   protected:

@@ -1,10 +1,10 @@
 #pragma once
 
-#include "../events/event_bus.hpp"
 #include "../services/hardware_service.hpp"
 #include "../services/open_rgb_service.hpp"
 #include "../services/performance_service.hpp"
 #include "../services/steam_service.hpp"
+#include "../utils/events/event_bus.hpp"
 
 class SocketServer : public Singleton<SocketServer>, Loggable {
   private:
