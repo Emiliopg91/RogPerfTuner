@@ -5,6 +5,7 @@
 #include "../clients/dbus/asus/core/platform_client.hpp"
 #include "../clients/dbus/linux/power_management_kb_brightness.hpp"
 #include "../clients/dbus/linux/upower_client.hpp"
+#include "../clients/file/battery_charge_limit_client.hpp"
 #include "../clients/file/boost_control_client.hpp"
 #include "../clients/file/cpuinfo_client.hpp"
 #include "../clients/file/firmware/asus-armoury/intel/pl1_spd_client.hpp"
@@ -46,6 +47,8 @@ class HardwareService : public Singleton<HardwareService>, Loggable {
 	 * @return The current boot sound availability.
 	 */
 	bool getBootSoundAvailable();
+
+	bool getBatteryLimitAvailable();
 
 	/**
 	 * @brief Gets the current boot sound status.
@@ -93,25 +96,26 @@ class HardwareService : public Singleton<HardwareService>, Loggable {
 
 	std::mutex actionMutex;
 
-	EventBus& eventBus								 = EventBus::getInstance();
-	Toaster& toaster								 = Toaster::getInstance();
-	OpenRgbService& openRgbService					 = OpenRgbService::getInstance();
-	Translator& translator							 = Translator::getInstance();
-	PlatformClient& platformClient					 = PlatformClient::getInstance();
-	BootSoundClient& bootSoundClient				 = BootSoundClient::getInstance();
-	Pl1SpdClient& pl1SpdClient						 = Pl1SpdClient::getInstance();
-	Pl2SpptClient& pl2SpptClient					 = Pl2SpptClient::getInstance();
-	Pl3FpptClient& pl3FpptClient					 = Pl3FpptClient::getInstance();
-	NvBoostClient& nvBoostClient					 = NvBoostClient::getInstance();
-	NvTempClient& nvTempClient						 = NvTempClient::getInstance();
-	UPowerClient& uPowerClient						 = UPowerClient::getInstance();
-	CPUInfoClient& cpuInfoClient					 = CPUInfoClient::getInstance();
-	BoostControlClient& boostControlClient			 = BoostControlClient::getInstance();
-	SwitcherooCtlClient& switcherooCtlClient		 = SwitcherooCtlClient::getInstance();
-	PanelOverdriveClient& panelOverdriveClient		 = PanelOverdriveClient::getInstance();
-	PMKeyboardBrightness& pmKeyboardBrightnessClient = PMKeyboardBrightness::getInstance();
-	LsUsbClient& udevClient							 = LsUsbClient::getInstance();
-	Configuration& configuration					 = Configuration::getInstance();
+	EventBus& eventBus								   = EventBus::getInstance();
+	Toaster& toaster								   = Toaster::getInstance();
+	OpenRgbService& openRgbService					   = OpenRgbService::getInstance();
+	Translator& translator							   = Translator::getInstance();
+	BatteryChargeLimitClient& batteryChargeLimitClient = BatteryChargeLimitClient::getInstance();
+	PlatformClient& platformClient					   = PlatformClient::getInstance();
+	BootSoundClient& bootSoundClient				   = BootSoundClient::getInstance();
+	Pl1SpdClient& pl1SpdClient						   = Pl1SpdClient::getInstance();
+	Pl2SpptClient& pl2SpptClient					   = Pl2SpptClient::getInstance();
+	Pl3FpptClient& pl3FpptClient					   = Pl3FpptClient::getInstance();
+	NvBoostClient& nvBoostClient					   = NvBoostClient::getInstance();
+	NvTempClient& nvTempClient						   = NvTempClient::getInstance();
+	UPowerClient& uPowerClient						   = UPowerClient::getInstance();
+	CPUInfoClient& cpuInfoClient					   = CPUInfoClient::getInstance();
+	BoostControlClient& boostControlClient			   = BoostControlClient::getInstance();
+	SwitcherooCtlClient& switcherooCtlClient		   = SwitcherooCtlClient::getInstance();
+	PanelOverdriveClient& panelOverdriveClient		   = PanelOverdriveClient::getInstance();
+	PMKeyboardBrightness& pmKeyboardBrightnessClient   = PMKeyboardBrightness::getInstance();
+	LsUsbClient& udevClient							   = LsUsbClient::getInstance();
+	Configuration& configuration					   = Configuration::getInstance();
 
 	std::unordered_map<std::string, std::string> gpus;
 	std::vector<UsbIdentifier> connectedDevices;

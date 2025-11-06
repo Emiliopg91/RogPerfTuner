@@ -173,52 +173,65 @@ TrayIcon::TrayIcon() : QObject(&MainWindow::getInstance()), tray_icon_(new QSyst
 	// -------------------------
 	// Hardware menu
 	// -------------------------
-	QAction* hardwareTitle = new QAction(translator.translate("hardware").c_str(), menu);
-	hardwareTitle->setEnabled(false);
-	menu->addAction(hardwareTitle);
-	// -------------------------
-	// BatteryThreshold submenu
-	// -------------------------
-	QMenu* chargeLimitMenu	  = new QMenu(("    " + translator.translate("charge.threshold")).c_str(), menu);
-	QActionGroup* chargeGroup = new QActionGroup(menu);
-	for (BatteryThreshold bct : BatteryThreshold::getAll()) {
-		QAction* act = new QAction((std::to_string(bct.toInt()) + "%").c_str(), chargeGroup);
-		act->setCheckable(true);
-		act->setChecked(bct == hardwareService.getChargeThreshold());
-		QObject::connect(act, &QAction::triggered, [this, bct]() {
-			onBatteryLimitChanged(bct);
-		});
-		chargeLimitMenu->addAction(act);
-		thresholdActions[bct.toName()] = act;
-	}
-	menu->insertMenu(nullptr, chargeLimitMenu);
-	// -------------------------
-	// BatteryThreshold submenu
-	// -------------------------
-	// -------------------------
-	// Boot sound submenu
-	// -------------------------
-	if (hardwareService.getBootSoundAvailable()) {
-		QMenu* bootSoundMenu		 = new QMenu(("    " + translator.translate("boot.sound")).c_str(), menu);
-		QActionGroup* bootSoundGroup = new QActionGroup(menu);
 
-		const std::array<bool, 2> vals = {true, false};
-		for (auto v : vals) {
-			QAction* bsAct = new QAction(translator.translate(v ? "enabled" : "disabled").c_str(), bootSoundGroup);
-			bsAct->setCheckable(true);
-			bsAct->setChecked(v == hardwareService.getBootSound());
-			QObject::connect(bsAct, &QAction::triggered, [this, v]() {
-				onBootSoundChanged(v);
+	if (hardwareService.getBatteryLimitAvailable() || hardwareService.getBootSoundAvailable()) {
+		QAction* hardwareTitle = new QAction(translator.translate("hardware").c_str(), menu);
+		hardwareTitle->setEnabled(false);
+		menu->addAction(hardwareTitle);
+		// -------------------------
+		// BatteryThreshold submenu
+		// -------------------------
+		if (hardwareService.getBatteryLimitAvailable()) {
+			QMenu* chargeLimitMenu	  = new QMenu(("    " + translator.translate("charge.threshold")).c_str(), menu);
+			QActionGroup* chargeGroup = new QActionGroup(menu);
+			for (BatteryThreshold bct : BatteryThreshold::getAll()) {
+				QAction* act = new QAction((std::to_string(bct.toInt()) + "%").c_str(), chargeGroup);
+				act->setCheckable(true);
+				act->setChecked(bct == hardwareService.getChargeThreshold());
+				QObject::connect(act, &QAction::triggered, [this, bct]() {
+					onBatteryLimitChanged(bct);
+				});
+				chargeLimitMenu->addAction(act);
+				thresholdActions[bct.toName()] = act;
+			}
+			menu->insertMenu(nullptr, chargeLimitMenu);
+
+			eventBus.onChargeThreshold([this](BatteryThreshold threshold) {
+				setBatteryThreshold(threshold);
 			});
-			bootSoundMenu->addAction(bsAct);
-			bootSoundActions[v] = bsAct;
 		}
+		// -------------------------
+		// BatteryThreshold submenu
+		// -------------------------
+		// -------------------------
+		// Boot sound submenu
+		// -------------------------
+		if (hardwareService.getBootSoundAvailable()) {
+			QMenu* bootSoundMenu		 = new QMenu(("    " + translator.translate("boot.sound")).c_str(), menu);
+			QActionGroup* bootSoundGroup = new QActionGroup(menu);
 
-		menu->insertMenu(nullptr, bootSoundMenu);
+			const std::array<bool, 2> vals = {true, false};
+			for (auto v : vals) {
+				QAction* bsAct = new QAction(translator.translate(v ? "enabled" : "disabled").c_str(), bootSoundGroup);
+				bsAct->setCheckable(true);
+				bsAct->setChecked(v == hardwareService.getBootSound());
+				QObject::connect(bsAct, &QAction::triggered, [this, v]() {
+					onBootSoundChanged(v);
+				});
+				bootSoundMenu->addAction(bsAct);
+				bootSoundActions[v] = bsAct;
+			}
+
+			menu->insertMenu(nullptr, bootSoundMenu);
+
+			eventBus.onBootSound([this](bool value) {
+				setBootSound(value);
+			});
+		}
+		// -------------------------
+		// Boot sound submenu
+		// -------------------------
 	}
-	// -------------------------
-	// Boot sound submenu
-	// -------------------------
 	// -------------------------
 	// Hardware menu
 	// -------------------------
@@ -248,6 +261,10 @@ TrayIcon::TrayIcon() : QObject(&MainWindow::getInstance()), tray_icon_(new QSyst
 		effectActions[item] = act;
 	}
 	menu->insertMenu(nullptr, effectMenu);
+
+	eventBus.onRgbEffect([this](std::string effect) {
+		setAuraEffect(effect);
+	});
 	// -------------------------
 	// Effect submenu
 	// -------------------------
@@ -268,6 +285,10 @@ TrayIcon::TrayIcon() : QObject(&MainWindow::getInstance()), tray_icon_(new QSyst
 		brightnessActions[item.toName()] = act;
 	}
 	menu->insertMenu(nullptr, brightnessMenu);
+
+	eventBus.onRgbBrightness([this](RgbBrightness brightness) {
+		setAuraBrightness(brightness);
+	});
 	// -------------------------
 	// Brightness submenu
 	// -------------------------
@@ -293,6 +314,10 @@ TrayIcon::TrayIcon() : QObject(&MainWindow::getInstance()), tray_icon_(new QSyst
 	colorMenu->addAction(pickColorAction);
 
 	menu->insertMenu(nullptr, colorMenu);
+
+	eventBus.onRgbColor([this](std::optional<std::string> color) {
+		setAuraColor(color);
+	});
 	// -------------------------
 	// Color submenu
 	// -------------------------
@@ -328,6 +353,10 @@ TrayIcon::TrayIcon() : QObject(&MainWindow::getInstance()), tray_icon_(new QSyst
 
 	profileMenu->setEnabled(runningGames == 0 && !onBattery);
 	menu->insertMenu(nullptr, profileMenu);
+
+	eventBus.onPerformanceProfile([this](PerformanceProfile profile) {
+		setPerformanceProfile(profile);
+	});
 	// -------------------------
 	// Profile submenu
 	// -------------------------
@@ -363,6 +392,10 @@ TrayIcon::TrayIcon() : QObject(&MainWindow::getInstance()), tray_icon_(new QSyst
 			schedulerActions[item] = act;
 		}
 		menu->insertMenu(nullptr, schedulerMenu);
+
+		eventBus.onScheduler([this](std::optional<std::string> scheduler) {
+			setScheduler(scheduler);
+		});
 	}
 	// -------------------------
 	// Scheduler submenu
@@ -492,34 +525,6 @@ TrayIcon::TrayIcon() : QObject(&MainWindow::getInstance()), tray_icon_(new QSyst
 		if (reason == QSystemTrayIcon::Trigger) {
 			openMainWindow();
 		}
-	});
-
-	eventBus.onRgbBrightness([this](RgbBrightness brightness) {
-		setAuraBrightness(brightness);
-	});
-
-	eventBus.onRgbEffect([this](std::string effect) {
-		setAuraEffect(effect);
-	});
-
-	eventBus.onRgbColor([this](std::optional<std::string> color) {
-		setAuraColor(color);
-	});
-
-	eventBus.onChargeThreshold([this](BatteryThreshold threshold) {
-		setBatteryThreshold(threshold);
-	});
-
-	eventBus.onBootSound([this](bool value) {
-		setBootSound(value);
-	});
-
-	eventBus.onPerformanceProfile([this](PerformanceProfile profile) {
-		setPerformanceProfile(profile);
-	});
-
-	eventBus.onScheduler([this](std::optional<std::string> scheduler) {
-		setScheduler(scheduler);
 	});
 
 	eventBus.onGameEvent([this](size_t runningGames) {

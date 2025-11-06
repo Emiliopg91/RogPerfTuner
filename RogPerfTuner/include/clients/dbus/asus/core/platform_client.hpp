@@ -1,33 +1,11 @@
 #pragma once
 
-#include "../../../../models/hardware/battery_charge_threshold.hpp"
 #include "../../../../models/others/singleton.hpp"
 #include "../../../../models/performance/platform_profile.hpp"
 #include "../asus_base_client.hpp"
 
 class PlatformClient : public AsusBaseClient, public Singleton<PlatformClient> {
   public:
-	/**
-	 * @brief Retrieves the current battery charge threshold limit.
-	 *
-	 * This function returns the configured battery threshold, which determines
-	 * the maximum charge level for the battery. This can be used to extend
-	 * battery lifespan by preventing full charge cycles.
-	 *
-	 * @return BatteryThreshold The current battery charge limit setting.
-	 */
-	BatteryThreshold getBatteryLimit();
-
-	/**
-	 * @brief Sets the battery charge limit to the specified threshold.
-	 *
-	 * This function configures the maximum battery charge level, which can help
-	 * prolong battery lifespan by preventing it from charging to 100% all the time.
-	 *
-	 * @param val The desired battery threshold value to set.
-	 */
-	void setBatteryLimit(BatteryThreshold val);
-
 	/**
 	 * @brief Retrieves the current platform profile.
 	 *

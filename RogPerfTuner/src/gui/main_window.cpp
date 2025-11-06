@@ -69,6 +69,10 @@ MainWindow::MainWindow(QWidget* parent) : QMainWindow(parent), _logger(new Logge
 	setPerformanceProfile(performanceService.getPerformanceProfile());
 	_profileDropdown->setEnabled(runningGames == 0 && !onBattery);
 	performanceLayout->addRow(new QLabel(QString::fromStdString(translator.translate("profile") + ":")), _profileDropdown);
+
+	eventBus.onPerformanceProfile([this](PerformanceProfile profile) {
+		setPerformanceProfile(profile);
+	});
 	// -------------------------
 	// Profile menu
 	// -------------------------
@@ -89,6 +93,10 @@ MainWindow::MainWindow(QWidget* parent) : QMainWindow(parent), _logger(new Logge
 		setScheduler(performanceService.getCurrentScheduler());
 		_schedulerDropdown->setEnabled(runningGames == 0);
 		performanceLayout->addRow(new QLabel(QString::fromStdString(translator.translate("scheduler") + ":")), _schedulerDropdown);
+
+		eventBus.onScheduler([this](std::optional<std::string> sched) {
+			setScheduler(sched);
+		});
 	}
 	// -------------------------
 	// Scheduler menu
@@ -143,6 +151,10 @@ MainWindow::MainWindow(QWidget* parent) : QMainWindow(parent), _logger(new Logge
 	_effectDropdown->setCurrentIndex(std::distance(effects.begin(), it));
 	connect(_effectDropdown, QOverload<int>::of(&QComboBox::currentIndexChanged), this, &MainWindow::onEffectChange);
 	auraLayout->addRow(new QLabel(QString::fromStdString(translator.translate("effect") + ":")), _effectDropdown);
+
+	eventBus.onRgbEffect([this](std::string effect) {
+		setAuraEffect(effect);
+	});
 	// -------------------------
 	// Effect menu
 	// -------------------------
@@ -174,6 +186,14 @@ MainWindow::MainWindow(QWidget* parent) : QMainWindow(parent), _logger(new Logge
 
 	auraGroup->setLayout(auraLayout);
 	mainLayout->addWidget(auraGroup);
+
+	eventBus.onRgbBrightness([this](RgbBrightness brightness) {
+		setAuraBrightness(brightness);
+	});
+
+	eventBus.onRgbColor([this](std::optional<std::string> color) {
+		setAuraColor(color);
+	});
 	// -------------------------
 	// Brightness + Color menu
 	// -------------------------
@@ -184,45 +204,57 @@ MainWindow::MainWindow(QWidget* parent) : QMainWindow(parent), _logger(new Logge
 	// -------------------------
 	// Hardware group
 	// -------------------------
-	QGroupBox* hardwareGroup	= new QGroupBox(QString::fromStdString(translator.translate("hardware")));
-	QFormLayout* hardwareLayout = new QFormLayout();
-	hardwareLayout->setContentsMargins(20, 10, 20, 10);
-	// -------------------------
-	// Battery menu
-	// -------------------------
-	_thresholdDropdown = new QComboBox();
-	_thresholdDropdown->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Preferred);
-	auto thresholds = BatteryThreshold::getAll();
-	for (BatteryThreshold t : thresholds) {
-		_thresholdDropdown->addItem("  " + QString::number(t.toInt()) + "%", t.toInt());
-	}
-	connect(_thresholdDropdown, QOverload<int>::of(&QComboBox::currentIndexChanged), this, &MainWindow::onBatteryLimitChanged);
-	setBatteryChargeLimit(hardwareService.getChargeThreshold());
-	hardwareLayout->addRow(new QLabel(QString::fromStdString(translator.translate("charge.threshold") + ":")), _thresholdDropdown);
-	// -------------------------
-	// Battery menu
-	// -------------------------
-	// -------------------------
-	// Boot sound menu
-	// -------------------------
-	if (hardwareService.getBootSoundAvailable()) {
-		_bootSoundDropdown = new QComboBox();
-		_bootSoundDropdown->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Preferred);
+	if (hardwareService.getBatteryLimitAvailable() || hardwareService.getBootSoundAvailable()) {
+		QGroupBox* hardwareGroup	= new QGroupBox(QString::fromStdString(translator.translate("hardware")));
+		QFormLayout* hardwareLayout = new QFormLayout();
+		hardwareLayout->setContentsMargins(20, 10, 20, 10);
+		// -------------------------
+		// Battery menu
+		// -------------------------
+		if (hardwareService.getBatteryLimitAvailable()) {
+			_thresholdDropdown = new QComboBox();
+			_thresholdDropdown->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Preferred);
+			auto thresholds = BatteryThreshold::getAll();
+			for (BatteryThreshold t : thresholds) {
+				_thresholdDropdown->addItem("  " + QString::number(t.toInt()) + "%", t.toInt());
+			}
+			connect(_thresholdDropdown, QOverload<int>::of(&QComboBox::currentIndexChanged), this, &MainWindow::onBatteryLimitChanged);
+			setBatteryChargeLimit(hardwareService.getChargeThreshold());
+			hardwareLayout->addRow(new QLabel(QString::fromStdString(translator.translate("charge.threshold") + ":")), _thresholdDropdown);
 
-		auto vals = std::array<bool, 2>{true, false};
-		for (size_t i = 0; i < vals.size(); i++) {
-			_bootSoundDropdown->addItem(("  " + translator.translate(vals[i] ? "enabled" : "disabled")).c_str(), vals[i]);
+			eventBus.onChargeThreshold([this](BatteryThreshold threshold) {
+				setBatteryChargeLimit(threshold);
+			});
 		}
-		onBootSoundEvent(hardwareService.getBootSound());
+		// -------------------------
+		// Battery menu
+		// -------------------------
+		// -------------------------
+		// Boot sound menu
+		// -------------------------
+		if (hardwareService.getBootSoundAvailable()) {
+			_bootSoundDropdown = new QComboBox();
+			_bootSoundDropdown->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Preferred);
 
-		connect(_bootSoundDropdown, QOverload<int>::of(&QComboBox::currentIndexChanged), this, &MainWindow::onBootSoundChanged);
-		hardwareLayout->addRow(new QLabel(QString::fromStdString(translator.translate("boot.sound"))), _bootSoundDropdown);
+			auto vals = std::array<bool, 2>{true, false};
+			for (size_t i = 0; i < vals.size(); i++) {
+				_bootSoundDropdown->addItem(("  " + translator.translate(vals[i] ? "enabled" : "disabled")).c_str(), vals[i]);
+			}
+			onBootSoundEvent(hardwareService.getBootSound());
+
+			connect(_bootSoundDropdown, QOverload<int>::of(&QComboBox::currentIndexChanged), this, &MainWindow::onBootSoundChanged);
+			hardwareLayout->addRow(new QLabel(QString::fromStdString(translator.translate("boot.sound"))), _bootSoundDropdown);
+
+			eventBus.onBootSound([this](bool value) {
+				onBootSoundEvent(value);
+			});
+		}
+		// -------------------------
+		// Boot sound menu
+		// -------------------------
+		hardwareGroup->setLayout(hardwareLayout);
+		mainLayout->addWidget(hardwareGroup);
 	}
-	// -------------------------
-	// Boot sound menu
-	// -------------------------
-	hardwareGroup->setLayout(hardwareLayout);
-	mainLayout->addWidget(hardwareGroup);
 	// -------------------------
 	// Hardware group
 	// -------------------------
@@ -273,42 +305,14 @@ MainWindow::MainWindow(QWidget* parent) : QMainWindow(parent), _logger(new Logge
 		move(x, y);
 	}
 
-	eventBus.onChargeThreshold([this](BatteryThreshold threshold) {
-		setBatteryChargeLimit(threshold);
-	});
-
-	eventBus.onRgbBrightness([this](RgbBrightness brightness) {
-		setAuraBrightness(brightness);
-	});
-
-	eventBus.onRgbColor([this](std::optional<std::string> color) {
-		setAuraColor(color);
-	});
-
-	eventBus.onRgbEffect([this](std::string effect) {
-		setAuraEffect(effect);
-	});
-
-	eventBus.onPerformanceProfile([this](PerformanceProfile profile) {
-		setPerformanceProfile(profile);
-	});
-
-	eventBus.onScheduler([this](std::optional<std::string> sched) {
-		setScheduler(sched);
-	});
-
-	eventBus.onGameEvent([this](size_t runningGames) {
-		this->runningGames = runningGames;
-		onGameEvent();
-	});
-
 	eventBus.onBattery([this](bool onBattery) {
 		this->onBattery = onBattery;
 		onBatteryEvent();
 	});
 
-	eventBus.onBootSound([this](bool value) {
-		onBootSoundEvent(value);
+	eventBus.onGameEvent([this](size_t runningGames) {
+		this->runningGames = runningGames;
+		onGameEvent();
 	});
 
 #ifdef AUR_HELPER

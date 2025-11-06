@@ -1,14 +1,6 @@
 
 #include "../../../../../include/clients/dbus/asus/core/platform_client.hpp"
 
-BatteryThreshold PlatformClient::getBatteryLimit() {
-	return BatteryThreshold::fromInt(this->getProperty<int>(QString("ChargeControlEndThreshold")));
-}
-
-void PlatformClient::setBatteryLimit(BatteryThreshold val) {
-	this->setProperty<unsigned char>(QString("ChargeControlEndThreshold"), static_cast<unsigned char>(val.toInt()));
-}
-
 PlatformProfile PlatformClient::getPlatformProfile() {
 	return PlatformProfile::fromInt(this->getProperty<int>(QString("PlatformProfile")));
 }

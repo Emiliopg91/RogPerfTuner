@@ -140,7 +140,7 @@ HardwareService::HardwareService() : Loggable("HardwareService") {
 		logger.info("Getting battery charge limit");
 		Logger::add_tab();
 		charge_limit = configuration.getConfiguration().platform.chargeLimit;
-		platformClient.setBatteryLimit(charge_limit);
+		batteryChargeLimitClient.setChargeLimit(charge_limit);
 		logger.info("{} %", charge_limit.toInt());
 		Logger::rem_tab();
 	}
@@ -218,7 +218,7 @@ void HardwareService::setChargeThreshold(const BatteryThreshold& threshold) {
 	if (charge_limit != threshold) {
 		logger.info("Setting charge limit to {}%", threshold.toInt());
 		auto t0 = TimeUtils::now();
-		platformClient.setBatteryLimit(threshold);
+		batteryChargeLimitClient.setChargeLimit(threshold);
 		auto t1 = TimeUtils::now();
 
 		charge_limit										  = threshold;
@@ -298,6 +298,10 @@ std::unordered_map<std::string, std::string> HardwareService::getGpus() {
 
 bool HardwareService::getBootSoundAvailable() {
 	return bootSoundClient.available();
+}
+
+bool HardwareService::getBatteryLimitAvailable() {
+	return batteryChargeLimitClient.available();
 }
 
 bool HardwareService::getBootSound() {

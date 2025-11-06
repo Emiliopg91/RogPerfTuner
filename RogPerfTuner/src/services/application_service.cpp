@@ -158,6 +158,7 @@ void ApplicationService::lookForUpdates() {
 				toaster.showToast(translator.translate("update.available", {{"version", version}}));
 				eventBus.emitUpdateAvailable(version);
 				found = true;
+				Logger::rem_tab();
 				break;
 			}
 		} catch (std::exception& e) {
