@@ -3,6 +3,7 @@
 #include <arpa/inet.h>
 #include <execinfo.h>
 #include <netinet/in.h>
+#include <signal.h>
 #include <sys/socket.h>
 #include <sys/un.h>
 
@@ -14,6 +15,8 @@
 #include "../../../../include/utils/time_utils.hpp"
 
 AbstractUnixSocketClient::AbstractUnixSocketClient(const std::string& path, const std::string& name) : Loggable(name), path(path), name(name) {
+	signal(SIGPIPE, SIG_IGN);
+
 	_running.store(true);
 	_connected.store(false);
 

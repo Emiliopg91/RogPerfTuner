@@ -159,7 +159,7 @@ HardwareService::HardwareService() : Loggable("HardwareService") {
 
 	if (pmKeyboardBrightnessClient.available()) {
 		pmKeyboardBrightnessClient.onBrightnessChange([this]() {
-			if (pmKeyboardBrightnessClient.getKeyboardBrightness() == 0) {
+			if (pmKeyboardBrightnessClient.getKeyboardBrightness() != 2) {
 				pmKeyboardBrightnessClient.setKeyboardBrightnessSilent(2);
 			}
 		});
