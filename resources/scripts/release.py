@@ -15,7 +15,7 @@ SRCINFO_FILE = os.path.abspath(
 CMAKE_FILE = os.path.abspath(os.path.dirname(__file__) + "/../../CMakeLists.txt")
 
 CHANGELOG_YAML_FILE = os.path.abspath(
-    os.path.join(os.path.dirname(__file__), "..", "changelog.yaml")
+    os.path.join(os.path.dirname(__file__), "..", "..", "changelog.yaml")
 )
 CHANGELOG_MD_FILE = os.path.abspath(
     os.path.join(os.path.dirname(__file__), "..", "..", "dist", "changelog.md")
