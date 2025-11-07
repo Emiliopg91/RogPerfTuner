@@ -1,3 +1,9 @@
+- version: 4.8.6-1
+  features:
+    - CLI help menu
+  fixes:
+    - Wait for update finished to reload application
+
 - version: 4.8.5-1
   improvements:
     - Ensure proper pipe lifecycle
