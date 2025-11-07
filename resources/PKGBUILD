@@ -35,6 +35,7 @@ depends=(
   'qt6-base'
   'qt6-charts'
   'qt6-svg'
+  'qtermwidget'
   'qtkeychain-qt6'
   'scx-scheds'
   'spdlog'

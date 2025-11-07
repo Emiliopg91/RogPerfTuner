@@ -26,17 +26,10 @@ Shell::Shell(const std::string& sudo_password) : Loggable("Shell") {
 	logger.info("Initializing terminal");
 	Logger::add_tab();
 	const std::unordered_map<std::string, std::vector<const char*>> terminals = {
-		{"alacritty", {"alacritty", "-e", nullptr}},
-		{"foot", {"foot", nullptr}},
-		{"ghostty", {"ghostty", "-e", nullptr}},
-		{"kgx", {"kgx", "--wait", "-e", nullptr}},
 		{"gnome-terminal", {"gnome-terminal", "--wait", "--", nullptr}},
-		{"kitty", {"kitty", "--hold=no", nullptr}},
-		{"konsole", {"konsole", "-e", nullptr}},  // cierre garantizado si el comando termina con "; exit"
-		{"lxterminal", {"lxterminal", "--command", nullptr}},
-		{"rio", {"rio", "-e", nullptr}},
-		{"st", {"st", nullptr}},
+		{"konsole", {"konsole", "--nofork", "-e", nullptr}},
 		{"xfce4-terminal", {"xfce4-terminal", "--disable-server", "--hold=no", "--command", nullptr}},
+		{"kitty", {"kitty", "--wait-for-child", "--hold=no", nullptr}},
 		{"xterm", {"xterm", "-e", nullptr}}};
 
 	terminalCfg = std::nullopt;
