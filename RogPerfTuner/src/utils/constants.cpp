@@ -85,4 +85,4 @@ const std::string Constants::FLATPAK_MANGOHUD_OVERRIDE = "--filesystem=xdg-confi
 
 const std::string Constants::LOGGER_PATTERN = "[%Y-%m-%d %H:%M:%S.%e][%-7l][%n] %v";
 
-const std::string Constants::CHANGELOG_URL = "https://github.com/Emiliopg91/RogPerfTuner/raw/refs/heads/main/resources/changelog.yaml";
+const std::string Constants::CHANGELOG_URL = "https://github.com/Emiliopg91/RogPerfTuner/raw/refs/heads/main/changelog.yaml";

@@ -32,3 +32,5 @@ perf.data.old
 compile_commands.json
 
 build-scan/
+
+*.pyc

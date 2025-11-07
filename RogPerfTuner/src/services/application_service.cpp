@@ -256,7 +256,7 @@ std::optional<std::string> ApplicationService::getChangeLog() {
 				sb << "\t\t</ul>\n";
 			}
 
-			if (!improvements.empty()) {
+			if (!fixes.empty()) {
 				sb << "\t\t<h2 style=\"margin-bottom: 0px;\">Bug fixes</h2>\n";
 				sb << "\t\t<ul style=\"margin-top: 5px;\">\n";
 				for (const auto& f : fixes) {
