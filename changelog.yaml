@@ -1,12 +1,9 @@
-- version: 4.8.6-2
-  fixes:
-    - Fix CMake error on OpenRGB-cppSDK when doxygen is installed
-
 - version: 4.8.6-1
   features:
     - CLI help menu
   fixes:
     - Wait for update finished to reload application
+    - Fix CMake error on OpenRGB-cppSDK when doxygen is installed
 
 - version: 4.8.5-1
   improvements:
