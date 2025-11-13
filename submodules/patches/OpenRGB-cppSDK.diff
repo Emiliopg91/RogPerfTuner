@@ -1,3 +1,25 @@
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+index f752b54..62d359c 100644
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -57,17 +57,6 @@ if(CMAKE_BUILD_TYPE MATCHES "Debug")
+ 	add_compile_definitions(DEBUG)
+ endif()
+ 
+-# generate documentation of Doxygen is present
+-find_package(Doxygen)
+-if(DOXYGEN_FOUND)
+-	configure_file(${CMAKE_SOURCE_DIR}/doc/Doxyfile ${CMAKE_BINARY_DIR}/doc/Doxyfile)
+-	add_custom_target(doc
+-		COMMAND ${DOXYGEN_EXECUTABLE} Doxyfile
+-		WORKING_DIRECTORY ${CMAKE_BINARY_DIR}/doc
+-		COMMENT "Generating API documentation with Doxygen"
+-	)
+-endif()
+-
+ # install the static library file to lib and copy the whole include directory
+ install(TARGETS orgbsdk DESTINATION lib)
+ install(DIRECTORY include DESTINATION include)
 diff --git a/include/OpenRGB/Client.hpp b/include/OpenRGB/Client.hpp
 index b70416d..70df01d 100644
 --- a/include/OpenRGB/Client.hpp
