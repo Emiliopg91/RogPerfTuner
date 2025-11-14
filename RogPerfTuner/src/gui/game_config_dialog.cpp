@@ -14,9 +14,8 @@
 GameConfigDialog::GameConfigDialog(unsigned int gid, bool runAfterSave, QWidget* parent)
 	: Loggable("GameConfigDialog"), QDialog(parent), gid(gid), runAfterSave(runAfterSave) {
 	Logger::add_tab();
-	setWindowTitle(QString::fromStdString(translator.translate("config.for.game", {{"game", ""}})));
-
 	gameEntry = configuration.getConfiguration().games[std::to_string(gid)];
+	setWindowTitle(gameEntry.name.c_str());
 
 	windowLayout = new QFormLayout();
 	windowLayout->setAlignment(Qt::AlignTop);
@@ -24,9 +23,14 @@ GameConfigDialog::GameConfigDialog(unsigned int gid, bool runAfterSave, QWidget*
 	QVBoxLayout* headerLayout = new QVBoxLayout();
 	headerLayout->setAlignment(Qt::AlignCenter);
 
-	auto iconPath = steamService.getBanner(gid);
+	auto iconPath = steamService.getIcon(gid);
 	if (iconPath.has_value()) {
-		QPixmap gameIcon(QString::fromStdString(*iconPath));
+		setWindowIcon(QIcon(iconPath.value().c_str()));
+	}
+
+	auto bannerPath = steamService.getBanner(gid);
+	if (bannerPath.has_value()) {
+		QPixmap gameIcon(QString::fromStdString(*bannerPath));
 		int targetSize	   = 300;
 		QPixmap scaledIcon = gameIcon.scaled(targetSize, targetSize, Qt::KeepAspectRatio, Qt::SmoothTransformation);
 
@@ -36,22 +40,16 @@ GameConfigDialog::GameConfigDialog(unsigned int gid, bool runAfterSave, QWidget*
 
 		headerLayout->addWidget(imageLabel);
 	}
-
-	QLabel* titleLabel = new QLabel(QString::fromStdString(gameEntry.name));
-	QFont titleFont	   = titleLabel->font();
-	titleFont.setPointSize(titleFont.pointSize() + 2);
-	titleFont.setBold(true);
-	titleLabel->setFont(titleFont);
-	titleLabel->setAlignment(Qt::AlignCenter);
-
-	headerLayout->addWidget(titleLabel);
-
 	windowLayout->addRow(headerLayout);
-
 	group  = new QGroupBox();
 	layout = new QFormLayout();
 
 	int index, i;
+
+	// --- PERFORMANCE ---
+	QGroupBox* performanceGroup	   = new QGroupBox(QString::fromStdString(translator.translate("performance")));
+	QFormLayout* performanceLayout = new QFormLayout();
+	performanceLayout->setContentsMargins(20, 10, 20, 10);
 
 	// --- GPU ---
 	gpuCombo = new NoScrollComboBox();
@@ -70,7 +68,8 @@ GameConfigDialog::GameConfigDialog(unsigned int gid, bool runAfterSave, QWidget*
 		i++;
 	}
 	gpuCombo->setCurrentIndex(index);
-	layout->addRow(new QLabel(QString::fromStdString(translator.translate("used.gpu") + ":")), gpuCombo);
+	performanceLayout->addRow(new QLabel(QString::fromStdString(translator.translate("used.gpu") + ":")), gpuCombo);
+	// --- GPU ---
 
 	// --- Scheduler ---
 	schedulerCombo = new NoScrollComboBox();
@@ -90,7 +89,8 @@ GameConfigDialog::GameConfigDialog(unsigned int gid, bool runAfterSave, QWidget*
 	}
 	schedulerCombo->setCurrentIndex(index);
 	schedulerCombo->setEnabled(!performanceService.getAvailableSchedulers().empty());
-	layout->addRow(new QLabel(QString::fromStdString(translator.translate("scheduler") + ":")), schedulerCombo);
+	performanceLayout->addRow(new QLabel(QString::fromStdString(translator.translate("scheduler") + ":")), schedulerCombo);
+	// --- Scheduler ---
 
 	// --- Metrics ---
 	metricsCombo = new NoScrollComboBox();
@@ -106,10 +106,20 @@ GameConfigDialog::GameConfigDialog(unsigned int gid, bool runAfterSave, QWidget*
 		i++;
 	}
 	metricsCombo->setEnabled(steamService.metricsEnabled());
-	layout->addRow(new QLabel(QString::fromStdString(translator.translate("metrics") + ":")), metricsCombo);
+	performanceLayout->addRow(new QLabel(QString::fromStdString(translator.translate("metrics") + ":")), metricsCombo);
+	// --- Metrics ---
 
+	performanceGroup->setLayout(performanceLayout);
+	windowLayout->addWidget(performanceGroup);
+	// --- PERFORMANCE ---
+
+	// --- PROTON ---
 	if (gameEntry.proton) {
-		// --- Mode ---
+		QGroupBox* protonGroup	  = new QGroupBox("Proton");
+		QFormLayout* protonLayout = new QFormLayout();
+		protonLayout->setContentsMargins(20, 10, 20, 10);
+
+		// --- Device ---
 		i		  = 0;
 		modeCombo = new NoScrollComboBox();
 		modeCombo->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Preferred);
@@ -123,12 +133,11 @@ GameConfigDialog::GameConfigDialog(unsigned int gid, bool runAfterSave, QWidget*
 
 			i++;
 		}
-		layout->addRow(new QLabel(QString::fromStdString(translator.translate("used.device") + ":")), modeCombo);
+		protonLayout->addRow(new QLabel(QString::fromStdString(translator.translate("used.device") + ":")), modeCombo);
+		// --- Device ---
 
 		// --- Wine Sync ---
-
-		i = 0;
-
+		i			  = 0;
 		wineSyncCombo = new NoScrollComboBox();
 		wineSyncCombo->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Preferred);
 		auto items3 = WineSyncOption::getAll();
@@ -141,29 +150,44 @@ GameConfigDialog::GameConfigDialog(unsigned int gid, bool runAfterSave, QWidget*
 
 			i++;
 		}
-		layout->addRow(new QLabel(QString::fromStdString(translator.translate("winesync") + ":")), wineSyncCombo);
+		protonLayout->addRow(new QLabel(QString::fromStdString(translator.translate("winesync") + ":")), wineSyncCombo);
+		// --- Wine Sync ---
+
+		protonGroup->setLayout(protonLayout);
+		windowLayout->addWidget(protonGroup);
 	}
+	// --- PROTON ---
+
+	// --- Execution ---
+	QGroupBox* executionGroup	 = new QGroupBox(translator.translate("execution").c_str());
+	QFormLayout* executionLayout = new QFormLayout();
+	executionLayout->setContentsMargins(20, 10, 20, 10);
 
 	// --- Environment ---
 	envInput = new QLineEdit(QString::fromStdString(gameEntry.env.value_or("")));
-	layout->addRow(new QLabel(QString::fromStdString(translator.translate("environment") + ":")), envInput);
+	executionLayout->addRow(new QLabel(QString::fromStdString(translator.translate("environment") + ":")), envInput);
+	// --- Environment ---
 
 	// --- Wrappers ---
 	wrappersInput = new QLineEdit(QString::fromStdString(gameEntry.wrappers.value_or("")));
-	layout->addRow(new QLabel(QString::fromStdString(translator.translate("wrappers") + ":")), wrappersInput);
+	executionLayout->addRow(new QLabel(QString::fromStdString(translator.translate("wrappers") + ":")), wrappersInput);
+	// --- Wrappers ---
 
 	// --- Parameters ---
 	paramsInput = new QLineEdit(QString::fromStdString(gameEntry.args.value_or("")));
-	layout->addRow(new QLabel(QString::fromStdString(translator.translate("params") + ":")), paramsInput);
+	executionLayout->addRow(new QLabel(QString::fromStdString(translator.translate("params") + ":")), paramsInput);
+	// --- Parameters ---
+
+	executionGroup->setLayout(executionLayout);
+	windowLayout->addWidget(executionGroup);
+	// --- EXECUTION ---
 
 	// --- Save button ---
 	save_button_ = new QPushButton(QString::fromStdString(translator.translate(runAfterSave ? "save.and.run" : "save")));
 	save_button_->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
-	layout->addRow(save_button_);
+	windowLayout->addRow(save_button_);
 	connect(save_button_, &QPushButton::clicked, this, &GameConfigDialog::onAccept);
 
-	group->setLayout(layout);
-	windowLayout->addWidget(group);
 	setLayout(windowLayout);
 
 	adjustSize();

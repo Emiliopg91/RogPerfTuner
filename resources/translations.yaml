@@ -394,3 +394,7 @@ no.changelog.available:
   en: No changelog available
   es: No hay registro de cambios disponible
   de: Kein Änderungsprotokoll verfügbar
+execution:
+  en: Execution
+  es: Ejecución
+  de: Ausführung
