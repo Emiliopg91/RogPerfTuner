@@ -5,25 +5,25 @@
 #include "../base/str_enum.hpp"
 
 struct ComputerTypeMeta {
-	enum class Enum { COMPUTER, STEAM_DECK, STEAM_MACHINE } e;
+	enum class Enum { COMPUTER, STEAM_DECK, /*STEAM_MACHINE*/ } e;
 	const char* name;
 	const char* val;
 };
 
-class ComputerType : public StrEnum<ComputerType, ComputerTypeMeta::Enum, 3> {
+class ComputerType : public StrEnum<ComputerType, ComputerTypeMeta::Enum, 2> {
   public:
 	using Enum = ComputerTypeMeta::Enum;
-	using Base = StrEnum<ComputerType, Enum, 3>;
+	using Base = StrEnum<ComputerType, Enum, 2>;
 	using Base::Base;
 
 	int getPresetIndex();
 
   private:
-	static constexpr std::array<ComputerTypeMeta, 3> table{{{Enum::COMPUTER, "COMPUTER", "computer"},
+	static constexpr std::array<ComputerTypeMeta, 2> table{{{Enum::COMPUTER, "COMPUTER", "computer"},
 															{Enum::STEAM_DECK, "STEAM_DECK", "steam_deck"},
-															{Enum::STEAM_MACHINE, "STEAM_MACHINE", "steam_machine"}}};
+															/*{Enum::STEAM_MACHINE, "STEAM_MACHINE", "steam_machine"}*/}};
 
-	static constexpr const std::array<ComputerTypeMeta, 3>& metaTable() {
+	static constexpr const std::array<ComputerTypeMeta, 2>& metaTable() {
 		return table;
 	}
 
