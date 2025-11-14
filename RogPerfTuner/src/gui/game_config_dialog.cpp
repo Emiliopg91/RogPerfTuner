@@ -211,8 +211,10 @@ void GameConfigDialog::onAccept() {
 	}
 
 	WineSyncOption sync = WineSyncOption::Enum::AUTO;
+	ComputerType device = ComputerType::Enum::COMPUTER;
 	if (gameEntry.proton) {
-		sync = WineSyncOption::fromString(wineSyncCombo->currentData().toString().toStdString());
+		device = ComputerType::fromString(modeCombo->currentData().toString().toStdString());
+		sync   = WineSyncOption::fromString(wineSyncCombo->currentData().toString().toStdString());
 	}
 
 	gameEntry.args			= paramsInput->text().toStdString();
@@ -221,7 +223,7 @@ void GameConfigDialog::onAccept() {
 	gameEntry.scheduler		= scheduler;
 	gameEntry.gpu			= gpu;
 	gameEntry.metrics_level = level.toString();
-	gameEntry.device		= ComputerType::fromString(modeCombo->currentData().toString().toStdString());
+	gameEntry.device		= device.toString();
 	gameEntry.sync			= sync.toString();
 
 	steamService.saveGameConfig(gid, gameEntry);
