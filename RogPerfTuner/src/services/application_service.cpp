@@ -187,11 +187,6 @@ void ApplicationService::applyUpdate() {
 	aurHelperClient.install(Constants::EXEC_NAME);
 	Logger::rem_tab();
 
-	logger.info("Relaunching application...");
-	const auto abs_path = *shell.which(Constants::EXEC_NAME);
-	shell.launch_process(abs_path.c_str(), (char* const[]){(char*)abs_path.c_str(), NULL}, environ);
-	Logger::rem_tab();
-
 	Logger::rem_tab();
 }
 #endif

@@ -220,7 +220,7 @@ std::vector<std::string> Shell::copyEnviron() {
 	return envCopy;
 }
 
-pid_t Shell::launch_process(const char* command, char* const argv[], char* const env[], std::optional<std::string> outFile, bool detached) {
+pid_t Shell::launch_process(const char* command, char* const argv[], char* const env[], std::optional<std::string> outFile) {
 	std::string cmd_str = command;
 	cmd_str += " ";
 
@@ -248,9 +248,7 @@ pid_t Shell::launch_process(const char* command, char* const argv[], char* const
 			}
 			close(fd);
 		}
-		if (!detached) {
-			prctl(PR_SET_PDEATHSIG, SIGTERM);
-		}
+		prctl(PR_SET_PDEATHSIG, SIGTERM);
 		execve(command, argv, env);
 		logger.error("Error on process launch: {}", std::strerror(errno));
 		_exit(1);

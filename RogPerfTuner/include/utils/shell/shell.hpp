@@ -49,8 +49,7 @@ class Shell : public Singleton<Shell>, Loggable {
 	 * @param outFile
 	 * @return pid_t
 	 */
-	pid_t launch_process(const char* command, char* const argv[], char* const env[], std::optional<std::string> outFile = std::nullopt,
-						 bool detached = true);
+	pid_t launch_process(const char* command, char* const argv[], char* const env[], std::optional<std::string> outFile = std::nullopt);
 
 	/**
 	 * @brief Launch command in terminal.
