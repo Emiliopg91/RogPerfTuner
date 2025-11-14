@@ -9,7 +9,6 @@
 #include <optional>
 
 #include "../../include/gui/yes_no_dialog.hpp"
-#include "../../include/utils/file_utils.hpp"
 #include "../../include/utils/string_utils.hpp"
 
 GameConfigDialog::GameConfigDialog(unsigned int gid, bool runAfterSave, QWidget* parent)
@@ -109,33 +108,41 @@ GameConfigDialog::GameConfigDialog(unsigned int gid, bool runAfterSave, QWidget*
 	metricsCombo->setEnabled(steamService.metricsEnabled());
 	layout->addRow(new QLabel(QString::fromStdString(translator.translate("metrics") + ":")), metricsCombo);
 
-	// --- Mode ---
-	modeCombo = new NoScrollComboBox();
-	modeCombo->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Preferred);
-	modeCombo->addItem(QString::fromStdString(translator.translate("label.steamdeck.no")), false);
-	modeCombo->addItem(QString::fromStdString(translator.translate("label.steamdeck.yes")), true);
-	modeCombo->setCurrentIndex(gameEntry.steamdeck ? 1 : 0);
-	modeCombo->setEnabled(gameEntry.proton);
-	layout->addRow(new QLabel(QString::fromStdString(translator.translate("used.steamdeck") + ":")), modeCombo);
-
-	// --- Wine Sync ---
-
-	i = 0;
-
-	wineSyncCombo = new NoScrollComboBox();
-	wineSyncCombo->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Preferred);
-	auto items2 = WineSyncOption::getAll();
-	for (WineSyncOption opt : items2) {
-		wineSyncCombo->addItem(QString::fromStdString(translator.translate("label.winesync." + opt.toString())),
+	if (gameEntry.proton) {
+		// --- Mode ---
+		i		  = 0;
+		modeCombo = new NoScrollComboBox();
+		modeCombo->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Preferred);
+		auto items2 = ComputerType::getAll();
+		for (ComputerType opt : items2) {
+			modeCombo->addItem(QString::fromStdString(translator.translate("label.device." + opt.toString())),
 							   QString::fromStdString(opt.toString()));
-		if (opt == gameEntry.sync) {
-			wineSyncCombo->setCurrentIndex(i);
-		}
+			if (opt == gameEntry.device) {
+				modeCombo->setCurrentIndex(i);
+			}
 
-		i++;
+			i++;
+		}
+		layout->addRow(new QLabel(QString::fromStdString(translator.translate("used.device") + ":")), modeCombo);
+
+		// --- Wine Sync ---
+
+		i = 0;
+
+		wineSyncCombo = new NoScrollComboBox();
+		wineSyncCombo->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Preferred);
+		auto items3 = WineSyncOption::getAll();
+		for (WineSyncOption opt : items3) {
+			wineSyncCombo->addItem(QString::fromStdString(translator.translate("label.winesync." + opt.toString())),
+								   QString::fromStdString(opt.toString()));
+			if (opt == gameEntry.sync) {
+				wineSyncCombo->setCurrentIndex(i);
+			}
+
+			i++;
+		}
+		layout->addRow(new QLabel(QString::fromStdString(translator.translate("winesync") + ":")), wineSyncCombo);
 	}
-	wineSyncCombo->setEnabled(gameEntry.proton);
-	layout->addRow(new QLabel(QString::fromStdString(translator.translate("winesync") + ":")), wineSyncCombo);
 
 	// --- Environment ---
 	envInput = new QLineEdit(QString::fromStdString(gameEntry.env.value_or("")));
@@ -190,7 +197,7 @@ void GameConfigDialog::onAccept() {
 	gameEntry.scheduler		= scheduler;
 	gameEntry.gpu			= gpu;
 	gameEntry.metrics_level = level.toString();
-	gameEntry.steamdeck		= modeCombo->currentData().toBool();
+	gameEntry.device		= ComputerType::fromString(modeCombo->currentData().toString().toStdString());
 	gameEntry.sync			= sync.toString();
 
 	steamService.saveGameConfig(gid, gameEntry);

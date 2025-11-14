@@ -4,6 +4,7 @@
 
 #include <optional>
 
+#include "../steam/computer_type.hpp"
 #include "../steam/mangohud_level.hpp"
 #include "../steam/wine_sync_option.hpp"
 
@@ -16,7 +17,7 @@ struct GameEntry {
 	std::string name;
 	std::optional<std::string> overlayId;
 	bool proton							= true;
-	bool steamdeck						= false;
+	ComputerType device					= ComputerType::Enum::COMPUTER;
 	WineSyncOption sync					= WineSyncOption::Enum::AUTO;
 	std::optional<std::string> wrappers = std::nullopt;
 };
@@ -50,10 +51,8 @@ struct convert<GameEntry> {
 			node["scheduler"] = *game.scheduler;
 		}
 		if (game.proton) {
-			if (game.steamdeck) {
-				node["steamdeck"] = true;
-			}
-			node["sync"] = game.sync.toString();
+			node["device"] = game.device.toString();
+			node["sync"]   = game.sync.toString();
 		}
 		if (game.wrappers && !game.wrappers->empty()) {
 			node["wrappers"] = *game.wrappers;
@@ -105,10 +104,14 @@ struct convert<GameEntry> {
 			game.proton = true;
 		}
 
-		if (node["steamdeck"]) {
-			game.steamdeck = node["steamdeck"].as<bool>();
+		if (node["computer"]) {
+			game.device = ComputerType::fromString(node["computer"].as<std::string>());
 		} else {
-			game.steamdeck = false;
+			if (node["steamdeck"]) {
+				game.device = node["steamdeck"].as<bool>() ? ComputerType::Enum::STEAM_DECK : ComputerType::Enum::COMPUTER;
+			} else {
+				game.device = ComputerType::Enum::COMPUTER;
+			}
 		}
 
 		if (node["sync"]) {

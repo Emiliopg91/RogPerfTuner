@@ -242,18 +242,22 @@ params:
   en: Parameters
   es: Parámetros
   de: Parameter
-used.steamdeck:
-  en: Mode
-  es: Modo
-  de: Modus
-label.steamdeck.no:
+used.device:
+  en: Device
+  es: Dispositivo
+  de: Gerät
+label.device.computer:
   en: Computer
   es: Ordenador
   de: Computer
-label.steamdeck.yes:
-  en: SteamDeck
-  es: SteamDeck
-  de: SteamDeck
+label.device.steam_deck:
+  en: Steam Deck
+  es: Steam Deck
+  de: Steam Deck
+label.device.steam_machine:
+  en: Steam Machine
+  es: Steam Machine
+  de: Steam Machine
 running:
   en: Running
   es: Ejecutando

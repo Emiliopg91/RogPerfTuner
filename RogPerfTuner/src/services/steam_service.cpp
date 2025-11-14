@@ -145,7 +145,7 @@ void SteamService::onFirstGameRun(unsigned int gid, std::string name) {
 					name,
 					details.is_shortcut ? std::optional<std::string>{encodeAppId(gid)} : std::nullopt,
 					!details.compat_tool.empty(),
-					false,
+					ComputerType::Enum::COMPUTER,
 					WineSyncOption::Enum::AUTO,
 					wrappers};
 	configuration.getConfiguration().games[std::to_string(gid)] = entry;
@@ -439,7 +439,7 @@ const SteamGameConfig SteamService::getConfiguration(const std::string& gid) {
 		}
 
 		if (gameEntry.proton) {
-			cfg.environment["SteamDeck"] = gameEntry.steamdeck ? "1" : "0";
+			cfg.environment["SteamDeck"] = gameEntry.device == ComputerType::Enum::STEAM_DECK ? "1" : "0";
 			if (gameEntry.sync != WineSyncOption::Enum::AUTO) {
 				cfg.environment["PROTON_USE_NTSYNC"] = gameEntry.sync == WineSyncOption::Enum::NTSYNC ? "1" : "0";
 				cfg.environment["PROTON_NO_NTSYNC"]	 = gameEntry.sync == WineSyncOption::Enum::NTSYNC ? "0" : "1";
