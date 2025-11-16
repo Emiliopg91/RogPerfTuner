@@ -212,8 +212,6 @@ std::optional<std::string> ApplicationService::getChangeLog() {
 			const auto version	 = release.version;
 			const auto versionSV = SemanticVersion::parse(version);
 			if (versionSV > currentSV) {
-				logger.error("{}>{}, aplica {} features, {} fixes, {} improvements", version, Constants::APP_VERSION, release.features.size(),
-							 release.fixes.size(), release.improvements.size());
 				for (const auto& f : release.features) {
 					features.emplace_back(f);
 				}

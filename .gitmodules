@@ -4,6 +4,7 @@
 [submodule "submodules/OpenRGB"]
 	path = submodules/OpenRGB
 	url = https://github.com/Emiliopg91/OpenRGB
+	branch = main
 [submodule "submodules/RccDeckyCompanion"]
 	path = submodules/RccDeckyCompanion
 	url = https://github.com/Emiliopg91/RccDeckyCompanion
