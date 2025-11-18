@@ -72,6 +72,8 @@ void AbstractUnixSocketClient::connectionLoop() {
 
 		if (connect(sock, (sockaddr*)&addr, sizeof(addr)) < 0) {
 			logger.debug(std::string(strerror(errno)));
+			close(sock);
+			sock = -1;
 			TimeUtils::sleep(3000);
 			continue;
 		}
