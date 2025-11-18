@@ -1,6 +1,8 @@
 - version: 4.8.9-1
   improvements:
     - Removed debug traces
+  fixes:
+    - Solved file descriptor leak
 
 - version: 4.8.8-1
   features:
