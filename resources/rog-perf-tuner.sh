@@ -36,5 +36,6 @@ pre_remove() {
 
 post_remove() {
     echo "🗑️ Performing post remove actions..."
+    rog-perf-tuner -u
     reload_udev_rules
 }

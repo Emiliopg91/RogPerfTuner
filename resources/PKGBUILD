@@ -23,8 +23,9 @@ options=(
 )
 depends=(
   'asusctl'
-  'coreutils'
   'cpp-httplib-compiled'
+  'coreutils'
+  'curl'
   'hicolor-icon-theme'
   'hidapi'
   'libusb'

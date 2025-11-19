@@ -12,7 +12,7 @@ const pid_t Constants::PID = getpid();
 const std::string Constants::APP_NAME  = "RogPerfTuner";
 const std::string Constants::EXEC_NAME = "rog-perf-tuner";
 
-const std::string Constants::APP_VERSION = "4.8.7-1";
+const std::string Constants::APP_VERSION = "4.8.8-1";
 
 const std::string Constants::PLUGIN_VERSION = "1.2.7";
 
@@ -86,3 +86,5 @@ const std::string Constants::FLATPAK_MANGOHUD_OVERRIDE = "--filesystem=xdg-confi
 const std::string Constants::LOGGER_PATTERN = "[%Y-%m-%d %H:%M:%S.%e][%-7l][%n] %v";
 
 const std::string Constants::CHANGELOG_URL = "https://github.com/Emiliopg91/RogPerfTuner/raw/refs/heads/main/changelog.yaml";
+
+const std::string Constants::APICOUNT_TOKEN = "ut_B44NTa3SW6lTAmxIbaGo2yMLpqg9FU4uqk40YCHO";

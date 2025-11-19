@@ -4,7 +4,6 @@
 #include <unistd.h>
 #include <yaml-cpp/node/parse.h>
 
-#include <cstddef>
 #include <exception>
 #include <optional>
 #include <sstream>
@@ -66,6 +65,13 @@ ApplicationService::ApplicationService(std::optional<std::string> execPath) : Lo
 			configuration.getConfiguration().application.currentVersion	 = Constants::APP_VERSION;
 			configuration.saveConfig();
 		}
+#ifndef DEV_MODE
+		if (!configuration.getConfiguration().application.enrolled) {
+			enroll();
+			configuration.getConfiguration().application.enrolled = true;
+			configuration.saveConfig();
+		}
+#endif
 	}
 
 	Logger::rem_tab();
@@ -189,6 +195,28 @@ void ApplicationService::applyUpdate() {
 	Logger::rem_tab();
 
 	Logger::rem_tab();
+}
+
+bool ApplicationService::enroll() {
+	try {
+		shell.run_command("curl https://api.counterapi.dev/v2/emilio-pulido-gils-team-1479/ropgerftu/up -H \"Authorization: Bearer " +
+							  Constants::APICOUNT_TOKEN + "\"",
+						  false);
+		return true;
+	} catch (std::exception& e) {
+		logger.warn("Could not unenroll application: {}", e.what());
+		return false;
+	}
+}
+
+void ApplicationService::unenroll() {
+	try {
+		shell.run_command("curl https://api.counterapi.dev/v2/emilio-pulido-gils-team-1479/ropgerftu/down -H \"Authorization: Bearer " +
+							  Constants::APICOUNT_TOKEN + "\"",
+						  false);
+	} catch (std::exception& e) {
+		logger.warn("Could not unenroll application: {}", e.what());
+	}
 }
 #endif
 

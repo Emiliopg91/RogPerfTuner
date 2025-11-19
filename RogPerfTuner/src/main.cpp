@@ -1,4 +1,5 @@
-#include <functional>
+#include <spdlog/common.h>
+
 #include <iostream>
 
 #include "../include/main/flatpak.hpp"
@@ -24,6 +25,10 @@ constexpr uint64_t hashStr(const char* str, uint64_t hash = 14695981039346656037
 }
 
 int main(int argc, char** argv) {
+#ifdef DEV_MODE
+	std::cout << "DEV MODE enabled" << std::endl;
+#endif
+
 	if (geteuid() == 0) {
 		std::cerr << "This program must not be run as root (sudo). Please run it as a regular user." << std::endl;
 		return 1;
@@ -73,6 +78,20 @@ int main(int argc, char** argv) {
 			case hashStr("--run"):
 				shiftArgv(argc, argv);
 				return runSteamWrapping(argc, argv);
+
+			case hashStr("-u"):
+			case hashStr("--unenroll"):
+				LoggerProvider::initialize();
+				LoggerProvider::getLogger("Shell")->set_level(spdlog::level::err);
+				try {
+					Shell::getInstance().run_command(
+						"curl https://api.counterapi.dev/v2/emilio-pulido-gils-team-1479/ropgerftu/down -H \"Authorization: Bearer " +
+							Constants::APICOUNT_TOKEN + "\"",
+						false);
+				} catch (std::exception& e) {
+					Logger().warn("Could not unenroll application: {}", e.what());
+				}
+				return 0;
 
 			case hashStr("-h"):
 			case hashStr("--help"):
