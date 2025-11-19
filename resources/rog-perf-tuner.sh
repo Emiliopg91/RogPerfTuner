@@ -32,10 +32,10 @@ post_upgrade() {
 pre_remove() {
     echo "🗑️ Performing pre remove actions..."
     stop_application
-    reload_udev_rules
+    rog-perf-tuner -u
 }
 
 post_remove() {
     echo "🗑️ Performing post remove actions..."
-    rog-perf-tuner -u
+    reload_udev_rules
 }
