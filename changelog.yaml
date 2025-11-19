@@ -1,3 +1,8 @@
+- version: 4.9.0-1
+  improvements:
+    - Refactor of changelog view
+    - Stats
+
 - version: 4.8.9-1
   improvements:
     - Removed debug traces
