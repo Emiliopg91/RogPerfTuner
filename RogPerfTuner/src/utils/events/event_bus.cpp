@@ -241,3 +241,13 @@ void EventBus::onUpdateAvailable(std::function<void(std::string)>&& callback) {
 		cb(std::any_cast<std::string>(data[0]));
 	});
 }
+
+void EventBus::emitUpdateStart() {
+	this->emit_event(APPLICATION_SERVICE_UPDATE_START);
+}
+
+void EventBus::onUpdateStart(Callback&& callback) {
+	this->on_without_data(APPLICATION_SERVICE_UPDATE_START, [cb = std::move(callback)]() {
+		cb();
+	});
+}

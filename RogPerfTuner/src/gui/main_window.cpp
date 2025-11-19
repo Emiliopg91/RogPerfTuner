@@ -321,6 +321,10 @@ MainWindow::MainWindow(QWidget* parent) : QMainWindow(parent), _logger(new Logge
 	eventBus.onUpdateAvailable([this](std::string value) {
 		onUpdateAvailable(value);
 	});
+
+	eventBus.onUpdateStart([this]() {
+		onUpdateStart();
+	});
 #endif
 }
 
@@ -355,13 +359,22 @@ void MainWindow::onUpdateAvailable(std::string value) {
 			statusBar->addPermanentWidget(updateButton);
 
 			QObject::connect(updateButton, &QPushButton::clicked, [this]() {
-				versionLabel->setText(translator.translate("update.in.progress").c_str());
-				statusBar->removeWidget(updateButton);
-
-				auto* changelog = new ChangelogView(this);		// crea en heap
-				changelog->setAttribute(Qt::WA_DeleteOnClose);	// se autodestruye al cerrar
+				auto* changelog = new ChangelogView(this);
+				changelog->setAttribute(Qt::WA_DeleteOnClose);
 				changelog->show();
 			});
+		},
+		Qt::QueuedConnection);
+}
+
+void MainWindow::onUpdateStart() {
+	versionLabel->setText("");
+
+	QMetaObject::invokeMethod(
+		this,
+		[=, this]() {
+			versionLabel->setText(translator.translate("update.in.progress").c_str());
+			statusBar->removeWidget(updateButton);
 		},
 		Qt::QueuedConnection);
 }

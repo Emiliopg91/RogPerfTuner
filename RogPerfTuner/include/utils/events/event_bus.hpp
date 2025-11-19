@@ -301,6 +301,10 @@ class EventBus : public Singleton<EventBus> {
 	 */
 	void emitScheduler(std::optional<std::string> scheduler);
 
+	void emitUpdateStart();
+
+	void onUpdateStart(Callback&& callback);
+
 	inline const static constexpr std::string_view APPLICATION_STOP						= "APPLICATION_STOP";
 	inline const static constexpr std::string_view UDEV_CLIENT_DEVICE_EVENT				= "UDEV_CLIENT_DEVICE_EVENT";
 	inline const static constexpr std::string_view HARDWARE_SERVICE_USB_REMOVED			= "HARDWARE_SERVICE_USB_REMOVED";
@@ -315,6 +319,7 @@ class EventBus : public Singleton<EventBus> {
 	inline const static constexpr std::string_view PROFILE_SERVICE_ON_SCHEDULER			= "PROFILE_SERVICE_ON_SCHEDULER";
 	inline const static constexpr std::string_view STEAM_SERVICE_GAME_EVENT				= "STEAM_SERVICE_GAME_EVENT";
 	inline const static constexpr std::string_view APPLICATION_SERVICE_UPDATE_AVAILABLE = "APPLICATION_SERVICE_UPDATE_AVAILABLE";
+	inline const static constexpr std::string_view APPLICATION_SERVICE_UPDATE_START		= "APPLICATION_SERVICE_UPDATE_START";
 
   private:
 	EventBus()							 = default;

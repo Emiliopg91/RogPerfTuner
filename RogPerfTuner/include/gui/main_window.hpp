@@ -59,6 +59,8 @@ class MainWindow : public QMainWindow, public Singleton<MainWindow> {
 
 #ifdef AUR_HELPER
 	void onUpdateAvailable(std::string value);
+
+	void onUpdateStart();
 #endif
 
 	void onEffectChange();

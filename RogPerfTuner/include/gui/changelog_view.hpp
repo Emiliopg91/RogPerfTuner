@@ -23,5 +23,4 @@ class ChangelogView : public QDialog {
 
   private slots:
 	void onUpdateClicked();
-	void closeEvent(QCloseEvent* event);
 };

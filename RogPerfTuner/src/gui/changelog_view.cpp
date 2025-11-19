@@ -21,12 +21,8 @@ ChangelogView::ChangelogView(QWidget* parent) : QDialog(parent) {
 }
 
 void ChangelogView::onUpdateClicked() {
-	this->close();
-}
-
-void ChangelogView::closeEvent(QCloseEvent* event) {
-	QDialog::closeEvent(event);
 	std::thread([this]() {
 		applicationService.applyUpdate();
 	}).detach();
+	this->close();
 }

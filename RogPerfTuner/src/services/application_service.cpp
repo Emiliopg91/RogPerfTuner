@@ -177,6 +177,7 @@ void ApplicationService::lookForUpdates() {
 
 void ApplicationService::applyUpdate() {
 	logger.info("Applying update...");
+	eventBus.emitUpdateStart();
 	Logger::add_tab();
 
 	PerformanceProfile p = PerformanceProfile::Enum::PERFORMANCE;
