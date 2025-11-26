@@ -76,7 +76,7 @@ void ScxCtlClient::start(std::string name) {
 	}
 
 	Logger::add_tab();
-	run_command(fmt::format("{} --sched {} --args=\"{}\"", action, name, it->second));
+	run_command(fmt::format("{} --sched {} --args=\"{}\"", action, name, it->second), false, true);
 	Logger::rem_tab();
 
 	logger.info("Scheduler applied succesfully");
@@ -91,7 +91,7 @@ void ScxCtlClient::stop() {
 	logger.info("Stopping scheduler {}", current.value());
 
 	Logger::add_tab();
-	run_command("stop");
+	run_command("stop", false, true);
 	Logger::rem_tab();
 	current = std::nullopt;
 
