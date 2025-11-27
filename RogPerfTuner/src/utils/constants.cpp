@@ -12,16 +12,18 @@ const pid_t Constants::PID = getpid();
 const std::string Constants::APP_NAME  = "RogPerfTuner";
 const std::string Constants::EXEC_NAME = "rog-perf-tuner";
 
-const std::string Constants::APP_VERSION = "4.9.0-1";
+const std::string Constants::APP_VERSION = "4.9.1-1";
 
 const std::string Constants::PLUGIN_VERSION = "1.2.7";
 
 #ifdef DEV_MODE
-const std::string Constants::ASSETS_DIR = FileUtils::getCWD() + "/build/assets";
-const std::string Constants::UDEV_RULES = ASSETS_DIR + "/OpenRGB/60-openrgb.rules";
+const std::string Constants::APP_DRAW_FILE = FileUtils::getCWD() + "/resources/" + Constants::APP_NAME + ".desktop";
+const std::string Constants::ASSETS_DIR	   = FileUtils::getCWD() + "/build/assets";
+const std::string Constants::UDEV_RULES	   = ASSETS_DIR + "/OpenRGB/60-openrgb.rules";
 #else
-const std::string Constants::ASSETS_DIR = "/usr/share/" + EXEC_NAME;
-const std::string Constants::UDEV_RULES = "/usr/lib/udev/rules.d/60-" + EXEC_NAME + ".rules";
+const std::string Constants::APP_DRAW_FILE = "/usr/share/applications/" + EXEC_NAME + ".desktop";
+const std::string Constants::ASSETS_DIR	   = "/usr/share/" + EXEC_NAME;
+const std::string Constants::UDEV_RULES	   = "/usr/lib/udev/rules.d/60-" + EXEC_NAME + ".rules";
 #endif
 
 const std::string Constants::LOG_FILE_NAME		  = APP_NAME;
@@ -64,7 +66,6 @@ const std::string Constants::LOG_DIR				  = HOME_DIR + "/." + APP_NAME + "/logs"
 const std::string Constants::LOG_OLD_DIR			  = HOME_DIR + "/." + APP_NAME + "/logs/old";
 const std::string Constants::USER_PLUGIN_DIR		  = HOME_DIR + "/." + APP_NAME + "/plugin";
 const std::string Constants::AUTOSTART_FILE			  = HOME_DIR + "/.config/autostart/" + APP_NAME + ".desktop";
-const std::string Constants::APP_DRAW_FILE			  = HOME_DIR + "/.local/share/applications/" + APP_NAME + ".desktop";
 const std::string Constants::STEAM_USERDATA_PATH	  = HOME_DIR + "/.steam/steam/userdata";
 const std::string Constants::RCDCC_SOCKET_PATH		  = HOME_DIR + "/homebrew/data/RCCDeckyCompanion/socket";
 const std::string Constants::PLUGINS_FOLDER			  = HOME_DIR + "/homebrew/plugins";

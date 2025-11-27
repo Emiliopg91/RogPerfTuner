@@ -35,6 +35,10 @@ class ApplicationService : public Singleton<ApplicationService>, Loggable {
 	 */
 	void setAutostart(bool enabled);
 
+	bool isStartMinimized();
+
+	void setStartMinimized(bool enabled);
+
 	std::optional<std::string> getChangeLog();
 
 #ifdef AUR_HELPER

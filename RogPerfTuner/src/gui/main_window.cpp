@@ -264,7 +264,19 @@ MainWindow::MainWindow(QWidget* parent) : QMainWindow(parent), _logger(new Logge
 	QFormLayout* settingsLayout = new QFormLayout();
 	settingsLayout->setContentsMargins(20, 10, 20, 10);
 	// -------------------------
-	// Autostart menu
+	// Start minimized
+	// -------------------------
+	_minimized = new QCheckBox();
+	_minimized->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Preferred);
+	_minimized->setEnabled(true);
+	_minimized->setChecked(applicationService.isStartMinimized());
+	connect(_minimized, &QCheckBox::toggled, this, &MainWindow::onStartMinimizedChanged);
+	settingsLayout->addRow(_minimized, new QLabel(QString::fromStdString(translator.translate("start.minimized"))));
+	// -------------------------
+	// Start minimized
+	// -------------------------
+	// -------------------------
+	// Autostart
 	// -------------------------
 	_autostart = new QCheckBox();
 	_autostart->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Preferred);
@@ -275,7 +287,7 @@ MainWindow::MainWindow(QWidget* parent) : QMainWindow(parent), _logger(new Logge
 	connect(_autostart, &QCheckBox::toggled, this, &MainWindow::onAutostartChanged);
 	settingsLayout->addRow(_autostart, new QLabel(QString::fromStdString(translator.translate("autostart"))));
 	// -------------------------
-	// Autostart menu
+	// Autostart
 	// -------------------------
 	settingsGroup->setLayout(settingsLayout);
 	mainLayout->addWidget(settingsGroup);
@@ -486,6 +498,10 @@ void MainWindow::openFanEditor() {
 
 void MainWindow::onAutostartChanged(bool enabled) {
 	applicationService.setAutostart(enabled);
+}
+
+void MainWindow::onStartMinimizedChanged(bool enabled) {
+	applicationService.setStartMinimized(enabled);
 }
 
 void MainWindow::onBootSoundChanged(int) {

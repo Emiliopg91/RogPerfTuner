@@ -17,6 +17,7 @@
 #include "../utils/configuration/configuration.hpp"
 #include "../utils/events/event_bus.hpp"
 #include "../utils/translator/translator.hpp"
+#include "./main_window.hpp"
 
 class TrayIcon : public QObject, public Singleton<TrayIcon> {
 	Q_OBJECT
@@ -64,6 +65,7 @@ class TrayIcon : public QObject, public Singleton<TrayIcon> {
 	void openSettings();
 	void reloadSettings();
 	void openLogs();
+	void openGameList();
 
 	Shell& shell						   = Shell::getInstance();
 	EventBus& eventBus					   = EventBus::getInstance();
@@ -75,6 +77,7 @@ class TrayIcon : public QObject, public Singleton<TrayIcon> {
 	Configuration& configuration		   = Configuration::getInstance();
 	SteamService& steamService			   = SteamService::getInstance();
 	UPowerClient& uPowerClient			   = UPowerClient::getInstance();
+	MainWindow& mainWindow;
 
 	int runningGames;
 	bool onBattery;

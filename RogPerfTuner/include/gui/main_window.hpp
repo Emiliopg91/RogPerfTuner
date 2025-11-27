@@ -47,6 +47,8 @@ class MainWindow : public QMainWindow, public Singleton<MainWindow> {
 
 	void onAutostartChanged(bool enabled);
 
+	void onStartMinimizedChanged(bool enabled);
+
 	void onProfileChanged(int index);
 
 	void onSchedulerChanged(int index);
@@ -96,6 +98,7 @@ class MainWindow : public QMainWindow, public Singleton<MainWindow> {
 	QPushButton* _colorButton;
 	QComboBox* _thresholdDropdown;
 	QCheckBox* _autostart;
+	QCheckBox* _minimized;
 	QComboBox* _bootSoundDropdown;
 	QStatusBar* statusBar;
 	QLabel* versionLabel;

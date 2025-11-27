@@ -398,3 +398,7 @@ execution:
   en: Execution
   es: Ejecución
   de: Ausführung
+start.minimized:
+  en: Start minimized
+  es: Iniciar minimizado
+  de: Minimiert starten

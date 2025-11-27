@@ -12,11 +12,12 @@
 
 #include "../../include/gui/fan_curve_editor.hpp"
 #include "../../include/gui/game_list.hpp"
-#include "../../include/gui/main_window.hpp"
 #include "../../include/utils/string_utils.hpp"
 
 void TrayIcon::openMainWindow() {
-	MainWindow::getInstance().show();
+	mainWindow.show();
+	mainWindow.raise();
+	mainWindow.activateWindow();
 }
 
 void TrayIcon::openSettings() {
@@ -31,22 +32,22 @@ void TrayIcon::openLogs() {
 	shell.run_command("xdg-open " + Constants::LOG_DIR + "/" + Constants::LOG_FILE_NAME + ".log");
 }
 
-void openGameList() {
+void TrayIcon::openGameList() {
 	if (GameList::INSTANCE == nullptr) {
-		GameList::INSTANCE = new GameList(&MainWindow::getInstance());
+		GameList::INSTANCE = new GameList(&mainWindow);
 	}
 	GameList::INSTANCE->show();
 }
 
 void TrayIcon::openFanEditor() {
 	auto profile		= performanceService.getPerformanceProfile().toString();
-	CurveEditor* editor = new CurveEditor(profile, &MainWindow::getInstance());
+	CurveEditor* editor = new CurveEditor(profile, &mainWindow);
 	editor->show();
 }
 
 void TrayIcon::setAuraBrightness(RgbBrightness brightness) {
 	QMetaObject::invokeMethod(
-		&TrayIcon::getInstance(),
+		this,
 		[=, this]() {
 			brightnessActions[brightness.toName()]->setChecked(true);
 		},
@@ -55,7 +56,7 @@ void TrayIcon::setAuraBrightness(RgbBrightness brightness) {
 
 void TrayIcon::setAuraEffect(const std::string& effect) {
 	QMetaObject::invokeMethod(
-		&TrayIcon::getInstance(),
+		this,
 		[=, this]() {
 			effectActions[effect]->setChecked(true);
 		},
@@ -64,7 +65,7 @@ void TrayIcon::setAuraEffect(const std::string& effect) {
 
 void TrayIcon::setAuraColor(const std::optional<std::string>& color) {
 	QMetaObject::invokeMethod(
-		&TrayIcon::getInstance(),
+		this,
 		[=, this]() {
 			if (color.has_value()) {
 				colorMenu->setEnabled(true);
@@ -78,7 +79,7 @@ void TrayIcon::setAuraColor(const std::optional<std::string>& color) {
 
 void TrayIcon::setPerformanceProfile(PerformanceProfile profile) {
 	QMetaObject::invokeMethod(
-		&TrayIcon::getInstance(),
+		this,
 		[=, this]() {
 			perfProfileActions[profile.toName()]->setChecked(true);
 		},
@@ -87,7 +88,7 @@ void TrayIcon::setPerformanceProfile(PerformanceProfile profile) {
 
 void TrayIcon::setScheduler(std::optional<std::string> scheduler) {
 	QMetaObject::invokeMethod(
-		&TrayIcon::getInstance(),
+		this,
 		[=, this]() {
 			schedulerActions[scheduler.value_or("")]->setChecked(true);
 		},
@@ -96,7 +97,7 @@ void TrayIcon::setScheduler(std::optional<std::string> scheduler) {
 
 void TrayIcon::setBatteryThreshold(BatteryThreshold threshold) {
 	QMetaObject::invokeMethod(
-		&TrayIcon::getInstance(),
+		this,
 		[=, this]() {
 			thresholdActions[threshold.toName()]->setChecked(true);
 		},
@@ -105,7 +106,7 @@ void TrayIcon::setBatteryThreshold(BatteryThreshold threshold) {
 
 void TrayIcon::setBootSound(bool value) {
 	QMetaObject::invokeMethod(
-		&TrayIcon::getInstance(),
+		this,
 		[=, this]() {
 			bootSoundActions[value]->setChecked(true);
 		},
@@ -114,7 +115,7 @@ void TrayIcon::setBootSound(bool value) {
 
 void TrayIcon::setProfileMenuEnabled() {
 	QMetaObject::invokeMethod(
-		&TrayIcon::getInstance(),
+		this,
 		[=, this]() {
 			profileMenu->setEnabled(!onBattery && runningGames == 0);
 		},
@@ -123,7 +124,7 @@ void TrayIcon::setProfileMenuEnabled() {
 
 void TrayIcon::setSchedulerMenuEnabled() {
 	QMetaObject::invokeMethod(
-		&TrayIcon::getInstance(),
+		this,
 		[=, this]() {
 			schedulerMenu->setEnabled(runningGames == 0);
 		},
@@ -161,7 +162,11 @@ void TrayIcon::onSchedulerChanged(std::optional<std::string> scheduler) {
 // ==============================
 // Constructor
 // ==============================
-TrayIcon::TrayIcon() : QObject(&MainWindow::getInstance()), tray_icon_(new QSystemTrayIcon(this)), tray_menu_(new QMenu(&MainWindow::getInstance())) {
+TrayIcon::TrayIcon()
+	: QObject(&MainWindow::getInstance()),
+	  tray_icon_(new QSystemTrayIcon(this)),
+	  tray_menu_(new QMenu(&MainWindow::getInstance())),
+	  mainWindow(MainWindow::getInstance()) {
 	tray_icon_->setIcon(QIcon::fromTheme(Constants::ASSET_ICON_FILE.c_str()));
 	tray_icon_->setToolTip(QString::fromStdString(Constants::APP_NAME));
 
@@ -423,7 +428,7 @@ TrayIcon::TrayIcon() : QObject(&MainWindow::getInstance()), tray_icon_(new QSyst
 	menu->insertMenu(nullptr, gamesMenu);
 
 	QAction* act = new QAction((translator.translate("label.game.configure") + "...").c_str());
-	QObject::connect(act, &QAction::triggered, []() {
+	QObject::connect(act, &QAction::triggered, [this]() {
 		openGameList();
 	});
 	gamesMenu->addAction(act);

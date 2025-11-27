@@ -7,6 +7,7 @@
 struct Application {
 	bool askedInstallRccdc		= false;
 	bool enrolled				= false;
+	bool startMinimized			= true;
 	std::string currentVersion	= Constants::APP_VERSION;
 	std::string previousVersion = Constants::APP_VERSION;
 };
@@ -19,6 +20,7 @@ struct convert<Application> {
 		Node node;
 		node["enrolled"]		  = app.enrolled;
 		node["askedInstallRccdc"] = app.askedInstallRccdc;
+		node["startMinimized"]	  = app.startMinimized;
 		node["currentVersion"]	  = app.currentVersion;
 		node["previousVersion"]	  = app.previousVersion;
 		return node;
@@ -30,6 +32,9 @@ struct convert<Application> {
 		}
 		if (node["enrolled"]) {
 			app.enrolled = node["enrolled"].as<bool>();
+		}
+		if (node["startMinimized"]) {
+			app.enrolled = node["startMinimized"].as<bool>();
 		}
 		if (node["currentVersion"]) {
 			app.currentVersion = node["currentVersion"].as<std::string>();

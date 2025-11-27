@@ -289,7 +289,7 @@ PerformanceProfile PerformanceService::nextPerformanceProfile() {
 }
 
 int PerformanceService::acIntelPl1Spl(PerformanceProfile profile) {
-	auto& client = Pl1SpdClient::getInstance();
+	auto& client = pl1SpdClient;
 
 	if (profile == PerformanceProfile::Enum::PERFORMANCE) {
 		return client.getMaxValue();
@@ -305,12 +305,12 @@ int PerformanceService::acIntelPl1Spl(PerformanceProfile profile) {
 }
 
 int PerformanceService::batteryIntelPl1Spl(PerformanceProfile profile) {
-	auto& client = Pl1SpdClient::getInstance();
+	auto& client = pl1SpdClient;
 	return acTdpToBatteryTdp(acIntelPl1Spl(profile), client.getMinValue());
 }
 
 int PerformanceService::acIntelPl2Sppt(PerformanceProfile profile) {
-	auto& client = Pl2SpptClient::getInstance();
+	auto& client = pl2SpptClient;
 
 	if (!acBoost()) {
 		return acIntelPl1Spl(profile);
@@ -330,12 +330,12 @@ int PerformanceService::acIntelPl2Sppt(PerformanceProfile profile) {
 }
 
 int PerformanceService::batteryIntelPl2Sppt(PerformanceProfile profile) {
-	auto& client = Pl2SpptClient::getInstance();
+	auto& client = pl2SpptClient;
 	return acTdpToBatteryTdp(acIntelPl2Sppt(profile), client.getMinValue());
 }
 
 int PerformanceService::acIntelPl3Fppt(PerformanceProfile profile) {
-	auto& client = Pl2SpptClient::getInstance();
+	auto& client = pl2SpptClient;
 
 	if (!acBoost()) {
 		return acIntelPl1Spl(profile);
@@ -355,12 +355,12 @@ int PerformanceService::acIntelPl3Fppt(PerformanceProfile profile) {
 }
 
 int PerformanceService::batteryIntelPl3Fppt(PerformanceProfile profile) {
-	auto& client = Pl3FpptClient::getInstance();
+	auto& client = pl3FpptClient;
 	return acTdpToBatteryTdp(acIntelPl2Sppt(profile), client.getMinValue());
 }
 
 int PerformanceService::acNvBoost(PerformanceProfile profile) {
-	auto& client = NvBoostClient::getInstance();
+	auto& client = nvBoostClient;
 
 	if (profile == PerformanceProfile::Enum::PERFORMANCE) {
 		return client.getMaxValue();
@@ -376,17 +376,17 @@ int PerformanceService::acNvBoost(PerformanceProfile profile) {
 }
 
 int PerformanceService::batteryNvBoost(PerformanceProfile profile) {
-	auto& client = NvBoostClient::getInstance();
+	auto& client = nvBoostClient;
 	return acTdpToBatteryTdp(acNvBoost(profile), client.getMinValue());
 }
 
 int PerformanceService::acNvTemp() {
-	auto& client = NvTempClient::getInstance();
+	auto& client = nvTempClient;
 	return client.getMaxValue();
 }
 
 int PerformanceService::batteryNvTemp(PerformanceProfile profile) {
-	auto& client = NvTempClient::getInstance();
+	auto& client = nvTempClient;
 
 	if (profile == PerformanceProfile::Enum::PERFORMANCE) {
 		return client.getMaxValue();

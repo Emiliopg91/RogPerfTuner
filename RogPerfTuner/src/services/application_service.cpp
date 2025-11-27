@@ -296,3 +296,14 @@ std::optional<std::string> ApplicationService::getChangeLog() {
 		return std::nullopt;
 	}
 }
+
+bool ApplicationService::isStartMinimized() {
+	return configuration.getConfiguration().application.startMinimized;
+}
+
+void ApplicationService::setStartMinimized(bool enabled) {
+	if (enabled != isStartMinimized()) {
+		configuration.getConfiguration().application.startMinimized = enabled;
+		configuration.saveConfig();
+	}
+}

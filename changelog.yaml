@@ -1,3 +1,7 @@
+- version: 4.9.2-1
+  features:
+    - Added Beerland CPU scheduler
+
 - version: 4.9.1-1
   fixes:
     - Elevated authentication on scxctl commands

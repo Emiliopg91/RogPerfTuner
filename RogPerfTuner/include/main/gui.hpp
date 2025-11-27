@@ -122,6 +122,10 @@ inline int startGui(int argc, char** argv) {
 	applicationService.startUpdateCheck();
 #endif
 
+	if (!configuration.getConfiguration().application.startMinimized) {
+		MainWindow::getInstance().show();
+	}
+
 	return app.exec();
 }
 
