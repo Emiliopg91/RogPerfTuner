@@ -1,6 +1,9 @@
 - version: 4.9.2-1
   features:
     - Added Beerland CPU scheduler
+    - Option to enable/disable minimized startup
+  improvements:
+    - Code cleanup and refactor
 
 - version: 4.9.1-1
   fixes:
