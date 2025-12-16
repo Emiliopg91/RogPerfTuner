@@ -125,6 +125,8 @@ class PerformanceService : public Singleton<PerformanceService>, Loggable {
 	 */
 	PerformanceProfile nextPerformanceProfile();
 
+	std::string getDefaultSchedulerName();
+
   private:
 	static int8_t CPU_PRIORITY;
 	static uint8_t IO_PRIORITY;

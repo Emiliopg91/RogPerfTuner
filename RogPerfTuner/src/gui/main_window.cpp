@@ -80,7 +80,7 @@ MainWindow::MainWindow(QWidget* parent) : QMainWindow(parent), _logger(new Logge
 	if (!performanceService.getAvailableSchedulers().empty()) {
 		_schedulerDropdown = new QComboBox();
 		_schedulerDropdown->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Preferred);
-		_schedulerDropdown->addItem(QString::fromStdString("  " + translator.translate("label.scheduler.none")), QString(""));
+		_schedulerDropdown->addItem(QString::fromStdString("  " + performanceService.getDefaultSchedulerName()), QString(""));
 
 		auto items2 = performanceService.getAvailableSchedulers();
 		std::reverse(items2.begin(), items2.end());

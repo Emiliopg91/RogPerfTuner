@@ -6,6 +6,7 @@
 #include "../../include/models/performance/power_profile.hpp"
 #include "../../include/utils/configuration/configuration.hpp"
 #include "../../include/utils/events/event_bus.hpp"
+#include "../../include/utils/file_utils.hpp"
 #include "../../include/utils/process_utils.hpp"
 #include "../../include/utils/string_utils.hpp"
 #include "../../include/utils/time_utils.hpp"
@@ -495,4 +496,12 @@ void PerformanceService::saveFanCurves(std::string profile, std::unordered_map<s
 
 	Logger::rem_tab();
 	logger.info("Fan curved updated succesfully");
+}
+
+std::string PerformanceService::getDefaultSchedulerName() {
+	const std::string borePath = "/proc/sys/kernel/sched_bore";
+	if (FileUtils::exists(borePath) && StringUtils::trim(FileUtils::readFileContent(borePath)) == "1") {
+		return "Bore";
+	}
+	return "Eevdf";
 }

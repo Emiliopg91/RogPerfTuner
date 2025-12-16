@@ -372,7 +372,7 @@ TrayIcon::TrayIcon()
 		schedulerMenu			 = new QMenu(("    " + translator.translate("scheduler")).c_str(), menu);
 		QActionGroup* schedGroup = new QActionGroup(menu);
 
-		QAction* act = new QAction(translator.translate("label.scheduler.none").c_str(), schedGroup);
+		QAction* act = new QAction(performanceService.getDefaultSchedulerName().c_str(), schedGroup);
 		act->setCheckable(true);
 		act->setChecked(std::nullopt == performanceService.getCurrentScheduler());
 		QObject::connect(act, &QAction::triggered, [this]() {
