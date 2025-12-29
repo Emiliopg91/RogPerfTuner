@@ -25,6 +25,8 @@ add_compile_options(
     -Wno-deprecated-literal-operator
 )
 
+add_subdirectory(submodules/httplib)
+
 add_subdirectory(submodules/OpenRGB-cppSDK)
 
 add_subdirectory(RogPerfTuner)

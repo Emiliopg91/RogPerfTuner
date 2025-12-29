@@ -14,6 +14,7 @@ clean:
 	@cd submodules/OpenRGB-cppSDK && git reset --hard > /dev/null && git submodule foreach git reset --hard > /dev/null
 	@cd submodules/OpenRGB && git reset --hard > /dev/null && git clean -fdx > /dev/null && rm -f CMakeLists.txt
 	@cd submodules/RccDeckyCompanion && git reset --hard > /dev/null
+	@cd submodules/httplib && git reset --hard > /dev/null
 	@rm -Rf dist logs out build
 
 config:
@@ -25,6 +26,9 @@ config:
 
 	@if [ ! -f "submodules/patches/OpenRGB-cppSDK.diff.applied" ]; then \
 		cd submodules/OpenRGB-cppSDK && git apply ../patches/OpenRGB-cppSDK.diff && touch ../patches/OpenRGB-cppSDK.diff.applied; \
+	fi
+	@if [ ! -f "submodules/patches/httplib.diff.applied" ]; then \
+		cd submodules/httplib && git apply ../patches/httplib.diff && touch ../patches/httplib.diff.applied; \
 	fi
 	
 	@if command -v paru >/dev/null 2>&1; then \
