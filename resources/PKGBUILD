@@ -23,7 +23,6 @@ options=(
 )
 depends=(
   'asusctl'
-  'cpp-httplib-compiled'
   'coreutils'
   'curl'
   'hicolor-icon-theme'
@@ -39,10 +38,8 @@ depends=(
   'qtermwidget'
   'qtkeychain-qt6'
   'scx-scheds'
-  'spdlog'
   'switcheroo-control'
   'upower'
-  'yaml-cpp'
 )
 makedepends=(
   'base-devel'

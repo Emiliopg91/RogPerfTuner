@@ -26,6 +26,8 @@ add_compile_options(
 )
 
 add_subdirectory(submodules/httplib)
+add_subdirectory(submodules/spdlog)
+add_subdirectory(submodules/yaml-cpp)
 
 add_subdirectory(submodules/OpenRGB-cppSDK)
 
