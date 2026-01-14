@@ -3,6 +3,7 @@
     - systemd-inhibit integration
   improvements:
     - Remove enrolment
+    - Curl as HTTP client
 
 - version: 4.10.0-1
   improvements:

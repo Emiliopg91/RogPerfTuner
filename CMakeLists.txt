@@ -25,7 +25,6 @@ add_compile_options(
     -Wno-deprecated-literal-operator
 )
 
-add_subdirectory(submodules/httplib)
 add_subdirectory(submodules/spdlog)
 add_subdirectory(submodules/yaml-cpp)
 

@@ -1,13 +1,14 @@
 #include "../../include/utils/net_utils.hpp"
 
+#include <curl/curl.h>
 #include <netinet/in.h>
 #include <unistd.h>
 
 #include <fstream>
+#include <regex>
 #include <stdexcept>
 
 #include "../../include/utils/logger/logger.hpp"
-#include "httplib.h"
 
 bool NetUtils::isPortFree(int port) {
 	int sock = socket(AF_INET, SOCK_STREAM, 0);
@@ -68,104 +69,24 @@ std::tuple<std::string, std::string> split_url(const std::string& url) {
 }
 
 void NetUtils::download(const std::string url, const std::string dst) {
-	Logger logger = Logger{"NetUtils"};
+	Logger logger = Logger("NetUtils");
 
-	std::string actualUrl = url;
-	logger.info("Downloading {} into {}", actualUrl, dst);
+	logger.info("Downloading {} into {}", url, dst);
 	Logger::add_tab();
 
-	httplib::Result res;
+	CurlClient::getInstance().download(url, dst);
 
-	do {
-		const auto [host, path] = split_url(actualUrl);
-		if (host.empty()) {
-			logger.error("Invalid URL");
-			Logger::rem_tab();
-			throw std::runtime_error("Invalid URL");
-		}
-
-		httplib::SSLClient cli(host);
-		res = cli.Get(path.c_str());
-
-		if (!res) {
-			logger.error("Could not connect to server");
-			Logger::rem_tab();
-			throw std::runtime_error("Could not connect to server");
-		}
-
-		if (res->status < 300 || res->status >= 400) {
-			break;
-		}
-
-		auto it = res->headers.find("Location");
-		if (it == res->headers.end()) {
-			logger.info("Redirection without Location");
-			break;
-		}
-
-		actualUrl = it->second;
-		logger.info(fmt::format("Redirected to {}", actualUrl));
-	} while (true);
-
-	if (res->status == 200) {
-		std::ofstream file(dst, std::ios::binary);
-		file << res->body;
-		file.close();
-		logger.info("Downloaded succesfully");
-		Logger::rem_tab();
-	} else {
-		logger.error("HTTP error: {}", res->status);
-		Logger::rem_tab();
-		throw std::runtime_error(fmt::format("HTTP error: {}", res->status));
-	}
+	Logger::rem_tab();
 }
 
 std::string NetUtils::fetch(const std::string url) {
-	Logger logger = Logger{"NetUtils"};
+	Logger logger = Logger("NetUtils");
 
-	std::string actualUrl = url;
-	logger.info("Fetching {}", actualUrl);
+	logger.info("Fetching {}", url);
 	Logger::add_tab();
 
-	httplib::Result res;
+	auto response = CurlClient::getInstance().fetch(url);
 
-	do {
-		const auto [host, path] = split_url(actualUrl);
-		if (host.empty()) {
-			logger.error("Invalid URL");
-			Logger::rem_tab();
-			throw std::runtime_error("Invalid URL");
-		}
-
-		httplib::SSLClient cli(host);
-		res = cli.Get(path.c_str());
-
-		if (!res) {
-			logger.error("Could not connect to server");
-			Logger::rem_tab();
-			throw std::runtime_error("Could not connect to server");
-		}
-
-		if (res->status < 300 || res->status >= 400) {
-			break;
-		}
-
-		auto it = res->headers.find("Location");
-		if (it == res->headers.end()) {
-			logger.info("Redirection without Location");
-			break;
-		}
-
-		actualUrl = it->second;
-		logger.info(fmt::format("Redirected to {}", actualUrl));
-	} while (true);
-
-	if (res->status == 200) {
-		Logger::rem_tab();
-		return res->body;
-	} else {
-		logger.error("HTTP error: {}", res->status);
-		Logger::rem_tab();
-		throw std::runtime_error(fmt::format("HTTP error: {}", res->status));
-	}
+	Logger::rem_tab();
+	return response;
 }

@@ -23,6 +23,7 @@ options=(
 )
 depends=(
   'asusctl'
+  'curl'
   'coreutils'
   'hicolor-icon-theme'
   'hidapi'

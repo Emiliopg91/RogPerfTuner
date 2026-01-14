@@ -23,7 +23,6 @@ file(GLOB_RECURSE HEADERS_RCC
 add_executable(RogPerfTuner ${SOURCES_RCC} ${HEADERS_RCC})
 set_target_properties(RogPerfTuner PROPERTIES AUTOMOC ON)
 target_link_libraries(RogPerfTuner PRIVATE 
-    httplib::httplib
     Qt6::Core
     Qt6::Gui
     Qt6::Widgets
