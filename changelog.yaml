@@ -1,3 +1,9 @@
+- version: 4.10.1-1
+  features:
+    - systemd-inhibit integration
+  improvements:
+    - Remove enrolment
+
 - version: 4.10.0-1
   improvements:
     - Embeded dependencies
