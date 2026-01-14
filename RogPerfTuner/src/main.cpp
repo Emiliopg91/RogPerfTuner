@@ -79,20 +79,6 @@ int main(int argc, char** argv) {
 				shiftArgv(argc, argv);
 				return runSteamWrapping(argc, argv);
 
-			case hashStr("-u"):
-			case hashStr("--unenroll"):
-				LoggerProvider::initialize();
-				LoggerProvider::getLogger("Shell")->set_level(spdlog::level::err);
-				try {
-					Shell::getInstance().run_command(
-						"curl https://api.counterapi.dev/v2/emilio-pulido-gils-team-1479/ropgerftu/down -H \"Authorization: Bearer " +
-							Constants::APICOUNT_TOKEN + "\"",
-						false);
-				} catch (std::exception& e) {
-					Logger().warn("Could not unenroll application: {}", e.what());
-				}
-				return 0;
-
 			case hashStr("-h"):
 			case hashStr("--help"):
 				std::cout << "Usage: " << argv[0] << " [option]" << std::endl

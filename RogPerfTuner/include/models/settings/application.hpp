@@ -6,7 +6,6 @@
 
 struct Application {
 	bool askedInstallRccdc		= false;
-	bool enrolled				= false;
 	bool startMinimized			= true;
 	std::string currentVersion	= Constants::APP_VERSION;
 	std::string previousVersion = Constants::APP_VERSION;
@@ -18,7 +17,6 @@ template <>
 struct convert<Application> {
 	static Node encode(const Application& app) {
 		Node node;
-		node["enrolled"]		  = app.enrolled;
 		node["askedInstallRccdc"] = app.askedInstallRccdc;
 		node["startMinimized"]	  = app.startMinimized;
 		node["currentVersion"]	  = app.currentVersion;
@@ -30,11 +28,8 @@ struct convert<Application> {
 		if (node["askedInstallRccdc"]) {
 			app.askedInstallRccdc = node["askedInstallRccdc"].as<bool>();
 		}
-		if (node["enrolled"]) {
-			app.enrolled = node["enrolled"].as<bool>();
-		}
 		if (node["startMinimized"]) {
-			app.enrolled = node["startMinimized"].as<bool>();
+			app.startMinimized = node["startMinimized"].as<bool>();
 		}
 		if (node["currentVersion"]) {
 			app.currentVersion = node["currentVersion"].as<std::string>();

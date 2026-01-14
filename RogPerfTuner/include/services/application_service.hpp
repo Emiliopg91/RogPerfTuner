@@ -52,10 +52,6 @@ class ApplicationService : public Singleton<ApplicationService>, Loggable {
 	void startUpdateCheck();
 
 	void applyUpdate();
-
-	bool enroll();
-
-	void unenroll();
 #endif
 
   private:

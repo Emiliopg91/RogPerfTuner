@@ -24,7 +24,6 @@ options=(
 depends=(
   'asusctl'
   'coreutils'
-  'curl'
   'hicolor-icon-theme'
   'hidapi'
   'libusb'

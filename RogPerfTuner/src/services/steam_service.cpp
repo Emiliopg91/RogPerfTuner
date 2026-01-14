@@ -27,8 +27,7 @@
 #include "yaml-cpp/node/parse.h"
 
 bool SteamService::metricsEnabled() {
-	auto mangohud_which = shell.which("mangohud");
-	return mangohud_which.has_value();
+	return whichMangohud.has_value();
 }
 
 bool SteamService::isRunning(const unsigned int& appid) const {
@@ -51,6 +50,9 @@ const std::unordered_map<std::string, GameEntry>& SteamService::getGames() {
 SteamService::SteamService() : Loggable("SteamService") {
 	logger.info("Initializing SteamService");
 	Logger::add_tab();
+
+	whichMangohud		= shell.which("mangohud");
+	whichSystemdInhibit = shell.which("systemd-inhibit");
 
 	if (!FileUtils::exists(Constants::LOGOS_DIR)) {
 		FileUtils::mkdirs(Constants::LOGOS_DIR);
@@ -431,7 +433,6 @@ const SteamGameConfig SteamService::getConfiguration(const std::string& gid) {
 
 			for (const auto& [key, val] : env_vars) {
 				cfg.environment[key] = val;
-				logger.info("Added env {}={}", key, val);
 			}
 		}
 		if (gameEntry.args.has_value()) {
@@ -455,12 +456,17 @@ const SteamGameConfig SteamService::getConfiguration(const std::string& gid) {
 			}
 		}
 
-		auto mangohud_which = shell.which("mangohud");
-		if (mangohud_which.has_value() && gameEntry.metrics_level != MangoHudLevelMeta::Enum::NO_DISPLAY) {
+		if (whichSystemdInhibit.has_value()) {
+			cfg.wrappers.emplace_back(whichSystemdInhibit.value());
+			cfg.wrappers.emplace_back("--who");
+			cfg.wrappers.emplace_back("\"" + entry->name + "\"");
+		}
+
+		if (whichMangohud.has_value() && gameEntry.metrics_level != MangoHudLevelMeta::Enum::NO_DISPLAY) {
 			cfg.environment["MANGOHUD_CONFIG"] = "preset=" + std::to_string(gameEntry.metrics_level.getPresetIndex());
 			cfg.environment["MANGOHUD_DLSYM"]  = "1";
 			cfg.environment["MANGOHUD"]		   = "1";
-			cfg.wrappers.emplace_back(mangohud_which.value());
+			cfg.wrappers.emplace_back(whichMangohud.value());
 		}
 
 		if (gameEntry.wrappers.has_value()) {

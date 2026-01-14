@@ -1,5 +1,7 @@
 #pragma once
 
+#include <optional>
+
 #include "../clients/shell/pip_client.hpp"
 #include "../clients/unix_socket/steam_client.hpp"
 #include "../models/steam/steam_game_config.hpp"
@@ -14,6 +16,8 @@ class SteamService : public Singleton<SteamService>, Loggable {
 	std::unordered_map<unsigned int, GameEntry> runningGames;
 	bool rccdcEnabled = false;
 	std::thread installer;
+	std::optional<std::string> whichMangohud;
+	std::optional<std::string> whichSystemdInhibit;
 
 	Shell& shell						   = Shell::getInstance();
 	EventBus& eventBus					   = EventBus::getInstance();
