@@ -51,8 +51,15 @@ SteamService::SteamService() : Loggable("SteamService") {
 	logger.info("Initializing SteamService");
 	Logger::add_tab();
 
-	whichMangohud		= shell.which("mangohud");
 	whichSystemdInhibit = shell.which("systemd-inhibit");
+
+	whichMangohud = shell.which("mangohud");
+	if (whichMangohud.has_value()) {
+		if (FileUtils::exists(std::string("/sys/class/powercap/intel-rapl\\:0/energy_uj"))) {
+			logger.info("Enabling CPU power drain...");
+			shell.run_elevated_command("chmod o+r /sys/class/powercap/intel-rapl\\:0/energy_uj", false);
+		}
+	}
 
 	if (!FileUtils::exists(Constants::LOGOS_DIR)) {
 		FileUtils::mkdirs(Constants::LOGOS_DIR);
