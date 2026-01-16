@@ -4,6 +4,7 @@
 #include <QtDBus/QDBusMessage>
 #include <QtDBus/QDBusReply>
 #include <QtDBus/QDBusVariant>
+#include <memory>
 
 AbstractDbusClient::AbstractDbusClient(bool systemBus, const QString& service, const QString& objectPath, const QString& interface, bool required,
 									   QObject* parent)
@@ -22,7 +23,7 @@ AbstractDbusClient::AbstractDbusClient(bool systemBus, const QString& service, c
 		return;
 	}
 
-	iface_	   = new QDBusInterface(serviceName_, objectPath_, interfaceName_, bus_, this);
+	iface_	   = std::make_unique<QDBusInterface>(serviceName_, objectPath_, interfaceName_, bus_, this);
 	available_ = iface_->isValid();
 	if (available_) {													  // Creamos un mensaje que llame a "Introspect" en el objeto remoto
 		QDBusMessage msg   = QDBusMessage::createMethodCall(service,	  // servicio remoto

@@ -4,6 +4,7 @@
 #include <QtCore/QVariant>
 #include <QtDBus/QDBusConnection>
 #include <QtDBus/QDBusInterface>
+#include <memory>
 #include <stdexcept>
 
 #include "../../../utils/events/event_bus.hpp"
@@ -25,7 +26,7 @@ class AbstractDbusClient : public QObject {
 	QString objectPath_;
 	QString interfaceName_;
 	QDBusConnection bus_;
-	QDBusInterface* iface_;
+	std::unique_ptr<QDBusInterface> iface_;
 	bool available_;
 	EventBus& eventBus = EventBus::getInstance();
 
