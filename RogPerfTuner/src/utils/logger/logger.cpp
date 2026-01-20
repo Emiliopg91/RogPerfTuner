@@ -1,5 +1,7 @@
 #include "../../../include/utils/logger/logger.hpp"
 
+#include <iostream>
+
 #include "../../../include/utils/logger/logger_provider.hpp"
 #include "../../../include/utils/string_utils.hpp"
 

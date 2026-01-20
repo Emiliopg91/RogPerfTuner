@@ -9,14 +9,13 @@
 
 #pragma once
 
-#include <spdlog/sinks/basic_file_sink.h>
-#include <spdlog/sinks/stdout_color_sinks.h>
-#include <spdlog/spdlog.h>
-
 #include <memory>
 #include <optional>
 #include <string>
 #include <unordered_map>
+
+#include "spdlog/sinks/basic_file_sink.h"
+#include "spdlog/sinks/stdout_color_sinks.h"
 
 class LoggerProvider {
   public:

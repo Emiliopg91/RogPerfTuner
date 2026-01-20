@@ -70,7 +70,7 @@ inline int startGui(int argc, char** argv) {
 	std::cout << "Assets directory: " << Constants::ASSETS_DIR << std::endl;
 
 	LoggerProvider::initialize(Constants::LOG_FILE_NAME, Constants::LOG_DIR);
-	Logger logger{};
+	Logger logger{"Default"};
 
 	std::string title = "Starting " + Constants::APP_NAME;
 	title			  = StringUtils::leftPad(title, title.length() + (49 - title.length()) / 2);

@@ -1,13 +1,12 @@
 #include "../../../include/utils/logger/logger_provider.hpp"
 
-#include <spdlog/fmt/ostr.h>
-#include <spdlog/logger.h>
-
 #include <filesystem>
 
 #include "../../../include/utils/constants.hpp"
 #include "../../../include/utils/file_utils.hpp"
 #include "../../../include/utils/string_utils.hpp"
+#include "spdlog/logger.h"
+#include "spdlog/spdlog.h"
 
 static std::string format_file_time(std::filesystem::file_time_type ftime) {
 	using namespace std::chrono;

@@ -8,10 +8,9 @@
  */
 #pragma once
 
-#include <spdlog/spdlog.h>
-
 #include "../../utils/string_utils.hpp"
 #include "spdlog/common.h"
+#include "spdlog/logger.h"
 
 template <typename... Args>
 using format_string_t = fmt::format_string<Args...>;
