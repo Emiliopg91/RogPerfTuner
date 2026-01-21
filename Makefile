@@ -14,8 +14,6 @@ clean:
 	@cd submodules/OpenRGB-cppSDK && git reset --hard > /dev/null && git submodule foreach git reset --hard > /dev/null
 	@cd submodules/OpenRGB && git reset --hard > /dev/null && git clean -fdx > /dev/null && rm -f CMakeLists.txt
 	@cd submodules/RccDeckyCompanion && git reset --hard > /dev/null
-	@cd submodules/httplib && git reset --hard > /dev/null
-	@cd submodules/spdlog && git reset --hard > /dev/null
 	@rm -Rf dist logs out build
 
 config:

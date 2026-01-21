@@ -20,12 +20,6 @@ file(GLOB_RECURSE HEADERS_RCC
     "${CMAKE_CURRENT_SOURCE_DIR}/include/*.hpp"
 )
 
-add_library(spdlog_headers INTERFACE)
-
-target_include_directories(spdlog_headers INTERFACE
-    ${CMAKE_SOURCE_DIR}/submodules/spdlog/include
-)
-
 add_executable(RogPerfTuner ${SOURCES_RCC} ${HEADERS_RCC})
 set_target_properties(RogPerfTuner PROPERTIES AUTOMOC ON)
 target_link_libraries(RogPerfTuner PRIVATE 
@@ -35,7 +29,6 @@ target_link_libraries(RogPerfTuner PRIVATE
     Qt6::DBus
     Qt6::Charts
     yaml-cpp::yaml-cpp
-    spdlog_headers
     qt6keychain
     orgbsdk
     udev
