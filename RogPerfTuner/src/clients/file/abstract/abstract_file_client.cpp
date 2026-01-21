@@ -2,7 +2,7 @@
 
 std::string AbstractFileClient::read(const int& head, const int& tail) {
 	if (!available_) {
-		throw std::runtime_error(fmt::format("File {} doesn't exist", path_));
+		throw std::runtime_error("File " + path_ + " doesn't exist");
 	}
 
 	std::string cmd = "cat " + path_;
@@ -37,6 +37,6 @@ AbstractFileClient::AbstractFileClient(const std::string& path, const std::strin
 	: Loggable(name), path_(path), sudo_(sudo) {
 	available_ = shell.run_command("ls " + path, false).exit_code == 0;
 	if (!available_ && required) {
-		throw std::runtime_error(fmt::format("File {} doesn't exist", path_));
+		throw std::runtime_error("File " + path_ + " doesn't exist");
 	}
 }

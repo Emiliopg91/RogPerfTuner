@@ -4,6 +4,7 @@
 
 #include <QApplication>
 #include <iostream>
+#include <string>
 
 #include "../gui/password_dialog.hpp"
 #include "../gui/toaster.hpp"
@@ -70,16 +71,16 @@ inline int startGui(int argc, char** argv) {
 	std::cout << "Assets directory: " << Constants::ASSETS_DIR << std::endl;
 
 	LoggerProvider::initialize(Constants::LOG_FILE_NAME, Constants::LOG_DIR);
-	Logger logger{"Default"};
+	Logger logger = *LoggerProvider::getLogger("Default");
 
 	std::string title = "Starting " + Constants::APP_NAME;
 	title			  = StringUtils::leftPad(title, title.length() + (49 - title.length()) / 2);
 	title			  = StringUtils::rightPad(title, 49);
 
 	logger.info("###################################################");
-	logger.info("#{}#", title);
+	logger.info("#" + title + "#");
 	logger.info("###################################################");
-	logger.info("Version {}", Constants::APP_VERSION);
+	logger.info("Version " + Constants::APP_VERSION);
 #ifdef DEV_MODE
 	logger.info("Starting initialization in dev mode");
 #else
@@ -116,7 +117,7 @@ inline int startGui(int argc, char** argv) {
 	Logger::rem_tab();
 
 	auto t1 = TimeUtils::now();
-	logger.info("Application ready after {} seconds", TimeUtils::getTimeDiff(t0, t1) / 1000.0);
+	logger.info("Application ready after " + std::to_string(TimeUtils::getTimeDiff(t0, t1) / 1000.0) + " seconds");
 
 #ifdef AUR_HELPER
 	applicationService.startUpdateCheck();

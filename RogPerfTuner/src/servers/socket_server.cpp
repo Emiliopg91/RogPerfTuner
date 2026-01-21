@@ -9,6 +9,7 @@
 
 #include <cstring>
 #include <filesystem>
+#include <string>
 
 #include "../../include/utils/file_utils.hpp"
 
@@ -120,7 +121,7 @@ void SocketServer::handleClient(int client_fd) {
 
 		uint32_t msg_len = ntohl(msg_len_net);
 		if (msg_len == 0 || msg_len > 10 * 1024 * 1024) {
-			logger.error("Invalid message length: {}", msg_len);
+			logger.error("Invalid message length: " + std::to_string(msg_len));
 			break;
 		}
 
@@ -188,7 +189,7 @@ void SocketServer::handleRequest(const int& clientFd, const CommunicationMessage
 			res.error = "No such method";
 		}
 	} catch (std::exception& e) {
-		logger.error("Error on request handling: {}", e.what());
+		logger.error("Error on request handling: " + std::string(e.what()));
 		res.error = e.what();
 	}
 

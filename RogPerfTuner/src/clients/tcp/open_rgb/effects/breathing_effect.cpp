@@ -1,5 +1,7 @@
 #include "../../../../../include/clients/tcp/open_rgb/effects/breathing_effect.hpp"
 
+#include <math.h>
+
 void BreathingEffect::apply_effect(const DeviceList& devices) {
 	int offset = 0;
 	while (_is_running) {

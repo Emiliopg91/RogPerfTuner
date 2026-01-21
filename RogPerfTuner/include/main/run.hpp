@@ -38,11 +38,11 @@ inline int run_command(Logger& logger, const std::vector<std::string>& cmd, cons
 	for (auto& arg : args) {
 		ss << arg << " ";
 	}
-	logger.info(">>> Replacing current process with: '{}'", StringUtils::trim(ss.str()));
+	logger.info(">>> Replacing current process with: '" + StringUtils::trim(ss.str()) + "'");
 
 	int fd = open((Constants::LOG_DIR + "/" + Constants::LOG_RUNNER_FILE_NAME + ".log").c_str(), O_WRONLY | O_CREAT | O_APPEND, 0644);
 	if (fd == -1) {
-		logger.error("Cannot open log file: {}", std::strerror(errno));
+		logger.error("Cannot open log file: " + std::string(std::strerror(errno)));
 		return errno;
 	}
 
@@ -52,14 +52,14 @@ inline int run_command(Logger& logger, const std::vector<std::string>& cmd, cons
 
 	execvp(argv[0], argv.data());
 
-	logger.error("Error on execvp: {}", std::strerror(errno));
+	logger.error("Error on execvp: " + std::string(std::strerror(errno)));
 	return errno;
 }
 
 inline int runSteamWrapping(int argc, char* argv[]) {
 	LoggerProvider::initialize(Constants::LOG_RUNNER_FILE_NAME, Constants::LOG_DIR);
 
-	Logger logger{"Runner"};
+	Logger logger = *LoggerProvider::getLogger("Runner");
 
 	if (argc < 2) {
 		logger.error("Error: no command provided");
@@ -103,12 +103,12 @@ inline int runSteamWrapping(int argc, char* argv[]) {
 
 	auto cmdWhichResult = shell.whichAll(std::string(argv[1]));
 	if (cmdWhichResult.empty()) {
-		logger.error("Command {} not found", argv[1]);
+		logger.error("Command " + std::string(argv[1]) + " not found");
 		exit(127);
 	}
 	std::string finalCommandStr = StringUtils::trim(cmdWhichResult[0]);
 
-	logger.info("{} -> {}", std::string(argv[1]), finalCommandStr);
+	logger.info(std::string(argv[1]) + " -> " + finalCommandStr);
 
 	command.push_back(finalCommandStr);
 
@@ -138,7 +138,7 @@ inline int runSteamWrapping(int argc, char* argv[]) {
 			logger.warn("No AppId provided");
 		}
 	} catch (std::exception& e) {
-		logger.error("Error requesting configuration {}", e.what());
+		logger.error("Error requesting configuration " + std::string(e.what()));
 	}
 
 	std::optional<std::string> bin = std::string(argv[argc - 1]);
@@ -153,7 +153,7 @@ inline int runSteamWrapping(int argc, char* argv[]) {
 			}
 		}
 
-		logger.error("{}", *bin);
+		logger.error(*bin);
 		if (FileUtils::exists(*bin)) {
 			try {
 				FileUtils::copy(*bin, *bin + ".bk");

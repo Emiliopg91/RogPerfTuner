@@ -1,8 +1,8 @@
 #include "../../include/services/hardware_service.hpp"
 
 #include <exception>
+#include <string>
 
-#include "../../include/clients/dbus/asus/core/platform_client.hpp"
 #include "../../include/clients/dbus/linux/power_management_kb_brightness.hpp"
 #include "../../include/clients/dbus/linux/upower_client.hpp"
 #include "../../include/clients/file/boost_control_client.hpp"
@@ -141,7 +141,7 @@ HardwareService::HardwareService() : Loggable("HardwareService") {
 		Logger::add_tab();
 		charge_limit = configuration.getConfiguration().platform.chargeLimit;
 		batteryChargeLimitClient.setChargeLimit(charge_limit);
-		logger.info("{} %", charge_limit.toInt());
+		logger.info(std::to_string(charge_limit.toInt()) + " %");
 		Logger::rem_tab();
 	}
 
@@ -216,7 +216,7 @@ BatteryThreshold HardwareService::getChargeThreshold() {
 void HardwareService::setChargeThreshold(const BatteryThreshold& threshold) {
 	std::lock_guard<std::mutex> lock(actionMutex);
 	if (charge_limit != threshold) {
-		logger.info("Setting charge limit to {}%", threshold.toInt());
+		logger.info("Setting charge limit to " + std::to_string(threshold.toInt()) + "%");
 		auto t0 = TimeUtils::now();
 		batteryChargeLimitClient.setChargeLimit(threshold);
 		auto t1 = TimeUtils::now();
@@ -225,7 +225,7 @@ void HardwareService::setChargeThreshold(const BatteryThreshold& threshold) {
 		configuration.getConfiguration().platform.chargeLimit = threshold;
 		configuration.saveConfig();
 
-		logger.info("Charge limit setted after {} ms", TimeUtils::getTimeDiff(t0, t1));
+		logger.info("Charge limit setted after " + std::to_string(TimeUtils::getTimeDiff(t0, t1)) + " ms");
 
 		toaster.showToast(translator.translate("applied.battery.threshold", {{"value", std::to_string(threshold.toInt())}}));
 		eventBus.emitChargeThreshold(threshold);
@@ -241,7 +241,7 @@ void HardwareService::onBatteryEvent(const bool& onBat, const bool& muted) {
 		if (!muted) {
 			std::string t1 = onBattery ? "un" : "";
 			std::string t2 = !onBattery ? "dis" : "";
-			logger.info("AC {}plugged, battery {}engaged", t1, t2);
+			logger.info("AC " + t1 + "plugged, battery " + t2 + "engaged");
 			Logger::add_tab();
 		}
 		eventBus.emitBattery(onBat);
@@ -253,7 +253,7 @@ void HardwareService::onBatteryEvent(const bool& onBat, const bool& muted) {
 
 void HardwareService::setPanelOverdrive(const bool& enable) {
 	if (panelOverdriveClient.available()) {
-		logger.info("Panel Overdrive: {}", enable ? "Enabled" : "Disabled");
+		logger.info("Panel Overdrive: " + std::string(enable ? "Enabled" : "Disabled"));
 		Logger::add_tab();
 		try {
 			panelOverdriveClient.setCurrentValue(enable);
@@ -314,12 +314,12 @@ void HardwareService::setBootSound(bool enable) {
 	}
 
 	std::lock_guard<std::mutex> lock(actionMutex);
-	logger.info("Setting boot sound: {}", enable ? "Enabled" : "Disabled");
+	logger.info("Setting boot sound: " + std::string(enable ? "Enabled" : "Disabled"));
 	Logger::add_tab();
 	auto t0 = TimeUtils::now();
 	bootSoundClient.setCurrentValue(enable);
 	auto t1 = TimeUtils::now();
 	Logger::rem_tab();
-	logger.info("Boot sound setted after {} ms", TimeUtils::getTimeDiff(t0, t1));
+	logger.info("Boot sound setted after " + std::to_string(TimeUtils::getTimeDiff(t0, t1)) + " ms");
 	eventBus.emitBootSound(enable);
 }

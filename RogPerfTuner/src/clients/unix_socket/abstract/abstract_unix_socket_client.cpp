@@ -9,6 +9,7 @@
 
 #include <exception>
 #include <mutex>
+#include <string>
 #include <thread>
 
 #include "../../../../include/utils/string_utils.hpp"
@@ -54,7 +55,7 @@ void AbstractUnixSocketClient::stop(bool stopConnThread) {
 		}
 		Logger::rem_tab();
 	} catch (std::exception& e) {
-		logger.error("Error on stop: {}", e.what());
+		logger.error("Error on stop: " + std::string(e.what()));
 	}
 }
 
@@ -210,7 +211,7 @@ std::vector<std::any> AbstractUnixSocketClient::invoke(std::string method, std::
 
 	if (fut.wait_for(std::chrono::milliseconds(timeout_ms)) == std::future_status::timeout) {
 		if (method != "ping") {
-			logger.error("No response for {} after {} ms", method, timeout_ms);
+			logger.error("No response for " + method + " after " + std::to_string(timeout_ms) + " ms");
 		}
 		throw std::runtime_error("UnixSocketTimeoutError");
 	}

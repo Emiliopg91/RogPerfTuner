@@ -21,7 +21,7 @@
 #include "../../include/utils/string_utils.hpp"
 #include "OpenRGB/Color.hpp"
 
-MainWindow::MainWindow(QWidget* parent) : QMainWindow(parent), _logger(new Logger()) {
+MainWindow::MainWindow(QWidget* parent) : QMainWindow(parent), _logger(LoggerProvider::getLogger("MainWindow")) {
 	onBattery	 = uPowerClient.isOnBattery();
 	runningGames = steamService.getRunningGames().size();
 

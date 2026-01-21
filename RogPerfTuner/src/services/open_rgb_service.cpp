@@ -1,6 +1,7 @@
 #include "../../include/services/open_rgb_service.hpp"
 
 #include <optional>
+#include <string>
 
 #include "../../include/clients/tcp/open_rgb/open_rgb_client.hpp"
 #include "../../include/models/hardware/usb_identifier.hpp"
@@ -135,7 +136,7 @@ void OpenRgbService::reload() {
 	applyAura();
 	auto t1 = TimeUtils::now();
 	Logger::rem_tab();
-	logger.info("Reloaded after {} ms", TimeUtils::getTimeDiff(t0, t1));
+	logger.info("Reloaded after " + std::to_string(TimeUtils::getTimeDiff(t0, t1)) + " ms");
 }
 
 void OpenRgbService::applyAura(const bool& temporal) {
@@ -162,11 +163,11 @@ void OpenRgbService::applyAura(const bool& temporal) {
 
 	auto t1 = TimeUtils::now();
 	Logger::rem_tab();
-	logger.info("Aura applied after {} ms", TimeUtils::getTimeDiff(t0, t1));
+	logger.info("Aura applied after " + std::to_string(TimeUtils::getTimeDiff(t0, t1)) + " ms");
 }
 
 void OpenRgbService::disableDevice(const UsbIdentifier& identifier) {
-	logger.info("Disabling {}", getDeviceName(identifier));
+	logger.info("Disabling " + getDeviceName(identifier));
 	openRgbClient.disableDevice(getDeviceName(identifier));
 }
 

@@ -43,7 +43,7 @@ ScxCtlClient::ScxCtlClient() : AbstractCmdClient("scxctl", "ScxCtlClient") {
 			current = std::nullopt;
 			logger.info("No active scheduler");
 		} else {
-			logger.info("Currently using {} scheduler", current.value());
+			logger.info("Currently using " + current.value() + " scheduler");
 		}
 		Logger::rem_tab();
 
@@ -54,7 +54,7 @@ ScxCtlClient::ScxCtlClient() : AbstractCmdClient("scxctl", "ScxCtlClient") {
 void ScxCtlClient::start(std::string name) {
 	auto it = available_sched.find(name);
 	if (it == available_sched.end()) {
-		logger.error("Scheduler {} not available", name);
+		logger.error("Scheduler " + name + " not available");
 		return;
 	}
 
@@ -71,13 +71,13 @@ void ScxCtlClient::start(std::string name) {
 		}
 
 		action = "switch";
-		logger.info("Switching scheduler from {} to {}", current.value(), name);
+		logger.info("Switching scheduler from " + current.value() + " to " + name);
 	} else {
-		logger.info("Starting scheduler {}", name);
+		logger.info("Starting scheduler " + name);
 	}
 
 	Logger::add_tab();
-	run_command(fmt::format("{} --sched {} --args=\"{}\"", action, name, it->second), false, true);
+	run_command(std::string(action) + " --sched " + name + " --args=\"" + it->second + "\"", false, true);
 	Logger::rem_tab();
 
 	logger.info("Scheduler applied succesfully");
@@ -89,7 +89,7 @@ void ScxCtlClient::stop() {
 	if (!current.has_value()) {
 		return;
 	}
-	logger.info("Stopping scheduler {}", current.value());
+	logger.info("Stopping scheduler " + current.value());
 
 	Logger::add_tab();
 	run_command("stop", false, true);

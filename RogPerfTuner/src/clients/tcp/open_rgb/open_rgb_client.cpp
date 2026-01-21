@@ -52,7 +52,7 @@ void OpenRgbClient::initialize() {
 		}
 	}
 	Logger::rem_tab();
-	logger.debug("Found {} compatible devices", compatibleDevices.size());
+	logger.debug("Found " + std::to_string(compatibleDevices.size()) + " compatible devices");
 
 	availableEffects.push_back(std::unique_ptr<AbstractEffect>(&BreathingEffect::init(client)));
 	availableEffects.push_back(std::unique_ptr<AbstractEffect>(&DanceFloorEffect::init(client)));
@@ -154,7 +154,7 @@ void OpenRgbClient::runner() {
 	pid			  = shell.launch_process(Constants::ORGB_PATH.c_str(), argv.data(), env.data(),
 										 Constants::LOG_DIR + "/" + Constants::LOG_ORGB_FILE_NAME + ".log");
 	int exit_code = shell.wait_for(pid);
-	logger.info("Command finished with exit code {}", exit_code);
+	logger.info("Command finished with exit code " + std::to_string(exit_code));
 }
 
 void OpenRgbClient::startOpenRgbClient() {

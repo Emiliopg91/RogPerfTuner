@@ -19,7 +19,7 @@ void ArmouryBaseClient::setCurrentValue(int value) {
 	auto max = getMaxValue();
 
 	if (value < min || value > max) {
-		throw std::runtime_error(fmt::format("Value {} outside of range [{},{}]", value, min, max));
+		throw std::runtime_error("Value " + std::to_string(value) + " outside of range [" + std::to_string(min) + "," + std::to_string(max) + "]");
 	}
 
 	write(std::to_string(value));

@@ -8,12 +8,16 @@
  */
 #pragma once
 
-#include "../../utils/string_utils.hpp"
-#include "spdlog/common.h"
-#include "spdlog/logger.h"
+#include <chrono>
+#include <ctime>
+#include <iomanip>
+#include <memory>
+#include <mutex>
 
-template <typename... Args>
-using format_string_t = fmt::format_string<Args...>;
+#include "../../models/others/logger_level.hpp"
+#include "../string_utils.hpp"
+#include "sink/console_sink.hpp"
+#include "sink/file_sink.hpp"
 
 class Logger {
   public:
@@ -29,36 +33,14 @@ class Logger {
 	 *
 	 * @param level
 	 */
-	void setLevel(spdlog::level::level_enum level);
+	void setLevel(LoggerLevel level);
 
 	/**
 	 * @brief Construct a new Logger object
 	 *
 	 * @param name
 	 */
-	Logger(std::string name = "Default");
-
-	/**
-	 * @brief Send trace log line
-	 *
-	 * @tparam Args
-	 * @param fmt
-	 * @param args
-	 */
-	template <typename... Args>
-	void trace(format_string_t<Args...> fmt, Args&&... args) {
-		log(spdlog::level::trace, fmt, std::forward<Args>(args)...);
-	}
-
-	/**
-	 * @brief Send trace log line
-	 *
-	 * @param msg
-	 * @param args
-	 */
-	void trace(std::string msg) {
-		trace("{}", msg);
-	}
+	Logger(std::shared_ptr<ConsoleSink> consoleSink, std::optional<std::shared_ptr<FileSink>> fileSink, std::string name = "Default");
 
 	/**
 	 * @brief  Send debug log line
@@ -68,18 +50,8 @@ class Logger {
 	 * @param args
 	 */
 	template <typename... Args>
-	void debug(format_string_t<Args...> fmt, Args&&... args) {
-		log(spdlog::level::debug, fmt, std::forward<Args>(args)...);
-	}
-
-	/**
-	 * @brief Send debug log line
-	 *
-	 * @param msg
-	 * @param args
-	 */
-	void debug(std::string msg) {
-		debug("{}", msg);
+	void debug(std::string format) {
+		log(LoggerLevel::Enum::DEBUG, format);
 	}
 
 	/**
@@ -90,18 +62,8 @@ class Logger {
 	 * @param args
 	 */
 	template <typename... Args>
-	void info(format_string_t<Args...> fmt, Args&&... args) {
-		log(spdlog::level::info, fmt, std::forward<Args>(args)...);
-	}
-
-	/**
-	 * @brief Send info log line
-	 *
-	 * @param msg
-	 * @param args
-	 */
-	void info(std::string msg) {
-		info("{}", msg);
+	void info(std::string format) {
+		log(LoggerLevel::Enum::INFO, format);
 	}
 
 	/**
@@ -112,18 +74,8 @@ class Logger {
 	 * @param args
 	 */
 	template <typename... Args>
-	void warn(format_string_t<Args...> fmt, Args&&... args) {
-		log(spdlog::level::warn, fmt, std::forward<Args>(args)...);
-	}
-
-	/**
-	 * @brief Send warning log line
-	 *
-	 * @param msg
-	 * @param args
-	 */
-	void warn(std::string msg) {
-		warn("{}", msg);
+	void warn(std::string format) {
+		log(LoggerLevel::Enum::WARN, format);
 	}
 
 	/**
@@ -134,18 +86,8 @@ class Logger {
 	 * @param args
 	 */
 	template <typename... Args>
-	void error(format_string_t<Args...> fmt, Args&&... args) {
-		log(spdlog::level::err, fmt, std::forward<Args>(args)...);
-	}
-
-	/**
-	 * @brief Send error log line
-	 *
-	 * @param msg
-	 * @param args
-	 */
-	void error(std::string msg) {
-		error("{}", msg);
+	void error(std::string format) {
+		log(LoggerLevel::Enum::ERROR, format);
 	}
 
 	/**
@@ -156,18 +98,8 @@ class Logger {
 	 * @param args
 	 */
 	template <typename... Args>
-	void critical(format_string_t<Args...> fmt, Args&&... args) {
-		log(spdlog::level::critical, fmt, std::forward<Args>(args)...);
-	}
-
-	/**
-	 * @brief Send critical log line
-	 *
-	 * @param msg
-	 * @param args
-	 */
-	void critical(std::string msg) {
-		critical("{}", msg);
+	void critical(std::string format) {
+		log(LoggerLevel::Enum::CRITICAL, format);
 	}
 
 	static void add_tab();
@@ -177,14 +109,41 @@ class Logger {
   private:
 	inline static int tabs = 0;
 	inline static std::mutex mutex;
-	std::shared_ptr<spdlog::logger> logger;
+
+	inline static std::string now_timestamp() {
+		using namespace std::chrono;
+
+		auto now  = system_clock::now();
+		auto secs = time_point_cast<seconds>(now);
+		auto ms	  = duration_cast<milliseconds>(now - secs).count();
+
+		std::time_t tt = system_clock::to_time_t(secs);
+		std::tm tm{};
+		localtime_r(&tt, &tm);
+
+		std::ostringstream oss;
+		oss << std::put_time(&tm, "%Y-%m-%d %H:%M:%S") << '.' << std::setw(3) << std::setfill('0') << ms;
+
+		return oss.str();
+	}
+
+	std::shared_ptr<ConsoleSink> consoleSink;
+	std::optional<std::shared_ptr<FileSink>> fileSink;
+	std::string name;
+	LoggerLevel level = LoggerLevel::Enum::INFO;
 
 	template <typename... Args>
-	void log(spdlog::level::level_enum level, format_string_t<Args...> fmt, Args&&... args) {
-		if (static_cast<int>(logger->level()) > static_cast<int>(level)) {
+	void log(LoggerLevel msgLevel, std::string format) {
+		std::lock_guard<std::mutex> lock(mutex);
+		if (msgLevel.toInt() > this->level.toInt()) {
 			return;
-		} else {
-			logger->log(level, fmt::format("{}{}", StringUtils::leftPad("", tabs * 2), fmt::format(fmt, std::forward<Args>(args)...)));
+		}
+
+		auto out = "[" + now_timestamp() + "][" + StringUtils::rightPad(msgLevel.toName(), 7).substr(0, 7) + "][" + name + "] - " +
+				   StringUtils::rightPad("", tabs * 2) + format + "\n";
+		consoleSink->write(out);
+		if (fileSink.has_value()) {
+			fileSink.value()->write(out);
 		}
 	}
 };

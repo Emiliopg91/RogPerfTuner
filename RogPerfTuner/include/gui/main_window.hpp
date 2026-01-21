@@ -77,7 +77,7 @@ class MainWindow : public QMainWindow, public Singleton<MainWindow> {
 
   private:
 	friend class Singleton<MainWindow>;
-	Logger* _logger;
+	std::shared_ptr<Logger> _logger;
 	int runningGames;
 	bool onBattery;
 

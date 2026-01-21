@@ -3,6 +3,7 @@
 #include <mutex>
 #include <optional>
 #include <string>
+#include <thread>
 
 #include "../../../../../models/hardware/rgb_brightness.hpp"
 #include "../../../../../models/others/loggable.hpp"

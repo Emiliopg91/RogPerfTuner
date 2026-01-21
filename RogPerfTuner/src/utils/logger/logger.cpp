@@ -1,12 +1,8 @@
 #include "../../../include/utils/logger/logger.hpp"
 
-#include <iostream>
+#include <memory>
 
-#include "../../../include/utils/logger/logger_provider.hpp"
-#include "../../../include/utils/string_utils.hpp"
-
-void Logger::setLevel(std::string levelStr) {
-	setLevel(spdlog::level::from_str(StringUtils::toLowerCase(levelStr)));
+void Logger::setLevel(std::string _) {
 }
 
 /**
@@ -14,10 +10,7 @@ void Logger::setLevel(std::string levelStr) {
  *
  * @param level
  */
-void Logger::setLevel(spdlog::level::level_enum level) {
-	std::lock_guard<std::mutex> lock(mutex);
-	logger->set_level(level);
-	logger->flush_on(level);
+void Logger::setLevel(LoggerLevel _) {
 }
 
 /**
@@ -25,9 +18,11 @@ void Logger::setLevel(spdlog::level::level_enum level) {
  *
  * @param name
  */
-Logger::Logger(std::string name) {
+Logger::Logger(std::shared_ptr<ConsoleSink> console_sink, std::optional<std::shared_ptr<FileSink>> fileSink, std::string name) {
 	std::lock_guard<std::mutex> lock(mutex);
-	logger = LoggerProvider::getLogger(name);
+	this->consoleSink = console_sink;
+	this->fileSink	  = fileSink;
+	this->name		  = StringUtils::rightPad(name, 20).substr(0, 20);
 }
 
 void Logger::add_tab() {

@@ -162,16 +162,16 @@ void SteamService::onFirstGameRun(unsigned int gid, std::string name) {
 
 	auto userIds = FileUtils::listDirectory(Constants::STEAM_USERDATA_PATH);
 	for (const auto& userId : userIds) {
-		auto path = fmt::format("{}/{}/config/grid/{}_logo.png", Constants::STEAM_USERDATA_PATH, userId, gid);
+		auto path = Constants::STEAM_USERDATA_PATH + "/" + userId + "/config/grid/" + std::to_string(gid) + "_logo.png";
 		if (FileUtils::exists(path)) {
-			FileUtils::copy(path, fmt::format("{}/{}_logo.png", Constants::LOGOS_DIR, gid));
+			FileUtils::copy(path, Constants::LOGOS_DIR + "/" + std::to_string(gid) + "_logo.png");
 			break;
 		}
 	}
 	for (const auto& userId : userIds) {
-		auto path = fmt::format("{}/{}/config/grid/{}_hero.png", Constants::STEAM_USERDATA_PATH, userId, gid);
+		auto path = Constants::STEAM_USERDATA_PATH + "/" + userId + "/config/grid/" + std::to_string(gid) + "_hero.png";
 		if (FileUtils::exists(path)) {
-			FileUtils::copy(path, fmt::format("{}/{}_hero.png", Constants::LOGOS_DIR, gid));
+			FileUtils::copy(path, Constants::LOGOS_DIR + "/" + std::to_string(gid) + "_hero.png");
 			break;
 		}
 	}
@@ -180,9 +180,9 @@ void SteamService::onFirstGameRun(unsigned int gid, std::string name) {
 		auto icon = getIcon(gid);
 		if (!icon.has_value()) {
 			try {
-				NetUtils::download(
-					fmt::format("https://cdn.cloudflare.steamstatic.com/steamcommunity/public/images/apps/{}/{}.jpg", gid, details.icon_hash),
-					fmt::format("{}/{}_logo.jpg", Constants::LOGOS_DIR, gid));
+				NetUtils::download("https://cdn.cloudflare.steamstatic.com/steamcommunity/public/images/apps/" + std::to_string(gid) + "/" +
+									   details.icon_hash + ".jpg",
+								   Constants::LOGOS_DIR + "/" + std::to_string(gid) + "_logo.jpg");
 			} catch (std::exception& e) {
 			}
 		}
@@ -190,8 +190,8 @@ void SteamService::onFirstGameRun(unsigned int gid, std::string name) {
 	auto banner = getBanner(gid);
 	if (!banner.has_value()) {
 		try {
-			NetUtils::download(fmt::format("https://cdn.cloudflare.steamstatic.com/steam/apps/{}/header.jpg", gid),
-							   fmt::format("{}/{}_hero.jpg", Constants::LOGOS_DIR, gid));
+			NetUtils::download("https://cdn.cloudflare.steamstatic.com/steam/apps/" + std::to_string(gid) + "/header.jpg",
+							   Constants::LOGOS_DIR + "/" + std::to_string(gid) + "_hero.jpg");
 		} catch (std::exception& e) {
 		}
 	}
@@ -210,7 +210,7 @@ void SteamService::onFirstGameRun(unsigned int gid, std::string name) {
 }
 
 void SteamService::saveGameConfig(uint gid, const GameEntry& entry) {
-	logger.info("Saving configuration for '{}' ({})", entry.name, gid);
+	logger.info("Saving configuration for '" + entry.name + "' (" + std::to_string(gid) + ")");
 	Logger::add_tab();
 
 	configuration.getConfiguration().games[std::to_string(gid)] = entry;
@@ -220,7 +220,7 @@ void SteamService::saveGameConfig(uint gid, const GameEntry& entry) {
 }
 
 void SteamService::launchGame(const std::string& id) {
-	logger.info("Launching game with id {}...", id);
+	logger.info("Launching game with id " + id + "...");
 	Logger::add_tab();
 
 	shell.run_command("steam steam://rungameid/" + id);
@@ -275,7 +275,7 @@ void SteamService::installRccDC() {
 			rccdcEnabled = false;
 		}
 	} catch (std::exception& e) {
-		logger.error("Error while installing RCCDeckyCompanion plugin: {}", e.what());
+		logger.error("Error while installing RCCDeckyCompanion plugin: " + std::string(e.what()));
 	}
 }
 
@@ -299,14 +299,14 @@ void SteamService::copyPlugin() {
 
 void SteamService::installPipDeps() {
 	auto depStr = StringUtils::join(Constants::RCCDC_REQUIRED_PIP, " ");
-	logger.info("Installing PIP dependencies {}", depStr);
+	logger.info("Installing PIP dependencies " + depStr);
 	Logger::add_tab();
 	pipClient.installPackage(depStr);
 	Logger::rem_tab();
 }
 
 void SteamService::onGameLaunch(unsigned int gid, std::string name, int pid) {
-	logger.info("Launched '{}' ({}) with PID {}", name, gid, pid);
+	logger.info("Launched '" + name + "' (" + std::to_string(gid) + ") with PID " + std::to_string(pid));
 	Logger::add_tab();
 
 	auto it = configuration.getConfiguration().games.find(std::to_string(gid));
@@ -321,11 +321,11 @@ void SteamService::onGameLaunch(unsigned int gid, std::string name, int pid) {
 			signaled	= newSignaled;
 			newSignaled = ProcessUtils::sendSignalToHierarchy(pid, SIGSTOP);
 
-			logger.debug("Stopped {} processes, before {}", newSignaled.size(), signaled.size());
+			logger.debug("Stopped " + std::to_string(newSignaled.size()) + " processes, before " + std::to_string(signaled.size()));
 
 			TimeUtils::sleep(100);
 		} while (signaled != newSignaled);
-		logger.debug("Killed {} processes", ProcessUtils::sendSignalToHierarchy(pid, SIGKILL).size());
+		logger.debug("Killed " + std::to_string(ProcessUtils::sendSignalToHierarchy(pid, SIGKILL).size()) + " processes");
 
 		Logger::rem_tab();
 
@@ -346,7 +346,7 @@ void SteamService::onGameLaunch(unsigned int gid, std::string name, int pid) {
 void SteamService::onGameStop(unsigned int gid, std::string name) {
 	auto it = runningGames.find(gid);
 	if (it != runningGames.end()) {
-		logger.info("Stopped '{}' ({})", name, gid);
+		logger.info("Stopped '" + name + "' (" + std::to_string(gid) + ")");
 		runningGames.erase(gid);
 		Logger::add_tab();
 
@@ -483,7 +483,7 @@ const SteamGameConfig SteamService::getConfiguration(const std::string& gid) {
 			}
 		}
 	} else {
-		logger.error("No configuration entry found for {}", gid);
+		logger.error("No configuration entry found for " + gid);
 	}
 
 	return cfg;
@@ -496,7 +496,7 @@ std::string SteamService::encodeAppId(uint32_t appid) {
 std::optional<std::string> SteamService::getImagePath(uint gid, std::string sufix) {
 	const std::vector<std::string> extensions = {"jpg", "png"};
 	for (auto ext : extensions) {
-		auto path = fmt::format("{}/{}{}.{}", Constants::LOGOS_DIR, gid, sufix, ext);
+		auto path = Constants::LOGOS_DIR + "/" + std::to_string(gid) + sufix + "." + ext;
 		if (FileUtils::exists(path)) {
 			return path;
 		}

@@ -2,11 +2,8 @@
 
 #include <filesystem>
 
-#include "../../../include/utils/constants.hpp"
 #include "../../../include/utils/file_utils.hpp"
 #include "../../../include/utils/string_utils.hpp"
-#include "spdlog/logger.h"
-#include "spdlog/spdlog.h"
 
 static std::string format_file_time(std::filesystem::file_time_type ftime) {
 	using namespace std::chrono;
@@ -72,10 +69,7 @@ static void rotate_log(const std::string& fileName, const std::filesystem::path&
 std::unordered_map<std::string, std::string> LoggerProvider::configMap{};
 
 void LoggerProvider::initialize(std::string fileName, std::string path) {
-	console_sink = std::make_shared<spdlog::sinks::stdout_color_sink_mt>();
-	console_sink->set_pattern("%^" + Constants::LOGGER_PATTERN + "%$");
-
-	auto sinkList = spdlog::sinks_init_list{console_sink};
+	console_sink = std::make_shared<ConsoleSink>();
 
 	if (!fileName.empty() && !path.empty()) {
 		std::filesystem::path dirPath(path);
@@ -86,25 +80,21 @@ void LoggerProvider::initialize(std::string fileName, std::string path) {
 
 		rotate_log(fileName, dirPath, dirPath2);
 
-		file_sink = std::make_shared<spdlog::sinks::basic_file_sink_mt>(path + "/" + fileName + ".log", true);
-		file_sink.value()->set_pattern(Constants::LOGGER_PATTERN);
-
-		sinkList = spdlog::sinks_init_list{console_sink, file_sink.value()};
+		file_sink = std::make_shared<FileSink>(path + "/" + fileName + ".log");
 	}
-	auto main_logger = std::make_shared<spdlog::logger>("Default", sinkList.begin(), sinkList.end());
+	auto main_logger = std::make_shared<Logger>(console_sink, file_sink, "Default");
 
-	defaultLevel = spdlog::level::info;
+	/**
 	if (getenv("RCC_LOG_LEVEL")) {
 		defaultLevel = spdlog::level::from_str(StringUtils::toLowerCase(getenv("RCC_LOG_LEVEL")));
 	}
 
-	main_logger->set_level(defaultLevel);
-	main_logger->flush_on(defaultLevel);
-
-	spdlog::set_default_logger(main_logger);
+	logger->set_level(level);
+	logger->flush_on(level);
+	*/
 }
 
-std::shared_ptr<spdlog::logger> LoggerProvider::getLogger(const std::string& name) {
+std::shared_ptr<Logger> LoggerProvider::getLogger(const std::string& name) {
 	auto it = loggers.find(name);
 	if (it != loggers.end()) {
 		return it->second;
@@ -118,22 +108,18 @@ std::shared_ptr<spdlog::logger> LoggerProvider::getLogger(const std::string& nam
 		display_name.resize(20);
 	}
 
-	auto sinkList = spdlog::sinks_init_list{console_sink};
-	if (file_sink.has_value()) {
-		sinkList = spdlog::sinks_init_list{console_sink, file_sink.value()};
-	}
-
-	auto logger = std::make_shared<spdlog::logger>(display_name, sinkList.begin(), sinkList.end());
+	auto logger = std::make_shared<Logger>(console_sink, file_sink, display_name);
 
 	auto level = defaultLevel;
-	auto it2   = LoggerProvider::configMap.find(name);
+	/*auto it2   = LoggerProvider::configMap.find(name);
 	if (it2 != configMap.end()) {
 		level = spdlog::level::from_str(StringUtils::toLowerCase(it2->second));
 	}
+
 	logger->set_level(level);
 	logger->flush_on(level);
+*/
 
-	spdlog::register_logger(logger);
 	loggers[name] = logger;
 	return logger;
 }
@@ -144,9 +130,10 @@ void LoggerProvider::setConfigMap(std::unordered_map<std::string, std::string> c
 	for (const auto& [key, loggerPtr] : LoggerProvider::loggers) {
 		auto it = LoggerProvider::configMap.find(StringUtils::trim(key));
 		if (it != LoggerProvider::configMap.end()) {
+			/*
 			auto level = spdlog::level::from_str(StringUtils::toLowerCase(it->second));
 			loggerPtr->set_level(level);
-			loggerPtr->flush_on(level);
+			loggerPtr->flush_on(level);*/
 		}
 	}
 }

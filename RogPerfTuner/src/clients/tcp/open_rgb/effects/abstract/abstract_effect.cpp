@@ -23,9 +23,9 @@ void AbstractEffect::start(const DeviceList& devices, const RgbBrightness& brigh
 	}
 
 	if (!_color.has_value()) {
-		logger.info("Starting effect '{}' with {} brightness", getName(), StringUtils::toLowerCase(brightness.toName()));
+		logger.info("Starting effect '" + getName() + "' with " + StringUtils::toLowerCase(brightness.toName()) + " brightness");
 	} else {
-		logger.info("Starting effect '{}' with {} brightness and color {}", getName(), StringUtils::toLowerCase(brightness.toName()),
+		logger.info("Starting effect '" + getName() + "' with " + StringUtils::toLowerCase(brightness.toName()) + " brightness and color " +
 					StringUtils::toUpperCase(_color.value().toHex()));
 	}
 	_brightness = brightness.toInt() / 100.0;
@@ -79,7 +79,7 @@ AbstractEffect::AbstractEffect(Client& client, const std::string& name, const st
 	for (size_t i = 0; i < parts.size(); i++) {
 		parts[i] = StringUtils::capitalize(parts[i]);
 	}
-	logger = Logger{StringUtils::join(parts, "") + "Effect"};
+	logger = *LoggerProvider::getLogger(StringUtils::join(parts, "") + "Effect");
 	if (color.has_value()) {
 		_color = Color::fromRgb(*color);
 	}

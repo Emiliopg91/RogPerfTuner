@@ -1,5 +1,7 @@
 #include "../../../../../include/clients/tcp/open_rgb/effects/rainbow_wave.hpp"
 
+#include <math.h>
+
 void RainbowWave::apply_effect(const DeviceList& devices) {
 	// Calcular la longitud de la zona más grande
 	size_t longest_zone = 0;

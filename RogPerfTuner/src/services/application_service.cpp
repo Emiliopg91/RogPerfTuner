@@ -115,11 +115,11 @@ void ApplicationService::setAutostart(bool enabled) {
 	if (enabled) {
 		if (!FileUtils::exists(Constants::AUTOSTART_FILE)) {
 			FileUtils::writeFileContent(Constants::AUTOSTART_FILE, buildDesktopFile());
-			logger.info("Autostart file '{}' written successfully", Constants::AUTOSTART_FILE);
+			logger.info("Autostart file '" + Constants::AUTOSTART_FILE + "' written successfully");
 		}
 	} else {
 		FileUtils::remove(Constants::AUTOSTART_FILE);
-		logger.info("Autostart file '{}' deleted successfully", Constants::AUTOSTART_FILE);
+		logger.info("Autostart file '" + Constants::AUTOSTART_FILE + "' deleted successfully");
 	}
 }
 
@@ -153,7 +153,7 @@ void ApplicationService::lookForUpdates() {
 			auto latestVersion = SemanticVersion::parse(version);
 
 			if (latestVersion > currentVersion) {
-				logger.info("New version available: {}", version);
+				logger.info("New version available: " + version);
 				toaster.showToast(translator.translate("update.available", {{"version", version}}));
 				eventBus.emitUpdateAvailable(version);
 				found = true;
@@ -161,7 +161,7 @@ void ApplicationService::lookForUpdates() {
 				break;
 			}
 		} catch (std::exception& e) {
-			logger.error("Error on update check: {}", e.what());
+			logger.error("Error on update check: " + std::string(e.what()));
 		}
 
 		if (!found) {
@@ -228,14 +228,14 @@ std::optional<std::string> ApplicationService::getChangeLog() {
 
 		if (!features.empty() || !improvements.empty() || !fixes.empty()) {
 			std::ostringstream sb;
-			sb << fmt::format("<h1>Changelog from {} (current version) to {} (latest version)</h1>\n", Constants::APP_VERSION, releases[0].version);
+			sb << "<h1>Changelog from " + Constants::APP_VERSION + " (current version) to " + releases[0].version + " (latest version)</h1>\n";
 			sb << "\t<div style=\"margin-left:20px\">\n";
 
 			if (!features.empty()) {
 				sb << "\t\t<h2 style=\"margin-bottom: 0px;\">New features</h2>\n";
 				sb << "\t\t<ul style=\"margin-top: 5px;\">\n";
 				for (const auto& f : features) {
-					sb << fmt::format("\t\t\t<li>{}</li>\n", f);
+					sb << "\t\t\t<li>" + f + "</li>\n";
 				}
 				sb << "\t\t</ul>\n";
 			}
@@ -244,7 +244,7 @@ std::optional<std::string> ApplicationService::getChangeLog() {
 				sb << "\t\t<h2 style=\"margin-bottom: 0px;\">Improvements</h2>\n";
 				sb << "\t\t<ul style=\"margin-top: 5px;\">\n";
 				for (const auto& f : improvements) {
-					sb << fmt::format("\t\t\t<li>{}</li>\n", f);
+					sb << "\t\t\t<li>" + f + "</li>\n";
 				}
 				sb << "\t\t</ul>\n";
 			}
@@ -253,7 +253,7 @@ std::optional<std::string> ApplicationService::getChangeLog() {
 				sb << "\t\t<h2 style=\"margin-bottom: 0px;\">Bug fixes</h2>\n";
 				sb << "\t\t<ul style=\"margin-top: 5px;\">\n";
 				for (const auto& f : fixes) {
-					sb << fmt::format("\t\t\t<li>{}</li>\n", f);
+					sb << "\t\t\t<li>" + f + "</li>\n";
 				}
 				sb << "\t\t</ul>\n";
 			}

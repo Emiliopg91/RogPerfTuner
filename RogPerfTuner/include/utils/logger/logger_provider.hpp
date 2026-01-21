@@ -14,8 +14,9 @@
 #include <string>
 #include <unordered_map>
 
-#include "spdlog/sinks/basic_file_sink.h"
-#include "spdlog/sinks/stdout_color_sinks.h"
+#include "logger.hpp"
+#include "sink/console_sink.hpp"
+#include "sink/file_sink.hpp"
 
 class LoggerProvider {
   public:
@@ -33,7 +34,7 @@ class LoggerProvider {
 	 * @param name
 	 * @return std::shared_ptr<spdlog::logger>
 	 */
-	static std::shared_ptr<spdlog::logger> getLogger(const std::string& name = "Default");
+	static std::shared_ptr<Logger> getLogger(const std::string& name = "Default");
 
 	/**
 	 * @brief Set the Config Map object
@@ -43,10 +44,10 @@ class LoggerProvider {
 	static void setConfigMap(std::unordered_map<std::string, std::string> configMap);
 
   private:
-	inline static std::shared_ptr<spdlog::sinks::stdout_color_sink_mt> console_sink{};
-	inline static std::optional<std::shared_ptr<spdlog::sinks::basic_file_sink_mt>> file_sink = std::nullopt;
-	inline static std::unordered_map<std::string, std::shared_ptr<spdlog::logger>> loggers{};
+	inline static std::shared_ptr<ConsoleSink> console_sink{};
+	inline static std::optional<std::shared_ptr<FileSink>> file_sink = std::nullopt;
+	inline static std::unordered_map<std::string, std::shared_ptr<Logger>> loggers{};
 
-	inline static spdlog::level::level_enum defaultLevel;
+	inline static LoggerLevel defaultLevel = LoggerLevel::Enum::INFO;
 	static std::unordered_map<std::string, std::string> configMap;
 };

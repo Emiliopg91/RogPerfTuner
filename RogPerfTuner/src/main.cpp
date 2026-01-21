@@ -1,5 +1,3 @@
-#include <spdlog/common.h>
-
 #include <iostream>
 
 #include "../include/main/flatpak.hpp"
