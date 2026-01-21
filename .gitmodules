@@ -11,9 +11,6 @@
 [submodule "submodules/httplib"]
 	path = submodules/httplib
 	url = https://github.com/yhirose/cpp-httplib
-[submodule "submodules/spdlog"]
-	path = submodules/spdlog
-	url = https://github.com/gabime/spdlog
 [submodule "submodules/yaml-cpp"]
 	path = submodules/yaml-cpp
 	url = https://github.com/jbeder/yaml-cpp
