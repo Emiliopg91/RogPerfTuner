@@ -2,6 +2,7 @@
   improvements:
     - Smart pointer refactor
     - Intel CPU power drain
+    - Source optimizations and build flags
 
 - version: 4.10.1-1
   features:
