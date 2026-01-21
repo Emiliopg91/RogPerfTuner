@@ -20,4 +20,5 @@ void FileSink::write(std::string message) {
 	if (!file) {
 		throw std::runtime_error("Error writing into file");
 	}
+	file.flush();
 }

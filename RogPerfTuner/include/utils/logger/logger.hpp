@@ -13,6 +13,7 @@
 #include <iomanip>
 #include <memory>
 #include <mutex>
+#include <optional>
 
 #include "../../models/others/logger_level.hpp"
 #include "../string_utils.hpp"
