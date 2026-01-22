@@ -19,6 +19,7 @@ sha256sums=(
 options=(
   '!strip'
   '!debug'
+  '!lto'
 )
 depends=(
   'asusctl'

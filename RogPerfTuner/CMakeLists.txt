@@ -44,3 +44,15 @@ if(DEFINED AUR_HELPER)
 else()
     message(STATUS "No AUR_HELPER defined.")
 endif()
+
+add_compile_options(
+    -flto
+    -fno-fat-lto-objects
+)
+
+add_link_options(
+    -flto
+    -march=native
+    -funroll-loops
+    -fstrict-aliasing
+)
