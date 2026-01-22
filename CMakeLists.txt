@@ -14,15 +14,9 @@ if(CMAKE_BUILD_TYPE STREQUAL "Release")
     set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -s")
 
     add_compile_options(
-        -flto
-        -fno-fat-lto-objects
         -march=native
         -funroll-loops
         -fstrict-aliasing
-    )
-
-    add_link_options(
-        -flto
     )
 elseif(CMAKE_BUILD_TYPE STREQUAL "Debug")
     add_compile_options(-pg)
