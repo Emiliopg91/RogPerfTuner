@@ -1,6 +1,5 @@
 #include "../../include/utils/time_utils.hpp"
 
-#include <format>
 #include <thread>
 
 std::chrono::time_point<std::chrono::high_resolution_clock> TimeUtils::now() {
