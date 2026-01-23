@@ -1,5 +1,6 @@
 #include "../../include/utils/time_utils.hpp"
 
+#include <format>
 #include <thread>
 
 std::chrono::time_point<std::chrono::high_resolution_clock> TimeUtils::now() {
@@ -21,4 +22,12 @@ int64_t TimeUtils::fileTimeToEpoch(const std::filesystem::file_time_type& ftime)
 	auto sctp = time_point_cast<system_clock::duration>(ftime - std::filesystem::file_time_type::clock::now() + system_clock::now());
 
 	return duration_cast<seconds>(sctp.time_since_epoch()).count();
+}
+
+std::string TimeUtils::format_seconds(long time_ms) {
+	double seconds = time_ms / 1000.0;
+
+	std::ostringstream oss;
+	oss << std::fixed << std::setprecision(3) << seconds;
+	return oss.str();
 }

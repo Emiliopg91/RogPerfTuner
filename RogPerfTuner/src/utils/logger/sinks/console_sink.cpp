@@ -2,7 +2,7 @@
 
 #include <iostream>
 
-void ConsoleSink::write(std::string message) {
-	std::cout.write(message.c_str(), message.length());
+void ConsoleSink::write(std::string message, LoggerLevel level) {
+	std::cout << level.colorCode() << message << "\033[0m";
 	std::cout.flush();
 }

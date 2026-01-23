@@ -7,5 +7,5 @@ class ConsoleSink : public Sink {
 	ConsoleSink()			= default;
 	~ConsoleSink() override = default;
 
-	void write(std::string) override;
+	void write(std::string, LoggerLevel level) override;
 };

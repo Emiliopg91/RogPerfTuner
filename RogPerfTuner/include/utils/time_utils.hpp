@@ -39,4 +39,6 @@ class TimeUtils {
 	 * @return The Unix epoch time in milliseconds since January 1, 1970 00:00:00 UTC.
 	 */
 	static int64_t fileTimeToEpoch(const std::filesystem::file_time_type& ftime);
+
+	static std::string format_seconds(long time);
 };

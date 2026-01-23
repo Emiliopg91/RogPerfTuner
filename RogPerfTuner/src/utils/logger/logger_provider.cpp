@@ -84,14 +84,10 @@ void LoggerProvider::initialize(std::string fileName, std::string path) {
 	}
 	auto main_logger = std::make_shared<Logger>(console_sink, file_sink, "Default");
 
-	/**
 	if (getenv("RCC_LOG_LEVEL")) {
-		defaultLevel = spdlog::level::from_str(StringUtils::toLowerCase(getenv("RCC_LOG_LEVEL")));
+		defaultLevel = LoggerLevel::from_string(StringUtils::toLowerCase(getenv("RCC_LOG_LEVEL")));
 	}
-
-	logger->set_level(level);
-	logger->flush_on(level);
-	*/
+	main_logger->setLevel(defaultLevel);
 }
 
 std::shared_ptr<Logger> LoggerProvider::getLogger(const std::string& name) {
@@ -111,14 +107,11 @@ std::shared_ptr<Logger> LoggerProvider::getLogger(const std::string& name) {
 	auto logger = std::make_shared<Logger>(console_sink, file_sink, display_name);
 
 	auto level = defaultLevel;
-	/*auto it2   = LoggerProvider::configMap.find(name);
+	auto it2   = LoggerProvider::configMap.find(name);
 	if (it2 != configMap.end()) {
-		level = spdlog::level::from_str(StringUtils::toLowerCase(it2->second));
+		level = LoggerLevel::from_string(StringUtils::toUpperCase(it2->second));
+		logger->setLevel(level);
 	}
-
-	logger->set_level(level);
-	logger->flush_on(level);
-*/
 
 	loggers[name] = logger;
 	return logger;
@@ -130,10 +123,8 @@ void LoggerProvider::setConfigMap(std::unordered_map<std::string, std::string> c
 	for (const auto& [key, loggerPtr] : LoggerProvider::loggers) {
 		auto it = LoggerProvider::configMap.find(StringUtils::trim(key));
 		if (it != LoggerProvider::configMap.end()) {
-			/*
-			auto level = spdlog::level::from_str(StringUtils::toLowerCase(it->second));
-			loggerPtr->set_level(level);
-			loggerPtr->flush_on(level);*/
+			auto level = LoggerLevel::from_string(StringUtils::toLowerCase(it->second));
+			loggerPtr->setLevel(level);
 		}
 	}
 }

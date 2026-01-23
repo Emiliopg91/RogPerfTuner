@@ -8,15 +8,11 @@
  */
 #pragma once
 
-#include <chrono>
-#include <ctime>
-#include <iomanip>
 #include <memory>
 #include <mutex>
 #include <optional>
 
 #include "../../models/others/logger_level.hpp"
-#include "../string_utils.hpp"
 #include "sink/console_sink.hpp"
 #include "sink/file_sink.hpp"
 
@@ -50,10 +46,7 @@ class Logger {
 	 * @param fmt
 	 * @param args
 	 */
-	template <typename... Args>
-	void debug(std::string format) {
-		log(LoggerLevel::Enum::DEBUG, format);
-	}
+	void debug(std::string format);
 
 	/**
 	 * @brief  Send info log line
@@ -62,10 +55,7 @@ class Logger {
 	 * @param fmt
 	 * @param args
 	 */
-	template <typename... Args>
-	void info(std::string format) {
-		log(LoggerLevel::Enum::INFO, format);
-	}
+	void info(std::string format);
 
 	/**
 	 * @brief  Send warning log line
@@ -74,10 +64,7 @@ class Logger {
 	 * @param fmt
 	 * @param args
 	 */
-	template <typename... Args>
-	void warn(std::string format) {
-		log(LoggerLevel::Enum::WARN, format);
-	}
+	void warn(std::string format);
 
 	/**
 	 * @brief  Send error log line
@@ -86,10 +73,7 @@ class Logger {
 	 * @param fmt
 	 * @param args
 	 */
-	template <typename... Args>
-	void error(std::string format) {
-		log(LoggerLevel::Enum::ERROR, format);
-	}
+	void error(std::string format);
 
 	/**
 	 * @brief  Send critical log line
@@ -98,10 +82,7 @@ class Logger {
 	 * @param fmt
 	 * @param args
 	 */
-	template <typename... Args>
-	void critical(std::string format) {
-		log(LoggerLevel::Enum::CRITICAL, format);
-	}
+	void critical(std::string format);
 
 	static void add_tab();
 
@@ -111,40 +92,11 @@ class Logger {
 	inline static int tabs = 0;
 	inline static std::mutex mutex;
 
-	inline static std::string now_timestamp() {
-		using namespace std::chrono;
-
-		auto now  = system_clock::now();
-		auto secs = time_point_cast<seconds>(now);
-		auto ms	  = duration_cast<milliseconds>(now - secs).count();
-
-		std::time_t tt = system_clock::to_time_t(secs);
-		std::tm tm{};
-		localtime_r(&tt, &tm);
-
-		std::ostringstream oss;
-		oss << std::put_time(&tm, "%Y-%m-%d %H:%M:%S") << '.' << std::setw(3) << std::setfill('0') << ms;
-
-		return oss.str();
-	}
-
 	std::shared_ptr<ConsoleSink> consoleSink;
 	std::optional<std::shared_ptr<FileSink>> fileSink;
 	std::string name;
 	LoggerLevel level = LoggerLevel::Enum::INFO;
 
-	template <typename... Args>
-	void log(LoggerLevel msgLevel, std::string format) {
-		std::lock_guard<std::mutex> lock(mutex);
-		if (msgLevel.toInt() > this->level.toInt()) {
-			return;
-		}
-
-		auto out = "[" + now_timestamp() + "][" + StringUtils::rightPad(msgLevel.toName(), 7).substr(0, 7) + "][" + name + "] - " +
-				   StringUtils::rightPad("", tabs * 2) + format + "\n";
-		consoleSink->write(out);
-		if (fileSink.has_value()) {
-			fileSink.value()->write(out);
-		}
-	}
+	static std::string now_timestamp();
+	void log(LoggerLevel msgLevel, std::string format);
 };

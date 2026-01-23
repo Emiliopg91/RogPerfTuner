@@ -117,7 +117,8 @@ inline int startGui(int argc, char** argv) {
 	Logger::rem_tab();
 
 	auto t1 = TimeUtils::now();
-	logger.info("Application ready after " + std::to_string(TimeUtils::getTimeDiff(t0, t1) / 1000.0) + " seconds");
+
+	logger.info("Application ready after " + TimeUtils::format_seconds(TimeUtils::getTimeDiff(t0, t1)) + " seconds");
 
 #ifdef AUR_HELPER
 	applicationService.startUpdateCheck();

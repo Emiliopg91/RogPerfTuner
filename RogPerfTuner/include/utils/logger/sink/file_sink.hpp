@@ -10,7 +10,7 @@ class FileSink : public Sink {
 	explicit FileSink(const std::string& filename);
 	~FileSink() override;
 
-	void write(std::string) override;
+	void write(std::string, LoggerLevel level) override;
 
   private:
 	std::ofstream file;

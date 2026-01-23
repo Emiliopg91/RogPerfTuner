@@ -225,7 +225,7 @@ void HardwareService::setChargeThreshold(const BatteryThreshold& threshold) {
 		configuration.getConfiguration().platform.chargeLimit = threshold;
 		configuration.saveConfig();
 
-		logger.info("Charge limit setted after " + std::to_string(TimeUtils::getTimeDiff(t0, t1)) + " ms");
+		logger.info("Charge limit setted after " + TimeUtils::format_seconds(TimeUtils::getTimeDiff(t0, t1)) + " seconds");
 
 		toaster.showToast(translator.translate("applied.battery.threshold", {{"value", std::to_string(threshold.toInt())}}));
 		eventBus.emitChargeThreshold(threshold);
@@ -320,6 +320,6 @@ void HardwareService::setBootSound(bool enable) {
 	bootSoundClient.setCurrentValue(enable);
 	auto t1 = TimeUtils::now();
 	Logger::rem_tab();
-	logger.info("Boot sound setted after " + std::to_string(TimeUtils::getTimeDiff(t0, t1)) + " ms");
+	logger.info("Boot sound setted after " + TimeUtils::format_seconds(TimeUtils::getTimeDiff(t0, t1)) + " seconds");
 	eventBus.emitBootSound(enable);
 }

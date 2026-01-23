@@ -136,7 +136,7 @@ void OpenRgbService::reload() {
 	applyAura();
 	auto t1 = TimeUtils::now();
 	Logger::rem_tab();
-	logger.info("Reloaded after " + std::to_string(TimeUtils::getTimeDiff(t0, t1)) + " ms");
+	logger.info("Reloaded after " + TimeUtils::format_seconds(TimeUtils::getTimeDiff(t0, t1)) + " seconds");
 }
 
 void OpenRgbService::applyAura(const bool& temporal) {
@@ -163,7 +163,7 @@ void OpenRgbService::applyAura(const bool& temporal) {
 
 	auto t1 = TimeUtils::now();
 	Logger::rem_tab();
-	logger.info("Aura applied after " + std::to_string(TimeUtils::getTimeDiff(t0, t1)) + " ms");
+	logger.info("Aura applied after " + TimeUtils::format_seconds(TimeUtils::getTimeDiff(t0, t1)) + " seconds");
 }
 
 void OpenRgbService::disableDevice(const UsbIdentifier& identifier) {

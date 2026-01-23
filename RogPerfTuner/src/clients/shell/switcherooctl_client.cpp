@@ -1,5 +1,7 @@
 #include "../../../include/clients/shell/switcherooctl_client.hpp"
 
+#include <sstream>
+
 const std::vector<GPUInfo> SwitcherooCtlClient::getGpus() {
 	CommandResult result = run_command();
 	std::vector<GPUInfo> gpus;

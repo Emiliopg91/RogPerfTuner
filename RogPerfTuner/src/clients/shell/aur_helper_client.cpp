@@ -2,6 +2,7 @@
 #ifdef AUR_HELPER
 #include "../../../include/clients/shell/aur_helper_client.hpp"
 #include "../../../include/utils/constants.hpp"
+#include "../../../include/utils/string_utils.hpp"
 #include "../../../include/utils/time_utils.hpp"
 
 AurHelperClient::AurHelperClient() : AbstractCmdClient(AUR_HELPER, "AurHelperClient", false) {
