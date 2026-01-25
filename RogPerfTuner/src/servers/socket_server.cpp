@@ -168,11 +168,11 @@ void SocketServer::handleRequest(const int& clientFd, const CommunicationMessage
 		if (req.name == Constants::NEXT_EFF) {
 			res.data.emplace_back(openRgbService.nextEffect());
 		} else if (req.name == Constants::INC_BRIGHT) {
-			res.data.emplace_back(openRgbService.increaseBrightness().toName());
+			res.data.emplace_back(RgbBrightnessNS::toName(openRgbService.increaseBrightness()));
 		} else if (req.name == Constants::DEC_BRIGHT) {
-			res.data.emplace_back(openRgbService.decreaseBrightness().toName());
+			res.data.emplace_back(RgbBrightnessNS::toName(openRgbService.decreaseBrightness()));
 		} else if (req.name == Constants::PERF_PROF) {
-			res.data.emplace_back(performanceService.nextPerformanceProfile().toName());
+			res.data.emplace_back(PerformanceProfileNS::toName(performanceService.nextPerformanceProfile()));
 		} else if (req.name == Constants::GAME_CFG) {
 			std::string idStr;
 			try {

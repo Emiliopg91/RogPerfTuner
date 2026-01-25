@@ -6,7 +6,7 @@
 
 class PowerProfileClient : public AbstractDbusClient, public Singleton<PowerProfileClient> {
   public:
-	const PowerProfile getPowerProfile();
+	PowerProfile getPowerProfile();
 
 	void setPowerProfile(const PowerProfile& val);
 

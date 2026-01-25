@@ -28,7 +28,7 @@ HardwareService::HardwareService() : Loggable("HardwareService") {
 	Logger::add_tab();
 	std::string cpuinfo_out = cpuInfoClient.read(5);
 	if (StringUtils::isSubstring("GenuineIntel", cpuinfo_out)) {
-		cpu		   = CpuBrand::Enum::INTEL;
+		cpu		   = CpuBrand::INTEL;
 		auto lines = StringUtils::splitLines(cpuinfo_out);
 		auto line  = lines[lines.size() - 1];
 		auto pos   = line.find(":");
@@ -37,7 +37,7 @@ HardwareService::HardwareService() : Loggable("HardwareService") {
 			logger.info(line);
 		}
 	} else if (StringUtils::isSubstring("AuthenticAMD", cpuinfo_out)) {
-		cpu		   = CpuBrand::Enum::AMD;
+		cpu		   = CpuBrand::AMD;
 		auto lines = StringUtils::splitLines(cpuinfo_out);
 		auto line  = lines[lines.size() - 1];
 		auto pos   = line.find(":");
@@ -65,7 +65,7 @@ HardwareService::HardwareService() : Loggable("HardwareService") {
 		logger.info(gpu.name);
 		if (!gpu.default_flag) {
 			auto replaced_name = StringUtils::replace(gpu.name, "Advanced Micro Devices, Inc.", "AMD");
-			auto brand		   = static_cast<GpuBrand>(GpuBrand::fromString(StringUtils::toLowerCase(StringUtils::split(replaced_name, ' ')[0])));
+			auto brand		   = GpuBrandNS::fromString(StringUtils::toLowerCase(StringUtils::split(replaced_name, ' ')[0]));
 			std::string env;
 			if (!gpu.environment.empty()) {
 				for (auto gpu_env : gpu.environment) {
@@ -83,11 +83,11 @@ HardwareService::HardwareService() : Loggable("HardwareService") {
 			}
 			FileUtils::mkdirs(Constants::LIB_OCL_DIR);
 
-			GpuBrand brandGpu = GpuBrand::Enum::AMD;
+			GpuBrand brandGpu = GpuBrand::AMD;
 
 			std::vector<std::string> vkIcd;
-			auto icdName = brand.toString();
-			if (icdName == brandGpu.toString()) {
+			auto icdName = GpuBrandNS::toString(brand);
+			if (icdName == GpuBrandNS::toString(brandGpu)) {
 				icdName = "radeon";
 			}
 			std::vector<std::string> vkIcdVariants = {icdName + "_icd.json", icdName + "_icd.i686.json", icdName + "_icd.x86_64.json"};
@@ -110,19 +110,19 @@ HardwareService::HardwareService() : Loggable("HardwareService") {
 				env = env + "VK_ICD_FILENAMES=" + oss.str() + " ";
 			}
 
-			icdName = brand.toString();
-			if (icdName == brandGpu.toString()) {
+			icdName = GpuBrandNS::toString(brand);
+			if (icdName == GpuBrandNS::toString(brandGpu)) {
 				icdName = "amdocl64";
 			}
 			if (FileUtils::exists(Constants::USR_SHARE_OCL_DIR + icdName + ".icd")) {
 				FileUtils::copy(Constants::USR_SHARE_OCL_DIR + icdName + ".icd", Constants::LIB_OCL_DIR + icdName + ".icd");
 				env = env + "OCL_ICD_FILENAMES=" + Constants::LIB_OCL_DIR + icdName + ".icd" + " ";
 			}
-			env					   = StringUtils::trim(env);
-			gpus[brand.toString()] = env;
+			env								  = StringUtils::trim(env);
+			gpus[GpuBrandNS::toString(brand)] = env;
 
 			Logger::add_tab();
-			if (brand == GpuBrand::Enum::NVIDIA) {
+			if (brand == GpuBrand::NVIDIA) {
 				if (nvBoostClient.available()) {
 					logger.info("Dynamic boost control available");
 				}
@@ -141,7 +141,7 @@ HardwareService::HardwareService() : Loggable("HardwareService") {
 		Logger::add_tab();
 		charge_limit = configuration.getConfiguration().platform.chargeLimit;
 		batteryChargeLimitClient.setChargeLimit(charge_limit);
-		logger.info(std::to_string(charge_limit.toInt()) + " %");
+		logger.info(std::to_string(BatteryThresholdNS::toInt(charge_limit)) + " %");
 		Logger::rem_tab();
 	}
 
@@ -216,7 +216,7 @@ BatteryThreshold HardwareService::getChargeThreshold() {
 void HardwareService::setChargeThreshold(const BatteryThreshold& threshold) {
 	std::lock_guard<std::mutex> lock(actionMutex);
 	if (charge_limit != threshold) {
-		logger.info("Setting charge limit to " + std::to_string(threshold.toInt()) + "%");
+		logger.info("Setting charge limit to " + std::to_string(BatteryThresholdNS::toInt(threshold)) + "%");
 		auto t0 = TimeUtils::now();
 		batteryChargeLimitClient.setChargeLimit(threshold);
 		auto t1 = TimeUtils::now();
@@ -227,7 +227,7 @@ void HardwareService::setChargeThreshold(const BatteryThreshold& threshold) {
 
 		logger.info("Charge limit setted after " + TimeUtils::format_seconds(TimeUtils::getTimeDiff(t0, t1)) + " seconds");
 
-		toaster.showToast(translator.translate("applied.battery.threshold", {{"value", std::to_string(threshold.toInt())}}));
+		toaster.showToast(translator.translate("applied.battery.threshold", {{"value", std::to_string(BatteryThresholdNS::toInt(threshold))}}));
 		eventBus.emitChargeThreshold(threshold);
 	}
 }

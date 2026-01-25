@@ -1,16 +1,38 @@
 #pragma once
 
-#include <array>
+#include "../../utils/enum_utils.hpp"
+#include "../../utils/string_utils.hpp"
 
-#include "../base/str_enum.hpp"
+enum class MangoHudLevel : int { NO_DISPLAY = 0, FPS_ONLY = 1, HORIZONTAL = 2, EXTENDED = 3, DETAILED = 4 };
 
-struct MangoHudLevelMeta {
-	enum class Enum { NO_DISPLAY, FPS_ONLY, HORIZONTAL_VIEW, EXTENDED, HIGH_DETAILED } e;
-	const char* name;
-	const char* val;
-};
+namespace MangoHudLevelNS {
+constexpr auto values() {
+	return EnumUtils<MangoHudLevel>::values();
+}
+constexpr std::string toName(MangoHudLevel profile) {
+	return std::string(EnumUtils<MangoHudLevel>::toString(profile));
+}
 
-class MangoHudLevel : public StrEnum<MangoHudLevel, MangoHudLevelMeta::Enum, 5> {
+constexpr std::string toString(MangoHudLevel dev) {
+	return StringUtils::toLowerCase(toName(dev));
+}
+
+constexpr auto toInt(MangoHudLevel level) {
+	return EnumUtils<MangoHudLevel>::toInt(level);
+}
+
+inline MangoHudLevel fromString(std::string s) {
+	std::optional<MangoHudLevel> v = EnumUtils<MangoHudLevel>::fromString(StringUtils::toUpperCase(s));
+
+	if (v.has_value()) {
+		return *v;
+	}
+
+	throw "Invalid MangoHudLevel " + s;
+}
+}  // namespace MangoHudLevelNS
+
+/*public StrEnum<MangoHudLevel, MangoHudLevelMeta::Enum, 5> {
   public:
 	using Enum = MangoHudLevelMeta::Enum;
 	using Base = StrEnum<MangoHudLevel, Enum, 5>;
@@ -31,3 +53,4 @@ class MangoHudLevel : public StrEnum<MangoHudLevel, MangoHudLevelMeta::Enum, 5> 
 
 	friend Base;
 };
+*/

@@ -140,7 +140,7 @@ class PerformanceService : public Singleton<PerformanceService>, Loggable {
 
 	std::mutex actionMutex;
 
-	PerformanceProfile currentProfile			= PerformanceProfile::Enum::PERFORMANCE;
+	PerformanceProfile currentProfile			= PerformanceProfile::PERFORMANCE;
 	std::optional<std::string> currentScheduler = std::nullopt;
 
 	PlatformClient& platformClient		   = PlatformClient::getInstance();

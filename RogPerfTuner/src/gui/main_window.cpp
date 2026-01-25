@@ -57,11 +57,10 @@ MainWindow::MainWindow(QWidget* parent) : QMainWindow(parent), _logger(LoggerPro
 	// -------------------------
 	_profileDropdown = new QComboBox();
 	_profileDropdown->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Preferred);
-	auto items = PerformanceProfile::getAll();
-	std::reverse(items.begin(), items.end());
+	auto items = PerformanceProfileNS::values();
 	for (PerformanceProfile item : items) {
-		_profileDropdown->addItem(QString::fromStdString("  " + translator.translate("label.profile." + item.toName())),
-								  QString::fromStdString(item.toString()));
+		_profileDropdown->addItem(QString::fromStdString("  " + translator.translate("label.profile." + PerformanceProfileNS::toName(item))),
+								  QString::fromStdString(PerformanceProfileNS::toString(item)));
 	}
 	connect(_profileDropdown, QOverload<int>::of(&QComboBox::currentIndexChanged), this, &MainWindow::onProfileChanged);
 	setPerformanceProfile(performanceService.getPerformanceProfile());
@@ -161,11 +160,12 @@ MainWindow::MainWindow(QWidget* parent) : QMainWindow(parent), _logger(LoggerPro
 	// -------------------------
 	_brightnessDropdown = new QComboBox();
 	_brightnessDropdown->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Preferred);
-	auto brightnesses = RgbBrightness::getAll();
+	auto brightnesses = RgbBrightnessNS::values();
 	for (RgbBrightness b : brightnesses) {
-		_brightnessDropdown->addItem("  " + QString::fromStdString(translator.translate("label.brightness." + b.toName())), b.toInt());
+		_brightnessDropdown->addItem("  " + QString::fromStdString(translator.translate("label.brightness." + RgbBrightnessNS::toName(b))),
+									 RgbBrightnessNS::toInt(b));
 	}
-	_brightnessDropdown->setCurrentIndex(_brightnessDropdown->findData(openRgbService.getCurrentBrightness().toInt()));
+	_brightnessDropdown->setCurrentIndex(_brightnessDropdown->findData(RgbBrightnessNS::toInt(openRgbService.getCurrentBrightness())));
 	connect(_brightnessDropdown, QOverload<int>::of(&QComboBox::currentIndexChanged), this, &MainWindow::onBrightnessChange);
 
 	_colorButton = new QPushButton();
@@ -212,9 +212,10 @@ MainWindow::MainWindow(QWidget* parent) : QMainWindow(parent), _logger(LoggerPro
 		if (hardwareService.getBatteryLimitAvailable()) {
 			_thresholdDropdown = new QComboBox();
 			_thresholdDropdown->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Preferred);
-			auto thresholds = BatteryThreshold::getAll();
+			auto thresholds = BatteryThresholdNS::values();
 			for (BatteryThreshold t : thresholds) {
-				_thresholdDropdown->addItem("  " + QString::number(t.toInt()) + "%", t.toInt());
+				const auto intVal = BatteryThresholdNS::toInt(t);
+				_thresholdDropdown->addItem("  " + QString::number(intVal) + "%", intVal);
 			}
 			connect(_thresholdDropdown, QOverload<int>::of(&QComboBox::currentIndexChanged), this, &MainWindow::onBatteryLimitChanged);
 			setBatteryChargeLimit(hardwareService.getChargeThreshold());
@@ -411,7 +412,7 @@ void MainWindow::onBootSoundEvent(bool value) {
 }
 
 void MainWindow::setPerformanceProfile(PerformanceProfile value) {
-	_profileDropdown->setCurrentIndex(_profileDropdown->findData(QString::fromStdString(value.toString())));
+	_profileDropdown->setCurrentIndex(_profileDropdown->findData(QString::fromStdString(PerformanceProfileNS::toString(value))));
 }
 
 void MainWindow::setScheduler(std::optional<std::string> sched) {
@@ -419,11 +420,11 @@ void MainWindow::setScheduler(std::optional<std::string> sched) {
 }
 
 void MainWindow::setBatteryChargeLimit(BatteryThreshold value) {
-	_thresholdDropdown->setCurrentIndex(_thresholdDropdown->findData(value.toInt()));
+	_thresholdDropdown->setCurrentIndex(_thresholdDropdown->findData(BatteryThresholdNS::toInt(value)));
 }
 
 void MainWindow::setAuraBrightness(RgbBrightness brightness) {
-	_brightnessDropdown->setCurrentIndex(_brightnessDropdown->findData(brightness.toInt()));
+	_brightnessDropdown->setCurrentIndex(_brightnessDropdown->findData(RgbBrightnessNS::toInt(brightness)));
 }
 
 void MainWindow::setAuraColor(std::optional<std::string> color) {
@@ -436,7 +437,7 @@ void MainWindow::setAuraEffect(std::string effect) {
 }
 
 void MainWindow::onProfileChanged(int) {
-	PerformanceProfile profile = PerformanceProfile::fromString(_profileDropdown->currentData().toString().toStdString());
+	PerformanceProfile profile = PerformanceProfileNS::fromString(_profileDropdown->currentData().toString().toStdString());
 	if (steamService.getRunningGames().empty()) {
 		if (performanceService.getPerformanceProfile() != profile) {
 			performanceService.setPerformanceProfile(profile);
@@ -456,7 +457,7 @@ void MainWindow::onSchedulerChanged(int) {
 }
 
 void MainWindow::onBatteryLimitChanged(int) {
-	auto threshold = BatteryThreshold::fromInt(_thresholdDropdown->currentData().toInt());
+	auto threshold = BatteryThresholdNS::fromInt(_thresholdDropdown->currentData().toInt());
 	if (hardwareService.getChargeThreshold() != threshold) {
 		hardwareService.setChargeThreshold(threshold);
 	}
@@ -479,7 +480,7 @@ void MainWindow::onEffectChange() {
 }
 
 void MainWindow::onBrightnessChange(int) {
-	auto level = RgbBrightness::fromInt(_brightnessDropdown->currentData().toInt());
+	auto level = RgbBrightnessNS::fromInt(_brightnessDropdown->currentData().toInt());
 	if (openRgbService.getCurrentBrightness() != level) {
 		openRgbService.setBrightness(level);
 	}

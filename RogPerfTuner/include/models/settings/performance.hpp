@@ -7,7 +7,7 @@
 #include "../performance/performance_profile.hpp"
 
 struct Performance {
-	PerformanceProfile profile			 = PerformanceProfile::Enum::QUIET;
+	PerformanceProfile profile			 = PerformanceProfile::QUIET;
 	std::optional<std::string> scheduler = std::nullopt;
 };
 
@@ -17,7 +17,7 @@ template <>
 struct convert<Performance> {
 	static Node encode(const Performance& perf) {
 		Node node;
-		node["profile"] = perf.profile.toString();
+		node["profile"] = PerformanceProfileNS::toString(perf.profile);
 		if (perf.scheduler.has_value()) {
 			node["scheduler"] = perf.scheduler.value();
 		}
@@ -26,7 +26,7 @@ struct convert<Performance> {
 
 	static bool decode(const Node& node, Performance& perf) {
 		if (node["profile"]) {
-			perf.profile = PerformanceProfile::fromString(node["profile"].as<std::string>());
+			perf.profile = PerformanceProfileNS::fromString(node["profile"].as<std::string>());
 		}
 		if (node["scheduler"]) {
 			perf.scheduler = node["scheduler"].as<std::string>();

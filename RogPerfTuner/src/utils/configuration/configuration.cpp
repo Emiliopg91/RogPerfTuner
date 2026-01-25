@@ -1,5 +1,6 @@
 #include "../../../include/utils/configuration/configuration.hpp"
 
+#include <qobject.h>
 #include <qt6keychain/keychain.h>
 
 #include <QEventLoop>
@@ -9,7 +10,6 @@
 #include "../../../include/utils/constants.hpp"
 #include "../../../include/utils/file_utils.hpp"
 #include "../../../include/utils/logger/logger_provider.hpp"
-#include "yaml-cpp/node/parse.h"
 
 void Configuration::loadConfig() {
 	if (FileUtils::exists(Constants::CONFIG_FILE)) {
@@ -51,10 +51,10 @@ void Configuration::saveConfig() {
 	}
 }
 
-std::string Configuration::getPassword() {
-	const QString service = Constants::EXEC_NAME.c_str();
-	const QString key	  = "password";
+const QString service = Constants::EXEC_NAME.c_str();
+const QString key	  = "password";
 
+std::string Configuration::getPassword() {
 	QKeychain::ReadPasswordJob job(service);
 	job.setKey(key);
 
@@ -72,9 +72,6 @@ std::string Configuration::getPassword() {
 }
 
 void Configuration::setPassword(const std::string& pss) {
-	const QString service = Constants::EXEC_NAME.c_str();
-	const QString key	  = "password";
-
 	QKeychain::WritePasswordJob job(service);
 	job.setKey(key);
 	job.setTextData(QString::fromStdString(pss));

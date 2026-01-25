@@ -7,5 +7,5 @@ BatteryChargeLimitClient::BatteryChargeLimitClient()
 }
 
 void BatteryChargeLimitClient::setChargeLimit(BatteryThreshold value) {
-	write(std::to_string(value.toInt()));
+	write(std::to_string(BatteryThresholdNS::toInt(value)));
 }

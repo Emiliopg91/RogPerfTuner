@@ -23,9 +23,9 @@ Translator::Translator() : Loggable("Translator") {
 			langStr = langStr.substr(0, pos);
 		}
 		try {
-			return Language::fromString(langStr);
+			return LanguageNS::fromString(langStr);
 		} catch (std::exception& e) {
-			logger.warn("Unsupported language " + langStr + ", fallback to " + FALLBACK_LANG.toString());
+			logger.warn("Unsupported language " + langStr + ", fallback to " + LanguageNS::toString(FALLBACK_LANG));
 			return FALLBACK_LANG;
 		}
 	}();
@@ -37,11 +37,11 @@ Translator::Translator() : Loggable("Translator") {
 		const YAML::Node& value = it->second;
 
 		std::string val = key;
-		if (value[currentLang.toString()]) {
-			val = value[currentLang.toString()].as<std::string>();
-		} else if (value[FALLBACK_LANG.toString()]) {
+		if (value[LanguageNS::toString(currentLang)]) {
+			val = value[LanguageNS::toString(currentLang)].as<std::string>();
+		} else if (value[LanguageNS::toString(FALLBACK_LANG)]) {
 			logger.warn("Missing specific translation for " + key);
-			val = value[FALLBACK_LANG.toString()].as<std::string>();
+			val = value[LanguageNS::toString(FALLBACK_LANG)].as<std::string>();
 		} else {
 			logger.warn("Missing specific and default translation for " + key);
 		}
@@ -49,7 +49,7 @@ Translator::Translator() : Loggable("Translator") {
 		translations[key] = val;
 	}
 
-	logger.debug("User language: " + currentLang.toString());
+	logger.debug("User language: " + LanguageNS::toString(currentLang));
 }
 
 std::string Translator::translate(const std::string& msg, const std::unordered_map<std::string, std::any>& replacement) {

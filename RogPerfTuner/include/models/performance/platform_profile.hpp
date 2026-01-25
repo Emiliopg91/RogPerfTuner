@@ -1,39 +1,38 @@
 #pragma once
+#include "../../utils/enum_utils.hpp"
 
-#include <array>
+enum class PlatformProfile : int { BALANCED = 0, PERFORMANCE = 1, LOW_POWER = 3 };
 
-#include "../base/int_enum.hpp"
+namespace PlatformProfileNS {
+constexpr std::array<PlatformProfile, 3> values() {
+	return EnumUtils<PlatformProfile>::values();
+}
+constexpr std::string toName(PlatformProfile profile) {
+	return std::string(EnumUtils<PlatformProfile>::toString(profile));
+}
 
-struct PlatformProfileMeta {
-	enum class Enum : int { BALANCED = 0, PERFORMANCE = 1, LOW_POWER = 3 } e;
-	const char* name;
-	int val;
-};
+constexpr auto toInt(PlatformProfile profile) {
+	return EnumUtils<PlatformProfile>::toInt(profile);
+}
 
-class PlatformProfile : public IntEnum<PlatformProfile, PlatformProfileMeta::Enum, PlatformProfileMeta, 3> {
-  public:
-	using Enum = PlatformProfileMeta::Enum;
-	using Base = IntEnum<PlatformProfile, Enum, PlatformProfileMeta, 3>;
-	using Base::Base;
+inline PlatformProfile fromInt(int i) {
+	std::optional<PlatformProfile> v = EnumUtils<PlatformProfile>::fromInt(i);
 
-	std::string formatValue() {
-		switch (this->value) {
-			case PlatformProfileMeta::Enum::LOW_POWER:
-				return "Quiet";
-			case PlatformProfileMeta::Enum::BALANCED:
-				return "Balanced";
-			case PlatformProfileMeta::Enum::PERFORMANCE:
-				return "Performance";
-		}
+	if (v.has_value()) {
+		return *v;
 	}
 
-  private:
-	static constexpr std::array<PlatformProfileMeta, 3> table{
-		{{Enum::BALANCED, "BALANCED", 0}, {Enum::PERFORMANCE, "PERFORMANCE", 1}, {Enum::LOW_POWER, "LOW_POWER", 3}}};
+	throw "Invalid PlatformProfile " + std::to_string(i);
+}
 
-	static constexpr const std::array<PlatformProfileMeta, 3>& metaTable() {
-		return table;
+inline std::string formatValue(PlatformProfile profile) {
+	switch (profile) {
+		case PlatformProfile::LOW_POWER:
+			return "Quiet";
+		case PlatformProfile::BALANCED:
+			return "Balanced";
+		case PlatformProfile::PERFORMANCE:
+			return "Performance";
 	}
-
-	friend Base;
-};
+}
+}  // namespace PlatformProfileNS

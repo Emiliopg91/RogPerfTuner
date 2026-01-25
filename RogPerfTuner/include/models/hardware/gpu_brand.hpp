@@ -1,27 +1,23 @@
 #pragma once
+#include <string>
 
-#include <array>
+#include "../../utils/enum_utils.hpp"
+#include "../../utils/string_utils.hpp"
 
-#include "../base/str_enum.hpp"
+enum class GpuBrand : int { INTEL = 0, NVIDIA = 1, AMD = 2 };
 
-struct GpuBrandMeta {
-	enum class Enum { INTEL, NVIDIA, AMD } e;
-	const char* name;
-	const char* val;
-};
+namespace GpuBrandNS {
+constexpr std::string toString(GpuBrand brand) {
+	return StringUtils::toLowerCase(std::string(EnumUtils<GpuBrand>::toString(brand)));
+}
 
-class GpuBrand : public StrEnum<GpuBrand, GpuBrandMeta::Enum, 3> {
-  public:
-	using Enum = GpuBrandMeta::Enum;
-	using Base = StrEnum<GpuBrand, Enum, 3>;
-	using Base::Base;
+inline GpuBrand fromString(std::string s) {
+	std::optional<GpuBrand> v = EnumUtils<GpuBrand>::fromString(StringUtils::toUpperCase(s));
 
-  private:
-	static constexpr std::array<GpuBrandMeta, 3> table{
-		{{Enum::INTEL, "INTEL", "intel"}, {Enum::NVIDIA, "NVIDIA", "nvidia"}, {Enum::AMD, "AMD", "amd"}}};
-
-	friend Base;
-	static constexpr const std::array<GpuBrandMeta, 3>& metaTable() {
-		return table;
+	if (v.has_value()) {
+		return *v;
 	}
-};
+
+	throw "Invalid GpuBrand " + s;
+}
+}  // namespace GpuBrandNS

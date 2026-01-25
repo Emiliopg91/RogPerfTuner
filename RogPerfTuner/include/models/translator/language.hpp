@@ -1,26 +1,26 @@
 #pragma once
 
-#include <array>
+#include "../../utils/enum_utils.hpp"
+#include "../../utils/string_utils.hpp"
+enum class Language : int { DE, EN, ES };
 
-#include "../base/str_enum.hpp"
+namespace LanguageNS {
 
-struct LanguageMeta {
-	enum class Enum { DE, EN, ES } e;
-	const char* name;
-	const char* val;
-};
+constexpr std::string toName(Language profile) {
+	return std::string(EnumUtils<Language>::toString(profile));
+}
 
-class Language : public StrEnum<Language, LanguageMeta::Enum, 3> {
-  public:
-	using Enum = LanguageMeta::Enum;
-	using Base = StrEnum<Language, Enum, 3>;
-	using Base::Base;
+constexpr std::string toString(Language dev) {
+	return StringUtils::toLowerCase(toName(dev));
+}
 
-  private:
-	static constexpr std::array<LanguageMeta, 3> table{{{Enum::DE, "DE", "de"}, {Enum::EN, "EN", "en"}, {Enum::ES, "ES", "es"}}};
+inline Language fromString(std::string s) {
+	std::optional<Language> v = EnumUtils<Language>::fromString(StringUtils::toUpperCase(s));
 
-	friend Base;
-	static constexpr const std::array<LanguageMeta, 3>& metaTable() {
-		return table;
+	if (v.has_value()) {
+		return *v;
 	}
-};
+
+	throw "Invalid MangoHudLevel " + s;
+}
+}  // namespace LanguageNS

@@ -8,7 +8,7 @@
 #include "effect.hpp"
 
 struct Aura {
-	RgbBrightness brightness							 = RgbBrightness::Enum::MAX;
+	RgbBrightness brightness							 = RgbBrightness::MAX;
 	std::unordered_map<std::string, EffectConfig> config = {};
 	std::optional<std::string> last_effect				 = std::nullopt;
 };
@@ -19,7 +19,7 @@ template <>
 struct convert<Aura> {
 	static Node encode(const Aura& aura) {
 		Node node;
-		node["brightness"] = aura.brightness.toInt();
+		node["brightness"] = RgbBrightnessNS::toInt(aura.brightness);
 		if (!aura.config.empty()) {
 			node["config"] = aura.config;
 		}
@@ -31,7 +31,7 @@ struct convert<Aura> {
 
 	static bool decode(const Node& node, Aura& aura) {
 		if (node["brightness"]) {
-			aura.brightness = RgbBrightness::fromInt(node["brightness"].as<int>());
+			aura.brightness = RgbBrightnessNS::fromInt(node["brightness"].as<int>());
 		}
 
 		if (node["config"]) {

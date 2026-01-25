@@ -23,10 +23,10 @@ class Translator : public Singleton<Translator>, Loggable {
 	std::string translate(const std::string& msg, const std::unordered_map<std::string, std::any>& replacement = {});
 
   private:
-	inline static Language FALLBACK_LANG = Language::Enum::EN;
+	inline static Language FALLBACK_LANG = Language::EN;
 
 	friend class Singleton<Translator>;
 	Translator();
-	Language currentLang = Language::Enum::EN;
+	Language currentLang = Language::EN;
 	std::unordered_map<std::string, std::string> translations;
 };

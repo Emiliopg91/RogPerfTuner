@@ -1,32 +1,59 @@
 #pragma once
 
-#include <array>
+#include <algorithm>
 
-#include "../base/int_enum.hpp"
+#include "../../utils/enum_utils.hpp"
 
-struct RgbBrightnessMeta {
-	enum class Enum : int { MAX = 100, HIGH = 67, MEDIUM = 50, LOW = 33, OFF = 0 } e;
-	const char* name;
-	int val;
-};
+enum class RgbBrightness : int { MAX = 100, HIGH = 67, MEDIUM = 50, LOW = 33, OFF = 0 };
 
-class RgbBrightness : public IntEnum<RgbBrightness, RgbBrightnessMeta::Enum, RgbBrightnessMeta, 5> {
-  public:
-	using Enum = RgbBrightnessMeta::Enum;
-	using Base = IntEnum<RgbBrightness, Enum, RgbBrightnessMeta, 5>;
-	using Base::Base;
+namespace RgbBrightnessNS {
+constexpr auto values() {
+	auto v = EnumUtils<RgbBrightness>::values();
+	std::reverse(v.begin(), v.end());
+	return v;
+}
 
-	RgbBrightness getNextBrightness() const;
+constexpr auto toInt(RgbBrightness level) {
+	return EnumUtils<RgbBrightness>::toInt(level);
+}
 
-	RgbBrightness getPreviousBrightness() const;
+constexpr auto toName(RgbBrightness level) {
+	return std::string(EnumUtils<RgbBrightness>::toString(level));
+}
 
-  private:
-	static constexpr std::array<RgbBrightnessMeta, 5> table{
-		{{Enum::MAX, "MAX", 100}, {Enum::HIGH, "HIGH", 67}, {Enum::MEDIUM, "MEDIUM", 50}, {Enum::LOW, "LOW", 33}, {Enum::OFF, "OFF", 0}}};
+inline RgbBrightness fromInt(int i) {
+	std::optional<RgbBrightness> v = EnumUtils<RgbBrightness>::fromInt(i);
 
-	static constexpr const std::array<RgbBrightnessMeta, 5>& metaTable() {
-		return table;
+	if (v.has_value()) {
+		return *v;
 	}
 
-	friend Base;
-};
+	throw "Invalid RgbBrightness " + std::to_string(i);
+}
+
+inline RgbBrightness getNextBrightness(RgbBrightness value) {
+	switch (value) {
+		case RgbBrightness::MEDIUM:
+			return RgbBrightness(RgbBrightness::HIGH);
+		case RgbBrightness::LOW:
+			return RgbBrightness(RgbBrightness::MEDIUM);
+		case RgbBrightness::OFF:
+			return RgbBrightness(RgbBrightness::LOW);
+		default:
+			return RgbBrightness::MAX;
+	}
+}
+
+inline RgbBrightness getPreviousBrightness(RgbBrightness value) {
+	switch (value) {
+		case RgbBrightness::MAX:
+			return RgbBrightness(RgbBrightness::HIGH);
+		case RgbBrightness::HIGH:
+			return RgbBrightness(RgbBrightness::MEDIUM);
+		case RgbBrightness::MEDIUM:
+			return RgbBrightness(RgbBrightness::LOW);
+		default:
+			return RgbBrightness::OFF;
+	}
+}
+}  // namespace RgbBrightnessNS

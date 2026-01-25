@@ -1,31 +1,30 @@
 #pragma once
 
-#include <array>
+#include "../../utils/enum_utils.hpp"
+#include "../../utils/string_utils.hpp"
 
-#include "../base/str_enum.hpp"
+enum class ComputerType : int { COMPUTER = 0, STEAM_DECK = 1, /*STEAM_MACHINE*/ };
 
-struct ComputerTypeMeta {
-	enum class Enum { COMPUTER, STEAM_DECK, /*STEAM_MACHINE*/ } e;
-	const char* name;
-	const char* val;
-};
+namespace ComputerTypeNS {
+constexpr auto values() {
+	return EnumUtils<ComputerType>::values();
+}
 
-class ComputerType : public StrEnum<ComputerType, ComputerTypeMeta::Enum, 2> {
-  public:
-	using Enum = ComputerTypeMeta::Enum;
-	using Base = StrEnum<ComputerType, Enum, 2>;
-	using Base::Base;
+constexpr std::string toName(ComputerType profile) {
+	return std::string(EnumUtils<ComputerType>::toString(profile));
+}
 
-	int getPresetIndex();
+constexpr std::string toString(ComputerType dev) {
+	return StringUtils::toLowerCase(toName(dev));
+}
 
-  private:
-	static constexpr std::array<ComputerTypeMeta, 2> table{{{Enum::COMPUTER, "COMPUTER", "computer"},
-															{Enum::STEAM_DECK, "STEAM_DECK", "steam_deck"},
-															/*{Enum::STEAM_MACHINE, "STEAM_MACHINE", "steam_machine"}*/}};
+inline ComputerType fromString(std::string s) {
+	std::optional<ComputerType> v = EnumUtils<ComputerType>::fromString(StringUtils::replace(StringUtils::toUpperCase(s), "-", "_"));
 
-	static constexpr const std::array<ComputerTypeMeta, 2>& metaTable() {
-		return table;
+	if (v.has_value()) {
+		return *v;
 	}
 
-	friend Base;
-};
+	throw "Invalid ComputerType " + s;
+}
+}  // namespace ComputerTypeNS

@@ -14,7 +14,7 @@ void AbstractEffect::start(const DeviceList& devices, const RgbBrightness& brigh
 		stop();
 	}
 
-	if (brightness == RgbBrightness::Enum::OFF) {
+	if (brightness == RgbBrightness::OFF) {
 		logger.info("Turning off RGB");
 		for (auto& dev : devices) {
 			_client.setDeviceColor(dev, Color::Black);
@@ -23,12 +23,12 @@ void AbstractEffect::start(const DeviceList& devices, const RgbBrightness& brigh
 	}
 
 	if (!_color.has_value()) {
-		logger.info("Starting effect '" + getName() + "' with " + StringUtils::toLowerCase(brightness.toName()) + " brightness");
+		logger.info("Starting effect '" + getName() + "' with " + StringUtils::toLowerCase(RgbBrightnessNS::toName(brightness)) + " brightness");
 	} else {
-		logger.info("Starting effect '" + getName() + "' with " + StringUtils::toLowerCase(brightness.toName()) + " brightness and color " +
-					StringUtils::toUpperCase(_color.value().toHex()));
+		logger.info("Starting effect '" + getName() + "' with " + StringUtils::toLowerCase(RgbBrightnessNS::toName(brightness)) +
+					" brightness and color " + StringUtils::toUpperCase(_color.value().toHex()));
 	}
-	_brightness = brightness.toInt() / 100.0;
+	_brightness = RgbBrightnessNS::toInt(brightness) / 100.0;
 	_is_running = true;
 
 	_thread = std::thread([this, &devices] {

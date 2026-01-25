@@ -6,6 +6,8 @@
 #include <QObject>
 #include <QSystemTrayIcon>
 #include <optional>
+#include <string>
+#include <string_view>
 
 #include "../models/hardware/battery_charge_threshold.hpp"
 #include "../models/hardware/rgb_brightness.hpp"

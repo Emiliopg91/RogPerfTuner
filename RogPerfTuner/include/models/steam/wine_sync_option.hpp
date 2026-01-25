@@ -1,30 +1,29 @@
 #pragma once
 
-#include <array>
+#include "../../utils/enum_utils.hpp"
+#include "../../utils/string_utils.hpp"
 
-#include "../base/str_enum.hpp"
+enum class WineSyncOption : int { AUTO, NTSYNC, FSYNC, ESYNC, NONE };
 
-struct WineSyncOptionMeta {
-	enum class Enum { AUTO, NTSYNC, FSYNC, ESYNC, NONE } e;
-	const char* name;
-	const char* val;
-};
+namespace WineSyncOptionNS {
+constexpr auto values() {
+	return EnumUtils<WineSyncOption>::values();
+}
+constexpr std::string toName(WineSyncOption profile) {
+	return std::string(EnumUtils<WineSyncOption>::toString(profile));
+}
 
-class WineSyncOption : public StrEnum<WineSyncOption, WineSyncOptionMeta::Enum, 5> {
-  public:
-	using Enum = WineSyncOptionMeta::Enum;
-	using Base = StrEnum<WineSyncOption, Enum, 5>;
-	using Base::Base;
+constexpr std::string toString(WineSyncOption dev) {
+	return StringUtils::toLowerCase(toName(dev));
+}
 
-  private:
-	static constexpr std::array<WineSyncOptionMeta, 5> table{{{Enum::AUTO, "AUTO", "auto"},
-															  {Enum::NTSYNC, "NTSYNC", "ntsync"},
-															  {Enum::FSYNC, "FSYNC", "fsync"},
-															  {Enum::ESYNC, "ESYNC", "esync"},
-															  {Enum::NONE, "NONE", "none"}}};
+inline WineSyncOption fromString(std::string s) {
+	std::optional<WineSyncOption> v = EnumUtils<WineSyncOption>::fromString(StringUtils::toUpperCase(s));
 
-	friend Base;
-	static constexpr const std::array<WineSyncOptionMeta, 5>& metaTable() {
-		return table;
+	if (v.has_value()) {
+		return *v;
 	}
-};
+
+	throw "Invalid WineSyncOption " + s;
+}
+}  // namespace WineSyncOptionNS

@@ -8,7 +8,7 @@
 #include "../../../include/utils/string_utils.hpp"
 
 void Logger::setLevel(std::string level) {
-	this->setLevel(LoggerLevel::from_string(level));
+	this->setLevel(LoggerLevelNS::fromName(level));
 }
 
 /**
@@ -40,7 +40,7 @@ Logger::Logger(std::shared_ptr<ConsoleSink> console_sink, std::optional<std::sha
  * @param args
  */
 void Logger::debug(std::string format) {
-	log(LoggerLevel::Enum::DEBUG, format);
+	log(LoggerLevel::DEBUG, format);
 }
 
 /**
@@ -51,7 +51,7 @@ void Logger::debug(std::string format) {
  * @param args
  */
 void Logger::info(std::string format) {
-	log(LoggerLevel::Enum::INFO, format);
+	log(LoggerLevel::INFO, format);
 }
 
 /**
@@ -62,7 +62,7 @@ void Logger::info(std::string format) {
  * @param args
  */
 void Logger::warn(std::string format) {
-	log(LoggerLevel::Enum::WARN, format);
+	log(LoggerLevel::WARN, format);
 }
 
 /**
@@ -73,7 +73,7 @@ void Logger::warn(std::string format) {
  * @param args
  */
 void Logger::error(std::string format) {
-	log(LoggerLevel::Enum::ERROR, format);
+	log(LoggerLevel::ERROR, format);
 }
 
 /**
@@ -84,7 +84,7 @@ void Logger::error(std::string format) {
  * @param args
  */
 void Logger::critical(std::string format) {
-	log(LoggerLevel::Enum::CRITICAL, format);
+	log(LoggerLevel::CRITICAL, format);
 }
 
 void Logger::add_tab() {
@@ -99,11 +99,11 @@ void Logger::rem_tab() {
 
 void Logger::log(LoggerLevel msgLevel, std::string format) {
 	std::lock_guard<std::mutex> lock(mutex);
-	if (msgLevel.toInt() > this->level.toInt()) {
+	if (LoggerLevelNS::toInt(msgLevel) > LoggerLevelNS::toInt(level)) {
 		return;
 	}
 
-	auto out = "[" + now_timestamp() + "][" + StringUtils::rightPad(msgLevel.toName(), 7).substr(0, 7) + "][" + name + "] - " +
+	auto out = "[" + now_timestamp() + "][" + StringUtils::rightPad(LoggerLevelNS::toName(msgLevel), 7).substr(0, 7) + "][" + name + "] - " +
 			   StringUtils::rightPad("", tabs * 2) + format + "\n";
 	consoleSink->write(out, level);
 	if (fileSink.has_value()) {

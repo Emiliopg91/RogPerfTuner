@@ -18,7 +18,7 @@ OpenRgbService::OpenRgbService() : Loggable("OpenRgbService") {
 	restoreAura();
 
 	eventBus.onBattery([this](bool onBat) {
-		auto brightness = onBat ? RgbBrightness::Enum::OFF : this->brightness;
+		auto brightness = onBat ? RgbBrightness::OFF : this->brightness;
 		openRgbClient.applyEffect(effect, brightness, _color);
 	});
 
@@ -172,13 +172,13 @@ void OpenRgbService::disableDevice(const UsbIdentifier& identifier) {
 }
 
 RgbBrightness OpenRgbService::increaseBrightness() {
-	auto next = brightness.getNextBrightness();
+	auto next = RgbBrightnessNS::getNextBrightness(brightness);
 	setBrightness(next);
 	return next;
 }
 
 RgbBrightness OpenRgbService::decreaseBrightness() {
-	auto next = brightness.getPreviousBrightness();
+	auto next = RgbBrightnessNS::getPreviousBrightness(brightness);
 	setBrightness(next);
 	return next;
 }

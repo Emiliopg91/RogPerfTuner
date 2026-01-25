@@ -122,8 +122,8 @@ class HardwareService : public Singleton<HardwareService>, Loggable {
 
 	bool onBattery										= true;
 	unsigned int runningGames							= 0;
-	BatteryThreshold charge_limit						= BatteryThreshold::Enum::CT_100;
-	CpuBrand cpu										= CpuBrand::Enum::INTEL;
+	BatteryThreshold charge_limit						= BatteryThreshold::CT_100;
+	CpuBrand cpu										= CpuBrand::INTEL;
 	inline static std::vector<std::string> VK_ICD_JSONS = {"/usr/share/vulkan/icd.d/{gpu.value}_icd.json",
 														   "/usr/share/vulkan/icd.d/{gpu.value}_icd.i686.json",
 														   "/usr/share/vulkan/icd.d/{gpu.value}_icd.x86_64.json"};

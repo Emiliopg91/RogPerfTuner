@@ -8,7 +8,7 @@
 
 struct Platform {
 	Performance performance															  = Performance{};
-	BatteryThreshold chargeLimit													  = BatteryThreshold::Enum::CT_100;
+	BatteryThreshold chargeLimit													  = BatteryThreshold::CT_100;
 	std::unordered_map<std::string, std::unordered_map<std::string, FanCurve>> curves = {};
 };
 
@@ -18,7 +18,7 @@ template <>
 struct convert<Platform> {
 	static Node encode(const Platform& platform) {
 		Node node;
-		node["chargeLimit"] = platform.chargeLimit.toInt();
+		node["chargeLimit"] = BatteryThresholdNS::toInt(platform.chargeLimit);
 		if (!platform.curves.empty()) {
 			node["curves"] = platform.curves;
 		}
@@ -31,7 +31,7 @@ struct convert<Platform> {
 			platform.performance = node["performance"].as<Performance>();
 		}
 		if (node["chargeLimit"]) {
-			platform.chargeLimit = BatteryThreshold::fromInt(node["chargeLimit"].as<int>());
+			platform.chargeLimit = BatteryThresholdNS::fromInt(node["chargeLimit"].as<int>());
 		}
 		if (node["curves"]) {
 			platform.curves = node["curves"].as<std::unordered_map<std::string, std::unordered_map<std::string, FanCurve>>>();

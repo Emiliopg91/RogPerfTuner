@@ -1,30 +1,35 @@
 #pragma once
+#include <algorithm>
 
-#include <array>
+#include "../../utils/enum_utils.hpp"
+#include "../../utils/string_utils.hpp"
+enum class BatteryThreshold : int { CT_100 = 100, CT_75 = 75, CT_50 = 50 };
 
-#include "../base/int_enum.hpp"
-// --------------------
-// Meta independiente
-// --------------------
-struct BatteryThresholdMeta {
-	enum class Enum : int { CT_100 = 100, CT_75 = 75, CT_50 = 50 } e;
-	const char* name;
-	int val;
-};
+namespace BatteryThresholdNS {
+constexpr auto values() {
+	auto v = EnumUtils<BatteryThreshold>::values();
+	std::reverse(v.begin(), v.end());
+	return v;
+}
 
-class BatteryThreshold : public IntEnum<BatteryThreshold, BatteryThresholdMeta::Enum, BatteryThresholdMeta, 3> {
-  public:
-	using Enum = BatteryThresholdMeta::Enum;
-	using Base = IntEnum<BatteryThreshold, Enum, BatteryThresholdMeta, 3>;
-	using Base::Base;
+constexpr auto toInt(BatteryThreshold level) {
+	return EnumUtils<BatteryThreshold>::toInt(level);
+}
 
-  private:
-	static constexpr std::array<BatteryThresholdMeta, 3> table{
-		{{Enum::CT_100, "CT_100", 100}, {Enum::CT_75, "CT_75", 75}, {Enum::CT_50, "CT_50", 50}}};
+inline BatteryThreshold fromInt(int i) {
+	std::optional<BatteryThreshold> v = EnumUtils<BatteryThreshold>::fromInt(i);
 
-	static constexpr const std::array<BatteryThresholdMeta, 3>& metaTable() {
-		return table;
+	if (v.has_value()) {
+		return *v;
 	}
 
-	friend Base;
-};
+	throw "Invalid BatteryThreshold " + std::to_string(i);
+}
+constexpr std::string toName(BatteryThreshold profile) {
+	return std::string(EnumUtils<BatteryThreshold>::toString(profile));
+}
+
+constexpr std::string toString(BatteryThreshold dev) {
+	return StringUtils::toLowerCase(toName(dev));
+}
+}  // namespace BatteryThresholdNS

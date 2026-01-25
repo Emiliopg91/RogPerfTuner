@@ -3,6 +3,6 @@
 #include <iostream>
 
 void ConsoleSink::write(std::string message, LoggerLevel level) {
-	std::cout << level.colorCode() << message << "\033[0m";
+	std::cout << LoggerLevelNS::colorCode(level) << message << "\033[0m";
 	std::cout.flush();
 }

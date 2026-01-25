@@ -13,12 +13,12 @@ struct GameEntry {
 	std::optional<std::string> env		 = std::nullopt;
 	std::optional<std::string> gpu		 = std::nullopt;
 	std::optional<std::string> scheduler = std::nullopt;
-	MangoHudLevel metrics_level			 = MangoHudLevel::Enum::NO_DISPLAY;
+	MangoHudLevel metrics_level			 = MangoHudLevel::NO_DISPLAY;
 	std::string name;
 	std::optional<std::string> overlayId;
 	bool proton							= true;
-	ComputerType device					= ComputerType::Enum::COMPUTER;
-	WineSyncOption sync					= WineSyncOption::Enum::AUTO;
+	ComputerType device					= ComputerType::COMPUTER;
+	WineSyncOption sync					= WineSyncOption::AUTO;
 	std::optional<std::string> wrappers = std::nullopt;
 };
 
@@ -40,7 +40,7 @@ struct convert<GameEntry> {
 		if (game.gpu && !game.gpu->empty()) {
 			node["gpu"] = *game.gpu;
 		}
-		node["metrics"] = game.metrics_level.toString();
+		node["metrics"] = MangoHudLevelNS::toString(game.metrics_level);
 		if (game.overlayId && !game.overlayId->empty()) {
 			node["overlayId"] = *game.overlayId;
 		}
@@ -51,8 +51,8 @@ struct convert<GameEntry> {
 			node["scheduler"] = *game.scheduler;
 		}
 		if (game.proton) {
-			node["device"] = game.device.toString();
-			node["sync"]   = game.sync.toString();
+			node["device"] = ComputerTypeNS::toString(game.device);
+			node["sync"]   = WineSyncOptionNS::toString(game.sync);
 		}
 		if (game.wrappers && !game.wrappers->empty()) {
 			node["wrappers"] = *game.wrappers;
@@ -105,23 +105,23 @@ struct convert<GameEntry> {
 		}
 
 		if (node["computer"]) {
-			game.device = ComputerType::fromString(node["computer"].as<std::string>());
+			game.device = ComputerTypeNS::fromString(node["computer"].as<std::string>());
 		} else {
 			if (node["steamdeck"]) {
-				game.device = node["steamdeck"].as<bool>() ? ComputerType::Enum::STEAM_DECK : ComputerType::Enum::COMPUTER;
+				game.device = node["steamdeck"].as<bool>() ? ComputerType::STEAM_DECK : ComputerType::COMPUTER;
 			} else {
-				game.device = ComputerType::Enum::COMPUTER;
+				game.device = ComputerType::COMPUTER;
 			}
 		}
 
 		if (node["sync"]) {
-			game.sync = WineSyncOption::fromString(node["sync"].as<std::string>());
+			game.sync = WineSyncOptionNS::fromString(node["sync"].as<std::string>());
 		} else {
-			game.sync = WineSyncOption::Enum::AUTO;
+			game.sync = WineSyncOption::AUTO;
 		}
 
 		if (node["metrics"]) {
-			game.metrics_level = MangoHudLevel::fromString(node["metrics"].as<std::string>());
+			game.metrics_level = MangoHudLevelNS::fromString(node["metrics"].as<std::string>());
 		}
 		if (node["name"]) {
 			game.name = node["name"].as<std::string>();

@@ -51,6 +51,7 @@ class Configuration : public Singleton<Configuration>, Loggable {
 
   private:
 	Configuration();
-	std::optional<RootConfig> config = std::nullopt;
 	friend class Singleton<Configuration>;
+
+	std::optional<RootConfig> config = std::nullopt;
 };

@@ -1,28 +1,26 @@
 #pragma once
 
-#include <array>
+#include "../../utils/enum_utils.hpp"
+#include "../../utils/string_utils.hpp"
+enum class PowerProfile : int { BALANCED, PERFORMANCE, POWER_SAVER };
 
-#include "../base/str_enum.hpp"
+namespace PowerProfileNS {
 
-struct PowerProfileMeta {
-	enum class Enum { BALANCED, PERFORMANCE, POWERSAVER } e;
-	const char* name;
-	const char* val;
-};
+constexpr std::string toName(PowerProfile profile) {
+	return std::string(EnumUtils<PowerProfile>::toString(profile));
+}
 
-class PowerProfile : public StrEnum<PowerProfile, PowerProfileMeta::Enum, 3> {
-  public:
-	using Enum = PowerProfileMeta::Enum;
-	using Base = StrEnum<PowerProfile, Enum, 3>;
-	using Base::Base;
+constexpr std::string toString(PowerProfile profile) {
+	return StringUtils::replace(StringUtils::toLowerCase(toName(profile)), "_", "-");
+}
 
-  private:
-	static constexpr std::array<PowerProfileMeta, 3> table{{{Enum::BALANCED, "BALANCED", "balanced"},
-															{Enum::PERFORMANCE, "PERFORMANCE", "performance"},
-															{Enum::POWERSAVER, "POWERSAVER", "power-saver"}}};
+inline PowerProfile fromString(std::string s) {
+	std::optional<PowerProfile> v = EnumUtils<PowerProfile>::fromString(StringUtils::replace(StringUtils::toUpperCase(s), "-", "_"));
 
-	friend Base;
-	static constexpr const std::array<PowerProfileMeta, 3>& metaTable() {
-		return table;
+	if (v.has_value()) {
+		return *v;
 	}
-};
+
+	throw "Invalid GpuBrand " + s;
+}
+}  // namespace PowerProfileNS

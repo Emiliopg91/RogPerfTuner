@@ -48,6 +48,6 @@ class LoggerProvider {
 	inline static std::optional<std::shared_ptr<FileSink>> file_sink = std::nullopt;
 	inline static std::unordered_map<std::string, std::shared_ptr<Logger>> loggers{};
 
-	inline static LoggerLevel defaultLevel = LoggerLevel::Enum::INFO;
+	inline static LoggerLevel defaultLevel = LoggerLevel::INFO;
 	static std::unordered_map<std::string, std::string> configMap;
 };

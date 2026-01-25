@@ -7,7 +7,7 @@ void AsusCtlClient::turnOffAura() {
 }
 
 std::unordered_map<std::string, FanCurveData> AsusCtlClient::getFanCurveData(PlatformProfile profile) {
-	auto output = run_command("fan-curve --mod-profile " + profile.formatValue()).stdout_str;
+	auto output = run_command("fan-curve --mod-profile " + PlatformProfileNS::formatValue(profile)).stdout_str;
 
 	size_t pos = output.find("[");
 	if (pos != output.npos) {
@@ -19,11 +19,11 @@ std::unordered_map<std::string, FanCurveData> AsusCtlClient::getFanCurveData(Pla
 }
 
 void AsusCtlClient::setCurvesToDefaults(PlatformProfile profile) {
-	run_command("fan-curve --mod-profile " + profile.formatValue() + " --default");
+	run_command("fan-curve --mod-profile " + PlatformProfileNS::formatValue(profile) + " --default");
 }
 
 void AsusCtlClient::setFanCurvesEnabled(PlatformProfile profile, bool enabled) {
-	run_command("fan-curve --mod-profile " + profile.formatValue() + " --enable-fan-curves " + (enabled ? "true" : "false"));
+	run_command("fan-curve --mod-profile " + PlatformProfileNS::formatValue(profile) + " --enable-fan-curves " + (enabled ? "true" : "false"));
 }
 
 void AsusCtlClient::setFanCurveData(PlatformProfile profile, std::string fanName, FanCurveData data) {
@@ -31,5 +31,5 @@ void AsusCtlClient::setFanCurveData(PlatformProfile profile, std::string fanName
 }
 
 void AsusCtlClient::setFanCurveStringData(PlatformProfile profile, std::string fanName, std::string data) {
-	run_command("fan-curve --mod-profile " + profile.formatValue() + " --fan " + fanName + " --data " + data);
+	run_command("fan-curve --mod-profile " + PlatformProfileNS::formatValue(profile) + " --fan " + fanName + " --data " + data);
 }

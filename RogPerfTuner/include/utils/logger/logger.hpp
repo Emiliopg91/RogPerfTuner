@@ -95,7 +95,7 @@ class Logger {
 	std::shared_ptr<ConsoleSink> consoleSink;
 	std::optional<std::shared_ptr<FileSink>> fileSink;
 	std::string name;
-	LoggerLevel level = LoggerLevel::Enum::INFO;
+	LoggerLevel level = LoggerLevel::INFO;
 
 	static std::string now_timestamp();
 	void log(LoggerLevel msgLevel, std::string format);

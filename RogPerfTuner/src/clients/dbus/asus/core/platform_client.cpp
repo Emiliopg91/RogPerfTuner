@@ -2,11 +2,11 @@
 #include "../../../../../include/clients/dbus/asus/core/platform_client.hpp"
 
 PlatformProfile PlatformClient::getPlatformProfile() {
-	return PlatformProfile::fromInt(this->getProperty<int>(QString("PlatformProfile")));
+	return PlatformProfileNS::fromInt(this->getProperty<int>(QString("PlatformProfile")));
 }
 
 void PlatformClient::setPlatformProfile(PlatformProfile val) {
-	this->setProperty<unsigned int>(QString("PlatformProfile"), static_cast<unsigned int>(val.toInt()));
+	this->setProperty<unsigned int>(QString("PlatformProfile"), static_cast<unsigned int>(PlatformProfileNS::toInt(val)));
 }
 
 bool PlatformClient::getEnablePptGroup() {

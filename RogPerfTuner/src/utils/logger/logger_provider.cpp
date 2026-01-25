@@ -85,7 +85,7 @@ void LoggerProvider::initialize(std::string fileName, std::string path) {
 	auto main_logger = std::make_shared<Logger>(console_sink, file_sink, "Default");
 
 	if (getenv("RCC_LOG_LEVEL")) {
-		defaultLevel = LoggerLevel::from_string(StringUtils::toLowerCase(getenv("RCC_LOG_LEVEL")));
+		defaultLevel = LoggerLevelNS::fromName(StringUtils::toLowerCase(getenv("RCC_LOG_LEVEL")));
 	}
 	main_logger->setLevel(defaultLevel);
 }
@@ -109,7 +109,7 @@ std::shared_ptr<Logger> LoggerProvider::getLogger(const std::string& name) {
 	auto level = defaultLevel;
 	auto it2   = LoggerProvider::configMap.find(name);
 	if (it2 != configMap.end()) {
-		level = LoggerLevel::from_string(StringUtils::toUpperCase(it2->second));
+		level = LoggerLevelNS::fromName(StringUtils::toUpperCase(it2->second));
 		logger->setLevel(level);
 	}
 
@@ -123,7 +123,7 @@ void LoggerProvider::setConfigMap(std::unordered_map<std::string, std::string> c
 	for (const auto& [key, loggerPtr] : LoggerProvider::loggers) {
 		auto it = LoggerProvider::configMap.find(StringUtils::trim(key));
 		if (it != LoggerProvider::configMap.end()) {
-			auto level = LoggerLevel::from_string(StringUtils::toLowerCase(it->second));
+			auto level = LoggerLevelNS::fromName(StringUtils::toLowerCase(it->second));
 			loggerPtr->setLevel(level);
 		}
 	}

@@ -179,7 +179,7 @@ void ApplicationService::applyUpdate() {
 	eventBus.emitUpdateStart();
 	Logger::add_tab();
 
-	PerformanceProfile p = PerformanceProfile::Enum::PERFORMANCE;
+	PerformanceProfile p = PerformanceProfile::PERFORMANCE;
 	performanceService.setPerformanceProfile(p, true, true, false);
 
 	logger.info("Launching update command...");

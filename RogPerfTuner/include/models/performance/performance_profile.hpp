@@ -1,40 +1,79 @@
 #pragma once
-
-#include <array>
-
-#include "../base/str_enum.hpp"
+#include "../../utils/enum_utils.hpp"
+#include "../../utils/string_utils.hpp"
 #include "../performance/platform_profile.hpp"
 #include "../performance/power_profile.hpp"
 
-struct PerformanceProfileMeta {
-	enum class Enum { PERFORMANCE, BALANCED, QUIET } e;
-	const char* name;
-	const char* val;
-};
+enum class PerformanceProfile : int { PERFORMANCE = 0, BALANCED = 1, QUIET = 2 };
 
-class PerformanceProfile : public StrEnum<PerformanceProfile, PerformanceProfileMeta::Enum, 3> {
-  public:
-	using Enum = PerformanceProfileMeta::Enum;
-	using Base = StrEnum<PerformanceProfile, Enum, 3>;
-	using Base::Base;
+namespace PerformanceProfileNS {
+constexpr std::array<PerformanceProfile, 3> values() {
+	return EnumUtils<PerformanceProfile>::values();
+}
 
-	bool supportedOnBattery() const;
+constexpr std::string toName(PerformanceProfile profile) {
+	return std::string(EnumUtils<PerformanceProfile>::toString(profile));
+}
 
-	PerformanceProfile getNextPerformanceProfile() const;
+constexpr std::string toString(PerformanceProfile profile) {
+	return StringUtils::toLowerCase(toName(profile));
+}
 
-	PerformanceProfile getGreater(const PerformanceProfile& other);
+inline PerformanceProfile fromString(std::string s) {
+	std::optional<PerformanceProfile> v = EnumUtils<PerformanceProfile>::fromString(StringUtils::toUpperCase(s));
 
-	PlatformProfile getPlatformProfile() const;
-
-	PowerProfile getPowerProfile() const;
-
-  private:
-	static constexpr std::array<PerformanceProfileMeta, 3> table{
-		{{Enum::QUIET, "QUIET", "quiet"}, {Enum::BALANCED, "BALANCED", "balanced"}, {Enum::PERFORMANCE, "PERFORMANCE", "performance"}}};
-
-	static constexpr const std::array<PerformanceProfileMeta, 3>& metaTable() {
-		return table;
+	if (v.has_value()) {
+		return *v;
 	}
 
-	friend Base;
-};
+	throw "Invalid PerformanceProfile " + s;
+}
+
+inline bool supportedOnBattery(PerformanceProfile value) {
+	return value == PerformanceProfile::QUIET;
+}
+
+inline PerformanceProfile getNextPerformanceProfile(PerformanceProfile value) {
+	if (value == PerformanceProfile::PERFORMANCE) {
+		return PerformanceProfile::QUIET;
+	}
+	if (value == PerformanceProfile::BALANCED) {
+		return PerformanceProfile::PERFORMANCE;
+	}
+	if (value == PerformanceProfile::QUIET) {
+		return PerformanceProfile::BALANCED;
+	}
+	return value;
+}
+
+inline PerformanceProfile getGreater(const PerformanceProfile value, const PerformanceProfile& other) {
+	if (value == PerformanceProfile::PERFORMANCE || other == PerformanceProfile::PERFORMANCE) {
+		return PerformanceProfile::PERFORMANCE;
+	}
+	if (value == PerformanceProfile::BALANCED || other == PerformanceProfile::BALANCED) {
+		return PerformanceProfile::BALANCED;
+	}
+	return PerformanceProfile::QUIET;
+}
+
+inline PlatformProfile getPlatformProfile(const PerformanceProfile value) {
+	if (value == PerformanceProfile::QUIET) {
+		return PlatformProfile::LOW_POWER;
+	} else if (value == PerformanceProfile::BALANCED) {
+		return PlatformProfile::BALANCED;
+	} else {
+		return PlatformProfile::PERFORMANCE;
+	}
+}
+
+inline PowerProfile getPowerProfile(const PerformanceProfile value) {
+	if (value == PerformanceProfile::QUIET) {
+		return PowerProfile::POWER_SAVER;
+	} else if (value == PerformanceProfile::BALANCED) {
+		return PowerProfile::BALANCED;
+	} else {
+		return PowerProfile::PERFORMANCE;
+	}
+}
+
+}  // namespace PerformanceProfileNS

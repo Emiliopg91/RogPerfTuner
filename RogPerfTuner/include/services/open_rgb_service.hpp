@@ -109,7 +109,7 @@ class OpenRgbService : public Singleton<OpenRgbService>, Loggable {
 
 	std::mutex actionMutex;
 
-	RgbBrightness brightness = RgbBrightness::Enum::MAX;
+	RgbBrightness brightness = RgbBrightness::MAX;
 	std::string effect;
 	std::optional<std::string> _color = std::nullopt;
 

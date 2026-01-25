@@ -150,12 +150,12 @@ void SteamService::onFirstGameRun(unsigned int gid, std::string name) {
 					env,
 					std::nullopt,
 					std::nullopt,
-					MangoHudLevel::Enum::NO_DISPLAY,
+					MangoHudLevel::NO_DISPLAY,
 					name,
 					details.is_shortcut ? std::optional<std::string>{encodeAppId(gid)} : std::nullopt,
 					!details.compat_tool.empty(),
-					ComputerType::Enum::COMPUTER,
-					WineSyncOption::Enum::AUTO,
+					ComputerType::COMPUTER,
+					WineSyncOption::AUTO,
 					wrappers};
 	configuration.getConfiguration().games[std::to_string(gid)] = entry;
 	configuration.saveConfig();
@@ -365,7 +365,7 @@ void SteamService::setProfileForGames(bool onConnect) {
 	if (!runningGames.empty()) {
 		hardwareService.setPanelOverdrive(true);
 		openRgbService.setEffect("Gaming", true);
-		PerformanceProfile p = PerformanceProfile::Enum::PERFORMANCE;
+		PerformanceProfile p = PerformanceProfile::PERFORMANCE;
 		performanceService.setPerformanceProfile(p, true, true);
 
 		std::optional<std::string> sched = configuration.getConfiguration().platform.performance.scheduler;
@@ -447,12 +447,12 @@ const SteamGameConfig SteamService::getConfiguration(const std::string& gid) {
 		}
 
 		if (gameEntry.proton) {
-			cfg.environment["SteamDeck"] = gameEntry.device == ComputerType::Enum::STEAM_DECK ? "1" : "0";
-			if (gameEntry.sync != WineSyncOption::Enum::AUTO) {
-				cfg.environment["PROTON_USE_NTSYNC"] = gameEntry.sync == WineSyncOption::Enum::NTSYNC ? "1" : "0";
-				cfg.environment["PROTON_NO_NTSYNC"]	 = gameEntry.sync == WineSyncOption::Enum::NTSYNC ? "0" : "1";
-				cfg.environment["PROTON_NO_FSYNC"]	 = gameEntry.sync == WineSyncOption::Enum::FSYNC ? "0" : "1";
-				cfg.environment["PROTON_NO_ESYNC"]	 = gameEntry.sync == WineSyncOption::Enum::ESYNC ? "0" : "1";
+			cfg.environment["SteamDeck"] = gameEntry.device == ComputerType::STEAM_DECK ? "1" : "0";
+			if (gameEntry.sync != WineSyncOption::AUTO) {
+				cfg.environment["PROTON_USE_NTSYNC"] = gameEntry.sync == WineSyncOption::NTSYNC ? "1" : "0";
+				cfg.environment["PROTON_NO_NTSYNC"]	 = gameEntry.sync == WineSyncOption::NTSYNC ? "0" : "1";
+				cfg.environment["PROTON_NO_FSYNC"]	 = gameEntry.sync == WineSyncOption::FSYNC ? "0" : "1";
+				cfg.environment["PROTON_NO_ESYNC"]	 = gameEntry.sync == WineSyncOption::ESYNC ? "0" : "1";
 			}
 		}
 
@@ -469,8 +469,8 @@ const SteamGameConfig SteamService::getConfiguration(const std::string& gid) {
 			cfg.wrappers.emplace_back("\"" + entry->name + "\"");
 		}
 
-		if (whichMangohud.has_value() && gameEntry.metrics_level != MangoHudLevelMeta::Enum::NO_DISPLAY) {
-			cfg.environment["MANGOHUD_CONFIG"] = "preset=" + std::to_string(gameEntry.metrics_level.getPresetIndex());
+		if (whichMangohud.has_value() && gameEntry.metrics_level != MangoHudLevel ::NO_DISPLAY) {
+			cfg.environment["MANGOHUD_CONFIG"] = "preset=" + std::to_string(MangoHudLevelNS::toInt(gameEntry.metrics_level));
 			cfg.environment["MANGOHUD_DLSYM"]  = "1";
 			cfg.environment["MANGOHUD"]		   = "1";
 			cfg.wrappers.emplace_back(whichMangohud.value());
