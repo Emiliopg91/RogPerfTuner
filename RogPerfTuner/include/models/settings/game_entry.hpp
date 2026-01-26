@@ -4,6 +4,7 @@
 
 #include <optional>
 
+#include "../../utils/enum_utils.hpp"
 #include "../steam/computer_type.hpp"
 #include "../steam/mangohud_level.hpp"
 #include "../steam/wine_sync_option.hpp"
@@ -40,7 +41,9 @@ struct convert<GameEntry> {
 		if (game.gpu && !game.gpu->empty()) {
 			node["gpu"] = *game.gpu;
 		}
-		node["metrics"] = toString(game.metrics_level);
+		if (game.metrics_level != MangoHudLevel::NO_DISPLAY) {
+			node["metrics"] = toString(game.metrics_level);
+		}
 		if (game.overlayId && !game.overlayId->empty()) {
 			node["overlayId"] = *game.overlayId;
 		}
@@ -51,8 +54,12 @@ struct convert<GameEntry> {
 			node["scheduler"] = *game.scheduler;
 		}
 		if (game.proton) {
-			node["device"] = ::toString(game.device);
-			node["sync"]   = toString(game.sync);
+			if (game.device != ComputerType::COMPUTER) {
+				node["device"] = toString(game.device);
+			}
+			if (game.sync != WineSyncOption::AUTO) {
+				node["sync"] = toString(game.sync);
+			}
 		}
 		if (game.wrappers && !game.wrappers->empty()) {
 			node["wrappers"] = *game.wrappers;
@@ -110,7 +117,11 @@ struct convert<GameEntry> {
 			if (node["steamdeck"]) {
 				game.device = node["steamdeck"].as<bool>() ? ComputerType::STEAM_DECK : ComputerType::COMPUTER;
 			} else {
-				game.device = ComputerType::COMPUTER;
+				if (node["device"]) {
+					game.device = fromString<ComputerType>(node["device"].as<std::string>());
+				} else {
+					game.device = ComputerType::COMPUTER;
+				}
 			}
 		}
 
@@ -122,7 +133,10 @@ struct convert<GameEntry> {
 
 		if (node["metrics"]) {
 			game.metrics_level = fromString<MangoHudLevel>(node["metrics"].as<std::string>());
+		} else {
+			game.metrics_level = MangoHudLevel::NO_DISPLAY;
 		}
+
 		if (node["name"]) {
 			game.name = node["name"].as<std::string>();
 		}

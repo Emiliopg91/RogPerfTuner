@@ -67,7 +67,7 @@ static void rotate_log(const std::string& fileName, const std::filesystem::path&
 	}
 }
 
-std::unordered_map<std::string, std::string> LoggerProvider::configMap{};
+std::unordered_map<std::string, LoggerLevel> LoggerProvider::configMap{};
 
 void LoggerProvider::initialize(std::string fileName, std::string path) {
 	console_sink = std::make_shared<ConsoleSink>();
@@ -110,22 +110,21 @@ std::shared_ptr<Logger> LoggerProvider::getLogger(const std::string& name) {
 	auto level = defaultLevel;
 	auto it2   = LoggerProvider::configMap.find(name);
 	if (it2 != configMap.end()) {
-		level = fromName<LoggerLevel>(StringUtils::toUpperCase(it2->second));
-		logger->setLevel(level);
+		level = it2->second;
 	}
+	logger->setLevel(level);
 
 	loggers[name] = logger;
 	return logger;
 }
 
-void LoggerProvider::setConfigMap(std::unordered_map<std::string, std::string> configMap) {
+void LoggerProvider::setConfigMap(std::unordered_map<std::string, LoggerLevel> configMap) {
 	LoggerProvider::configMap = configMap;
 
 	for (const auto& [key, loggerPtr] : LoggerProvider::loggers) {
 		auto it = LoggerProvider::configMap.find(StringUtils::trim(key));
 		if (it != LoggerProvider::configMap.end()) {
-			auto level = fromName<LoggerLevel>(StringUtils::toLowerCase(it->second));
-			loggerPtr->setLevel(level);
+			loggerPtr->setLevel(it->second);
 		}
 	}
 }

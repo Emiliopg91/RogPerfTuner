@@ -41,7 +41,7 @@ class LoggerProvider {
 	 *
 	 * @param configMap
 	 */
-	static void setConfigMap(std::unordered_map<std::string, std::string> configMap);
+	static void setConfigMap(std::unordered_map<std::string, LoggerLevel> configMap);
 
   private:
 	inline static std::shared_ptr<ConsoleSink> console_sink{};
@@ -49,5 +49,5 @@ class LoggerProvider {
 	inline static std::unordered_map<std::string, std::shared_ptr<Logger>> loggers{};
 
 	inline static LoggerLevel defaultLevel = LoggerLevel::INFO;
-	static std::unordered_map<std::string, std::string> configMap;
+	static std::unordered_map<std::string, LoggerLevel> configMap;
 };

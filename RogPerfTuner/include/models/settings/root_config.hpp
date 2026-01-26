@@ -2,6 +2,8 @@
 
 #include <yaml-cpp/yaml.h>
 
+#include "../../utils/enum_utils.hpp"
+#include "../others/logger_level.hpp"
 #include "application.hpp"
 #include "aura.hpp"
 #include "game_entry.hpp"
@@ -11,7 +13,7 @@ struct RootConfig {
 	Aura aura											= Aura();
 	Application application								= Application();
 	std::unordered_map<std::string, GameEntry> games	= {};
-	std::unordered_map<std::string, std::string> logger = {};
+	std::unordered_map<std::string, LoggerLevel> logger = {};
 	Platform platform									= Platform();
 };
 
@@ -28,8 +30,13 @@ struct convert<RootConfig> {
 		if (!config.games.empty()) {
 			node["games"] = config.games;
 		}
+
 		if (!config.logger.empty()) {
-			node["logger"] = config.logger;
+			Node loggerNode;
+			for (const auto& [key, level] : config.logger) {
+				loggerNode[key] = toName(level);
+			}
+			node["logger"] = loggerNode;
 		}
 
 		node["platform"] = config.platform;
@@ -45,9 +52,13 @@ struct convert<RootConfig> {
 		}
 
 		if (node["logger"]) {
-			config.logger = node["logger"].as<std::unordered_map<std::string, std::string>>();
+			auto loggerNode = node["logger"];
+			config.logger.clear();
+			for (const auto& it : loggerNode) {
+				config.logger[it.first.as<std::string>()] = fromString<LoggerLevel>(it.second.as<std::string>());
+			}
 		} else {
-			config.logger = std::unordered_map<std::string, std::string>{};
+			config.logger.clear();
 		}
 
 		if (node["aura"]) {

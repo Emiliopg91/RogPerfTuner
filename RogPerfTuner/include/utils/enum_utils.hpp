@@ -33,7 +33,7 @@ E fromName(const std::string& s) {
 	if (auto v = magic_enum::enum_cast<E>(s)) {
 		return *v;
 	}
-	throw std::runtime_error("Invalid name " + s);
+	throw std::runtime_error("Invalid name '" + s + "'");
 }
 
 template <EnumClass E>
@@ -75,5 +75,5 @@ E fromInt(const int& i) {
 	if (auto v = magic_enum::enum_cast<E>(i)) {
 		return *v;
 	}
-	throw std::runtime_error("Invalid value " + std::to_string(i));
+	throw std::runtime_error("Invalid value '" + std::to_string(i) + "'");
 }
