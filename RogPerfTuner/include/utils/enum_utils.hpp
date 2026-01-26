@@ -1,11 +1,11 @@
 #pragma once
 
 #include <algorithm>
+#include <magic_enum.hpp>
 #include <optional>
 #include <string>
 #include <type_traits>
 
-#include "../models/base/magin_enum.hpp"
 #include "string_utils.hpp"
 
 template <typename T>

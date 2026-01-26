@@ -20,6 +20,7 @@ if(CMAKE_BUILD_TYPE STREQUAL "Release")
     )
 elseif(CMAKE_BUILD_TYPE STREQUAL "Debug")
     add_compile_options(
+        -O0
         -pg
     )
 endif()
