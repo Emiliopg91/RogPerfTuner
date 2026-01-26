@@ -69,7 +69,7 @@ void TrayIcon::setAuraColor(const std::optional<std::string>& color) {
 		[=, this]() {
 			if (color.has_value()) {
 				colorMenu->setEnabled(true);
-				currentColorAction->setText(QString::fromStdString(StringUtils::toUpperCase(color.value())));
+				currentColorAction->setText(StringUtils::toUpperCase(color.value()).c_str());
 			} else {
 				colorMenu->setEnabled(false);
 			}
@@ -168,7 +168,7 @@ TrayIcon::TrayIcon()
 	  tray_menu_(new QMenu(&MainWindow::getInstance())),
 	  mainWindow(MainWindow::getInstance()) {
 	tray_icon_->setIcon(QIcon::fromTheme(Constants::ASSET_ICON_FILE.c_str()));
-	tray_icon_->setToolTip(QString::fromStdString(Constants::APP_NAME));
+	tray_icon_->setToolTip(Constants::APP_NAME.c_str());
 
 	QMenu* menu = tray_menu_;
 
@@ -309,8 +309,8 @@ TrayIcon::TrayIcon()
 
 	pickColorAction = new QAction((translator.translate("select")).c_str(), menu);
 	QObject::connect(pickColorAction, &QAction::triggered, [this]() {
-		QColor initial = QColor(QString::fromStdString(openRgbService.getColor().value()));
-		QColor chosen  = QColorDialog::getColor(initial, nullptr, QString::fromStdString(translator.translate("pick.color")));
+		QColor initial = QColor(openRgbService.getColor().value().c_str());
+		QColor chosen  = QColorDialog::getColor(initial, nullptr, translator.translate("pick.color").c_str());
 
 		if (chosen.isValid()) {
 			openRgbService.setColor(chosen.name(QColor::HexRgb).toStdString());

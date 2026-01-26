@@ -92,7 +92,7 @@ inline int startGui(int argc, char** argv) {
 
 	logger.info("Creating QT application");
 	QApplication app(argc, argv);
-	app.setDesktopFileName(QString::fromStdString(Constants::APP_DRAW_FILE));
+	app.setDesktopFileName(Constants::APP_DRAW_FILE.c_str());
 
 	Toaster::getInstance().showToast(Translator::getInstance().translate("initializing"));
 

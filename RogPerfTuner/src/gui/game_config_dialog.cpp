@@ -30,7 +30,7 @@ GameConfigDialog::GameConfigDialog(unsigned int gid, bool runAfterSave, QWidget*
 
 	auto bannerPath = steamService.getBanner(gid);
 	if (bannerPath.has_value()) {
-		QPixmap gameIcon(QString::fromStdString(*bannerPath));
+		QPixmap gameIcon((*bannerPath).c_str());
 		int targetSize	   = 300;
 		QPixmap scaledIcon = gameIcon.scaled(targetSize, targetSize, Qt::KeepAspectRatio, Qt::SmoothTransformation);
 
@@ -47,7 +47,7 @@ GameConfigDialog::GameConfigDialog(unsigned int gid, bool runAfterSave, QWidget*
 	int index, i;
 
 	// --- PERFORMANCE ---
-	QGroupBox* performanceGroup	   = new QGroupBox(QString::fromStdString(translator.translate("performance")));
+	QGroupBox* performanceGroup	   = new QGroupBox(translator.translate("performance").c_str());
 	QFormLayout* performanceLayout = new QFormLayout();
 	performanceLayout->setContentsMargins(20, 10, 20, 10);
 
@@ -58,17 +58,17 @@ GameConfigDialog::GameConfigDialog(unsigned int gid, bool runAfterSave, QWidget*
 	index = 0;
 	i	  = 1;
 
-	gpuCombo->addItem(QString::fromStdString(translator.translate("label.dgpu.auto")), QString::fromStdString(""));
+	gpuCombo->addItem(translator.translate("label.dgpu.auto").c_str(), "");
 	auto gpus = hardwareService.getGpus();
 	for (const auto& [key, val] : gpus) {
-		gpuCombo->addItem(QString::fromStdString(StringUtils::capitalize(key)), QString::fromStdString(key));
+		gpuCombo->addItem(StringUtils::capitalize(key).c_str(), key.c_str());
 		if (gameEntry.gpu.has_value() && gameEntry.gpu.value() == key) {
 			index = i;
 		}
 		i++;
 	}
 	gpuCombo->setCurrentIndex(index);
-	performanceLayout->addRow(new QLabel(QString::fromStdString(translator.translate("used.gpu") + ":")), gpuCombo);
+	performanceLayout->addRow(new QLabel((translator.translate("used.gpu") + ":").c_str()), gpuCombo);
 	// --- GPU ---
 
 	// --- Scheduler ---
@@ -78,10 +78,10 @@ GameConfigDialog::GameConfigDialog(unsigned int gid, bool runAfterSave, QWidget*
 	index = 0;
 	i	  = 1;
 
-	schedulerCombo->addItem(QString::fromStdString(translator.translate("label.scheduler.none")), QString::fromStdString(""));
+	schedulerCombo->addItem(translator.translate("label.scheduler.none").c_str(), "");
 	auto scheds = performanceService.getAvailableSchedulers();
 	for (const auto& sched : scheds) {
-		schedulerCombo->addItem(QString::fromStdString(StringUtils::capitalize(sched)), QString::fromStdString(sched));
+		schedulerCombo->addItem(StringUtils::capitalize(sched).c_str(), sched.c_str());
 		if (gameEntry.scheduler.has_value() && gameEntry.scheduler.value() == sched) {
 			index = i;
 		}
@@ -89,7 +89,7 @@ GameConfigDialog::GameConfigDialog(unsigned int gid, bool runAfterSave, QWidget*
 	}
 	schedulerCombo->setCurrentIndex(index);
 	schedulerCombo->setEnabled(!performanceService.getAvailableSchedulers().empty());
-	performanceLayout->addRow(new QLabel(QString::fromStdString(translator.translate("scheduler") + ":")), schedulerCombo);
+	performanceLayout->addRow(new QLabel((translator.translate("scheduler") + ":").c_str()), schedulerCombo);
 	// --- Scheduler ---
 
 	// --- Metrics ---
@@ -98,15 +98,14 @@ GameConfigDialog::GameConfigDialog(unsigned int gid, bool runAfterSave, QWidget*
 	auto items = values<MangoHudLevel>();
 	i		   = 0;
 	for (MangoHudLevel level : items) {
-		metricsCombo->addItem(QString::fromStdString(translator.translate("label.level." + toString(level))),
-							  QString::fromStdString(toString(level)));
+		metricsCombo->addItem(translator.translate("label.level." + toString(level)).c_str(), toString(level).c_str());
 		if (level == gameEntry.metrics_level) {
 			metricsCombo->setCurrentIndex(i);
 		}
 		i++;
 	}
 	metricsCombo->setEnabled(steamService.metricsEnabled());
-	performanceLayout->addRow(new QLabel(QString::fromStdString(translator.translate("metrics") + ":")), metricsCombo);
+	performanceLayout->addRow(new QLabel((translator.translate("metrics") + ":").c_str()), metricsCombo);
 	// --- Metrics ---
 
 	performanceGroup->setLayout(performanceLayout);
@@ -125,15 +124,14 @@ GameConfigDialog::GameConfigDialog(unsigned int gid, bool runAfterSave, QWidget*
 		modeCombo->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Preferred);
 		auto items2 = values<ComputerType>();
 		for (ComputerType opt : items2) {
-			modeCombo->addItem(QString::fromStdString(translator.translate("label.device." + ::toString(opt))),
-							   QString::fromStdString(::toString(opt)));
+			modeCombo->addItem(translator.translate("label.device." + ::toString(opt)).c_str(), ::toString(opt).c_str());
 			if (opt == gameEntry.device) {
 				modeCombo->setCurrentIndex(i);
 			}
 
 			i++;
 		}
-		protonLayout->addRow(new QLabel(QString::fromStdString(translator.translate("used.device") + ":")), modeCombo);
+		protonLayout->addRow(new QLabel((translator.translate("used.device") + ":").c_str()), modeCombo);
 		// --- Device ---
 
 		// --- Wine Sync ---
@@ -142,15 +140,14 @@ GameConfigDialog::GameConfigDialog(unsigned int gid, bool runAfterSave, QWidget*
 		wineSyncCombo->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Preferred);
 		auto items3 = values<WineSyncOption>();
 		for (WineSyncOption opt : items3) {
-			wineSyncCombo->addItem(QString::fromStdString(translator.translate("label.winesync." + toString(opt))),
-								   QString::fromStdString(toString(opt)));
+			wineSyncCombo->addItem(translator.translate("label.winesync." + toString(opt)).c_str(), toString(opt).c_str());
 			if (opt == gameEntry.sync) {
 				wineSyncCombo->setCurrentIndex(i);
 			}
 
 			i++;
 		}
-		protonLayout->addRow(new QLabel(QString::fromStdString(translator.translate("winesync") + ":")), wineSyncCombo);
+		protonLayout->addRow(new QLabel((translator.translate("winesync") + ":").c_str()), wineSyncCombo);
 		// --- Wine Sync ---
 
 		protonGroup->setLayout(protonLayout);
@@ -164,18 +161,18 @@ GameConfigDialog::GameConfigDialog(unsigned int gid, bool runAfterSave, QWidget*
 	executionLayout->setContentsMargins(20, 10, 20, 10);
 
 	// --- Environment ---
-	envInput = new QLineEdit(QString::fromStdString(gameEntry.env.value_or("")));
-	executionLayout->addRow(new QLabel(QString::fromStdString(translator.translate("environment") + ":")), envInput);
+	envInput = new QLineEdit(gameEntry.env.value_or("").c_str());
+	executionLayout->addRow(new QLabel((translator.translate("environment") + ":").c_str()), envInput);
 	// --- Environment ---
 
 	// --- Wrappers ---
-	wrappersInput = new QLineEdit(QString::fromStdString(gameEntry.wrappers.value_or("")));
-	executionLayout->addRow(new QLabel(QString::fromStdString(translator.translate("wrappers") + ":")), wrappersInput);
+	wrappersInput = new QLineEdit(gameEntry.wrappers.value_or("").c_str());
+	executionLayout->addRow(new QLabel((translator.translate("wrappers") + ":").c_str()), wrappersInput);
 	// --- Wrappers ---
 
 	// --- Parameters ---
-	paramsInput = new QLineEdit(QString::fromStdString(gameEntry.args.value_or("")));
-	executionLayout->addRow(new QLabel(QString::fromStdString(translator.translate("params") + ":")), paramsInput);
+	paramsInput = new QLineEdit(gameEntry.args.value_or("").c_str());
+	executionLayout->addRow(new QLabel((translator.translate("params") + ":").c_str()), paramsInput);
 	// --- Parameters ---
 
 	executionGroup->setLayout(executionLayout);
@@ -183,7 +180,7 @@ GameConfigDialog::GameConfigDialog(unsigned int gid, bool runAfterSave, QWidget*
 	// --- EXECUTION ---
 
 	// --- Save button ---
-	save_button_ = new QPushButton(QString::fromStdString(translator.translate(runAfterSave ? "save.and.run" : "save")));
+	save_button_ = new QPushButton(translator.translate(runAfterSave ? "save.and.run" : "save").c_str());
 	save_button_->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
 	windowLayout->addRow(save_button_);
 	connect(save_button_, &QPushButton::clicked, this, &GameConfigDialog::onAccept);

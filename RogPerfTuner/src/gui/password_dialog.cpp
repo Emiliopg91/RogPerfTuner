@@ -12,28 +12,28 @@ bool PasswordDialog::showDialog() {
 		return true;
 	}
 
-	QMessageBox::information(nullptr, "Canceled", QString::fromStdString(translator.translate("user.canceled.operation")));
+	QMessageBox::information(nullptr, "Canceled", translator.translate("user.canceled.operation").c_str());
 	exit(EXIT_FAILURE);
 }
 
 PasswordDialog::PasswordDialog(QWidget* parent) : QDialog(parent) {
-	setWindowTitle(QString::fromStdString(translator.translate("authentication.required")));
+	setWindowTitle(translator.translate("authentication.required").c_str());
 	setFixedSize(300, 150);
 
 	QVBoxLayout* layout = new QVBoxLayout(this);
 
-	label_ = new QLabel(QString::fromStdString(translator.translate("enter.sudo.password")));
+	label_ = new QLabel(translator.translate("enter.sudo.password").c_str());
 	layout->addWidget(label_);
 
 	password_input_ = new QLineEdit();
 	password_input_->setEchoMode(QLineEdit::Password);
 	layout->addWidget(password_input_);
 
-	ok_button_ = new QPushButton(QString::fromStdString(translator.translate("accept")));
+	ok_button_ = new QPushButton(translator.translate("accept").c_str());
 	layout->addWidget(ok_button_);
 	connect(ok_button_, &QPushButton::clicked, this, &PasswordDialog::onAccept);
 
-	cancel_button_ = new QPushButton(QString::fromStdString(translator.translate("cancel")));
+	cancel_button_ = new QPushButton(translator.translate("cancel").c_str());
 	layout->addWidget(cancel_button_);
 	connect(cancel_button_, &QPushButton::clicked, this, &PasswordDialog::reject);
 }
@@ -49,7 +49,7 @@ void PasswordDialog::onAccept() {
 	} else {
 		ok_button_->setDisabled(false);
 		cancel_button_->setDisabled(false);
-		QMessageBox::warning(this, "Error", QString::fromStdString(translator.translate("authentication.failed")));
+		QMessageBox::warning(this, "Error", translator.translate("authentication.failed").c_str());
 	}
 }
 bool PasswordDialog::checkPassword(const QString& password) {

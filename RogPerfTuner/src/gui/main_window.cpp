@@ -25,8 +25,8 @@ MainWindow::MainWindow(QWidget* parent) : QMainWindow(parent), _logger(LoggerPro
 	onBattery	 = uPowerClient.isOnBattery();
 	runningGames = steamService.getRunningGames().size();
 
-	setWindowTitle(QString::fromStdString(Constants::APP_NAME));
-	setWindowIcon(QIcon(QString::fromStdString(Constants::ASSET_ICON_45_FILE)));
+	setWindowTitle(Constants::APP_NAME.c_str());
+	setWindowIcon(QIcon(Constants::ASSET_ICON_45_FILE.c_str()));
 
 	QWidget* centralWidget	= new QWidget(this);
 	QVBoxLayout* mainLayout = new QVBoxLayout(centralWidget);
@@ -37,7 +37,7 @@ MainWindow::MainWindow(QWidget* parent) : QMainWindow(parent), _logger(LoggerPro
 	// Logo
 	// -------------------------
 	QLabel* imageLabel = new QLabel();
-	QPixmap pixmap(QString::fromStdString(Constants::ASSET_ICON_FILE));
+	QPixmap pixmap(Constants::ASSET_ICON_FILE.c_str());
 	QPixmap scaledPixmap = pixmap.scaled(140, 140, Qt::KeepAspectRatio, Qt::SmoothTransformation);
 	imageLabel->setPixmap(scaledPixmap);
 	imageLabel->setAlignment(Qt::AlignCenter);
@@ -49,7 +49,7 @@ MainWindow::MainWindow(QWidget* parent) : QMainWindow(parent), _logger(LoggerPro
 	// -------------------------
 	// Performance group
 	// -------------------------
-	QGroupBox* performanceGroup	   = new QGroupBox(QString::fromStdString(translator.translate("performance")));
+	QGroupBox* performanceGroup	   = new QGroupBox(translator.translate("performance").c_str());
 	QFormLayout* performanceLayout = new QFormLayout();
 	performanceLayout->setContentsMargins(20, 10, 20, 10);
 	// -------------------------
@@ -59,13 +59,12 @@ MainWindow::MainWindow(QWidget* parent) : QMainWindow(parent), _logger(LoggerPro
 	_profileDropdown->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Preferred);
 	auto items = values<PerformanceProfile>();
 	for (PerformanceProfile item : items) {
-		_profileDropdown->addItem(QString::fromStdString("  " + translator.translate("label.profile." + toName(item))),
-								  QString::fromStdString(toString(item)));
+		_profileDropdown->addItem(("  " + translator.translate("label.profile." + toName(item))).c_str(), toString(item).c_str());
 	}
 	connect(_profileDropdown, QOverload<int>::of(&QComboBox::currentIndexChanged), this, &MainWindow::onProfileChanged);
 	setPerformanceProfile(performanceService.getPerformanceProfile());
 	_profileDropdown->setEnabled(runningGames == 0 && !onBattery);
-	performanceLayout->addRow(new QLabel(QString::fromStdString(translator.translate("profile") + ":")), _profileDropdown);
+	performanceLayout->addRow(new QLabel((translator.translate("profile") + ":").c_str()), _profileDropdown);
 
 	eventBus.onPerformanceProfile([this](PerformanceProfile profile) {
 		setPerformanceProfile(profile);
@@ -79,17 +78,17 @@ MainWindow::MainWindow(QWidget* parent) : QMainWindow(parent), _logger(LoggerPro
 	if (!performanceService.getAvailableSchedulers().empty()) {
 		_schedulerDropdown = new QComboBox();
 		_schedulerDropdown->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Preferred);
-		_schedulerDropdown->addItem(QString::fromStdString("  " + performanceService.getDefaultSchedulerName()), QString(""));
+		_schedulerDropdown->addItem(("  " + performanceService.getDefaultSchedulerName()).c_str(), "");
 
 		auto items2 = performanceService.getAvailableSchedulers();
 		std::reverse(items2.begin(), items2.end());
 		for (auto item : items2) {
-			_schedulerDropdown->addItem("  " + QString::fromStdString(StringUtils::capitalize(item)), QString::fromStdString(item));
+			_schedulerDropdown->addItem(("  " + StringUtils::capitalize(item)).c_str(), item.c_str());
 		}
 		connect(_schedulerDropdown, QOverload<int>::of(&QComboBox::currentIndexChanged), this, &MainWindow::onSchedulerChanged);
 		setScheduler(performanceService.getCurrentScheduler());
 		_schedulerDropdown->setEnabled(runningGames == 0);
-		performanceLayout->addRow(new QLabel(QString::fromStdString(translator.translate("scheduler") + ":")), _schedulerDropdown);
+		performanceLayout->addRow(new QLabel((translator.translate("scheduler") + ":").c_str()), _schedulerDropdown);
 
 		eventBus.onScheduler([this](std::optional<std::string> sched) {
 			setScheduler(sched);
@@ -103,11 +102,11 @@ MainWindow::MainWindow(QWidget* parent) : QMainWindow(parent), _logger(LoggerPro
 	// -------------------------
 	if (!performanceService.getFans().empty()) {
 		QPushButton* fanEdit = new QPushButton();
-		fanEdit->setText(QString::fromStdString(translator.translate("edit.curve")));
+		fanEdit->setText(translator.translate("edit.curve").c_str());
 		connect(fanEdit, &QPushButton::clicked, this, &MainWindow::openFanEditor);
 		fanEdit->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Preferred);
 
-		performanceLayout->addRow(new QLabel(QString::fromStdString(translator.translate("fan.curves") + ":")), fanEdit);
+		performanceLayout->addRow(new QLabel((translator.translate("fan.curves") + ":").c_str()), fanEdit);
 	}
 	// -------------------------
 	// Fan curves menu
@@ -115,10 +114,10 @@ MainWindow::MainWindow(QWidget* parent) : QMainWindow(parent), _logger(LoggerPro
 	// -------------------------
 	// Games menu
 	// -------------------------
-	_gameProfileButton = new QPushButton(QString::fromStdString(translator.translate("label.game.configure")));
+	_gameProfileButton = new QPushButton(translator.translate("label.game.configure").c_str());
 	_gameProfileButton->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Preferred);
 	connect(_gameProfileButton, &QPushButton::clicked, this, &MainWindow::openGameList);
-	performanceLayout->addRow(new QLabel(QString::fromStdString(translator.translate("games") + ":")), _gameProfileButton);
+	performanceLayout->addRow(new QLabel((translator.translate("games") + ":").c_str()), _gameProfileButton);
 	// -------------------------
 	// Games menu
 	// -------------------------
@@ -141,13 +140,13 @@ MainWindow::MainWindow(QWidget* parent) : QMainWindow(parent), _logger(LoggerPro
 	_effectDropdown->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Preferred);
 	auto effects = openRgbService.getAvailableEffects();
 	for (const auto effect : effects) {
-		_effectDropdown->addItem("  " + QString::fromStdString(effect), QString::fromStdString(effect));
+		_effectDropdown->addItem(("  " + effect).c_str(), effect.c_str());
 	}
 
 	auto it = std::find(effects.begin(), effects.end(), openRgbService.getCurrentEffect());
 	_effectDropdown->setCurrentIndex(std::distance(effects.begin(), it));
 	connect(_effectDropdown, QOverload<int>::of(&QComboBox::currentIndexChanged), this, &MainWindow::onEffectChange);
-	auraLayout->addRow(new QLabel(QString::fromStdString(translator.translate("effect") + ":")), _effectDropdown);
+	auraLayout->addRow(new QLabel((translator.translate("effect") + ":").c_str()), _effectDropdown);
 
 	eventBus.onRgbEffect([this](std::string effect) {
 		setAuraEffect(effect);
@@ -162,14 +161,14 @@ MainWindow::MainWindow(QWidget* parent) : QMainWindow(parent), _logger(LoggerPro
 	_brightnessDropdown->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Preferred);
 	auto brightnesses = values<RgbBrightness>(true);
 	for (RgbBrightness b : brightnesses) {
-		_brightnessDropdown->addItem("  " + QString::fromStdString(translator.translate("label.brightness." + toName(b))), toInt(b));
+		_brightnessDropdown->addItem(("  " + translator.translate("label.brightness." + toName(b))).c_str(), toInt(b));
 	}
 	_brightnessDropdown->setCurrentIndex(_brightnessDropdown->findData(toInt(openRgbService.getCurrentBrightness())));
 	connect(_brightnessDropdown, QOverload<int>::of(&QComboBox::currentIndexChanged), this, &MainWindow::onBrightnessChange);
 
 	_colorButton = new QPushButton();
 	_colorButton->setFixedSize(25, 25);
-	_colorButton->setStyleSheet(QString::fromStdString("background-color: " + (openRgbService.getColor().value_or(Color::Black.toHex()))));
+	_colorButton->setStyleSheet(("background-color: " + (openRgbService.getColor().value_or(Color::Black.toHex()))).c_str());
 	_colorButton->setCursor(Qt::PointingHandCursor);
 	_colorButton->setEnabled(openRgbService.getColor().has_value());
 	connect(_colorButton, &QPushButton::clicked, this, &MainWindow::showColorPicker);
@@ -179,7 +178,7 @@ MainWindow::MainWindow(QWidget* parent) : QMainWindow(parent), _logger(LoggerPro
 	brightnessColorLayout->addWidget(_colorButton);
 	brightnessColorLayout->setSpacing(10);
 
-	auraLayout->addRow(new QLabel(QString::fromStdString(translator.translate("brightness") + ":")), brightnessColorLayout);
+	auraLayout->addRow(new QLabel((translator.translate("brightness") + ":").c_str()), brightnessColorLayout);
 
 	auraGroup->setLayout(auraLayout);
 	mainLayout->addWidget(auraGroup);
@@ -202,7 +201,7 @@ MainWindow::MainWindow(QWidget* parent) : QMainWindow(parent), _logger(LoggerPro
 	// Hardware group
 	// -------------------------
 	if (hardwareService.getBatteryLimitAvailable() || hardwareService.getBootSoundAvailable()) {
-		QGroupBox* hardwareGroup	= new QGroupBox(QString::fromStdString(translator.translate("hardware")));
+		QGroupBox* hardwareGroup	= new QGroupBox(translator.translate("hardware").c_str());
 		QFormLayout* hardwareLayout = new QFormLayout();
 		hardwareLayout->setContentsMargins(20, 10, 20, 10);
 		// -------------------------
@@ -218,7 +217,7 @@ MainWindow::MainWindow(QWidget* parent) : QMainWindow(parent), _logger(LoggerPro
 			}
 			connect(_thresholdDropdown, QOverload<int>::of(&QComboBox::currentIndexChanged), this, &MainWindow::onBatteryLimitChanged);
 			setBatteryChargeLimit(hardwareService.getChargeThreshold());
-			hardwareLayout->addRow(new QLabel(QString::fromStdString(translator.translate("charge.threshold") + ":")), _thresholdDropdown);
+			hardwareLayout->addRow(new QLabel((translator.translate("charge.threshold") + ":").c_str()), _thresholdDropdown);
 
 			eventBus.onChargeThreshold([this](BatteryThreshold threshold) {
 				setBatteryChargeLimit(threshold);
@@ -241,7 +240,7 @@ MainWindow::MainWindow(QWidget* parent) : QMainWindow(parent), _logger(LoggerPro
 			onBootSoundEvent(hardwareService.getBootSound());
 
 			connect(_bootSoundDropdown, QOverload<int>::of(&QComboBox::currentIndexChanged), this, &MainWindow::onBootSoundChanged);
-			hardwareLayout->addRow(new QLabel(QString::fromStdString(translator.translate("boot.sound"))), _bootSoundDropdown);
+			hardwareLayout->addRow(new QLabel(translator.translate("boot.sound").c_str()), _bootSoundDropdown);
 
 			eventBus.onBootSound([this](bool value) {
 				onBootSoundEvent(value);
@@ -260,7 +259,7 @@ MainWindow::MainWindow(QWidget* parent) : QMainWindow(parent), _logger(LoggerPro
 	// -------------------------
 	// Settings group
 	// -------------------------
-	QGroupBox* settingsGroup	= new QGroupBox(QString::fromStdString(translator.translate("settings")));
+	QGroupBox* settingsGroup	= new QGroupBox(translator.translate("settings").c_str());
 	QFormLayout* settingsLayout = new QFormLayout();
 	settingsLayout->setContentsMargins(20, 10, 20, 10);
 	// -------------------------
@@ -271,7 +270,7 @@ MainWindow::MainWindow(QWidget* parent) : QMainWindow(parent), _logger(LoggerPro
 	_minimized->setEnabled(true);
 	_minimized->setChecked(applicationService.isStartMinimized());
 	connect(_minimized, &QCheckBox::toggled, this, &MainWindow::onStartMinimizedChanged);
-	settingsLayout->addRow(_minimized, new QLabel(QString::fromStdString(translator.translate("start.minimized"))));
+	settingsLayout->addRow(_minimized, new QLabel(translator.translate("start.minimized").c_str()));
 	// -------------------------
 	// Start minimized
 	// -------------------------
@@ -285,7 +284,7 @@ MainWindow::MainWindow(QWidget* parent) : QMainWindow(parent), _logger(LoggerPro
 #endif
 	_autostart->setChecked(applicationService.isAutostartEnabled());
 	connect(_autostart, &QCheckBox::toggled, this, &MainWindow::onAutostartChanged);
-	settingsLayout->addRow(_autostart, new QLabel(QString::fromStdString(translator.translate("autostart"))));
+	settingsLayout->addRow(_autostart, new QLabel(translator.translate("autostart").c_str()));
 	// -------------------------
 	// Autostart
 	// -------------------------
@@ -411,11 +410,11 @@ void MainWindow::onBootSoundEvent(bool value) {
 }
 
 void MainWindow::setPerformanceProfile(PerformanceProfile value) {
-	_profileDropdown->setCurrentIndex(_profileDropdown->findData(QString::fromStdString(toString(value))));
+	_profileDropdown->setCurrentIndex(_profileDropdown->findData(toString(value).c_str()));
 }
 
 void MainWindow::setScheduler(std::optional<std::string> sched) {
-	_schedulerDropdown->setCurrentIndex(_schedulerDropdown->findData(QString::fromStdString(sched.value_or(""))));
+	_schedulerDropdown->setCurrentIndex(_schedulerDropdown->findData(sched.value_or("").c_str()));
 }
 
 void MainWindow::setBatteryChargeLimit(BatteryThreshold value) {
@@ -427,12 +426,12 @@ void MainWindow::setAuraBrightness(RgbBrightness brightness) {
 }
 
 void MainWindow::setAuraColor(std::optional<std::string> color) {
-	_colorButton->setStyleSheet(QString::fromStdString("background-color: " + (color.value_or(Color::Black.toHex()))));
+	_colorButton->setStyleSheet(("background-color: " + (color.value_or(Color::Black.toHex()))).c_str());
 	_colorButton->setEnabled(color.has_value());
 }
 
 void MainWindow::setAuraEffect(std::string effect) {
-	_effectDropdown->setCurrentIndex(_effectDropdown->findData(QString::fromStdString(effect)));
+	_effectDropdown->setCurrentIndex(_effectDropdown->findData(effect.c_str()));
 }
 
 void MainWindow::onProfileChanged(int) {
@@ -463,8 +462,8 @@ void MainWindow::onBatteryLimitChanged(int) {
 }
 
 void MainWindow::showColorPicker() {
-	QColor initial = QColor(QString::fromStdString(openRgbService.getColor().value()));
-	QColor chosen  = QColorDialog::getColor(initial, this, QString::fromStdString(translator.translate("pick.color")));
+	QColor initial = QColor(openRgbService.getColor().value().c_str());
+	QColor chosen  = QColorDialog::getColor(initial, this, translator.translate("pick.color").c_str());
 
 	if (chosen.isValid()) {
 		openRgbService.setColor(chosen.name(QColor::HexRgb).toStdString());

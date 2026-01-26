@@ -21,9 +21,9 @@ GameList::GameList(QWidget* parent, bool manage_parent) : QDialog(parent), manag
 
 	setWindowModality(Qt::WindowModal);
 
-	setWindowTitle(QString::fromStdString(translator.translate("game.performance.configuration")));
+	setWindowTitle(translator.translate("game.performance.configuration").c_str());
 	setFixedSize(500, 600);
-	setWindowIcon(QIcon(QString::fromStdString(Constants::ASSET_ICON_45_FILE)));
+	setWindowIcon(QIcon(Constants::ASSET_ICON_45_FILE.c_str()));
 	setAttribute(Qt::WA_DeleteOnClose);
 	setWindowFlags(windowFlags() & ~Qt::WindowContextHelpButtonHint);
 
@@ -48,8 +48,8 @@ GameList::GameList(QWidget* parent, bool manage_parent) : QDialog(parent), manag
 	auto metricsEnabled = steamService.metricsEnabled();
 
 	QStringList columns;
-	columns << QString::fromStdString(translator.translate("game.title"));
-	columns << QString::fromStdString(translator.translate("configuration"));
+	columns << translator.translate("game.title").c_str();
+	columns << translator.translate("configuration").c_str();
 
 	QTableWidget* table = new QTableWidget(appIds.size(), columns.size());
 	table->setSizeAdjustPolicy(QAbstractScrollArea::AdjustToContents);
@@ -78,12 +78,12 @@ GameList::GameList(QWidget* parent, bool manage_parent) : QDialog(parent), manag
 		bool isRunning = steamService.isRunning(appid);
 
 		// --- Title ---
-		QTableWidgetItem* item = new QTableWidgetItem(
-			QString::fromStdString(gameCfg[std::to_string(appid)].name + (isRunning ? " (" + translator.translate("running") + "...)" : "")));
+		QTableWidgetItem* item =
+			new QTableWidgetItem((gameCfg[std::to_string(appid)].name + (isRunning ? " (" + translator.translate("running") + "...)" : "")).c_str());
 
 		auto iconPath = steamService.getIcon(appid);
 		if (iconPath.has_value()) {
-			item->setIcon(QIcon(QString::fromStdString(*iconPath)));
+			item->setIcon(QIcon((*iconPath).c_str()));
 		}
 
 		item->setFlags(Qt::ItemIsEnabled);
@@ -94,7 +94,7 @@ GameList::GameList(QWidget* parent, bool manage_parent) : QDialog(parent), manag
 
 		table->setItem(row, 0, item);
 
-		QPushButton* btn = new QPushButton(QString::fromStdString(translator.translate("edit")));
+		QPushButton* btn = new QPushButton(translator.translate("edit").c_str());
 		btn->setProperty("appid", QVariant::fromValue<qulonglong>(appid));
 		connect(btn, &QPushButton::clicked, this, [this, btn]() {
 			unsigned int gid = btn->property("appid").toULongLong();

@@ -7,7 +7,7 @@ PowerProfile PowerProfileClient::getPowerProfile() {
 }
 
 void PowerProfileClient::setPowerProfile(const PowerProfile& val) {
-	this->setProperty<QString>(QString("ActiveProfile"), QString::fromStdString(toString(val, {{"_", "-"}})));
+	this->setProperty<QString>(QString("ActiveProfile"), toString(val, {{"_", "-"}}).c_str());
 }
 
 PowerProfileClient::PowerProfileClient()

@@ -74,7 +74,7 @@ std::string Configuration::getPassword() {
 void Configuration::setPassword(const std::string& pss) {
 	QKeychain::WritePasswordJob job(service);
 	job.setKey(key);
-	job.setTextData(QString::fromStdString(pss));
+	job.setTextData(pss.c_str());
 
 	QEventLoop loop;
 	QObject::connect(&job, &QKeychain::Job::finished, &loop, &QEventLoop::quit);

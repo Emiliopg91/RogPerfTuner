@@ -10,10 +10,12 @@
 CurveEditor::CurveEditor(const std::string& profile, QWidget* parent) : QDialog(parent), profile(profile) {
 	setWindowModality(Qt::WindowModal);
 
-	setWindowTitle(QString::fromStdString(translator.translate(
-		"edit.fan.profile", {{"prof", StringUtils::toLowerCase(translator.translate("label.profile." + StringUtils::toUpperCase(profile)))}})));
+	setWindowTitle(translator
+					   .translate("edit.fan.profile",
+								  {{"prof", StringUtils::toLowerCase(translator.translate("label.profile." + StringUtils::toUpperCase(profile)))}})
+					   .c_str());
 	setFixedSize(550, 550);
-	setWindowIcon(QIcon(QString::fromStdString(Constants::ASSET_ICON_45_FILE)));
+	setWindowIcon(QIcon(Constants::ASSET_ICON_45_FILE.c_str()));
 	setAttribute(Qt::WA_DeleteOnClose);
 	setWindowFlags(windowFlags() & ~Qt::WindowContextHelpButtonHint);
 
@@ -57,15 +59,15 @@ CurveEditor::CurveEditor(const std::string& profile, QWidget* parent) : QDialog(
 		QVBoxLayout* tabLayout = new QVBoxLayout(tabPage);
 		tabLayout->addWidget(chartView);
 
-		tabs->addTab(tabPage, QString::fromStdString(fan));
+		tabs->addTab(tabPage, fan.c_str());
 
 		seriesList.push_back(s);
 		charts.push_back(chartView);
 	}
-	QPushButton* saveBtn	   = new QPushButton(QString::fromStdString(translator.translate("save")));
-	QPushButton* resetBtn	   = new QPushButton(QString::fromStdString(translator.translate("reset")));
-	QPushButton* defaultBtn	   = new QPushButton(QString::fromStdString(translator.translate("reset.default")));
-	QPushButton* suggestionBtn = new QPushButton(QString::fromStdString(translator.translate("apply.suggestion")));
+	QPushButton* saveBtn	   = new QPushButton(translator.translate("save").c_str());
+	QPushButton* resetBtn	   = new QPushButton(translator.translate("reset").c_str());
+	QPushButton* defaultBtn	   = new QPushButton(translator.translate("reset.default").c_str());
+	QPushButton* suggestionBtn = new QPushButton(translator.translate("apply.suggestion").c_str());
 
 	QWidget* buttonGroup = new QWidget();
 	QHBoxLayout* hLayout = new QHBoxLayout(buttonGroup);
