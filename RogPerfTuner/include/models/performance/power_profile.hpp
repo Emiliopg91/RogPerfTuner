@@ -1,3 +1,3 @@
 #pragma once
 
-enum class PowerProfile : int { BALANCED, PERFORMANCE, POWER_SAVER };
+enum class PowerProfile { BALANCED, PERFORMANCE, POWER_SAVER };

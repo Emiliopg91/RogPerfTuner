@@ -9,9 +9,12 @@
 #include "string_utils.hpp"
 
 template <typename T>
-concept EnumClassInt = std::is_enum_v<T> && std::is_same_v<std::underlying_type_t<T>, int>;
+concept EnumClass = std::is_enum_v<T>;
 
-template <EnumClassInt E>
+template <typename T>
+concept EnumClassInt = EnumClass<T> && std::is_same_v<std::underlying_type_t<T>, int>;
+
+template <EnumClass E>
 auto values(const bool& reversed = false) {
 	auto v = magic_enum::enum_values<E>();
 	if (reversed) {
@@ -20,12 +23,12 @@ auto values(const bool& reversed = false) {
 	return v;
 }
 
-template <EnumClassInt E>
+template <EnumClass E>
 std::string toName(const E& e) {
 	return std::string(magic_enum::enum_name<E>(e));
 }
 
-template <EnumClassInt E>
+template <EnumClass E>
 E fromName(const std::string& s) {
 	if (auto v = magic_enum::enum_cast<E>(s)) {
 		return *v;
@@ -33,7 +36,7 @@ E fromName(const std::string& s) {
 	throw std::runtime_error("Invalid name " + s);
 }
 
-template <EnumClassInt E>
+template <EnumClass E>
 std::string toString(const E& e, const std::unordered_map<std::string, std::string>& replacement = {}) {
 	auto v = StringUtils::toLowerCase(toName(e));
 
@@ -48,7 +51,7 @@ std::string toString(const E& e, const std::unordered_map<std::string, std::stri
 	return v;
 }
 
-template <EnumClassInt E>
+template <EnumClass E>
 E fromString(const std::string& s, const std::unordered_map<std::string, std::string>& replacement = {}) {
 	std::string v = s;
 	for (const auto& [key, value] : replacement) {

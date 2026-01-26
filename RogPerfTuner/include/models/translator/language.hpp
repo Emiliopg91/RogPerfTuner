@@ -1,3 +1,3 @@
 #pragma once
 
-enum class Language : int { EN, ES, DE };
+enum class Language { EN, ES, DE };

@@ -3,7 +3,7 @@
 #include "../performance/platform_profile.hpp"
 #include "../performance/power_profile.hpp"
 
-enum class PerformanceProfile : int { PERFORMANCE = 0, BALANCED = 1, QUIET = 2 };
+enum class PerformanceProfile { PERFORMANCE, BALANCED, QUIET };
 
 bool supportedOnBattery(PerformanceProfile value);
 

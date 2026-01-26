@@ -1,3 +1,3 @@
 #pragma once
 
-enum class WineSyncOption : int { AUTO, NTSYNC, FSYNC, ESYNC, NONE };
+enum class WineSyncOption { AUTO, NTSYNC, FSYNC, ESYNC, NONE };
