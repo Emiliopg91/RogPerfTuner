@@ -4,8 +4,7 @@ TabWidth: 4
 UseTab: Always
 ColumnLimit: 150
 
-# Preferencias C++
-Standard: c++17
+Standard: c++23
 DerivePointerAlignment: false
 PointerAlignment: Left
 SpaceBeforeParens: ControlStatements
@@ -18,15 +17,12 @@ AllowShortFunctionsOnASingleLine: None
 AllowShortLambdasOnASingleLine: None
 AccessModifierOffset: -2
 
-# Organizar includes
 IncludeBlocks: Regroup
 SortIncludes: true
 
-# Mantener comentarios bonitos
 ReflowComments: true
 SpacesInAngles: false
 
-# Ajustes extra
 AlignOperands: true
 AlignConsecutiveAssignments: true
 AlignConsecutiveDeclarations: false
