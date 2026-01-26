@@ -1,11 +1,13 @@
 #include "../../../../include/clients/dbus/linux/power_profile_client.hpp"
 
+#include "../../../../include/utils/enum_utils.hpp"
+
 PowerProfile PowerProfileClient::getPowerProfile() {
-	return PowerProfileNS::fromString(this->getProperty<QString>(QString("ActiveProfile")).toStdString());
+	return fromString<PowerProfile>(this->getProperty<QString>(QString("ActiveProfile")).toStdString(), {{"-", "_"}});
 }
 
 void PowerProfileClient::setPowerProfile(const PowerProfile& val) {
-	this->setProperty<QString>(QString("ActiveProfile"), QString::fromStdString(PowerProfileNS::toString(val)));
+	this->setProperty<QString>(QString("ActiveProfile"), QString::fromStdString(toString(val, {{"_", "-"}})));
 }
 
 PowerProfileClient::PowerProfileClient()

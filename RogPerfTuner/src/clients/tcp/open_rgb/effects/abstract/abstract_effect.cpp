@@ -6,6 +6,7 @@
 #include <thread>
 
 #include "../../../../../../include/models/hardware/rgb_brightness.hpp"
+#include "../../../../../../include/utils/enum_utils.hpp"
 #include "../../../../../../include/utils/string_utils.hpp"
 #include "../../../../../../include/utils/time_utils.hpp"
 
@@ -23,12 +24,12 @@ void AbstractEffect::start(const DeviceList& devices, const RgbBrightness& brigh
 	}
 
 	if (!_color.has_value()) {
-		logger.info("Starting effect '" + getName() + "' with " + StringUtils::toLowerCase(RgbBrightnessNS::toName(brightness)) + " brightness");
+		logger.info("Starting effect '" + getName() + "' with " + StringUtils::toLowerCase(toName(brightness)) + " brightness");
 	} else {
-		logger.info("Starting effect '" + getName() + "' with " + StringUtils::toLowerCase(RgbBrightnessNS::toName(brightness)) +
-					" brightness and color " + StringUtils::toUpperCase(_color.value().toHex()));
+		logger.info("Starting effect '" + getName() + "' with " + StringUtils::toLowerCase(toName(brightness)) + " brightness and color " +
+					StringUtils::toUpperCase(_color.value().toHex()));
 	}
-	_brightness = RgbBrightnessNS::toInt(brightness) / 100.0;
+	_brightness = toInt<RgbBrightness>(brightness) / 100.0;
 	_is_running = true;
 
 	_thread = std::thread([this, &devices] {

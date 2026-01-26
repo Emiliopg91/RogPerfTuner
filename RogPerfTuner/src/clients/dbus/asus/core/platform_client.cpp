@@ -1,12 +1,14 @@
 
 #include "../../../../../include/clients/dbus/asus/core/platform_client.hpp"
 
+#include "../../../../../include/utils/enum_utils.hpp"
+
 PlatformProfile PlatformClient::getPlatformProfile() {
-	return PlatformProfileNS::fromInt(this->getProperty<int>(QString("PlatformProfile")));
+	return fromInt<PlatformProfile>(this->getProperty<int>(QString("PlatformProfile")));
 }
 
 void PlatformClient::setPlatformProfile(PlatformProfile val) {
-	this->setProperty<unsigned int>(QString("PlatformProfile"), static_cast<unsigned int>(PlatformProfileNS::toInt(val)));
+	this->setProperty<unsigned int>(QString("PlatformProfile"), static_cast<unsigned int>(toInt<PlatformProfile>(val)));
 }
 
 bool PlatformClient::getEnablePptGroup() {

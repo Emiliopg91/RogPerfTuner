@@ -95,11 +95,11 @@ GameConfigDialog::GameConfigDialog(unsigned int gid, bool runAfterSave, QWidget*
 	// --- Metrics ---
 	metricsCombo = new NoScrollComboBox();
 	metricsCombo->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Preferred);
-	auto items = MangoHudLevelNS::values();
+	auto items = values<MangoHudLevel>();
 	i		   = 0;
 	for (MangoHudLevel level : items) {
-		metricsCombo->addItem(QString::fromStdString(translator.translate("label.level." + MangoHudLevelNS::toString(level))),
-							  QString::fromStdString(MangoHudLevelNS::toString(level)));
+		metricsCombo->addItem(QString::fromStdString(translator.translate("label.level." + toString(level))),
+							  QString::fromStdString(toString(level)));
 		if (level == gameEntry.metrics_level) {
 			metricsCombo->setCurrentIndex(i);
 		}
@@ -123,10 +123,10 @@ GameConfigDialog::GameConfigDialog(unsigned int gid, bool runAfterSave, QWidget*
 		i		  = 0;
 		modeCombo = new NoScrollComboBox();
 		modeCombo->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Preferred);
-		auto items2 = ComputerTypeNS::values();
+		auto items2 = values<ComputerType>();
 		for (ComputerType opt : items2) {
-			modeCombo->addItem(QString::fromStdString(translator.translate("label.device." + ComputerTypeNS::toString(opt))),
-							   QString::fromStdString(ComputerTypeNS::toString(opt)));
+			modeCombo->addItem(QString::fromStdString(translator.translate("label.device." + ::toString(opt))),
+							   QString::fromStdString(::toString(opt)));
 			if (opt == gameEntry.device) {
 				modeCombo->setCurrentIndex(i);
 			}
@@ -140,10 +140,10 @@ GameConfigDialog::GameConfigDialog(unsigned int gid, bool runAfterSave, QWidget*
 		i			  = 0;
 		wineSyncCombo = new NoScrollComboBox();
 		wineSyncCombo->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Preferred);
-		auto items3 = WineSyncOptionNS::values();
+		auto items3 = values<WineSyncOption>();
 		for (WineSyncOption opt : items3) {
-			wineSyncCombo->addItem(QString::fromStdString(translator.translate("label.winesync." + WineSyncOptionNS::toString(opt))),
-								   QString::fromStdString(WineSyncOptionNS::toString(opt)));
+			wineSyncCombo->addItem(QString::fromStdString(translator.translate("label.winesync." + toString(opt))),
+								   QString::fromStdString(toString(opt)));
 			if (opt == gameEntry.sync) {
 				wineSyncCombo->setCurrentIndex(i);
 			}
@@ -207,14 +207,14 @@ void GameConfigDialog::onAccept() {
 
 	MangoHudLevel level = MangoHudLevel::NO_DISPLAY;
 	if (steamService.metricsEnabled()) {
-		level = MangoHudLevelNS::fromString(metricsCombo->currentData().toString().toStdString());
+		level = fromString<MangoHudLevel>(metricsCombo->currentData().toString().toStdString());
 	}
 
 	WineSyncOption sync = WineSyncOption::AUTO;
 	ComputerType device = ComputerType::COMPUTER;
 	if (gameEntry.proton) {
-		device = ComputerTypeNS::fromString(modeCombo->currentData().toString().toStdString());
-		sync   = WineSyncOptionNS::fromString(wineSyncCombo->currentData().toString().toStdString());
+		device = fromString<ComputerType>(modeCombo->currentData().toString().toStdString());
+		sync   = fromString<WineSyncOption>(wineSyncCombo->currentData().toString().toStdString());
 	}
 
 	gameEntry.args			= paramsInput->text().toStdString();

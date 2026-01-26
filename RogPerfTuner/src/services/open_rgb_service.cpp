@@ -172,13 +172,13 @@ void OpenRgbService::disableDevice(const UsbIdentifier& identifier) {
 }
 
 RgbBrightness OpenRgbService::increaseBrightness() {
-	auto next = RgbBrightnessNS::getNextBrightness(brightness);
+	auto next = getNextBrightness(brightness);
 	setBrightness(next);
 	return next;
 }
 
 RgbBrightness OpenRgbService::decreaseBrightness() {
-	auto next = RgbBrightnessNS::getPreviousBrightness(brightness);
+	auto next = getPreviousBrightness(brightness);
 	setBrightness(next);
 	return next;
 }

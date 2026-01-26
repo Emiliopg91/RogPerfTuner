@@ -4,6 +4,7 @@
 
 #include <string>
 
+#include "../../utils/enum_utils.hpp"
 #include "../hardware/rgb_brightness.hpp"
 #include "effect.hpp"
 
@@ -19,7 +20,7 @@ template <>
 struct convert<Aura> {
 	static Node encode(const Aura& aura) {
 		Node node;
-		node["brightness"] = RgbBrightnessNS::toInt(aura.brightness);
+		node["brightness"] = toInt<RgbBrightness>(aura.brightness);
 		if (!aura.config.empty()) {
 			node["config"] = aura.config;
 		}
@@ -31,7 +32,7 @@ struct convert<Aura> {
 
 	static bool decode(const Node& node, Aura& aura) {
 		if (node["brightness"]) {
-			aura.brightness = RgbBrightnessNS::fromInt(node["brightness"].as<int>());
+			aura.brightness = fromInt<RgbBrightness>(node["brightness"].as<int>());
 		}
 
 		if (node["config"]) {

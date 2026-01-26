@@ -470,7 +470,7 @@ const SteamGameConfig SteamService::getConfiguration(const std::string& gid) {
 		}
 
 		if (whichMangohud.has_value() && gameEntry.metrics_level != MangoHudLevel ::NO_DISPLAY) {
-			cfg.environment["MANGOHUD_CONFIG"] = "preset=" + std::to_string(MangoHudLevelNS::toInt(gameEntry.metrics_level));
+			cfg.environment["MANGOHUD_CONFIG"] = "preset=" + std::to_string(toInt(gameEntry.metrics_level));
 			cfg.environment["MANGOHUD_DLSYM"]  = "1";
 			cfg.environment["MANGOHUD"]		   = "1";
 			cfg.wrappers.emplace_back(whichMangohud.value());

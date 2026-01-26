@@ -18,7 +18,7 @@ template <>
 struct convert<Platform> {
 	static Node encode(const Platform& platform) {
 		Node node;
-		node["chargeLimit"] = BatteryThresholdNS::toInt(platform.chargeLimit);
+		node["chargeLimit"] = toInt(platform.chargeLimit);
 		if (!platform.curves.empty()) {
 			node["curves"] = platform.curves;
 		}
@@ -31,7 +31,7 @@ struct convert<Platform> {
 			platform.performance = node["performance"].as<Performance>();
 		}
 		if (node["chargeLimit"]) {
-			platform.chargeLimit = BatteryThresholdNS::fromInt(node["chargeLimit"].as<int>());
+			platform.chargeLimit = fromInt<BatteryThreshold>(node["chargeLimit"].as<int>());
 		}
 		if (node["curves"]) {
 			platform.curves = node["curves"].as<std::unordered_map<std::string, std::unordered_map<std::string, FanCurve>>>();

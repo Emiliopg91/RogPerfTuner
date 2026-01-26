@@ -2,10 +2,12 @@
 
 #include <string>
 
+#include "../../../include/utils/enum_utils.hpp"
+
 BatteryChargeLimitClient::BatteryChargeLimitClient()
 	: AbstractFileClient("/sys/class/power_supply/BAT0/charge_control_end_threshold", "BatteryChargeLimitClient", true, false) {
 }
 
 void BatteryChargeLimitClient::setChargeLimit(BatteryThreshold value) {
-	write(std::to_string(BatteryThresholdNS::toInt(value)));
+	write(std::to_string(toInt(value)));
 }

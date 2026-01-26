@@ -40,7 +40,7 @@ void TrayIcon::openGameList() {
 }
 
 void TrayIcon::openFanEditor() {
-	auto profile		= PerformanceProfileNS::toString(performanceService.getPerformanceProfile());
+	auto profile		= toString(performanceService.getPerformanceProfile());
 	CurveEditor* editor = new CurveEditor(profile, &mainWindow);
 	editor->show();
 }
@@ -49,7 +49,7 @@ void TrayIcon::setAuraBrightness(RgbBrightness brightness) {
 	QMetaObject::invokeMethod(
 		this,
 		[=, this]() {
-			brightnessActions[RgbBrightnessNS::toName(brightness)]->setChecked(true);
+			brightnessActions[toName(brightness)]->setChecked(true);
 		},
 		Qt::QueuedConnection);
 }
@@ -81,7 +81,7 @@ void TrayIcon::setPerformanceProfile(PerformanceProfile profile) {
 	QMetaObject::invokeMethod(
 		this,
 		[=, this]() {
-			perfProfileActions[PerformanceProfileNS::toName(profile)]->setChecked(true);
+			perfProfileActions[toName(profile)]->setChecked(true);
 		},
 		Qt::QueuedConnection);
 }
@@ -99,7 +99,7 @@ void TrayIcon::setBatteryThreshold(BatteryThreshold threshold) {
 	QMetaObject::invokeMethod(
 		this,
 		[=, this]() {
-			thresholdActions[BatteryThresholdNS::toString(threshold)]->setChecked(true);
+			thresholdActions[toString(threshold)]->setChecked(true);
 		},
 		Qt::QueuedConnection);
 }
@@ -189,15 +189,15 @@ TrayIcon::TrayIcon()
 		if (hardwareService.getBatteryLimitAvailable()) {
 			QMenu* chargeLimitMenu	  = new QMenu(("    " + translator.translate("charge.threshold")).c_str(), menu);
 			QActionGroup* chargeGroup = new QActionGroup(menu);
-			for (BatteryThreshold bct : BatteryThresholdNS::values()) {
-				QAction* act = new QAction((std::to_string(BatteryThresholdNS::toInt(bct)) + "%").c_str(), chargeGroup);
+			for (BatteryThreshold bct : values<BatteryThreshold>(true)) {
+				QAction* act = new QAction((std::to_string(toInt(bct)) + "%").c_str(), chargeGroup);
 				act->setCheckable(true);
 				act->setChecked(bct == hardwareService.getChargeThreshold());
 				QObject::connect(act, &QAction::triggered, [this, bct]() {
 					onBatteryLimitChanged(bct);
 				});
 				chargeLimitMenu->addAction(act);
-				thresholdActions[BatteryThresholdNS::toString(bct)] = act;
+				thresholdActions[toString(bct)] = act;
 			}
 			menu->insertMenu(nullptr, chargeLimitMenu);
 
@@ -278,16 +278,16 @@ TrayIcon::TrayIcon()
 	// -------------------------
 	QMenu* brightnessMenu		  = new QMenu(("    " + translator.translate("brightness")).c_str(), menu);
 	QActionGroup* brightnessGroup = new QActionGroup(menu);
-	auto levels					  = RgbBrightnessNS::values();
+	auto levels					  = values<RgbBrightness>(true);
 	for (RgbBrightness item : levels) {
-		QAction* act = new QAction(translator.translate("label.brightness." + RgbBrightnessNS::toName(item)).c_str(), brightnessGroup);
+		QAction* act = new QAction(translator.translate("label.brightness." + toName(item)).c_str(), brightnessGroup);
 		act->setCheckable(true);
 		act->setChecked(item == openRgbService.getCurrentBrightness());
 		QObject::connect(act, &QAction::triggered, [this, item]() {
 			onBrightnessChanged(item);
 		});
 		brightnessMenu->addAction(act);
-		brightnessActions[RgbBrightnessNS::toName(item)] = act;
+		brightnessActions[toName(item)] = act;
 	}
 	menu->insertMenu(nullptr, brightnessMenu);
 
@@ -343,16 +343,16 @@ TrayIcon::TrayIcon()
 	// -------------------------
 	profileMenu				   = new QMenu(("    " + translator.translate("profile")).c_str(), menu);
 	QActionGroup* profileGroup = new QActionGroup(menu);
-	auto items				   = PerformanceProfileNS::values();
+	auto items				   = values<PerformanceProfile>();
 	for (PerformanceProfile item : items) {
-		QAction* act = new QAction(translator.translate("label.profile." + PerformanceProfileNS::toName(item)).c_str(), profileGroup);
+		QAction* act = new QAction(translator.translate("label.profile." + toName(item)).c_str(), profileGroup);
 		act->setCheckable(true);
 		act->setChecked(item == performanceService.getPerformanceProfile());
 		QObject::connect(act, &QAction::triggered, [this, item]() {
 			onPerformanceProfileChanged(item);
 		});
 		profileMenu->addAction(act);
-		perfProfileActions[PerformanceProfileNS::toName(item)] = act;
+		perfProfileActions[toName(item)] = act;
 	}
 
 	profileMenu->setEnabled(runningGames == 0 && !onBattery);

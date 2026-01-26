@@ -4,6 +4,7 @@
 
 #include <optional>
 
+#include "../../utils/enum_utils.hpp"
 #include "../performance/performance_profile.hpp"
 
 struct Performance {
@@ -17,7 +18,7 @@ template <>
 struct convert<Performance> {
 	static Node encode(const Performance& perf) {
 		Node node;
-		node["profile"] = PerformanceProfileNS::toString(perf.profile);
+		node["profile"] = toString(perf.profile);
 		if (perf.scheduler.has_value()) {
 			node["scheduler"] = perf.scheduler.value();
 		}
@@ -26,7 +27,7 @@ struct convert<Performance> {
 
 	static bool decode(const Node& node, Performance& perf) {
 		if (node["profile"]) {
-			perf.profile = PerformanceProfileNS::fromString(node["profile"].as<std::string>());
+			perf.profile = fromString<PerformanceProfile>(node["profile"].as<std::string>());
 		}
 		if (node["scheduler"]) {
 			perf.scheduler = node["scheduler"].as<std::string>();

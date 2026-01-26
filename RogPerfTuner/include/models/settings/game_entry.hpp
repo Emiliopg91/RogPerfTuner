@@ -40,7 +40,7 @@ struct convert<GameEntry> {
 		if (game.gpu && !game.gpu->empty()) {
 			node["gpu"] = *game.gpu;
 		}
-		node["metrics"] = MangoHudLevelNS::toString(game.metrics_level);
+		node["metrics"] = toString(game.metrics_level);
 		if (game.overlayId && !game.overlayId->empty()) {
 			node["overlayId"] = *game.overlayId;
 		}
@@ -51,8 +51,8 @@ struct convert<GameEntry> {
 			node["scheduler"] = *game.scheduler;
 		}
 		if (game.proton) {
-			node["device"] = ComputerTypeNS::toString(game.device);
-			node["sync"]   = WineSyncOptionNS::toString(game.sync);
+			node["device"] = ::toString(game.device);
+			node["sync"]   = toString(game.sync);
 		}
 		if (game.wrappers && !game.wrappers->empty()) {
 			node["wrappers"] = *game.wrappers;
@@ -105,7 +105,7 @@ struct convert<GameEntry> {
 		}
 
 		if (node["computer"]) {
-			game.device = ComputerTypeNS::fromString(node["computer"].as<std::string>());
+			game.device = fromString<ComputerType>(node["computer"].as<std::string>());
 		} else {
 			if (node["steamdeck"]) {
 				game.device = node["steamdeck"].as<bool>() ? ComputerType::STEAM_DECK : ComputerType::COMPUTER;
@@ -115,13 +115,13 @@ struct convert<GameEntry> {
 		}
 
 		if (node["sync"]) {
-			game.sync = WineSyncOptionNS::fromString(node["sync"].as<std::string>());
+			game.sync = fromString<WineSyncOption>(node["sync"].as<std::string>());
 		} else {
 			game.sync = WineSyncOption::AUTO;
 		}
 
 		if (node["metrics"]) {
-			game.metrics_level = MangoHudLevelNS::fromString(node["metrics"].as<std::string>());
+			game.metrics_level = fromString<MangoHudLevel>(node["metrics"].as<std::string>());
 		}
 		if (node["name"]) {
 			game.name = node["name"].as<std::string>();

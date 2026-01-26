@@ -6,6 +6,8 @@
 #include <string>
 
 #include "../../../include/utils/constants.hpp"
+#include "../../../include/utils/enum_utils.hpp"
+#include "../../../include/utils/string_utils.hpp"
 
 Translator::Translator() : Loggable("Translator") {
 	currentLang = [this]() -> Language {
@@ -23,9 +25,9 @@ Translator::Translator() : Loggable("Translator") {
 			langStr = langStr.substr(0, pos);
 		}
 		try {
-			return LanguageNS::fromString(langStr);
+			return fromString<Language>(StringUtils::toUpperCase(langStr));
 		} catch (std::exception& e) {
-			logger.warn("Unsupported language " + langStr + ", fallback to " + LanguageNS::toString(FALLBACK_LANG));
+			logger.warn("Unsupported language " + langStr + ", fallback to " + toString(FALLBACK_LANG));
 			return FALLBACK_LANG;
 		}
 	}();
@@ -37,11 +39,11 @@ Translator::Translator() : Loggable("Translator") {
 		const YAML::Node& value = it->second;
 
 		std::string val = key;
-		if (value[LanguageNS::toString(currentLang)]) {
-			val = value[LanguageNS::toString(currentLang)].as<std::string>();
-		} else if (value[LanguageNS::toString(FALLBACK_LANG)]) {
+		if (value[toString(currentLang)]) {
+			val = value[toString(currentLang)].as<std::string>();
+		} else if (value[toString(FALLBACK_LANG)]) {
 			logger.warn("Missing specific translation for " + key);
-			val = value[LanguageNS::toString(FALLBACK_LANG)].as<std::string>();
+			val = value[toString(FALLBACK_LANG)].as<std::string>();
 		} else {
 			logger.warn("Missing specific and default translation for " + key);
 		}
@@ -49,7 +51,7 @@ Translator::Translator() : Loggable("Translator") {
 		translations[key] = val;
 	}
 
-	logger.debug("User language: " + LanguageNS::toString(currentLang));
+	logger.debug("User language: " + toString(currentLang));
 }
 
 std::string Translator::translate(const std::string& msg, const std::unordered_map<std::string, std::any>& replacement) {

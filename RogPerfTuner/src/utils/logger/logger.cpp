@@ -5,10 +5,11 @@
 #include <iomanip>
 #include <memory>
 
+#include "../../../include/utils/enum_utils.hpp"
 #include "../../../include/utils/string_utils.hpp"
 
 void Logger::setLevel(std::string level) {
-	this->setLevel(LoggerLevelNS::fromName(level));
+	this->setLevel(fromName<LoggerLevel>(level));
 }
 
 /**
@@ -99,11 +100,11 @@ void Logger::rem_tab() {
 
 void Logger::log(LoggerLevel msgLevel, std::string format) {
 	std::lock_guard<std::mutex> lock(mutex);
-	if (LoggerLevelNS::toInt(msgLevel) > LoggerLevelNS::toInt(level)) {
+	if (toInt(msgLevel) > toInt(level)) {
 		return;
 	}
 
-	auto out = "[" + now_timestamp() + "][" + StringUtils::rightPad(LoggerLevelNS::toName(msgLevel), 7).substr(0, 7) + "][" + name + "] - " +
+	auto out = "[" + now_timestamp() + "][" + StringUtils::rightPad(toName(msgLevel), 7).substr(0, 7) + "][" + name + "] - " +
 			   StringUtils::rightPad("", tabs * 2) + format + "\n";
 	consoleSink->write(out, level);
 	if (fileSink.has_value()) {
