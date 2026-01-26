@@ -4,7 +4,7 @@ TabWidth: 4
 UseTab: Always
 ColumnLimit: 150
 
-Standard: c++23
+Standard: c++17
 DerivePointerAlignment: false
 PointerAlignment: Left
 SpaceBeforeParens: ControlStatements
