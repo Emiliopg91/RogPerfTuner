@@ -2,8 +2,6 @@
 
 #include <string>
 
-#include "../clients/shell/curl_client.hpp"
-
 class NetUtils {
   public:
 	/**

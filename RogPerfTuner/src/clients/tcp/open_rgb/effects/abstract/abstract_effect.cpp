@@ -29,7 +29,7 @@ void AbstractEffect::start(const DeviceList& devices, const RgbBrightness& brigh
 		logger->info("Starting effect '" + getName() + "' with " + StringUtils::toLowerCase(toName(brightness)) + " brightness and color " +
 					 StringUtils::toUpperCase(_color.value().toHex()));
 	}
-	_brightness = toInt<RgbBrightness>(brightness) / 100.0;
+	_brightness = toInt(brightness) / 100.0;
 	_is_running = true;
 
 	_thread = std::thread([this, &devices] {

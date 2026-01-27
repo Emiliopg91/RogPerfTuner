@@ -124,7 +124,7 @@ GameConfigDialog::GameConfigDialog(unsigned int gid, bool runAfterSave, QWidget*
 		modeCombo->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Preferred);
 		auto items2 = values<ComputerType>();
 		for (ComputerType opt : items2) {
-			modeCombo->addItem(translator.translate("label.device." + ::toString(opt)).c_str(), ::toString(opt).c_str());
+			modeCombo->addItem(translator.translate("label.device." + toString(opt)).c_str(), toString(opt).c_str());
 			if (opt == gameEntry.device) {
 				modeCombo->setCurrentIndex(i);
 			}

@@ -11,7 +11,6 @@
 #include "../../include/clients/shell/switcherooctl_client.hpp"
 #include "../../include/gui/toaster.hpp"
 #include "../../include/models/hardware/battery_charge_threshold.hpp"
-#include "../../include/models/hardware/cpu_brand.hpp"
 #include "../../include/models/hardware/gpu_brand.hpp"
 #include "../../include/services/open_rgb_service.hpp"
 #include "../../include/utils/events/event_bus.hpp"
@@ -28,7 +27,6 @@ HardwareService::HardwareService() : Loggable("HardwareService") {
 	Logger::add_tab();
 	std::string cpuinfo_out = cpuInfoClient.read(5);
 	if (StringUtils::isSubstring("GenuineIntel", cpuinfo_out)) {
-		cpu		   = CpuBrand::INTEL;
 		auto lines = StringUtils::splitLines(cpuinfo_out);
 		auto line  = lines[lines.size() - 1];
 		auto pos   = line.find(":");
@@ -37,7 +35,6 @@ HardwareService::HardwareService() : Loggable("HardwareService") {
 			logger->info(line);
 		}
 	} else if (StringUtils::isSubstring("AuthenticAMD", cpuinfo_out)) {
-		cpu		   = CpuBrand::AMD;
 		auto lines = StringUtils::splitLines(cpuinfo_out);
 		auto line  = lines[lines.size() - 1];
 		auto pos   = line.find(":");
@@ -83,13 +80,8 @@ HardwareService::HardwareService() : Loggable("HardwareService") {
 			}
 			FileUtils::mkdirs(Constants::LIB_OCL_DIR);
 
-			GpuBrand brandGpu = GpuBrand::AMD;
-
+			auto icdName = getIcdName(brand);
 			std::vector<std::string> vkIcd;
-			auto icdName = toString(brand);
-			if (icdName == toString(brandGpu)) {
-				icdName = "radeon";
-			}
 			std::vector<std::string> vkIcdVariants = {icdName + "_icd.json", icdName + "_icd.i686.json", icdName + "_icd.x86_64.json"};
 			for (auto var : vkIcdVariants) {
 				if (FileUtils::exists(Constants::USR_SHARE_VK_DIR + var)) {
@@ -110,13 +102,10 @@ HardwareService::HardwareService() : Loggable("HardwareService") {
 				env = env + "VK_ICD_FILENAMES=" + oss.str() + " ";
 			}
 
-			icdName = toString(brand);
-			if (icdName == toString(brandGpu)) {
-				icdName = "amdocl64";
-			}
-			if (FileUtils::exists(Constants::USR_SHARE_OCL_DIR + icdName + ".icd")) {
-				FileUtils::copy(Constants::USR_SHARE_OCL_DIR + icdName + ".icd", Constants::LIB_OCL_DIR + icdName + ".icd");
-				env = env + "OCL_ICD_FILENAMES=" + Constants::LIB_OCL_DIR + icdName + ".icd" + " ";
+			auto ocdName = getOclName(brand);
+			if (FileUtils::exists(Constants::USR_SHARE_OCL_DIR + ocdName + ".icd")) {
+				FileUtils::copy(Constants::USR_SHARE_OCL_DIR + ocdName + ".icd", Constants::LIB_OCL_DIR + ocdName + ".icd");
+				env = env + "OCL_ICD_FILENAMES=" + Constants::LIB_OCL_DIR + ocdName + ".icd" + " ";
 			}
 			env					  = StringUtils::trim(env);
 			gpus[toString(brand)] = env;
@@ -141,7 +130,7 @@ HardwareService::HardwareService() : Loggable("HardwareService") {
 		Logger::add_tab();
 		charge_limit = configuration.getConfiguration().platform.chargeLimit;
 		batteryChargeLimitClient.setChargeLimit(charge_limit);
-		logger->info(std::to_string(toInt(charge_limit)) + " %");
+		logger->info(std::to_string(toInt(charge_limit)) + "%");
 		Logger::rem_tab();
 	}
 

@@ -9,7 +9,6 @@
 #include <sstream>
 #include <string>
 
-#include "../../include/clients/shell/md5_client.hpp"
 #include "../../include/utils/constants.hpp"
 
 std::filesystem::path FileUtils::expandPath(const std::string& path) {
@@ -91,35 +90,16 @@ std::filesystem::file_time_type FileUtils::getMTime(std::filesystem::path path) 
 	return std::filesystem::last_write_time(path);
 }
 
-void FileUtils::move(const std::string& src, const std::string& dst) {
-	move(std::filesystem::path(src), std::filesystem::path(dst));
-}
-
-void FileUtils::move(std::filesystem::path src, std::filesystem::path dst) {
-	std::filesystem::rename(src, dst);
-}
-
 void FileUtils::copy(const std::string& src, const std::string& dst) {
-	copy(std::filesystem::path(src), std::filesystem::path(dst));
-}
-
-void FileUtils::copy(std::filesystem::path src, std::filesystem::path dst) {
 	std::filesystem::copy(src, dst, std::filesystem::copy_options::recursive | std::filesystem::copy_options::overwrite_existing);
 }
 
 void FileUtils::remove(const std::string& src) {
-	remove(std::filesystem::path(src));
-}
-
-void FileUtils::remove(std::filesystem::path src) {
 	std::filesystem::remove_all(src);
 }
 
-void FileUtils::chmodRecursive(const std::string& path, mode_t mode) {
-	chmodRecursive(std::filesystem::path(path), mode);
-}
-
-void FileUtils::chmodRecursive(const std::filesystem::path& path, mode_t mode) {
+void FileUtils::chmodRecursive(const std::string& pathStr, mode_t mode) {
+	auto path = std::filesystem::path(pathStr);
 	if (!std::filesystem::exists(path)) {
 		return;
 	}
@@ -137,53 +117,14 @@ void FileUtils::chmodRecursive(const std::filesystem::path& path, mode_t mode) {
 	}
 }
 
-std::string FileUtils::md5(const std::string& path) {
-	return FileUtils::md5(std::filesystem::path(path));
-}
-
-std::string FileUtils::md5(const std::filesystem::path& path) {
-	return Md5SumClient::getInstance().checksum(path);
-}
-
-void FileUtils::createSymlink(const std::string& target, const std::string& linkName) {
-	return createSymlink(std::filesystem::path(target), std::filesystem::path(linkName));
-}
-
-void FileUtils::createSymlink(const std::filesystem::path& target, const std::filesystem::path& linkName) {
-	if (std::filesystem::exists(linkName)) {
-		std::filesystem::remove(linkName);
-	}
-	std::filesystem::create_symlink(target, linkName);
-}
-
 std::string FileUtils::getCWD() {
 	return std::filesystem::current_path().string();
 }
 
-std::vector<std::string> FileUtils::listDirectory(const std::filesystem::path& path) {
+std::vector<std::string> FileUtils::listDirectory(const std::string& path) {
 	std::vector<std::string> entries;
 	for (const auto& entry : std::filesystem::directory_iterator(path)) {
 		entries.push_back(entry.path().filename().string());
 	}
 	return entries;
-}
-
-std::vector<std::string> FileUtils::listDirectory(const std::string& path) {
-	return listDirectory(std::filesystem::path(path));
-}
-
-bool FileUtils::isDirectory(const std::filesystem::path& path) {
-	return std::filesystem::is_directory(path);
-}
-
-bool FileUtils::isDirectory(const std::string& path) {
-	return isDirectory(std::filesystem::path(path));
-}
-
-bool FileUtils::isFile(const std::filesystem::path& path) {
-	return std::filesystem::is_regular_file(path);
-}
-
-bool FileUtils::isFile(const std::string& path) {
-	return isFile(std::filesystem::path(path));
 }

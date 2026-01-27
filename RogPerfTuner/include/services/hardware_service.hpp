@@ -19,7 +19,6 @@
 #include "../clients/shell/switcherooctl_client.hpp"
 #include "../gui/toaster.hpp"
 #include "../models/hardware/battery_charge_threshold.hpp"
-#include "../models/hardware/cpu_brand.hpp"
 #include "../models/hardware/usb_identifier.hpp"
 #include "../services/open_rgb_service.hpp"
 #include "../utils/events/event_bus.hpp"
@@ -120,11 +119,7 @@ class HardwareService : public Singleton<HardwareService>, Loggable {
 	std::unordered_map<std::string, std::string> gpus;
 	std::vector<UsbIdentifier> connectedDevices;
 
-	bool onBattery										= true;
-	unsigned int runningGames							= 0;
-	BatteryThreshold charge_limit						= BatteryThreshold::CT_100;
-	CpuBrand cpu										= CpuBrand::INTEL;
-	inline static std::vector<std::string> VK_ICD_JSONS = {"/usr/share/vulkan/icd.d/{gpu.value}_icd.json",
-														   "/usr/share/vulkan/icd.d/{gpu.value}_icd.i686.json",
-														   "/usr/share/vulkan/icd.d/{gpu.value}_icd.x86_64.json"};
+	bool onBattery				  = true;
+	unsigned int runningGames	  = 0;
+	BatteryThreshold charge_limit = BatteryThreshold::CT_100;
 };

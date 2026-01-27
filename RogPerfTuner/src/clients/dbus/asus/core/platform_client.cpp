@@ -8,7 +8,7 @@ PlatformProfile PlatformClient::getPlatformProfile() {
 }
 
 void PlatformClient::setPlatformProfile(PlatformProfile val) {
-	this->setProperty<unsigned int>(QString("PlatformProfile"), static_cast<unsigned int>(toInt<PlatformProfile>(val)));
+	this->setProperty<unsigned int>(QString("PlatformProfile"), static_cast<unsigned int>(toInt(val)));
 }
 
 bool PlatformClient::getEnablePptGroup() {

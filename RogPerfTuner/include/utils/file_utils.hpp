@@ -25,24 +25,6 @@ class FileUtils {
 	static bool exists(const std::filesystem::path& path);
 
 	/**
-	 * @brief Create a symbolic link.
-	 *
-	 * @param target Path the symlink will point to.
-	 * @param linkName Name of the symlink to create.
-	 * @return true if the symlink was created successfully, false otherwise.
-	 */
-	static void createSymlink(const std::string& target, const std::string& linkName);
-
-	/**
-	 * @brief Create a symbolic link.
-	 *
-	 * @param target Path the symlink will point to.
-	 * @param linkName Name of the symlink to create.
-	 * @return true if the symlink was created successfully, false otherwise.
-	 */
-	static void createSymlink(const std::filesystem::path& target, const std::filesystem::path& linkName);
-
-	/**
 	 * @brief Create a Directory.
 	 *
 	 * Creates a directory at the specified path.
@@ -120,26 +102,6 @@ class FileUtils {
 	static std::filesystem::file_time_type getMTime(std::filesystem::path path);
 
 	/**
-	 * @brief Move entry from source to destination.
-	 *
-	 * Moves a file or directory from the source path to the destination path.
-	 *
-	 * @param src The source path.
-	 * @param dst The destination path.
-	 */
-	static void move(const std::string& src, const std::string& dst);
-
-	/**
-	 * @brief Move entry from source to destination.
-	 *
-	 * Moves a file or directory from the source filesystem path to the destination filesystem path.
-	 *
-	 * @param src The source filesystem path.
-	 * @param dst The destination filesystem path.
-	 */
-	static void move(std::filesystem::path src, std::filesystem::path dst);
-
-	/**
 	 * @brief Copy entry from source to destination.
 	 *
 	 * Copies a file or directory from the source path to the destination path.
@@ -148,16 +110,6 @@ class FileUtils {
 	 * @param dst The destination path.
 	 */
 	static void copy(const std::string& src, const std::string& dst);
-
-	/**
-	 * @brief Copy entry from source to destination.
-	 *
-	 * Copies a file or directory from the source filesystem path to the destination filesystem path.
-	 *
-	 * @param src The source filesystem path.
-	 * @param dst The destination filesystem path.
-	 */
-	static void copy(std::filesystem::path src, std::filesystem::path dst);
 
 	/**
 	 * @brief Remove path.
@@ -169,15 +121,6 @@ class FileUtils {
 	static void remove(const std::string& src);
 
 	/**
-	 * @brief Remove path.
-	 *
-	 * Removes the file or directory at the specified filesystem path.
-	 *
-	 * @param src The filesystem path to remove.
-	 */
-	static void remove(std::filesystem::path src);
-
-	/**
 	 * @brief Change permissions recursively.
 	 *
 	 * Changes permissions for the specified path and all its contents.
@@ -186,39 +129,6 @@ class FileUtils {
 	 * @param mode The permissions mode to set.
 	 */
 	static void chmodRecursive(const std::string& path, mode_t mode);
-
-	/**
-	 * @brief Change permissions recursively.
-	 *
-	 * Changes permissions for the specified filesystem path and all its contents.
-	 *
-	 * @param path The filesystem path to change permissions for.
-	 * @param mode The permissions mode to set.
-	 */
-	static void chmodRecursive(const std::filesystem::path& path, mode_t mode);
-
-	/**
-	 * @brief Calculates the MD5 hash of the contents of the specified file.
-	 *
-	 * @param path The path to the file whose MD5 hash is to be computed.
-	 * @return std::string The MD5 hash as a hexadecimal string.
-	 *
-	 * @note Throws an exception if the file cannot be opened or read.
-	 */
-	static std::string md5(const std::string& path);
-
-	/**
-	 * @brief Calculates the MD5 hash of the contents of the specified file.
-	 *
-	 * This function reads the file at the given path and computes its MD5 hash.
-	 * The resulting hash is returned as a hexadecimal string.
-	 *
-	 * @param path The path to the file whose MD5 hash is to be calculated.
-	 * @return std::string The hexadecimal representation of the MD5 hash.
-	 * @throws std::filesystem::filesystem_error If the file cannot be accessed.
-	 * @throws std::runtime_error If the file cannot be read or the hash cannot be computed.
-	 */
-	static std::string md5(const std::filesystem::path& path);
 
 	/**
 	 * @brief Retrieve the current working directory as an absolute path.
@@ -237,14 +147,5 @@ class FileUtils {
 	static std::string getCWD();
 
 	// Lista los elementos (nombres) de un directorio
-	static std::vector<std::string> listDirectory(const std::filesystem::path& path);
 	static std::vector<std::string> listDirectory(const std::string& path);
-
-	// Comprueba si una ruta es un directorio
-	static bool isDirectory(const std::filesystem::path& path);
-	static bool isDirectory(const std::string& path);
-
-	// Comprueba si una ruta es un fichero regular
-	static bool isFile(const std::filesystem::path& path);
-	static bool isFile(const std::string& path);
 };

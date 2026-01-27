@@ -20,7 +20,7 @@ template <>
 struct convert<Aura> {
 	static Node encode(const Aura& aura) {
 		Node node;
-		node["brightness"] = toInt<RgbBrightness>(aura.brightness);
+		node["brightness"] = toInt(aura.brightness);
 		if (!aura.config.empty()) {
 			node["config"] = aura.config;
 		}

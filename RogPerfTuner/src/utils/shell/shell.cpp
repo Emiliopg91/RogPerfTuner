@@ -215,7 +215,7 @@ CommandResult Shell::run_elevated_command(const std::string& cmd, bool check) {
 
 std::vector<std::string> Shell::copyEnviron() {
 	std::vector<std::string> envCopy;
-	for (char** env = ::environ; *env != nullptr; ++env) {
+	for (char** env = environ; *env != nullptr; ++env) {
 		envCopy.emplace_back(*env);	 // copia de la cadena
 	}
 	return envCopy;

@@ -7,6 +7,7 @@
 #include <regex>
 #include <stdexcept>
 
+#include "../../include/clients/shell/curl_client.hpp"
 #include "../../include/utils/logger/logger.hpp"
 
 bool NetUtils::isPortFree(int port) {
