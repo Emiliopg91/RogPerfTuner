@@ -43,12 +43,12 @@ const std::unordered_map<unsigned int, GameEntry>& SteamService::getRunningGames
 	return runningGames;
 }
 
-const std::unordered_map<std::string, GameEntry>& SteamService::getGames() {
+const std::map<std::string, GameEntry>& SteamService::getGames() {
 	return configuration.getConfiguration().games;
 }
 
 SteamService::SteamService() : Loggable("SteamService") {
-	logger.info("Initializing SteamService");
+	logger->info("Initializing SteamService");
 	Logger::add_tab();
 
 	whichSystemdInhibit = shell.which("systemd-inhibit");
@@ -56,7 +56,7 @@ SteamService::SteamService() : Loggable("SteamService") {
 	whichMangohud = shell.which("mangohud");
 	if (whichMangohud.has_value()) {
 		if (FileUtils::exists(std::string("/sys/class/powercap/intel-rapl\\:0/energy_uj"))) {
-			logger.info("Enabling CPU power drain...");
+			logger->info("Enabling CPU power drain...");
 			shell.run_elevated_command("chmod o+r /sys/class/powercap/intel-rapl\\:0/energy_uj", false);
 		}
 	}
@@ -98,7 +98,7 @@ SteamService::SteamService() : Loggable("SteamService") {
 }
 
 void SteamService::onFirstGameRun(unsigned int gid, std::string name) {
-	logger.info("Configuring game");
+	logger->info("Configuring game");
 	Logger::add_tab();
 
 	SteamGameDetails details = steamClient.getAppsDetails({gid})[0];
@@ -210,7 +210,7 @@ void SteamService::onFirstGameRun(unsigned int gid, std::string name) {
 }
 
 void SteamService::saveGameConfig(uint gid, const GameEntry& entry) {
-	logger.info("Saving configuration for '" + entry.name + "' (" + std::to_string(gid) + ")");
+	logger->info("Saving configuration for '" + entry.name + "' (" + std::to_string(gid) + ")");
 	Logger::add_tab();
 
 	configuration.getConfiguration().games[std::to_string(gid)] = entry;
@@ -220,7 +220,7 @@ void SteamService::saveGameConfig(uint gid, const GameEntry& entry) {
 }
 
 void SteamService::launchGame(const std::string& id) {
-	logger.info("Launching game with id " + id + "...");
+	logger->info("Launching game with id " + id + "...");
 	Logger::add_tab();
 
 	shell.run_command("steam steam://rungameid/" + id);
@@ -246,7 +246,7 @@ void SteamService::installRccDC() {
 					YesNoDialog::showDialog(translator.translate("enable.decky.integration.title"),
 											translator.translate("enable.decky.integration.body"))) {
 #endif
-					logger.info("Installing plugin for first time");
+					logger->info("Installing plugin for first time");
 					Logger::add_tab();
 					installPipDeps();
 					copyPlugin();
@@ -258,29 +258,29 @@ void SteamService::installRccDC() {
 				configuration.saveConfig();
 			} else {
 				if (checkIfRequiredInstallation()) {
-					logger.info("Updating Decky plugin");
+					logger->info("Updating Decky plugin");
 					Logger::add_tab();
 					installPipDeps();
 					copyPlugin();
 					Logger::rem_tab();
 				} else {
-					logger.info("Plugin up to date");
+					logger->info("Plugin up to date");
 				}
 				configuration.getConfiguration().application.askedInstallRccdc = true;
 				configuration.saveConfig();
 			}
 			rccdcEnabled = true;
 		} else {
-			logger.warn("No Decky installation found, skipping plugin installation");
+			logger->warn("No Decky installation found, skipping plugin installation");
 			rccdcEnabled = false;
 		}
 	} catch (std::exception& e) {
-		logger.error("Error while installing RCCDeckyCompanion plugin: " + std::string(e.what()));
+		logger->error("Error while installing RCCDeckyCompanion plugin: " + std::string(e.what()));
 	}
 }
 
 void SteamService::copyPlugin() {
-	logger.info("Copying plugin");
+	logger->info("Copying plugin");
 	Logger::add_tab();
 	installer = std::thread([this]() {
 		FileUtils::copy(Constants::RCCDC_ASSET_PATH, Constants::USER_PLUGIN_DIR);
@@ -299,33 +299,33 @@ void SteamService::copyPlugin() {
 
 void SteamService::installPipDeps() {
 	auto depStr = StringUtils::join(Constants::RCCDC_REQUIRED_PIP, " ");
-	logger.info("Installing PIP dependencies " + depStr);
+	logger->info("Installing PIP dependencies " + depStr);
 	Logger::add_tab();
 	pipClient.installPackage(depStr);
 	Logger::rem_tab();
 }
 
 void SteamService::onGameLaunch(unsigned int gid, std::string name, int pid) {
-	logger.info("Launched '" + name + "' (" + std::to_string(gid) + ") with PID " + std::to_string(pid));
+	logger->info("Launched '" + name + "' (" + std::to_string(gid) + ") with PID " + std::to_string(pid));
 	Logger::add_tab();
 
 	auto it = configuration.getConfiguration().games.find(std::to_string(gid));
 	if (it == configuration.getConfiguration().games.end()) {
-		logger.info("Game not configured");
+		logger->info("Game not configured");
 		Logger::add_tab();
 
-		logger.info("Stopping process...");
+		logger->info("Stopping process...");
 
 		std::set<pid_t> signaled, newSignaled;
 		do {
 			signaled	= newSignaled;
 			newSignaled = ProcessUtils::sendSignalToHierarchy(pid, SIGSTOP);
 
-			logger.debug("Stopped " + std::to_string(newSignaled.size()) + " processes, before " + std::to_string(signaled.size()));
+			logger->debug("Stopped " + std::to_string(newSignaled.size()) + " processes, before " + std::to_string(signaled.size()));
 
 			TimeUtils::sleep(100);
 		} while (signaled != newSignaled);
-		logger.debug("Killed " + std::to_string(ProcessUtils::sendSignalToHierarchy(pid, SIGKILL).size()) + " processes");
+		logger->debug("Killed " + std::to_string(ProcessUtils::sendSignalToHierarchy(pid, SIGKILL).size()) + " processes");
 
 		Logger::rem_tab();
 
@@ -346,7 +346,7 @@ void SteamService::onGameLaunch(unsigned int gid, std::string name, int pid) {
 void SteamService::onGameStop(unsigned int gid, std::string name) {
 	auto it = runningGames.find(gid);
 	if (it != runningGames.end()) {
-		logger.info("Stopped '" + name + "' (" + std::to_string(gid) + ")");
+		logger->info("Stopped '" + name + "' (" + std::to_string(gid) + ")");
 		runningGames.erase(gid);
 		Logger::add_tab();
 
@@ -384,7 +384,7 @@ void SteamService::setProfileForGames(bool onConnect) {
 }
 
 void SteamService::onConnect(bool onBoot) {
-	logger.info("Connected to Steam");
+	logger->info("Connected to Steam");
 	Logger::add_tab();
 	if (!onBoot) {
 		setProfileForGames(true);
@@ -394,7 +394,7 @@ void SteamService::onConnect(bool onBoot) {
 }
 
 void SteamService::onDisconnect() {
-	logger.info("Disconnected from Steam");
+	logger->info("Disconnected from Steam");
 	Logger::add_tab();
 	if (!runningGames.empty()) {
 		performanceService.restoreProfile();
@@ -483,7 +483,7 @@ const SteamGameConfig SteamService::getConfiguration(const std::string& gid) {
 			}
 		}
 	} else {
-		logger.error("No configuration entry found for " + gid);
+		logger->error("No configuration entry found for " + gid);
 	}
 
 	return cfg;

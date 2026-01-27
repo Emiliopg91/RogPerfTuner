@@ -67,7 +67,7 @@ static void rotate_log(const std::string& fileName, const std::filesystem::path&
 	}
 }
 
-std::unordered_map<std::string, LoggerLevel> LoggerProvider::configMap{};
+std::map<std::string, LoggerLevel> LoggerProvider::configMap{};
 
 void LoggerProvider::initialize(std::string fileName, std::string path) {
 	console_sink = std::make_shared<ConsoleSink>();
@@ -84,7 +84,6 @@ void LoggerProvider::initialize(std::string fileName, std::string path) {
 		file_sink = std::make_shared<FileSink>(path + "/" + fileName + ".log");
 	}
 	auto main_logger = std::make_shared<Logger>(console_sink, file_sink, "Default");
-
 	if (getenv("RCC_LOG_LEVEL")) {
 		defaultLevel = fromName<LoggerLevel>(StringUtils::toLowerCase(getenv("RCC_LOG_LEVEL")));
 	}
@@ -97,15 +96,7 @@ std::shared_ptr<Logger> LoggerProvider::getLogger(const std::string& name) {
 		return it->second;
 	}
 
-	std::string display_name = name;
-
-	if (display_name.size() < 20) {
-		display_name.append(20 - display_name.size(), ' ');
-	} else if (display_name.size() > 20) {
-		display_name.resize(20);
-	}
-
-	auto logger = std::make_shared<Logger>(console_sink, file_sink, display_name);
+	auto logger = std::make_shared<Logger>(console_sink, file_sink, StringUtils::rightPad(name, 20).substr(0, 20));
 
 	auto level = defaultLevel;
 	auto it2   = LoggerProvider::configMap.find(name);
@@ -117,14 +108,13 @@ std::shared_ptr<Logger> LoggerProvider::getLogger(const std::string& name) {
 	loggers[name] = logger;
 	return logger;
 }
-
-void LoggerProvider::setConfigMap(std::unordered_map<std::string, LoggerLevel> configMap) {
+void LoggerProvider::setConfigMap(std::map<std::string, LoggerLevel> configMap) {
 	LoggerProvider::configMap = configMap;
 
-	for (const auto& [key, loggerPtr] : LoggerProvider::loggers) {
-		auto it = LoggerProvider::configMap.find(StringUtils::trim(key));
-		if (it != LoggerProvider::configMap.end()) {
-			loggerPtr->setLevel(it->second);
+	for (const auto& [key, level] : LoggerProvider::configMap) {
+		auto it = LoggerProvider::loggers.find(key);
+		if (it != LoggerProvider::loggers.end()) {
+			it->second->setLevel(level);
 		}
 	}
 }

@@ -10,11 +10,11 @@
 #include "platform.hpp"
 
 struct RootConfig {
-	Aura aura											= Aura();
-	Application application								= Application();
-	std::unordered_map<std::string, GameEntry> games	= {};
-	std::unordered_map<std::string, LoggerLevel> logger = {};
-	Platform platform									= Platform();
+	Aura aura								  = Aura();
+	Application application					  = Application();
+	std::map<std::string, GameEntry> games	  = {};
+	std::map<std::string, LoggerLevel> logger = {};
+	Platform platform						  = Platform();
 };
 
 // YAML-CPP serialization/deserialization
@@ -31,13 +31,13 @@ struct convert<RootConfig> {
 			node["games"] = config.games;
 		}
 
+		Node loggerNode;
 		if (!config.logger.empty()) {
-			Node loggerNode;
 			for (const auto& [key, level] : config.logger) {
 				loggerNode[key] = toName(level);
 			}
-			node["logger"] = loggerNode;
 		}
+		node["logger"] = loggerNode;
 
 		node["platform"] = config.platform;
 
@@ -46,9 +46,9 @@ struct convert<RootConfig> {
 
 	static bool decode(const Node& node, RootConfig& config) {
 		if (node["games"]) {
-			config.games = node["games"].as<std::unordered_map<std::string, GameEntry>>();
+			config.games = node["games"].as<std::map<std::string, GameEntry>>();
 		} else {
-			config.games = std::unordered_map<std::string, GameEntry>{};
+			config.games = std::map<std::string, GameEntry>{};
 		}
 
 		if (node["logger"]) {

@@ -16,7 +16,7 @@ void AbstractEffect::start(const DeviceList& devices, const RgbBrightness& brigh
 	}
 
 	if (brightness == RgbBrightness::OFF) {
-		logger.info("Turning off RGB");
+		logger->info("Turning off RGB");
 		for (auto& dev : devices) {
 			_client.setDeviceColor(dev, Color::Black);
 		}
@@ -24,10 +24,10 @@ void AbstractEffect::start(const DeviceList& devices, const RgbBrightness& brigh
 	}
 
 	if (!_color.has_value()) {
-		logger.info("Starting effect '" + getName() + "' with " + StringUtils::toLowerCase(toName(brightness)) + " brightness");
+		logger->info("Starting effect '" + getName() + "' with " + StringUtils::toLowerCase(toName(brightness)) + " brightness");
 	} else {
-		logger.info("Starting effect '" + getName() + "' with " + StringUtils::toLowerCase(toName(brightness)) + " brightness and color " +
-					StringUtils::toUpperCase(_color.value().toHex()));
+		logger->info("Starting effect '" + getName() + "' with " + StringUtils::toLowerCase(toName(brightness)) + " brightness and color " +
+					 StringUtils::toUpperCase(_color.value().toHex()));
 	}
 	_brightness = toInt<RgbBrightness>(brightness) / 100.0;
 	_is_running = true;
@@ -39,7 +39,7 @@ void AbstractEffect::start(const DeviceList& devices, const RgbBrightness& brigh
 
 void AbstractEffect::stop() {
 	if (_is_running) {
-		logger.info("Stopping effect");
+		logger->info("Stopping effect");
 		_is_running = false;
 		if (_thread.joinable()) {
 			_thread.join();
@@ -71,7 +71,7 @@ void AbstractEffect::_set_colors(Device& dev, const std::vector<orgb::Color>& co
 
 void AbstractEffect::_thread_main(const DeviceList& devices) {
 	apply_effect(devices);
-	logger.info("Effect finished");
+	logger->info("Effect finished");
 }
 
 AbstractEffect::AbstractEffect(Client& client, const std::string& name, const std::optional<std::string>& color)
@@ -80,7 +80,7 @@ AbstractEffect::AbstractEffect(Client& client, const std::string& name, const st
 	for (size_t i = 0; i < parts.size(); i++) {
 		parts[i] = StringUtils::capitalize(parts[i]);
 	}
-	logger = *LoggerProvider::getLogger(StringUtils::join(parts, "") + "Effect");
+	logger = LoggerProvider::getLogger(StringUtils::join(parts, "") + "Effect");
 	if (color.has_value()) {
 		_color = Color::fromRgb(*color);
 	}

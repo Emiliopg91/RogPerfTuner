@@ -27,7 +27,7 @@ Translator::Translator() : Loggable("Translator") {
 		try {
 			return fromString<Language>(StringUtils::toUpperCase(langStr));
 		} catch (std::exception& e) {
-			logger.warn("Unsupported language " + langStr + ", fallback to " + toString(FALLBACK_LANG));
+			logger->warn("Unsupported language " + langStr + ", fallback to " + toString(FALLBACK_LANG));
 			return FALLBACK_LANG;
 		}
 	}();
@@ -42,22 +42,22 @@ Translator::Translator() : Loggable("Translator") {
 		if (value[toString(currentLang)]) {
 			val = value[toString(currentLang)].as<std::string>();
 		} else if (value[toString(FALLBACK_LANG)]) {
-			logger.warn("Missing specific translation for " + key);
+			logger->warn("Missing specific translation for " + key);
 			val = value[toString(FALLBACK_LANG)].as<std::string>();
 		} else {
-			logger.warn("Missing specific and default translation for " + key);
+			logger->warn("Missing specific and default translation for " + key);
 		}
 
 		translations[key] = val;
 	}
 
-	logger.debug("User language: " + toString(currentLang));
+	logger->debug("User language: " + toString(currentLang));
 }
 
 std::string Translator::translate(const std::string& msg, const std::unordered_map<std::string, std::any>& replacement) {
 	auto it = translations.find(msg);
 	if (it == translations.end()) {
-		logger.warn("Missing translation for " + msg);
+		logger->warn("Missing translation for " + msg);
 		return msg;
 	}
 

@@ -71,26 +71,26 @@ inline int startGui(int argc, char** argv) {
 	std::cout << "Assets directory: " << Constants::ASSETS_DIR << std::endl;
 
 	LoggerProvider::initialize(Constants::LOG_FILE_NAME, Constants::LOG_DIR);
-	Logger logger = *LoggerProvider::getLogger("Default");
+	auto logger = LoggerProvider::getLogger("Default");
 
 	std::string title = "Starting " + Constants::APP_NAME;
 	title			  = StringUtils::leftPad(title, title.length() + (49 - title.length()) / 2);
 	title			  = StringUtils::rightPad(title, 49);
 
-	logger.info("###################################################");
-	logger.info("#" + title + "#");
-	logger.info("###################################################");
-	logger.info("Version " + Constants::APP_VERSION);
+	logger->info("###################################################");
+	logger->info("#" + title + "#");
+	logger->info("###################################################");
+	logger->info("Version " + Constants::APP_VERSION);
 #ifdef DEV_MODE
-	logger.info("Starting initialization in dev mode");
+	logger->info("Starting initialization in dev mode");
 #else
-	logger.info("Starting initialization");
+	logger->info("Starting initialization");
 #endif
 	Logger::add_tab();
 
 	Translator::getInstance();
 
-	logger.info("Creating QT application");
+	logger->info("Creating QT application");
 	QApplication app(argc, argv);
 	app.setDesktopFileName(Constants::APP_DRAW_FILE.c_str());
 
@@ -118,7 +118,7 @@ inline int startGui(int argc, char** argv) {
 
 	auto t1 = TimeUtils::now();
 
-	logger.info("Application ready after " + TimeUtils::format_seconds(TimeUtils::getTimeDiff(t0, t1)) + " seconds");
+	logger->info("Application ready after " + TimeUtils::format_seconds(TimeUtils::getTimeDiff(t0, t1)) + " seconds");
 
 #ifdef AUR_HELPER
 	applicationService.startUpdateCheck();

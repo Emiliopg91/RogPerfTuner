@@ -10,7 +10,7 @@
 #include "../../include/utils/time_utils.hpp"
 
 OpenRgbService::OpenRgbService() : Loggable("OpenRgbService") {
-	logger.info("Initializing OpenRgbService");
+	logger->info("Initializing OpenRgbService");
 	Logger::add_tab();
 
 	openRgbClient.initialize();
@@ -129,18 +129,18 @@ void OpenRgbService::setColor(const std::string& color) {
 
 void OpenRgbService::reload() {
 	auto t0 = TimeUtils::now();
-	logger.info("Reloading OpenRGB server");
+	logger->info("Reloading OpenRGB server");
 	Logger::add_tab();
 	openRgbClient.stop();
 	openRgbClient.start();
 	applyAura();
 	auto t1 = TimeUtils::now();
 	Logger::rem_tab();
-	logger.info("Reloaded after " + TimeUtils::format_seconds(TimeUtils::getTimeDiff(t0, t1)) + " seconds");
+	logger->info("Reloaded after " + TimeUtils::format_seconds(TimeUtils::getTimeDiff(t0, t1)) + " seconds");
 }
 
 void OpenRgbService::applyAura(const bool& temporal) {
-	logger.info("Applying aura settings");
+	logger->info("Applying aura settings");
 	Logger::add_tab();
 	auto t0 = TimeUtils::now();
 	openRgbClient.applyEffect(effect, brightness, _color);
@@ -163,11 +163,11 @@ void OpenRgbService::applyAura(const bool& temporal) {
 
 	auto t1 = TimeUtils::now();
 	Logger::rem_tab();
-	logger.info("Aura applied after " + TimeUtils::format_seconds(TimeUtils::getTimeDiff(t0, t1)) + " seconds");
+	logger->info("Aura applied after " + TimeUtils::format_seconds(TimeUtils::getTimeDiff(t0, t1)) + " seconds");
 }
 
 void OpenRgbService::disableDevice(const UsbIdentifier& identifier) {
-	logger.info("Disabling " + getDeviceName(identifier));
+	logger->info("Disabling " + getDeviceName(identifier));
 	openRgbClient.disableDevice(getDeviceName(identifier));
 }
 

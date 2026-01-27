@@ -18,7 +18,7 @@ uint8_t PerformanceService::IO_PRIORITY = (CPU_PRIORITY + 20) / 5;
 uint8_t PerformanceService::IO_CLASS	= 2;
 
 PerformanceService::PerformanceService() : Loggable("PerformanceService") {
-	logger.info("Initializing PerformanceService");
+	logger->info("Initializing PerformanceService");
 	Logger::add_tab();
 
 	currentProfile	 = configuration.getConfiguration().platform.performance.profile;
@@ -27,7 +27,7 @@ PerformanceService::PerformanceService() : Loggable("PerformanceService") {
 	if (uPowerClient.available()) {
 		onBattery		 = uPowerClient.isOnBattery();
 		std::string mode = onBattery ? "battery" : "AC";
-		logger.info("Laptop on " + mode + " mode");
+		logger->info("Laptop on " + mode + " mode");
 	}
 
 	if (platformClient.available()) {
@@ -54,7 +54,7 @@ PerformanceService::PerformanceService() : Loggable("PerformanceService") {
 }
 
 void PerformanceService::renice(const pid_t& pid) {
-	logger.info("Renicing process " + std::to_string(pid));
+	logger->info("Renicing process " + std::to_string(pid));
 	Logger::add_tab();
 	std::set<pid_t> ion, ren;
 	do {
@@ -73,7 +73,7 @@ void PerformanceService::setPerformanceProfile(PerformanceProfile& profile, cons
 	std::string profileName = toName(profile);
 
 	if (profile != currentProfile || force) {
-		logger.info("Setting " + profileName + " profile");
+		logger->info("Setting " + profileName + " profile");
 		Logger::add_tab();
 		try {
 			setPlatformProfile(profile);
@@ -91,7 +91,7 @@ void PerformanceService::setPerformanceProfile(PerformanceProfile& profile, cons
 			}
 
 			Logger::rem_tab();
-			logger.info("Profile setted succesfully");
+			logger->info("Profile setted succesfully");
 
 			if (showToast) {
 				toaster.showToast(translator.translate(
@@ -103,20 +103,20 @@ void PerformanceService::setPerformanceProfile(PerformanceProfile& profile, cons
 			Logger::rem_tab();
 		}
 	} else {
-		logger.info("Profile " + StringUtils::toLowerCase(profileName) + " already setted");
+		logger->info("Profile " + StringUtils::toLowerCase(profileName) + " already setted");
 	}
 }
 
 void PerformanceService::setPlatformProfile(const PerformanceProfile& profile) {
 	if (platformClient.available()) {
 		auto platformProfile = getPlatformProfile(profile);
-		logger.info("Platform profile: " + toName<PlatformProfile>(platformProfile));
+		logger->info("Platform profile: " + toName<PlatformProfile>(platformProfile));
 		Logger::add_tab();
 		try {
 			platformClient.setPlatformProfile(platformProfile);
 			platformClient.setEnablePptGroup(true);
 		} catch (std::exception& e) {
-			logger.error("Error while setting platform profile: " + std::string(e.what()));
+			logger->error("Error while setting platform profile: " + std::string(e.what()));
 		}
 		Logger::rem_tab();
 	}
@@ -125,7 +125,7 @@ void PerformanceService::setPlatformProfile(const PerformanceProfile& profile) {
 void PerformanceService::setFanCurves(const PerformanceProfile& profile) {
 	if (asusCtlClient.available()) {
 		auto platformProfile = getPlatformProfile(profile);
-		logger.info("Fan profile: " + toName<PlatformProfile>(platformProfile));
+		logger->info("Fan profile: " + toName<PlatformProfile>(platformProfile));
 		Logger::add_tab();
 		try {
 			auto it = configuration.getConfiguration().platform.curves.find(toString(profile));
@@ -150,7 +150,7 @@ void PerformanceService::setFanCurves(const PerformanceProfile& profile) {
 			}
 
 			for (const auto& [fan, data] : configuration.getConfiguration().platform.curves[toString(profile)]) {
-				logger.info(fan + ": " + StringUtils::replaceAll(data.current, ",", " "));
+				logger->info(fan + ": " + StringUtils::replaceAll(data.current, ",", " "));
 				Logger::add_tab();
 				asusCtlClient.setFanCurveStringData(platformProfile, fan, data.current);
 				Logger::rem_tab();
@@ -158,7 +158,7 @@ void PerformanceService::setFanCurves(const PerformanceProfile& profile) {
 
 			asusCtlClient.setFanCurvesEnabled(platformProfile, true);
 		} catch (std::exception& e) {
-			logger.error("Error while setting fan curve: " + std::string(e.what()));
+			logger->error("Error while setting fan curve: " + std::string(e.what()));
 		}
 		Logger::rem_tab();
 	}
@@ -167,12 +167,12 @@ void PerformanceService::setFanCurves(const PerformanceProfile& profile) {
 void PerformanceService::setBoost(const PerformanceProfile&) {
 	if (boostControlClient.available()) {
 		bool enabled = onBattery ? batteryBoost() : acBoost();
-		logger.info("CPU boost: " + std::string(enabled ? "ON" : "OFF"));
+		logger->info("CPU boost: " + std::string(enabled ? "ON" : "OFF"));
 		Logger::add_tab();
 		try {
 			boostControlClient.set_boost(enabled);
 		} catch (std::exception& e) {
-			logger.error("Error while setting CPU boost: " + std::string(e.what()));
+			logger->error("Error while setting CPU boost: " + std::string(e.what()));
 		}
 		Logger::rem_tab();
 	}
@@ -181,12 +181,12 @@ void PerformanceService::setBoost(const PerformanceProfile&) {
 void PerformanceService::setCpuGovernor(const PerformanceProfile& profile) {
 	if (cpuPowerClient.available()) {
 		CpuGovernor cpuGovernor = onBattery ? batteryGovernor() : acGovernor(profile);
-		logger.info("CPU governor: " + toName(cpuGovernor));
+		logger->info("CPU governor: " + toName(cpuGovernor));
 		Logger::add_tab();
 		try {
 			cpuPowerClient.setGovernor(cpuGovernor);
 		} catch (std::exception& e) {
-			logger.error("Error while setting CPU governor: " + std::string(e.what()));
+			logger->error("Error while setting CPU governor: " + std::string(e.what()));
 		}
 		Logger::rem_tab();
 	}
@@ -195,12 +195,12 @@ void PerformanceService::setCpuGovernor(const PerformanceProfile& profile) {
 void PerformanceService::setPowerProfile(PerformanceProfile& profile) {
 	if (powerProfileClient.available()) {
 		PowerProfile powerProfile = getPowerProfile(profile);
-		logger.info("Power profile: " + toName(powerProfile));
+		logger->info("Power profile: " + toName(powerProfile));
 		Logger::add_tab();
 		try {
 			powerProfileClient.setPowerProfile(powerProfile);
 		} catch (std::exception& e) {
-			logger.error("Error while setting power profile: " + std::string(e.what()));
+			logger->error("Error while setting power profile: " + std::string(e.what()));
 		}
 		Logger::rem_tab();
 	}
@@ -209,23 +209,23 @@ void PerformanceService::setPowerProfile(PerformanceProfile& profile) {
 void PerformanceService::setTdps(const PerformanceProfile& profile) {
 	try {
 		if (pl1SpdClient.available()) {
-			logger.info("TDP values");
+			logger->info("TDP values");
 			Logger::add_tab();
 			auto pl1 = onBattery ? batteryIntelPl1Spl(profile) : acIntelPl1Spl(profile);
-			logger.info("PL1: " + std::to_string(pl1) + "W");
+			logger->info("PL1: " + std::to_string(pl1) + "W");
 			pl1SpdClient.setCurrentValue(pl1);
 			TimeUtils::sleep(25);
 
 			if (pl2SpptClient.available()) {
 				auto pl2 = onBattery ? batteryIntelPl2Sppt(profile) : acIntelPl2Sppt(profile);
-				logger.info("PL2: " + std::to_string(pl2) + "W");
+				logger->info("PL2: " + std::to_string(pl2) + "W");
 				pl2SpptClient.setCurrentValue(pl2);
 				TimeUtils::sleep(25);
 			}
 
 			if (pl3FpptClient.available()) {
 				auto pl3 = onBattery ? batteryIntelPl3Fppt(profile) : acIntelPl3Fppt(profile);
-				logger.info("PL3: " + std::to_string(pl3) + "W");
+				logger->info("PL3: " + std::to_string(pl3) + "W");
 				pl3FpptClient.setCurrentValue(pl3);
 				TimeUtils::sleep(25);
 			}
@@ -233,33 +233,33 @@ void PerformanceService::setTdps(const PerformanceProfile& profile) {
 			Logger::rem_tab();
 		}
 	} catch (std::exception& e) {
-		logger.error("Error setting CPU TDPs: " + std::string(e.what()));
+		logger->error("Error setting CPU TDPs: " + std::string(e.what()));
 	}
 }
 
 void PerformanceService::setTgp(const PerformanceProfile& profile) {
 	if (nvTempClient.available() || nvBoostClient.available()) {
-		logger.info("Nvidia GPU");
+		logger->info("Nvidia GPU");
 		Logger::add_tab();
 
 		if (nvBoostClient.available()) {
 			try {
 				auto nvb = onBattery ? batteryNvBoost(profile) : acNvBoost(profile);
-				logger.info("Dynamic Boost: " + std::to_string(nvb) + "W");
+				logger->info("Dynamic Boost: " + std::to_string(nvb) + "W");
 				nvBoostClient.setCurrentValue(nvb);
 				TimeUtils::sleep(25);
 			} catch (std::exception& e) {
-				logger.error("Error setting Nvidia Boost: " + std::string(e.what()));
+				logger->error("Error setting Nvidia Boost: " + std::string(e.what()));
 			}
 		}
 
 		if (nvTempClient.available()) {
 			try {
 				auto nvt = onBattery ? batteryNvTemp(profile) : acNvTemp();
-				logger.info("Throttle temp: " + std::to_string(nvt) + "ºC");
+				logger->info("Throttle temp: " + std::to_string(nvt) + "ºC");
 				nvTempClient.setCurrentValue(nvt);
 			} catch (std::exception& e) {
-				logger.error("Error setting Nvidia TGP");
+				logger->error("Error setting Nvidia TGP");
 			}
 		}
 
@@ -482,7 +482,7 @@ FanCurveData PerformanceService::getDefaultFanCurve(std::string fan, std::string
 }
 
 void PerformanceService::saveFanCurves(std::string profile, std::unordered_map<std::string, FanCurveData> curves) {
-	logger.info("Saving curves for " + profile + " profile");
+	logger->info("Saving curves for " + profile + " profile");
 	Logger::add_tab();
 
 	auto pp = getPlatformProfile(fromString<PerformanceProfile>(profile));
@@ -497,7 +497,7 @@ void PerformanceService::saveFanCurves(std::string profile, std::unordered_map<s
 	configuration.saveConfig();
 
 	Logger::rem_tab();
-	logger.info("Fan curved updated succesfully");
+	logger->info("Fan curved updated succesfully");
 }
 
 std::string PerformanceService::getDefaultSchedulerName() {

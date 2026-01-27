@@ -21,10 +21,10 @@
 #include "../../include/utils/translator/translator.hpp"
 
 HardwareService::HardwareService() : Loggable("HardwareService") {
-	logger.info("Initializing HardwareService");
+	logger->info("Initializing HardwareService");
 	Logger::add_tab();
 
-	logger.info("Detecting CPU");
+	logger->info("Detecting CPU");
 	Logger::add_tab();
 	std::string cpuinfo_out = cpuInfoClient.read(5);
 	if (StringUtils::isSubstring("GenuineIntel", cpuinfo_out)) {
@@ -34,7 +34,7 @@ HardwareService::HardwareService() : Loggable("HardwareService") {
 		auto pos   = line.find(":");
 		if (pos != std::string::npos) {
 			line = line.substr(pos + 2);
-			logger.info(line);
+			logger->info(line);
 		}
 	} else if (StringUtils::isSubstring("AuthenticAMD", cpuinfo_out)) {
 		cpu		   = CpuBrand::AMD;
@@ -43,26 +43,26 @@ HardwareService::HardwareService() : Loggable("HardwareService") {
 		auto pos   = line.find(":");
 		if (pos != std::string::npos) {
 			line = line.substr(pos + 2);
-			logger.info(line);
+			logger->info(line);
 		}
 	}
 
 	Logger::add_tab();
 	if (pl1SpdClient.available()) {
-		logger.info("TDP control available");
+		logger->info("TDP control available");
 	}
 	if (boostControlClient.available()) {
-		logger.info("Boost control available");
+		logger->info("Boost control available");
 	}
 	Logger::rem_tab();
 
 	Logger::rem_tab();
 
-	logger.info("Detecting GPUs");
+	logger->info("Detecting GPUs");
 	Logger::add_tab();
 	auto detected_gpus = switcherooCtlClient.getGpus();
 	for (auto gpu : detected_gpus) {
-		logger.info(gpu.name);
+		logger->info(gpu.name);
 		if (!gpu.default_flag) {
 			auto replaced_name = StringUtils::replace(gpu.name, "Advanced Micro Devices, Inc.", "AMD");
 			auto brand		   = fromString<GpuBrand>(StringUtils::toLowerCase(StringUtils::split(replaced_name, ' ')[0]));
@@ -124,10 +124,10 @@ HardwareService::HardwareService() : Loggable("HardwareService") {
 			Logger::add_tab();
 			if (brand == GpuBrand::NVIDIA) {
 				if (nvBoostClient.available()) {
-					logger.info("Dynamic boost control available");
+					logger->info("Dynamic boost control available");
 				}
 				if (nvTempClient.available()) {
-					logger.info("Throttle temperature control available");
+					logger->info("Throttle temperature control available");
 				}
 			}
 
@@ -137,11 +137,11 @@ HardwareService::HardwareService() : Loggable("HardwareService") {
 	Logger::rem_tab();
 
 	if (batteryChargeLimitClient.available()) {
-		logger.info("Getting battery charge limit");
+		logger->info("Getting battery charge limit");
 		Logger::add_tab();
 		charge_limit = configuration.getConfiguration().platform.chargeLimit;
 		batteryChargeLimitClient.setChargeLimit(charge_limit);
-		logger.info(std::to_string(toInt(charge_limit)) + " %");
+		logger->info(std::to_string(toInt(charge_limit)) + " %");
 		Logger::rem_tab();
 	}
 
@@ -183,19 +183,19 @@ void HardwareService::onDeviceEvent() {
 	});
 
 	if (added.size() > 0) {
-		logger.info("Added compatible device(s):");
+		logger->info("Added compatible device(s):");
 		Logger::add_tab();
 		for (auto dev : added) {
-			logger.info(openRgbService.getDeviceName(dev));
+			logger->info(openRgbService.getDeviceName(dev));
 		}
 		Logger::rem_tab();
 	}
 
 	if (removed.size() > 0) {
-		logger.info("Removed compatible device(s):");
+		logger->info("Removed compatible device(s):");
 		Logger::add_tab();
 		for (auto dev : removed) {
-			logger.info(openRgbService.getDeviceName(dev));
+			logger->info(openRgbService.getDeviceName(dev));
 		}
 		Logger::rem_tab();
 	}
@@ -216,7 +216,7 @@ BatteryThreshold HardwareService::getChargeThreshold() {
 void HardwareService::setChargeThreshold(const BatteryThreshold& threshold) {
 	std::lock_guard<std::mutex> lock(actionMutex);
 	if (charge_limit != threshold) {
-		logger.info("Setting charge limit to " + std::to_string(toInt(threshold)) + "%");
+		logger->info("Setting charge limit to " + std::to_string(toInt(threshold)) + "%");
 		auto t0 = TimeUtils::now();
 		batteryChargeLimitClient.setChargeLimit(threshold);
 		auto t1 = TimeUtils::now();
@@ -225,7 +225,7 @@ void HardwareService::setChargeThreshold(const BatteryThreshold& threshold) {
 		configuration.getConfiguration().platform.chargeLimit = threshold;
 		configuration.saveConfig();
 
-		logger.info("Charge limit setted after " + TimeUtils::format_seconds(TimeUtils::getTimeDiff(t0, t1)) + " seconds");
+		logger->info("Charge limit setted after " + TimeUtils::format_seconds(TimeUtils::getTimeDiff(t0, t1)) + " seconds");
 
 		toaster.showToast(translator.translate("applied.battery.threshold", {{"value", std::to_string(toInt(threshold))}}));
 		eventBus.emitChargeThreshold(threshold);
@@ -241,7 +241,7 @@ void HardwareService::onBatteryEvent(const bool& onBat, const bool& muted) {
 		if (!muted) {
 			std::string t1 = onBattery ? "un" : "";
 			std::string t2 = !onBattery ? "dis" : "";
-			logger.info("AC " + t1 + "plugged, battery " + t2 + "engaged");
+			logger->info("AC " + t1 + "plugged, battery " + t2 + "engaged");
 			Logger::add_tab();
 		}
 		eventBus.emitBattery(onBat);
@@ -253,12 +253,12 @@ void HardwareService::onBatteryEvent(const bool& onBat, const bool& muted) {
 
 void HardwareService::setPanelOverdrive(const bool& enable) {
 	if (panelOverdriveClient.available()) {
-		logger.info("Panel Overdrive: " + std::string(enable ? "Enabled" : "Disabled"));
+		logger->info("Panel Overdrive: " + std::string(enable ? "Enabled" : "Disabled"));
 		Logger::add_tab();
 		try {
 			panelOverdriveClient.setCurrentValue(enable);
 		} catch (std::exception& e) {
-			logger.error(e.what());
+			logger->error(e.what());
 		}
 		Logger::rem_tab();
 	}
@@ -314,12 +314,12 @@ void HardwareService::setBootSound(bool enable) {
 	}
 
 	std::lock_guard<std::mutex> lock(actionMutex);
-	logger.info("Setting boot sound: " + std::string(enable ? "Enabled" : "Disabled"));
+	logger->info("Setting boot sound: " + std::string(enable ? "Enabled" : "Disabled"));
 	Logger::add_tab();
 	auto t0 = TimeUtils::now();
 	bootSoundClient.setCurrentValue(enable);
 	auto t1 = TimeUtils::now();
 	Logger::rem_tab();
-	logger.info("Boot sound setted after " + TimeUtils::format_seconds(TimeUtils::getTimeDiff(t0, t1)) + " seconds");
+	logger->info("Boot sound setted after " + TimeUtils::format_seconds(TimeUtils::getTimeDiff(t0, t1)) + " seconds");
 	eventBus.emitBootSound(enable);
 }

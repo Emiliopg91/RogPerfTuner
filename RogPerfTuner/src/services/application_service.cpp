@@ -20,12 +20,12 @@
 #endif
 
 ApplicationService::ApplicationService(std::optional<std::string> execPath) : Loggable("ApplicationService") {
-	logger.info("Initializing ApplicationService");
+	logger->info("Initializing ApplicationService");
 	Logger::add_tab();
 
 #ifndef DEV_MODE
 	if (!FileUtils::exists(Constants::APP_DRAW_FILE)) {
-		logger.info("Creating menu entry");
+		logger->info("Creating menu entry");
 		Logger::add_tab();
 		FileUtils::writeFileContent(Constants::APP_DRAW_FILE, buildDesktopFile());
 		Logger::rem_tab();
@@ -35,7 +35,7 @@ ApplicationService::ApplicationService(std::optional<std::string> execPath) : Lo
 	if (execPath.has_value()) {
 		this->execPath = *execPath;
 
-		logger.info("Creating helper scripts");
+		logger->info("Creating helper scripts");
 		Logger::add_tab();
 
 		if (FileUtils::exists(Constants::BIN_DIR)) {
@@ -115,21 +115,21 @@ void ApplicationService::setAutostart(bool enabled) {
 	if (enabled) {
 		if (!FileUtils::exists(Constants::AUTOSTART_FILE)) {
 			FileUtils::writeFileContent(Constants::AUTOSTART_FILE, buildDesktopFile());
-			logger.info("Autostart file '" + Constants::AUTOSTART_FILE + "' written successfully");
+			logger->info("Autostart file '" + Constants::AUTOSTART_FILE + "' written successfully");
 		}
 	} else {
 		FileUtils::remove(Constants::AUTOSTART_FILE);
-		logger.info("Autostart file '" + Constants::AUTOSTART_FILE + "' deleted successfully");
+		logger->info("Autostart file '" + Constants::AUTOSTART_FILE + "' deleted successfully");
 	}
 }
 
 void ApplicationService::shutdown() {
 	shuttingDown = true;
-	logger.info("Starting application shutdown");
+	logger->info("Starting application shutdown");
 	Logger::add_tab();
 	eventBus.emitApplicationStop();
 	Logger::rem_tab();
-	logger.info("Shutdown finished");
+	logger->info("Shutdown finished");
 	kill(Constants::PID, SIGTERM);
 }
 
@@ -146,14 +146,14 @@ void ApplicationService::lookForUpdates() {
 	bool found = false;
 
 	while (true) {
-		logger.info("Looking for update");
+		logger->info("Looking for update");
 		Logger::add_tab();
 		try {
 			auto version	   = aurHelperClient.getVersion(Constants::EXEC_NAME);
 			auto latestVersion = SemanticVersion::parse(version);
 
 			if (latestVersion > currentVersion) {
-				logger.info("New version available: " + version);
+				logger->info("New version available: " + version);
 				toaster.showToast(translator.translate("update.available", {{"version", version}}));
 				eventBus.emitUpdateAvailable(version);
 				found = true;
@@ -161,11 +161,11 @@ void ApplicationService::lookForUpdates() {
 				break;
 			}
 		} catch (std::exception& e) {
-			logger.error("Error on update check: " + std::string(e.what()));
+			logger->error("Error on update check: " + std::string(e.what()));
 		}
 
 		if (!found) {
-			logger.info("No update found");
+			logger->info("No update found");
 		}
 
 		Logger::rem_tab();
@@ -175,14 +175,14 @@ void ApplicationService::lookForUpdates() {
 }
 
 void ApplicationService::applyUpdate() {
-	logger.info("Applying update...");
+	logger->info("Applying update...");
 	eventBus.emitUpdateStart();
 	Logger::add_tab();
 
 	PerformanceProfile p = PerformanceProfile::PERFORMANCE;
 	performanceService.setPerformanceProfile(p, true, true, false);
 
-	logger.info("Launching update command...");
+	logger->info("Launching update command...");
 	Logger::add_tab();
 	aurHelperClient.install(Constants::EXEC_NAME);
 	Logger::rem_tab();
@@ -197,7 +197,7 @@ std::optional<std::string> ApplicationService::getChangeLog() {
 		YAML::Node root			= YAML::Load(changelogYml);
 
 		if (!root.IsSequence()) {
-			logger.error("Invalid changelog format");
+			logger->error("Invalid changelog format");
 			return std::nullopt;
 		}
 

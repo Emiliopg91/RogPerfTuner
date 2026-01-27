@@ -22,7 +22,7 @@
 #include "../../../../include/utils/time_utils.hpp"
 
 void OpenRgbClient::initialize() {
-	logger.info("Reading UDEV files");
+	logger->info("Reading UDEV files");
 	Logger::add_tab();
 	auto lines = StringUtils::splitLines(FileUtils::readFileContent(Constants::UDEV_RULES));
 	std::regex regex(
@@ -52,7 +52,7 @@ void OpenRgbClient::initialize() {
 		}
 	}
 	Logger::rem_tab();
-	logger.debug("Found " + std::to_string(compatibleDevices.size()) + " compatible devices");
+	logger->debug("Found " + std::to_string(compatibleDevices.size()) + " compatible devices");
 
 	availableEffects.push_back(std::unique_ptr<AbstractEffect>(&BreathingEffect::init(client)));
 	availableEffects.push_back(std::unique_ptr<AbstractEffect>(&DanceFloorEffect::init(client)));
@@ -76,7 +76,7 @@ void OpenRgbClient::configureUdev() {
 }
 
 void OpenRgbClient::start() {
-	logger.info("Starting OpenRgbClient");
+	logger->info("Starting OpenRgbClient");
 	Logger::add_tab();
 
 	if (asusCtlClient.available()) {
@@ -89,7 +89,7 @@ void OpenRgbClient::start() {
 }
 
 void OpenRgbClient::stop() {
-	logger.info("Stopping OpenRgbClient");
+	logger->info("Stopping OpenRgbClient");
 	Logger::add_tab();
 	for (auto& effect : availableEffects) {
 		effect->stop();
@@ -111,25 +111,25 @@ const std::vector<UsbIdentifier> OpenRgbClient::getCompatibleDevices() {
 }
 
 void OpenRgbClient::startOpenRgbProcess() {
-	logger.info("Starting OpenRGB server");
+	logger->info("Starting OpenRGB server");
 	Logger::add_tab();
 	port		 = NetUtils::getRandomFreePort();
 	runnerThread = std::thread(&OpenRgbClient::runner, this);
 	while (NetUtils::isPortFree(port)) {
 		TimeUtils::sleep(50);
 	}
-	logger.info("OpenRgb server ready");
+	logger->info("OpenRgb server ready");
 	Logger::rem_tab();
 }
 
 void OpenRgbClient::stopOpenRgbProcess() {
-	logger.info("Stopping OpenRGB server");
+	logger->info("Stopping OpenRGB server");
 	Logger::add_tab();
 	ProcessUtils::sendSignal(pid, SIGKILL);
 	if (runnerThread.joinable()) {
 		runnerThread.join();
 	}
-	logger.info("OpenRGB server killed");
+	logger->info("OpenRGB server killed");
 	Logger::rem_tab();
 }
 
@@ -154,26 +154,26 @@ void OpenRgbClient::runner() {
 	pid			  = shell.launch_process(Constants::ORGB_PATH.c_str(), argv.data(), env.data(),
 										 Constants::LOG_DIR + "/" + Constants::LOG_ORGB_FILE_NAME + ".log");
 	int exit_code = shell.wait_for(pid);
-	logger.info("Command finished with exit code " + std::to_string(exit_code));
+	logger->info("Command finished with exit code " + std::to_string(exit_code));
 }
 
 void OpenRgbClient::startOpenRgbClient() {
-	logger.info("Connecting to server");
+	logger->info("Connecting to server");
 	Logger::add_tab();
 	client.connect("localhost", port);
-	logger.info("Connected");
+	logger->info("Connected");
 	Logger::rem_tab();
 }
 
 void OpenRgbClient::getAvailableDevices() {
-	logger.info("Getting available devices");
+	logger->info("Getting available devices");
 	Logger::add_tab();
 
 	detectedDevices = client.requestDeviceList().devices;
 	for (auto& dev : detectedDevices) {
 		const orgb::Mode* directMode = dev.findMode("Direct");
 		if (directMode) {
-			logger.info(dev.name);
+			logger->info(dev.name);
 			client.changeMode(dev, *directMode);
 			client.setDeviceColor(dev, orgb::Color::Black);
 		}

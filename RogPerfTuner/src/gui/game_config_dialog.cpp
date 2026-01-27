@@ -192,7 +192,7 @@ GameConfigDialog::GameConfigDialog(unsigned int gid, bool runAfterSave, QWidget*
 }
 
 void GameConfigDialog::onAccept() {
-	logger.info("Accepted configuration");
+	logger->info("Accepted configuration");
 	std::optional<std::string> gpu = gpuCombo->currentData().toString().toStdString();
 	if (gpu.value().empty()) {
 		gpu = std::nullopt;
@@ -240,7 +240,7 @@ void GameConfigDialog::closeEvent(QCloseEvent* event) {
 	if (runAfterSave) {
 		auto reply = YesNoDialog::showDialog(translator.translate("confirmation.required"), translator.translate("run.with.default.config"), this);
 		if (reply) {
-			logger.info("Game will launch with default configuration");
+			logger->info("Game will launch with default configuration");
 			event->accept();
 		} else {
 			event->ignore();

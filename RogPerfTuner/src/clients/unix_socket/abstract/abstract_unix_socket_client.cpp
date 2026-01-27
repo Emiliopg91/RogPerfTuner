@@ -55,7 +55,7 @@ void AbstractUnixSocketClient::stop(bool stopConnThread) {
 		}
 		Logger::rem_tab();
 	} catch (std::exception& e) {
-		logger.error("Error on stop: " + std::string(e.what()));
+		logger->error("Error on stop: " + std::string(e.what()));
 	}
 }
 
@@ -72,7 +72,7 @@ void AbstractUnixSocketClient::connectionLoop() {
 		strncpy(addr.sun_path, path.c_str(), sizeof(addr.sun_path) - 1);
 
 		if (connect(sock, (sockaddr*)&addr, sizeof(addr)) < 0) {
-			logger.debug(std::string(strerror(errno)));
+			logger->debug(std::string(strerror(errno)));
 			close(sock);
 			sock = -1;
 			TimeUtils::sleep(3000);
@@ -104,7 +104,7 @@ void AbstractUnixSocketClient::connectionLoop() {
 				try {
 					invoke("ping", {}, 100);
 				} catch (std::exception& e) {
-					logger.debug("Lost connection");
+					logger->debug("Lost connection");
 					stop(false);
 					_running = true;
 					eventBus.emitUnixSocketEvent(name, "disconnect", {});
@@ -144,7 +144,7 @@ void AbstractUnixSocketClient::writeLoop() {
 
 		uint32_t msgLen = htonl(msg.size());
 		if (write(sock, &msgLen, sizeof(msgLen)) <= 0 || write(sock, msg.c_str(), msg.size()) <= 0) {
-			logger.error("Error sending message");
+			logger->error("Error sending message");
 		}
 	}
 }
@@ -160,7 +160,7 @@ void AbstractUnixSocketClient::readLoop() {
 			while (total_read < resp_len) {
 				ssize_t r = read(sock, &data[total_read], resp_len - total_read);
 				if (r <= 0) {
-					logger.debug("Server closed the connection");
+					logger->debug("Server closed the connection");
 					eventBus.emitUnixSocketEvent(name, "disconnect", {});
 					_connected.store(false);
 					break;
@@ -211,7 +211,7 @@ std::vector<std::any> AbstractUnixSocketClient::invoke(std::string method, std::
 
 	if (fut.wait_for(std::chrono::milliseconds(timeout_ms)) == std::future_status::timeout) {
 		if (method != "ping") {
-			logger.error("No response for " + method + " after " + std::to_string(timeout_ms) + " ms");
+			logger->error("No response for " + method + " after " + std::to_string(timeout_ms) + " ms");
 		}
 		throw std::runtime_error("UnixSocketTimeoutError");
 	}

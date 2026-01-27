@@ -4,7 +4,6 @@
 #include <netinet/in.h>
 #include <unistd.h>
 
-#include <fstream>
 #include <regex>
 #include <stdexcept>
 
@@ -69,9 +68,9 @@ std::tuple<std::string, std::string> split_url(const std::string& url) {
 }
 
 void NetUtils::download(const std::string url, const std::string dst) {
-	Logger logger = *LoggerProvider::getLogger("NetUtils");
+	auto logger = LoggerProvider::getLogger("NetUtils");
 
-	logger.info("Downloading " + url + " into " + dst);
+	logger->info("Downloading " + url + " into " + dst);
 	Logger::add_tab();
 
 	CurlClient::getInstance().download(url, dst);
@@ -80,9 +79,9 @@ void NetUtils::download(const std::string url, const std::string dst) {
 }
 
 std::string NetUtils::fetch(const std::string url) {
-	Logger logger = *LoggerProvider::getLogger("NetUtils");
+	auto logger = LoggerProvider::getLogger("NetUtils");
 
-	logger.info("Fetching " + url);
+	logger->info("Fetching " + url);
 	Logger::add_tab();
 
 	auto response = CurlClient::getInstance().fetch(url);

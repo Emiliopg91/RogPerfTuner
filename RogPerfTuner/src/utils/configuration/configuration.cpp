@@ -13,16 +13,16 @@
 
 void Configuration::loadConfig() {
 	if (FileUtils::exists(Constants::CONFIG_FILE)) {
-		logger.debug("Loading settings from '" + Constants::CONFIG_FILE + "'");
+		logger->debug("Loading settings from '" + Constants::CONFIG_FILE + "'");
 		try {
 			auto node = YAML::LoadFile(Constants::CONFIG_FILE);
 			config	  = node.as<RootConfig>();
 			LoggerProvider::setConfigMap(config->logger);
 		} catch (const std::exception& e) {
-			logger.error("Error loading settings: " + std::string(e.what()));
+			logger->error("Error loading settings: " + std::string(e.what()));
 		}
 	} else {
-		logger.debug("Settings file not found, creating new");
+		logger->debug("Settings file not found, creating new");
 		FileUtils::createDirectory(Constants::CONFIG_DIR);
 
 		RootConfig defaultCfg;
@@ -30,7 +30,7 @@ void Configuration::loadConfig() {
 
 		saveConfig();
 	}
-	logger.info("Configuration loaded");
+	logger->info("Configuration loaded");
 }
 
 void Configuration::saveConfig() {
@@ -38,7 +38,7 @@ void Configuration::saveConfig() {
 		return;
 	}
 
-	logger.debug("Configuration saved");
+	logger->debug("Configuration saved");
 
 	try {
 		YAML::Node node = YAML::convert<RootConfig>::encode(*config);
@@ -47,7 +47,7 @@ void Configuration::saveConfig() {
 		fout << node;
 		fout.close();
 	} catch (const std::exception& e) {
-		logger.error("Error saving settings file: " + std::string(e.what()));
+		logger->error("Error saving settings file: " + std::string(e.what()));
 	}
 }
 
@@ -64,7 +64,7 @@ std::string Configuration::getPassword() {
 	loop.exec();
 
 	if (job.error()) {
-		logger.error("Error on password fetching: " + job.errorString().toStdString());
+		logger->error("Error on password fetching: " + job.errorString().toStdString());
 		return "";
 	}
 

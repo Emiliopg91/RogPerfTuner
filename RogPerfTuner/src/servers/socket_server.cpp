@@ -14,7 +14,7 @@
 #include "../../include/utils/file_utils.hpp"
 
 SocketServer::SocketServer() : Loggable("SocketServer") {
-	logger.info("Initializing socket server");
+	logger->info("Initializing socket server");
 	Logger::add_tab();
 
 	auto modTime = std::filesystem::file_time_type::min();
@@ -38,7 +38,7 @@ SocketServer::SocketServer() : Loggable("SocketServer") {
 		stop();
 	});
 
-	logger.info("Socket server started on " + Constants::SOCKET_FILE);
+	logger->info("Socket server started on " + Constants::SOCKET_FILE);
 	Logger::rem_tab();
 }
 
@@ -47,7 +47,7 @@ SocketServer::~SocketServer() {
 }
 
 void SocketServer::stop() {
-	logger.info("Stopping socket server");
+	logger->info("Stopping socket server");
 
 	if (!started.load()) {
 		return;
@@ -66,13 +66,13 @@ void SocketServer::stop() {
 		runner.join();
 	}
 
-	logger.info("Socket server stopped");
+	logger->info("Socket server stopped");
 }
 
 void SocketServer::run() {
 	server_fd = socket(AF_UNIX, SOCK_STREAM, 0);
 	if (server_fd < 0) {
-		logger.error("Failed to create socket");
+		logger->error("Failed to create socket");
 		return;
 	}
 
@@ -83,13 +83,13 @@ void SocketServer::run() {
 	unlink(Constants::SOCKET_FILE.c_str());
 
 	if (bind(server_fd, (struct sockaddr*)&addr, sizeof(addr)) < 0) {
-		logger.error("Failed to bind socket: " + std::string(strerror(errno)));
+		logger->error("Failed to bind socket: " + std::string(strerror(errno)));
 		close(server_fd);
 		return;
 	}
 
 	if (listen(server_fd, 5) < 0) {
-		logger.error("Failed to listen on socket");
+		logger->error("Failed to listen on socket");
 		close(server_fd);
 		return;
 	}
@@ -98,7 +98,7 @@ void SocketServer::run() {
 		int client_fd = accept(server_fd, nullptr, nullptr);
 		if (client_fd < 0) {
 			if (started.load()) {
-				logger.error("Accept failed: " + std::string(strerror(errno)));
+				logger->error("Accept failed: " + std::string(strerror(errno)));
 			}
 			continue;
 		}
@@ -115,13 +115,13 @@ void SocketServer::handleClient(int client_fd) {
 		}
 
 		if (n != sizeof(msg_len_net)) {
-			logger.error("Incomplete header received");
+			logger->error("Incomplete header received");
 			break;
 		}
 
 		uint32_t msg_len = ntohl(msg_len_net);
 		if (msg_len == 0 || msg_len > 10 * 1024 * 1024) {
-			logger.error("Invalid message length: " + std::to_string(msg_len));
+			logger->error("Invalid message length: " + std::to_string(msg_len));
 			break;
 		}
 
@@ -130,7 +130,7 @@ void SocketServer::handleClient(int client_fd) {
 		while (total_read < msg_len) {
 			ssize_t r = read(client_fd, &data[total_read], msg_len - total_read);
 			if (r <= 0) {
-				logger.error("Error reading message body");
+				logger->error("Error reading message body");
 				close(client_fd);
 				return;
 			}
@@ -147,7 +147,7 @@ void SocketServer::handleClient(int client_fd) {
 				handleRequest(client_fd, req);
 			}
 		} catch (const std::exception& e) {
-			logger.error("YAML parse error: " + std::string(e.what()));
+			logger->error("YAML parse error: " + std::string(e.what()));
 		}
 		Logger::rem_tab();
 	}
@@ -189,7 +189,7 @@ void SocketServer::handleRequest(const int& clientFd, const CommunicationMessage
 			res.error = "No such method";
 		}
 	} catch (std::exception& e) {
-		logger.error("Error on request handling: " + std::string(e.what()));
+		logger->error("Error on request handling: " + std::string(e.what()));
 		res.error = e.what();
 	}
 
