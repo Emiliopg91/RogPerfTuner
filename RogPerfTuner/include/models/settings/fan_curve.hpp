@@ -4,7 +4,7 @@
 
 struct FanCurve {
 	std::string current = {};
-	std::string factory = {};
+	std::string presets = {};
 };
 
 // YAML-CPP serialization/deserialization
@@ -14,7 +14,7 @@ struct convert<FanCurve> {
 	static Node encode(const FanCurve& fanCurve) {
 		Node node;
 		node["current"] = fanCurve.current;
-		node["factory"] = fanCurve.factory;
+		node["presets"] = fanCurve.presets;
 		return node;
 	}
 
@@ -23,7 +23,9 @@ struct convert<FanCurve> {
 			fanCurve.current = node["current"].as<std::string>();
 		}
 		if (node["factory"]) {
-			fanCurve.factory = node["factory"].as<std::string>();
+			fanCurve.presets = node["factory"].as<std::string>();
+		} else {
+			fanCurve.presets = node["presets"].as<std::string>();
 		}
 		return true;
 	}

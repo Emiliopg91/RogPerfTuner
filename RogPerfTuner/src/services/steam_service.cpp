@@ -43,7 +43,7 @@ const std::unordered_map<unsigned int, GameEntry>& SteamService::getRunningGames
 	return runningGames;
 }
 
-const std::map<std::string, GameEntry>& SteamService::getGames() {
+const std::map<uint, GameEntry>& SteamService::getGames() {
 	return configuration.getConfiguration().games;
 }
 
@@ -157,7 +157,7 @@ void SteamService::onFirstGameRun(unsigned int gid, std::string name) {
 					ComputerType::COMPUTER,
 					WineSyncOption::AUTO,
 					wrappers};
-	configuration.getConfiguration().games[std::to_string(gid)] = entry;
+	configuration.getConfiguration().games[gid] = entry;
 	configuration.saveConfig();
 
 	auto userIds = FileUtils::listDirectory(Constants::STEAM_USERDATA_PATH);
@@ -213,7 +213,7 @@ void SteamService::saveGameConfig(uint gid, const GameEntry& entry) {
 	logger->info("Saving configuration for '" + entry.name + "' (" + std::to_string(gid) + ")");
 	Logger::add_tab();
 
-	configuration.getConfiguration().games[std::to_string(gid)] = entry;
+	configuration.getConfiguration().games[gid] = entry;
 	configuration.saveConfig();
 
 	Logger::rem_tab();
@@ -309,7 +309,7 @@ void SteamService::onGameLaunch(unsigned int gid, std::string name, int pid) {
 	logger->info("Launched '" + name + "' (" + std::to_string(gid) + ") with PID " + std::to_string(pid));
 	Logger::add_tab();
 
-	auto it = configuration.getConfiguration().games.find(std::to_string(gid));
+	auto it = configuration.getConfiguration().games.find(gid);
 	if (it == configuration.getConfiguration().games.end()) {
 		logger->info("Game not configured");
 		Logger::add_tab();
@@ -404,18 +404,18 @@ void SteamService::onDisconnect() {
 	Logger::rem_tab();
 }
 
-const SteamGameConfig SteamService::getConfiguration(const std::string& gid) {
+const SteamGameConfig SteamService::getConfiguration(const std::string& id) {
 	SteamGameConfig cfg;
 
 	auto games = configuration.getConfiguration().games;
-	auto it	   = games.find(gid);
+	auto it	   = games.find(std::stoul(id));
 
 	std::optional<GameEntry> entry = std::nullopt;
 	if (it != games.end()) {
 		entry = it->second;
 	} else {
 		for (const auto& [key, val] : configuration.getConfiguration().games) {
-			if (val.overlayId == gid) {
+			if (val.overlayId.has_value() && val.overlayId == id) {
 				entry = val;
 				break;
 			}
@@ -483,7 +483,7 @@ const SteamGameConfig SteamService::getConfiguration(const std::string& gid) {
 			}
 		}
 	} else {
-		logger->error("No configuration entry found for " + gid);
+		logger->error("No configuration entry found for " + id);
 	}
 
 	return cfg;

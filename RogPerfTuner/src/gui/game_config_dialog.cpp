@@ -14,7 +14,7 @@
 GameConfigDialog::GameConfigDialog(unsigned int gid, bool runAfterSave, QWidget* parent)
 	: Loggable("GameConfigDialog"), QDialog(parent), gid(gid), runAfterSave(runAfterSave) {
 	Logger::add_tab();
-	gameEntry = configuration.getConfiguration().games[std::to_string(gid)];
+	gameEntry = configuration.getConfiguration().games[gid];
 	setWindowTitle(gameEntry.name.c_str());
 
 	windowLayout = new QFormLayout();

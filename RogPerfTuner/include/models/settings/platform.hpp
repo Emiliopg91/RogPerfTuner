@@ -7,9 +7,9 @@
 #include "performance.hpp"
 
 struct Platform {
-	Performance performance															  = Performance{};
-	BatteryThreshold chargeLimit													  = BatteryThreshold::CT_100;
-	std::unordered_map<std::string, std::unordered_map<std::string, FanCurve>> curves = {};
+	Performance performance										  = Performance{};
+	BatteryThreshold chargeLimit								  = BatteryThreshold::CT_100;
+	std::map<std::string, std::map<std::string, FanCurve>> curves = {};
 };
 
 // YAML-CPP serialization/deserialization
@@ -34,7 +34,7 @@ struct convert<Platform> {
 			platform.chargeLimit = fromInt<BatteryThreshold>(node["chargeLimit"].as<int>());
 		}
 		if (node["curves"]) {
-			platform.curves = node["curves"].as<std::unordered_map<std::string, std::unordered_map<std::string, FanCurve>>>();
+			platform.curves = node["curves"].as<std::map<std::string, std::map<std::string, FanCurve>>>();
 		}
 		return true;
 	}

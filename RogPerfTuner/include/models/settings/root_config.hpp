@@ -12,7 +12,7 @@
 struct RootConfig {
 	Aura aura								  = Aura();
 	Application application					  = Application();
-	std::map<std::string, GameEntry> games	  = {};
+	std::map<uint, GameEntry> games			  = {};
 	std::map<std::string, LoggerLevel> logger = {};
 	Platform platform						  = Platform();
 };
@@ -27,9 +27,7 @@ struct convert<RootConfig> {
 		node["application"] = config.application;
 		node["aura"]		= config.aura;
 
-		if (!config.games.empty()) {
-			node["games"] = config.games;
-		}
+		node["games"] = config.games;
 
 		Node loggerNode;
 		if (!config.logger.empty()) {
@@ -46,9 +44,9 @@ struct convert<RootConfig> {
 
 	static bool decode(const Node& node, RootConfig& config) {
 		if (node["games"]) {
-			config.games = node["games"].as<std::map<std::string, GameEntry>>();
+			config.games = node["games"].as<std::map<uint, GameEntry>>();
 		} else {
-			config.games = std::map<std::string, GameEntry>{};
+			config.games = std::map<uint, GameEntry>{};
 		}
 
 		if (node["logger"]) {

@@ -18,9 +18,9 @@ struct convert<Application> {
 	static Node encode(const Application& app) {
 		Node node;
 		node["askedInstallRccdc"] = app.askedInstallRccdc;
-		node["startMinimized"]	  = app.startMinimized;
 		node["currentVersion"]	  = app.currentVersion;
 		node["previousVersion"]	  = app.previousVersion;
+		node["startMinimized"]	  = app.startMinimized;
 		return node;
 	}
 
@@ -28,14 +28,14 @@ struct convert<Application> {
 		if (node["askedInstallRccdc"]) {
 			app.askedInstallRccdc = node["askedInstallRccdc"].as<bool>();
 		}
-		if (node["startMinimized"]) {
-			app.startMinimized = node["startMinimized"].as<bool>();
-		}
 		if (node["currentVersion"]) {
 			app.currentVersion = node["currentVersion"].as<std::string>();
 		}
 		if (node["previousVersion"]) {
 			app.previousVersion = node["previousVersion"].as<std::string>();
+		}
+		if (node["startMinimized"]) {
+			app.startMinimized = node["startMinimized"].as<bool>();
 		}
 		return true;
 	}

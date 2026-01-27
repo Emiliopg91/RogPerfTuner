@@ -9,9 +9,9 @@
 #include "effect.hpp"
 
 struct Aura {
-	RgbBrightness brightness							 = RgbBrightness::MAX;
-	std::unordered_map<std::string, EffectConfig> config = {};
-	std::optional<std::string> last_effect				 = std::nullopt;
+	RgbBrightness brightness				   = RgbBrightness::MAX;
+	std::map<std::string, EffectConfig> config = {};
+	std::optional<std::string> last_effect	   = std::nullopt;
 };
 
 // YAML-CPP serialization/deserialization
@@ -36,9 +36,9 @@ struct convert<Aura> {
 		}
 
 		if (node["config"]) {
-			aura.config = node["config"].as<std::unordered_map<std::string, EffectConfig>>();
+			aura.config = node["config"].as<std::map<std::string, EffectConfig>>();
 		} else if (node["effects"]) {
-			aura.config = node["effects"].as<std::unordered_map<std::string, EffectConfig>>();
+			aura.config = node["effects"].as<std::map<std::string, EffectConfig>>();
 		}
 
 		if (node["effect"] && !node["effect"].IsNull()) {

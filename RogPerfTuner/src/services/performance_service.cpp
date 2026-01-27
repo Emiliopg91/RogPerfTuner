@@ -136,7 +136,7 @@ void PerformanceService::setFanCurves(const PerformanceProfile& profile) {
 				asusCtlClient.setCurvesToDefaults(platformProfile);
 				auto data = asusCtlClient.getFanCurveData(platformProfile);
 				for (auto& [fan, curve] : data) {
-					configuration.getConfiguration().platform.curves[toString(profile)][fan].factory = curve.toData();
+					configuration.getConfiguration().platform.curves[toString(profile)][fan].presets = curve.toData();
 					configuration.getConfiguration().platform.curves[toString(profile)][fan].current = curve.toData();
 				}
 
@@ -478,7 +478,7 @@ FanCurveData PerformanceService::getFanCurve(std::string fan, std::string profil
 }
 
 FanCurveData PerformanceService::getDefaultFanCurve(std::string fan, std::string profile) {
-	return FanCurveData::fromData(configuration.getConfiguration().platform.curves[profile][fan].factory);
+	return FanCurveData::fromData(configuration.getConfiguration().platform.curves[profile][fan].presets);
 }
 
 void PerformanceService::saveFanCurves(std::string profile, std::unordered_map<std::string, FanCurveData> curves) {

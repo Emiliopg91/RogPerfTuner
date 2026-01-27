@@ -57,7 +57,7 @@ class SteamService : public Singleton<SteamService>, Loggable {
 	 *
 	 * @return A constant reference to a map of games, keyed by their string IDs.
 	 */
-	const std::map<std::string, GameEntry>& getGames();
+	const std::map<uint, GameEntry>& getGames();
 
 	/**
 	 * @brief Checks if a game with the given app ID is currently running.
