@@ -21,7 +21,7 @@
 #include "gui/game_list.hpp"
 #include "utils/string_utils.hpp"
 
-MainWindow::MainWindow(QWidget* parent) : QMainWindow(parent), _logger(LoggerProvider::getLogger("MainWindow")) {
+MainWindow::MainWindow(QWidget* parent) : QMainWindow(parent) {
 	onBattery	 = uPowerClient.isOnBattery();
 	runningGames = steamService.getRunningGames().size();
 
