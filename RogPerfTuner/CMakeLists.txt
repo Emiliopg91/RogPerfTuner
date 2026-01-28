@@ -11,11 +11,6 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 find_package(Qt6 REQUIRED COMPONENTS Core DBus Gui Widgets Charts)
 find_package(Qt6Keychain REQUIRED)
 
-add_library(magic_enum INTERFACE)
-target_include_directories(magic_enum INTERFACE
-    "${CMAKE_CURRENT_SOURCE_DIR}/../submodules/magic_enum/include/magic_enum"
-)
-
 file(GLOB_RECURSE SOURCES_RCC
     "${CMAKE_CURRENT_SOURCE_DIR}/src/*.cpp"
 )

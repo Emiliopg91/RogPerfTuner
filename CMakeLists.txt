@@ -34,6 +34,11 @@ add_compile_options(
     -Wno-deprecated-literal-operator
 )
 
+add_library(magic_enum INTERFACE)
+target_include_directories(magic_enum INTERFACE
+    "submodules/magic_enum/include/magic_enum"
+)
+
 add_subdirectory(submodules/yaml-cpp)
 
 add_subdirectory(submodules/OpenRGB-cppSDK)
