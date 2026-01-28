@@ -37,7 +37,7 @@ Shell::Shell(const std::string& sudo_password) : Loggable("Shell") {
 	for (const auto& [term, args] : terminals) {
 		std::string check = "command -v " + term + " >/dev/null 2>&1";
 		if (system(check.c_str()) == 0) {
-			logger->info("Using terminal " + term);
+			logger->info("Using terminal {}", term);
 			terminalCfg = args;
 			break;
 		}
@@ -74,13 +74,13 @@ Shell::~Shell() {
 Shell::BashSession Shell::start_bash(const std::vector<std::string>& args, const std::string& initial_input) {
 	int in_pipe[2], out_pipe[2], err_pipe[2];
 	if (pipe(in_pipe) || pipe(out_pipe) || pipe(err_pipe)) {
-		logger->error("Error creating process pipe: " + std::string(std::strerror(errno)));
+		logger->error("Error creating process pipe: {}", strerror(errno));
 		exit(1);
 	}
 
 	pid_t pid = fork();
 	if (pid == -1) {
-		logger->error("Error on process launch: " + std::string(std::strerror(errno)));
+		logger->error("Error on process launch: {}", strerror(errno));
 		exit(1);
 	}
 
@@ -106,7 +106,7 @@ Shell::BashSession Shell::start_bash(const std::vector<std::string>& args, const
 		setenv("LC_ALL", "C", 1);
 
 		execvp(argv_exec[0], argv_exec.data());
-		logger->error("Error on process launch: " + std::string(std::strerror(errno)));
+		logger->error("Error on process launch: {}", strerror(errno));
 		_exit(127);
 	}
 
@@ -144,9 +144,9 @@ void Shell::close_bash(BashSession& session) {
 CommandResult Shell::send_command(BashSession& session, bool elevated, const std::string& cmd, bool check) {
 	std::lock_guard<std::mutex> lock(mtx);
 	if (elevated) {
-		logger->debug("Running admin command '" + cmd + "'");
+		logger->debug("Running admin command '{}'", cmd);
 	} else {
-		logger->debug("Running command '" + cmd + "'");
+		logger->debug("Running command '{}'", cmd);
 	}
 	std::string marker	 = "__END__";
 	std::string full_cmd = cmd + "\necho " + marker + "$?\n";
@@ -165,7 +165,7 @@ CommandResult Shell::send_command(BashSession& session, bool elevated, const std
 		int maxfd = std::max(session.stdout_fd, session.stderr_fd) + 1;
 
 		if (select(maxfd, &readfds, nullptr, nullptr, nullptr) == -1) {
-			logger->error("Error waiting for file descriptors: " + std::string(std::strerror(errno)));
+			logger->error("Error waiting for file descriptors: {}", strerror(errno));
 			break;
 		}
 
@@ -193,7 +193,7 @@ CommandResult Shell::send_command(BashSession& session, bool elevated, const std
 			}
 		}
 	}
-	logger->debug("Command finished with code " + std::to_string(exit_code));
+	logger->debug("Command finished with code {}", exit_code);
 
 	if (check && exit_code != 0) {
 		throw std::runtime_error("Command '" + cmd + "' finished with code " + std::to_string(exit_code));
@@ -229,10 +229,10 @@ pid_t Shell::launch_process(const char* command, char* const argv[], char* const
 		cmd_str = cmd_str + argv[i] + " ";
 	}
 
-	logger->debug("Launching process: " + cmd_str);
+	logger->debug("Launching process: {}", cmd_str);
 	pid_t pid = fork();
 	if (pid == -1) {
-		logger->error("Error on process launch: " + std::string(std::strerror(errno)));
+		logger->error("Error on process launch: {}", strerror(errno));
 		return -1;
 	}
 
@@ -240,22 +240,22 @@ pid_t Shell::launch_process(const char* command, char* const argv[], char* const
 		if (outFile.has_value() > 0) {
 			int fd = open(outFile.value().c_str(), O_WRONLY | O_CREAT | O_APPEND, 0644);
 			if (dup2(fd, STDOUT_FILENO) < 0) {
-				logger->error("Error redirecting stdout: " + std::string(std::strerror(errno)));
+				logger->error("Error redirecting stdout: {}", strerror(errno));
 				exit(EXIT_FAILURE);
 			}
 			if (dup2(fd, STDERR_FILENO) < 0) {
-				logger->error("Error redirecting stderr: " + std::string(std::strerror(errno)));
+				logger->error("Error redirecting stderr: {}", strerror(errno));
 				exit(EXIT_FAILURE);
 			}
 			close(fd);
 		}
 		prctl(PR_SET_PDEATHSIG, SIGTERM);
 		execve(command, argv, env);
-		logger->error("Error on process launch: " + std::string(std::strerror(errno)));
+		logger->error("Error on process launch: {}", std::strerror(errno));
 		_exit(1);
 	}
 
-	logger->debug("Launched with PID " + std::to_string(pid));
+	logger->debug("Launched with PID {}", pid);
 
 	return pid;
 }

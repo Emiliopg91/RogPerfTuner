@@ -211,7 +211,7 @@ void SteamService::onFirstGameRun(unsigned int gid, std::string name) {
 }
 
 void SteamService::saveGameConfig(uint gid, const GameEntry& entry) {
-	logger->info("Saving configuration for '" + entry.name + "' (" + std::to_string(gid) + ")");
+	logger->info("Saving configuration for '{}' ({})", entry.name, gid);
 	Logger::add_tab();
 
 	configuration.getConfiguration().games[gid] = entry;
@@ -221,7 +221,7 @@ void SteamService::saveGameConfig(uint gid, const GameEntry& entry) {
 }
 
 void SteamService::launchGame(const std::string& id) {
-	logger->info("Launching game with id " + id + "...");
+	logger->info("Launching game with id {}...", id);
 	Logger::add_tab();
 
 	shell.run_command("steam steam://rungameid/" + id);
@@ -276,7 +276,7 @@ void SteamService::installRccDC() {
 			rccdcEnabled = false;
 		}
 	} catch (std::exception& e) {
-		logger->error("Error while installing RCCDeckyCompanion plugin: " + std::string(e.what()));
+		logger->error("Error while installing RCCDeckyCompanion plugin: {}", e.what());
 	}
 }
 
@@ -300,14 +300,14 @@ void SteamService::copyPlugin() {
 
 void SteamService::installPipDeps() {
 	auto depStr = StringUtils::join(Constants::RCCDC_REQUIRED_PIP, " ");
-	logger->info("Installing PIP dependencies " + depStr);
+	logger->info("Installing PIP dependencies {}", depStr);
 	Logger::add_tab();
 	pipClient.installPackage(depStr);
 	Logger::rem_tab();
 }
 
 void SteamService::onGameLaunch(unsigned int gid, std::string name, int pid) {
-	logger->info("Launched '" + name + "' (" + std::to_string(gid) + ") with PID " + std::to_string(pid));
+	logger->info("Launched '{}' () with PID {}", name, gid, pid);
 	Logger::add_tab();
 
 	auto it = configuration.getConfiguration().games.find(gid);
@@ -322,11 +322,11 @@ void SteamService::onGameLaunch(unsigned int gid, std::string name, int pid) {
 			signaled	= newSignaled;
 			newSignaled = ProcessUtils::sendSignalToHierarchy(pid, SIGSTOP);
 
-			logger->debug("Stopped " + std::to_string(newSignaled.size()) + " processes, before " + std::to_string(signaled.size()));
+			logger->debug("Stopped {} processes, before {}", newSignaled.size(), signaled.size());
 
 			TimeUtils::sleep(100);
 		} while (signaled != newSignaled);
-		logger->debug("Killed " + std::to_string(ProcessUtils::sendSignalToHierarchy(pid, SIGKILL).size()) + " processes");
+		logger->debug("Killed {} processes", ProcessUtils::sendSignalToHierarchy(pid, SIGKILL).size());
 
 		Logger::rem_tab();
 
@@ -347,7 +347,7 @@ void SteamService::onGameLaunch(unsigned int gid, std::string name, int pid) {
 void SteamService::onGameStop(unsigned int gid, std::string name) {
 	auto it = runningGames.find(gid);
 	if (it != runningGames.end()) {
-		logger->info("Stopped '" + name + "' (" + std::to_string(gid) + ")");
+		logger->info("Stopped '' ({})", name, gid);
 		runningGames.erase(gid);
 		Logger::add_tab();
 
@@ -472,7 +472,7 @@ const SteamGameConfig SteamService::getConfiguration(const std::string& id) {
 
 		auto level = getEffective(gameEntry.metrics_level);
 		if (level != gameEntry.metrics_level) {
-			logger->warn("Metrics level " + toName(gameEntry.metrics_level) + " downgraded to " + toName(level));
+			logger->warn("Metrics level {} downgraded to {}", toName(gameEntry.metrics_level), toName(level));
 		}
 		if (whichMangohud.has_value() && level != MangoHudLevel::NO_DISPLAY) {
 			cfg.environment["MANGOHUD_CONFIG"] = "preset=" + std::to_string(toInt(level));
@@ -488,7 +488,7 @@ const SteamGameConfig SteamService::getConfiguration(const std::string& id) {
 			}
 		}
 	} else {
-		logger->error("No configuration entry found for " + id);
+		logger->error("No configuration entry found for {}", id);
 	}
 
 	return cfg;

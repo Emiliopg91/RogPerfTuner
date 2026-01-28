@@ -13,13 +13,13 @@
 
 void Configuration::loadConfig() {
 	if (FileUtils::exists(Constants::CONFIG_FILE)) {
-		logger->debug("Loading settings from '" + Constants::CONFIG_FILE + "'");
+		logger->debug("Loading settings from '{}'", Constants::CONFIG_FILE);
 		try {
 			auto node = YAML::LoadFile(Constants::CONFIG_FILE);
 			config	  = node.as<RootConfig>();
 			LoggerProvider::setConfigMap(config->logger);
 		} catch (const std::exception& e) {
-			logger->error("Error loading settings: " + std::string(e.what()));
+			logger->error("Error loading settings: {}", e.what());
 		}
 	} else {
 		logger->debug("Settings file not found, creating new");
@@ -47,7 +47,7 @@ void Configuration::saveConfig() {
 		fout << node;
 		fout.close();
 	} catch (const std::exception& e) {
-		logger->error("Error saving settings file: " + std::string(e.what()));
+		logger->error("Error saving settings file: {}", e.what());
 	}
 }
 
@@ -64,7 +64,7 @@ std::string Configuration::getPassword() {
 	loop.exec();
 
 	if (job.error()) {
-		logger->error("Error on password fetching: " + job.errorString().toStdString());
+		logger->error("Error on password fetching: {}", job.errorString().toStdString());
 		return "";
 	}
 

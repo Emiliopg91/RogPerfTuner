@@ -24,9 +24,9 @@ void AbstractEffect::start(const DeviceList& devices, const RgbBrightness& brigh
 	}
 
 	if (!_color.has_value()) {
-		logger->info("Starting effect '" + getName() + "' with " + StringUtils::toLowerCase(toName(brightness)) + " brightness");
+		logger->info("Starting effect {} with {} brightness", getName(), StringUtils::toLowerCase(toName(brightness)));
 	} else {
-		logger->info("Starting effect '" + getName() + "' with " + StringUtils::toLowerCase(toName(brightness)) + " brightness and color " +
+		logger->info("Starting effect {} with {} brightness and color ", getName(), StringUtils::toLowerCase(toName(brightness)),
 					 StringUtils::toUpperCase(_color.value().toHex()));
 	}
 	_brightness = toInt(brightness) / 100.0;

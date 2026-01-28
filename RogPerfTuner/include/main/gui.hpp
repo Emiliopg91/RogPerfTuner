@@ -78,9 +78,9 @@ inline int startGui(int argc, char** argv) {
 	title			  = StringUtils::rightPad(title, 49);
 
 	logger->info("###################################################");
-	logger->info("#" + title + "#");
+	logger->info("#{}#", title);
 	logger->info("###################################################");
-	logger->info("Version " + Constants::APP_VERSION);
+	logger->info("Version {}", Constants::APP_VERSION);
 #ifdef DEV_MODE
 	logger->info("Starting initialization in dev mode");
 #else
@@ -118,7 +118,7 @@ inline int startGui(int argc, char** argv) {
 
 	auto t1 = TimeUtils::now();
 
-	logger->info("Application ready after " + TimeUtils::format_seconds(TimeUtils::getTimeDiff(t0, t1)) + " seconds");
+	logger->info("Application ready after {} seconds", TimeUtils::format_seconds(TimeUtils::getTimeDiff(t0, t1)));
 
 #ifdef AUR_HELPER
 	applicationService.startUpdateCheck();

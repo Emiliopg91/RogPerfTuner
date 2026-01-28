@@ -41,11 +41,11 @@ inline int run_command(std::shared_ptr<Logger> logger, const std::vector<std::st
 	for (auto& arg : args) {
 		ss << arg << " ";
 	}
-	logger->info(">>> Replacing current process with: '" + StringUtils::trim(ss.str()) + "'");
+	logger->info(">>> Replacing current process with: '{}'", StringUtils::trim(ss.str()));
 
 	int fd = open((Constants::LOG_DIR + "/" + Constants::LOG_RUNNER_FILE_NAME + ".log").c_str(), O_WRONLY | O_CREAT | O_APPEND, 0644);
 	if (fd == -1) {
-		logger->error("Cannot open log file: " + std::string(std::strerror(errno)));
+		logger->error("Cannot open log file: ", std::strerror(errno));
 		return errno;
 	}
 
@@ -55,7 +55,7 @@ inline int run_command(std::shared_ptr<Logger> logger, const std::vector<std::st
 
 	execvp(argv[0], argv.data());
 
-	logger->error("Error on execvp: " + std::string(std::strerror(errno)));
+	logger->error("Error on execvp: {}", std::strerror(errno));
 	return errno;
 }
 
@@ -106,7 +106,7 @@ inline int runSteamWrapping(int argc, char* argv[]) {
 
 	auto cmdWhichResult = shell.whichAll(std::string(argv[1]));
 	if (cmdWhichResult.empty()) {
-		logger->error("Command " + std::string(argv[1]) + " not found");
+		logger->error("Command {} not found", std::string(argv[1]));
 		exit(127);
 	}
 	std::string finalCommandStr = StringUtils::trim(cmdWhichResult[0]);
@@ -141,7 +141,7 @@ inline int runSteamWrapping(int argc, char* argv[]) {
 			logger->warn("No AppId provided");
 		}
 	} catch (std::exception& e) {
-		logger->error("Error requesting configuration " + std::string(e.what()));
+		logger->error("Error requesting configuration {}", e.what());
 	}
 
 	std::optional<std::string> bin = std::string(argv[argc - 1]);

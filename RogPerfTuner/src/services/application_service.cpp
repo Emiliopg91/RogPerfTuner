@@ -115,11 +115,11 @@ void ApplicationService::setAutostart(bool enabled) {
 	if (enabled) {
 		if (!FileUtils::exists(Constants::AUTOSTART_FILE)) {
 			FileUtils::writeFileContent(Constants::AUTOSTART_FILE, buildDesktopFile());
-			logger->info("Autostart file '" + Constants::AUTOSTART_FILE + "' written successfully");
+			logger->info("Autostart file '{}' written successfully", Constants::AUTOSTART_FILE);
 		}
 	} else {
 		FileUtils::remove(Constants::AUTOSTART_FILE);
-		logger->info("Autostart file '" + Constants::AUTOSTART_FILE + "' deleted successfully");
+		logger->info("Autostart file '{}' deleted successfully", Constants::AUTOSTART_FILE);
 	}
 }
 
@@ -153,7 +153,7 @@ void ApplicationService::lookForUpdates() {
 			auto latestVersion = SemanticVersion::parse(version);
 
 			if (latestVersion > currentVersion) {
-				logger->info("New version available: " + version);
+				logger->info("New version available: {}", version);
 				toaster.showToast(translator.translate("update.available", {{"version", version}}));
 				eventBus.emitUpdateAvailable(version);
 				found = true;
@@ -161,7 +161,7 @@ void ApplicationService::lookForUpdates() {
 				break;
 			}
 		} catch (std::exception& e) {
-			logger->error("Error on update check: " + std::string(e.what()));
+			logger->error("Error on update check: {}", e.what());
 		}
 
 		if (!found) {

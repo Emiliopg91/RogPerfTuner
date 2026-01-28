@@ -16,6 +16,9 @@
 #include "utils/logger/sink/console_sink.hpp"
 #include "utils/logger/sink/file_sink.hpp"
 
+template <typename... Args>
+using format_string_t = std::format_string<Args...>;
+
 class Logger {
   public:
 	/**
@@ -49,6 +52,18 @@ class Logger {
 	void debug(std::string format);
 
 	/**
+	 * @brief  Send debug log line
+	 *
+	 * @tparam Args
+	 * @param fmt
+	 * @param args
+	 */
+	template <typename... Args>
+	void debug(format_string_t<Args...> fmt, Args&&... args) {
+		debug(std::format(fmt, std::forward<Args>(args)...));
+	}
+
+	/**
 	 * @brief  Send info log line
 	 *
 	 * @tparam Args
@@ -56,6 +71,18 @@ class Logger {
 	 * @param args
 	 */
 	void info(std::string format);
+
+	/**
+	 * @brief  Send info log line
+	 *
+	 * @tparam Args
+	 * @param fmt
+	 * @param args
+	 */
+	template <typename... Args>
+	void info(format_string_t<Args...> fmt, Args&&... args) {
+		info(std::format(fmt, std::forward<Args>(args)...));
+	}
 
 	/**
 	 * @brief  Send warning log line
@@ -67,6 +94,18 @@ class Logger {
 	void warn(std::string format);
 
 	/**
+	 * @brief  Send warn log line
+	 *
+	 * @tparam Args
+	 * @param fmt
+	 * @param args
+	 */
+	template <typename... Args>
+	void warn(format_string_t<Args...> fmt, Args&&... args) {
+		warn(std::format(fmt, std::forward<Args>(args)...));
+	}
+
+	/**
 	 * @brief  Send error log line
 	 *
 	 * @tparam Args
@@ -76,6 +115,18 @@ class Logger {
 	void error(std::string format);
 
 	/**
+	 * @brief  Send error log line
+	 *
+	 * @tparam Args
+	 * @param fmt
+	 * @param args
+	 */
+	template <typename... Args>
+	void error(format_string_t<Args...> fmt, Args&&... args) {
+		error(std::format(fmt, std::forward<Args>(args)...));
+	}
+
+	/**
 	 * @brief  Send critical log line
 	 *
 	 * @tparam Args
@@ -83,6 +134,18 @@ class Logger {
 	 * @param args
 	 */
 	void critical(std::string format);
+
+	/**
+	 * @brief  Send critical log line
+	 *
+	 * @tparam Args
+	 * @param fmt
+	 * @param args
+	 */
+	template <typename... Args>
+	void critical(format_string_t<Args...> fmt, Args&&... args) {
+		critical(std::format(fmt, std::forward<Args>(args)...));
+	}
 
 	static void add_tab();
 

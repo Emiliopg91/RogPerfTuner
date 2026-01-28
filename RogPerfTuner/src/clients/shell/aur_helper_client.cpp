@@ -6,7 +6,7 @@
 #include "utils/time_utils.hpp"
 
 AurHelperClient::AurHelperClient() : AbstractCmdClient(AUR_HELPER, "AurHelperClient", false) {
-	logger->info("Using AUR helper " + std::string(AUR_HELPER));
+	logger->info("Using AUR helper {}", AUR_HELPER);
 }
 
 std::string AurHelperClient::getVersion(std::string package) {

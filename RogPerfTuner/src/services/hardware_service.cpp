@@ -205,7 +205,7 @@ BatteryThreshold HardwareService::getChargeThreshold() {
 void HardwareService::setChargeThreshold(const BatteryThreshold& threshold) {
 	std::lock_guard<std::mutex> lock(actionMutex);
 	if (charge_limit != threshold) {
-		logger->info("Setting charge limit to " + std::to_string(toInt(threshold)) + "%");
+		logger->info("Setting charge limit to {}%", toInt(threshold));
 		auto t0 = TimeUtils::now();
 		batteryChargeLimitClient.setChargeLimit(threshold);
 		auto t1 = TimeUtils::now();
@@ -214,7 +214,7 @@ void HardwareService::setChargeThreshold(const BatteryThreshold& threshold) {
 		configuration.getConfiguration().platform.chargeLimit = threshold;
 		configuration.saveConfig();
 
-		logger->info("Charge limit setted after " + TimeUtils::format_seconds(TimeUtils::getTimeDiff(t0, t1)) + " seconds");
+		logger->info("Charge limit setted after {} seconds", TimeUtils::format_seconds(TimeUtils::getTimeDiff(t0, t1)));
 
 		toaster.showToast(translator.translate("applied.battery.threshold", {{"value", std::to_string(toInt(threshold))}}));
 		eventBus.emitChargeThreshold(threshold);
@@ -230,7 +230,7 @@ void HardwareService::onBatteryEvent(const bool& onBat, const bool& muted) {
 		if (!muted) {
 			std::string t1 = onBattery ? "un" : "";
 			std::string t2 = !onBattery ? "dis" : "";
-			logger->info("AC " + t1 + "plugged, battery " + t2 + "engaged");
+			logger->info("AC {}plugged, battery {}engaged", t1, t2);
 			Logger::add_tab();
 		}
 		eventBus.emitBattery(onBat);
@@ -242,7 +242,7 @@ void HardwareService::onBatteryEvent(const bool& onBat, const bool& muted) {
 
 void HardwareService::setPanelOverdrive(const bool& enable) {
 	if (panelOverdriveClient.available()) {
-		logger->info("Panel Overdrive: " + std::string(enable ? "Enabled" : "Disabled"));
+		logger->info("Panel Overdrive: {}", enable ? "Enabled" : "Disabled");
 		Logger::add_tab();
 		try {
 			panelOverdriveClient.setCurrentValue(enable);
@@ -303,12 +303,12 @@ void HardwareService::setBootSound(bool enable) {
 	}
 
 	std::lock_guard<std::mutex> lock(actionMutex);
-	logger->info("Setting boot sound: " + std::string(enable ? "Enabled" : "Disabled"));
+	logger->info("Setting boot sound: {}", enable ? "Enabled" : "Disabled");
 	Logger::add_tab();
 	auto t0 = TimeUtils::now();
 	bootSoundClient.setCurrentValue(enable);
 	auto t1 = TimeUtils::now();
 	Logger::rem_tab();
-	logger->info("Boot sound setted after " + TimeUtils::format_seconds(TimeUtils::getTimeDiff(t0, t1)) + " seconds");
+	logger->info("Boot sound setted after {} seconds", TimeUtils::format_seconds(TimeUtils::getTimeDiff(t0, t1)));
 	eventBus.emitBootSound(enable);
 }

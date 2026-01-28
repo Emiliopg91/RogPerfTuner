@@ -10,7 +10,7 @@ void CurlClient::download(std::string url, std::string dst) {
 
 	auto ret = run_command("-L -f -s -o \"" + dst + "\" \"" + url + "\"").exit_code;
 	if (ret != 0) {
-		logger->error("Failed to download " + url + " (exit code " + std::to_string(ret) + ")");
+		logger->error("Failed to download {} (exit code {})", url, ret);
 		Logger::rem_tab();
 		throw std::runtime_error("Curl download failed: " + std::to_string(ret));
 	}

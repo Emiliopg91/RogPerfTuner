@@ -12,7 +12,7 @@ AbstractCmdClient::AbstractCmdClient(const std::string& command, const std::stri
 			throw std::runtime_error("Command " + command_ + " not available");
 		}
 
-		logger->error("Command " + command_ + " not available");
+		logger->error("Command {} not available", command);
 		available_ = false;
 	}
 }

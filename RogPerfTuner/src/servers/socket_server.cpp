@@ -38,7 +38,7 @@ SocketServer::SocketServer() : Loggable("SocketServer") {
 		stop();
 	});
 
-	logger->info("Socket server started on " + Constants::SOCKET_FILE);
+	logger->info("Socket server started on {}", Constants::SOCKET_FILE);
 	Logger::rem_tab();
 }
 
@@ -83,7 +83,7 @@ void SocketServer::run() {
 	unlink(Constants::SOCKET_FILE.c_str());
 
 	if (bind(server_fd, (struct sockaddr*)&addr, sizeof(addr)) < 0) {
-		logger->error("Failed to bind socket: " + std::string(strerror(errno)));
+		logger->error("Failed to bind socket: {}", strerror(errno));
 		close(server_fd);
 		return;
 	}
@@ -98,7 +98,7 @@ void SocketServer::run() {
 		int client_fd = accept(server_fd, nullptr, nullptr);
 		if (client_fd < 0) {
 			if (started.load()) {
-				logger->error("Accept failed: " + std::string(strerror(errno)));
+				logger->error("Accept failed: {}", strerror(errno));
 			}
 			continue;
 		}
@@ -121,7 +121,7 @@ void SocketServer::handleClient(int client_fd) {
 
 		uint32_t msg_len = ntohl(msg_len_net);
 		if (msg_len == 0 || msg_len > 10 * 1024 * 1024) {
-			logger->error("Invalid message length: " + std::to_string(msg_len));
+			logger->error("Invalid message length: {}", msg_len);
 			break;
 		}
 
@@ -147,7 +147,7 @@ void SocketServer::handleClient(int client_fd) {
 				handleRequest(client_fd, req);
 			}
 		} catch (const std::exception& e) {
-			logger->error("YAML parse error: " + std::string(e.what()));
+			logger->error("YAML parse error: {}", e.what());
 		}
 		Logger::rem_tab();
 	}
@@ -189,7 +189,7 @@ void SocketServer::handleRequest(const int& clientFd, const CommunicationMessage
 			res.error = "No such method";
 		}
 	} catch (std::exception& e) {
-		logger->error("Error on request handling: " + std::string(e.what()));
+		logger->error("Error on request handling: {}", e.what());
 		res.error = e.what();
 	}
 
