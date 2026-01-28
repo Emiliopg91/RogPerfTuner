@@ -1,12 +1,12 @@
-#include "../../include/utils/single_instance.hpp"
+#include "utils/single_instance.hpp"
 
 #include <signal.h>
 
 #include <fstream>
 #include <iostream>
 
-#include "../../include/utils/constants.hpp"
-#include "../../include/utils/file_utils.hpp"
+#include "utils/constants.hpp"
+#include "utils/file_utils.hpp"
 
 void SingleInstance::acquire() {
 	killRunningInstance();

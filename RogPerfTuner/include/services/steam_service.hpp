@@ -2,13 +2,13 @@
 
 #include <optional>
 
-#include "../clients/shell/pip_client.hpp"
-#include "../clients/unix_socket/steam_client.hpp"
-#include "../models/steam/steam_game_config.hpp"
-#include "../utils/configuration/configuration.hpp"
-#include "./hardware_service.hpp"
-#include "./open_rgb_service.hpp"
-#include "./performance_service.hpp"
+#include "clients/shell/pip_client.hpp"
+#include "clients/unix_socket/steam_client.hpp"
+#include "models/steam/steam_game_config.hpp"
+#include "services/hardware_service.hpp"
+#include "services/open_rgb_service.hpp"
+#include "services/performance_service.hpp"
+#include "utils/configuration/configuration.hpp"
 
 class SteamService : public Singleton<SteamService>, Loggable {
   private:
@@ -42,7 +42,6 @@ class SteamService : public Singleton<SteamService>, Loggable {
 	void installPipDeps();
 	std::optional<std::string> getImagePath(uint gid, std::string sufix);
 	bool checkIfRequiredInstallation();
-	std::string encodeAppId(uint32_t appid);
 
   public:
 	/**

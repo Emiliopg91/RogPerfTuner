@@ -1,7 +1,7 @@
 #pragma once
 
-#include "../../../../models/others/singleton.hpp"
-#include "abstract/abstract_effect.hpp"
+#include "clients/tcp/open_rgb/effects/abstract/abstract_effect.hpp"
+#include "models/others/singleton.hpp"
 
 class BreathingEffect : public AbstractEffect, public Singleton<BreathingEffect> {
   public:

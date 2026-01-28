@@ -1,4 +1,4 @@
-#include "../../../../../include/clients/tcp/open_rgb/effects/breathing_effect.hpp"
+#include "clients/tcp/open_rgb/effects/breathing_effect.hpp"
 
 #include <math.h>
 

@@ -1,14 +1,14 @@
-#include "../../../../../../include/clients/tcp/open_rgb/effects/abstract/abstract_effect.hpp"
+#include "clients/tcp/open_rgb/effects/abstract/abstract_effect.hpp"
 
 #include <mutex>
 #include <optional>
 #include <string>
 #include <thread>
 
-#include "../../../../../../include/models/hardware/rgb_brightness.hpp"
-#include "../../../../../../include/utils/enum_utils.hpp"
-#include "../../../../../../include/utils/string_utils.hpp"
-#include "../../../../../../include/utils/time_utils.hpp"
+#include "models/hardware/rgb_brightness.hpp"
+#include "utils/enum_utils.hpp"
+#include "utils/string_utils.hpp"
+#include "utils/time_utils.hpp"
 
 void AbstractEffect::start(const DeviceList& devices, const RgbBrightness& brightness) {
 	if (_is_running) {

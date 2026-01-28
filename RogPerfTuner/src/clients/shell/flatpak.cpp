@@ -1,4 +1,4 @@
-#include "../../../include/clients/shell/flatpak.hpp"
+#include "clients/shell/flatpak.hpp"
 
 bool FlatpakClient::checkInstalled(const std::string& name, bool userland) {
 	std::string args = "info ";

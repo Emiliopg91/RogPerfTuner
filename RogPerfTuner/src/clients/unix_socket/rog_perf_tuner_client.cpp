@@ -1,8 +1,8 @@
-#include "../../../include/clients/unix_socket/rog_perf_tuner_client.hpp"
+#include "clients/unix_socket/rog_perf_tuner_client.hpp"
 
 #include <any>
 
-#include "../../../include/utils/constants.hpp"
+#include "utils/constants.hpp"
 
 RogPerfTunerClient::RogPerfTunerClient() : AbstractUnixSocketClient(Constants::SOCKET_FILE, "RogPerfTunerClient") {
 }

@@ -1,9 +1,9 @@
-#include "../../../include/models/hardware/fan_curve_data.hpp"
+#include "models/hardware/fan_curve_data.hpp"
 
 #include <regex>
 #include <sstream>
 
-#include "../../../include/utils/string_utils.hpp"
+#include "utils/string_utils.hpp"
 
 std::unordered_map<std::string, FanCurveData> FanCurveData::parseCurves(std::string input) {
 	std::unordered_map<std::string, FanCurveData> result;

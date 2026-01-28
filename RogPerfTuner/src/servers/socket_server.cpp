@@ -1,4 +1,4 @@
-#include "../../include/servers/socket_server.hpp"
+#include "servers/socket_server.hpp"
 
 #include <arpa/inet.h>
 #include <fcntl.h>
@@ -11,7 +11,7 @@
 #include <filesystem>
 #include <string>
 
-#include "../../include/utils/file_utils.hpp"
+#include "utils/file_utils.hpp"
 
 SocketServer::SocketServer() : Loggable("SocketServer") {
 	logger->info("Initializing socket server");

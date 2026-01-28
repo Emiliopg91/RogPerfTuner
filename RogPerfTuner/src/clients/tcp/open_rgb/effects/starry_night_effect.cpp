@@ -1,4 +1,4 @@
-#include "../../../../../include/clients/tcp/open_rgb/effects/starry_night_effect.hpp"
+#include "clients/tcp/open_rgb/effects/starry_night_effect.hpp"
 
 #include <random>
 

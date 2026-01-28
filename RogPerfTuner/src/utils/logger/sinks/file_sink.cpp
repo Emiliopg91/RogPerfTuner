@@ -1,4 +1,4 @@
-#include "../../../../include/utils/logger/sink/file_sink.hpp"
+#include "utils/logger/sink/file_sink.hpp"
 
 #include <stdexcept>
 

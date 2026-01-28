@@ -1,10 +1,10 @@
-#include "../../../include/utils/logger/logger_provider.hpp"
+#include "utils/logger/logger_provider.hpp"
 
 #include <filesystem>
 
-#include "../../../include/utils/enum_utils.hpp"
-#include "../../../include/utils/file_utils.hpp"
-#include "../../../include/utils/string_utils.hpp"
+#include "utils/enum_utils.hpp"
+#include "utils/file_utils.hpp"
+#include "utils/string_utils.hpp"
 
 static std::string format_file_time(std::filesystem::file_time_type ftime) {
 	using namespace std::chrono;

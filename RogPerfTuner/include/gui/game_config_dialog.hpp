@@ -4,12 +4,12 @@
 #include <QFormLayout>
 #include <QGroupBox>
 
-#include "../gui/no_scroll_combo_box.hpp"
-#include "../services/hardware_service.hpp"
-#include "../services/steam_service.hpp"
-#include "../utils/configuration/configuration.hpp"
-#include "../utils/shell/shell.hpp"
-#include "../utils/translator/translator.hpp"
+#include "gui/no_scroll_combo_box.hpp"
+#include "services/hardware_service.hpp"
+#include "services/steam_service.hpp"
+#include "utils/configuration/configuration.hpp"
+#include "utils/shell/shell.hpp"
+#include "utils/translator/translator.hpp"
 
 class GameConfigDialog : public QDialog, Loggable {
 	Q_OBJECT

@@ -1,4 +1,4 @@
-#include "../../../../../include/clients/tcp/open_rgb/effects/rainbow_wave.hpp"
+#include "clients/tcp/open_rgb/effects/rainbow_wave.hpp"
 
 #include <math.h>
 

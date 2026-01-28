@@ -1,4 +1,4 @@
-#include "../../../include/models/hardware/rgb_brightness.hpp"
+#include "models/hardware/rgb_brightness.hpp"
 
 RgbBrightness getNextBrightness(RgbBrightness value) {
 	switch (value) {

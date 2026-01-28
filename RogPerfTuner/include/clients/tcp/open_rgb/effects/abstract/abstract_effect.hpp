@@ -5,9 +5,9 @@
 #include <string>
 #include <thread>
 
-#include "../../../../../models/hardware/rgb_brightness.hpp"
-#include "../../../../../models/others/loggable.hpp"
 #include "OpenRGB/Client.hpp"
+#include "models/hardware/rgb_brightness.hpp"
+#include "models/others/loggable.hpp"
 
 using orgb::Client;
 using orgb::Color;

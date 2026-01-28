@@ -12,9 +12,9 @@
 #include <mutex>
 #include <optional>
 
-#include "../../models/others/logger_level.hpp"
-#include "sink/console_sink.hpp"
-#include "sink/file_sink.hpp"
+#include "models/others/logger_level.hpp"
+#include "utils/logger/sink/console_sink.hpp"
+#include "utils/logger/sink/file_sink.hpp"
 
 class Logger {
   public:

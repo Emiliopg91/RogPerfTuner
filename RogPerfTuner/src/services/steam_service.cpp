@@ -1,4 +1,4 @@
-#include "../../include/services/steam_service.hpp"
+#include "services/steam_service.hpp"
 
 #include <QApplication>
 #include <cstdint>
@@ -7,22 +7,22 @@
 #include <string>
 #include <thread>
 
-#include "../../include/gui/game_config_dialog.hpp"
-#include "../../include/utils/configuration/configuration.hpp"
-#include "../../include/utils/events/event_bus.hpp"
+#include "gui/game_config_dialog.hpp"
+#include "utils/configuration/configuration.hpp"
+#include "utils/events/event_bus.hpp"
 #ifndef DEV_MODE
-#include "../../include/gui/yes_no_dialog.hpp"
+#include "gui/yes_no_dialog.hpp"
 #endif
-#include "../../include/models/others/semantic_version.hpp"
-#include "../../include/models/steam/steam_game_details.hpp"
-#include "../../include/services/hardware_service.hpp"
-#include "../../include/services/open_rgb_service.hpp"
-#include "../../include/services/performance_service.hpp"
-#include "../../include/utils/file_utils.hpp"
-#include "../../include/utils/net_utils.hpp"
-#include "../../include/utils/process_utils.hpp"
-#include "../../include/utils/string_utils.hpp"
-#include "../../include/utils/time_utils.hpp"
+#include "models/others/semantic_version.hpp"
+#include "models/steam/steam_game_details.hpp"
+#include "services/hardware_service.hpp"
+#include "services/open_rgb_service.hpp"
+#include "services/performance_service.hpp"
+#include "utils/file_utils.hpp"
+#include "utils/net_utils.hpp"
+#include "utils/process_utils.hpp"
+#include "utils/string_utils.hpp"
+#include "utils/time_utils.hpp"
 #include "yaml-cpp/node/node.h"
 #include "yaml-cpp/node/parse.h"
 
@@ -146,13 +146,14 @@ void SteamService::onFirstGameRun(unsigned int gid, std::string name) {
 		env = pure_env;
 	}
 
+	auto encodedAppId = std::to_string((static_cast<uint64_t>(gid) << 32) | 0x02000000ULL);
 	GameEntry entry{args,
 					env,
 					std::nullopt,
 					std::nullopt,
 					MangoHudLevel::NO_DISPLAY,
 					name,
-					details.is_shortcut ? std::optional<std::string>{encodeAppId(gid)} : std::nullopt,
+					details.is_shortcut ? std::optional<std::string>{encodedAppId} : std::nullopt,
 					!details.compat_tool.empty(),
 					ComputerType::COMPUTER,
 					WineSyncOption::AUTO,
@@ -491,10 +492,6 @@ const SteamGameConfig SteamService::getConfiguration(const std::string& id) {
 	}
 
 	return cfg;
-}
-
-std::string SteamService::encodeAppId(uint32_t appid) {
-	return std::to_string((static_cast<uint64_t>(appid) << 32) | 0x02000000ULL);
 }
 
 std::optional<std::string> SteamService::getImagePath(uint gid, std::string sufix) {

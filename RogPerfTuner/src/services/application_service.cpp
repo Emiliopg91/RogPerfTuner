@@ -1,4 +1,4 @@
-#include "../../include/services/application_service.hpp"
+#include "services/application_service.hpp"
 
 #include <signal.h>
 #include <unistd.h>
@@ -9,12 +9,12 @@
 #include <sstream>
 #include <vector>
 
-#include "../../include/models/others/release_entry.hpp"
-#include "../../include/models/others/semantic_version.hpp"
-#include "../../include/utils/events/event_bus.hpp"
-#include "../../include/utils/file_utils.hpp"
-#include "../../include/utils/net_utils.hpp"
-#include "../../include/utils/time_utils.hpp"
+#include "models/others/release_entry.hpp"
+#include "models/others/semantic_version.hpp"
+#include "utils/events/event_bus.hpp"
+#include "utils/file_utils.hpp"
+#include "utils/net_utils.hpp"
+#include "utils/time_utils.hpp"
 
 #ifdef DEV_MODE
 #endif

@@ -7,7 +7,7 @@
 #include <QGroupBox>
 #include <QTextBrowser>
 
-#include "../services/application_service.hpp"
+#include "services/application_service.hpp"
 
 class ChangelogView : public QDialog {
 	Q_OBJECT

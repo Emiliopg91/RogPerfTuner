@@ -1,4 +1,4 @@
-#include "../../include/gui/yes_no_dialog.hpp"
+#include "gui/yes_no_dialog.hpp"
 
 #include <qmessagebox.h>
 

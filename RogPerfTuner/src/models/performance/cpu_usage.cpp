@@ -1,4 +1,4 @@
-#include "../../../include/models/performance/cpu_usage.hpp"
+#include "models/performance/cpu_usage.hpp"
 
 long long CPUUsage::total() const {
 	return user + nice + system + idle + iowait + irq + softirq;

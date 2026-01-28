@@ -27,6 +27,11 @@ file(GLOB_RECURSE HEADERS_RCC
 
 add_executable(RogPerfTuner ${SOURCES_RCC} ${HEADERS_RCC})
 set_target_properties(RogPerfTuner PROPERTIES AUTOMOC ON)
+target_include_directories(
+    RogPerfTuner
+    PRIVATE
+        ${CMAKE_CURRENT_SOURCE_DIR}/include
+)
 target_link_libraries(RogPerfTuner PRIVATE 
     magic_enum
     Qt6::Core

@@ -1,12 +1,12 @@
-#include "../../../include/utils/logger/logger.hpp"
+#include "utils/logger/logger.hpp"
 
 #include <chrono>
 #include <ctime>
 #include <iomanip>
 #include <memory>
 
-#include "../../../include/utils/enum_utils.hpp"
-#include "../../../include/utils/string_utils.hpp"
+#include "utils/enum_utils.hpp"
+#include "utils/string_utils.hpp"
 
 void Logger::setLevel(std::string level) {
 	this->setLevel(fromName<LoggerLevel>(level));

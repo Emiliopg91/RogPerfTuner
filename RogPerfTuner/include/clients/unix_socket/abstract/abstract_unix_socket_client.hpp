@@ -6,9 +6,9 @@
 #include <queue>
 #include <unordered_map>
 
-#include "../../../models/others/communication_message.hpp"
-#include "../../../models/others/loggable.hpp"
-#include "../../../utils/events/event_bus.hpp"
+#include "models/others/communication_message.hpp"
+#include "models/others/loggable.hpp"
+#include "utils/events/event_bus.hpp"
 
 struct UnixMethodResponse {
 	CommunicationMessage data;

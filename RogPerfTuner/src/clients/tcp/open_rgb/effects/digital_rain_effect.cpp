@@ -1,4 +1,4 @@
-#include "../../../../../include/clients/tcp/open_rgb/effects/digital_rain_effect.hpp"
+#include "clients/tcp/open_rgb/effects/digital_rain_effect.hpp"
 
 #include <algorithm>
 #include <cmath>

@@ -1,4 +1,4 @@
-#include "../../include/gui/toaster.hpp"
+#include "gui/toaster.hpp"
 
 void Toaster::showToast(std::string message, bool can_be_hidden, std::string icon) {
 	if (notificationClient.available()) {

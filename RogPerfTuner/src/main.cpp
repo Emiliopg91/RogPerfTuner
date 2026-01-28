@@ -1,9 +1,9 @@
 #include <iostream>
 
-#include "../include/main/flatpak.hpp"
-#include "../include/main/gui.hpp"
-#include "../include/main/rgb.hpp"
-#include "../include/main/run.hpp"
+#include "main/flatpak.hpp"
+#include "main/gui.hpp"
+#include "main/rgb.hpp"
+#include "main/run.hpp"
 
 inline void shiftArgv(int& argc, char** argv) {
 	if (argc <= 2) {

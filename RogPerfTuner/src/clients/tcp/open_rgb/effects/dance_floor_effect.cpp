@@ -1,4 +1,4 @@
-#include "../../../../../include/clients/tcp/open_rgb/effects/dance_floor_effect.hpp"
+#include "clients/tcp/open_rgb/effects/dance_floor_effect.hpp"
 
 Color DanceFloorEffect::_get_random_color() {
 	std::uniform_int_distribution<int> hue_dist(0, 359);

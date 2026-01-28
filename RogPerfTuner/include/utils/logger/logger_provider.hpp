@@ -16,8 +16,8 @@
 #include <unordered_map>
 
 #include "logger.hpp"
-#include "sink/console_sink.hpp"
-#include "sink/file_sink.hpp"
+#include "utils/logger/sink/console_sink.hpp"
+#include "utils/logger/sink/file_sink.hpp"
 
 class LoggerProvider {
   public:

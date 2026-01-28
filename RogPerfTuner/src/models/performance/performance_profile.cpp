@@ -1,4 +1,4 @@
-#include "../../../include/models/performance/performance_profile.hpp"
+#include "models/performance/performance_profile.hpp"
 
 bool supportedOnBattery(PerformanceProfile value) {
 	return value == PerformanceProfile::QUIET;

@@ -1,23 +1,23 @@
-#include "../../include/services/hardware_service.hpp"
+#include "services/hardware_service.hpp"
 
 #include <exception>
 #include <string>
 
-#include "../../include/clients/dbus/linux/power_management_kb_brightness.hpp"
-#include "../../include/clients/dbus/linux/upower_client.hpp"
-#include "../../include/clients/file/boost_control_client.hpp"
-#include "../../include/clients/file/cpuinfo_client.hpp"
-#include "../../include/clients/lib/lsusb_client.hpp"
-#include "../../include/clients/shell/switcherooctl_client.hpp"
-#include "../../include/gui/toaster.hpp"
-#include "../../include/models/hardware/battery_charge_threshold.hpp"
-#include "../../include/models/hardware/gpu_brand.hpp"
-#include "../../include/services/open_rgb_service.hpp"
-#include "../../include/utils/events/event_bus.hpp"
-#include "../../include/utils/file_utils.hpp"
-#include "../../include/utils/string_utils.hpp"
-#include "../../include/utils/time_utils.hpp"
-#include "../../include/utils/translator/translator.hpp"
+#include "clients/dbus/linux/power_management_kb_brightness.hpp"
+#include "clients/dbus/linux/upower_client.hpp"
+#include "clients/file/boost_control_client.hpp"
+#include "clients/file/cpuinfo_client.hpp"
+#include "clients/lib/lsusb_client.hpp"
+#include "clients/shell/switcherooctl_client.hpp"
+#include "gui/toaster.hpp"
+#include "models/hardware/battery_charge_threshold.hpp"
+#include "models/hardware/gpu_brand.hpp"
+#include "services/open_rgb_service.hpp"
+#include "utils/events/event_bus.hpp"
+#include "utils/file_utils.hpp"
+#include "utils/string_utils.hpp"
+#include "utils/time_utils.hpp"
+#include "utils/translator/translator.hpp"
 
 HardwareService::HardwareService() : Loggable("HardwareService") {
 	logger->info("Initializing HardwareService");

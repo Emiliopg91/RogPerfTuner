@@ -1,4 +1,4 @@
-#include "../../../include/utils/configuration/configuration.hpp"
+#include "utils/configuration/configuration.hpp"
 
 #include <qobject.h>
 #include <qt6keychain/keychain.h>
@@ -7,9 +7,9 @@
 #include <fstream>
 #include <string>
 
-#include "../../../include/utils/constants.hpp"
-#include "../../../include/utils/file_utils.hpp"
-#include "../../../include/utils/logger/logger_provider.hpp"
+#include "utils/constants.hpp"
+#include "utils/file_utils.hpp"
+#include "utils/logger/logger_provider.hpp"
 
 void Configuration::loadConfig() {
 	if (FileUtils::exists(Constants::CONFIG_FILE)) {

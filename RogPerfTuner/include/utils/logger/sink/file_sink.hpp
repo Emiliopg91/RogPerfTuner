@@ -3,7 +3,7 @@
 #include <fstream>
 #include <string>
 
-#include "base/sink.hpp"
+#include "utils/logger/sink/base/sink.hpp"
 
 class FileSink : public Sink {
   public:

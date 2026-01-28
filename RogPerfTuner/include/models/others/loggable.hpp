@@ -1,7 +1,7 @@
 #pragma once
 #include <memory>
 
-#include "../../utils/logger/logger_provider.hpp"
+#include "utils/logger/logger_provider.hpp"
 
 class Loggable {
   public:

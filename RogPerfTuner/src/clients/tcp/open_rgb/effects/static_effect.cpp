@@ -1,4 +1,4 @@
-#include "../../../../../include/clients/tcp/open_rgb/effects/static_effect.hpp"
+#include "clients/tcp/open_rgb/effects/static_effect.hpp"
 
 void StaticEffect::apply_effect(const DeviceList& devices) {
 	for (auto& dev : devices) {

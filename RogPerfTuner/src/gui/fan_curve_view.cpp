@@ -1,4 +1,4 @@
-#include "../../include/gui/fan_curve_view.hpp"
+#include "gui/fan_curve_view.hpp"
 
 #include <qlineseries.h>
 #include <qnamespace.h>

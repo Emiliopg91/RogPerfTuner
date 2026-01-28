@@ -1,4 +1,4 @@
-#include "../../include/gui/changelog_view.hpp"
+#include "gui/changelog_view.hpp"
 
 #include <qnamespace.h>
 

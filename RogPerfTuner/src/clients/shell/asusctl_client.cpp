@@ -1,4 +1,4 @@
-#include "../../../include/clients/shell/asusctl_client.hpp"
+#include "clients/shell/asusctl_client.hpp"
 
 #include <unordered_map>
 

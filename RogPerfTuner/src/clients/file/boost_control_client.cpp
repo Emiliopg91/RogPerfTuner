@@ -1,6 +1,6 @@
-#include "../../../include/clients/file/boost_control_client.hpp"
+#include "clients/file/boost_control_client.hpp"
 
-#include "../../../include/utils/file_utils.hpp"
+#include "utils/file_utils.hpp"
 
 BoostControlClient::BoostControlClient() {
 	std::vector<std::unordered_map<std::string, std::string>> BOOST_CONTROLS = {

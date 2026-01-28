@@ -1,7 +1,7 @@
 #pragma once
 
-#include "../../../../../models/others/singleton.hpp"
-#include "../armoury_base_client.hpp"
+#include "clients/file/firmware/asus-armoury//armoury_base_client.hpp"
+#include "models/others/singleton.hpp"
 
 class BootSoundClient : public ArmouryBaseClient, public Singleton<BootSoundClient> {
   private:

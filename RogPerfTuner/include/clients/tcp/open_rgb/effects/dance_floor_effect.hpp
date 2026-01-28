@@ -3,8 +3,8 @@
 #include <random>
 #include <vector>
 
-#include "../../../../models/others/singleton.hpp"
-#include "abstract/abstract_effect.hpp"
+#include "clients/tcp/open_rgb/effects/abstract/abstract_effect.hpp"
+#include "models/others/singleton.hpp"
 
 class DanceFloorEffect : public AbstractEffect, public Singleton<DanceFloorEffect> {
   private:

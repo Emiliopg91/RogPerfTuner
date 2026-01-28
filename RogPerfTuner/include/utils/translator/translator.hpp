@@ -4,9 +4,9 @@
 #include <string>
 #include <unordered_map>
 
-#include "../../models/others/loggable.hpp"
-#include "../../models/others/singleton.hpp"
-#include "../../models/translator/language.hpp"
+#include "models/others/loggable.hpp"
+#include "models/others/singleton.hpp"
+#include "models/translator/language.hpp"
 
 class Translator : public Singleton<Translator>, Loggable {
   public:

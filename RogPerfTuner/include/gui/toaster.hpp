@@ -1,9 +1,9 @@
 #pragma once
 #include <string>
 
-#include "../clients/dbus/linux/notifications_client.hpp"
-#include "../utils/constants.hpp"
-#include "../utils/translator/translator.hpp"
+#include "clients/dbus/linux/notifications_client.hpp"
+#include "utils/constants.hpp"
+#include "utils/translator/translator.hpp"
 
 class Toaster : public Singleton<Toaster> {
   public:

@@ -1,4 +1,4 @@
-#include "../../../../../include/clients/tcp/open_rgb/effects/drops_effect.hpp"
+#include "clients/tcp/open_rgb/effects/drops_effect.hpp"
 
 void DropsEffect::apply_effect(const DeviceList& devices) {
 	_buffer.clear();

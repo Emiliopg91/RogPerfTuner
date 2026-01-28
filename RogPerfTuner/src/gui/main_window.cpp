@@ -1,4 +1,4 @@
-#include "../../include/gui/main_window.hpp"
+#include "gui/main_window.hpp"
 
 #include <qcombobox.h>
 #include <qcontainerfwd.h>
@@ -15,11 +15,11 @@
 #include <algorithm>
 #include <optional>
 
-#include "../../include/gui/changelog_view.hpp"
-#include "../../include/gui/fan_curve_editor.hpp"
-#include "../../include/gui/game_list.hpp"
-#include "../../include/utils/string_utils.hpp"
 #include "OpenRGB/Color.hpp"
+#include "gui/changelog_view.hpp"
+#include "gui/fan_curve_editor.hpp"
+#include "gui/game_list.hpp"
+#include "utils/string_utils.hpp"
 
 MainWindow::MainWindow(QWidget* parent) : QMainWindow(parent), _logger(LoggerProvider::getLogger("MainWindow")) {
 	onBattery	 = uPowerClient.isOnBattery();

@@ -1,4 +1,4 @@
-#include "../../../include/models/performance/platform_profile.hpp"
+#include "models/performance/platform_profile.hpp"
 
 std::string formatValue(PlatformProfile profile) {
 	switch (profile) {

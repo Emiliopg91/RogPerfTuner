@@ -1,7 +1,7 @@
 #pragma once
 
-#include "../models/others/loggable.hpp"
-#include "../models/others/singleton.hpp"
+#include "models/others/loggable.hpp"
+#include "models/others/singleton.hpp"
 
 class SingleInstance : public Singleton<SingleInstance>, Loggable {
   public:

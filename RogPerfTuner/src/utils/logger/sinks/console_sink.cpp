@@ -1,4 +1,4 @@
-#include "../../../../include/utils/logger/sink/console_sink.hpp"
+#include "utils/logger/sink/console_sink.hpp"
 
 #include <iostream>
 

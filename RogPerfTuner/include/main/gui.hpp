@@ -6,22 +6,22 @@
 #include <iostream>
 #include <string>
 
-#include "../gui/password_dialog.hpp"
-#include "../gui/toaster.hpp"
-#include "../gui/tray_icon.hpp"
-#include "../servers/socket_server.hpp"
-#include "../services/application_service.hpp"
-#include "../services/hardware_service.hpp"
-#include "../services/open_rgb_service.hpp"
-#include "../services/performance_service.hpp"
-#include "../services/steam_service.hpp"
-#include "../utils/configuration/configuration.hpp"
-#include "../utils/constants.hpp"
-#include "../utils/logger/logger_provider.hpp"
-#include "../utils/single_instance.hpp"
-#include "../utils/string_utils.hpp"
-#include "../utils/time_utils.hpp"
-#include "../utils/translator/translator.hpp"
+#include "gui/password_dialog.hpp"
+#include "gui/toaster.hpp"
+#include "gui/tray_icon.hpp"
+#include "servers/socket_server.hpp"
+#include "services/application_service.hpp"
+#include "services/hardware_service.hpp"
+#include "services/open_rgb_service.hpp"
+#include "services/performance_service.hpp"
+#include "services/steam_service.hpp"
+#include "utils/configuration/configuration.hpp"
+#include "utils/constants.hpp"
+#include "utils/logger/logger_provider.hpp"
+#include "utils/single_instance.hpp"
+#include "utils/string_utils.hpp"
+#include "utils/time_utils.hpp"
+#include "utils/translator/translator.hpp"
 
 inline void terminateHandler() {
 	std::cerr << "Unhandled exception detected\n";

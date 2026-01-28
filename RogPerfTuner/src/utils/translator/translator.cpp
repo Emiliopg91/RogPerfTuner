@@ -1,13 +1,13 @@
 
-#include "../../../include/utils/translator/translator.hpp"
+#include "utils/translator/translator.hpp"
 
 #include <yaml-cpp/yaml.h>
 
 #include <string>
 
-#include "../../../include/utils/constants.hpp"
-#include "../../../include/utils/enum_utils.hpp"
-#include "../../../include/utils/string_utils.hpp"
+#include "utils/constants.hpp"
+#include "utils/enum_utils.hpp"
+#include "utils/string_utils.hpp"
 
 Translator::Translator() : Loggable("Translator") {
 	currentLang = [this]() -> Language {

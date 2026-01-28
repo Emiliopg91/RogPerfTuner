@@ -1,8 +1,8 @@
 #pragma once
 
-#include "../../../../models/others/singleton.hpp"
-#include "../../../../models/performance/platform_profile.hpp"
-#include "../asus_base_client.hpp"
+#include "clients/dbus/asus/asus_base_client.hpp"
+#include "models/others/singleton.hpp"
+#include "models/performance/platform_profile.hpp"
 
 class PlatformClient : public AsusBaseClient, public Singleton<PlatformClient> {
   public:

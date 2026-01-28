@@ -1,4 +1,4 @@
-#include "../../../../include/clients/unix_socket/abstract/abstract_unix_socket_client.hpp"
+#include "clients/unix_socket/abstract/abstract_unix_socket_client.hpp"
 
 #include <arpa/inet.h>
 #include <execinfo.h>
@@ -12,8 +12,8 @@
 #include <string>
 #include <thread>
 
-#include "../../../../include/utils/string_utils.hpp"
-#include "../../../../include/utils/time_utils.hpp"
+#include "utils/string_utils.hpp"
+#include "utils/time_utils.hpp"
 
 AbstractUnixSocketClient::AbstractUnixSocketClient(const std::string& path, const std::string& name) : Loggable(name), path(path), name(name) {
 	signal(SIGPIPE, SIG_IGN);

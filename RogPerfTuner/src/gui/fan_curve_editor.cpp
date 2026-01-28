@@ -1,11 +1,11 @@
-#include "../../include/gui/fan_curve_editor.hpp"
+#include "gui/fan_curve_editor.hpp"
 
 #include <QPoint>
 #include <QtCharts>
 #include <unordered_map>
 
-#include "../../include/utils/constants.hpp"
-#include "../../include/utils/string_utils.hpp"
+#include "utils/constants.hpp"
+#include "utils/string_utils.hpp"
 
 CurveEditor::CurveEditor(const std::string& profile, QWidget* parent) : QDialog(parent), profile(profile) {
 	setWindowModality(Qt::WindowModal);

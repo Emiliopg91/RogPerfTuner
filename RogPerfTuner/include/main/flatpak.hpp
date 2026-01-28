@@ -9,11 +9,11 @@
 #include <sstream>
 #include <string>
 
-#include "../clients/shell/flatpak.hpp"
-#include "../utils/constants.hpp"
-#include "../utils/file_utils.hpp"
-#include "../utils/logger/logger_provider.hpp"
-#include "../utils/shell/shell.hpp"
+#include "clients/shell/flatpak.hpp"
+#include "utils/constants.hpp"
+#include "utils/file_utils.hpp"
+#include "utils/logger/logger_provider.hpp"
+#include "utils/shell/shell.hpp"
 
 inline int runFlatpakWrapping(int argc, char* argv[]) {
 	LoggerProvider::initialize();

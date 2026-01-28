@@ -7,7 +7,7 @@
 #include <memory>
 #include <stdexcept>
 
-#include "../../../utils/events/event_bus.hpp"
+#include "utils/events/event_bus.hpp"
 
 class AbstractDbusClient : public QObject {
 	Q_OBJECT

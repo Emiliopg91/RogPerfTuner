@@ -1,25 +1,25 @@
-#include "../../../../include/clients/tcp/open_rgb/open_rgb_client.hpp"
+#include "clients/tcp/open_rgb/open_rgb_client.hpp"
 
 #include <string>
 #include <vector>
 
-#include "../../../../include/clients/shell/asusctl_client.hpp"
-#include "../../../../include/clients/tcp/open_rgb/effects/breathing_effect.hpp"
-#include "../../../../include/clients/tcp/open_rgb/effects/dance_floor_effect.hpp"
-#include "../../../../include/clients/tcp/open_rgb/effects/digital_rain_effect.hpp"
-#include "../../../../include/clients/tcp/open_rgb/effects/drops_effect.hpp"
-#include "../../../../include/clients/tcp/open_rgb/effects/gaming.hpp"
-#include "../../../../include/clients/tcp/open_rgb/effects/rainbow_wave.hpp"
-#include "../../../../include/clients/tcp/open_rgb/effects/spectrum_cycle_effect.hpp"
-#include "../../../../include/clients/tcp/open_rgb/effects/starry_night_effect.hpp"
-#include "../../../../include/clients/tcp/open_rgb/effects/static_effect.hpp"
-#include "../../../../include/models/hardware/rgb_brightness.hpp"
-#include "../../../../include/utils/events/event_bus.hpp"
-#include "../../../../include/utils/file_utils.hpp"
-#include "../../../../include/utils/net_utils.hpp"
-#include "../../../../include/utils/process_utils.hpp"
-#include "../../../../include/utils/string_utils.hpp"
-#include "../../../../include/utils/time_utils.hpp"
+#include "clients/shell/asusctl_client.hpp"
+#include "clients/tcp/open_rgb/effects/breathing_effect.hpp"
+#include "clients/tcp/open_rgb/effects/dance_floor_effect.hpp"
+#include "clients/tcp/open_rgb/effects/digital_rain_effect.hpp"
+#include "clients/tcp/open_rgb/effects/drops_effect.hpp"
+#include "clients/tcp/open_rgb/effects/gaming.hpp"
+#include "clients/tcp/open_rgb/effects/rainbow_wave.hpp"
+#include "clients/tcp/open_rgb/effects/spectrum_cycle_effect.hpp"
+#include "clients/tcp/open_rgb/effects/starry_night_effect.hpp"
+#include "clients/tcp/open_rgb/effects/static_effect.hpp"
+#include "models/hardware/rgb_brightness.hpp"
+#include "utils/events/event_bus.hpp"
+#include "utils/file_utils.hpp"
+#include "utils/net_utils.hpp"
+#include "utils/process_utils.hpp"
+#include "utils/string_utils.hpp"
+#include "utils/time_utils.hpp"
 
 void OpenRgbClient::initialize() {
 	logger->info("Reading UDEV files");

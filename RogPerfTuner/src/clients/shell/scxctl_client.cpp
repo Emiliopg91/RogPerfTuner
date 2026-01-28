@@ -1,8 +1,8 @@
-#include "../../../include/clients/shell/scxctl_client.hpp"
+#include "clients/shell/scxctl_client.hpp"
 
 #include <optional>
 
-#include "../../../include/utils/string_utils.hpp"
+#include "utils/string_utils.hpp"
 
 ScxCtlClient::ScxCtlClient() : AbstractCmdClient("scxctl", "ScxCtlClient") {
 	if (available()) {

@@ -1,4 +1,4 @@
-#include "../../../../include/clients/dbus/linux/power_management_kb_brightness.hpp"
+#include "clients/dbus/linux/power_management_kb_brightness.hpp"
 
 int PMKeyboardBrightness::getKeyboardBrightness() {
 	return call<int>("keyboardBrightness");

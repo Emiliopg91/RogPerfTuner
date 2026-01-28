@@ -1,4 +1,4 @@
-#include "../../include/utils/file_utils.hpp"
+#include "utils/file_utils.hpp"
 
 #include <sys/stat.h>
 
@@ -9,7 +9,7 @@
 #include <sstream>
 #include <string>
 
-#include "../../include/utils/constants.hpp"
+#include "utils/constants.hpp"
 
 std::filesystem::path FileUtils::expandPath(const std::string& path) {
 	std::filesystem::path p = path;

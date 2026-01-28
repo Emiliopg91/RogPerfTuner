@@ -1,4 +1,4 @@
-#include "../../../../../include/clients/tcp/open_rgb/effects/spectrum_cycle_effect.hpp"
+#include "clients/tcp/open_rgb/effects/spectrum_cycle_effect.hpp"
 
 void SpectrumCycleEffect::apply_effect(const DeviceList& devices) {
 	int offset = 0;

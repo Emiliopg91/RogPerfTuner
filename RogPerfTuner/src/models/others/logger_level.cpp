@@ -1,4 +1,4 @@
-#include "../../../include/models/others/logger_level.hpp"
+#include "models/others/logger_level.hpp"
 
 const char* colorCode(LoggerLevel level) {
 	switch (level) {

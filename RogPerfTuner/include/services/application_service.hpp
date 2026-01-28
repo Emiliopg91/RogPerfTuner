@@ -3,13 +3,13 @@
 #include <thread>
 
 #ifdef AUR_HELPER
-#include "../clients/shell/aur_helper_client.hpp"
+#include "clients/shell/aur_helper_client.hpp"
 #endif
 
-#include "../services/steam_service.hpp"
-#include "../utils/events/event_bus.hpp"
-#include "../utils/translator/translator.hpp"
-#include "performance_service.hpp"
+#include "services/performance_service.hpp"
+#include "services/steam_service.hpp"
+#include "utils/events/event_bus.hpp"
+#include "utils/translator/translator.hpp"
 
 class ApplicationService : public Singleton<ApplicationService>, Loggable {
   public:

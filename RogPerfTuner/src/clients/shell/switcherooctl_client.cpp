@@ -1,4 +1,4 @@
-#include "../../../include/clients/shell/switcherooctl_client.hpp"
+#include "clients/shell/switcherooctl_client.hpp"
 
 #include <sstream>
 

@@ -1,8 +1,8 @@
 #pragma once
 
-#include "../../../models/others/singleton.hpp"
-#include "../../../models/performance/power_profile.hpp"
-#include "../abstract/abstract_dbus_client.hpp"
+#include "clients/dbus/abstract/abstract_dbus_client.hpp"
+#include "models/others/singleton.hpp"
+#include "models/performance/power_profile.hpp"
 
 class PowerProfileClient : public AbstractDbusClient, public Singleton<PowerProfileClient> {
   public:

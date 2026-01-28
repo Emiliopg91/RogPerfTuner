@@ -8,9 +8,9 @@
 #include <tuple>
 #include <vector>
 
-#include "../../models/hardware/usb_identifier.hpp"
-#include "../../models/others/singleton.hpp"
-#include "../../utils/events/event_bus.hpp"
+#include "models/hardware/usb_identifier.hpp"
+#include "models/others/singleton.hpp"
+#include "utils/events/event_bus.hpp"
 
 class LsUsbClient : public Singleton<LsUsbClient> {
   private:

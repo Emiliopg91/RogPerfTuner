@@ -1,4 +1,4 @@
-#include "../../include/gui/game_list.hpp"
+#include "gui/game_list.hpp"
 
 #include <qcontainerfwd.h>
 #include <qnamespace.h>
@@ -10,8 +10,8 @@
 #include <QTableWidget>
 #include <optional>
 
-#include "../../include/gui/game_config_dialog.hpp"
-#include "../../include/utils/constants.hpp"
+#include "gui/game_config_dialog.hpp"
+#include "utils/constants.hpp"
 
 GameList::GameList(QWidget* parent, bool manage_parent) : QDialog(parent), manageParent(manage_parent), parentWidget(parent) {
 	if (!INSTANCE) {

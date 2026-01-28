@@ -1,11 +1,11 @@
-#include "../../include/gui/password_dialog.hpp"
+#include "gui/password_dialog.hpp"
 
 #include <QMessageBox>
 #include <QProcess>
 #include <QVBoxLayout>
 
-#include "../../include/utils/configuration/configuration.hpp"
-#include "../../include/utils/translator/translator.hpp"
+#include "utils/configuration/configuration.hpp"
+#include "utils/translator/translator.hpp"
 
 bool PasswordDialog::showDialog() {
 	if (exec() == QDialog::Accepted) {

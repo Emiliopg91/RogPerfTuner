@@ -2,7 +2,7 @@
 
 #include <yaml-cpp/yaml.h>
 
-#include "../../utils/constants.hpp"
+#include "utils/constants.hpp"
 
 struct Application {
 	bool askedInstallRccdc		= false;

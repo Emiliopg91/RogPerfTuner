@@ -1,4 +1,4 @@
-#include "../../include/gui/tray_icon.hpp"
+#include "gui/tray_icon.hpp"
 
 #include <qaction.h>
 #include <qcolordialog.h>
@@ -10,9 +10,9 @@
 #include <array>
 #include <optional>
 
-#include "../../include/gui/fan_curve_editor.hpp"
-#include "../../include/gui/game_list.hpp"
-#include "../../include/utils/string_utils.hpp"
+#include "gui/fan_curve_editor.hpp"
+#include "gui/game_list.hpp"
+#include "utils/string_utils.hpp"
 
 void TrayIcon::openMainWindow() {
 	mainWindow.show();

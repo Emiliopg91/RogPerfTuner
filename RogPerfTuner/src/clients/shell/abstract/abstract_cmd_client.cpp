@@ -1,9 +1,9 @@
-#include "../../../../include/clients/shell/abstract/abstract_cmd_client.hpp"
+#include "clients/shell/abstract/abstract_cmd_client.hpp"
 
 #include <cstdlib>
 #include <stdexcept>
 
-#include "../../../../include/utils/string_utils.hpp"
+#include "utils/string_utils.hpp"
 
 AbstractCmdClient::AbstractCmdClient(const std::string& command, const std::string& name, const bool& required)
 	: Loggable(name), command_(command), available_(true) {

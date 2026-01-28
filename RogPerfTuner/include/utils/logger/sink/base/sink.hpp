@@ -2,7 +2,7 @@
 
 #include <string>
 
-#include "../../../../models/others/logger_level.hpp"
+#include "models/others/logger_level.hpp"
 
 class Sink {
   public:

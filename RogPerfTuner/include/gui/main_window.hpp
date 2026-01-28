@@ -8,16 +8,16 @@
 #include <QMainWindow>
 #include <QPushButton>
 
-#include "../models/hardware/battery_charge_threshold.hpp"
-#include "../models/hardware/rgb_brightness.hpp"
-#include "../models/performance/performance_profile.hpp"
-#include "../services/application_service.hpp"
-#include "../services/hardware_service.hpp"
-#include "../services/open_rgb_service.hpp"
-#include "../services/performance_service.hpp"
-#include "../services/steam_service.hpp"
-#include "../utils/events/event_bus.hpp"
-#include "../utils/translator/translator.hpp"
+#include "models/hardware/battery_charge_threshold.hpp"
+#include "models/hardware/rgb_brightness.hpp"
+#include "models/performance/performance_profile.hpp"
+#include "services/application_service.hpp"
+#include "services/hardware_service.hpp"
+#include "services/open_rgb_service.hpp"
+#include "services/performance_service.hpp"
+#include "services/steam_service.hpp"
+#include "utils/events/event_bus.hpp"
+#include "utils/translator/translator.hpp"
 
 class MainWindow : public QMainWindow, public Singleton<MainWindow> {
 	Q_OBJECT

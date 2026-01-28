@@ -1,5 +1,5 @@
 
-#include "../../../../include/clients/dbus/abstract/abstract_dbus_client.hpp"
+#include "clients/dbus/abstract/abstract_dbus_client.hpp"
 
 #include <QtDBus/QDBusMessage>
 #include <QtDBus/QDBusReply>

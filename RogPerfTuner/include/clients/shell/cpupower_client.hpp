@@ -2,9 +2,9 @@
 
 #include <string>
 
-#include "../../models/others/singleton.hpp"
-#include "../../models/performance/cpu_governor.hpp"
-#include "./abstract/abstract_cmd_client.hpp"
+#include "clients/shell/abstract/abstract_cmd_client.hpp"
+#include "models/others/singleton.hpp"
+#include "models/performance/cpu_governor.hpp"
 
 class CpuPowerClient : public AbstractCmdClient, public Singleton<CpuPowerClient> {
   private:

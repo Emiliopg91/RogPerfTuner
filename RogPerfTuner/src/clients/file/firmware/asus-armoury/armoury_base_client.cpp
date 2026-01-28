@@ -1,10 +1,10 @@
-#include "../../../../../include/clients/file/firmware/asus-armoury/armoury_base_client.hpp"
+#include "clients/file/firmware/asus-armoury/armoury_base_client.hpp"
 
 #include <stdexcept>
 #include <string>
 
-#include "../../../../../include/utils/file_utils.hpp"
-#include "../../../../../include/utils/string_utils.hpp"
+#include "utils/file_utils.hpp"
+#include "utils/string_utils.hpp"
 
 ArmouryBaseClient::ArmouryBaseClient(std::string attribute, bool required)
 	: AbstractFileClient("/sys/class/firmware-attributes/asus-armoury/attributes/" + attribute + "/current_value", attribute, true, required),

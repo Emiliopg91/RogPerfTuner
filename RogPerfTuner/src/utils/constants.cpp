@@ -1,10 +1,10 @@
-#include "../../include/utils/constants.hpp"
+#include "utils/constants.hpp"
 
 #include <limits.h>
 #include <unistd.h>
 
 #ifdef DEV_MODE
-#include "../../include/utils/file_utils.hpp"
+#include "utils/file_utils.hpp"
 #endif
 
 const pid_t Constants::PID = getpid();

@@ -1,17 +1,17 @@
-#include "../../include/services/performance_service.hpp"
+#include "services/performance_service.hpp"
 
 #include <optional>
 #include <string>
 
-#include "../../include/models/performance/cpu_governor.hpp"
-#include "../../include/models/performance/power_profile.hpp"
-#include "../../include/utils/configuration/configuration.hpp"
-#include "../../include/utils/enum_utils.hpp"
-#include "../../include/utils/events/event_bus.hpp"
-#include "../../include/utils/file_utils.hpp"
-#include "../../include/utils/process_utils.hpp"
-#include "../../include/utils/string_utils.hpp"
-#include "../../include/utils/time_utils.hpp"
+#include "models/performance/cpu_governor.hpp"
+#include "models/performance/power_profile.hpp"
+#include "utils/configuration/configuration.hpp"
+#include "utils/enum_utils.hpp"
+#include "utils/events/event_bus.hpp"
+#include "utils/file_utils.hpp"
+#include "utils/process_utils.hpp"
+#include "utils/string_utils.hpp"
+#include "utils/time_utils.hpp"
 
 int8_t PerformanceService::CPU_PRIORITY = -17;
 uint8_t PerformanceService::IO_PRIORITY = (CPU_PRIORITY + 20) / 5;

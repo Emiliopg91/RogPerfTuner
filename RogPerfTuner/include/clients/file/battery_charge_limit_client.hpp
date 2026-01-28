@@ -1,8 +1,8 @@
 #pragma once
 
-#include "../../models/hardware/battery_charge_threshold.hpp"
-#include "../../models/others/singleton.hpp"
-#include "abstract/abstract_file_client.hpp"
+#include "clients/file/abstract/abstract_file_client.hpp"
+#include "models/hardware/battery_charge_threshold.hpp"
+#include "models/others/singleton.hpp"
 
 class BatteryChargeLimitClient : public AbstractFileClient, public Singleton<BatteryChargeLimitClient> {
   private:

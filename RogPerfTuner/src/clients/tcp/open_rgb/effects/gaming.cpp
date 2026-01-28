@@ -1,4 +1,4 @@
-#include "../../../../../include/clients/tcp/open_rgb/effects/gaming.hpp"
+#include "clients/tcp/open_rgb/effects/gaming.hpp"
 
 const Color GamingEffect::MAIN_COLOR = Color::fromRgb("#000040");
 

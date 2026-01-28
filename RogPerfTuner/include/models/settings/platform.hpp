@@ -2,9 +2,9 @@
 
 #include <yaml-cpp/yaml.h>
 
-#include "../hardware/battery_charge_threshold.hpp"
-#include "fan_curve.hpp"
-#include "performance.hpp"
+#include "models/hardware/battery_charge_threshold.hpp"
+#include "models/settings/fan_curve.hpp"
+#include "models/settings/performance.hpp"
 
 struct Platform {
 	Performance performance										  = Performance{};

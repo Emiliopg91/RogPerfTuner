@@ -1,6 +1,6 @@
 #pragma once
 
-#include "base/sink.hpp"
+#include "utils/logger/sink/base/sink.hpp"
 
 class ConsoleSink : public Sink {
   public:

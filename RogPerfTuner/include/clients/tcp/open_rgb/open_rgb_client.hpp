@@ -1,11 +1,11 @@
 #pragma once
 
-#include "../../../clients/shell/asusctl_client.hpp"
-#include "../../../models/hardware/usb_identifier.hpp"
-#include "../../../utils/constants.hpp"
-#include "../../../utils/events/event_bus.hpp"
 #include "OpenRGB/Client.hpp"
-#include "effects/abstract/abstract_effect.hpp"
+#include "clients/shell/asusctl_client.hpp"
+#include "clients/tcp/open_rgb/effects/abstract/abstract_effect.hpp"
+#include "models/hardware/usb_identifier.hpp"
+#include "utils/constants.hpp"
+#include "utils/events/event_bus.hpp"
 
 class OpenRgbClient : public Singleton<OpenRgbClient>, Loggable {
   public:

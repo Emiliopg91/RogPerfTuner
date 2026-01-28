@@ -1,7 +1,7 @@
 #pragma once
 
-#include "../performance/platform_profile.hpp"
-#include "../performance/power_profile.hpp"
+#include "models/performance/platform_profile.hpp"
+#include "models/performance/power_profile.hpp"
 
 enum class PerformanceProfile { PERFORMANCE, BALANCED, QUIET };
 

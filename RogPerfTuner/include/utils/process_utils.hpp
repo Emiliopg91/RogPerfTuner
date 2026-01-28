@@ -4,7 +4,7 @@
 
 #include <set>
 
-#include "../utils/shell/shell.hpp"
+#include "utils/shell/shell.hpp"
 
 class ProcessUtils {
   private:

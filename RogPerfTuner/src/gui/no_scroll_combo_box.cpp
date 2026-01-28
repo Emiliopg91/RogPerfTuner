@@ -1,4 +1,4 @@
-#include "../../include/gui/no_scroll_combo_box.hpp"
+#include "gui/no_scroll_combo_box.hpp"
 
 NoScrollComboBox::NoScrollComboBox(QWidget* parent) : QComboBox(parent) {
 }

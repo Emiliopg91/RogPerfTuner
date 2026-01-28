@@ -1,4 +1,4 @@
-#include "../../include/gui/game_config_dialog.hpp"
+#include "gui/game_config_dialog.hpp"
 
 #include <qcontainerfwd.h>
 
@@ -8,8 +8,8 @@
 #include <QPushButton>
 #include <optional>
 
-#include "../../include/gui/yes_no_dialog.hpp"
-#include "../../include/utils/string_utils.hpp"
+#include "gui/yes_no_dialog.hpp"
+#include "utils/string_utils.hpp"
 
 GameConfigDialog::GameConfigDialog(unsigned int gid, bool runAfterSave, QWidget* parent)
 	: Loggable("GameConfigDialog"), QDialog(parent), gid(gid), runAfterSave(runAfterSave) {
