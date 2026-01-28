@@ -1,4 +1,6 @@
 - version: 4.10.8-1
+  improvements:
+    - Refactor
   fixes:
     - Fallback DETAILED in MangoHud
 
