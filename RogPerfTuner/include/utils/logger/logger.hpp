@@ -40,7 +40,7 @@ class Logger {
 	 *
 	 * @param name
 	 */
-	Logger(std::shared_ptr<ConsoleSink> consoleSink, std::optional<std::shared_ptr<FileSink>> fileSink, std::string name = "Default");
+	Logger(std::shared_ptr<ConsoleSink> consoleSink, std::optional<std::shared_ptr<FileSink>> fileSink, std::string name);
 
 	/**
 	 * @brief  Send debug log line

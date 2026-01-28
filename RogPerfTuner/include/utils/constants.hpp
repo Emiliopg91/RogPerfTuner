@@ -94,4 +94,5 @@ class Constants {
 	static const std::string CHANGELOG_URL;
 
 	static const std::string APICOUNT_TOKEN;
+	static const std::string DEFAULT_LOGGER_NAME;
 };

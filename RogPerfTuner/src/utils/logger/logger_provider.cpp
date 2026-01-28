@@ -2,6 +2,7 @@
 
 #include <filesystem>
 
+#include "utils/constants.hpp"
 #include "utils/enum_utils.hpp"
 #include "utils/file_utils.hpp"
 #include "utils/string_utils.hpp"
@@ -83,7 +84,7 @@ void LoggerProvider::initialize(std::string fileName, std::string path) {
 
 		file_sink = std::make_shared<FileSink>(path + "/" + fileName + ".log");
 	}
-	auto main_logger = std::make_shared<Logger>(console_sink, file_sink, "Default");
+	auto main_logger = std::make_shared<Logger>(console_sink, file_sink, Constants::DEFAULT_LOGGER_NAME);
 	if (getenv("RCC_LOG_LEVEL")) {
 		defaultLevel = fromName<LoggerLevel>(StringUtils::toLowerCase(getenv("RCC_LOG_LEVEL")));
 	}
@@ -115,6 +116,9 @@ void LoggerProvider::setConfigMap(std::map<std::string, LoggerLevel> configMap) 
 		auto it = LoggerProvider::loggers.find(key);
 		if (it != LoggerProvider::loggers.end()) {
 			it->second->setLevel(level);
+		}
+		if (key == Constants::DEFAULT_LOGGER_NAME) {
+			defaultLevel = level;
 		}
 	}
 }

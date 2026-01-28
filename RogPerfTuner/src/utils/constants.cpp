@@ -89,3 +89,5 @@ const std::string Constants::LOGGER_PATTERN = "[%Y-%m-%d %H:%M:%S.%e][%-7l][%n] 
 const std::string Constants::CHANGELOG_URL = "https://github.com/Emiliopg91/RogPerfTuner/raw/refs/heads/main/changelog.yaml";
 
 const std::string Constants::APICOUNT_TOKEN = "ut_B44NTa3SW6lTAmxIbaGo2yMLpqg9FU4uqk40YCHO";
+
+const std::string Constants::DEFAULT_LOGGER_NAME = "Default";

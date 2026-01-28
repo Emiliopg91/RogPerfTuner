@@ -16,6 +16,7 @@
 #include <unordered_map>
 
 #include "logger.hpp"
+#include "utils/constants.hpp"
 #include "utils/logger/sink/console_sink.hpp"
 #include "utils/logger/sink/file_sink.hpp"
 
@@ -35,7 +36,7 @@ class LoggerProvider {
 	 * @param name
 	 * @return std::shared_ptr<spdlog::logger>
 	 */
-	static std::shared_ptr<Logger> getLogger(const std::string& name = "Default");
+	static std::shared_ptr<Logger> getLogger(const std::string& name = Constants::DEFAULT_LOGGER_NAME);
 
 	/**
 	 * @brief Set the Config Map object

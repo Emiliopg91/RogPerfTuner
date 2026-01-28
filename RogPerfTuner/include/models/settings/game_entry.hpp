@@ -102,16 +102,8 @@ struct convert<GameEntry> {
 			game.proton = node["proton"].as<bool>();
 		}
 
-		if (node["computer"]) {
-			game.device = fromString<ComputerType>(node["computer"].as<std::string>());
-		} else {
-			if (node["steamdeck"]) {
-				game.device = node["steamdeck"].as<bool>() ? ComputerType::STEAM_DECK : GameEntry::DEFAULT_DEVICE;
-			} else {
-				if (node["device"]) {
-					game.device = fromString<ComputerType>(node["device"].as<std::string>());
-				}
-			}
+		if (node["device"]) {
+			game.device = fromString<ComputerType>(node["device"].as<std::string>());
 		}
 
 		if (node["sync"]) {

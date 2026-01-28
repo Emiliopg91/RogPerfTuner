@@ -22,11 +22,7 @@ struct convert<FanCurve> {
 		if (node["current"]) {
 			fanCurve.current = node["current"].as<std::string>();
 		}
-		if (node["factory"]) {
-			fanCurve.presets = node["factory"].as<std::string>();
-		} else {
-			fanCurve.presets = node["presets"].as<std::string>();
-		}
+		fanCurve.presets = node["presets"].as<std::string>();
 		return true;
 	}
 };

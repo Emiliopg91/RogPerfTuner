@@ -29,7 +29,7 @@ struct convert<RootConfig> {
 
 		node["games"] = config.games;
 
-		Node loggerNode;
+		YAML::Node loggerNode(YAML::NodeType::Map);
 		if (!config.logger.empty()) {
 			for (const auto& [key, level] : config.logger) {
 				loggerNode[key] = toName(level);

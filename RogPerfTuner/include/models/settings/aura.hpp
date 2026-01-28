@@ -37,16 +37,10 @@ struct convert<Aura> {
 
 		if (node["config"]) {
 			aura.config = node["config"].as<std::map<std::string, EffectConfig>>();
-		} else if (node["effects"]) {
-			aura.config = node["effects"].as<std::map<std::string, EffectConfig>>();
 		}
 
-		if (node["effect"] && !node["effect"].IsNull()) {
+		if (node["effect"]) {
 			aura.last_effect = node["effect"].as<std::string>();
-		} else if (node["last_effect"] && !node["last_effect"].IsNull()) {
-			aura.last_effect = node["last_effect"].as<std::string>();
-		} else {
-			aura.last_effect = std::nullopt;
 		}
 
 		return true;
