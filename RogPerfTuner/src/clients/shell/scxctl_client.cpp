@@ -22,10 +22,10 @@ ScxCtlClient::ScxCtlClient() : AbstractCmdClient("scxctl", "ScxCtlClient") {
 		Logger::add_tab();
 		auto output = run_command("list").stdout_str;
 		std::vector<std::string> schedulers;
-		for (auto entry : all) {
-			if (StringUtils::isSubstring("\"" + entry[0] + "\"", output)) {
-				available_sched[entry[0]] = entry[1];
-				schedulers.emplace_back(entry[0]);
+		for (auto [sched, params] : all) {
+			if (StringUtils::isSubstring("\"" + sched + "\"", output)) {
+				available_sched[sched] = params;
+				schedulers.emplace_back(sched);
 			}
 		}
 		logger->info(StringUtils::join(schedulers, ", "));

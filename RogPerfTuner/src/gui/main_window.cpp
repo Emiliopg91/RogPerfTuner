@@ -159,8 +159,7 @@ MainWindow::MainWindow(QWidget* parent) : QMainWindow(parent) {
 	// -------------------------
 	_brightnessDropdown = new QComboBox();
 	_brightnessDropdown->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Preferred);
-	auto brightnesses = values<RgbBrightness>(true);
-	for (RgbBrightness b : brightnesses) {
+	for (RgbBrightness b : values<RgbBrightness, true>()) {
 		_brightnessDropdown->addItem(("  " + translator.translate("label.brightness." + toName(b))).c_str(), toInt(b));
 	}
 	_brightnessDropdown->setCurrentIndex(_brightnessDropdown->findData(toInt(openRgbService.getCurrentBrightness())));
@@ -210,8 +209,7 @@ MainWindow::MainWindow(QWidget* parent) : QMainWindow(parent) {
 		if (hardwareService.getBatteryLimitAvailable()) {
 			_thresholdDropdown = new QComboBox();
 			_thresholdDropdown->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Preferred);
-			auto thresholds = values<BatteryThreshold>(true);
-			for (BatteryThreshold t : thresholds) {
+			for (BatteryThreshold t : values<BatteryThreshold, true>()) {
 				const auto intVal = toInt(t);
 				_thresholdDropdown->addItem("  " + QString::number(intVal) + "%", intVal);
 			}

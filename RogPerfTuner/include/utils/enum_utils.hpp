@@ -1,7 +1,7 @@
 #pragma once
 
-#include <algorithm>
 #include <magic_enum.hpp>
+#include <ranges>
 #include <string>
 #include <type_traits>
 #include <unordered_map>
@@ -14,17 +14,17 @@ concept EnumClass = std::is_enum_v<T>;
 template <typename T>
 concept EnumClassInt = EnumClass<T> && std::is_same_v<std::underlying_type_t<T>, int>;
 
-template <EnumClass E>
-auto values(const bool& reversed = false) {
-	auto v = magic_enum::enum_values<E>();
-	if (reversed) {
-		std::reverse(v.begin(), v.end());
+template <EnumClass E, bool Reversed = false>
+constexpr auto values() {
+	if constexpr (Reversed) {
+		return magic_enum::enum_values<E>() | std::views::reverse;
+	} else {
+		return magic_enum::enum_values<E>();
 	}
-	return v;
 }
 
 template <EnumClass E>
-std::string toName(const E& e) {
+constexpr std::string toName(const E& e) {
 	return std::string(magic_enum::enum_name<E>(e));
 }
 
@@ -37,7 +37,7 @@ E fromName(const std::string& s) {
 }
 
 template <EnumClass E>
-std::string toString(const E& e, const std::unordered_map<std::string, std::string>& replacement = {}) {
+constexpr std::string toString(const E& e, const std::unordered_map<std::string, std::string>& replacement = {}) {
 	auto v = StringUtils::toLowerCase(toName(e));
 
 	for (const auto& [key, value] : replacement) {
@@ -66,7 +66,7 @@ E fromString(const std::string& s, const std::unordered_map<std::string, std::st
 }
 
 template <EnumClassInt E>
-int toInt(const E& e) {
+constexpr int toInt(const E& e) {
 	return static_cast<std::underlying_type_t<E>>(e);
 }
 

@@ -189,7 +189,7 @@ TrayIcon::TrayIcon()
 		if (hardwareService.getBatteryLimitAvailable()) {
 			QMenu* chargeLimitMenu	  = new QMenu(("    " + translator.translate("charge.threshold")).c_str(), menu);
 			QActionGroup* chargeGroup = new QActionGroup(menu);
-			for (BatteryThreshold bct : values<BatteryThreshold>(true)) {
+			for (BatteryThreshold bct : values<BatteryThreshold, true>()) {
 				QAction* act = new QAction((std::to_string(toInt(bct)) + "%").c_str(), chargeGroup);
 				act->setCheckable(true);
 				act->setChecked(bct == hardwareService.getChargeThreshold());
@@ -278,7 +278,7 @@ TrayIcon::TrayIcon()
 	// -------------------------
 	QMenu* brightnessMenu		  = new QMenu(("    " + translator.translate("brightness")).c_str(), menu);
 	QActionGroup* brightnessGroup = new QActionGroup(menu);
-	auto levels					  = values<RgbBrightness>(true);
+	auto levels					  = values<RgbBrightness, true>();
 	for (RgbBrightness item : levels) {
 		QAction* act = new QAction(translator.translate("label.brightness." + toName(item)).c_str(), brightnessGroup);
 		act->setCheckable(true);
