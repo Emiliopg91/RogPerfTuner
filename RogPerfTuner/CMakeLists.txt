@@ -27,22 +27,20 @@ file(GLOB_RECURSE HEADERS_RCC
 
 add_executable(RogPerfTuner ${SOURCES_RCC} ${HEADERS_RCC})
 set_target_properties(RogPerfTuner PROPERTIES AUTOMOC ON)
-target_include_directories(
-    RogPerfTuner
-    PRIVATE
-        ${CMAKE_CURRENT_SOURCE_DIR}/include
+target_include_directories(RogPerfTuner PRIVATE
+    "${CMAKE_CURRENT_SOURCE_DIR}/include"
 )
 target_link_libraries(RogPerfTuner PRIVATE 
     magic_enum
+    orgbsdk
+    qt6keychain
     Qt6::Core
     Qt6::Gui
     Qt6::Widgets
     Qt6::DBus
     Qt6::Charts
-    yaml-cpp::yaml-cpp
-    qt6keychain
-    orgbsdk
     udev
+    yaml-cpp::yaml-cpp
 )
 
 if(DEV_MODE)
