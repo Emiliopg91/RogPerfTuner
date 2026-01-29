@@ -89,30 +89,6 @@ build_rccdc:
 	    cd submodules/RccDeckyCompanion && ./cli/decky.py build && mkdir -p ../../build/assets && cp -r out/RccDeckyCompanion ../../build/assets/RccDeckyCompanion; \
 	fi
 
-package:
-	@echo "#######################################################################"
-	@echo "####################### Generating Dist folder ########################"
-	@echo "#######################################################################"
-	@mkdir dist dist/RogPerfTuner
-	@cp ./build/RogPerfTuner/RogPerfTuner dist/RogPerfTuner
-	@cp -r build/assets dist/RogPerfTuner
-
-	@echo "#######################################################################"
-	@echo "######################### Generating AppImage #########################"
-	@echo "#######################################################################"
-	@rm -rf dist/appimage-fs
-	@mkdir -p dist/appimage-fs dist/appimage-fs/usr/bin dist/appimage-fs/usr/share/rog-perf-tuner
-	@cp dist/RogPerfTuner/RogPerfTuner dist/appimage-fs/usr/bin/rog-perf-tuner
-	@cp -r dist/RogPerfTuner/assets/* dist/appimage-fs/usr/share/rog-perf-tuner
-	@cp resources/AppRun dist/appimage-fs/
-	@cp resources/RogPerfTuner.desktop dist/appimage-fs/rog-perf-tuner.desktop
-	@cp build/assets/icons/icon.svg dist/appimage-fs/icon.svg
-	@chmod 777 -R resources/appimagetool dist/appimage-fs
-	@rm dist/appimage-fs/usr/share/rog-perf-tuner/OpenRGB/usr/lib/*.so*
-	@chmod 777 -R dist
-	@ARCH=x86_64 VERSION=$$(cat resources/version) ./resources/appimagetool --comp zstd -u "gh-releases-zsync|Emiliopg91|RogPerfTuner|latest|RogPerfTuner.AppImage.zsync" -n dist/appimage-fs dist/RogPerfTuner.AppImage
-	@mv RogPerfTuner.AppImage.zsync dist
-
 
 pkgbuild:
 	@export BUILD_TYPE=Release

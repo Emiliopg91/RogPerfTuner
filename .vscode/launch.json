@@ -11,7 +11,6 @@
             "preLaunchTask": "CMake Build",
             "console": "integratedTerminal",
             "env": {
-                "APPIMAGE": "/tmp/fake.AppImage",
                 "RCC_ASSETS_DIR": "${workspaceFolder}/build/assets"
             }
         }

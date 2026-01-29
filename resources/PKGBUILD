@@ -45,7 +45,6 @@ makedepends=(
   'clang'
   'cmake'
   'git'
-  'fuse2'
   'ninja'
   'npm'
   'pkgconf'
@@ -67,9 +66,6 @@ prepare() {
 }
 
 build() {
-    export APPIMAGE_EXTRACT_AND_RUN=1
-    unset SOURCE_DATE_EPOCH
-
     clean_flags() {
         echo "$1" \
         | sed -E 's/(^| )-Wp,-D_FORTIFY_SOURCE=[0-9]+//g' \
