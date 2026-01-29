@@ -41,7 +41,7 @@ inline int run_command(std::shared_ptr<Logger> logger, const std::vector<std::st
 	for (auto& arg : args) {
 		ss << arg << " ";
 	}
-	logger->info(">>> Replacing current process with: '{}'", StringUtils::trim(ss.str()));
+	logger->info(">>> Replacing current process with: {}", StringUtils::trim(ss.str()));
 
 	int fd = open((Constants::LOG_DIR + "/" + Constants::LOG_RUNNER_FILE_NAME + ".log").c_str(), O_WRONLY | O_CREAT | O_APPEND, 0644);
 	if (fd == -1) {

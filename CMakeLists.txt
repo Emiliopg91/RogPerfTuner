@@ -10,13 +10,17 @@ if(NOT CMAKE_BUILD_TYPE)
 endif()
 
 if(CMAKE_BUILD_TYPE STREQUAL "Release")
-    set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -s")
-
     add_compile_options(
         -O3
         -march=native
         -funroll-loops
         -fstrict-aliasing
+        -flto
+    )
+
+    add_link_options(
+        -flto=full
+        -s
     )
 elseif(CMAKE_BUILD_TYPE STREQUAL "Debug")
     add_compile_options(

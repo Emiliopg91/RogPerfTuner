@@ -1,20 +1,40 @@
 #include "models/performance/performance_profile.hpp"
 
-bool supportedOnBattery(PerformanceProfile value) {
-	return value == PerformanceProfile::QUIET;
-}
+#include "models/performance/platform_profile.hpp"
 
 PerformanceProfile getNextPerformanceProfile(PerformanceProfile value) {
-	if (value == PerformanceProfile::PERFORMANCE) {
-		return PerformanceProfile::QUIET;
+	switch (value) {
+		case PerformanceProfile::PERFORMANCE:
+			return PerformanceProfile::QUIET;
+		case PerformanceProfile::BALANCED:
+			return PerformanceProfile::QUIET;
+		case PerformanceProfile::QUIET:
+			return PerformanceProfile::BALANCED;
+		default:
+			return value;
 	}
-	if (value == PerformanceProfile::BALANCED) {
-		return PerformanceProfile::PERFORMANCE;
+}
+
+PlatformProfile getPlatformProfile(const PerformanceProfile value) {
+	switch (value) {
+		case PerformanceProfile::QUIET:
+			return PlatformProfile::LOW_POWER;
+		case PerformanceProfile::BALANCED:
+			return PlatformProfile::BALANCED;
+		default:
+			return PlatformProfile::PERFORMANCE;
 	}
-	if (value == PerformanceProfile::QUIET) {
-		return PerformanceProfile::BALANCED;
+}
+
+PowerProfile getPowerProfile(const PerformanceProfile value) {
+	switch (value) {
+		case PerformanceProfile::QUIET:
+			return PowerProfile::POWER_SAVER;
+		case PerformanceProfile::BALANCED:
+			return PowerProfile::BALANCED;
+		default:
+			return PowerProfile::PERFORMANCE;
 	}
-	return value;
 }
 
 PerformanceProfile getGreater(const PerformanceProfile value, const PerformanceProfile& other) {
@@ -25,24 +45,4 @@ PerformanceProfile getGreater(const PerformanceProfile value, const PerformanceP
 		return PerformanceProfile::BALANCED;
 	}
 	return PerformanceProfile::QUIET;
-}
-
-PlatformProfile getPlatformProfile(const PerformanceProfile value) {
-	if (value == PerformanceProfile::QUIET) {
-		return PlatformProfile::LOW_POWER;
-	} else if (value == PerformanceProfile::BALANCED) {
-		return PlatformProfile::BALANCED;
-	} else {
-		return PlatformProfile::PERFORMANCE;
-	}
-}
-
-PowerProfile getPowerProfile(const PerformanceProfile value) {
-	if (value == PerformanceProfile::QUIET) {
-		return PowerProfile::POWER_SAVER;
-	} else if (value == PerformanceProfile::BALANCED) {
-		return PowerProfile::BALANCED;
-	} else {
-		return PowerProfile::PERFORMANCE;
-	}
 }

@@ -13,7 +13,7 @@
 
 void Configuration::loadConfig() {
 	if (FileUtils::exists(Constants::CONFIG_FILE)) {
-		logger->debug("Loading settings from '{}'", Constants::CONFIG_FILE);
+		logger->debug("Loading settings from {}", Constants::CONFIG_FILE);
 		try {
 			auto node = YAML::LoadFile(Constants::CONFIG_FILE);
 			config	  = node.as<RootConfig>();

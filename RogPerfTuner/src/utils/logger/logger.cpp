@@ -98,7 +98,7 @@ void Logger::rem_tab() {
 	tabs = std::max(0, tabs - 1);
 }
 
-void Logger::log(LoggerLevel msgLevel, std::string format) {
+void Logger::log(LoggerLevel msgLevel, const std::string& format) {
 	std::lock_guard<std::mutex> lock(mutex);
 	if (toInt(msgLevel) > toInt(level)) {
 		return;

@@ -161,5 +161,5 @@ class Logger {
 	LoggerLevel level = LoggerLevel::INFO;
 
 	static std::string now_timestamp();
-	void log(LoggerLevel msgLevel, std::string format);
+	void log(LoggerLevel msgLevel, const std::string&);
 };

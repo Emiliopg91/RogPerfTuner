@@ -115,11 +115,11 @@ void ApplicationService::setAutostart(bool enabled) {
 	if (enabled) {
 		if (!FileUtils::exists(Constants::AUTOSTART_FILE)) {
 			FileUtils::writeFileContent(Constants::AUTOSTART_FILE, buildDesktopFile());
-			logger->info("Autostart file '{}' written successfully", Constants::AUTOSTART_FILE);
+			logger->info("Autostart file {} written successfully", Constants::AUTOSTART_FILE);
 		}
 	} else {
 		FileUtils::remove(Constants::AUTOSTART_FILE);
-		logger->info("Autostart file '{}' deleted successfully", Constants::AUTOSTART_FILE);
+		logger->info("Autostart file {} deleted successfully", Constants::AUTOSTART_FILE);
 	}
 }
 

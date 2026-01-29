@@ -211,7 +211,7 @@ void SteamService::onFirstGameRun(unsigned int gid, std::string name) {
 }
 
 void SteamService::saveGameConfig(uint gid, const GameEntry& entry) {
-	logger->info("Saving configuration for '{}' ({})", entry.name, gid);
+	logger->info("Saving configuration for {} ({})", entry.name, gid);
 	Logger::add_tab();
 
 	configuration.getConfiguration().games[gid] = entry;
@@ -307,7 +307,7 @@ void SteamService::installPipDeps() {
 }
 
 void SteamService::onGameLaunch(unsigned int gid, std::string name, int pid) {
-	logger->info("Launched '{}' () with PID {}", name, gid, pid);
+	logger->info("Launched {} () with PID {}", name, gid, pid);
 	Logger::add_tab();
 
 	auto it = configuration.getConfiguration().games.find(gid);

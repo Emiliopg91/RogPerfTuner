@@ -8,5 +8,5 @@ class Sink {
   public:
 	virtual ~Sink() = default;
 
-	virtual void write(std::string, LoggerLevel level) = 0;
+	virtual void write(const std::string&, LoggerLevel level) = 0;
 };

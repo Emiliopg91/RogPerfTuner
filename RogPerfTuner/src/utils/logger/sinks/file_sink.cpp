@@ -15,7 +15,7 @@ FileSink::~FileSink() {
 	}
 }
 
-void FileSink::write(std::string message, LoggerLevel _) {
+void FileSink::write(const std::string& message, LoggerLevel _) {
 	file.write(message.c_str(), message.length());
 	if (!file) {
 		throw std::runtime_error("Error writing into file");

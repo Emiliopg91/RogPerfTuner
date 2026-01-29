@@ -5,8 +5,6 @@
 
 enum class PerformanceProfile { PERFORMANCE, BALANCED, QUIET };
 
-bool supportedOnBattery(PerformanceProfile value);
-
 PerformanceProfile getNextPerformanceProfile(PerformanceProfile value);
 
 PerformanceProfile getGreater(const PerformanceProfile value, const PerformanceProfile& other);

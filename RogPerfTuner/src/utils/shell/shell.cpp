@@ -144,9 +144,9 @@ void Shell::close_bash(BashSession& session) {
 CommandResult Shell::send_command(BashSession& session, bool elevated, const std::string& cmd, bool check) {
 	std::lock_guard<std::mutex> lock(mtx);
 	if (elevated) {
-		logger->debug("Running admin command '{}'", cmd);
+		logger->debug("Running admin command {}", cmd);
 	} else {
-		logger->debug("Running command '{}'", cmd);
+		logger->debug("Running command {}", cmd);
 	}
 	std::string marker	 = "__END__";
 	std::string full_cmd = cmd + "\necho " + marker + "$?\n";

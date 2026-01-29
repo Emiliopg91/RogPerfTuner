@@ -181,6 +181,7 @@ void OpenRgbClient::getAvailableDevices() {
 
 	Logger::rem_tab();
 }
+
 const std::vector<std::string> OpenRgbClient::getAvailableEffects() {
 	std::vector<std::string> result;
 	for (auto& effect : availableEffects) {
