@@ -8,10 +8,12 @@
 #include "models/hardware/rgb_brightness.hpp"
 #include "models/hardware/usb_identifier.hpp"
 #include "models/performance/performance_profile.hpp"
-class EventBusWrapper : public EventBus, public Singleton<EventBusWrapper> {
+class EventBusWrapper : public Singleton<EventBusWrapper> {
   private:
 	friend class Singleton<EventBusWrapper>;
 	EventBusWrapper();
+
+	EventBus& eventBus = EventBus::getInstance();
 
   public:
 	inline const static constexpr std::string_view APPLICATION_STOP						= "APPLICATION_STOP";

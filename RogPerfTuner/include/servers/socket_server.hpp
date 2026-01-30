@@ -1,5 +1,6 @@
 #pragma once
 
+#include "abstracts/clients/abstract_unix_socket_client.hpp"
 #include "services/hardware_service.hpp"
 #include "services/open_rgb_service.hpp"
 #include "services/performance_service.hpp"
@@ -23,8 +24,8 @@ class SocketServer : public Singleton<SocketServer>, Loggable {
 
 	void handleClient(int client_fd);
 
-	void handleRequest(const int& clientFd, const CommunicationMessage& req);
-	void handleEvent(const CommunicationMessage& req);
+	void handleRequest(const int& clientFd, const UnixCommunicationMessage& req);
+	void handleEvent(const UnixCommunicationMessage& req);
 
 	SocketServer();
 	friend class Singleton<SocketServer>;

@@ -5,6 +5,8 @@ project(Framework LANGUAGES CXX)
 set(CMAKE_CXX_STANDARD 23)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
+find_package(Qt6 REQUIRED COMPONENTS DBus)
+
 file(GLOB_RECURSE SOURCES_LIB
     "${CMAKE_CURRENT_SOURCE_DIR}/src/*.cpp"
 )
@@ -18,8 +20,11 @@ add_library(Framework STATIC
     ${HEADERS_LIB}
 )
 
+set_target_properties(Framework PROPERTIES AUTOMOC ON)
+
 target_link_libraries(Framework PUBLIC 
     magic_enum
+    Qt6::DBus
     yaml-cpp::yaml-cpp
 )
 

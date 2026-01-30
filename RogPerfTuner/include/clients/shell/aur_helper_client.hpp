@@ -1,8 +1,7 @@
 #ifdef AUR_HELPER
 #pragma once
-
+#include "abstracts/clients/abstract_cmd_client.hpp"
 #include "abstracts/singleton.hpp"
-#include "clients/shell/abstract/abstract_cmd_client.hpp"
 #include "translator/translator.hpp"
 
 class AurHelperClient : public AbstractCmdClient, public Singleton<AurHelperClient> {

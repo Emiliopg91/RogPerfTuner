@@ -8,13 +8,15 @@
 #include <unordered_map>
 #include <vector>
 
+#include "abstracts/singleton.hpp"
+
 typedef std::vector<std::any> CallbackParam;
 typedef std::any CallbackAnyParam;
 typedef std::function<void(CallbackParam)> CallbackWithParams;
 typedef std::function<void(CallbackAnyParam)> CallbackWithAnyParam;
 typedef std::function<void()> Callback;
 
-class EventBus {
+class EventBus : public Singleton<EventBus> {
   public:
 	void on_without_data(const std::string_view& event, Callback callback);
 	void emit_event(const std::string_view& event);
@@ -26,7 +28,7 @@ class EventBus {
 	void on_with_data(const std::string& event, CallbackWithParams&& callback);
 	void emit_event(const std::string& event, const std::vector<std::any>& args);
 
-  protected:
+  private:
 	EventBus()							 = default;
 	EventBus(const EventBus&)			 = delete;
 	EventBus& operator=(const EventBus&) = delete;
@@ -34,4 +36,6 @@ class EventBus {
 	std::unordered_map<std::string, std::vector<Callback>> no_params_listeners;
 	std::unordered_map<std::string, std::vector<CallbackWithParams>> with_params_listeners;
 	std::mutex mtx;
+
+	friend class Singleton<EventBus>;
 };

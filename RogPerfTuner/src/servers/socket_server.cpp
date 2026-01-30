@@ -11,6 +11,7 @@
 #include <filesystem>
 #include <string>
 
+#include "abstracts/clients/abstract_unix_socket_client.hpp"
 #include "file_utils.hpp"
 
 SocketServer::SocketServer() : Loggable("SocketServer") {
@@ -141,7 +142,7 @@ void SocketServer::handleClient(int client_fd) {
 		try {
 			YAML::Node node = YAML::Load(data);
 
-			CommunicationMessage req = node.as<CommunicationMessage>();
+			UnixCommunicationMessage req = node.as<UnixCommunicationMessage>();
 
 			if (req.type == "REQUEST") {
 				handleRequest(client_fd, req);
@@ -155,14 +156,14 @@ void SocketServer::handleClient(int client_fd) {
 	close(client_fd);
 }
 
-void SocketServer::handleEvent(const CommunicationMessage& req) {
+void SocketServer::handleEvent(const UnixCommunicationMessage& req) {
 	eventBus.emitServerSocketEvent(req.name, req.data);
 }
 
-void SocketServer::handleRequest(const int& clientFd, const CommunicationMessage& req) {
-	CommunicationMessage res = CommunicationMessage(req);
-	res.type				 = "RESPONSE";
-	res.data				 = {};
+void SocketServer::handleRequest(const int& clientFd, const UnixCommunicationMessage& req) {
+	UnixCommunicationMessage res = UnixCommunicationMessage(req);
+	res.type					 = "RESPONSE";
+	res.data					 = {};
 
 	try {
 		if (req.name == Constants::NEXT_EFF) {
@@ -193,7 +194,7 @@ void SocketServer::handleRequest(const int& clientFd, const CommunicationMessage
 		res.error = e.what();
 	}
 
-	YAML::Node node = YAML::convert<CommunicationMessage>::encode(res);
+	YAML::Node node = YAML::convert<UnixCommunicationMessage>::encode(res);
 	std::stringstream ss;
 	ss << node;
 	std::string resp_str = ss.str();
