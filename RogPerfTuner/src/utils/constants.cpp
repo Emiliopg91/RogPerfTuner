@@ -10,7 +10,7 @@
 const std::string Constants::APP_NAME  = "RogPerfTuner";
 const std::string Constants::EXEC_NAME = "rog-perf-tuner";
 
-const std::string Constants::APP_VERSION = "4.10.7-1";
+const std::string Constants::APP_VERSION = "4.10.8-1";
 
 const std::string Constants::PLUGIN_VERSION = "1.2.7";
 

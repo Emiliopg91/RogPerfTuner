@@ -1,11 +1,43 @@
 #pragma once
 
+#include "abstracts/loggable.hpp"
 #include "abstracts/singleton.hpp"
 #include "configuration/configuration.hpp"
 #include "models/settings/root_config.hpp"
 
-class ConfigurationWrapper : public Singleton<ConfigurationWrapper>, public Configuration<RootConfig> {
+class ConfigurationWrapper : public Singleton<ConfigurationWrapper>, Loggable {
   public:
+	/**
+	 * @brief Saves the current configuration to persistent storage.
+	 *
+	 * This method serializes and writes the current configuration settings
+	 * to a file or other persistent medium, ensuring that changes are retained
+	 * across application restarts.
+	 *
+	 * @note Throws an exception if saving fails.
+	 */
+	void saveConfig();
+
+	/**
+	 * @brief Loads the configuration settings from the appropriate source.
+	 *
+	 * This function initializes or updates the configuration by reading from
+	 * a file, database, or other storage medium. It should be called before
+	 * accessing any configuration-dependent functionality to ensure that the
+	 * latest settings are applied.
+	 *
+	 * @note Throws an exception or handles errors internally if the configuration
+	 *       cannot be loaded.
+	 */
+	void loadConfig();
+
+	/**
+	 * @brief Retrieves the current root configuration.
+	 *
+	 * @return Reference to the RootConfig object containing the application's configuration settings.
+	 */
+	RootConfig& getConfiguration();
+
 	/**
 	 * @brief Retrieves the stored password.
 	 *
@@ -20,8 +52,9 @@ class ConfigurationWrapper : public Singleton<ConfigurationWrapper>, public Conf
 	void setPassword(const std::string& pss);
 
   private:
-	ConfigurationWrapper();
 	friend class Singleton<ConfigurationWrapper>;
 
-	std::optional<RootConfig> config = std::nullopt;
+	ConfigurationWrapper();
+
+	Configuration<RootConfig>& config = Configuration<RootConfig>::init(Constants::CONFIG_DIR, Constants::CONFIG_FILE);
 };

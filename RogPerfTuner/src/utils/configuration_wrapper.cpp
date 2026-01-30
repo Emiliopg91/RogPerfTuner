@@ -6,8 +6,17 @@
 #include <QEventLoop>
 #include <string>
 
+#include "abstracts/loggable.hpp"
+#include "configuration/configuration.hpp"
+#include "models/settings/root_config.hpp"
+#include "utils/constants.hpp"
+
 const QString service = Constants::EXEC_NAME.c_str();
 const QString key	  = "password";
+
+RootConfig& ConfigurationWrapper::getConfiguration() {
+	return this->config.getConfiguration();
+}
 
 std::string ConfigurationWrapper::getPassword() {
 	QKeychain::ReadPasswordJob job(service);
@@ -42,6 +51,13 @@ void ConfigurationWrapper::setPassword(const std::string& pss) {
 	}
 }
 
-ConfigurationWrapper::ConfigurationWrapper() : Configuration<RootConfig>(Constants::CONFIG_DIR, Constants::CONFIG_FILE) {
-	loadConfig();
+ConfigurationWrapper::ConfigurationWrapper() : Loggable("ConfigurationWrapper") {
+}
+
+void ConfigurationWrapper::saveConfig() {
+	this->config.saveConfig();
+}
+
+void ConfigurationWrapper::loadConfig() {
+	this->config.loadConfig();
 }

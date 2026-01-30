@@ -3,10 +3,11 @@
 #include <yaml-cpp/yaml.h>
 
 #include "abstracts/loggable.hpp"
+#include "abstracts/singleton.hpp"
 #include "file_utils.hpp"
 
 template <typename T>
-class Configuration : protected Loggable {
+class Configuration : public Singleton<Configuration<T>>, Loggable {
   public:
 	/**
 	 * @brief Saves the current configuration to persistent storage.
@@ -82,6 +83,7 @@ class Configuration : protected Loggable {
 	}
 
   private:
+	friend class Singleton<Configuration<T>>;
 	std::string configDir;
 	std::string configFile;
 	std::optional<T> config = std::nullopt;
