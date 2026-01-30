@@ -1,7 +1,7 @@
 
 #include "clients/dbus/asus/core/platform_client.hpp"
 
-#include "utils/enum_utils.hpp"
+#include "enum_utils.hpp"
 
 PlatformProfile PlatformClient::getPlatformProfile() {
 	return fromInt<PlatformProfile>(this->getProperty<int>(QString("PlatformProfile")));

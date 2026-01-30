@@ -8,9 +8,9 @@
 #include <tuple>
 #include <vector>
 
+#include "abstracts/singleton.hpp"
 #include "models/hardware/usb_identifier.hpp"
-#include "models/others/singleton.hpp"
-#include "utils/events/event_bus.hpp"
+#include "utils/event_bus_wrapper.hpp"
 
 class LsUsbClient : public Singleton<LsUsbClient> {
   private:
@@ -19,7 +19,7 @@ class LsUsbClient : public Singleton<LsUsbClient> {
 	std::thread runner;
 	int fd;
 	std::atomic<bool> stop;
-	EventBus& eventBus = EventBus::getInstance();
+	EventBusWrapper& eventBus = EventBusWrapper::getInstance();
 
 	LsUsbClient();
 	friend class Singleton<LsUsbClient>;

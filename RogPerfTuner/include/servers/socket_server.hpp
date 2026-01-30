@@ -4,7 +4,7 @@
 #include "services/open_rgb_service.hpp"
 #include "services/performance_service.hpp"
 #include "services/steam_service.hpp"
-#include "utils/events/event_bus.hpp"
+#include "utils/event_bus_wrapper.hpp"
 
 class SocketServer : public Singleton<SocketServer>, Loggable {
   private:
@@ -13,7 +13,7 @@ class SocketServer : public Singleton<SocketServer>, Loggable {
 	std::thread runner;
 	std::atomic<bool> started{false};
 
-	EventBus& eventBus					   = EventBus::getInstance();
+	EventBusWrapper& eventBus			   = EventBusWrapper::getInstance();
 	PerformanceService& performanceService = PerformanceService::getInstance();
 	OpenRgbService& openRgbService		   = OpenRgbService::getInstance();
 	HardwareService& hardwareService	   = HardwareService::getInstance();

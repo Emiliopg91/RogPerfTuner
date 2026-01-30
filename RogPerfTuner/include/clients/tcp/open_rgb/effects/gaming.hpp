@@ -3,8 +3,8 @@
 #include <regex>
 #include <vector>
 
+#include "abstracts/singleton.hpp"
 #include "clients/tcp/open_rgb/effects/abstract/abstract_effect.hpp"
-#include "models/others/singleton.hpp"
 
 class GamingEffect : public AbstractEffect, public Singleton<GamingEffect> {
   private:

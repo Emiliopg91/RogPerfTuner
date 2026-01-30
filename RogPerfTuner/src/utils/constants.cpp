@@ -4,10 +4,8 @@
 #include <unistd.h>
 
 #ifdef DEV_MODE
-#include "utils/file_utils.hpp"
+#include "file_utils.hpp"
 #endif
-
-const pid_t Constants::PID = getpid();
 
 const std::string Constants::APP_NAME  = "RogPerfTuner";
 const std::string Constants::EXEC_NAME = "rog-perf-tuner";
@@ -44,7 +42,6 @@ const std::string Constants::ORGB_PATH			= ASSETS_DIR + "/OpenRGB/openrgb";
 const std::string Constants::RCCDC_ASSET_PATH	= ASSETS_DIR + "/RccDeckyCompanion";
 const std::string Constants::TRANSLATIONS_FILE	= ASSETS_DIR + "/translations.yaml";
 
-const std::string Constants::HOME_DIR				  = std::getenv("HOME");
 const std::string Constants::BIN_DIR				  = HOME_DIR + "/." + APP_NAME + "/bin";
 const std::string Constants::BIN_APPLICATION_DIR	  = HOME_DIR + "/." + APP_NAME + "/bin/application";
 const std::string Constants::BIN_PERFORMANCE_DIR	  = HOME_DIR + "/." + APP_NAME + "/bin/performance";
@@ -57,7 +54,7 @@ const std::string Constants::BIN_STEAM_DIR			  = HOME_DIR + "/." + APP_NAME + "/
 const std::string Constants::STEAM_WRAPPER_PATH		  = HOME_DIR + "/." + APP_NAME + "/bin/steam/run";
 const std::string Constants::FLATPAK_WRAPPER_PATH	  = HOME_DIR + "/." + APP_NAME + "/bin/steam/flatpak";
 const std::string Constants::CONFIG_DIR				  = HOME_DIR + "/." + APP_NAME + "/config";
-const std::string Constants::CONFIG_FILE			  = HOME_DIR + "/." + APP_NAME + "/config/config.yaml";
+const std::string Constants::CONFIG_FILE			  = "config.yaml";
 const std::string Constants::LOGOS_DIR				  = HOME_DIR + "/." + APP_NAME + "/logos";
 const std::string Constants::LIB_DIR				  = HOME_DIR + "/." + APP_NAME + "/lib";
 const std::string Constants::LIB_VK_DIR				  = HOME_DIR + "/." + APP_NAME + "/lib/vk/icd.d/";
@@ -89,5 +86,3 @@ const std::string Constants::LOGGER_PATTERN = "[%Y-%m-%d %H:%M:%S.%e][%-7l][%n] 
 const std::string Constants::CHANGELOG_URL = "https://github.com/Emiliopg91/RogPerfTuner/raw/refs/heads/main/changelog.yaml";
 
 const std::string Constants::APICOUNT_TOKEN = "ut_B44NTa3SW6lTAmxIbaGo2yMLpqg9FU4uqk40YCHO";
-
-const std::string Constants::DEFAULT_LOGGER_NAME = "Default";

@@ -21,8 +21,8 @@
 #include "models/hardware/battery_charge_threshold.hpp"
 #include "models/hardware/usb_identifier.hpp"
 #include "services/open_rgb_service.hpp"
-#include "utils/events/event_bus.hpp"
-#include "utils/translator/translator.hpp"
+#include "translator/translator.hpp"
+#include "utils/event_bus_wrapper.hpp"
 
 class HardwareService : public Singleton<HardwareService>, Loggable {
   public:
@@ -95,7 +95,7 @@ class HardwareService : public Singleton<HardwareService>, Loggable {
 
 	std::mutex actionMutex;
 
-	EventBus& eventBus								   = EventBus::getInstance();
+	EventBusWrapper& eventBus						   = EventBusWrapper::getInstance();
 	Toaster& toaster								   = Toaster::getInstance();
 	OpenRgbService& openRgbService					   = OpenRgbService::getInstance();
 	Translator& translator							   = Translator::getInstance();
@@ -114,7 +114,7 @@ class HardwareService : public Singleton<HardwareService>, Loggable {
 	PanelOverdriveClient& panelOverdriveClient		   = PanelOverdriveClient::getInstance();
 	PMKeyboardBrightness& pmKeyboardBrightnessClient   = PMKeyboardBrightness::getInstance();
 	LsUsbClient& udevClient							   = LsUsbClient::getInstance();
-	Configuration& configuration					   = Configuration::getInstance();
+	ConfigurationWrapper& configuration				   = ConfigurationWrapper::getInstance();
 
 	std::unordered_map<std::string, std::string> gpus;
 	std::vector<UsbIdentifier> connectedDevices;

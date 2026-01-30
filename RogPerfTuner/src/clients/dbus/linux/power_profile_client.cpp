@@ -1,6 +1,6 @@
 #include "clients/dbus/linux/power_profile_client.hpp"
 
-#include "utils/enum_utils.hpp"
+#include "enum_utils.hpp"
 
 PowerProfile PowerProfileClient::getPowerProfile() {
 	return fromString<PowerProfile>(this->getProperty<QString>(QString("ActiveProfile")).toStdString(), {{"-", "_"}});

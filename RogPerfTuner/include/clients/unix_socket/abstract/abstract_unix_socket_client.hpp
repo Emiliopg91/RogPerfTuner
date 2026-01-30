@@ -6,9 +6,9 @@
 #include <queue>
 #include <unordered_map>
 
+#include "abstracts/loggable.hpp"
 #include "models/others/communication_message.hpp"
-#include "models/others/loggable.hpp"
-#include "utils/events/event_bus.hpp"
+#include "utils/event_bus_wrapper.hpp"
 
 struct UnixMethodResponse {
 	CommunicationMessage data;
@@ -54,5 +54,5 @@ class AbstractUnixSocketClient : Loggable {
 	std::thread writeThread;
 	std::thread readThread;
 
-	EventBus& eventBus = EventBus::getInstance();
+	EventBusWrapper& eventBus = EventBusWrapper::getInstance();
 };

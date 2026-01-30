@@ -5,9 +5,9 @@
 
 #include "clients/tcp/open_rgb/open_rgb_client.hpp"
 #include "models/hardware/usb_identifier.hpp"
-#include "utils/configuration/configuration.hpp"
-#include "utils/events/event_bus.hpp"
-#include "utils/time_utils.hpp"
+#include "time_utils.hpp"
+#include "utils/configuration_wrapper.hpp"
+#include "utils/event_bus_wrapper.hpp"
 
 OpenRgbService::OpenRgbService() : Loggable("OpenRgbService") {
 	logger->info("Initializing OpenRgbService");

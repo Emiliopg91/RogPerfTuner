@@ -9,12 +9,12 @@
 #include <sstream>
 #include <vector>
 
+#include "file_utils.hpp"
 #include "models/others/release_entry.hpp"
 #include "models/others/semantic_version.hpp"
-#include "utils/events/event_bus.hpp"
-#include "utils/file_utils.hpp"
-#include "utils/net_utils.hpp"
-#include "utils/time_utils.hpp"
+#include "net_utils.hpp"
+#include "time_utils.hpp"
+#include "utils/event_bus_wrapper.hpp"
 
 #ifdef DEV_MODE
 #endif

@@ -2,8 +2,8 @@
 #include <string>
 
 #include "clients/dbus/linux/notifications_client.hpp"
+#include "translator/translator.hpp"
 #include "utils/constants.hpp"
-#include "utils/translator/translator.hpp"
 
 class Toaster : public Singleton<Toaster> {
   public:

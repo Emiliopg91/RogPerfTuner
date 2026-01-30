@@ -3,9 +3,9 @@
 #include <random>
 #include <vector>
 
+#include "abstracts/singleton.hpp"
 #include "clients/tcp/open_rgb/effects/abstract/abstract_effect.hpp"
 #include "models/others/led_status.hpp"
-#include "models/others/singleton.hpp"
 #include "models/performance/cpu_usage.hpp"
 
 class DigitalRainEffect : public AbstractEffect, public Singleton<DigitalRainEffect> {

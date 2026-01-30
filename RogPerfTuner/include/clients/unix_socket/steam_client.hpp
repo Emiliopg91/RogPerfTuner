@@ -1,7 +1,7 @@
 #pragma once
 
+#include "abstracts/singleton.hpp"
 #include "clients/unix_socket/abstract/abstract_unix_socket_client.hpp"
-#include "models/others/singleton.hpp"
 #include "models/steam/steam_game_details.hpp"
 
 class SteamSocketClient : public AbstractUnixSocketClient, public Singleton<SteamSocketClient> {

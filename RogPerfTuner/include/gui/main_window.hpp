@@ -16,8 +16,8 @@
 #include "services/open_rgb_service.hpp"
 #include "services/performance_service.hpp"
 #include "services/steam_service.hpp"
-#include "utils/events/event_bus.hpp"
-#include "utils/translator/translator.hpp"
+#include "translator/translator.hpp"
+#include "utils/event_bus_wrapper.hpp"
 
 class MainWindow : public QMainWindow, public Singleton<MainWindow> {
 	Q_OBJECT
@@ -80,7 +80,7 @@ class MainWindow : public QMainWindow, public Singleton<MainWindow> {
 	int runningGames;
 	bool onBattery;
 
-	EventBus& eventBus					   = EventBus::getInstance();
+	EventBusWrapper& eventBus			   = EventBusWrapper::getInstance();
 	PerformanceService& performanceService = PerformanceService::getInstance();
 	OpenRgbService& openRgbService		   = OpenRgbService::getInstance();
 	HardwareService& hardwareService	   = HardwareService::getInstance();

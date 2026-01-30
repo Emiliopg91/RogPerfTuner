@@ -2,8 +2,8 @@
 
 #include <string>
 
-#include "models/others/loggable.hpp"
-#include "utils/shell/shell.hpp"
+#include "abstracts/loggable.hpp"
+#include "shell/shell.hpp"
 
 class AbstractFileClient : public Loggable {
   public:

@@ -9,19 +9,20 @@
 #include "gui/password_dialog.hpp"
 #include "gui/toaster.hpp"
 #include "gui/tray_icon.hpp"
+#include "logger/logger_provider.hpp"
+#include "models/settings/root_config.hpp"
 #include "servers/socket_server.hpp"
 #include "services/application_service.hpp"
 #include "services/hardware_service.hpp"
 #include "services/open_rgb_service.hpp"
 #include "services/performance_service.hpp"
 #include "services/steam_service.hpp"
-#include "utils/configuration/configuration.hpp"
+#include "single_instance.hpp"
+#include "string_utils.hpp"
+#include "time_utils.hpp"
+#include "translator/translator.hpp"
+#include "utils/configuration_wrapper.hpp"
 #include "utils/constants.hpp"
-#include "utils/logger/logger_provider.hpp"
-#include "utils/single_instance.hpp"
-#include "utils/string_utils.hpp"
-#include "utils/time_utils.hpp"
-#include "utils/translator/translator.hpp"
 
 inline void terminateHandler() {
 	std::cerr << "Unhandled exception detected\n";
@@ -65,12 +66,14 @@ inline int startGui(int argc, char** argv) {
 	std::strncpy(argv[0], (Constants::APP_NAME + " v" + Constants::APP_VERSION).c_str(), std::strlen(argv[0]));
 	argv[0][std::strlen(argv[0])] = '\0';
 
-	SingleInstance::getInstance().acquire();
+	SingleInstance::getInstance().acquire(Constants::LOCK_FILE);
 	std::cout << "Running application with PID " << Constants::PID << std::endl;
 
 	std::cout << "Assets directory: " << Constants::ASSETS_DIR << std::endl;
 
 	LoggerProvider::initialize(Constants::LOG_FILE_NAME, Constants::LOG_DIR);
+	Translator::init(Constants::TRANSLATIONS_FILE);
+
 	auto logger = LoggerProvider::getLogger();
 
 	std::string title = "Starting " + Constants::APP_NAME;
@@ -96,7 +99,7 @@ inline int startGui(int argc, char** argv) {
 
 	Toaster::getInstance().showToast(Translator::getInstance().translate("initializing"));
 
-	Configuration& configuration = Configuration::getInstance();
+	ConfigurationWrapper& configuration = ConfigurationWrapper::getInstance();
 	if (configuration.getPassword().length() == 0) {
 		PasswordDialog::getInstance().showDialog();
 	}
@@ -132,5 +135,5 @@ inline int startGui(int argc, char** argv) {
 }
 
 inline int killInstance() {
-	return SingleInstance::getInstance().killRunningInstance() ? 0 : 1;
+	return SingleInstance::getInstance().killRunningInstance(Constants::LOCK_FILE) ? 0 : 1;
 }

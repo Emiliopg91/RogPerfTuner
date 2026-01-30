@@ -2,7 +2,7 @@
 
 #include <string>
 
-#include "utils/enum_utils.hpp"
+#include "enum_utils.hpp"
 
 enum class GpuBrand { INTEL, NVIDIA, AMD };
 

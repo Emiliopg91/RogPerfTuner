@@ -3,9 +3,9 @@
 #include <random>
 #include <vector>
 
+#include "abstracts/singleton.hpp"
 #include "clients/tcp/open_rgb/effects/abstract/abstract_effect.hpp"
 #include "models/others/led_task.hpp"
-#include "models/others/singleton.hpp"
 
 class DropsEffect : public AbstractEffect, public Singleton<DropsEffect> {
   public:

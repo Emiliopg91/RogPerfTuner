@@ -5,8 +5,8 @@
 #include <QLineEdit>
 #include <QPushButton>
 
-#include "utils/configuration/configuration.hpp"
-#include "utils/translator/translator.hpp"
+#include "translator/translator.hpp"
+#include "utils/configuration_wrapper.hpp"
 
 class PasswordDialog : public QDialog, public Singleton<PasswordDialog> {
 	Q_OBJECT
@@ -27,6 +27,6 @@ class PasswordDialog : public QDialog, public Singleton<PasswordDialog> {
 	QPushButton* ok_button_;
 	QPushButton* cancel_button_;
 
-	Translator& translator		 = Translator::getInstance();
-	Configuration& configuration = Configuration::getInstance();
+	Translator& translator				= Translator::getInstance();
+	ConfigurationWrapper& configuration = ConfigurationWrapper::getInstance();
 };

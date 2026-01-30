@@ -4,8 +4,8 @@
 #include <thread>
 #include <vector>
 
+#include "abstracts/singleton.hpp"
 #include "clients/tcp/open_rgb/effects/abstract/abstract_effect.hpp"
-#include "models/others/singleton.hpp"
 
 class StarryNightEffect : public AbstractEffect, public Singleton<StarryNightEffect> {
   private:

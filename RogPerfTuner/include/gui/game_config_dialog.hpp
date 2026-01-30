@@ -7,9 +7,9 @@
 #include "gui/no_scroll_combo_box.hpp"
 #include "services/hardware_service.hpp"
 #include "services/steam_service.hpp"
-#include "utils/configuration/configuration.hpp"
-#include "utils/shell/shell.hpp"
-#include "utils/translator/translator.hpp"
+#include "shell/shell.hpp"
+#include "translator/translator.hpp"
+#include "utils/configuration_wrapper.hpp"
 
 class GameConfigDialog : public QDialog, Loggable {
 	Q_OBJECT
@@ -43,7 +43,7 @@ class GameConfigDialog : public QDialog, Loggable {
 	bool runAfterSave;
 
 	Translator& translator				   = Translator::getInstance();
-	Configuration& configuration		   = Configuration::getInstance();
+	ConfigurationWrapper& configuration	   = ConfigurationWrapper::getInstance();
 	HardwareService& hardwareService	   = HardwareService::getInstance();
 	PerformanceService& performanceService = PerformanceService::getInstance();
 	SteamService& steamService			   = SteamService::getInstance();

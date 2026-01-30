@@ -7,8 +7,8 @@
 #include "clients/tcp/open_rgb/open_rgb_client.hpp"
 #include "models/hardware/rgb_brightness.hpp"
 #include "models/hardware/usb_identifier.hpp"
-#include "utils/configuration/configuration.hpp"
-#include "utils/events/event_bus.hpp"
+#include "utils/configuration_wrapper.hpp"
+#include "utils/event_bus_wrapper.hpp"
 
 class OpenRgbService : public Singleton<OpenRgbService>, Loggable {
   public:
@@ -113,10 +113,10 @@ class OpenRgbService : public Singleton<OpenRgbService>, Loggable {
 	std::string effect;
 	std::optional<std::string> _color = std::nullopt;
 
-	UPowerClient& uPowerClient	 = UPowerClient::getInstance();
-	OpenRgbClient& openRgbClient = OpenRgbClient::getInstance();
-	Configuration& configuration = Configuration::getInstance();
-	EventBus& eventBus			 = EventBus::getInstance();
+	UPowerClient& uPowerClient			= UPowerClient::getInstance();
+	OpenRgbClient& openRgbClient		= OpenRgbClient::getInstance();
+	ConfigurationWrapper& configuration = ConfigurationWrapper::getInstance();
+	EventBusWrapper& eventBus			= EventBusWrapper::getInstance();
 
 	void applyAura(const bool& temporal = false);
 	void reload();

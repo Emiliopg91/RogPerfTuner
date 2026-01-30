@@ -16,9 +16,9 @@
 #include "services/hardware_service.hpp"
 #include "services/open_rgb_service.hpp"
 #include "services/performance_service.hpp"
-#include "utils/configuration/configuration.hpp"
-#include "utils/events/event_bus.hpp"
-#include "utils/translator/translator.hpp"
+#include "translator/translator.hpp"
+#include "utils/configuration_wrapper.hpp"
+#include "utils/event_bus_wrapper.hpp"
 
 class TrayIcon : public QObject, public Singleton<TrayIcon> {
 	Q_OBJECT
@@ -69,13 +69,13 @@ class TrayIcon : public QObject, public Singleton<TrayIcon> {
 	void openGameList();
 
 	Shell& shell						   = Shell::getInstance();
-	EventBus& eventBus					   = EventBus::getInstance();
+	EventBusWrapper& eventBus			   = EventBusWrapper::getInstance();
 	PerformanceService& performanceService = PerformanceService::getInstance();
 	OpenRgbService& openRgbService		   = OpenRgbService::getInstance();
 	HardwareService& hardwareService	   = HardwareService::getInstance();
 	ApplicationService& applicationService = ApplicationService::init(std::nullopt);
 	Translator& translator				   = Translator::getInstance();
-	Configuration& configuration		   = Configuration::getInstance();
+	ConfigurationWrapper& configuration	   = ConfigurationWrapper::getInstance();
 	SteamService& steamService			   = SteamService::getInstance();
 	UPowerClient& uPowerClient			   = UPowerClient::getInstance();
 	MainWindow& mainWindow;

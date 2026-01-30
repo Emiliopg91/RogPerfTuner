@@ -2,8 +2,8 @@
 
 #include <string>
 
+#include "abstracts/singleton.hpp"
 #include "clients/shell/abstract/abstract_cmd_client.hpp"
-#include "models/others/singleton.hpp"
 #include "models/performance/cpu_governor.hpp"
 
 class CpuPowerClient : public AbstractCmdClient, public Singleton<CpuPowerClient> {

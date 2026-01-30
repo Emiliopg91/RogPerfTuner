@@ -6,7 +6,7 @@
 
 #include "gui/fan_curve_view.hpp"
 #include "services/performance_service.hpp"
-#include "utils/translator/translator.hpp"
+#include "translator/translator.hpp"
 
 class CurveEditor : public QDialog {
 	Q_OBJECT

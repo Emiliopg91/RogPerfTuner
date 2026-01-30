@@ -11,7 +11,7 @@
 #include <filesystem>
 #include <string>
 
-#include "utils/file_utils.hpp"
+#include "file_utils.hpp"
 
 SocketServer::SocketServer() : Loggable("SocketServer") {
 	logger->info("Initializing socket server");

@@ -7,7 +7,7 @@
 #include <memory>
 #include <stdexcept>
 
-#include "utils/events/event_bus.hpp"
+#include "utils/event_bus_wrapper.hpp"
 
 class AbstractDbusClient : public QObject {
 	Q_OBJECT
@@ -28,7 +28,7 @@ class AbstractDbusClient : public QObject {
 	QDBusConnection bus_;
 	std::unique_ptr<QDBusInterface> iface_;
 	bool available_;
-	EventBus& eventBus = EventBus::getInstance();
+	EventBusWrapper& eventBus = EventBusWrapper::getInstance();
 
   protected:
 	template <typename Ret = QVariant>

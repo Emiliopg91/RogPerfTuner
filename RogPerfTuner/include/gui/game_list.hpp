@@ -3,7 +3,7 @@
 #include <QDialog>
 
 #include "services/steam_service.hpp"
-#include "utils/translator/translator.hpp"
+#include "translator/translator.hpp"
 
 class GameList : public QDialog {
 	Q_OBJECT

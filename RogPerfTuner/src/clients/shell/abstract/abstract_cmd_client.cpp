@@ -3,7 +3,7 @@
 #include <cstdlib>
 #include <stdexcept>
 
-#include "utils/string_utils.hpp"
+#include "string_utils.hpp"
 
 AbstractCmdClient::AbstractCmdClient(const std::string& command, const std::string& name, const bool& required)
 	: Loggable(name), command_(command), available_(true) {

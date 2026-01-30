@@ -5,7 +5,7 @@
 #include "clients/tcp/open_rgb/effects/abstract/abstract_effect.hpp"
 #include "models/hardware/usb_identifier.hpp"
 #include "utils/constants.hpp"
-#include "utils/events/event_bus.hpp"
+#include "utils/event_bus_wrapper.hpp"
 
 class OpenRgbClient : public Singleton<OpenRgbClient>, Loggable {
   public:
@@ -99,7 +99,7 @@ class OpenRgbClient : public Singleton<OpenRgbClient>, Loggable {
 	std::vector<UsbIdentifier> compatibleDevices;
 
 	Shell& shell				 = Shell::getInstance();
-	EventBus& eventBus			 = EventBus::getInstance();
+	EventBusWrapper& eventBus	 = EventBusWrapper::getInstance();
 	AsusCtlClient& asusCtlClient = AsusCtlClient::getInstance();
 
 	uint currentEffectIdx = 0;

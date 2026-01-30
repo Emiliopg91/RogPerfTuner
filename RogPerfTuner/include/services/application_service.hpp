@@ -8,8 +8,8 @@
 
 #include "services/performance_service.hpp"
 #include "services/steam_service.hpp"
-#include "utils/events/event_bus.hpp"
-#include "utils/translator/translator.hpp"
+#include "translator/translator.hpp"
+#include "utils/event_bus_wrapper.hpp"
 
 class ApplicationService : public Singleton<ApplicationService>, Loggable {
   public:
@@ -62,11 +62,11 @@ class ApplicationService : public Singleton<ApplicationService>, Loggable {
 	std::thread updateChecker;
 
 	Shell& shell						   = Shell::getInstance();
-	EventBus& eventBus					   = EventBus::getInstance();
+	EventBusWrapper& eventBus			   = EventBusWrapper::getInstance();
 	SteamService& steamService			   = SteamService::getInstance();
 	Translator& translator				   = Translator::getInstance();
 	Toaster& toaster					   = Toaster::getInstance();
-	Configuration& configuration		   = Configuration::getInstance();
+	ConfigurationWrapper& configuration	   = ConfigurationWrapper::getInstance();
 	PerformanceService& performanceService = PerformanceService::getInstance();
 
 	const std::string buildDesktopFile();

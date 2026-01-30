@@ -3,9 +3,9 @@
 #include <string>
 #include <vector>
 
+#include "abstracts/singleton.hpp"
 #include "clients/shell/abstract/abstract_cmd_client.hpp"
 #include "models/hardware/gpu_info.hpp"
-#include "models/others/singleton.hpp"
 
 class SwitcherooCtlClient : AbstractCmdClient, public Singleton<SwitcherooCtlClient> {
   private:

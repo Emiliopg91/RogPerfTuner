@@ -5,18 +5,16 @@
 #include <string>
 #include <vector>
 
-class Constants {
+#include "framework_constants.hpp"
+
+class Constants : public FrameworkConstants {
   public:
 	static const std::string APP_NAME;
 	static const std::string EXEC_NAME;
 
 	const static std::string APP_VERSION;
 
-	const static pid_t PID;
-
 	const static std::string PLUGIN_VERSION;
-
-	static const std::string HOME_DIR;
 
 	static const std::string ASSETS_DIR;
 
@@ -94,5 +92,4 @@ class Constants {
 	static const std::string CHANGELOG_URL;
 
 	static const std::string APICOUNT_TOKEN;
-	static const std::string DEFAULT_LOGGER_NAME;
 };

@@ -17,10 +17,10 @@
 #include "clients/shell/scxctl_client.hpp"
 #include "gui/toaster.hpp"
 #include "models/performance/performance_profile.hpp"
-#include "utils/configuration/configuration.hpp"
-#include "utils/events/event_bus.hpp"
-#include "utils/shell/shell.hpp"
-#include "utils/translator/translator.hpp"
+#include "shell/shell.hpp"
+#include "translator/translator.hpp"
+#include "utils/configuration_wrapper.hpp"
+#include "utils/event_bus_wrapper.hpp"
 
 class PerformanceService : public Singleton<PerformanceService>, Loggable {
   public:
@@ -154,8 +154,8 @@ class PerformanceService : public Singleton<PerformanceService>, Loggable {
 	Toaster& toaster					   = Toaster::getInstance();
 	CpuPowerClient& cpuPowerClient		   = CpuPowerClient::getInstance();
 	BoostControlClient& boostControlClient = BoostControlClient::getInstance();
-	EventBus& eventBus					   = EventBus::getInstance();
-	Configuration& configuration		   = Configuration::getInstance();
+	EventBusWrapper& eventBus			   = EventBusWrapper::getInstance();
+	ConfigurationWrapper& configuration	   = ConfigurationWrapper::getInstance();
 	Translator& translator				   = Translator::getInstance();
 	ScxCtlClient& scxCtlClient			   = ScxCtlClient::getInstance();
 	AsusCtlClient& asusCtlClient		   = AsusCtlClient::getInstance();

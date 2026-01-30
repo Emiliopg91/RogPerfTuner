@@ -12,8 +12,8 @@
 #include <string>
 #include <thread>
 
-#include "utils/string_utils.hpp"
-#include "utils/time_utils.hpp"
+#include "string_utils.hpp"
+#include "time_utils.hpp"
 
 AbstractUnixSocketClient::AbstractUnixSocketClient(const std::string& path, const std::string& name) : Loggable(name), path(path), name(name) {
 	signal(SIGPIPE, SIG_IGN);

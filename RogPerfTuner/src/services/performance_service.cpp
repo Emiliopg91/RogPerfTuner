@@ -3,15 +3,15 @@
 #include <optional>
 #include <string>
 
+#include "enum_utils.hpp"
+#include "file_utils.hpp"
 #include "models/performance/cpu_governor.hpp"
 #include "models/performance/power_profile.hpp"
-#include "utils/configuration/configuration.hpp"
-#include "utils/enum_utils.hpp"
-#include "utils/events/event_bus.hpp"
-#include "utils/file_utils.hpp"
-#include "utils/process_utils.hpp"
-#include "utils/string_utils.hpp"
-#include "utils/time_utils.hpp"
+#include "process_utils.hpp"
+#include "string_utils.hpp"
+#include "time_utils.hpp"
+#include "utils/configuration_wrapper.hpp"
+#include "utils/event_bus_wrapper.hpp"
 
 int8_t PerformanceService::CPU_PRIORITY = -17;
 uint8_t PerformanceService::IO_PRIORITY = (CPU_PRIORITY + 20) / 5;

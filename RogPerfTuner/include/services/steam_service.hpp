@@ -8,7 +8,7 @@
 #include "services/hardware_service.hpp"
 #include "services/open_rgb_service.hpp"
 #include "services/performance_service.hpp"
-#include "utils/configuration/configuration.hpp"
+#include "utils/configuration_wrapper.hpp"
 
 class SteamService : public Singleton<SteamService>, Loggable {
   private:
@@ -20,8 +20,8 @@ class SteamService : public Singleton<SteamService>, Loggable {
 	std::optional<std::string> whichSystemdInhibit;
 
 	Shell& shell						   = Shell::getInstance();
-	EventBus& eventBus					   = EventBus::getInstance();
-	Configuration& configuration		   = Configuration::getInstance();
+	EventBusWrapper& eventBus			   = EventBusWrapper::getInstance();
+	ConfigurationWrapper& configuration	   = ConfigurationWrapper::getInstance();
 	PerformanceService& performanceService = PerformanceService::getInstance();
 	OpenRgbService& openRgbService		   = OpenRgbService::getInstance();
 	HardwareService& hardwareService	   = HardwareService::getInstance();

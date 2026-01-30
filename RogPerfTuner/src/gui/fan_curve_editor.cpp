@@ -4,8 +4,8 @@
 #include <QtCharts>
 #include <unordered_map>
 
+#include "string_utils.hpp"
 #include "utils/constants.hpp"
-#include "utils/string_utils.hpp"
 
 CurveEditor::CurveEditor(const std::string& profile, QWidget* parent) : QDialog(parent), profile(profile) {
 	setWindowModality(Qt::WindowModal);

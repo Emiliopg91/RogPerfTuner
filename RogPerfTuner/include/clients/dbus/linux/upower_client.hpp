@@ -1,7 +1,7 @@
 #pragma once
 
+#include "abstracts/singleton.hpp"
 #include "clients/dbus/abstract/abstract_dbus_client.hpp"
-#include "models/others/singleton.hpp"
 
 class UPowerClient : public AbstractDbusClient, public Singleton<UPowerClient> {
   public:

@@ -1,7 +1,7 @@
 #pragma once
 
+#include "abstracts/singleton.hpp"
 #include "clients/tcp/open_rgb/effects/abstract/abstract_effect.hpp"
-#include "models/others/singleton.hpp"
 
 class RainbowWave : public AbstractEffect, public Singleton<RainbowWave> {
   public:

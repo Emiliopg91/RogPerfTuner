@@ -47,4 +47,6 @@ add_subdirectory(submodules/yaml-cpp)
 
 add_subdirectory(submodules/OpenRGB-cppSDK)
 
+add_subdirectory(Framework)
+
 add_subdirectory(RogPerfTuner)

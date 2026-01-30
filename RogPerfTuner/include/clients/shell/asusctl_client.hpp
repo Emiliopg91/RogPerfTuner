@@ -1,8 +1,8 @@
 #pragma once
 
+#include "abstracts/singleton.hpp"
 #include "clients/shell/abstract/abstract_cmd_client.hpp"
 #include "models/hardware/fan_curve_data.hpp"
-#include "models/others/singleton.hpp"
 #include "models/performance/platform_profile.hpp"
 
 class AsusCtlClient : public AbstractCmdClient, public Singleton<AsusCtlClient> {

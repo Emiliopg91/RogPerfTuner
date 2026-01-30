@@ -26,6 +26,7 @@ target_include_directories(RogPerfTuner PRIVATE
     "${CMAKE_CURRENT_SOURCE_DIR}/include"
 )
 target_link_libraries(RogPerfTuner PRIVATE 
+    Framework
     magic_enum
     orgbsdk
     qt6keychain
