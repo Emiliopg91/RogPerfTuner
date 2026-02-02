@@ -2,7 +2,6 @@
 
 #include <signal.h>
 #include <unistd.h>
-#include <yaml-cpp/node/parse.h>
 
 #include <exception>
 #include <optional>
@@ -194,7 +193,7 @@ void ApplicationService::applyUpdate() {
 std::optional<std::string> ApplicationService::getChangeLog() {
 	try {
 		const auto changelogYml = NetUtils::fetch(Constants::CHANGELOG_URL);
-		YAML::Node root			= YAML::Load(changelogYml);
+		auto root				= SerializeUtils::parseYaml(changelogYml);
 
 		if (!root.IsSequence()) {
 			logger->error("Invalid changelog format");

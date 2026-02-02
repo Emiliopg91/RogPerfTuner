@@ -1,10 +1,9 @@
 #pragma once
 
-#include <yaml-cpp/yaml.h>
-
 #include "abstracts/loggable.hpp"
 #include "abstracts/singleton.hpp"
 #include "file_utils.hpp"
+#include "serialize_utils.hpp"
 
 template <typename T>
 class Configuration : public Singleton<Configuration<T>>, Loggable {
@@ -26,11 +25,7 @@ class Configuration : public Singleton<Configuration<T>>, Loggable {
 		logger->debug("Configuration saved");
 
 		try {
-			YAML::Node node = YAML::convert<T>::encode(*config);
-
-			std::ofstream fout(configFile);
-			fout << node;
-			fout.close();
+			SerializeUtils::writeYamlFile(*config, configFile);
 		} catch (const std::exception& e) {
 			logger->error("Error saving settings file: {}", e.what());
 		}
@@ -50,8 +45,7 @@ class Configuration : public Singleton<Configuration<T>>, Loggable {
 		if (FileUtils::exists(configFile)) {
 			logger->debug("Loading settings from {}", configFile);
 			try {
-				auto node = YAML::LoadFile(configFile);
-				config	  = node.as<T>();
+				config = SerializeUtils::readYamlFile<T>(configFile);
 				LoggerProvider::setConfigMap(config->logger);
 			} catch (const std::exception& e) {
 				logger->error("Error loading settings: {}", e.what());

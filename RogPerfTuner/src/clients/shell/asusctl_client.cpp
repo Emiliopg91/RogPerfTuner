@@ -3,7 +3,7 @@
 #include <unordered_map>
 
 void AsusCtlClient::turnOffAura() {
-	run_command("aura static -c 000000", true, false);
+	run_command("aura effect static --colour 000000", true, false);
 }
 
 std::unordered_map<std::string, FanCurveData> AsusCtlClient::getFanCurveData(PlatformProfile profile) {

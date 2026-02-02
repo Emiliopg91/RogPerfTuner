@@ -1,0 +1,76 @@
+{
+  "name": "rcc-decky-companion",
+  "version": "1.2.7",
+  "description": "Rog laptop Decky plugin companion",
+  "type": "module",
+  "scripts": {
+    "format": "prettier --write .",
+    "lint": "eslint . --ext .js,.jsx,.cjs,.mjs,.ts,.tsx,.cts,.mts --fix --cache",
+    "build": "shx rm -rf dist && rollup -c --silent",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com//Emiliopg91/AllyDeckyCompanion.git"
+  },
+  "keywords": [
+    "decky",
+    "plugin",
+    "ally"
+  ],
+  "author": "Emiliopg91",
+  "license": "BSD-3-Clause",
+  "bugs": {
+    "url": "https://github.com//Emiliopg91/AllyDeckyCompanion/issues"
+  },
+  "homepage": "https://github.com//Emiliopg91/AllyDeckyCompanion#readme",
+  "devDependencies": {
+    "@decky/api": "^1.1.2",
+    "@decky/rollup": "^1.0.1",
+    "@decky/ui": "^4.7.2",
+    "@electron-toolkit/eslint-config-prettier": "^2.0.0",
+    "@electron-toolkit/eslint-config-ts": "^2.0.0",
+    "@rollup/plugin-commonjs": "^21.1.0",
+    "@rollup/plugin-json": "^4.1.0",
+    "@rollup/plugin-node-resolve": "^13.3.0",
+    "@rollup/plugin-replace": "^4.0.0",
+    "@rollup/plugin-terser": "^0.4.4",
+    "@rollup/plugin-typescript": "^8.5.0",
+    "@trivago/prettier-plugin-sort-imports": "^4.3.0",
+    "@types/lodash": "^4.17.7",
+    "@types/react": "18.3.3",
+    "@types/react-dom": "18.3.0",
+    "@types/webpack": "^5.28.5",
+    "@types/ws": "^8.5.13",
+    "decky-plugin-framework": "^1.4.8",
+    "eslint": "8.57.1",
+    "eslint-plugin-react": "^7.34.3",
+    "prettier": "3.3.3",
+    "rollup": "^4.21.3",
+    "rollup-plugin-import-assets": "^1.1.1",
+    "shx": "^0.3.4",
+    "tslib": "^2.7.0",
+    "typescript": "^5.6.2"
+  },
+  "dependencies": {
+    "async-mutex": "^0.5.0",
+    "lodash": "^4.17.21",
+    "react-icons": "^4.12.0",
+    "ws": "^8.18.0"
+  },
+  "pnpm": {
+    "peerDependencyRules": {
+      "ignoreMissing": [
+        "react",
+        "react-dom"
+      ]
+    }
+  },
+  "importSort": {
+    ".js, .jsx, .ts, .tsx": {
+      "style": "module",
+      "parser": "typescript"
+    }
+  },
+  "packageManager": "pnpm@9.14.2+sha512.6e2baf77d06b9362294152c851c4f278ede37ab1eba3a55fda317a4a17b209f4dbb973fb250a77abc463a341fcb1f17f17cfa24091c4eb319cda0d9b84278387"
+}

@@ -24,6 +24,7 @@ set_target_properties(Framework PROPERTIES AUTOMOC ON)
 
 target_link_libraries(Framework PUBLIC 
     magic_enum
+    nlohmann-json
     Qt6::DBus
     yaml-cpp::yaml-cpp
 )

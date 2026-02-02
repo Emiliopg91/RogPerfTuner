@@ -1,0 +1,36 @@
+{
+  "name": "rollup-plugin-import-assets",
+  "version": "1.1.1",
+  "description": "Rollup plugin to import assets",
+  "main": "index.js",
+  "files": [
+    "index.js",
+    "README.md",
+    "LICENSE"
+  ],
+  "scripts": {
+    "lint": "eslint index.js",
+    "prepublishOnly": "npm run lint"
+  },
+  "repository": "domingues/rollup-plugin-import-assets",
+  "keywords": [
+    "rollup-plugin",
+    "assets"
+  ],
+  "author": "Fábio Domingues",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/domingues/rollup-plugin-import-assets/issues"
+  },
+  "homepage": "https://github.com/domingues/rollup-plugin-import-assets",
+  "dependencies": {
+    "rollup-pluginutils": "^2.7.1",
+    "url-join": "^4.0.1"
+  },
+  "devDependencies": {
+    "eslint": "^7.8.1"
+  },
+  "peerDependencies": {
+    "rollup": ">=1.9.0"
+  }
+}

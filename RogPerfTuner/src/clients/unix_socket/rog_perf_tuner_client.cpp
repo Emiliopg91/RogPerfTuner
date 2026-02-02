@@ -2,6 +2,8 @@
 
 #include <any>
 
+#include "models/steam/steam_game_config.hpp"
+#include "serialize_utils.hpp"
 #include "utils/constants.hpp"
 
 RogPerfTunerClient::RogPerfTunerClient() : AbstractUnixSocketClient(Constants::SOCKET_FILE, "RogPerfTunerClient") {
@@ -24,13 +26,8 @@ void RogPerfTunerClient::nextProfile() {
 }
 
 SteamGameConfig RogPerfTunerClient::getGameConfig(std::string steamId) {
-	auto res = invoke(Constants::GAME_CFG, {steamId});
-
+	auto res	  = invoke(Constants::GAME_CFG, {steamId});
 	auto yaml_str = std::any_cast<std::string>(res[0]);
 
-	YAML::Node node = YAML::Load(yaml_str);
-
-	SteamGameConfig cfg = node.as<SteamGameConfig>();
-
-	return cfg;
+	return SerializeUtils::parseYaml<SteamGameConfig>(yaml_str);
 }

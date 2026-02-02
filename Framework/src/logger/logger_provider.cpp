@@ -86,7 +86,7 @@ void LoggerProvider::initialize(std::string fileName, std::string path) {
 	}
 	auto main_logger = std::make_shared<Logger>(console_sink, file_sink, FrameworkConstants::DEFAULT_LOGGER_NAME);
 	if (getenv("RCC_LOG_LEVEL")) {
-		defaultLevel = fromName<LoggerLevel>(StringUtils::toLowerCase(getenv("RCC_LOG_LEVEL")));
+		defaultLevel = fromName<LoggerLevel>(StringUtils::toUpperCase(getenv("RCC_LOG_LEVEL")));
 	}
 	main_logger->setLevel(defaultLevel);
 }

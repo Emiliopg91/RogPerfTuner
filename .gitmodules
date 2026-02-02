@@ -14,3 +14,6 @@
 [submodule "submodules/magic_enum"]
 	path = submodules/magic_enum
 	url = https://github.com/Neargye/magic_enum
+[submodule "submodules/nlohmann-json"]
+	path = submodules/nlohmann-json
+	url = https://github.com/nlohmann/json

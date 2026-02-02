@@ -1,5 +1,6 @@
 #include "clients/unix_socket/steam_client.hpp"
 
+#include "serialize_utils.hpp"
 #include "utils/constants.hpp"
 
 SteamSocketClient::SteamSocketClient() : AbstractUnixSocketClient(Constants::RCDCC_SOCKET_PATH, "SteamClient") {
@@ -24,9 +25,8 @@ const std::vector<SteamGameDetails> SteamSocketClient::getAppsDetails(const std:
 
 	auto invResult = invoke("get_apps_details", converted);
 
-	auto yaml_node	= std::any_cast<std::string>(invResult[0]);
-	YAML::Node node = YAML::Load(yaml_node);
-	auto map		= node.as<std::unordered_map<std::string, SteamGameDetails>>();
+	auto yaml = std::any_cast<std::string>(invResult[0]);
+	auto map  = SerializeUtils::parseYaml<std::unordered_map<std::string, SteamGameDetails>>(yaml);
 	for (const auto& [key, val] : map) {
 		result.emplace_back(val);
 	}

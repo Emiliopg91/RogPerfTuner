@@ -1,11 +1,10 @@
 
 #include "translator/translator.hpp"
 
-#include <yaml-cpp/yaml.h>
-
 #include <string>
 
 #include "enum_utils.hpp"
+#include "serialize_utils.hpp"
 #include "string_utils.hpp"
 
 Translator::Translator(const std::string& translation_file) : Loggable("Translator") {
@@ -31,11 +30,11 @@ Translator::Translator(const std::string& translation_file) : Loggable("Translat
 		}
 	}();
 
-	YAML::Node root = YAML::LoadFile(translation_file);
+	auto root = SerializeUtils::readYamlFile(translation_file);
 
 	for (auto it = root.begin(); it != root.end(); ++it) {
-		const std::string key	= it->first.as<std::string>();
-		const YAML::Node& value = it->second;
+		const std::string key = it->first.as<std::string>();
+		const auto& value	  = it->second;
 
 		std::string val = key;
 		if (value[toString(currentLang)]) {

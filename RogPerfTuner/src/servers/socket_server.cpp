@@ -13,6 +13,7 @@
 
 #include "clients/abstract_unix_socket_client.hpp"
 #include "file_utils.hpp"
+#include "serialize_utils.hpp"
 
 SocketServer::SocketServer() : Loggable("SocketServer") {
 	logger->info("Initializing socket server");
@@ -140,10 +141,7 @@ void SocketServer::handleClient(int client_fd) {
 
 		Logger::add_tab();
 		try {
-			YAML::Node node = YAML::Load(data);
-
-			UnixCommunicationMessage req = node.as<UnixCommunicationMessage>();
-
+			auto req = SerializeUtils::parseYaml<UnixCommunicationMessage>(data);
 			if (req.type == "REQUEST") {
 				handleRequest(client_fd, req);
 			}
@@ -181,11 +179,7 @@ void SocketServer::handleRequest(const int& clientFd, const UnixCommunicationMes
 			} catch (std::exception& e) {
 				idStr = std::to_string(std::any_cast<uint64_t>(req.data[0]));
 			}
-			YAML::Node node = YAML::convert<SteamGameConfig>::encode(steamService.getConfiguration(idStr));
-
-			std::stringstream ss;
-			ss << node;
-			res.data.emplace_back(ss.str());
+			res.data.emplace_back(SerializeUtils::writeYaml(steamService.getConfiguration(idStr)));
 		} else {
 			res.error = "No such method";
 		}
@@ -194,10 +188,7 @@ void SocketServer::handleRequest(const int& clientFd, const UnixCommunicationMes
 		res.error = e.what();
 	}
 
-	YAML::Node node = YAML::convert<UnixCommunicationMessage>::encode(res);
-	std::stringstream ss;
-	ss << node;
-	std::string resp_str = ss.str();
+	std::string resp_str = SerializeUtils::writeYaml(res);
 
 	uint32_t resp_len = htonl(resp_str.size());
 	write(clientFd, &resp_len, sizeof(resp_len));

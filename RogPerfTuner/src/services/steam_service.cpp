@@ -230,10 +230,10 @@ void SteamService::launchGame(const std::string& id) {
 }
 
 bool SteamService::checkIfRequiredInstallation() {
-	YAML::Node node = YAML::LoadFile(Constants::RCCDC_PACKAGE_FILE);
+	auto node = SerializeUtils::readJsonFile(Constants::RCCDC_PACKAGE_FILE);
 
 	SemanticVersion vA = SemanticVersion::parse(Constants::PLUGIN_VERSION);
-	SemanticVersion vR = SemanticVersion::parse(node["version"].as<std::string>());
+	SemanticVersion vR = SemanticVersion::parse(node["version"]);
 
 	return vA > vR;
 }

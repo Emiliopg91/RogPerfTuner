@@ -2,6 +2,7 @@
 
 #include <csignal>
 
+#include "serialize_utils.hpp"
 #include "string_utils.hpp"
 #include "time_utils.hpp"
 
@@ -54,10 +55,7 @@ std::vector<std::any> AbstractUnixSocketClient::invoke(std::string method, std::
 	{
 		std::lock_guard<std::mutex> lock(mutex);
 		promises[cm.id] = std::move(prom);
-		YAML::Node node = YAML::convert<UnixCommunicationMessage>::encode(cm);
-		std::stringstream ss;
-		ss << node;
-		_message_queue.push(ss.str());
+		_message_queue.push(SerializeUtils::writeYaml(cm));
 	}
 	queue_cv.notify_one();
 
@@ -196,9 +194,7 @@ void AbstractUnixSocketClient::readLoop() {
 				total_read += r;
 			}
 
-			YAML::Node node			   = YAML::Load(data);
-			UnixCommunicationMessage j = node.as<UnixCommunicationMessage>();
-
+			auto j = SerializeUtils::parseYaml<UnixCommunicationMessage>(data);
 			if (j.type == "RESPONSE") {
 				handleResponse(j);
 			} else if (j.type == "EVENT") {
