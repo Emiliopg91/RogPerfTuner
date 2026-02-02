@@ -105,9 +105,9 @@ void Logger::log(LoggerLevel msgLevel, const std::string& format) {
 
 	auto out = "[" + now_timestamp() + "][" + StringUtils::rightPad(toName(msgLevel), 7).substr(0, 7) + "][" + name + "] - " +
 			   StringUtils::rightPad("", tabs * 2) + format + "\n";
-	consoleSink->write(out, level);
+	consoleSink->write(out, msgLevel);
 	if (fileSink.has_value()) {
-		fileSink.value()->write(out, level);
+		fileSink.value()->write(out, msgLevel);
 	}
 }
 
