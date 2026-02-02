@@ -1,7 +1,7 @@
 #pragma once
 
-#include "abstracts/clients/abstract_cmd_client.hpp"
 #include "abstracts/singleton.hpp"
+#include "clients/abstract_cmd_client.hpp"
 #include "models/hardware/fan_curve_data.hpp"
 #include "models/performance/platform_profile.hpp"
 

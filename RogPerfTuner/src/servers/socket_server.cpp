@@ -11,7 +11,7 @@
 #include <filesystem>
 #include <string>
 
-#include "abstracts/clients/abstract_unix_socket_client.hpp"
+#include "clients/abstract_unix_socket_client.hpp"
 #include "file_utils.hpp"
 
 SocketServer::SocketServer() : Loggable("SocketServer") {

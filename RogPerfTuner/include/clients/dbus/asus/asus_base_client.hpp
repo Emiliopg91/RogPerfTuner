@@ -1,6 +1,6 @@
 #pragma once
 
-#include "abstracts/clients/abstract_dbus_client.hpp"
+#include "clients/abstract_dbus_client.hpp"
 
 class AsusBaseClient : public AbstractDbusClient {
   public:

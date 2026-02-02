@@ -1,7 +1,7 @@
 #pragma once
 
-#include "abstracts/clients/abstract_cmd_client.hpp"
 #include "abstracts/singleton.hpp"
+#include "clients/abstract_cmd_client.hpp"
 
 class FlatpakClient : public AbstractCmdClient, public Singleton<FlatpakClient> {
   private:

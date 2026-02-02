@@ -1,6 +1,5 @@
 
-#include "abstracts/clients/abstract_cmd_client.hpp"
-
+#include "clients/abstract_cmd_client.hpp"
 #include "string_utils.hpp"
 
 AbstractCmdClient::AbstractCmdClient(const std::string& command, const std::string& name, const bool& required)

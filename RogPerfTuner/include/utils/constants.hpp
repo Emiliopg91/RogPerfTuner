@@ -84,12 +84,8 @@ class Constants : public FrameworkConstants {
 	static const std::string FLATPAK_MANGOHUD;
 	static const std::string FLATPAK_MANGOHUD_OVERRIDE;
 
-	static const std::string LOGGER_PATTERN;
-
 	static const std::string RCDCC_SOCKET_PATH;
 
 	static const std::string TRANSLATIONS_FILE;
 	static const std::string CHANGELOG_URL;
-
-	static const std::string APICOUNT_TOKEN;
 };
