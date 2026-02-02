@@ -1,3 +1,0 @@
-# Decky API
-
-doc todo

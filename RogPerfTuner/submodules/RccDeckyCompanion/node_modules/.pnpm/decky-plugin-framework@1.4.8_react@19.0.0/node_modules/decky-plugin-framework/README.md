@@ -1,1 +1,0 @@
-# decky-plugin-lib
