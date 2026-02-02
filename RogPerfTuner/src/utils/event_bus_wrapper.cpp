@@ -114,42 +114,12 @@ void EventBusWrapper::emitBootSound(bool value) {
 	this->eventBus.emit_event(HARDWARE_SERVICE_BOOT_SOUND_CHANGED, {value});
 }
 
-void EventBusWrapper::emitDbusPropertyEvent(std::string interface, std::string property, std::any value) {
-	this->eventBus.emit_event("dbus." + interface + ".property." + property, {value});
-}
-
-void EventBusWrapper::onDbusPropertyEvent(std::string interface, std::string property, CallbackWithAnyParam&& callback) {
-	this->eventBus.on_with_data("dbus." + interface + ".property." + property, [cb = std::move(callback)](CallbackParam data) {
-		cb(data[0]);
-	});
-}
-
-void EventBusWrapper::emitDbusSignalEvent(std::string interface, std::string property) {
-	this->eventBus.emit_event("dbus." + interface + ".signal." + property);
-}
-
-void EventBusWrapper::onDbusSignalEvent(std::string interface, std::string property, Callback&& callback) {
-	this->eventBus.on_without_data("dbus." + interface + ".property." + property, [cb = std::move(callback)]() {
-		cb();
-	});
-}
-
 void EventBusWrapper::emitServerSocketEvent(std::string event, CallbackParam value) {
 	this->eventBus.emit_event("socket.server.event." + event, value);
 }
 
 void EventBusWrapper::onServerSocketEvent(std::string event, CallbackWithParams&& callback) {
 	this->eventBus.on_with_data("socket.server.event." + event, [cb = std::move(callback)](CallbackParam data) {
-		cb(data);
-	});
-}
-
-void EventBusWrapper::emitUnixSocketEvent(std::string name, std::string event, CallbackParam value) {
-	this->eventBus.emit_event("unix.socket." + name + ".event." + event, value);
-}
-
-void EventBusWrapper::onUnixSocketEvent(std::string name, std::string event, CallbackWithParams&& callback) {
-	this->eventBus.on_with_data("unix.socket." + name + ".event." + event, [cb = std::move(callback)](CallbackParam data) {
 		cb(data);
 	});
 }
