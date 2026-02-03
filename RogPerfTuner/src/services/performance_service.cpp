@@ -129,7 +129,6 @@ void PerformanceService::setPerformanceProfile(PerformanceProfile& profile, cons
 	std::lock_guard<std::mutex> lock(actionMutex);
 	std::string profileName = toName(profile);
 
-	Logger::add_tab();
 	if (profile != currentProfile || force) {
 		logger->info("Setting {} profile", profileName);
 
@@ -163,7 +162,6 @@ void PerformanceService::setPerformanceProfile(PerformanceProfile& profile, cons
 	} else {
 		logger->info("Profile {} already setted", StringUtils::toLowerCase(profileName));
 	}
-	Logger::rem_tab();
 	eventBus.emitPerformanceProfile(profile);
 }
 
