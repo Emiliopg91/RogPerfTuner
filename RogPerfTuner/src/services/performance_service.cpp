@@ -89,8 +89,8 @@ void PerformanceService::setActualPerformanceProfile(PerformanceProfile& profile
 		actualProfile = profile;
 
 	} catch (std::exception& e) {
-		Logger::rem_tab();
 	}
+	Logger::rem_tab();
 }
 
 void PerformanceService::smartWorker() {
