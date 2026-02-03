@@ -135,8 +135,10 @@ void PerformanceService::setPerformanceProfile(PerformanceProfile& profile, cons
 
 		if (profile != PerformanceProfile::SMART) {
 			stopFlag.store(true);
-			smartThread->detach();
-			smartThread = std::nullopt;
+			if (smartThread.has_value()) {
+				smartThread->detach();
+				smartThread = std::nullopt;
+			}
 			setActualPerformanceProfile(profile);
 		} else {
 			auto perf = PerformanceProfile::QUIET;
