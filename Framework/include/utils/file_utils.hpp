@@ -5,9 +5,6 @@
 #include <vector>
 
 class FileUtils {
-  private:
-	static std::filesystem::path expandPath(const std::string& path);
-
   public: /**
 		   * @brief Check if path exists.
 		   *

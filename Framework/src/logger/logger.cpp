@@ -5,7 +5,7 @@
 #include <iomanip>
 #include <memory>
 
-#include "enum_utils.hpp"
+#include "utils/enum_utils.hpp"
 
 void Logger::setLevel(std::string level) {
 	this->setLevel(fromName<LoggerLevel>(level));

@@ -1,7 +1,7 @@
 #include "clients/unix_socket/steam_client.hpp"
 
-#include "serialize_utils.hpp"
 #include "utils/constants.hpp"
+#include "utils/serialize_utils.hpp"
 
 SteamSocketClient::SteamSocketClient() : AbstractUnixSocketClient(Constants::RCDCC_SOCKET_PATH, "SteamClient") {
 }

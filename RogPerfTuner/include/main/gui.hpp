@@ -17,12 +17,12 @@
 #include "services/open_rgb_service.hpp"
 #include "services/performance_service.hpp"
 #include "services/steam_service.hpp"
-#include "single_instance.hpp"
-#include "string_utils.hpp"
-#include "time_utils.hpp"
 #include "translator/translator.hpp"
 #include "utils/configuration_wrapper.hpp"
 #include "utils/constants.hpp"
+#include "utils/single_instance.hpp"
+#include "utils/string_utils.hpp"
+#include "utils/time_utils.hpp"
 
 inline void terminateHandler() {
 	std::cerr << "Unhandled exception detected\n";

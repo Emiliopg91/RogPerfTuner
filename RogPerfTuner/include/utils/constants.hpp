@@ -5,12 +5,13 @@
 #include <string>
 #include <vector>
 
-#include "framework_constants.hpp"
-
-class Constants : public FrameworkConstants {
+class Constants {
   public:
 	static const std::string APP_NAME;
 	static const std::string EXEC_NAME;
+	static const pid_t PID;
+
+	static const std::string HOME_DIR;
 
 	const static std::string APP_VERSION;
 

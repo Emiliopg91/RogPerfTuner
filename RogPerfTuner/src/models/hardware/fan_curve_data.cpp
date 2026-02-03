@@ -3,7 +3,7 @@
 #include <regex>
 #include <sstream>
 
-#include "string_utils.hpp"
+#include "utils/string_utils.hpp"
 
 std::unordered_map<std::string, FanCurveData> FanCurveData::parseCurves(std::string input) {
 	std::unordered_map<std::string, FanCurveData> result;

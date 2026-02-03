@@ -45,11 +45,6 @@ target_include_directories(magic_enum INTERFACE
 
 add_subdirectory(submodules/yaml-cpp)
 
-add_library(nlohmann-json INTERFACE)
-target_include_directories(nlohmann-json INTERFACE
-    "submodules/nlohmann-json/include/nlohmann"
-)
-
 add_subdirectory(submodules/OpenRGB-cppSDK)
 
 add_subdirectory(Framework)

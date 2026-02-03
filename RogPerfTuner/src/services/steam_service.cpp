@@ -13,16 +13,16 @@
 #ifndef DEV_MODE
 #include "gui/yes_no_dialog.hpp"
 #endif
-#include "file_utils.hpp"
 #include "models/others/semantic_version.hpp"
 #include "models/steam/steam_game_details.hpp"
-#include "net_utils.hpp"
-#include "process_utils.hpp"
 #include "services/hardware_service.hpp"
 #include "services/open_rgb_service.hpp"
 #include "services/performance_service.hpp"
-#include "string_utils.hpp"
-#include "time_utils.hpp"
+#include "utils/file_utils.hpp"
+#include "utils/net_utils.hpp"
+#include "utils/process_utils.hpp"
+#include "utils/string_utils.hpp"
+#include "utils/time_utils.hpp"
 #include "yaml-cpp/node/node.h"
 #include "yaml-cpp/node/parse.h"
 

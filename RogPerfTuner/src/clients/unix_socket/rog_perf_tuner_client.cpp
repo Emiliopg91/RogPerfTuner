@@ -3,8 +3,8 @@
 #include <any>
 
 #include "models/steam/steam_game_config.hpp"
-#include "serialize_utils.hpp"
 #include "utils/constants.hpp"
+#include "utils/serialize_utils.hpp"
 
 RogPerfTunerClient::RogPerfTunerClient() : AbstractUnixSocketClient(Constants::SOCKET_FILE, "RogPerfTunerClient") {
 }

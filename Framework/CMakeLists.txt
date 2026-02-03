@@ -7,6 +7,8 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 find_package(Qt6 REQUIRED COMPONENTS DBus)
 
+find_package(nlohmann_json REQUIRED)
+
 file(GLOB_RECURSE SOURCES_LIB
     "${CMAKE_CURRENT_SOURCE_DIR}/src/*.cpp"
 )
@@ -24,7 +26,7 @@ set_target_properties(Framework PROPERTIES AUTOMOC ON)
 
 target_link_libraries(Framework PUBLIC 
     magic_enum
-    nlohmann-json
+    nlohmann_json::nlohmann_json
     Qt6::DBus
     yaml-cpp::yaml-cpp
 )

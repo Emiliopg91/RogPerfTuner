@@ -11,7 +11,7 @@
 #include <stdexcept>
 #include <string>
 
-#include "string_utils.hpp"
+#include "utils/string_utils.hpp"
 
 namespace {
 void set_nonblocking(int fd) {

@@ -15,7 +15,6 @@
 #include <string>
 #include <unordered_map>
 
-#include "framework_constants.hpp"
 #include "logger/logger.hpp"
 #include "logger/sink/console_sink.hpp"
 #include "logger/sink/file_sink.hpp"
@@ -36,7 +35,7 @@ class LoggerProvider {
 	 * @param name
 	 * @return std::shared_ptr<spdlog::logger>
 	 */
-	static std::shared_ptr<Logger> getLogger(const std::string& name = FrameworkConstants::DEFAULT_LOGGER_NAME);
+	static std::shared_ptr<Logger> getLogger(const std::string& name = DEFAULT_LOGGER_NAME);
 
 	/**
 	 * @brief Set the Config Map object
@@ -46,6 +45,7 @@ class LoggerProvider {
 	static void setConfigMap(std::map<std::string, LoggerLevel> configMap);
 
   private:
+	inline static const std::string DEFAULT_LOGGER_NAME = "Default";
 	inline static std::shared_ptr<ConsoleSink> console_sink{};
 	inline static std::optional<std::shared_ptr<FileSink>> file_sink = std::nullopt;
 	inline static std::unordered_map<std::string, std::shared_ptr<Logger>> loggers{};

@@ -19,7 +19,7 @@
 #include "gui/changelog_view.hpp"
 #include "gui/fan_curve_editor.hpp"
 #include "gui/game_list.hpp"
-#include "string_utils.hpp"
+#include "utils/string_utils.hpp"
 
 MainWindow::MainWindow(QWidget* parent) : QMainWindow(parent) {
 	onBattery	 = uPowerClient.isOnBattery();

@@ -4,11 +4,12 @@
 #include <unistd.h>
 
 #ifdef DEV_MODE
-#include "file_utils.hpp"
+#include "utils/file_utils.hpp"
 #endif
 
 const std::string Constants::APP_NAME  = "RogPerfTuner";
 const std::string Constants::EXEC_NAME = "rog-perf-tuner";
+const pid_t Constants::PID			   = getpid();
 
 const std::string Constants::APP_VERSION = "4.10.9-1";
 
@@ -42,6 +43,7 @@ const std::string Constants::ORGB_PATH			= ASSETS_DIR + "/OpenRGB/openrgb";
 const std::string Constants::RCCDC_ASSET_PATH	= ASSETS_DIR + "/RccDeckyCompanion";
 const std::string Constants::TRANSLATIONS_FILE	= ASSETS_DIR + "/translations.yaml";
 
+const std::string Constants::HOME_DIR				  = std::getenv("HOME");
 const std::string Constants::BIN_DIR				  = HOME_DIR + "/." + APP_NAME + "/bin";
 const std::string Constants::BIN_APPLICATION_DIR	  = HOME_DIR + "/." + APP_NAME + "/bin/application";
 const std::string Constants::BIN_PERFORMANCE_DIR	  = HOME_DIR + "/." + APP_NAME + "/bin/performance";

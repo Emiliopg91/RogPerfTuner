@@ -2,8 +2,8 @@
 
 #include "abstracts/loggable.hpp"
 #include "abstracts/singleton.hpp"
-#include "file_utils.hpp"
-#include "serialize_utils.hpp"
+#include "utils/file_utils.hpp"
+#include "utils/serialize_utils.hpp"
 
 template <typename T>
 class Configuration : public Singleton<Configuration<T>>, Loggable {

@@ -9,15 +9,15 @@
 #include "clients/file/cpuinfo_client.hpp"
 #include "clients/lib/lsusb_client.hpp"
 #include "clients/shell/switcherooctl_client.hpp"
-#include "file_utils.hpp"
 #include "gui/toaster.hpp"
 #include "models/hardware/battery_charge_threshold.hpp"
 #include "models/hardware/gpu_brand.hpp"
 #include "services/open_rgb_service.hpp"
-#include "string_utils.hpp"
-#include "time_utils.hpp"
 #include "translator/translator.hpp"
 #include "utils/event_bus_wrapper.hpp"
+#include "utils/file_utils.hpp"
+#include "utils/string_utils.hpp"
+#include "utils/time_utils.hpp"
 
 HardwareService::HardwareService() : Loggable("HardwareService") {
 	logger->info("Initializing HardwareService");

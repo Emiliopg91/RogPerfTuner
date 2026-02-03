@@ -2,12 +2,12 @@
 
 #include <yaml-cpp/yaml.h>
 
-#include "enum_utils.hpp"
 #include "logger/logger_level.hpp"
 #include "models/settings/application.hpp"
 #include "models/settings/aura.hpp"
 #include "models/settings/game_entry.hpp"
 #include "models/settings/platform.hpp"
+#include "utils/enum_utils.hpp"
 
 struct RootConfig {
 	Aura aura								  = Aura();

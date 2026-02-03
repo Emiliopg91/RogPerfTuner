@@ -1,4 +1,4 @@
-#include "file_utils.hpp"
+#include "utils/file_utils.hpp"
 
 #include <sys/stat.h>
 
@@ -8,23 +8,6 @@
 #include <iostream>
 #include <sstream>
 #include <string>
-
-#include "framework_constants.hpp"
-
-std::filesystem::path FileUtils::expandPath(const std::string& path) {
-	std::filesystem::path p = path;
-
-	if (!path.empty() && path[0] == '~') {
-		p = std::filesystem::path(std::string(FrameworkConstants::HOME_DIR) + path.substr(1));
-	}
-
-	// Convierte a ruta absoluta
-	if (!p.is_absolute()) {
-		p = std::filesystem::absolute(p);
-	}
-
-	return p;
-}
 
 bool FileUtils::exists(const std::string& path) {
 	return std::filesystem::exists(std::filesystem::path(path));

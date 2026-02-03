@@ -9,7 +9,7 @@
 #include <optional>
 
 #include "gui/yes_no_dialog.hpp"
-#include "string_utils.hpp"
+#include "utils/string_utils.hpp"
 
 GameConfigDialog::GameConfigDialog(unsigned int gid, bool runAfterSave, QWidget* parent)
 	: Loggable("GameConfigDialog"), QDialog(parent), gid(gid), runAfterSave(runAfterSave) {

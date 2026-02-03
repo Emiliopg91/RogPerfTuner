@@ -6,7 +6,7 @@
 #include <type_traits>
 #include <unordered_map>
 
-#include "string_utils.hpp"
+#include "utils/string_utils.hpp"
 
 template <typename T>
 concept EnumClass = std::is_enum_v<T>;

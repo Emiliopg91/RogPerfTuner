@@ -1,18 +1,18 @@
-#include "single_instance.hpp"
+#include "utils/single_instance.hpp"
 
 #include <signal.h>
+#include <unistd.h>
 
 #include <fstream>
 #include <iostream>
 
-#include "file_utils.hpp"
-#include "framework_constants.hpp"
+#include "utils/file_utils.hpp"
 
 void SingleInstance::acquire(std::string lockFile) {
 	killRunningInstance(lockFile);
 
 	std::ofstream out(lockFile);
-	out << FrameworkConstants::PID;
+	out << getpid();
 	out.close();
 }
 

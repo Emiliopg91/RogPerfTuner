@@ -2,10 +2,9 @@
 
 #include <filesystem>
 
-#include "enum_utils.hpp"
-#include "file_utils.hpp"
-#include "framework_constants.hpp"
-#include "string_utils.hpp"
+#include "utils/enum_utils.hpp"
+#include "utils/file_utils.hpp"
+#include "utils/string_utils.hpp"
 
 static std::string format_file_time(std::filesystem::file_time_type ftime) {
 	using namespace std::chrono;
@@ -84,7 +83,7 @@ void LoggerProvider::initialize(std::string fileName, std::string path) {
 
 		file_sink = std::make_shared<FileSink>(path + "/" + fileName + ".log");
 	}
-	auto main_logger = std::make_shared<Logger>(console_sink, file_sink, FrameworkConstants::DEFAULT_LOGGER_NAME);
+	auto main_logger = std::make_shared<Logger>(console_sink, file_sink, DEFAULT_LOGGER_NAME);
 	if (getenv("RCC_LOG_LEVEL")) {
 		defaultLevel = fromName<LoggerLevel>(StringUtils::toUpperCase(getenv("RCC_LOG_LEVEL")));
 	}
@@ -117,7 +116,7 @@ void LoggerProvider::setConfigMap(std::map<std::string, LoggerLevel> configMap) 
 		if (it != LoggerProvider::loggers.end()) {
 			it->second->setLevel(level);
 		}
-		if (key == FrameworkConstants::DEFAULT_LOGGER_NAME) {
+		if (key == DEFAULT_LOGGER_NAME) {
 			defaultLevel = level;
 		}
 	}
