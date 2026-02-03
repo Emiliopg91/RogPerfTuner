@@ -16,7 +16,7 @@
 
 #include "abstracts/loggable.hpp"
 #include "abstracts/singleton.hpp"
-#include "command_result.hpp"
+#include "models/command_result.hpp"
 
 class Shell : public Singleton<Shell>, Loggable {
   public:

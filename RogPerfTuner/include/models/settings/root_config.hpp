@@ -2,7 +2,7 @@
 
 #include <yaml-cpp/yaml.h>
 
-#include "logger/logger_level.hpp"
+#include "models/logger_level.hpp"
 #include "models/settings/application.hpp"
 #include "models/settings/aura.hpp"
 #include "models/settings/game_entry.hpp"

@@ -2,35 +2,9 @@
 
 #include <algorithm>
 #include <cmath>
-#include <fstream>
 #include <thread>
 
-CPUUsage DigitalRainEffect::readCPU() {
-	std::ifstream file("/proc/stat");
-	std::string line;
-	CPUUsage cpu;
-
-	if (file.is_open()) {
-		std::getline(file, line);
-		std::istringstream ss(line);
-		std::string cpu_label;
-		ss >> cpu_label >> cpu.user >> cpu.nice >> cpu.system >> cpu.idle >> cpu.iowait >> cpu.irq >> cpu.softirq;
-	}
-
-	return cpu;
-}
-
-double DigitalRainEffect::getCPUUsagePercent() {
-	CPUUsage cpu1 = readCPU();
-	_sleep(0.1);
-	CPUUsage cpu2 = readCPU();
-
-	long long active_diff = cpu2.active() - cpu1.active();
-	long long total_diff  = cpu2.total() - cpu1.total();
-
-	return 100.0 * active_diff / total_diff;
-}
-
+#include "models/cpu_usage.hpp"
 std::vector<std::vector<LedStatus>> DigitalRainEffect::_dev_to_mat(Device& dev) {
 	std::vector<std::vector<LedStatus>> mat_def;
 	uint32_t offset	   = 0;
@@ -165,7 +139,7 @@ void DigitalRainEffect::device_thread(Device& dev) {
 
 void DigitalRainEffect::cpu_thread() {
 	while (_is_running) {
-		_cpu = std::max(1.0, getCPUUsagePercent()) / 100.0;	 // psutil_cpu_percent() sería tu función para CPU %
+		_cpu = std::max(0.01, CPUUsage::getUseRate());
 		_sleep(2 * _nap_time);
 	}
 }

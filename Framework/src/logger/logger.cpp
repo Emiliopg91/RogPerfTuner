@@ -98,10 +98,11 @@ void Logger::rem_tab() {
 }
 
 void Logger::log(LoggerLevel msgLevel, const std::string& format) {
-	std::lock_guard<std::mutex> lock(mutex);
 	if (toInt(msgLevel) > toInt(level)) {
 		return;
 	}
+
+	std::lock_guard<std::mutex> lock(mutex);
 
 	auto out = "[" + now_timestamp() + "][" + StringUtils::rightPad(toName(msgLevel), 7).substr(0, 7) + "][" + name + "] - " +
 			   StringUtils::rightPad("", tabs * 2) + format + "\n";

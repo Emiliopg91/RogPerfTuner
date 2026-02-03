@@ -2,14 +2,27 @@
 
 #include "models/performance/platform_profile.hpp"
 
-PerformanceProfile getNextPerformanceProfile(PerformanceProfile value) {
+PerformanceProfile getNextPerformanceProfile(PerformanceProfile value, bool circular) {
 	switch (value) {
 		case PerformanceProfile::PERFORMANCE:
-			return PerformanceProfile::QUIET;
+			return circular ? PerformanceProfile::QUIET : PerformanceProfile::PERFORMANCE;
+		case PerformanceProfile::BALANCED:
+			return PerformanceProfile::PERFORMANCE;
+		case PerformanceProfile::QUIET:
+			return PerformanceProfile::BALANCED;
+		default:
+			return value;
+	}
+}
+
+PerformanceProfile getPreviousPerformanceProfile(PerformanceProfile value, bool circular) {
+	switch (value) {
+		case PerformanceProfile::PERFORMANCE:
+			return PerformanceProfile::BALANCED;
 		case PerformanceProfile::BALANCED:
 			return PerformanceProfile::QUIET;
 		case PerformanceProfile::QUIET:
-			return PerformanceProfile::BALANCED;
+			return circular ? PerformanceProfile::PERFORMANCE : PerformanceProfile::QUIET;
 		default:
 			return value;
 	}

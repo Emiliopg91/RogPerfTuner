@@ -2,8 +2,11 @@
 
 #include <optional>
 #include <string>
+#include <thread>
 
+#include "models/cpu_usage.hpp"
 #include "models/performance/cpu_governor.hpp"
+#include "models/performance/performance_profile.hpp"
 #include "models/performance/power_profile.hpp"
 #include "utils/configuration_wrapper.hpp"
 #include "utils/enum_utils.hpp"
@@ -68,43 +71,96 @@ PerformanceProfile PerformanceService::getPerformanceProfile() {
 	return currentProfile;
 }
 
+void PerformanceService::setActualPerformanceProfile(PerformanceProfile& profile) {
+	std::string profileName = toName(profile);
+	logger->info("Applying {} profile", profileName);
+	Logger::add_tab();
+	try {
+		setPlatformProfile(profile);
+		setBoost(profile);
+		setCpuGovernor(profile);
+		setPowerProfile(profile);
+		setTdps(profile);
+		setTgp(profile);
+		setFanCurves(profile);
+
+		Logger::rem_tab();
+		logger->info("Profile applied succesfully");
+		actualProfile = profile;
+
+	} catch (std::exception& e) {
+		Logger::rem_tab();
+	}
+}
+
+void PerformanceService::smartWorker() {
+	while (!stopFlag) {
+		std::array<double, 5> buffer{};
+		size_t index = 0;
+		for (size_t j = 0; j < buffer.size(); j++) {
+			for (int i = 0; i < 9; i++ && !stopFlag) {
+				TimeUtils::sleep(100);
+			}
+			if (!stopFlag) {
+				auto usage	  = CPUUsage::getUseRate(100);
+				buffer[index] = usage;
+				if (++index == buffer.size()) {
+					break;
+				}
+			}
+		}
+		if (!stopFlag) {
+			double mean = std::accumulate(buffer.begin(), buffer.end(), 0.0) / buffer.size();
+			auto next	= actualProfile;
+			if (mean > 0.67) {
+				next = getNextPerformanceProfile(actualProfile, false);
+			} else if (mean < 0.25) {
+				next = getPreviousPerformanceProfile(actualProfile, false);
+			}
+			logger->debug("Mean CPU load: {:.2f}% -> {}", mean * 100, toName(next));
+			if (next != actualProfile) {
+				setActualPerformanceProfile(next);
+			}
+		}
+	}
+}
+
 void PerformanceService::setPerformanceProfile(PerformanceProfile& profile, const bool& temporal, const bool& force, const bool& showToast) {
 	std::lock_guard<std::mutex> lock(actionMutex);
 	std::string profileName = toName(profile);
 
+	Logger::add_tab();
 	if (profile != currentProfile || force) {
 		logger->info("Setting {} profile", profileName);
-		Logger::add_tab();
-		try {
-			setPlatformProfile(profile);
-			setBoost(profile);
-			setCpuGovernor(profile);
-			setPowerProfile(profile);
-			setTdps(profile);
-			setTgp(profile);
-			setFanCurves(profile);
 
-			currentProfile = profile;
-			if (!temporal) {
-				configuration.getConfiguration().platform.performance.profile = profile;
-				configuration.saveConfig();
-			}
-
-			Logger::rem_tab();
-			logger->info("Profile setted succesfully");
-
-			if (showToast) {
-				toaster.showToast(translator.translate(
-					"profile.applied", {{"profile", StringUtils::toLowerCase(translator.translate("label.profile." + profileName))}}));
-			}
-
-			eventBus.emitPerformanceProfile(profile);
-		} catch (std::exception& e) {
-			Logger::rem_tab();
+		if (profile != PerformanceProfile::SMART) {
+			stopFlag.store(true);
+			smartThread->detach();
+			smartThread = std::nullopt;
+			setActualPerformanceProfile(profile);
+		} else {
+			auto perf = PerformanceProfile::QUIET;
+			setActualPerformanceProfile(perf);
+			stopFlag.store(false);
+			smartThread = std::thread(&PerformanceService::smartWorker, this);
 		}
+
+		if (!temporal) {
+			configuration.getConfiguration().platform.performance.profile = profile;
+			configuration.saveConfig();
+		}
+
+		if (showToast) {
+			toaster.showToast(translator.translate("profile.applied",
+												   {{"profile", StringUtils::toLowerCase(translator.translate("label.profile." + profileName))}}));
+		}
+
+		currentProfile = profile;
 	} else {
 		logger->info("Profile {} already setted", StringUtils::toLowerCase(profileName));
+		Logger::rem_tab();
 	}
+	eventBus.emitPerformanceProfile(profile);
 }
 
 void PerformanceService::setPlatformProfile(const PerformanceProfile& profile) {

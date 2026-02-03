@@ -1,6 +1,8 @@
-#include "logger/logger_level.hpp"
+#pragma once
 
-const char* colorCode(LoggerLevel level) {
+enum class LoggerLevel { OFF = 0, CRITICAL = 1, ERROR = 2, WARN = 3, INFO = 4, DEBUG = 5 };
+
+inline const char* colorCode(LoggerLevel level) {
 	switch (level) {
 		case LoggerLevel::DEBUG:
 			return "\033[36m";

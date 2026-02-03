@@ -8,7 +8,7 @@
 #include <stdexcept>
 
 #include "logger/logger_provider.hpp"
-#include "shell/command_result.hpp"
+#include "models/command_result.hpp"
 #include "shell/shell.hpp"
 
 bool NetUtils::isPortFree(int port) {

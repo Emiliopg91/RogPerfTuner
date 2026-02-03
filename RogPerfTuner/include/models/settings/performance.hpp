@@ -8,7 +8,7 @@
 #include "utils/enum_utils.hpp"
 
 struct Performance {
-	PerformanceProfile profile			 = PerformanceProfile::QUIET;
+	PerformanceProfile profile			 = PerformanceProfile::SMART;
 	std::optional<std::string> scheduler = std::nullopt;
 };
 

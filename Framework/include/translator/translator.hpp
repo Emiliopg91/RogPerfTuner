@@ -6,7 +6,7 @@
 
 #include "abstracts/loggable.hpp"
 #include "abstracts/singleton.hpp"
-#include "translator/language.hpp"
+#include "models/language.hpp"
 
 class Translator : public Singleton<Translator>, Loggable {
   public:

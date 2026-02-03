@@ -2,6 +2,7 @@
 
 #include <mutex>
 #include <optional>
+#include <thread>
 
 #include "clients/dbus/asus/core/platform_client.hpp"
 #include "clients/dbus/linux/power_profile_client.hpp"
@@ -40,6 +41,8 @@ class PerformanceService : public Singleton<PerformanceService>, Loggable {
 	 * @param showToast If true, shows a notification toast.
 	 */
 	void setPerformanceProfile(PerformanceProfile& profile, const bool& temporal = false, const bool& force = false, const bool& showToast = true);
+
+	void setActualPerformanceProfile(PerformanceProfile& profile);
 
 	/**
 	 * @brief Restores the last saved performance settings.
@@ -140,8 +143,11 @@ class PerformanceService : public Singleton<PerformanceService>, Loggable {
 
 	std::mutex actionMutex;
 
-	PerformanceProfile currentProfile			= PerformanceProfile::PERFORMANCE;
+	PerformanceProfile actualProfile			= PerformanceProfile::PERFORMANCE;
+	PerformanceProfile currentProfile			= PerformanceProfile::SMART;
 	std::optional<std::string> currentScheduler = std::nullopt;
+	std::optional<std::thread> smartThread		= std::nullopt;
+	std::atomic<bool> stopFlag					= false;
 
 	PlatformClient& platformClient		   = PlatformClient::getInstance();
 	Pl1SpdClient& pl1SpdClient			   = Pl1SpdClient::getInstance();
@@ -184,4 +190,6 @@ class PerformanceService : public Singleton<PerformanceService>, Loggable {
 	CpuGovernor acGovernor(PerformanceProfile profile);
 	CpuGovernor batteryGovernor();
 	int acTdpToBatteryTdp(int tdp, int minTdp);
+
+	void smartWorker();
 };

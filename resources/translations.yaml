@@ -6,6 +6,10 @@ profile:
   en: Profile
   es: Perfil
   de: Profil
+label.profile.SMART:
+  en: Smart
+  es: Inteligente
+  de: Intelligent
 label.profile.PERFORMANCE:
   en: Performance
   es: Rendimiento

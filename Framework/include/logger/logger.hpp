@@ -12,9 +12,9 @@
 #include <mutex>
 #include <optional>
 
-#include "logger/logger_level.hpp"
 #include "logger/sink/console_sink.hpp"
 #include "logger/sink/file_sink.hpp"
+#include "models/logger_level.hpp"
 
 template <typename... Args>
 using format_string_t = std::format_string<Args...>;
