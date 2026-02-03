@@ -133,6 +133,7 @@ void PerformanceService::setPerformanceProfile(PerformanceProfile& profile, cons
 	if (profile != currentProfile || force) {
 		logger->info("Setting {} profile", profileName);
 
+		Logger::add_tab();
 		if (profile != PerformanceProfile::SMART) {
 			stopFlag.store(true);
 			if (smartThread.has_value()) {
@@ -158,6 +159,7 @@ void PerformanceService::setPerformanceProfile(PerformanceProfile& profile, cons
 		}
 
 		currentProfile = profile;
+		Logger::rem_tab();
 	} else {
 		logger->info("Profile {} already setted", StringUtils::toLowerCase(profileName));
 	}
