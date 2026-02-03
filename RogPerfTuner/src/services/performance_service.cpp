@@ -158,8 +158,8 @@ void PerformanceService::setPerformanceProfile(PerformanceProfile& profile, cons
 		currentProfile = profile;
 	} else {
 		logger->info("Profile {} already setted", StringUtils::toLowerCase(profileName));
-		Logger::rem_tab();
 	}
+	Logger::rem_tab();
 	eventBus.emitPerformanceProfile(profile);
 }
 
