@@ -350,7 +350,7 @@ void SteamService::onGameLaunch(unsigned int gid, std::string name, int pid) {
 void SteamService::onGameStop(unsigned int gid, std::string name) {
 	auto it = runningGames.find(gid);
 	if (it != runningGames.end()) {
-		logger->info("Stopped '' ({})", name, gid);
+		logger->info("Stopped '{}' ({})", name, gid);
 		runningGames.erase(gid);
 		Logger::add_tab();
 
