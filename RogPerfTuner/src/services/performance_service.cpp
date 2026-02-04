@@ -98,7 +98,7 @@ void PerformanceService::smartWorker() {
 		std::array<double, 5> buffer{};
 		size_t index = 0;
 		for (size_t j = 0; j < buffer.size(); j++) {
-			for (int i = 0; i < 9; i++ && !stopFlag) {
+			for (int i = 0; i < 9 && !stopFlag; i++) {
 				TimeUtils::sleep(100);
 			}
 			if (!stopFlag) {
@@ -117,8 +117,8 @@ void PerformanceService::smartWorker() {
 			} else if (mean < 0.25) {
 				next = getPreviousPerformanceProfile(actualProfile, false);
 			}
-			logger->debug("Mean CPU load: {:.2f}% -> {}", mean * 100, toName(next));
 			if (next != actualProfile) {
+				logger->info("Mean CPU load: {:.2f}%", mean * 100);
 				setActualPerformanceProfile(next);
 			}
 		}
@@ -136,11 +136,15 @@ void PerformanceService::setPerformanceProfile(PerformanceProfile& profile, cons
 		if (profile != PerformanceProfile::SMART) {
 			stopFlag.store(true);
 			if (smartThread.has_value()) {
-				smartThread->detach();
+				if (smartThread->joinable()) {
+					logger->info("Waiting for {} worker to stop", toName(PerformanceProfile::SMART));
+					smartThread->join();
+				}
 				smartThread = std::nullopt;
 			}
 			setActualPerformanceProfile(profile);
 		} else {
+			logger->info("Starting {} worker", toName(PerformanceProfile::SMART));
 			auto perf = PerformanceProfile::QUIET;
 			setActualPerformanceProfile(perf);
 			stopFlag.store(false);

@@ -18,7 +18,6 @@
 - [Features](#features)
 
 - [Installation](#installation)
-
   - [AUR](#aur)
   - [Steam and DeckyLoader integration](#steam-and-deckyloader-integration)
 
@@ -44,8 +43,13 @@ Do you want something similar for Asus Rog Ally/Ally X? Check [AllyDeckyCompanio
 
 ## Features
 
-- [x] Selection of three performance profiles, which control:
+- [x] Choose the performance profile that best fits your needs:
+  - Smart: Automatically switches between profiles depending on system load.
+  - Performance: Maximizes system performance with no compromises.
+  - Balanced: The sweet spot between performance and system stress.
+  - Quiet: Prioritizes silence and power efficiency by reducing performance.
 
+  Each profile controls:
   - CPU TDP
   - CPU Boost
   - CPU Governor
@@ -59,7 +63,6 @@ Do you want something similar for Asus Rog Ally/Ally X? Check [AllyDeckyCompanio
 - [x] RGB control for Asus ROG laptops and peripherics and support for custom AuraSync
 
 - [x] Available RGB effects:
-
   - **Breathing**: Feel every breath
   - **Dance floor**: Every led dancing at rithm
   - **Digital rain**: Matrix like animation that speeds up as your CPU is more demanded
@@ -73,14 +76,12 @@ Do you want something similar for Asus Rog Ally/Ally X? Check [AllyDeckyCompanio
 - [x] Select color for the effect (only available on Breathing, Digital Rain and Static effect)
 
 - [x] Allow changing RGB brightness
-
   - Off
   - Low
   - Medium
   - High
 
 - [x] Limit battery charge threshold to maintain its life-span
-
   - 100%: If you requires full battery without bothering about its health
   - 75%: If you want big battery capacity saving its health
   - 50%: for laptops that are always connected to AC
@@ -88,7 +89,6 @@ Do you want something similar for Asus Rog Ally/Ally X? Check [AllyDeckyCompanio
 - [x] Wrapper to apply optimization to applications (standard and flatpak)
 
 - [x] Steam integration through Decky plugin
-
   - Interception of game first run to change it's launch option to use our custom wrapper
   - Force use of dGPU or letting Linux select for you
   - Show performance metrics
