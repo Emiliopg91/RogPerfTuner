@@ -102,4 +102,5 @@ class MainWindow : public QMainWindow, public Singleton<MainWindow> {
 	QStatusBar* statusBar;
 	QLabel* versionLabel;
 	QPushButton* updateButton;
+	QPushButton* fanEdit;
 };

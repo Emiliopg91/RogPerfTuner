@@ -145,8 +145,10 @@ void PerformanceService::setPerformanceProfile(PerformanceProfile& profile, cons
 			setActualPerformanceProfile(profile);
 		} else {
 			logger->info("Starting {} worker", toName(PerformanceProfile::SMART));
-			auto perf = PerformanceProfile::QUIET;
-			setActualPerformanceProfile(perf);
+			auto perf = PerformanceProfile::BALANCED;
+			if (perf != actualProfile) {
+				setActualPerformanceProfile(perf);
+			}
 			stopFlag.store(false);
 			smartThread = std::thread(&PerformanceService::smartWorker, this);
 		}
@@ -526,13 +528,7 @@ void PerformanceService::setScheduler(std::optional<std::string> scheduler, bool
 }
 
 std::vector<std::string> PerformanceService::getFans() {
-	std::vector<std::string> res;
-
-	for (const auto& [key, val] : configuration.getConfiguration().platform.curves[toString(currentProfile)]) {
-		res.emplace_back(key);
-	}
-
-	return res;
+	return asusCtlClient.getFans(getPlatformProfile(actualProfile));
 }
 
 FanCurveData PerformanceService::getFanCurve(std::string fan, std::string profile) {

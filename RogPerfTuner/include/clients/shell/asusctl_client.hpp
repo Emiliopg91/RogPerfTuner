@@ -67,6 +67,8 @@ class AsusCtlClient : public AbstractCmdClient, public Singleton<AsusCtlClient> 
 	 */
 	void setFanCurveStringData(PlatformProfile profile, std::string fanName, std::string data);
 
+	std::vector<std::string> getFans(PlatformProfile profile);
+
 	/**
 	 * @brief Retrieves the fan curve data for the specified platform profile.
 	 *

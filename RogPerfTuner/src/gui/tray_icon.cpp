@@ -12,6 +12,7 @@
 
 #include "gui/fan_curve_editor.hpp"
 #include "gui/game_list.hpp"
+#include "models/performance/performance_profile.hpp"
 #include "utils/enum_utils.hpp"
 #include "utils/string_utils.hpp"
 
@@ -119,6 +120,15 @@ void TrayIcon::setProfileMenuEnabled() {
 		this,
 		[=, this]() {
 			profileMenu->setEnabled(!onBattery && runningGames == 0);
+		},
+		Qt::QueuedConnection);
+}
+
+void TrayIcon::setCoolingMenuEnabled(bool enabled) {
+	QMetaObject::invokeMethod(
+		this,
+		[=, this]() {
+			coolingMenu->setEnabled(enabled);
 		},
 		Qt::QueuedConnection);
 }
@@ -358,10 +368,6 @@ TrayIcon::TrayIcon()
 
 	profileMenu->setEnabled(runningGames == 0 && !onBattery);
 	menu->insertMenu(nullptr, profileMenu);
-
-	eventBus.onPerformanceProfile([this](PerformanceProfile profile) {
-		setPerformanceProfile(profile);
-	});
 	// -------------------------
 	// Profile submenu
 	// -------------------------
@@ -409,14 +415,15 @@ TrayIcon::TrayIcon()
 	// Fan curves menu
 	// -------------------------
 	if (!performanceService.getFans().empty()) {
-		QMenu* fanMenu = new QMenu(("    " + translator.translate("fan.curves")).c_str(), menu);
-		menu->insertMenu(nullptr, fanMenu);
+		coolingMenu = new QMenu(("    " + translator.translate("fan.curves")).c_str(), menu);
+		menu->insertMenu(nullptr, coolingMenu);
 
 		QAction* act = new QAction((translator.translate("edit.curve") + "...").c_str());
 		QObject::connect(act, &QAction::triggered, [this]() {
 			openFanEditor();
 		});
-		fanMenu->addAction(act);
+		coolingMenu->addAction(act);
+		coolingMenu->setEnabled(performanceService.getPerformanceProfile() != PerformanceProfile::SMART);
 	}
 	// -------------------------
 	// Fan curves menu
@@ -530,6 +537,11 @@ TrayIcon::TrayIcon()
 		if (reason == QSystemTrayIcon::Trigger) {
 			openMainWindow();
 		}
+	});
+
+	eventBus.onPerformanceProfile([this](PerformanceProfile profile) {
+		setPerformanceProfile(profile);
+		setCoolingMenuEnabled(profile != PerformanceProfile::SMART);
 	});
 
 	eventBus.onGameEvent([this](size_t runningGames) {

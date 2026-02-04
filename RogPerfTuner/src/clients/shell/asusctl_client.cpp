@@ -1,6 +1,9 @@
 #include "clients/shell/asusctl_client.hpp"
 
+#include <regex>
 #include <unordered_map>
+
+#include "utils/serialize_utils.hpp"
 
 void AsusCtlClient::turnOffAura() {
 	run_command("aura effect static --colour 000000", true, false);
@@ -32,4 +35,27 @@ void AsusCtlClient::setFanCurveData(PlatformProfile profile, std::string fanName
 
 void AsusCtlClient::setFanCurveStringData(PlatformProfile profile, std::string fanName, std::string data) {
 	run_command("fan-curve --mod-profile " + formatValue(profile) + " --fan " + fanName + " --data " + data);
+}
+
+std::vector<std::string> AsusCtlClient::getFans(PlatformProfile profile) {
+	auto output = run_command("fan-curve --mod-profile " + formatValue(profile)).stdout_str;
+	std::vector<std::string> result;
+
+	size_t pos = output.find("[");
+	if (pos != output.npos) {
+		auto dataStr = output.substr(pos);
+
+		std::regex blockRegex(R"(\(\s*fan:\s*([A-Za-z0-9_]+)\s*,\s*pwm:\s*\(([^)]*)\)\s*,\s*temp:\s*\(([^)]*)\))", std::regex::ECMAScript);
+
+		auto begin = std::sregex_iterator(dataStr.begin(), dataStr.end(), blockRegex);
+		auto end   = std::sregex_iterator();
+
+		for (auto it = begin; it != end; ++it) {
+			std::smatch match	= *it;
+			std::string fanName = match[1].str();
+			result.emplace_back(fanName);
+		}
+	}
+
+	return result;
 }

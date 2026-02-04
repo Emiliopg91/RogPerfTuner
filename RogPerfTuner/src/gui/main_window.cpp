@@ -19,6 +19,7 @@
 #include "gui/changelog_view.hpp"
 #include "gui/fan_curve_editor.hpp"
 #include "gui/game_list.hpp"
+#include "models/performance/performance_profile.hpp"
 #include "utils/string_utils.hpp"
 
 MainWindow::MainWindow(QWidget* parent) : QMainWindow(parent) {
@@ -65,10 +66,6 @@ MainWindow::MainWindow(QWidget* parent) : QMainWindow(parent) {
 	setPerformanceProfile(performanceService.getPerformanceProfile());
 	_profileDropdown->setEnabled(runningGames == 0 && !onBattery);
 	performanceLayout->addRow(new QLabel((translator.translate("profile") + ":").c_str()), _profileDropdown);
-
-	eventBus.onPerformanceProfile([this](PerformanceProfile profile) {
-		setPerformanceProfile(profile);
-	});
 	// -------------------------
 	// Profile menu
 	// -------------------------
@@ -101,10 +98,11 @@ MainWindow::MainWindow(QWidget* parent) : QMainWindow(parent) {
 	// Fan curves menu
 	// -------------------------
 	if (!performanceService.getFans().empty()) {
-		QPushButton* fanEdit = new QPushButton();
+		fanEdit = new QPushButton();
 		fanEdit->setText(translator.translate("edit.curve").c_str());
 		connect(fanEdit, &QPushButton::clicked, this, &MainWindow::openFanEditor);
 		fanEdit->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Preferred);
+		fanEdit->setEnabled(performanceService.getPerformanceProfile() != PerformanceProfile::SMART);
 
 		performanceLayout->addRow(new QLabel((translator.translate("fan.curves") + ":").c_str()), fanEdit);
 	}
@@ -123,6 +121,11 @@ MainWindow::MainWindow(QWidget* parent) : QMainWindow(parent) {
 	// -------------------------
 	performanceGroup->setLayout(performanceLayout);
 	mainLayout->addWidget(performanceGroup);
+
+	eventBus.onPerformanceProfile([this](PerformanceProfile profile) {
+		setPerformanceProfile(profile);
+		fanEdit->setEnabled(profile != PerformanceProfile::SMART);
+	});
 	// -------------------------
 	// Performance group
 	// -------------------------

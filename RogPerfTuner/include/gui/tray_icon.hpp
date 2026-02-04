@@ -47,6 +47,7 @@ class TrayIcon : public QObject, public Singleton<TrayIcon> {
 	std::unordered_map<std::string, QAction*> schedulerActions;
 	std::unordered_map<bool, QAction*> bootSoundActions;
 	QMenu* profileMenu;
+	QMenu* coolingMenu;
 	QMenu* schedulerMenu;
 	QMenu* colorMenu;
 	QAction* currentColorAction;
@@ -61,6 +62,7 @@ class TrayIcon : public QObject, public Singleton<TrayIcon> {
 	void setBootSound(bool value);
 	void setProfileMenuEnabled();
 	void setSchedulerMenuEnabled();
+	void setCoolingMenuEnabled(bool enabled);
 	void openMainWindow();
 	void openFanEditor();
 	void openSettings();

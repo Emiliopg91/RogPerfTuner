@@ -1,6 +1,11 @@
+- version: 4.11.3-1
+  fixes:
+    - Disable cooler settings on SMART mode
+
 - version: 4.11.2-1
   fixes:
     - Force mangohud-git to fix some metrics level on Vulkan games
+    - Regression for flatpak wrapper
 
 - version: 4.11.0-2
   fixes:
