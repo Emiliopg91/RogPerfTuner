@@ -49,7 +49,7 @@ class Logger {
 	 * @param fmt
 	 * @param args
 	 */
-	void debug(std::string format);
+	void debug(std::string message);
 
 	/**
 	 * @brief  Send debug log line
@@ -59,8 +59,8 @@ class Logger {
 	 * @param args
 	 */
 	template <typename... Args>
-	void debug(format_string_t<Args...> fmt, Args&&... args) {
-		debug(std::format(fmt, std::forward<Args>(args)...));
+	void debug(format_string_t<Args...> message, Args&&... args) {
+		debug(std::format(message, std::forward<Args>(args)...));
 	}
 
 	/**
@@ -70,7 +70,7 @@ class Logger {
 	 * @param fmt
 	 * @param args
 	 */
-	void info(std::string format);
+	void info(std::string message);
 
 	/**
 	 * @brief  Send info log line
@@ -80,8 +80,8 @@ class Logger {
 	 * @param args
 	 */
 	template <typename... Args>
-	void info(format_string_t<Args...> fmt, Args&&... args) {
-		info(std::format(fmt, std::forward<Args>(args)...));
+	void info(format_string_t<Args...> message, Args&&... args) {
+		info(std::format(message, std::forward<Args>(args)...));
 	}
 
 	/**
@@ -91,7 +91,7 @@ class Logger {
 	 * @param fmt
 	 * @param args
 	 */
-	void warn(std::string format);
+	void warn(std::string message);
 
 	/**
 	 * @brief  Send warn log line
@@ -101,8 +101,8 @@ class Logger {
 	 * @param args
 	 */
 	template <typename... Args>
-	void warn(format_string_t<Args...> fmt, Args&&... args) {
-		warn(std::format(fmt, std::forward<Args>(args)...));
+	void warn(format_string_t<Args...> message, Args&&... args) {
+		warn(std::format(message, std::forward<Args>(args)...));
 	}
 
 	/**
@@ -112,7 +112,7 @@ class Logger {
 	 * @param fmt
 	 * @param args
 	 */
-	void error(std::string format);
+	void error(std::string message);
 
 	/**
 	 * @brief  Send error log line
@@ -122,8 +122,8 @@ class Logger {
 	 * @param args
 	 */
 	template <typename... Args>
-	void error(format_string_t<Args...> fmt, Args&&... args) {
-		error(std::format(fmt, std::forward<Args>(args)...));
+	void error(format_string_t<Args...> message, Args&&... args) {
+		error(std::format(message, std::forward<Args>(args)...));
 	}
 
 	/**
@@ -133,7 +133,7 @@ class Logger {
 	 * @param fmt
 	 * @param args
 	 */
-	void critical(std::string format);
+	void critical(std::string message);
 
 	/**
 	 * @brief  Send critical log line
@@ -143,8 +143,8 @@ class Logger {
 	 * @param args
 	 */
 	template <typename... Args>
-	void critical(format_string_t<Args...> fmt, Args&&... args) {
-		critical(std::format(fmt, std::forward<Args>(args)...));
+	void critical(format_string_t<Args...> message, Args&&... args) {
+		critical(std::format(message, std::forward<Args>(args)...));
 	}
 
 	static void add_tab();

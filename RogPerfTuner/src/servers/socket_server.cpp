@@ -11,7 +11,7 @@
 #include <filesystem>
 #include <string>
 
-#include "clients/abstract_unix_socket_client.hpp"
+#include "clients/abstract/abstract_unix_socket_client.hpp"
 #include "utils/file_utils.hpp"
 #include "utils/serialize_utils.hpp"
 

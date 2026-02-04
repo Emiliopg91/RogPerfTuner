@@ -470,12 +470,8 @@ const SteamGameConfig SteamService::getConfiguration(const std::string& id) {
 			cfg.wrappers.emplace_back("\"" + entry->name + "\"");
 		}
 
-		auto level = getEffective(gameEntry.metrics_level);
-		if (level != gameEntry.metrics_level) {
-			logger->warn("Metrics level {} downgraded to {}", toName(gameEntry.metrics_level), toName(level));
-		}
-		if (whichMangohud.has_value() && level != MangoHudLevel::NO_DISPLAY) {
-			cfg.environment["MANGOHUD_CONFIG"] = "preset=" + std::to_string(toInt(level));
+		if (whichMangohud.has_value() && gameEntry.metrics_level != MangoHudLevel::NO_DISPLAY) {
+			cfg.environment["MANGOHUD_CONFIG"] = "preset=" + std::to_string(toInt(gameEntry.metrics_level));
 			cfg.environment["MANGOHUD_DLSYM"]  = "1";
 			cfg.environment["MANGOHUD"]		   = "1";
 			cfg.wrappers.emplace_back(whichMangohud.value());

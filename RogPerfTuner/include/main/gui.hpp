@@ -97,6 +97,7 @@ inline int startGui(int argc, char** argv) {
 	QApplication app(argc, argv);
 	app.setDesktopFileName(Constants::APP_DRAW_FILE.c_str());
 
+	Toaster::init(Constants::APP_NAME, Constants::ASSET_ICON_FILE);
 	Toaster::getInstance().showToast(Translator::getInstance().translate("initializing"));
 
 	ConfigurationWrapper& configuration = ConfigurationWrapper::getInstance();

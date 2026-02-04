@@ -4,7 +4,7 @@
 #include <vector>
 
 #include "abstracts/singleton.hpp"
-#include "clients/abstract_cmd_client.hpp"
+#include "clients/abstract/abstract_cmd_client.hpp"
 #include "models/hardware/gpu_info.hpp"
 
 class SwitcherooCtlClient : AbstractCmdClient, public Singleton<SwitcherooCtlClient> {

@@ -1,7 +1,7 @@
 #pragma once
 
 #include "abstracts/singleton.hpp"
-#include "clients/abstract_unix_socket_client.hpp"
+#include "clients/abstract/abstract_unix_socket_client.hpp"
 #include "models/steam/steam_game_config.hpp"
 
 class RogPerfTunerClient : public AbstractUnixSocketClient, public Singleton<RogPerfTunerClient> {

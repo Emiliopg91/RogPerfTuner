@@ -1,4 +1,4 @@
-#include "clients/abstract_unix_socket_client.hpp"
+#include "clients/abstract/abstract_unix_socket_client.hpp"
 
 #include <csignal>
 

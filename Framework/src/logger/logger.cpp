@@ -39,8 +39,8 @@ Logger::Logger(std::shared_ptr<ConsoleSink> console_sink, std::optional<std::sha
  * @param fmt
  * @param args
  */
-void Logger::debug(std::string format) {
-	log(LoggerLevel::DEBUG, format);
+void Logger::debug(std::string message) {
+	log(LoggerLevel::DEBUG, message);
 }
 
 /**
@@ -50,8 +50,8 @@ void Logger::debug(std::string format) {
  * @param fmt
  * @param args
  */
-void Logger::info(std::string format) {
-	log(LoggerLevel::INFO, format);
+void Logger::info(std::string message) {
+	log(LoggerLevel::INFO, message);
 }
 
 /**
@@ -61,8 +61,8 @@ void Logger::info(std::string format) {
  * @param fmt
  * @param args
  */
-void Logger::warn(std::string format) {
-	log(LoggerLevel::WARN, format);
+void Logger::warn(std::string message) {
+	log(LoggerLevel::WARN, message);
 }
 
 /**
@@ -72,8 +72,8 @@ void Logger::warn(std::string format) {
  * @param fmt
  * @param args
  */
-void Logger::error(std::string format) {
-	log(LoggerLevel::ERROR, format);
+void Logger::error(std::string message) {
+	log(LoggerLevel::ERROR, message);
 }
 
 /**
@@ -83,8 +83,8 @@ void Logger::error(std::string format) {
  * @param fmt
  * @param args
  */
-void Logger::critical(std::string format) {
-	log(LoggerLevel::CRITICAL, format);
+void Logger::critical(std::string message) {
+	log(LoggerLevel::CRITICAL, message);
 }
 
 void Logger::add_tab() {

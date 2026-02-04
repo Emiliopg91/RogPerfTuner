@@ -1,6 +1,6 @@
-- version: 4.11.1-2
+- version: 4.11.2-1
   fixes:
-    - Profile switch on update
+    - Force mangohud-git to fix some metrics level on Vulkan games
 
 - version: 4.11.0-2
   fixes:

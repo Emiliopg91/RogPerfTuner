@@ -5,7 +5,7 @@ project(Framework LANGUAGES CXX)
 set(CMAKE_CXX_STANDARD 23)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
-find_package(Qt6 REQUIRED COMPONENTS DBus)
+find_package(Qt6 REQUIRED COMPONENTS DBus Widgets)
 
 find_package(nlohmann_json REQUIRED)
 
@@ -28,6 +28,7 @@ target_link_libraries(Framework PUBLIC
     magic_enum
     nlohmann_json::nlohmann_json
     Qt6::DBus
+    Qt6::Widgets
     yaml-cpp::yaml-cpp
 )
 

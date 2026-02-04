@@ -27,6 +27,7 @@ depends=(
   'hicolor-icon-theme'
   'hidapi'
   'libusb'
+  'mangohud-git'
   'nlohmann-json'
   'power-profiles-daemon'
   'python'
