@@ -52,7 +52,7 @@ inline int run_command(std::shared_ptr<Logger> logger, const std::vector<std::st
 	dup2(fd, STDOUT_FILENO);
 	dup2(fd, STDERR_FILENO);
 	close(fd);
-
+	logger->error("PATH before execvp: {}", getenv("PATH"));
 	execvp(argv[0], argv.data());
 
 	logger->error("Error on execvp: {}", std::strerror(errno));
@@ -68,9 +68,10 @@ inline int runSteamWrapping(int argc, char* argv[]) {
 		logger->error("Error: no command provided");
 		return 1;
 	}
+	logger->error("Old PATH: {}", getenv("PATH"));
 
-	std::string dirname = FileUtils::dirname(argv[0]);
-	std::string path	= dirname + ":" + getenv("PATH");
+	std::string path = Constants::BIN_STEAM_DIR + ":" + getenv("PATH");
+	logger->error("New PATH: {}", path);
 	setenv("PATH", path.c_str(), 1);
 
 	logger->info("===== Started wrapping =====");

@@ -55,10 +55,13 @@ SteamService::SteamService() : Loggable("SteamService") {
 
 	whichMangohud = shell.which("mangohud");
 	if (whichMangohud.has_value()) {
-		if (FileUtils::exists(std::string("/sys/class/powercap/intel-rapl\\:0/energy_uj"))) {
+		logger->info("Metric level service available");
+		Logger::add_tab();
+		if (FileUtils::exists(std::string("/sys/class/powercap/intel-rapl:0/energy_uj"))) {
 			logger->info("Enabling CPU power drain...");
-			shell.run_elevated_command("chmod o+r /sys/class/powercap/intel-rapl\\:0/energy_uj", false);
+			shell.run_elevated_command("chmod o+r /sys/class/powercap/intel-rapl:0/energy_uj", false);
 		}
+		Logger::rem_tab();
 	}
 
 	if (!FileUtils::exists(Constants::LOGOS_DIR)) {

@@ -11,7 +11,7 @@ const std::string Constants::APP_NAME  = "RogPerfTuner";
 const std::string Constants::EXEC_NAME = "rog-perf-tuner";
 const pid_t Constants::PID			   = getpid();
 
-const std::string Constants::APP_VERSION = "4.11.0-1";
+const std::string Constants::APP_VERSION = "4.11.1-1";
 
 const std::string Constants::PLUGIN_VERSION = "1.2.7";
 
@@ -80,7 +80,7 @@ const std::string Constants::NEXT_EFF	= "nextRgbEffect";
 
 const std::vector<std::string> Constants::RCCDC_REQUIRED_PIP = {"asyncio", "pyyaml"};
 
-const std::string Constants::FLATPAK_MANGOHUD		   = "org.freedesktop.Platform.VulkanLayer.MangoHud/x86_64/24.08";
+const std::string Constants::FLATPAK_MANGOHUD		   = "org.freedesktop.Platform.VulkanLayer.MangoHud/x86_64/25.08";
 const std::string Constants::FLATPAK_MANGOHUD_OVERRIDE = "--filesystem=xdg-config/MangoHud:ro";
 
 const std::string Constants::CHANGELOG_URL = "https://github.com/Emiliopg91/RogPerfTuner/raw/refs/heads/main/changelog.yaml";
