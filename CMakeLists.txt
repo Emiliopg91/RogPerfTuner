@@ -42,6 +42,10 @@ add_library(magic_enum INTERFACE)
 target_include_directories(magic_enum INTERFACE
     "submodules/magic_enum/include/magic_enum"
 )
+add_library(nlohmann_json INTERFACE)
+target_include_directories(magic_enum INTERFACE
+    "submodules/nlohmann-json/include/nlohmann"
+)
 
 add_subdirectory(submodules/yaml-cpp)
 
