@@ -8,6 +8,7 @@
 #include <optional>
 #include <string>
 
+#include "framework/translator/translator.hpp"
 #include "gui/main_window.hpp"
 #include "models/hardware/battery_charge_threshold.hpp"
 #include "models/hardware/rgb_brightness.hpp"
@@ -16,7 +17,6 @@
 #include "services/hardware_service.hpp"
 #include "services/open_rgb_service.hpp"
 #include "services/performance_service.hpp"
-#include "translator/translator.hpp"
 #include "utils/configuration_wrapper.hpp"
 #include "utils/event_bus_wrapper.hpp"
 

@@ -5,7 +5,7 @@
 #include <QLineEdit>
 #include <QPushButton>
 
-#include "translator/translator.hpp"
+#include "framework/translator/translator.hpp"
 #include "utils/configuration_wrapper.hpp"
 
 class PasswordDialog : public QDialog, public Singleton<PasswordDialog> {

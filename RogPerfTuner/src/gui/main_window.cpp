@@ -16,11 +16,11 @@
 #include <optional>
 
 #include "OpenRGB/Color.hpp"
+#include "framework/utils/string_utils.hpp"
 #include "gui/changelog_view.hpp"
 #include "gui/fan_curve_editor.hpp"
 #include "gui/game_list.hpp"
 #include "models/performance/performance_profile.hpp"
-#include "utils/string_utils.hpp"
 
 MainWindow::MainWindow(QWidget* parent) : QMainWindow(parent) {
 	onBattery	 = uPowerClient.isOnBattery();

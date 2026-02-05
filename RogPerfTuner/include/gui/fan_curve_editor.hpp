@@ -4,9 +4,9 @@
 #include <QtCharts>
 #include <QtWidgets>
 
+#include "framework/translator/translator.hpp"
 #include "gui/fan_curve_view.hpp"
 #include "services/performance_service.hpp"
-#include "translator/translator.hpp"
 
 class CurveEditor : public QDialog {
 	Q_OBJECT

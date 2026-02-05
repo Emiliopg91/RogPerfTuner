@@ -3,8 +3,8 @@
 #include <string>
 #include <vector>
 
-#include "abstracts/singleton.hpp"
-#include "clients/abstract/abstract_cmd_client.hpp"
+#include "framework/abstracts/singleton.hpp"
+#include "framework/clients/abstract/abstract_cmd_client.hpp"
 #include "models/hardware/gpu_info.hpp"
 
 class SwitcherooCtlClient : AbstractCmdClient, public Singleton<SwitcherooCtlClient> {

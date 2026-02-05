@@ -1,7 +1,7 @@
 #pragma once
 
-#include "abstracts/singleton.hpp"
 #include "clients/file/firmware/asus-armoury//armoury_base_client.hpp"
+#include "framework/abstracts/singleton.hpp"
 
 class NvTempClient : public ArmouryBaseClient, public Singleton<NvTempClient> {
   private:

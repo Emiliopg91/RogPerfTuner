@@ -13,13 +13,13 @@
 #include "clients/tcp/open_rgb/effects/spectrum_cycle_effect.hpp"
 #include "clients/tcp/open_rgb/effects/starry_night_effect.hpp"
 #include "clients/tcp/open_rgb/effects/static_effect.hpp"
+#include "framework/utils/file_utils.hpp"
+#include "framework/utils/net_utils.hpp"
+#include "framework/utils/process_utils.hpp"
+#include "framework/utils/string_utils.hpp"
+#include "framework/utils/time_utils.hpp"
 #include "models/hardware/rgb_brightness.hpp"
 #include "utils/event_bus_wrapper.hpp"
-#include "utils/file_utils.hpp"
-#include "utils/net_utils.hpp"
-#include "utils/process_utils.hpp"
-#include "utils/string_utils.hpp"
-#include "utils/time_utils.hpp"
 
 void OpenRgbClient::initialize() {
 	logger->info("Reading UDEV files");

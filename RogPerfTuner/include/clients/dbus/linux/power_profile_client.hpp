@@ -1,7 +1,7 @@
 #pragma once
 
-#include "abstracts/singleton.hpp"
-#include "clients/abstract/abstract_dbus_client.hpp"
+#include "framework/abstracts/singleton.hpp"
+#include "framework/clients/abstract/abstract_dbus_client.hpp"
 #include "models/performance/power_profile.hpp"
 
 class PowerProfileClient : public AbstractDbusClient, public Singleton<PowerProfileClient> {

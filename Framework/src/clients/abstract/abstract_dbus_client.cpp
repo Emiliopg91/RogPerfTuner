@@ -1,5 +1,5 @@
 
-#include "clients/abstract/abstract_dbus_client.hpp"
+#include "framework/clients/abstract/abstract_dbus_client.hpp"
 
 AbstractDbusClient::AbstractDbusClient(bool systemBus, const QString& service, const QString& objectPath, const QString& interface, bool required,
 									   QObject* parent)

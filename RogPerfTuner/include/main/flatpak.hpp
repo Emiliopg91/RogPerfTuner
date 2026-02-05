@@ -10,10 +10,10 @@
 #include <string>
 
 #include "clients/shell/flatpak.hpp"
-#include "logger/logger_provider.hpp"
-#include "shell/shell.hpp"
+#include "framework/logger/logger_provider.hpp"
+#include "framework/shell/shell.hpp"
+#include "framework/utils/file_utils.hpp"
 #include "utils/constants.hpp"
-#include "utils/file_utils.hpp"
 
 inline int runFlatpakWrapping(int argc, char* argv[]) {
 	LoggerProvider::initialize();

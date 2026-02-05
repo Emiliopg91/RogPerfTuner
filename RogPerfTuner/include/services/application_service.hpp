@@ -6,9 +6,9 @@
 #include "clients/shell/aur_helper_client.hpp"
 #endif
 
+#include "framework/translator/translator.hpp"
 #include "services/performance_service.hpp"
 #include "services/steam_service.hpp"
-#include "translator/translator.hpp"
 #include "utils/event_bus_wrapper.hpp"
 
 class ApplicationService : public Singleton<ApplicationService>, Loggable {

@@ -2,8 +2,8 @@
 
 #include <unordered_map>
 
-#include "abstracts/singleton.hpp"
-#include "clients/abstract/abstract_cmd_client.hpp"
+#include "framework/abstracts/singleton.hpp"
+#include "framework/clients/abstract/abstract_cmd_client.hpp"
 
 class ScxCtlClient : public AbstractCmdClient, public Singleton<ScxCtlClient> {
   private:

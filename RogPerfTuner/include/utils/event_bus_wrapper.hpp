@@ -2,8 +2,8 @@
 
 #include <optional>
 
-#include "abstracts/singleton.hpp"
-#include "events/event_bus.hpp"
+#include "framework/abstracts/singleton.hpp"
+#include "framework/events/event_bus.hpp"
 #include "models/hardware/battery_charge_threshold.hpp"
 #include "models/hardware/rgb_brightness.hpp"
 #include "models/hardware/usb_identifier.hpp"

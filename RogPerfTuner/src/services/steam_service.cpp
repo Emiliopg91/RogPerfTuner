@@ -13,16 +13,16 @@
 #ifndef DEV_MODE
 #include "gui/yes_no_dialog.hpp"
 #endif
+#include "framework/utils/file_utils.hpp"
+#include "framework/utils/net_utils.hpp"
+#include "framework/utils/process_utils.hpp"
+#include "framework/utils/string_utils.hpp"
+#include "framework/utils/time_utils.hpp"
 #include "models/others/semantic_version.hpp"
 #include "models/steam/steam_game_details.hpp"
 #include "services/hardware_service.hpp"
 #include "services/open_rgb_service.hpp"
 #include "services/performance_service.hpp"
-#include "utils/file_utils.hpp"
-#include "utils/net_utils.hpp"
-#include "utils/process_utils.hpp"
-#include "utils/string_utils.hpp"
-#include "utils/time_utils.hpp"
 #include "yaml-cpp/node/node.h"
 #include "yaml-cpp/node/parse.h"
 
@@ -58,7 +58,7 @@ SteamService::SteamService() : Loggable("SteamService") {
 		logger->info("Metric level service available");
 		Logger::add_tab();
 		if (FileUtils::exists(std::string("/sys/class/powercap/intel-rapl:0/energy_uj"))) {
-			logger->info("Enabling CPU power drain...");
+			logger->info("Enabling Intel CPU RAPL...");
 			shell.run_elevated_command("chmod o+r /sys/class/powercap/intel-rapl:0/energy_uj", false);
 		}
 		Logger::rem_tab();

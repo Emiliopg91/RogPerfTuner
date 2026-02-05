@@ -4,7 +4,8 @@
 #include <cmath>
 #include <thread>
 
-#include "models/cpu_usage.hpp"
+#include "framework/models/cpu_usage.hpp"
+
 std::vector<std::vector<LedStatus>> DigitalRainEffect::_dev_to_mat(Device& dev) {
 	std::vector<std::vector<LedStatus>> mat_def;
 	uint32_t offset	   = 0;

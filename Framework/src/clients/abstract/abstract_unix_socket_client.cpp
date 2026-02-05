@@ -1,10 +1,10 @@
-#include "clients/abstract/abstract_unix_socket_client.hpp"
+#include "framework/clients/abstract/abstract_unix_socket_client.hpp"
 
 #include <csignal>
 
-#include "utils/serialize_utils.hpp"
-#include "utils/string_utils.hpp"
-#include "utils/time_utils.hpp"
+#include "framework/utils/serialize_utils.hpp"
+#include "framework/utils/string_utils.hpp"
+#include "framework/utils/time_utils.hpp"
 
 void AbstractUnixSocketClient::emitUnixSocketEvent(EventBus& eventBus, std::string name, std::string event, CallbackParam value) {
 	eventBus.emit_event("unix.socket." + name + ".event." + event, value);

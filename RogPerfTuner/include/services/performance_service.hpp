@@ -13,13 +13,14 @@
 #include "clients/file/firmware/asus-armoury/intel/pl3_fppt_client.hpp"
 #include "clients/file/firmware/asus-armoury/nvidia/nv_boost_client.hpp"
 #include "clients/file/firmware/asus-armoury/nvidia/nv_temp_client.hpp"
+#include "clients/file/sched_bore_client.hpp"
 #include "clients/shell/asusctl_client.hpp"
 #include "clients/shell/cpupower_client.hpp"
 #include "clients/shell/scxctl_client.hpp"
-#include "gui/toaster.hpp"
+#include "framework/gui/toaster.hpp"
+#include "framework/shell/shell.hpp"
+#include "framework/translator/translator.hpp"
 #include "models/performance/performance_profile.hpp"
-#include "shell/shell.hpp"
-#include "translator/translator.hpp"
 #include "utils/configuration_wrapper.hpp"
 #include "utils/event_bus_wrapper.hpp"
 
@@ -158,6 +159,7 @@ class PerformanceService : public Singleton<PerformanceService>, Loggable {
 	UPowerClient& uPowerClient			   = UPowerClient::getInstance();
 	PowerProfileClient& powerProfileClient = PowerProfileClient::getInstance();
 	Toaster& toaster					   = Toaster::getInstance();
+	SchedBoreClient& schedBoreClient	   = SchedBoreClient::getInstance();
 	CpuPowerClient& cpuPowerClient		   = CpuPowerClient::getInstance();
 	BoostControlClient& boostControlClient = BoostControlClient::getInstance();
 	EventBusWrapper& eventBus			   = EventBusWrapper::getInstance();
@@ -192,4 +194,5 @@ class PerformanceService : public Singleton<PerformanceService>, Loggable {
 	int acTdpToBatteryTdp(int tdp, int minTdp);
 
 	void smartWorker();
+	PerformanceProfile getNextSmart(size_t samples = 5, bool inRecursion = false);
 };

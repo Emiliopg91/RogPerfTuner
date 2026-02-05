@@ -1,9 +1,9 @@
 #include <string>
 #ifdef AUR_HELPER
 #include "clients/shell/aur_helper_client.hpp"
+#include "framework/utils/string_utils.hpp"
+#include "framework/utils/time_utils.hpp"
 #include "utils/constants.hpp"
-#include "utils/string_utils.hpp"
-#include "utils/time_utils.hpp"
 
 AurHelperClient::AurHelperClient() : AbstractCmdClient(AUR_HELPER, "AurHelperClient", false) {
 	logger->info("Using AUR helper {}", AUR_HELPER);

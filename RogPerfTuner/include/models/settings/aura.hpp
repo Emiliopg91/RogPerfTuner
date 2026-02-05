@@ -4,9 +4,9 @@
 
 #include <string>
 
+#include "framework/utils/enum_utils.hpp"
 #include "models/hardware/rgb_brightness.hpp"
 #include "models/settings/effect.hpp"
-#include "utils/enum_utils.hpp"
 
 struct Aura {
 	RgbBrightness brightness				   = RgbBrightness::MAX;

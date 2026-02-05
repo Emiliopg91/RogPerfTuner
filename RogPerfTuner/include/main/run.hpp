@@ -10,11 +10,11 @@
 #include <string>
 
 #include "clients/unix_socket/rog_perf_tuner_client.hpp"
-#include "logger/logger_provider.hpp"
-#include "shell/shell.hpp"
+#include "framework/logger/logger_provider.hpp"
+#include "framework/shell/shell.hpp"
+#include "framework/utils/file_utils.hpp"
+#include "framework/utils/string_utils.hpp"
 #include "utils/constants.hpp"
-#include "utils/file_utils.hpp"
-#include "utils/string_utils.hpp"
 
 inline int run_command(std::shared_ptr<Logger> logger, const std::vector<std::string>& cmd, const std::vector<std::string>& wrappers,
 					   const std::string& parameters) {

@@ -6,10 +6,14 @@
 #include <iostream>
 #include <string>
 
+#include "framework/gui/toaster.hpp"
+#include "framework/logger/logger_provider.hpp"
+#include "framework/translator/translator.hpp"
+#include "framework/utils/single_instance.hpp"
+#include "framework/utils/string_utils.hpp"
+#include "framework/utils/time_utils.hpp"
 #include "gui/password_dialog.hpp"
-#include "gui/toaster.hpp"
 #include "gui/tray_icon.hpp"
-#include "logger/logger_provider.hpp"
 #include "models/settings/root_config.hpp"
 #include "servers/socket_server.hpp"
 #include "services/application_service.hpp"
@@ -17,12 +21,8 @@
 #include "services/open_rgb_service.hpp"
 #include "services/performance_service.hpp"
 #include "services/steam_service.hpp"
-#include "translator/translator.hpp"
 #include "utils/configuration_wrapper.hpp"
 #include "utils/constants.hpp"
-#include "utils/single_instance.hpp"
-#include "utils/string_utils.hpp"
-#include "utils/time_utils.hpp"
 
 inline void terminateHandler() {
 	std::cerr << "Unhandled exception detected\n";

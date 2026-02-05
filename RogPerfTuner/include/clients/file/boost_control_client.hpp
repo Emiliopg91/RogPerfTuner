@@ -2,8 +2,8 @@
 
 #include <memory>
 
-#include "abstracts/singleton.hpp"
-#include "clients/abstract/abstract_file_client.hpp"
+#include "framework/abstracts/singleton.hpp"
+#include "framework/clients/abstract/abstract_file_client.hpp"
 
 class BoostControlClientImpl : public AbstractFileClient {
   public:

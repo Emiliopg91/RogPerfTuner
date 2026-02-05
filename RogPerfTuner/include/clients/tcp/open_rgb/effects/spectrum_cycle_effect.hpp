@@ -1,7 +1,7 @@
 #pragma once
 
-#include "abstracts/singleton.hpp"
 #include "clients/tcp/open_rgb/effects/abstract/abstract_effect.hpp"
+#include "framework/abstracts/singleton.hpp"
 
 class SpectrumCycleEffect : public AbstractEffect, public Singleton<SpectrumCycleEffect> {
   protected:

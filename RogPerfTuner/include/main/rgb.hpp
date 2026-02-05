@@ -1,5 +1,5 @@
 #include "clients/unix_socket/rog_perf_tuner_client.hpp"
-#include "logger/logger_provider.hpp"
+#include "framework/logger/logger_provider.hpp"
 
 inline void nextProfile() {
 	LoggerProvider::initialize();

@@ -4,8 +4,8 @@
 
 #include <optional>
 
+#include "framework/utils/enum_utils.hpp"
 #include "models/performance/performance_profile.hpp"
-#include "utils/enum_utils.hpp"
 
 struct Performance {
 	PerformanceProfile profile			 = PerformanceProfile::SMART;

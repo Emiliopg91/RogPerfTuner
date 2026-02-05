@@ -4,17 +4,18 @@
 #include <string>
 #include <thread>
 
-#include "models/cpu_usage.hpp"
+#include "framework/logger/logger.hpp"
+#include "framework/models/cpu_usage.hpp"
+#include "framework/utils/enum_utils.hpp"
+#include "framework/utils/file_utils.hpp"
+#include "framework/utils/process_utils.hpp"
+#include "framework/utils/string_utils.hpp"
+#include "framework/utils/time_utils.hpp"
 #include "models/performance/cpu_governor.hpp"
 #include "models/performance/performance_profile.hpp"
 #include "models/performance/power_profile.hpp"
 #include "utils/configuration_wrapper.hpp"
-#include "utils/enum_utils.hpp"
 #include "utils/event_bus_wrapper.hpp"
-#include "utils/file_utils.hpp"
-#include "utils/process_utils.hpp"
-#include "utils/string_utils.hpp"
-#include "utils/time_utils.hpp"
 
 int8_t PerformanceService::CPU_PRIORITY = -17;
 uint8_t PerformanceService::IO_PRIORITY = (CPU_PRIORITY + 20) / 5;
@@ -93,33 +94,55 @@ void PerformanceService::setActualPerformanceProfile(PerformanceProfile& profile
 	Logger::rem_tab();
 }
 
-void PerformanceService::smartWorker() {
-	while (!stopFlag) {
-		std::array<double, 5> buffer{};
-		size_t index = 0;
-		for (size_t j = 0; j < buffer.size(); j++) {
-			for (int i = 0; i < 9 && !stopFlag; i++) {
-				TimeUtils::sleep(100);
+PerformanceProfile PerformanceService::getNextSmart(size_t samples, bool inRecursion) {
+	auto next = actualProfile;
+
+	std::vector<double> buffer(samples, 0.0);
+	size_t index = 0;
+	for (size_t j = 0; j < samples; j++) {
+		for (int i = 0; i < 9 && !stopFlag; i++) {
+			TimeUtils::sleep(100);
+		}
+		if (!stopFlag) {
+			auto usage	  = CPUUsage::getUseRate(100);
+			buffer[index] = usage;
+			if (++index == samples) {
+				break;
 			}
-			if (!stopFlag) {
-				auto usage	  = CPUUsage::getUseRate(100);
-				buffer[index] = usage;
-				if (++index == buffer.size()) {
-					break;
+		}
+	}
+
+	if (!stopFlag) {
+		auto avg = std::accumulate(buffer.begin(), buffer.end(), 0.0) / samples;
+		if (avg > 0.67) {
+			next = getNextPerformanceProfile(actualProfile, false);
+			if (next != actualProfile) {
+				logger->info("Average CPU usage: {:.2f}%, ramp up to {}", avg * 100, toName(next));
+			}
+		} else if (avg < 0.25) {
+			next = getPreviousPerformanceProfile(actualProfile, false);
+			if (next != actualProfile) {
+				if (!inRecursion) {
+					logger->info("Average CPU usage: {:.2f}%, waiting for next average before ramp down", avg * 100);
+					next = getNextSmart(samples * 2, true);
+				} else {
+					logger->info("Average CPU usage: {:.2f}%, ramp down to {}", avg * 100, toName(next));
 				}
 			}
 		}
+	}
+
+	return next;
+}
+
+void PerformanceService::smartWorker() {
+	while (!stopFlag) {
 		if (!stopFlag) {
-			double mean = std::accumulate(buffer.begin(), buffer.end(), 0.0) / buffer.size();
-			auto next	= actualProfile;
-			if (mean > 0.67) {
-				next = getNextPerformanceProfile(actualProfile, false);
-			} else if (mean < 0.25) {
-				next = getPreviousPerformanceProfile(actualProfile, false);
-			}
+			auto next = getNextSmart();
 			if (next != actualProfile) {
-				logger->info("Mean CPU load: {:.2f}%", mean * 100);
+				Logger::add_tab();
 				setActualPerformanceProfile(next);
+				Logger::rem_tab();
 			}
 		}
 	}
@@ -145,7 +168,7 @@ void PerformanceService::setPerformanceProfile(PerformanceProfile& profile, cons
 			setActualPerformanceProfile(profile);
 		} else {
 			logger->info("Starting {} worker", toName(PerformanceProfile::SMART));
-			auto perf = PerformanceProfile::BALANCED;
+			auto perf = PerformanceProfile::PERFORMANCE;
 			if (perf != actualProfile) {
 				setActualPerformanceProfile(perf);
 			}
@@ -559,9 +582,8 @@ void PerformanceService::saveFanCurves(std::string profile, std::unordered_map<s
 }
 
 std::string PerformanceService::getDefaultSchedulerName() {
-	const std::string borePath = "/proc/sys/kernel/sched_bore";
-	if (FileUtils::exists(borePath) && StringUtils::trim(FileUtils::readFileContent(borePath)) == "1") {
-		return "Bore";
+	if (schedBoreClient.available()) {
+		return "BORE";
 	}
-	return "Eevdf";
+	return "EEVDF";
 }

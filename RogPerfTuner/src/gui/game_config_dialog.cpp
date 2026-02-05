@@ -8,8 +8,8 @@
 #include <QPushButton>
 #include <optional>
 
+#include "framework/utils/string_utils.hpp"
 #include "gui/yes_no_dialog.hpp"
-#include "utils/string_utils.hpp"
 
 GameConfigDialog::GameConfigDialog(unsigned int gid, bool runAfterSave, QWidget* parent)
 	: Loggable("GameConfigDialog"), QDialog(parent), gid(gid), runAfterSave(runAfterSave) {

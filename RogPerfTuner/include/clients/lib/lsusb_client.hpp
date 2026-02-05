@@ -8,7 +8,7 @@
 #include <tuple>
 #include <vector>
 
-#include "abstracts/singleton.hpp"
+#include "framework/abstracts/singleton.hpp"
 #include "models/hardware/usb_identifier.hpp"
 #include "utils/event_bus_wrapper.hpp"
 

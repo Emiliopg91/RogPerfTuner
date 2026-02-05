@@ -1,6 +1,6 @@
 #pragma once
 
-#include "clients/abstract/abstract_unix_socket_client.hpp"
+#include "framework/clients/abstract/abstract_unix_socket_client.hpp"
 #include "services/hardware_service.hpp"
 #include "services/open_rgb_service.hpp"
 #include "services/performance_service.hpp"

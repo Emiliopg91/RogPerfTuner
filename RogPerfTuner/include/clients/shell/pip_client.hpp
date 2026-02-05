@@ -1,7 +1,7 @@
 #pragma once
 
-#include "abstracts/singleton.hpp"
-#include "clients/abstract/abstract_cmd_client.hpp"
+#include "framework/abstracts/singleton.hpp"
+#include "framework/clients/abstract/abstract_cmd_client.hpp"
 
 class PipClient : AbstractCmdClient, public Singleton<PipClient> {
   private:

@@ -4,14 +4,14 @@
 #include <unistd.h>
 
 #ifdef DEV_MODE
-#include "utils/file_utils.hpp"
+#include "framework/utils/file_utils.hpp"
 #endif
 
 const std::string Constants::APP_NAME  = "RogPerfTuner";
 const std::string Constants::EXEC_NAME = "rog-perf-tuner";
 const pid_t Constants::PID			   = getpid();
 
-const std::string Constants::APP_VERSION = "4.11.2-1";
+const std::string Constants::APP_VERSION = "4.11.3-1";
 
 const std::string Constants::PLUGIN_VERSION = "1.2.7";
 

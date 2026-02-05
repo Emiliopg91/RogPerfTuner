@@ -1,4 +1,4 @@
-#include "utils/single_instance.hpp"
+#include "framework/utils/single_instance.hpp"
 
 #include <signal.h>
 #include <unistd.h>
@@ -6,7 +6,7 @@
 #include <fstream>
 #include <iostream>
 
-#include "utils/file_utils.hpp"
+#include "framework/utils/file_utils.hpp"
 
 void SingleInstance::acquire(std::string lockFile) {
 	killRunningInstance(lockFile);

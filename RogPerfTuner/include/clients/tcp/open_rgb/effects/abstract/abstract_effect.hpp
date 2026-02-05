@@ -6,7 +6,7 @@
 #include <thread>
 
 #include "OpenRGB/Client.hpp"
-#include "abstracts/loggable.hpp"
+#include "framework/abstracts/loggable.hpp"
 #include "models/hardware/rgb_brightness.hpp"
 
 using orgb::Client;

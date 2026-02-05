@@ -1,4 +1,4 @@
-#include "utils/net_utils.hpp"
+#include "framework/utils/net_utils.hpp"
 
 #include <curl/curl.h>
 #include <netinet/in.h>
@@ -7,9 +7,9 @@
 #include <regex>
 #include <stdexcept>
 
-#include "logger/logger_provider.hpp"
-#include "models/command_result.hpp"
-#include "shell/shell.hpp"
+#include "framework/logger/logger_provider.hpp"
+#include "framework/models/command_result.hpp"
+#include "framework/shell/shell.hpp"
 
 bool NetUtils::isPortFree(int port) {
 	int sock = socket(AF_INET, SOCK_STREAM, 0);

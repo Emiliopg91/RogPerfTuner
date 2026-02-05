@@ -1,10 +1,10 @@
-#include "utils/process_utils.hpp"
+#include "framework/utils/process_utils.hpp"
 
 #include <cstdint>
 #include <set>
 #include <string>
 
-#include "utils/string_utils.hpp"
+#include "framework/utils/string_utils.hpp"
 
 Shell& ProcessUtils::getShell() {
 	static Shell& instance = Shell::getInstance();

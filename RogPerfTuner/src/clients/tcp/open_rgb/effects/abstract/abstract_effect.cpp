@@ -5,10 +5,10 @@
 #include <string>
 #include <thread>
 
+#include "framework/utils/enum_utils.hpp"
+#include "framework/utils/string_utils.hpp"
+#include "framework/utils/time_utils.hpp"
 #include "models/hardware/rgb_brightness.hpp"
-#include "utils/enum_utils.hpp"
-#include "utils/string_utils.hpp"
-#include "utils/time_utils.hpp"
 
 void AbstractEffect::start(const DeviceList& devices, const RgbBrightness& brightness) {
 	if (_is_running) {

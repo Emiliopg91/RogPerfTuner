@@ -3,8 +3,8 @@
 #include <random>
 #include <vector>
 
-#include "abstracts/singleton.hpp"
 #include "clients/tcp/open_rgb/effects/abstract/abstract_effect.hpp"
+#include "framework/abstracts/singleton.hpp"
 #include "models/others/led_status.hpp"
 
 class DigitalRainEffect : public AbstractEffect, public Singleton<DigitalRainEffect> {

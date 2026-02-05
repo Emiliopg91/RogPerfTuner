@@ -8,6 +8,7 @@
 #include <QMainWindow>
 #include <QPushButton>
 
+#include "framework/translator/translator.hpp"
 #include "models/hardware/battery_charge_threshold.hpp"
 #include "models/hardware/rgb_brightness.hpp"
 #include "models/performance/performance_profile.hpp"
@@ -16,7 +17,6 @@
 #include "services/open_rgb_service.hpp"
 #include "services/performance_service.hpp"
 #include "services/steam_service.hpp"
-#include "translator/translator.hpp"
 #include "utils/event_bus_wrapper.hpp"
 
 class MainWindow : public QMainWindow, public Singleton<MainWindow> {

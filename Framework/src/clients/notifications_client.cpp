@@ -1,4 +1,4 @@
-#include "clients/notifications_client.hpp"
+#include "framework/clients/notifications_client.hpp"
 
 int NotificationClient::show_notification(const std::string& app_name, const std::string& app_icon, const std::string& title, const std::string& body,
 										  const int& timeout) {

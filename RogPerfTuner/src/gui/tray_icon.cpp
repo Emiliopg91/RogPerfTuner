@@ -10,11 +10,11 @@
 #include <array>
 #include <optional>
 
+#include "framework/utils/enum_utils.hpp"
+#include "framework/utils/string_utils.hpp"
 #include "gui/fan_curve_editor.hpp"
 #include "gui/game_list.hpp"
 #include "models/performance/performance_profile.hpp"
-#include "utils/enum_utils.hpp"
-#include "utils/string_utils.hpp"
 
 void TrayIcon::openMainWindow() {
 	mainWindow.show();

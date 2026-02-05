@@ -1,6 +1,6 @@
 #pragma once
 
-#include "clients/abstract/abstract_file_client.hpp"
+#include "framework/clients/abstract/abstract_file_client.hpp"
 
 class ArmouryBaseClient : private AbstractFileClient {
   public:

@@ -2,7 +2,7 @@
 
 #include <optional>
 
-#include "utils/string_utils.hpp"
+#include "framework/utils/string_utils.hpp"
 
 ScxCtlClient::ScxCtlClient() : AbstractCmdClient("scxctl", "ScxCtlClient") {
 	if (available()) {

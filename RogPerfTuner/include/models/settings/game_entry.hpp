@@ -4,10 +4,10 @@
 
 #include <optional>
 
+#include "framework/utils/enum_utils.hpp"
 #include "models/steam/computer_type.hpp"
 #include "models/steam/mangohud_level.hpp"
 #include "models/steam/wine_sync_option.hpp"
-#include "utils/enum_utils.hpp"
 
 struct GameEntry {
 	inline static const MangoHudLevel DEFAULT_METRICS_LEVEL = MangoHudLevel::NO_DISPLAY;

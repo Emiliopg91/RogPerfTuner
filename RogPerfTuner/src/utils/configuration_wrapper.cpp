@@ -6,8 +6,8 @@
 #include <QEventLoop>
 #include <string>
 
-#include "abstracts/loggable.hpp"
-#include "configuration/configuration.hpp"
+#include "framework/abstracts/loggable.hpp"
+#include "framework/configuration/configuration.hpp"
 #include "models/settings/root_config.hpp"
 #include "utils/constants.hpp"
 

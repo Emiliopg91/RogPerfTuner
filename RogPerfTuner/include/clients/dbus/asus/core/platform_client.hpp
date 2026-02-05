@@ -1,7 +1,7 @@
 #pragma once
 
-#include "abstracts/singleton.hpp"
 #include "clients/dbus/asus/asus_base_client.hpp"
+#include "framework/abstracts/singleton.hpp"
 #include "models/performance/platform_profile.hpp"
 
 class PlatformClient : public AsusBaseClient, public Singleton<PlatformClient> {

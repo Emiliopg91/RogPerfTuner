@@ -11,9 +11,9 @@
 #include <filesystem>
 #include <string>
 
-#include "clients/abstract/abstract_unix_socket_client.hpp"
-#include "utils/file_utils.hpp"
-#include "utils/serialize_utils.hpp"
+#include "framework/clients/abstract/abstract_unix_socket_client.hpp"
+#include "framework/utils/file_utils.hpp"
+#include "framework/utils/serialize_utils.hpp"
 
 SocketServer::SocketServer() : Loggable("SocketServer") {
 	logger->info("Initializing socket server");

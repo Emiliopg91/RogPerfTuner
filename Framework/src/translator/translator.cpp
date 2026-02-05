@@ -1,11 +1,11 @@
 
-#include "translator/translator.hpp"
+#include "framework/translator/translator.hpp"
 
 #include <string>
 
-#include "utils/enum_utils.hpp"
-#include "utils/serialize_utils.hpp"
-#include "utils/string_utils.hpp"
+#include "framework/utils/enum_utils.hpp"
+#include "framework/utils/serialize_utils.hpp"
+#include "framework/utils/string_utils.hpp"
 
 Translator::Translator(const std::string& translation_file) : Loggable("Translator") {
 	currentLang = [this]() -> Language {
