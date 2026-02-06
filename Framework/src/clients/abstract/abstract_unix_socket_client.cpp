@@ -2,9 +2,9 @@
 
 #include <csignal>
 
-#include "framework/utils/serialize_utils.hpp"
 #include "framework/utils/string_utils.hpp"
 #include "framework/utils/time_utils.hpp"
+#include "framework/utils/yaml_utils.hpp"
 
 void AbstractUnixSocketClient::emitUnixSocketEvent(EventBus& eventBus, std::string name, std::string event, CallbackParam value) {
 	eventBus.emit_event("unix.socket." + name + ".event." + event, value);
@@ -55,7 +55,7 @@ std::vector<std::any> AbstractUnixSocketClient::invoke(std::string method, std::
 	{
 		std::lock_guard<std::mutex> lock(mutex);
 		promises[cm.id] = std::move(prom);
-		_message_queue.push(SerializeUtils::writeYaml(cm));
+		_message_queue.push(YamlUtils::writeYaml(cm));
 	}
 	queue_cv.notify_one();
 
@@ -194,7 +194,7 @@ void AbstractUnixSocketClient::readLoop() {
 				total_read += r;
 			}
 
-			auto j = SerializeUtils::parseYaml<UnixCommunicationMessage>(data);
+			auto j = YamlUtils::parseYaml<UnixCommunicationMessage>(data);
 			if (j.type == "RESPONSE") {
 				handleResponse(j);
 			} else if (j.type == "EVENT") {

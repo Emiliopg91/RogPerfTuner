@@ -7,6 +7,7 @@
 #include <string>
 #include <thread>
 
+#include "framework/utils/json_utils.hpp"
 #include "gui/game_config_dialog.hpp"
 #include "utils/configuration_wrapper.hpp"
 #include "utils/event_bus_wrapper.hpp"
@@ -23,8 +24,6 @@
 #include "services/hardware_service.hpp"
 #include "services/open_rgb_service.hpp"
 #include "services/performance_service.hpp"
-#include "yaml-cpp/node/node.h"
-#include "yaml-cpp/node/parse.h"
 
 bool SteamService::metricsEnabled() {
 	return whichMangohud.has_value();
@@ -57,9 +56,9 @@ SteamService::SteamService() : Loggable("SteamService") {
 	if (whichMangohud.has_value()) {
 		logger->info("Metric level service available");
 		Logger::add_tab();
-		if (FileUtils::exists(std::string("/sys/class/powercap/intel-rapl:0/energy_uj"))) {
+		if (intelRaplUjClient.available()) {
 			logger->info("Enabling Intel CPU RAPL...");
-			shell.run_elevated_command("chmod o+r /sys/class/powercap/intel-rapl:0/energy_uj", false);
+			intelRaplUjClient.enableRead();
 		}
 		Logger::rem_tab();
 	}
@@ -233,7 +232,7 @@ void SteamService::launchGame(const std::string& id) {
 }
 
 bool SteamService::checkIfRequiredInstallation() {
-	auto node = SerializeUtils::readJsonFile(Constants::RCCDC_PACKAGE_FILE);
+	auto node = JsonUtils::readJsonFile(Constants::RCCDC_PACKAGE_FILE);
 
 	SemanticVersion vA = SemanticVersion::parse(Constants::PLUGIN_VERSION);
 	SemanticVersion vR = SemanticVersion::parse(node["version"]);

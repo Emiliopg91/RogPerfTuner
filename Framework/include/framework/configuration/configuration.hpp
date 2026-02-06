@@ -3,7 +3,7 @@
 #include "framework/abstracts/loggable.hpp"
 #include "framework/abstracts/singleton.hpp"
 #include "framework/utils/file_utils.hpp"
-#include "framework/utils/serialize_utils.hpp"
+#include "framework/utils/yaml_utils.hpp"
 
 template <typename T>
 class Configuration : public Singleton<Configuration<T>>, Loggable {
@@ -25,7 +25,7 @@ class Configuration : public Singleton<Configuration<T>>, Loggable {
 		logger->debug("Configuration saved");
 
 		try {
-			SerializeUtils::writeYamlFile(*config, configFile);
+			YamlUtils::writeYamlFile(*config, configFile);
 		} catch (const std::exception& e) {
 			logger->error("Error saving settings file: {}", e.what());
 		}
@@ -45,7 +45,7 @@ class Configuration : public Singleton<Configuration<T>>, Loggable {
 		if (FileUtils::exists(configFile)) {
 			logger->debug("Loading settings from {}", configFile);
 			try {
-				config = SerializeUtils::readYamlFile<T>(configFile);
+				config = YamlUtils::readYamlFile<T>(configFile);
 				LoggerProvider::setConfigMap(config->logger);
 			} catch (const std::exception& e) {
 				logger->error("Error loading settings: {}", e.what());

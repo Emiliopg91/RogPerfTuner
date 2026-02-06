@@ -8,6 +8,7 @@
 #include <QMainWindow>
 #include <QPushButton>
 
+#include "framework/gui/no_scroll_combo_box.hpp"
 #include "framework/translator/translator.hpp"
 #include "models/hardware/battery_charge_threshold.hpp"
 #include "models/hardware/rgb_brightness.hpp"
@@ -89,16 +90,16 @@ class MainWindow : public QMainWindow, public Singleton<MainWindow> {
 	ApplicationService& applicationService = ApplicationService::init(std::nullopt);
 	UPowerClient& uPowerClient			   = UPowerClient::getInstance();
 
-	QComboBox* _profileDropdown;
-	QComboBox* _schedulerDropdown;
+	NoScrollComboBox* _profileDropdown;
+	NoScrollComboBox* _schedulerDropdown;
 	QPushButton* _gameProfileButton;
-	QComboBox* _effectDropdown;
-	QComboBox* _brightnessDropdown;
+	NoScrollComboBox* _effectDropdown;
+	NoScrollComboBox* _brightnessDropdown;
 	QPushButton* _colorButton;
-	QComboBox* _thresholdDropdown;
+	NoScrollComboBox* _thresholdDropdown;
 	QCheckBox* _autostart;
 	QCheckBox* _minimized;
-	QComboBox* _bootSoundDropdown;
+	NoScrollComboBox* _bootSoundDropdown;
 	QStatusBar* statusBar;
 	QLabel* versionLabel;
 	QPushButton* updateButton;

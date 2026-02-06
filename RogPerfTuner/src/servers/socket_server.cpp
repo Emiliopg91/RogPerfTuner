@@ -13,7 +13,7 @@
 
 #include "framework/clients/abstract/abstract_unix_socket_client.hpp"
 #include "framework/utils/file_utils.hpp"
-#include "framework/utils/serialize_utils.hpp"
+#include "framework/utils/yaml_utils.hpp"
 
 SocketServer::SocketServer() : Loggable("SocketServer") {
 	logger->info("Initializing socket server");
@@ -141,7 +141,7 @@ void SocketServer::handleClient(int client_fd) {
 
 		Logger::add_tab();
 		try {
-			auto req = SerializeUtils::parseYaml<UnixCommunicationMessage>(data);
+			auto req = YamlUtils::parseYaml<UnixCommunicationMessage>(data);
 			if (req.type == "REQUEST") {
 				handleRequest(client_fd, req);
 			}
@@ -179,7 +179,7 @@ void SocketServer::handleRequest(const int& clientFd, const UnixCommunicationMes
 			} catch (std::exception& e) {
 				idStr = std::to_string(std::any_cast<uint64_t>(req.data[0]));
 			}
-			res.data.emplace_back(SerializeUtils::writeYaml(steamService.getConfiguration(idStr)));
+			res.data.emplace_back(YamlUtils::writeYaml(steamService.getConfiguration(idStr)));
 		} else {
 			res.error = "No such method";
 		}
@@ -188,7 +188,7 @@ void SocketServer::handleRequest(const int& clientFd, const UnixCommunicationMes
 		res.error = e.what();
 	}
 
-	std::string resp_str = SerializeUtils::writeYaml(res);
+	std::string resp_str = YamlUtils::writeYaml(res);
 
 	uint32_t resp_len = htonl(resp_str.size());
 	write(clientFd, &resp_len, sizeof(resp_len));

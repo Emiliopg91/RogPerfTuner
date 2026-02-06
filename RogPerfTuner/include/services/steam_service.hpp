@@ -2,6 +2,7 @@
 
 #include <optional>
 
+#include "clients/file/intel_rapl_uj_client.hpp"
 #include "clients/shell/pip_client.hpp"
 #include "clients/unix_socket/steam_client.hpp"
 #include "models/steam/steam_game_config.hpp"
@@ -20,6 +21,7 @@ class SteamService : public Singleton<SteamService>, Loggable {
 	std::optional<std::string> whichSystemdInhibit;
 
 	Shell& shell						   = Shell::getInstance();
+	IntelRaplUJClient& intelRaplUjClient   = IntelRaplUJClient::getInstance();
 	EventBusWrapper& eventBus			   = EventBusWrapper::getInstance();
 	ConfigurationWrapper& configuration	   = ConfigurationWrapper::getInstance();
 	PerformanceService& performanceService = PerformanceService::getInstance();

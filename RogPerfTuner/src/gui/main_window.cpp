@@ -56,7 +56,7 @@ MainWindow::MainWindow(QWidget* parent) : QMainWindow(parent) {
 	// -------------------------
 	// Profile menu
 	// -------------------------
-	_profileDropdown = new QComboBox();
+	_profileDropdown = new NoScrollComboBox();
 	_profileDropdown->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Preferred);
 	auto items = values<PerformanceProfile>();
 	for (PerformanceProfile item : items) {
@@ -73,7 +73,7 @@ MainWindow::MainWindow(QWidget* parent) : QMainWindow(parent) {
 	// Scheduler menu
 	// -------------------------
 	if (!performanceService.getAvailableSchedulers().empty()) {
-		_schedulerDropdown = new QComboBox();
+		_schedulerDropdown = new NoScrollComboBox();
 		_schedulerDropdown->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Preferred);
 		_schedulerDropdown->addItem(("  " + performanceService.getDefaultSchedulerName()).c_str(), "");
 
@@ -139,7 +139,7 @@ MainWindow::MainWindow(QWidget* parent) : QMainWindow(parent) {
 	// -------------------------
 	// Effect menu
 	// -------------------------
-	_effectDropdown = new QComboBox();
+	_effectDropdown = new NoScrollComboBox();
 	_effectDropdown->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Preferred);
 	auto effects = openRgbService.getAvailableEffects();
 	for (const auto effect : effects) {
@@ -160,7 +160,7 @@ MainWindow::MainWindow(QWidget* parent) : QMainWindow(parent) {
 	// -------------------------
 	// Brightness + Color menu
 	// -------------------------
-	_brightnessDropdown = new QComboBox();
+	_brightnessDropdown = new NoScrollComboBox();
 	_brightnessDropdown->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Preferred);
 	for (RgbBrightness b : values<RgbBrightness, true>()) {
 		_brightnessDropdown->addItem(("  " + translator.translate("label.brightness." + toName(b))).c_str(), toInt(b));
@@ -210,7 +210,7 @@ MainWindow::MainWindow(QWidget* parent) : QMainWindow(parent) {
 		// Battery menu
 		// -------------------------
 		if (hardwareService.getBatteryLimitAvailable()) {
-			_thresholdDropdown = new QComboBox();
+			_thresholdDropdown = new NoScrollComboBox();
 			_thresholdDropdown->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Preferred);
 			for (BatteryThreshold t : values<BatteryThreshold, true>()) {
 				const auto intVal = toInt(t);
@@ -231,7 +231,7 @@ MainWindow::MainWindow(QWidget* parent) : QMainWindow(parent) {
 		// Boot sound menu
 		// -------------------------
 		if (hardwareService.getBootSoundAvailable()) {
-			_bootSoundDropdown = new QComboBox();
+			_bootSoundDropdown = new NoScrollComboBox();
 			_bootSoundDropdown->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Preferred);
 
 			auto vals = std::array<bool, 2>{true, false};

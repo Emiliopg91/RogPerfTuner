@@ -4,8 +4,8 @@
 #include <string>
 
 #include "framework/utils/enum_utils.hpp"
-#include "framework/utils/serialize_utils.hpp"
 #include "framework/utils/string_utils.hpp"
+#include "framework/utils/yaml_utils.hpp"
 
 Translator::Translator(const std::string& translation_file) : Loggable("Translator") {
 	currentLang = [this]() -> Language {
@@ -30,7 +30,7 @@ Translator::Translator(const std::string& translation_file) : Loggable("Translat
 		}
 	}();
 
-	auto root = SerializeUtils::readYamlFile(translation_file);
+	auto root = YamlUtils::readYamlFile(translation_file);
 
 	for (auto it = root.begin(); it != root.end(); ++it) {
 		const std::string key = it->first.as<std::string>();

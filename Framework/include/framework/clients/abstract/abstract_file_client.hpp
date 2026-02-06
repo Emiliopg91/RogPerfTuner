@@ -15,8 +15,6 @@ class AbstractFileClient : public Loggable {
 
   protected:
 	AbstractFileClient(const std::string& path, const std::string& name, const bool& sudo = false, const bool& required = true);
-
-  private:
 	std::string path_;
 	bool sudo_;
 	bool available_;

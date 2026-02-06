@@ -193,7 +193,7 @@ void ApplicationService::applyUpdate() {
 std::optional<std::string> ApplicationService::getChangeLog() {
 	try {
 		const auto changelogYml = NetUtils::fetch(Constants::CHANGELOG_URL);
-		auto root				= SerializeUtils::parseYaml(changelogYml);
+		auto root				= YamlUtils::parseYaml(changelogYml);
 
 		if (!root.IsSequence()) {
 			logger->error("Invalid changelog format");
