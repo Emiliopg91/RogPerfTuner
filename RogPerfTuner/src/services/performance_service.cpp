@@ -7,7 +7,6 @@
 #include "framework/logger/logger.hpp"
 #include "framework/models/cpu_usage.hpp"
 #include "framework/utils/enum_utils.hpp"
-#include "framework/utils/file_utils.hpp"
 #include "framework/utils/process_utils.hpp"
 #include "framework/utils/string_utils.hpp"
 #include "framework/utils/time_utils.hpp"
