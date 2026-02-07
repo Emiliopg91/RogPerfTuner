@@ -46,6 +46,7 @@ const std::string Constants::TRANSLATIONS_FILE	= ASSETS_DIR + "/translations.yam
 const std::string Constants::HOME_DIR				  = std::getenv("HOME");
 const std::string Constants::BIN_DIR				  = HOME_DIR + "/." + APP_NAME + "/bin";
 const std::string Constants::BIN_APPLICATION_DIR	  = HOME_DIR + "/." + APP_NAME + "/bin/application";
+const std::string Constants::SHOW_GUI_PATH			  = HOME_DIR + "/." + APP_NAME + "/bin/application/showGui";
 const std::string Constants::BIN_PERFORMANCE_DIR	  = HOME_DIR + "/." + APP_NAME + "/bin/performance";
 const std::string Constants::NEXT_PROFILE_PATH		  = HOME_DIR + "/." + APP_NAME + "/bin/performance/nextProfile";
 const std::string Constants::BIN_RGB_DIR			  = HOME_DIR + "/." + APP_NAME + "/bin/rgb";
@@ -77,6 +78,7 @@ const std::string Constants::PERF_PROF	= "nexPerformanceProfile";
 const std::string Constants::DEC_BRIGHT = "decRgbBrightness";
 const std::string Constants::INC_BRIGHT = "incRgbBrightness";
 const std::string Constants::NEXT_EFF	= "nextRgbEffect";
+const std::string Constants::SHOW_GUI	= "showGui";
 
 const std::vector<std::string> Constants::RCCDC_REQUIRED_PIP = {"asyncio", "pyyaml"};
 

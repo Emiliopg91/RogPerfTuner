@@ -25,6 +25,10 @@ void RogPerfTunerClient::nextProfile() {
 	invoke(Constants::PERF_PROF, {});
 }
 
+void RogPerfTunerClient::showGui() {
+	invoke(Constants::SHOW_GUI, {});
+}
+
 SteamGameConfig RogPerfTunerClient::getGameConfig(std::string steamId) {
 	auto res	  = invoke(Constants::GAME_CFG, {steamId});
 	auto yaml_str = std::any_cast<std::string>(res[0]);

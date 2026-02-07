@@ -37,6 +37,7 @@ class Constants {
 	static const std::string APP_DRAW_FILE;
 	static const std::string BIN_DIR;
 	static const std::string BIN_APPLICATION_DIR;
+	static const std::string SHOW_GUI_PATH;
 	static const std::string BIN_PERFORMANCE_DIR;
 	static const std::string NEXT_PROFILE_PATH;
 	static const std::string BIN_RGB_DIR;
@@ -78,6 +79,7 @@ class Constants {
 	static const std::string DEC_BRIGHT;
 	static const std::string INC_BRIGHT;
 	static const std::string NEXT_EFF;
+	static const std::string SHOW_GUI;
 
 	static const std::string SOCKET_FILE;
 

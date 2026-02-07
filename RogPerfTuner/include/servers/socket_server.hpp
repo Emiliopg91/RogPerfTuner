@@ -1,6 +1,7 @@
 #pragma once
 
 #include "framework/clients/abstract/abstract_unix_socket_client.hpp"
+#include "gui/main_window.hpp"
 #include "services/hardware_service.hpp"
 #include "services/open_rgb_service.hpp"
 #include "services/performance_service.hpp"
@@ -19,6 +20,7 @@ class SocketServer : public Singleton<SocketServer>, Loggable {
 	OpenRgbService& openRgbService		   = OpenRgbService::getInstance();
 	HardwareService& hardwareService	   = HardwareService::getInstance();
 	SteamService& steamService			   = SteamService::getInstance();
+	MainWindow& mainWindow				   = MainWindow::getInstance();
 
 	void run();
 

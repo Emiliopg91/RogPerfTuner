@@ -6,6 +6,7 @@
 #include <iostream>
 #include <string>
 
+#include "clients/unix_socket/rog_perf_tuner_client.hpp"
 #include "framework/gui/toaster.hpp"
 #include "framework/logger/logger_provider.hpp"
 #include "framework/translator/translator.hpp"
@@ -137,4 +138,9 @@ inline int startGui(int argc, char** argv) {
 
 inline int killInstance() {
 	return SingleInstance::getInstance().killRunningInstance(Constants::LOCK_FILE) ? 0 : 1;
+}
+
+inline void showGui() {
+	LoggerProvider::initialize();
+	RogPerfTunerClient::getInstance().showGui();
 }

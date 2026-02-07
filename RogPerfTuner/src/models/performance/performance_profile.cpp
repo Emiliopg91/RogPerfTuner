@@ -4,8 +4,10 @@
 
 PerformanceProfile getNextPerformanceProfile(PerformanceProfile value, bool circular) {
 	switch (value) {
+		case PerformanceProfile::SMART:
+			return circular ? PerformanceProfile::QUIET : PerformanceProfile::SMART;
 		case PerformanceProfile::PERFORMANCE:
-			return circular ? PerformanceProfile::QUIET : PerformanceProfile::PERFORMANCE;
+			return PerformanceProfile::SMART;
 		case PerformanceProfile::BALANCED:
 			return PerformanceProfile::PERFORMANCE;
 		case PerformanceProfile::QUIET:

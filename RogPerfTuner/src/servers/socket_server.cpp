@@ -172,6 +172,10 @@ void SocketServer::handleRequest(const int& clientFd, const UnixCommunicationMes
 			res.data.emplace_back(toName(openRgbService.decreaseBrightness()));
 		} else if (req.name == Constants::PERF_PROF) {
 			res.data.emplace_back(toName(performanceService.nextPerformanceProfile()));
+		} else if (req.name == Constants::SHOW_GUI) {
+			mainWindow.show();
+			mainWindow.raise();
+			mainWindow.activateWindow();
 		} else if (req.name == Constants::GAME_CFG) {
 			std::string idStr;
 			try {

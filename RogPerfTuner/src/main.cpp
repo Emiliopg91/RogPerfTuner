@@ -77,6 +77,11 @@ int main(int argc, char** argv) {
 				shiftArgv(argc, argv);
 				return runSteamWrapping(argc, argv);
 
+			case hashStr("-s"):
+			case hashStr("--show"):
+				showGui();
+				break;
+
 			case hashStr("-h"):
 			case hashStr("--help"):
 				std::cout << "Usage: " << argv[0] << " [option]" << std::endl
@@ -93,6 +98,7 @@ int main(int argc, char** argv) {
 						  << "    -r, --run            Wrap Steam execution" << std::endl
 						  << std::endl
 						  << "  Application" << std::endl
+						  << "    -s, --show           Show GUI" << std::endl
 						  << "    -k, --kill           Kill existing instance" << std::endl
 						  << "    -v, --version        Show version information" << std::endl
 						  << "    -h, --help           Show this help message" << std::endl;

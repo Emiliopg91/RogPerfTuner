@@ -54,6 +54,9 @@ ApplicationService::ApplicationService(std::optional<std::string> execPath) : Lo
 		createWrapperScriptFile(Constants::STEAM_WRAPPER_PATH, *execPath, "-r");
 		createWrapperScriptFile(Constants::FLATPAK_WRAPPER_PATH, *execPath, "-f");
 
+		FileUtils::mkdirs(Constants::BIN_APPLICATION_DIR);
+		createWrapperScriptFile(Constants::SHOW_GUI_PATH, *execPath, "-s");
+
 		FileUtils::chmodRecursive(Constants::BIN_DIR, 0777);
 
 		Logger::rem_tab();
