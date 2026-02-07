@@ -2,6 +2,7 @@
 
 #include <arpa/inet.h>
 #include <fcntl.h>
+#include <qobjectdefs.h>
 #include <sys/socket.h>
 #include <sys/stat.h>
 #include <sys/types.h>
@@ -173,9 +174,14 @@ void SocketServer::handleRequest(const int& clientFd, const UnixCommunicationMes
 		} else if (req.name == Constants::PERF_PROF) {
 			res.data.emplace_back(toName(performanceService.nextPerformanceProfile()));
 		} else if (req.name == Constants::SHOW_GUI) {
-			mainWindow.show();
-			mainWindow.raise();
-			mainWindow.activateWindow();
+			QMetaObject::invokeMethod(
+				&mainWindow,
+				[this]() {
+					mainWindow.show();
+					mainWindow.raise();
+					mainWindow.activateWindow();
+				},
+				Qt::QueuedConnection);
 		} else if (req.name == Constants::GAME_CFG) {
 			std::string idStr;
 			try {
