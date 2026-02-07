@@ -24,6 +24,7 @@ depends=(
   'asusctl'
   'curl'
   'coreutils'
+  'cpp-httplib-compiled'
   'hicolor-icon-theme'
   'hidapi'
   'libusb'

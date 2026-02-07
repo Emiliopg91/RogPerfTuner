@@ -51,7 +51,7 @@ inline std::string getExecutablePath(const char* argv0) {
 	}
 
 	char resolved[PATH_MAX];
-	if (realpath(argv0, resolved)) {
+	if (realpath(input.c_str(), resolved)) {
 		return std::string(resolved);
 	}
 
@@ -69,7 +69,7 @@ inline int startGui(int argc, char** argv) {
 
 	SingleInstance::getInstance().acquire(Constants::LOCK_FILE);
 	std::cout << "Running application with PID " << Constants::PID << std::endl;
-
+	std::cout << "Executable path: " << execPath << std::endl;
 	std::cout << "Assets directory: " << Constants::ASSETS_DIR << std::endl;
 
 	LoggerProvider::initialize(Constants::LOG_FILE_NAME, Constants::LOG_DIR);
