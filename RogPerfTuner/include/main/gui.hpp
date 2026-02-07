@@ -113,9 +113,9 @@ inline int startGui(int argc, char** argv) {
 	PerformanceService::getInstance();
 	SteamService::getInstance();
 
-	SocketServer::getInstance();
-
 	auto& applicationService = ApplicationService::init(execPath);
+
+	SocketServer::getInstance();
 
 	TrayIcon::init().show();
 
