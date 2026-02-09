@@ -22,18 +22,6 @@ void TrayIcon::openMainWindow() {
 	mainWindow.activateWindow();
 }
 
-void TrayIcon::openSettings() {
-	shell.run_command("xdg-open " + Constants::CONFIG_FILE);
-}
-
-void TrayIcon::reloadSettings() {
-	configuration.loadConfig();
-}
-
-void TrayIcon::openLogs() {
-	shell.run_command("xdg-open " + Constants::LOG_DIR + "/" + Constants::LOG_FILE_NAME + ".log");
-}
-
 void TrayIcon::openGameList() {
 	if (GameList::INSTANCE == nullptr) {
 		GameList::INSTANCE = new GameList(&mainWindow);
@@ -499,7 +487,7 @@ TrayIcon::TrayIcon()
 
 	QAction* openSettingsAct = new QAction("Open settings");
 	QObject::connect(openSettingsAct, &QAction::triggered, [this]() {
-		shell.run_command("xdg-open " + Constants::CONFIG_FILE);
+		shell.run_command("xdg-open " + Constants::CONFIG_DIR + "/" + Constants::CONFIG_FILE);
 	});
 	settingsMenu->addAction(openSettingsAct);
 

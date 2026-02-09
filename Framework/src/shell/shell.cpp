@@ -195,8 +195,13 @@ CommandResult Shell::send_command(BashSession& session, bool elevated, const std
 	}
 	logger->debug("Command finished with code {}", exit_code);
 
-	if (check && exit_code != 0) {
-		throw std::runtime_error("Command '" + cmd + "' finished with code " + std::to_string(exit_code));
+	if (exit_code != 0) {
+		Logger::add_tab();
+		logger->debug("Error output: {}", StringUtils::trim(err));
+		Logger::rem_tab();
+		if (check) {
+			throw std::runtime_error("Command '" + cmd + "' finished with code " + std::to_string(exit_code) + ". Error output: " + err);
+		}
 	}
 
 	return {exit_code, out, err};

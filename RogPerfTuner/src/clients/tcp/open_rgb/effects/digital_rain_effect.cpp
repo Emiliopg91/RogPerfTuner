@@ -6,7 +6,7 @@
 
 #include "framework/models/cpu_usage.hpp"
 
-std::vector<std::vector<LedStatus>> DigitalRainEffect::_dev_to_mat(Device& dev) {
+std::vector<std::vector<DigitalRainEffect::LedStatus>> DigitalRainEffect::_dev_to_mat(Device& dev) {
 	std::vector<std::vector<LedStatus>> mat_def;
 	uint32_t offset	   = 0;
 	uint32_t last_leds = 0;
@@ -17,10 +17,10 @@ std::vector<std::vector<LedStatus>> DigitalRainEffect::_dev_to_mat(Device& dev) 
 			for (size_t r = 0; r < zone.matrix_height; ++r) {
 				std::vector<LedStatus> row;
 				for (size_t c = 0; c < zone.matrix_width; ++c) {
-					if (zone.matrix_values[(r * zone.matrix_width) + c] != INVALID_LED) {
+					if (zone.matrix_values[(r * zone.matrix_width) + c] != DigitalRainEffect::LedStatus::INVALID_LED) {
 						row.push_back(LedStatus{offset + static_cast<int>(zone.matrix_values[(r * zone.matrix_width) + c])});
 					} else {
-						row.push_back(LedStatus{INVALID_LED});
+						row.push_back(LedStatus{DigitalRainEffect::LedStatus::INVALID_LED});
 					}
 				}
 				mat_def.push_back(row);

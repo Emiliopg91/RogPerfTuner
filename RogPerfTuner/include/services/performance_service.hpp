@@ -1,5 +1,6 @@
 #pragma once
 
+#include <cstdint>
 #include <mutex>
 #include <optional>
 #include <thread>
@@ -43,22 +44,10 @@ class PerformanceService : public Singleton<PerformanceService>, Loggable {
 	 */
 	void setPerformanceProfile(PerformanceProfile& profile, const bool& temporal = false, const bool& force = false, const bool& showToast = true);
 
-	void setActualPerformanceProfile(PerformanceProfile& profile);
-
 	/**
 	 * @brief Restores the last saved performance settings.
 	 */
 	void restore();
-
-	/**
-	 * @brief Restores the last saved performance profile.
-	 */
-	void restoreProfile();
-
-	/**
-	 * @brief Restores the last saved scheduler.
-	 */
-	void restoreScheduler();
 
 	/**
 	 * @brief Gets the list of available schedulers.
@@ -132,9 +121,9 @@ class PerformanceService : public Singleton<PerformanceService>, Loggable {
 	std::string getDefaultSchedulerName();
 
   private:
-	static int8_t CPU_PRIORITY;
-	static uint8_t IO_PRIORITY;
-	static uint8_t IO_CLASS;
+	inline static const uint8_t CPU_PRIORITY = -17;
+	inline static const uint8_t IO_PRIORITY	 = (CPU_PRIORITY + 20) / 5;
+	inline static const uint8_t IO_CLASS	 = 2;
 
 	friend class Singleton<PerformanceService>;
 	PerformanceService();
@@ -142,7 +131,8 @@ class PerformanceService : public Singleton<PerformanceService>, Loggable {
 	bool onBattery	 = false;
 	int runningGames = 0;
 
-	std::mutex actionMutex;
+	std::mutex perProfMutex;
+	std::mutex actProfMutex;
 
 	PerformanceProfile actualProfile			= PerformanceProfile::PERFORMANCE;
 	PerformanceProfile currentProfile			= PerformanceProfile::SMART;
@@ -194,5 +184,7 @@ class PerformanceService : public Singleton<PerformanceService>, Loggable {
 	int acTdpToBatteryTdp(int tdp, int minTdp);
 
 	void smartWorker();
-	PerformanceProfile getNextSmart(size_t samples = 5, bool inRecursion = false);
+	PerformanceProfile getNextSmart(size_t samples = 5, int level = 2);
+
+	void setActualPerformanceProfile(PerformanceProfile& profile);
 };

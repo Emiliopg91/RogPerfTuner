@@ -5,13 +5,17 @@
 
 #include "clients/tcp/open_rgb/effects/abstract/abstract_effect.hpp"
 #include "framework/abstracts/singleton.hpp"
-#include "models/others/led_task.hpp"
 
 class DropsEffect : public AbstractEffect, public Singleton<DropsEffect> {
   public:
 	void apply_effect(const DeviceList& devices);
 
   private:
+	struct LedTask {
+		size_t index;
+		orgb::Color color;
+	};
+
 	friend class Singleton<DropsEffect>;
 	DropsEffect(Client& client);
 

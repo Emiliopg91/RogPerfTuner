@@ -10,9 +10,8 @@ struct SemanticVersion {
 	int patch;
 	std::string sufix;
 
-	SemanticVersion parse(const std::string& version_str) {
+	static SemanticVersion parse(const std::string& version_str) {
 		std::string v = version_str;
-		// Trim de espacios
 		v.erase(v.begin(), std::find_if(v.begin(), v.end(), [](unsigned char ch) {
 					return !std::isspace(ch);
 				}));
@@ -34,7 +33,6 @@ struct SemanticVersion {
 			semver.minor = std::stoi(token);
 		}
 		if (std::getline(ss, token, '.')) {
-			// El patch puede venir acompañado de - o .
 			size_t pos			  = token.find_first_of("-.");
 			std::string patch_str = token.substr(0, pos);
 			semver.patch		  = std::stoi(patch_str);
@@ -56,7 +54,7 @@ struct SemanticVersion {
 		return semver;
 	}
 
-	bool is_numeric(const std::string& s) const {
+	static bool is_numeric(const std::string& s) {
 		return !s.empty() && std::all_of(s.begin(), s.end(), [](unsigned char c) {
 			return std::isdigit(c);
 		});

@@ -41,7 +41,7 @@ void DropsEffect::_effect_thread(size_t dev_index, Device& dev) {
 	}
 }
 
-LedTask DropsEffect::_get_next(size_t dev_index, Device& dev) {
+DropsEffect::LedTask DropsEffect::_get_next(size_t dev_index, Device& dev) {
 	if (_buffer[dev_index].empty()) {
 		for (size_t i = 0; i < dev.leds.size(); ++i) {
 			_buffer[dev_index].push_back({i, _available_colors[random_int(0, _available_colors.size() - 1)]});

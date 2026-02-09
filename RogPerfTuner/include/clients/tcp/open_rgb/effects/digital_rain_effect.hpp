@@ -5,10 +5,20 @@
 
 #include "clients/tcp/open_rgb/effects/abstract/abstract_effect.hpp"
 #include "framework/abstracts/singleton.hpp"
-#include "models/others/led_status.hpp"
 
 class DigitalRainEffect : public AbstractEffect, public Singleton<DigitalRainEffect> {
   private:
+	struct LedStatus {
+		static const uint32_t INVALID_LED = 0xFFFFFFFF;
+		uint32_t pos_idx				  = INVALID_LED;
+		int max_val						  = 20;
+		int cur_val						  = 0;
+
+		LedStatus clone() const {
+			return LedStatus{pos_idx, max_val, cur_val};
+		}
+	};
+
 	int _max_count	 = 15;
 	double _cpu		 = 0.0;
 	double _nap_time = 0.07;

@@ -16,22 +16,6 @@ class EventBusWrapper : public Singleton<EventBusWrapper> {
 	EventBus& eventBus = EventBus::getInstance();
 
   public:
-	inline const static constexpr std::string_view APPLICATION_STOP						= "APPLICATION_STOP";
-	inline const static constexpr std::string_view UDEV_CLIENT_DEVICE_EVENT				= "UDEV_CLIENT_DEVICE_EVENT";
-	inline const static constexpr std::string_view HARDWARE_SERVICE_USB_REMOVED			= "HARDWARE_SERVICE_USB_REMOVED";
-	inline const static constexpr std::string_view HARDWARE_SERVICE_USB_ADDED			= "HARDWARE_SERVICE_USB_ADDED";
-	inline const static constexpr std::string_view HARDWARE_SERVICE_ON_BATTERY			= "HARDWARE_SERVICE_ON_BATTERY";
-	inline const static constexpr std::string_view HARDWARE_SERVICE_THRESHOLD_CHANGED	= "HARDWARE_SERVICE_THRESHOLD_CHANGED";
-	inline const static constexpr std::string_view HARDWARE_SERVICE_BOOT_SOUND_CHANGED	= "HARDWARE_SERVICE_BOOT_SOUND_CHANGED";
-	inline const static constexpr std::string_view ORGB_SERVICE_ON_BRIGHTNESS			= "ORGB_SERVICE_ON_BRIGHTNESS";
-	inline const static constexpr std::string_view ORGB_SERVICE_ON_EFFECT				= "ORGB_SERVICE_ON_EFFECT";
-	inline const static constexpr std::string_view ORGB_SERVICE_ON_COLOR				= "ORGB_SERVICE_ON_COLOR";
-	inline const static constexpr std::string_view PROFILE_SERVICE_ON_PROFILE			= "PROFILE_SERVICE_ON_PROFILE";
-	inline const static constexpr std::string_view PROFILE_SERVICE_ON_SCHEDULER			= "PROFILE_SERVICE_ON_SCHEDULER";
-	inline const static constexpr std::string_view STEAM_SERVICE_GAME_EVENT				= "STEAM_SERVICE_GAME_EVENT";
-	inline const static constexpr std::string_view APPLICATION_SERVICE_UPDATE_AVAILABLE = "APPLICATION_SERVICE_UPDATE_AVAILABLE";
-	inline const static constexpr std::string_view APPLICATION_SERVICE_UPDATE_START		= "APPLICATION_SERVICE_UPDATE_START";
-
 	/**
 	 * Emit a notification that a new software update is available.
 	 *

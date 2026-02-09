@@ -38,10 +38,16 @@ add_compile_options(
     -Wno-deprecated-literal-operator
 )
 
+add_library(httplib INTERFACE)
+target_include_directories(httplib INTERFACE
+    "submodules/httplib/include/httplib.h"
+)
+
 add_library(magic_enum INTERFACE)
 target_include_directories(magic_enum INTERFACE
     "submodules/magic_enum/include/magic_enum"
 )
+
 add_library(nlohmann_json INTERFACE)
 target_include_directories(magic_enum INTERFACE
     "submodules/nlohmann-json/include/nlohmann"

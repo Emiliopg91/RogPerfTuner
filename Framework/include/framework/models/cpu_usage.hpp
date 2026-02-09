@@ -24,14 +24,18 @@ struct CPUUsage {
 	}
 
 	static double getUseRate(int interval = 20) {
-		CPUUsage cpu1 = CPUUsage::read();
+		const auto cpu1 = CPUUsage::read();
 		TimeUtils::sleep(interval);
-		CPUUsage cpu2 = CPUUsage::read();
+		const auto cpu2 = CPUUsage::read();
 
-		long long active_diff = cpu2.active() - cpu1.active();
-		long long total_diff  = cpu2.total() - cpu1.total();
+		const auto active_diff = cpu2.active() - cpu1.active();
+		const auto total_diff  = cpu2.total() - cpu1.total();
 
-		return (100.0 * active_diff / total_diff) / 100.0;
+		if (total_diff <= 0) {
+			return 0.0;
+		}
+
+		return (static_cast<double>(active_diff) / total_diff) / 100.0;
 	}
 
 	static CPUUsage read() {

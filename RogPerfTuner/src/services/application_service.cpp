@@ -97,17 +97,21 @@ void ApplicationService::createScriptFile(std::string path, std::string execPath
 }
 
 void ApplicationService::createWrapperScriptFile(std::string path, std::string wrp, std::string option) {
-	std::ostringstream script;
-	script << "#!/usr/bin/env bash\n\n";
-	script << "set -e\n\n";
-	script << "TARGET=\"" << wrp << "\"\n\n";
-	script << "if [[ -f \"$TARGET\" && -x \"$TARGET\" ]]; then\n";
-	script << "    exec \"$TARGET\" " << option << " \"$@\"\n";
-	script << "else\n";
-	script << "    exec \"$@\"\n";
-	script << "fi\n";
+	try {
+		std::ostringstream script;
+		script << "#!/usr/bin/env bash\n\n";
+		script << "set -e\n\n";
+		script << "TARGET=\"" << wrp << "\"\n\n";
+		script << "if [[ -f \"$TARGET\" && -x \"$TARGET\" ]]; then\n";
+		script << "    exec \"$TARGET\" " << option << " \"$@\"\n";
+		script << "else\n";
+		script << "    exec \"$@\"\n";
+		script << "fi\n";
 
-	FileUtils::writeFileContent(path, script.str());
+		FileUtils::writeFileContent(path, script.str());
+	} catch (std::exception& e) {
+		logger->error("Error writing script {}: {}", path, e.what());
+	}
 }
 
 bool ApplicationService::isAutostartEnabled() {

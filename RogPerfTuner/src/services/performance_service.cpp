@@ -16,10 +16,6 @@
 #include "utils/configuration_wrapper.hpp"
 #include "utils/event_bus_wrapper.hpp"
 
-int8_t PerformanceService::CPU_PRIORITY = -17;
-uint8_t PerformanceService::IO_PRIORITY = (CPU_PRIORITY + 20) / 5;
-uint8_t PerformanceService::IO_CLASS	= 2;
-
 PerformanceService::PerformanceService() : Loggable("PerformanceService") {
 	logger->info("Initializing PerformanceService");
 	Logger::add_tab();
@@ -42,7 +38,7 @@ PerformanceService::PerformanceService() : Loggable("PerformanceService") {
 	eventBus.onBattery([this](bool onBat) {
 		onBattery = onBat;
 		if (runningGames == 0) {
-			restoreProfile();
+			restore();
 		}
 	});
 
@@ -72,6 +68,8 @@ PerformanceProfile PerformanceService::getPerformanceProfile() {
 }
 
 void PerformanceService::setActualPerformanceProfile(PerformanceProfile& profile) {
+	std::lock_guard<std::mutex> lock(actProfMutex);
+
 	std::string profileName = toName(profile);
 	logger->info("Applying {} profile", profileName);
 	Logger::add_tab();
@@ -93,14 +91,14 @@ void PerformanceService::setActualPerformanceProfile(PerformanceProfile& profile
 	Logger::rem_tab();
 }
 
-PerformanceProfile PerformanceService::getNextSmart(size_t samples, bool inRecursion) {
+PerformanceProfile PerformanceService::getNextSmart(size_t samples, int level) {
 	auto next = actualProfile;
 
 	std::vector<double> buffer(samples, 0.0);
 	size_t index = 0;
 	for (size_t j = 0; j < samples; j++) {
-		for (int i = 0; i < 9 && !stopFlag; i++) {
-			TimeUtils::sleep(100);
+		for (int i = 0; i < 8 && !stopFlag; i++) {
+			TimeUtils::sleep(200);
 		}
 		if (!stopFlag) {
 			auto usage	  = CPUUsage::getUseRate(100);
@@ -113,19 +111,21 @@ PerformanceProfile PerformanceService::getNextSmart(size_t samples, bool inRecur
 
 	if (!stopFlag) {
 		auto avg = std::accumulate(buffer.begin(), buffer.end(), 0.0) / samples;
+		logger->debug("Average CPU usage: {:.2f}%", avg * 100);
 		if (avg > 0.67) {
-			next = getNextPerformanceProfile(actualProfile, false);
+			next = getNextPerformanceProfile(actualProfile, false, false);
 			if (next != actualProfile) {
-				logger->info("Average CPU usage: {:.2f}%, ramp up to {}", avg * 100, toName(next));
+				logger->info("Ramp up to {}", toName(next));
 			}
+
 		} else if (avg < 0.25) {
 			next = getPreviousPerformanceProfile(actualProfile, false);
 			if (next != actualProfile) {
-				if (!inRecursion) {
-					logger->info("Average CPU usage: {:.2f}%, waiting for next average before ramp down", avg * 100);
-					next = getNextSmart(samples * 2, true);
+				if (level != 0) {
+					logger->debug("Waiting for {} more checks before ramp down", level);
+					next = getNextSmart(samples, level - 1);
 				} else {
-					logger->info("Average CPU usage: {:.2f}%, ramp down to {}", avg * 100, toName(next));
+					logger->info("Ramp down to {}", toName(next));
 				}
 			}
 		}
@@ -148,7 +148,7 @@ void PerformanceService::smartWorker() {
 }
 
 void PerformanceService::setPerformanceProfile(PerformanceProfile& profile, const bool& temporal, const bool& force, const bool& showToast) {
-	std::lock_guard<std::mutex> lock(actionMutex);
+	std::lock_guard<std::mutex> lock(perProfMutex);
 	std::string profileName = toName(profile);
 
 	if (profile != currentProfile || force) {
@@ -168,9 +168,7 @@ void PerformanceService::setPerformanceProfile(PerformanceProfile& profile, cons
 		} else {
 			logger->info("Starting {} worker", toName(PerformanceProfile::SMART));
 			auto perf = PerformanceProfile::PERFORMANCE;
-			if (perf != actualProfile) {
-				setActualPerformanceProfile(perf);
-			}
+			setActualPerformanceProfile(perf);
 			stopFlag.store(false);
 			smartThread = std::thread(&PerformanceService::smartWorker, this);
 		}
@@ -345,7 +343,7 @@ void PerformanceService::setTgp(const PerformanceProfile& profile) {
 				logger->info("Throttle temp: {}ºC", nvt);
 				nvTempClient.setCurrentValue(nvt);
 			} catch (std::exception& e) {
-				logger->error("Error setting Nvidia TGP: {}", e.what());
+				logger->error("Error setting Nvidia throttle temp: {}", e.what());
 			}
 		}
 
@@ -354,20 +352,13 @@ void PerformanceService::setTgp(const PerformanceProfile& profile) {
 }
 
 void PerformanceService::restore() {
-	restoreProfile();
-	restoreScheduler();
-}
-
-void PerformanceService::restoreProfile() {
 	if (onBattery) {
 		PerformanceProfile p = PerformanceProfile::QUIET;
 		setPerformanceProfile(p, true, true);
 	} else {
 		setPerformanceProfile(configuration.getConfiguration().platform.performance.profile, false, true);
 	}
-}
 
-void PerformanceService::restoreScheduler() {
 	setScheduler(configuration.getConfiguration().platform.performance.scheduler);
 }
 
@@ -378,116 +369,101 @@ PerformanceProfile PerformanceService::nextPerformanceProfile() {
 }
 
 int PerformanceService::acIntelPl1Spl(PerformanceProfile profile) {
-	auto& client = pl1SpdClient;
-
 	if (profile == PerformanceProfile::PERFORMANCE) {
-		return client.getMaxValue();
+		return pl1SpdClient.getMaxValue();
 	}
 	if (profile == PerformanceProfile::BALANCED) {
-		return client.getMaxValue() * 0.75;
+		return pl1SpdClient.getMaxValue() * 0.75;
 	}
 	if (profile == PerformanceProfile::QUIET) {
-		return client.getMaxValue() * 0.55;
+		return pl1SpdClient.getMaxValue() * 0.55;
 	}
 
-	return client.getCurrentValue();
+	return pl1SpdClient.getCurrentValue();
 }
 
 int PerformanceService::batteryIntelPl1Spl(PerformanceProfile profile) {
-	auto& client = pl1SpdClient;
-	return acTdpToBatteryTdp(acIntelPl1Spl(profile), client.getMinValue());
+	return acTdpToBatteryTdp(acIntelPl1Spl(profile), pl1SpdClient.getMinValue());
 }
 
 int PerformanceService::acIntelPl2Sppt(PerformanceProfile profile) {
-	auto& client = pl2SpptClient;
-
 	if (!acBoost()) {
 		return acIntelPl1Spl(profile);
 	}
 
 	if (profile == PerformanceProfile::PERFORMANCE) {
-		return client.getMaxValue();
+		return pl2SpptClient.getMaxValue();
 	}
 	if (profile == PerformanceProfile::BALANCED) {
-		return client.getMaxValue() * 0.85;
+		return pl2SpptClient.getMaxValue() * 0.85;
 	}
 	if (profile == PerformanceProfile::QUIET) {
-		return client.getMaxValue() * 0.7;
+		return pl2SpptClient.getMaxValue() * 0.7;
 	}
 
-	return client.getCurrentValue();
+	return pl2SpptClient.getCurrentValue();
 }
 
 int PerformanceService::batteryIntelPl2Sppt(PerformanceProfile profile) {
-	auto& client = pl2SpptClient;
-	return acTdpToBatteryTdp(acIntelPl2Sppt(profile), client.getMinValue());
+	return acTdpToBatteryTdp(acIntelPl2Sppt(profile), pl2SpptClient.getMinValue());
 }
 
 int PerformanceService::acIntelPl3Fppt(PerformanceProfile profile) {
-	auto& client = pl2SpptClient;
-
 	if (!acBoost()) {
 		return acIntelPl1Spl(profile);
 	}
 
 	if (profile == PerformanceProfile::PERFORMANCE) {
-		return client.getMaxValue();
+		return pl2SpptClient.getMaxValue();
 	}
 	if (profile == PerformanceProfile::BALANCED) {
-		return client.getMaxValue() * 0.9;
+		return pl2SpptClient.getMaxValue() * 0.9;
 	}
 	if (profile == PerformanceProfile::QUIET) {
-		return client.getMaxValue() * 0.8;
+		return pl2SpptClient.getMaxValue() * 0.8;
 	}
 
-	return client.getCurrentValue();
+	return pl2SpptClient.getCurrentValue();
 }
 
 int PerformanceService::batteryIntelPl3Fppt(PerformanceProfile profile) {
-	auto& client = pl3FpptClient;
-	return acTdpToBatteryTdp(acIntelPl2Sppt(profile), client.getMinValue());
+	return acTdpToBatteryTdp(acIntelPl2Sppt(profile), pl3FpptClient.getMinValue());
 }
 
 int PerformanceService::acNvBoost(PerformanceProfile profile) {
-	auto& client = nvBoostClient;
-
 	if (profile == PerformanceProfile::PERFORMANCE) {
-		return client.getMaxValue();
+		return nvBoostClient.getMaxValue();
 	}
 	if (profile == PerformanceProfile::BALANCED) {
-		return (client.getMaxValue() + client.getMinValue()) / 2;
+		return (nvBoostClient.getMaxValue() + nvBoostClient.getMinValue()) / 2;
 	}
 	if (profile == PerformanceProfile::QUIET) {
-		return client.getMinValue();
+		return nvBoostClient.getMinValue();
 	}
 
-	return client.getCurrentValue();
+	return nvBoostClient.getCurrentValue();
 }
 
 int PerformanceService::batteryNvBoost(PerformanceProfile profile) {
-	auto& client = nvBoostClient;
-	return acTdpToBatteryTdp(acNvBoost(profile), client.getMinValue());
+	return acTdpToBatteryTdp(acNvBoost(profile), nvBoostClient.getMinValue());
 }
 
 int PerformanceService::acNvTemp() {
-	auto& client = nvTempClient;
-	return client.getMaxValue();
+	return nvTempClient.getMaxValue();
 }
 
 int PerformanceService::batteryNvTemp(PerformanceProfile profile) {
-	auto& client = nvTempClient;
-
 	if (profile == PerformanceProfile::PERFORMANCE) {
-		return client.getMaxValue();
+		return nvTempClient.getMaxValue();
 	}
 	if (profile == PerformanceProfile::BALANCED) {
-		return (client.getMaxValue() + client.getMinValue()) / 2;
+		return (nvTempClient.getMaxValue() + nvTempClient.getMinValue()) / 2;
 	}
 	if (profile == PerformanceProfile::QUIET) {
-		return client.getMinValue();
+		return nvTempClient.getMinValue();
 	}
 
-	return client.getCurrentValue();
+	return nvTempClient.getCurrentValue();
 }
 
 bool PerformanceService::acBoost() {

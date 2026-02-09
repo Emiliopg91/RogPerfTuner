@@ -22,9 +22,8 @@ options=(
 )
 depends=(
   'asusctl'
-  'curl'
   'coreutils'
-  'cpp-httplib-compiled'
+  'cpp-httplib'
   'hicolor-icon-theme'
   'hidapi'
   'libusb'
@@ -39,6 +38,7 @@ depends=(
   'qtermwidget'
   'qtkeychain-qt6'
   'scx-scheds'
+  'openssl'
   'switcheroo-control'
   'upower'
 )

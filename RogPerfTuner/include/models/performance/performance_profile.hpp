@@ -5,12 +5,12 @@
 
 enum class PerformanceProfile { SMART, PERFORMANCE, BALANCED, QUIET };
 
-inline PerformanceProfile getNextPerformanceProfile(PerformanceProfile value, bool circular) {
+inline PerformanceProfile getNextPerformanceProfile(const PerformanceProfile& value, bool circular = true, bool includeSmart = true) {
 	switch (value) {
 		case PerformanceProfile::SMART:
 			return circular ? PerformanceProfile::QUIET : PerformanceProfile::SMART;
 		case PerformanceProfile::PERFORMANCE:
-			return PerformanceProfile::SMART;
+			return includeSmart ? PerformanceProfile::SMART : (circular ? PerformanceProfile::QUIET : PerformanceProfile::PERFORMANCE);
 		case PerformanceProfile::BALANCED:
 			return PerformanceProfile::PERFORMANCE;
 		case PerformanceProfile::QUIET:
@@ -20,7 +20,7 @@ inline PerformanceProfile getNextPerformanceProfile(PerformanceProfile value, bo
 	}
 }
 
-inline PerformanceProfile getPreviousPerformanceProfile(PerformanceProfile value, bool circular) {
+inline PerformanceProfile getPreviousPerformanceProfile(const PerformanceProfile& value, bool circular) {
 	switch (value) {
 		case PerformanceProfile::PERFORMANCE:
 			return PerformanceProfile::BALANCED;
@@ -33,7 +33,7 @@ inline PerformanceProfile getPreviousPerformanceProfile(PerformanceProfile value
 	}
 }
 
-inline PlatformProfile getPlatformProfile(const PerformanceProfile value) {
+inline PlatformProfile getPlatformProfile(const PerformanceProfile& value) {
 	switch (value) {
 		case PerformanceProfile::QUIET:
 			return PlatformProfile::LOW_POWER;
@@ -44,7 +44,7 @@ inline PlatformProfile getPlatformProfile(const PerformanceProfile value) {
 	}
 }
 
-inline PowerProfile getPowerProfile(const PerformanceProfile value) {
+inline PowerProfile getPowerProfile(const PerformanceProfile& value) {
 	switch (value) {
 		case PerformanceProfile::QUIET:
 			return PowerProfile::POWER_SAVER;
@@ -55,7 +55,7 @@ inline PowerProfile getPowerProfile(const PerformanceProfile value) {
 	}
 }
 
-inline PerformanceProfile getGreater(const PerformanceProfile value, const PerformanceProfile& other) {
+inline PerformanceProfile getGreater(const PerformanceProfile& value, const PerformanceProfile& other) {
 	if (value == PerformanceProfile::PERFORMANCE || other == PerformanceProfile::PERFORMANCE) {
 		return PerformanceProfile::PERFORMANCE;
 	}

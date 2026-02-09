@@ -57,7 +57,7 @@ SteamService::SteamService() : Loggable("SteamService") {
 		logger->info("Metric level service available");
 		Logger::add_tab();
 		if (intelRaplUjClient.available()) {
-			logger->info("Enabling Intel CPU RAPL...");
+			logger->info("Enabling Intel CPU Wattage report...");
 			intelRaplUjClient.enableRead();
 		}
 		Logger::rem_tab();
@@ -400,7 +400,7 @@ void SteamService::onDisconnect() {
 	logger->info("Disconnected from Steam");
 	Logger::add_tab();
 	if (!runningGames.empty()) {
-		performanceService.restoreProfile();
+		performanceService.restore();
 		openRgbService.restoreAura();
 		runningGames.clear();
 	}
@@ -423,6 +423,12 @@ const SteamGameConfig SteamService::getConfiguration(const std::string& id) {
 				break;
 			}
 		}
+	}
+
+	if (whichSystemdInhibit.has_value()) {
+		cfg.wrappers.emplace_back(whichSystemdInhibit.value());
+		cfg.wrappers.emplace_back("--who");
+		cfg.wrappers.emplace_back("\"" + entry->name + "\"");
 	}
 
 	if (entry.has_value()) {
@@ -464,12 +470,6 @@ const SteamGameConfig SteamService::getConfiguration(const std::string& id) {
 			for (const auto& [key, val] : gpuEnv) {
 				cfg.environment[key] = val;
 			}
-		}
-
-		if (whichSystemdInhibit.has_value()) {
-			cfg.wrappers.emplace_back(whichSystemdInhibit.value());
-			cfg.wrappers.emplace_back("--who");
-			cfg.wrappers.emplace_back("\"" + entry->name + "\"");
 		}
 
 		if (whichMangohud.has_value() && gameEntry.metrics_level != MangoHudLevel::NO_DISPLAY) {
