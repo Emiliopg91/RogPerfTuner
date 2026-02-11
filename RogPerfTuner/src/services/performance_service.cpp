@@ -97,11 +97,8 @@ PerformanceProfile PerformanceService::getNextSmart(size_t samples, int level) {
 	std::vector<double> buffer(samples, 0.0);
 	size_t index = 0;
 	for (size_t j = 0; j < samples; j++) {
-		for (int i = 0; i < 8 && !stopFlag; i++) {
-			TimeUtils::sleep(200);
-		}
 		if (!stopFlag) {
-			auto usage	  = CPUUsage::getUseRate(100);
+			auto usage	  = std::round(CPUUsage::getUseRate(1000) * 100);
 			buffer[index] = usage;
 			if (++index == samples) {
 				break;
@@ -110,15 +107,15 @@ PerformanceProfile PerformanceService::getNextSmart(size_t samples, int level) {
 	}
 
 	if (!stopFlag) {
-		auto avg = std::accumulate(buffer.begin(), buffer.end(), 0.0) / samples;
-		logger->debug("Average CPU usage: {:.2f}%", avg * 100);
-		if (avg > 0.67) {
+		auto avg = std::round(std::accumulate(buffer.begin(), buffer.end(), 0.0) / samples);
+		logger->debug("Average CPU usage: {}%", avg);
+		if (avg > 67) {
 			next = getNextPerformanceProfile(actualProfile, false, false);
 			if (next != actualProfile) {
 				logger->info("Ramp up to {}", toName(next));
 			}
 
-		} else if (avg < 0.25) {
+		} else if (avg < 25) {
 			next = getPreviousPerformanceProfile(actualProfile, false);
 			if (next != actualProfile) {
 				if (level != 0) {
