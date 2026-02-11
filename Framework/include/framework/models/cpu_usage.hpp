@@ -35,7 +35,7 @@ struct CPUUsage {
 			return 0.0;
 		}
 
-		return (static_cast<double>(active_diff) / total_diff) / 100.0;
+		return static_cast<double>(active_diff) / total_diff;
 	}
 
 	static CPUUsage read() {
