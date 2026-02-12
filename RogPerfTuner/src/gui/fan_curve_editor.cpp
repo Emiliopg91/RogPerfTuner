@@ -64,20 +64,21 @@ CurveEditor::CurveEditor(const std::string& profile, QWidget* parent) : QDialog(
 		seriesList.push_back(s);
 		charts.push_back(chartView);
 	}
-	QPushButton* saveBtn	   = new QPushButton(translator.translate("save").c_str());
-	QPushButton* resetBtn	   = new QPushButton(translator.translate("reset").c_str());
-	QPushButton* defaultBtn	   = new QPushButton(translator.translate("reset.default").c_str());
-	QPushButton* suggestionBtn = new QPushButton(translator.translate("apply.suggestion").c_str());
+	QPushButton* saveBtn = new QPushButton(translator.translate("save").c_str());
+	saveBtn->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Preferred);
+
+	QPushButton* resetBtn = new QPushButton(translator.translate("reset").c_str());
+	resetBtn->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Preferred);
+
+	QPushButton* defaultBtn = new QPushButton(translator.translate("reset.default").c_str());
+	defaultBtn->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Preferred);
 
 	QWidget* buttonGroup = new QWidget();
 	QHBoxLayout* hLayout = new QHBoxLayout(buttonGroup);
 	hLayout->setContentsMargins(0, 0, 0, 0);
 	hLayout->setSpacing(5);
-	hLayout->addWidget(saveBtn);
 	hLayout->addWidget(resetBtn);
-
-	saveBtn->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Preferred);
-	resetBtn->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Preferred);
+	hLayout->addWidget(defaultBtn);
 
 	layout->addWidget(buttonGroup);
 
@@ -86,11 +87,7 @@ CurveEditor::CurveEditor(const std::string& profile, QWidget* parent) : QDialog(
 	hLayout->setContentsMargins(0, 0, 0, 0);
 	hLayout->setSpacing(5);
 
-	hLayout->addWidget(suggestionBtn);
-	hLayout->addWidget(defaultBtn);
-	defaultBtn->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Preferred);
-	suggestionBtn->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Preferred);
-
+	hLayout->addWidget(saveBtn);
 	layout->addWidget(buttonGroup);
 
 	connect(saveBtn, &QPushButton::clicked, this, [this]() {
@@ -140,23 +137,6 @@ CurveEditor::CurveEditor(const std::string& profile, QWidget* parent) : QDialog(
 			for (int i = 0; i < series->count(); ++i) {
 				qreal x = curve.temp[i];
 				qreal y = static_cast<int>(curve.perc[i]);
-				series->replace(i, QPointF(x, y));
-			}
-
-			chart->update();
-		}
-	});
-
-	connect(suggestionBtn, &QPushButton::clicked, this, [this]() {
-		for (size_t idx = 0; idx < fans.size(); idx++) {
-			QLineSeries* series = seriesList[idx];
-			std::string fan		= fans[idx];
-			FanCurveView* chart = charts[idx];
-			auto curve			= performanceService.getDefaultFanCurve(fan, this->profile);
-
-			for (int i = 0; i < series->count(); ++i) {
-				qreal x = curve.temp[i];
-				qreal y = std::min(static_cast<int>(curve.perc[i] * 1.2), 100);
 				series->replace(i, QPointF(x, y));
 			}
 
