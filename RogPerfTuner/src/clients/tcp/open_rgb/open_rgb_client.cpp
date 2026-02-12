@@ -65,7 +65,7 @@ void OpenRgbClient::initialize() {
 	availableEffects.push_back(std::unique_ptr<AbstractEffect>(&StaticEffect::init(client)));
 	currentEffectIdx = availableEffects.size() - 1;
 
-	eventBus.onApplicationStop([this]() {
+	eventBus.onApplicationShutdown([this]() {
 		stop();
 	});
 

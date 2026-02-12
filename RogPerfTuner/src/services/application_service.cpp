@@ -97,21 +97,17 @@ void ApplicationService::createScriptFile(std::string path, std::string execPath
 }
 
 void ApplicationService::createWrapperScriptFile(std::string path, std::string wrp, std::string option) {
-	try {
-		std::ostringstream script;
-		script << "#!/usr/bin/env bash\n\n";
-		script << "set -e\n\n";
-		script << "TARGET=\"" << wrp << "\"\n\n";
-		script << "if [[ -f \"$TARGET\" && -x \"$TARGET\" ]]; then\n";
-		script << "    exec \"$TARGET\" " << option << " \"$@\"\n";
-		script << "else\n";
-		script << "    exec \"$@\"\n";
-		script << "fi\n";
+	std::ostringstream script;
+	script << "#!/usr/bin/env bash\n\n";
+	script << "set -e\n\n";
+	script << "TARGET=\"" << wrp << "\"\n\n";
+	script << "if [[ -f \"$TARGET\" && -x \"$TARGET\" ]]; then\n";
+	script << "    exec \"$TARGET\" " << option << " \"$@\"\n";
+	script << "else\n";
+	script << "    exec \"$@\"\n";
+	script << "fi\n";
 
-		FileUtils::writeFileContent(path, script.str());
-	} catch (std::exception& e) {
-		logger->error("Error writing script {}: {}", path, e.what());
-	}
+	FileUtils::writeFileContent(path, script.str());
 }
 
 bool ApplicationService::isAutostartEnabled() {
@@ -133,10 +129,11 @@ void ApplicationService::shutdown() {
 	shuttingDown = true;
 	logger->info("Starting application shutdown");
 	Logger::add_tab();
-	eventBus.emitApplicationStop();
+	eventBus.emitApplicationShutdown();
 	Logger::rem_tab();
 	logger->info("Shutdown finished");
-	kill(Constants::PID, SIGTERM);
+	logger->info("Stopping application");
+	eventBus.emitApplicationStop();
 }
 
 #ifdef AUR_HELPER

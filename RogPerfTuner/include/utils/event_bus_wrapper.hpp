@@ -16,6 +16,10 @@ class EventBusWrapper : public Singleton<EventBusWrapper> {
 	EventBus& eventBus = EventBus::getInstance();
 
   public:
+	void onApplicationStop(Callback&& callback);
+
+	void emitApplicationStop();
+
 	/**
 	 * Emit a notification that a new software update is available.
 	 *
@@ -72,12 +76,12 @@ class EventBusWrapper : public Singleton<EventBusWrapper> {
 	 * @brief Registers a callback for application stop events.
 	 * @param callback The callback function to be called when the application stops.
 	 */
-	void onApplicationStop(Callback&& callback);
+	void onApplicationShutdown(Callback&& callback);
 
 	/**
 	 * @brief Emits an application stop event.
 	 */
-	void emitApplicationStop();
+	void emitApplicationShutdown();
 
 	/**
 	 * @brief Registers a callback for RGB brightness events.

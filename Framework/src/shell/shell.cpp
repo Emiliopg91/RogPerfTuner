@@ -141,7 +141,7 @@ void Shell::close_bash(BashSession& session) {
 	}
 }
 
-CommandResult Shell::send_command(BashSession& session, bool elevated, const std::string& cmd, bool check) {
+CommandResult Shell::send_command(BashSession& session, bool elevated, const std::string& cmd, bool check, uint8_t timeout) {
 	std::lock_guard<std::mutex> lock(mtx);
 	if (elevated) {
 		logger->debug("Running admin command {}", cmd);
@@ -150,6 +150,9 @@ CommandResult Shell::send_command(BashSession& session, bool elevated, const std
 	}
 	std::string marker	 = "__END__";
 	std::string full_cmd = cmd + "\necho " + marker + "$?\n";
+	if (timeout > 0) {
+		full_cmd = "timeout " + std::to_string(timeout / 1000) + " " + full_cmd;
+	}
 	write(session.stdin_fd, full_cmd.c_str(), full_cmd.size());
 
 	std::string out, err;
@@ -207,21 +210,21 @@ CommandResult Shell::send_command(BashSession& session, bool elevated, const std
 	return {exit_code, out, err};
 }
 
-CommandResult Shell::run_command(const std::string& cmd, bool check) {
-	return send_command(normal_bash, false, cmd, check);
+CommandResult Shell::run_command(const std::string& cmd, bool check, uint8_t timeout) {
+	return send_command(normal_bash, false, cmd, check, timeout);
 }
 
-CommandResult Shell::run_elevated_command(const std::string& cmd, bool check) {
+CommandResult Shell::run_elevated_command(const std::string& cmd, bool check, uint8_t timeout) {
 	if (!elevated_bash.has_value()) {
 		throw new std::runtime_error("No elevated command available");
 	}
-	return send_command(elevated_bash.value(), true, cmd, check);
+	return send_command(elevated_bash.value(), true, cmd, check, timeout);
 }
 
 std::vector<std::string> Shell::copyEnviron() {
 	std::vector<std::string> envCopy;
 	for (char** env = environ; *env != nullptr; ++env) {
-		envCopy.emplace_back(*env);	 // copia de la cadena
+		envCopy.emplace_back(*env);
 	}
 	return envCopy;
 }

@@ -42,7 +42,7 @@ PerformanceService::PerformanceService() : Loggable("PerformanceService") {
 		}
 	});
 
-	eventBus.onApplicationStop([this]() {
+	eventBus.onApplicationShutdown([this]() {
 		PerformanceProfile p = PerformanceProfile::PERFORMANCE;
 		this->setPerformanceProfile(p, true, true, false);
 	});

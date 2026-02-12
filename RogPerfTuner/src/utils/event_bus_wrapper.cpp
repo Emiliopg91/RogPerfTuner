@@ -13,6 +13,13 @@ void EventBusWrapper::emitDeviceEvent() {
 	this->eventBus.emit_event(toName(Events::UDEV_CLIENT_DEVICE_EVENT));
 }
 
+void EventBusWrapper::onApplicationShutdown(Callback&& callback) {
+	this->eventBus.on_without_data(toName(Events::APPLICATION_SHUTDOWN), callback);
+}
+void EventBusWrapper::emitApplicationShutdown() {
+	this->eventBus.emit_event(toName(Events::APPLICATION_SHUTDOWN));
+}
+
 void EventBusWrapper::onApplicationStop(Callback&& callback) {
 	this->eventBus.on_without_data(toName(Events::APPLICATION_STOP), callback);
 }

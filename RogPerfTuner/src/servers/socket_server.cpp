@@ -37,7 +37,7 @@ SocketServer::SocketServer() : Loggable("SocketServer") {
 		}
 	}
 
-	eventBus.onApplicationStop([this] {
+	eventBus.onApplicationShutdown([this] {
 		stop();
 	});
 

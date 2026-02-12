@@ -24,6 +24,7 @@
 #include "services/steam_service.hpp"
 #include "utils/configuration_wrapper.hpp"
 #include "utils/constants.hpp"
+#include "utils/event_bus_wrapper.hpp"
 
 inline void terminateHandler() {
 	std::cerr << "Unhandled exception detected\n";
@@ -121,9 +122,7 @@ inline int startGui(int argc, char** argv) {
 
 	Logger::rem_tab();
 
-	auto t1 = TimeUtils::now();
-
-	logger->info("Application ready after {} seconds", TimeUtils::format_seconds(TimeUtils::getTimeDiff(t0, t1)));
+	logger->info("Application ready after {} seconds", TimeUtils::format_seconds(TimeUtils::getTimeDiff(t0, TimeUtils::now())));
 
 #ifdef AUR_HELPER
 	applicationService.startUpdateCheck();
@@ -132,6 +131,11 @@ inline int startGui(int argc, char** argv) {
 	if (!configuration.getConfiguration().application.startMinimized) {
 		MainWindow::getInstance().show();
 	}
+
+	EventBusWrapper::getInstance().onApplicationStop([&t0, &logger, &app]() {
+		logger->info("Application finished after {} seconds", TimeUtils::format_seconds(TimeUtils::getTimeDiff(t0, TimeUtils::now())));
+		::_exit(0);
+	});
 
 	return app.exec();
 }
