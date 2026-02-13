@@ -99,7 +99,7 @@ SteamService::SteamService() : Loggable("SteamService") {
 	Logger::rem_tab();
 }
 
-void SteamService::onFirstGameRun(unsigned int gid, std::string name) {
+void SteamService::onFirstGameRun(unsigned int gid, std::string name, bool proton) {
 	logger->info("Configuring game");
 	Logger::add_tab();
 
@@ -156,7 +156,7 @@ void SteamService::onFirstGameRun(unsigned int gid, std::string name) {
 					MangoHudLevel::NO_DISPLAY,
 					name,
 					details.is_shortcut ? std::optional<std::string>{encodedAppId} : std::nullopt,
-					!details.compat_tool.empty(),
+					proton,
 					ComputerType::COMPUTER,
 					WineSyncOption::AUTO,
 					wrappers};
@@ -317,6 +317,16 @@ void SteamService::onGameLaunch(unsigned int gid, std::string name, int pid) {
 		logger->info("Game not configured");
 		Logger::add_tab();
 
+		bool proton	 = false;
+		auto cmdLine = ProcessUtils::getCmdLine(pid);
+		logger->debug("CMD line: {}", StringUtils::join(cmdLine, " "));
+		for (auto it = cmdLine.rbegin(); it != cmdLine.rend(); ++it) {
+			if (StringUtils::toLowerCase(*it).ends_with(".exe")) {
+				proton = true;
+				break;
+			}
+		}
+
 		logger->info("Stopping process...");
 
 		std::set<pid_t> signaled, newSignaled;
@@ -332,8 +342,8 @@ void SteamService::onGameLaunch(unsigned int gid, std::string name, int pid) {
 
 		Logger::rem_tab();
 
-		std::thread([this, gid, name]() {
-			onFirstGameRun(gid, name);
+		std::thread([this, gid, name, proton]() {
+			onFirstGameRun(gid, name, proton);
 		}).detach();
 	} else if (runningGames.find(gid) == runningGames.end()) {
 		runningGames[gid] = GameEntry(it->second);
@@ -428,7 +438,7 @@ const SteamGameConfig SteamService::getConfiguration(const std::string& id) {
 	if (whichSystemdInhibit.has_value()) {
 		cfg.wrappers.emplace_back(whichSystemdInhibit.value());
 		cfg.wrappers.emplace_back("--who");
-		cfg.wrappers.emplace_back("\"" + entry->name + "\"");
+		cfg.wrappers.emplace_back("\"" + (entry.has_value() ? entry->name : Constants::APP_NAME) + "\"");
 	}
 
 	if (entry.has_value()) {

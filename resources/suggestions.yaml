@@ -1,0 +1,11 @@
+# Hollow Knight
+367520:
+  args: --force-vulkan
+
+# Hollow Knight: Silksong
+1030300:
+  args: --force-vulkan
+
+#Cyberpunk 2077
+1091500:
+  args: --launcher-skip

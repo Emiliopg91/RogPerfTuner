@@ -9,10 +9,11 @@
 #include <optional>
 
 #include "framework/utils/string_utils.hpp"
+#include "framework/utils/yaml_utils.hpp"
 #include "gui/yes_no_dialog.hpp"
 
-GameConfigDialog::GameConfigDialog(unsigned int gid, bool runAfterSave, QWidget* parent)
-	: Loggable("GameConfigDialog"), QDialog(parent), gid(gid), runAfterSave(runAfterSave) {
+GameConfigDialog::GameConfigDialog(unsigned int gid, bool onGameFirstRun, QWidget* parent)
+	: Loggable("GameConfigDialog"), QDialog(parent), gid(gid), onGameFirstRun(onGameFirstRun) {
 	Logger::add_tab();
 	gameEntry = configuration.getConfiguration().games[gid];
 	setWindowTitle(gameEntry.name.c_str());
@@ -78,7 +79,7 @@ GameConfigDialog::GameConfigDialog(unsigned int gid, bool runAfterSave, QWidget*
 	index = 0;
 	i	  = 1;
 
-	schedulerCombo->addItem(translator.translate("label.scheduler.none").c_str(), "");
+	schedulerCombo->addItem(performanceService.getDefaultSchedulerName().c_str(), "");
 	auto scheds = performanceService.getAvailableSchedulers();
 	for (const auto& sched : scheds) {
 		schedulerCombo->addItem(StringUtils::capitalize(sched).c_str(), sched.c_str());
@@ -180,7 +181,7 @@ GameConfigDialog::GameConfigDialog(unsigned int gid, bool runAfterSave, QWidget*
 	// --- EXECUTION ---
 
 	// --- Save button ---
-	save_button_ = new QPushButton(translator.translate(runAfterSave ? "save.and.run" : "save").c_str());
+	save_button_ = new QPushButton(translator.translate(onGameFirstRun ? "save.and.run" : "save").c_str());
 	save_button_->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
 	windowLayout->addRow(save_button_);
 	connect(save_button_, &QPushButton::clicked, this, &GameConfigDialog::onAccept);
@@ -189,6 +190,20 @@ GameConfigDialog::GameConfigDialog(unsigned int gid, bool runAfterSave, QWidget*
 
 	adjustSize();
 	setFixedSize(size());
+
+	if (onGameFirstRun) {
+		auto suggestions = YamlUtils::readYamlFile(Constants::SUGGESTIONS_FILE);
+		if (suggestions[gid]) {
+			auto reply =
+				YesNoDialog::showDialog(translator.translate("suggested.game.cfg.found"), translator.translate("apply.suggested.game.cfg"), this);
+			if (suggestions[gid]["args"]) {
+				paramsInput->setText(suggestions[gid]["args"].as<std::string>().c_str());
+			}
+			if (suggestions[gid]["env"]) {
+				envInput->setText(suggestions[gid]["env"].as<std::string>().c_str());
+			}
+		}
+	}
 }
 
 void GameConfigDialog::onAccept() {
@@ -231,13 +246,13 @@ void GameConfigDialog::onAccept() {
 void GameConfigDialog::showDialog() {
 	exec();
 
-	if (runAfterSave) {
+	if (onGameFirstRun) {
 		steamService.launchGame(gameEntry.overlayId.value_or(std::to_string(gid)));
 	}
 }
 
 void GameConfigDialog::closeEvent(QCloseEvent* event) {
-	if (runAfterSave) {
+	if (onGameFirstRun) {
 		auto reply = YesNoDialog::showDialog(translator.translate("confirmation.required"), translator.translate("run.with.default.config"), this);
 		if (reply) {
 			logger->info("Game will launch with default configuration");

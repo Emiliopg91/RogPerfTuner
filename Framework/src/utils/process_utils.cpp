@@ -49,3 +49,73 @@ std::set<pid_t> ProcessUtils::ioniceHierarchy(pid_t pid, uint8_t cls, uint8_t va
 
 	return pids;
 }
+
+std::vector<std::string> ProcessUtils::getCmdLine(pid_t pid) {
+	std::string path = "/proc/" + std::to_string(pid) + "/cmdline";
+	std::ifstream file(path, std::ios::in | std::ios::binary);
+
+	if (!file) {
+		return {};
+	}
+
+	std::string raw((std::istreambuf_iterator<char>(file)), std::istreambuf_iterator<char>());
+
+	std::vector<std::string> args;
+	std::string current;
+
+	for (char c : raw) {
+		if (c == '\0') {
+			if (!current.empty()) {
+				args.push_back(current);
+				current.clear();
+			}
+		} else {
+			current += c;
+		}
+	}
+
+	// añadir último argumento si existe
+	if (!current.empty()) {
+		args.push_back(current);
+	}
+
+	return args;
+}
+
+std::unordered_map<std::string, std::string> ProcessUtils::getEnvironment(pid_t pid) {
+	std::string path = "/proc/" + std::to_string(pid) + "/environ";
+	std::ifstream file(path, std::ios::in | std::ios::binary);
+
+	if (!file) {
+		return {};
+	}
+
+	std::string raw((std::istreambuf_iterator<char>(file)), std::istreambuf_iterator<char>());
+
+	std::unordered_map<std::string, std::string> env;
+	std::string current;
+
+	for (char c : raw) {
+		if (c == '\0') {
+			if (!current.empty()) {
+				auto pos = current.find('=');
+				if (pos != std::string::npos) {
+					env[current.substr(0, pos)] = current.substr(pos + 1);
+				}
+				current.clear();
+			}
+		} else {
+			current += c;
+		}
+	}
+
+	// añadir última variable si existe
+	if (!current.empty()) {
+		auto pos = current.find('=');
+		if (pos != std::string::npos) {
+			env[current.substr(0, pos)] = current.substr(pos + 1);
+		}
+	}
+
+	return env;
+}

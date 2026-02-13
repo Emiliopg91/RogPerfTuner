@@ -36,7 +36,7 @@ class SteamService : public Singleton<SteamService>, Loggable {
 	void onConnect(bool onBoot = false);
 	void onDisconnect();
 	void onGameLaunch(unsigned int gid, std::string name, int pid);
-	void onFirstGameRun(unsigned int gid, std::string name);
+	void onFirstGameRun(unsigned int gid, std::string name, bool proton);
 	void onGameStop(unsigned int gid, std::string name);
 	void setProfileForGames(bool onConnect = false);
 	void installRccDC();

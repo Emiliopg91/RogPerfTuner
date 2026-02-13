@@ -56,4 +56,8 @@ class ProcessUtils {
 	 * @return A set of all process IDs that were ioniced.
 	 */
 	static std::set<pid_t> ioniceHierarchy(pid_t pid, uint8_t cls, uint8_t value);
+
+	static std::vector<std::string> getCmdLine(pid_t pid);
+
+	static std::unordered_map<std::string, std::string> getEnvironment(pid_t pid);
 };

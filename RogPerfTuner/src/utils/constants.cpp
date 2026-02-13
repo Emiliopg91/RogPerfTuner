@@ -11,7 +11,7 @@ const std::string Constants::APP_NAME  = "RogPerfTuner";
 const std::string Constants::EXEC_NAME = "rog-perf-tuner";
 const pid_t Constants::PID			   = getpid();
 
-const std::string Constants::APP_VERSION = "4.11.5-1";
+const std::string Constants::APP_VERSION = "4.11.6-1";
 
 const std::string Constants::PLUGIN_VERSION = "1.2.7";
 
@@ -41,6 +41,7 @@ const std::string Constants::ASSET_ICON_45_FILE = ASSETS_DIR + "/icons/icon-45x4
 const std::string Constants::ORGB_DIR			= ASSETS_DIR + "/OpenRGB";
 const std::string Constants::ORGB_PATH			= ASSETS_DIR + "/OpenRGB/openrgb";
 const std::string Constants::RCCDC_ASSET_PATH	= ASSETS_DIR + "/RccDeckyCompanion";
+const std::string Constants::SUGGESTIONS_FILE	= ASSETS_DIR + "/suggestions.yaml";
 const std::string Constants::TRANSLATIONS_FILE	= ASSETS_DIR + "/translations.yaml";
 
 const std::string Constants::HOME_DIR				  = std::getenv("HOME");

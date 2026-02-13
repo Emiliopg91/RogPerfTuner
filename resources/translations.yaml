@@ -406,3 +406,11 @@ start.minimized:
   en: Start minimized
   es: Iniciar minimizado
   de: Minimiert starten
+suggested.game.cfg.found:
+  en: Suggested configuration found
+  es: Sugerencia de configuración disponible
+  de: Vorgeschlagene Konfiguration gefunden
+apply.suggested.game.cfg:
+  en: Do you like to apply the suggested configuration for game?
+  es: ¿Aplicar sugerencia de configuración para el juego?
+  de: Möchten Sie die vorgeschlagene Konfiguration für das Spiel anwenden?

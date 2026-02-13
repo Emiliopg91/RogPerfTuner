@@ -65,6 +65,7 @@ build:
 	@cmake --build build -- -j$(NUM_CORES)
 
 	@mkdir build/assets/bin build/assets/bin/rgb  build/assets/bin/performance build/assets/bin/steam
+	@cp resources/suggestions.yaml build/assets/suggestions.yaml
 	@cp resources/translations.yaml build/assets/translations.yaml
 
 build_openrgb:

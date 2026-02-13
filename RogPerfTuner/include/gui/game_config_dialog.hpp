@@ -16,7 +16,7 @@ class GameConfigDialog : public QDialog, Loggable {
 
   public:
 	void showDialog();
-	GameConfigDialog(unsigned int gid, bool runAfterSave, QWidget* parent = nullptr);
+	GameConfigDialog(unsigned int gid, bool onGameFirstRun, QWidget* parent = nullptr);
 
   private:
 	void onAccept();
@@ -40,7 +40,7 @@ class GameConfigDialog : public QDialog, Loggable {
 
 	unsigned int gid;
 	GameEntry gameEntry;
-	bool runAfterSave;
+	bool onGameFirstRun;
 
 	Translator& translator				   = Translator::getInstance();
 	ConfigurationWrapper& configuration	   = ConfigurationWrapper::getInstance();
