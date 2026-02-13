@@ -11,6 +11,7 @@
 #include "framework/utils/string_utils.hpp"
 #include "framework/utils/yaml_utils.hpp"
 #include "gui/yes_no_dialog.hpp"
+#include "models/settings/game_entry.hpp"
 
 GameConfigDialog::GameConfigDialog(unsigned int gid, bool onGameFirstRun, QWidget* parent)
 	: Loggable("GameConfigDialog"), QDialog(parent), gid(gid), onGameFirstRun(onGameFirstRun) {
@@ -196,11 +197,12 @@ GameConfigDialog::GameConfigDialog(unsigned int gid, bool onGameFirstRun, QWidge
 		if (suggestions[gid]) {
 			auto reply =
 				YesNoDialog::showDialog(translator.translate("suggested.game.cfg.found"), translator.translate("apply.suggested.game.cfg"), this);
-			if (suggestions[gid]["args"]) {
-				paramsInput->setText(suggestions[gid]["args"].as<std::string>().c_str());
+			auto sugEntry = suggestions[gid].as<GameEntry>();
+			if (sugEntry.args.has_value()) {
+				paramsInput->setText(sugEntry.args.value().c_str());
 			}
-			if (suggestions[gid]["env"]) {
-				envInput->setText(suggestions[gid]["env"].as<std::string>().c_str());
+			if (sugEntry.env.has_value()) {
+				envInput->setText(sugEntry.env.value().c_str());
 			}
 		}
 	}
