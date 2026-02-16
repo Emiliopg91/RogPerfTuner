@@ -60,12 +60,6 @@ class MainWindow : public QMainWindow, public Singleton<MainWindow> {
 
 	void onBootSoundEvent(bool enabled);
 
-#ifdef AUR_HELPER
-	void onUpdateAvailable(std::string value);
-
-	void onUpdateStart();
-#endif
-
 	void onEffectChange();
 
 	void onBrightnessChange(int index);

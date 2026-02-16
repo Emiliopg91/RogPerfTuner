@@ -42,10 +42,3 @@ target_link_libraries(RogPerfTuner PRIVATE
 if(DEV_MODE)
     add_compile_definitions(DEV_MODE)
 endif()
-
-if(DEFINED AUR_HELPER)
-    message(STATUS "Detected AUR helper: ${AUR_HELPER}")
-    add_compile_definitions(AUR_HELPER="${AUR_HELPER}")
-else()
-    message(STATUS "No AUR_HELPER defined.")
-endif()

@@ -2,10 +2,6 @@
 
 #include <thread>
 
-#ifdef AUR_HELPER
-#include "clients/shell/aur_helper_client.hpp"
-#endif
-
 #include "framework/translator/translator.hpp"
 #include "services/performance_service.hpp"
 #include "services/steam_service.hpp"
@@ -41,19 +37,6 @@ class ApplicationService : public Singleton<ApplicationService>, Loggable {
 
 	std::optional<std::string> getChangeLog();
 
-#ifdef AUR_HELPER
-	/**
-	 * @brief Initiates an asynchronous check for application updates.
-	 *
-	 * This method starts a background process that checks whether a newer version
-	 * of the application is available. The update check is performed asynchronously
-	 * to avoid blocking the main application thread.
-	 */
-	void startUpdateCheck();
-
-	void applyUpdate();
-#endif
-
   private:
 	friend class Singleton<ApplicationService>;
 	bool rccdcEnabled = false;
@@ -72,11 +55,6 @@ class ApplicationService : public Singleton<ApplicationService>, Loggable {
 	const std::string buildDesktopFile();
 	void createScriptFile(std::string path, std::string execPath, std::string option);
 	void createWrapperScriptFile(std::string path, std::string execPath, std::string option);
-
-#ifdef AUR_HELPER
-	AurHelperClient& aurHelperClient = AurHelperClient::getInstance();
-	void lookForUpdates();
-#endif
 
 	ApplicationService(std::optional<std::string> execPath);
 };

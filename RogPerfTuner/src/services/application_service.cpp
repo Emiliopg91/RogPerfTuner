@@ -136,64 +136,6 @@ void ApplicationService::shutdown() {
 	eventBus.emitApplicationStop();
 }
 
-#ifdef AUR_HELPER
-void ApplicationService::startUpdateCheck() {
-	updateChecker = std::thread(&ApplicationService::lookForUpdates, this);
-	updateChecker.detach();
-}
-
-void ApplicationService::lookForUpdates() {
-	TimeUtils::sleep(5 * 1000);
-	auto currentVersion = SemanticVersion::parse(Constants::APP_VERSION);
-
-	bool found = false;
-
-	while (true) {
-		logger->info("Looking for update");
-		Logger::add_tab();
-		try {
-			auto version	   = aurHelperClient.getVersion(Constants::EXEC_NAME);
-			auto latestVersion = SemanticVersion::parse(version);
-
-			if (latestVersion > currentVersion) {
-				logger->info("New version available: {}", version);
-				toaster.showToast(translator.translate("update.available", {{"version", version}}));
-				eventBus.emitUpdateAvailable(version);
-				found = true;
-				Logger::rem_tab();
-				break;
-			}
-		} catch (std::exception& e) {
-			logger->error("Error on update check: {}", e.what());
-		}
-
-		if (!found) {
-			logger->info("No update found");
-		}
-
-		Logger::rem_tab();
-
-		TimeUtils::sleep(60 * 60 * 1000);
-	}
-}
-
-void ApplicationService::applyUpdate() {
-	logger->info("Applying update...");
-	eventBus.emitUpdateStart();
-	Logger::add_tab();
-
-	PerformanceProfile p = PerformanceProfile::PERFORMANCE;
-	performanceService.setPerformanceProfile(p, true, true, false);
-
-	logger->info("Launching update command...");
-	Logger::add_tab();
-	aurHelperClient.install(Constants::EXEC_NAME);
-	Logger::rem_tab();
-
-	Logger::rem_tab();
-}
-#endif
-
 std::optional<std::string> ApplicationService::getChangeLog() {
 	try {
 		const auto changelogYml = NetUtils::fetch(Constants::CHANGELOG_URL);

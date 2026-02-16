@@ -27,12 +27,7 @@ config:
 		cd submodules/OpenRGB-cppSDK && git apply ../patches/OpenRGB-cppSDK.diff && touch ../patches/OpenRGB-cppSDK.diff.applied; \
 	fi
 	
-	@if command -v paru >/dev/null 2>&1; then \
-		export AUR_HELPER=paru; \
-    elif command -v yay >/dev/null 2>&1; then \
-        export AUR_HELPER=yay; \
-    fi; \
-	CXX=clang++ CC=clang cmake -B build -G Ninja -S . -DCMAKE_BUILD_TYPE=$(BUILD_TYPE) -DCMAKE_EXPORT_COMPILE_COMMANDS=ON $${DEV_MODE:+-DDEV_MODE=1} $${AUR_HELPER:+-DAUR_HELPER=$$AUR_HELPER}
+	CXX=clang++ CC=clang cmake -B build -G Ninja -S . -DCMAKE_BUILD_TYPE=$(BUILD_TYPE) -DCMAKE_EXPORT_COMPILE_COMMANDS=ON $${DEV_MODE:+-DDEV_MODE=1} 
 
 	@if [ ! -f "compile_commands.json" ]; then \
 		ln -s build/compile_commands.json .; \

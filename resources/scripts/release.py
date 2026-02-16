@@ -1,5 +1,8 @@
+# pylint: disable=invalid-name
+
 import os
 import re
+import subprocess
 import yaml
 from pathlib import Path
 
@@ -169,8 +172,29 @@ if __name__ == "__main__":
     with open(PKGBUILD_FILE, "r") as f:
         content = f.read()
 
+    other_sufix = "-git"
+    sufix = ""
+    ref = "tag=$pkgver-$pkgrel"
+    env = ""
+    if os.environ.get("GIT_RELEASE", None) is not None:
+        commit = subprocess.check_output(
+            ["git", "log", "-1", "--format=%h"], text=True
+        ).strip()
+        commit_count = subprocess.check_output(
+            ["git", "rev-list", "--count", f"{version}-1..HEAD"], text=True
+        ).strip()
+        version = version + ".r" + commit_count + ".g" + commit
+        ref = f"commit={commit}"
+        env = "GIT_RELEASE=1"
+        other_sufix = ""
+        sufix = "-git"
+
+    content = content.replace("<env>", env)
+    content = content.replace("<git_ref>", ref)
     content = content.replace("pkgver=<version>", f"pkgver={version}")
     content = content.replace("pkgrel=<release>", f"pkgrel={release}")
+    content = content.replace("<sufix>", sufix)
+    content = content.replace("<other_sufix>", other_sufix)
 
     if os.path.exists(PKGBUILD_FILE):
         os.unlink(PKGBUILD_FILE)

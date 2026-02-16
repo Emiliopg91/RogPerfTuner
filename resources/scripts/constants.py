@@ -1,7 +1,11 @@
+# pylint: disable=invalid-name
+
 import os
 import json
 from pathlib import Path
 import re
+import subprocess
+import sys
 from release import parse_pkgbuild
 
 print("Generating constants preloads")
@@ -36,7 +40,18 @@ match = re.search(
 )
 
 name, version = match.groups()
+ref = "tag=$pkgver-$pkgrel"
+if os.environ.get("GIT_RELEASE", None) is not None:
+    commit = subprocess.check_output(
+        ["git", "log", "-1", "--format=%h"], text=True
+    ).strip()
+    commit_count = subprocess.check_output(
+        ["git", "rev-list", "--count", f"{version}-1..HEAD"], text=True
+    ).strip()
+    version = version + ".r" + commit_count + ".g" + commit
+
 version = os.getenv("RCC_VERSION", version + "-1")
+
 
 with open(plugin_file, "r", encoding="utf-8") as f:
     plugin = json.load(f)

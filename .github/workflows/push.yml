@@ -1,0 +1,71 @@
+name: Push
+
+on:
+  push:
+
+jobs:
+  compile_and_release:
+    runs-on: ubuntu-latest
+    outputs:
+      version: ${{ steps.get_version.outputs.version }}
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          submodules: recursive
+          fetch-depth: 0
+
+      - name: Configure Git user
+        run: |
+          git config user.name "GitHub Actions"
+          git config user.email "actions@github.com"
+
+      - name: Process release
+        run: |
+          GIT_RELEASE=1 make release
+
+      - name: Publish to AUR
+        env:
+          AUR_SSH_PRIVATE_KEY: ${{ secrets.AUR_SSH_PRIVATE_KEY }}
+        run: |
+          echo "Setting SSH key for AUR..."
+          mkdir -p ~/.ssh
+          echo "$AUR_SSH_PRIVATE_KEY" > ~/.ssh/aur
+          chmod 600 ~/.ssh/aur
+          echo -e "Host aur.archlinux.org\n\tIdentityFile ~/.ssh/aur\n\tUser aur\n\tStrictHostKeyChecking no" >> ~/.ssh/config
+
+          echo "Cloning AUR repository..."
+          git clone ssh://aur@aur.archlinux.org/rog-perf-tuner.git aur_repo
+          cd aur_repo
+
+          echo "Configuring Git identity..."
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+
+          echo "Copying files..."
+          cp ../dist/PKGBUILD .
+          cp ../dist/.SRCINFO .
+          cp ../dist/rog-perf-tuner.install rog-perf-tuner-git.install
+
+          echo "Committing changes..."
+          git add PKGBUILD .SRCINFO rog-perf-tuner-git.install
+          git diff-index --quiet HEAD || git commit -m "Push for commit"
+          git push
+
+      - name: Create tag
+        run: |
+          git tag "${{ env.TAG }}"
+          git push origin main
+          git push origin main:develop --force
+
+      - name: Create GitHub release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ env.TAG }}
+          name: ${{ env.TAG }}
+          body_path: dist/changelog.md
+          files: |
+            dist/PKGBUILD
+            dist/rog-perf-tuner.install
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

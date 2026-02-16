@@ -27,7 +27,12 @@ struct convert<Performance> {
 
 	static bool decode(const Node& node, Performance& perf) {
 		if (node["profile"]) {
-			perf.profile = fromString<PerformanceProfile>(node["profile"].as<std::string>());
+			auto profStr = node["profile"].as<std::string>();
+			if (profStr == "low_power") {
+				profStr = toString(PerformanceProfile::QUIET);
+
+				perf.profile = fromString<PerformanceProfile>(profStr);
+			}
 		}
 		if (node["scheduler"]) {
 			perf.scheduler = node["scheduler"].as<std::string>();

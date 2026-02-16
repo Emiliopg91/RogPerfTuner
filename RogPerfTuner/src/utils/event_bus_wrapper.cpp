@@ -133,23 +133,3 @@ void EventBusWrapper::onServerSocketEvent(std::string event, CallbackWithParams&
 		cb(data);
 	});
 }
-
-void EventBusWrapper::emitUpdateAvailable(std::string version) {
-	this->eventBus.emit_event(toName(Events::APPLICATION_SERVICE_UPDATE_AVAILABLE), {version});
-}
-
-void EventBusWrapper::onUpdateAvailable(std::function<void(std::string)>&& callback) {
-	this->eventBus.on_with_data(toName(Events::APPLICATION_SERVICE_UPDATE_AVAILABLE), [cb = std::move(callback)](CallbackParam data) {
-		cb(std::any_cast<std::string>(data[0]));
-	});
-}
-
-void EventBusWrapper::emitUpdateStart() {
-	this->eventBus.emit_event(toName(Events::APPLICATION_SERVICE_UPDATE_START));
-}
-
-void EventBusWrapper::onUpdateStart(Callback&& callback) {
-	this->eventBus.on_without_data(toName(Events::APPLICATION_SERVICE_UPDATE_START), [cb = std::move(callback)]() {
-		cb();
-	});
-}

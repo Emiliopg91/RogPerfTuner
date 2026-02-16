@@ -124,10 +124,6 @@ inline int startGui(int argc, char** argv) {
 
 	logger->info("Application ready after {} seconds", TimeUtils::format_seconds(TimeUtils::getTimeDiff(t0, TimeUtils::now())));
 
-#ifdef AUR_HELPER
-	applicationService.startUpdateCheck();
-#endif
-
 	if (!configuration.getConfiguration().application.startMinimized) {
 		MainWindow::getInstance().show();
 	}

@@ -17,7 +17,6 @@
 
 #include "OpenRGB/Color.hpp"
 #include "framework/utils/string_utils.hpp"
-#include "gui/changelog_view.hpp"
 #include "gui/fan_curve_editor.hpp"
 #include "gui/game_list.hpp"
 #include "models/performance/performance_profile.hpp"
@@ -328,69 +327,7 @@ MainWindow::MainWindow(QWidget* parent) : QMainWindow(parent) {
 		this->runningGames = runningGames;
 		onGameEvent();
 	});
-
-#ifdef AUR_HELPER
-	eventBus.onUpdateAvailable([this](std::string value) {
-		onUpdateAvailable(value);
-	});
-
-	eventBus.onUpdateStart([this]() {
-		onUpdateStart();
-	});
-#endif
 }
-
-#ifdef AUR_HELPER
-void MainWindow::onUpdateAvailable(std::string value) {
-	versionLabel->setText("");
-
-	QMetaObject::invokeMethod(
-		this,
-		[=, this]() {
-			updateButton = new QPushButton(translator.translate("update.application", {{"version", value}}).c_str());
-			updateButton->setFlat(true);
-			updateButton->setStyleSheet("QPushButton {"
-										"  padding: 0;"
-										"  margin: 0;"
-										"  border: none;"
-										"  background: transparent;"
-										"}"
-										"QPushButton:hover {"
-										"  border: none;"
-										"  background: transparent;"
-										"}"
-										"QPushButton:focus {"
-										"  outline: none;"
-										"  border: none;"
-										"}"
-										"QPushButton:pressed {"
-										"  border: none;"
-										"  background: transparent;"
-										"}");
-			updateButton->setCursor(Qt::PointingHandCursor);
-			statusBar->addPermanentWidget(updateButton);
-
-			QObject::connect(updateButton, &QPushButton::clicked, [this]() {
-				auto* changelog = new ChangelogView(this);
-				changelog->setAttribute(Qt::WA_DeleteOnClose);
-				changelog->show();
-			});
-		},
-		Qt::QueuedConnection);
-}
-
-void MainWindow::onUpdateStart() {
-	versionLabel->setText("");
-
-	QMetaObject::invokeMethod(
-		this,
-		[=, this]() {
-			versionLabel->setText(translator.translate("update.in.progress").c_str());
-			statusBar->removeWidget(updateButton);
-		},
-		Qt::QueuedConnection);
-}
-#endif
 
 void MainWindow::closeEvent(QCloseEvent* event) {
 	event->ignore();
