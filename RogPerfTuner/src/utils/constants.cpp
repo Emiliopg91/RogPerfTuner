@@ -8,7 +8,7 @@
 #endif
 
 const std::string Constants::APP_NAME  = "RogPerfTuner";
-const std::string Constants::EXEC_NAME = "rog-perf-tuner<sufix>";
+const std::string Constants::EXEC_NAME = "rog-perf-tuner";
 const pid_t Constants::PID			   = getpid();
 
 const std::string Constants::APP_VERSION = "4.12.0.r1.g02293e5a-1";

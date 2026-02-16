@@ -80,9 +80,9 @@ if (
     plugin_pattern = re.compile(
         r'(const std::string Constants::PLUGIN_VERSION\s*=\s*")[^"]+(";)'
     )
-    exec_name_pattern = re.compile = re.compile(
-        r'(const std::string Constants::EXEC_NAME\s*=\s*")[^"]+(";)'
-    )
+    # exec_name_pattern = re.compile = re.compile(
+    #    r'(const std::string Constants::EXEC_NAME\s*=\s*")[^"]+(";)'
+    # )
 
     new_lines = []
     for line in lines:
@@ -96,11 +96,11 @@ if (
                 lambda m: f"{m.group(1)}{plugin_version}{m.group(2)}", line
             )
 
-        if exec_name_pattern.search(line):
-            line = exec_name_pattern.sub(
-                lambda m: f"{m.group(1)}{parse_pkgbuild(pkgbuild_file)["pkgname"]}{m.group(2)}",
-                line,
-            )
+        # if exec_name_pattern.search(line):
+        #    line = exec_name_pattern.sub(
+        #        lambda m: f"{m.group(1)}{parse_pkgbuild(pkgbuild_file)["pkgname"]}{m.group(2)}",
+        #        line,
+        #    )
 
         new_lines.append(line)
 
