@@ -1,5 +1,6 @@
 #pragma once
 
+#include <algorithm>
 #include <regex>
 #include <string>
 #include <unordered_map>
@@ -79,5 +80,19 @@ class FanCurveData {
 			data.emplace_back(std::to_string(temp[i]) + "c:" + std::to_string(perc[i]) + "%");
 		}
 		return StringUtils::join(data, ",");
+	}
+
+	void normalize() {
+		for (size_t i = 1; i < temp.size(); i++) {
+			if (temp[i - 1] == temp[i]) {
+				int prev_tmp = temp[i - 1];
+				int next_tmp = i + 1 < temp.size() ? temp[i + 1] : temp[i] + 4;
+				temp[i]		 = (prev_tmp + next_tmp) / 2;
+
+				int prev_per = perc[i - 1];
+				int next_per = i + 1 < perc.size() ? perc[i + 1] : std::min(100, perc[i] + 5);
+				perc[i]		 = (prev_per + next_per) / 2;
+			}
+		}
 	}
 };

@@ -94,8 +94,5 @@ class MainWindow : public QMainWindow, public Singleton<MainWindow> {
 	QCheckBox* _autostart;
 	QCheckBox* _minimized;
 	NoScrollComboBox* _bootSoundDropdown;
-	QStatusBar* statusBar;
-	QLabel* versionLabel;
-	QPushButton* updateButton;
 	QPushButton* fanEdit;
 };

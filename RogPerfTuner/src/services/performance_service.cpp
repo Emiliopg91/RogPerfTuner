@@ -218,6 +218,7 @@ void PerformanceService::setFanCurves(const PerformanceProfile& profile) {
 				auto data = asusCtlClient.getFanCurveData(platformProfile);
 				for (auto& [fan, curve] : data) {
 					configuration.getConfiguration().platform.curves[toString(profile)][fan].presets = curve.toData();
+					curve.normalize();
 					configuration.getConfiguration().platform.curves[toString(profile)][fan].current = curve.toData();
 				}
 

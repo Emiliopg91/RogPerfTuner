@@ -25,7 +25,7 @@ MainWindow::MainWindow(QWidget* parent) : QMainWindow(parent) {
 	onBattery	 = uPowerClient.isOnBattery();
 	runningGames = steamService.getRunningGames().size();
 
-	setWindowTitle(Constants::APP_NAME.c_str());
+	setWindowTitle((Constants::APP_NAME + " | " + Constants::APP_VERSION).c_str());
 	setWindowIcon(QIcon(Constants::ASSET_ICON_45_FILE.c_str()));
 
 	QWidget* centralWidget	= new QWidget(this);
@@ -292,17 +292,6 @@ MainWindow::MainWindow(QWidget* parent) : QMainWindow(parent) {
 	mainLayout->addWidget(settingsGroup);
 	// -------------------------
 	// Settings group
-	// -------------------------
-
-	// -------------------------
-	// Status bar
-	// -------------------------
-	statusBar	 = new QStatusBar(this);
-	versionLabel = new QLabel(Constants::APP_VERSION.c_str());
-	statusBar->addPermanentWidget(versionLabel);
-	setStatusBar(statusBar);
-	// -------------------------
-	// Status bar
 	// -------------------------
 
 	setCentralWidget(centralWidget);
