@@ -35,7 +35,7 @@ jobs:
           echo -e "Host aur.archlinux.org\n\tIdentityFile ~/.ssh/aur\n\tUser aur\n\tStrictHostKeyChecking no" >> ~/.ssh/config
 
           echo "Cloning AUR repository..."
-          git clone ssh://aur@aur.archlinux.org/rog-perf-tuner.git aur_repo
+          git clone ssh://aur@aur.archlinux.org/rog-perf-tuner-git.git aur_repo
           cd aur_repo
 
           echo "Configuring Git identity..."
@@ -51,21 +51,3 @@ jobs:
           git add PKGBUILD .SRCINFO rog-perf-tuner-git.install
           git diff-index --quiet HEAD || git commit -m "Push for commit"
           git push
-
-      - name: Create tag
-        run: |
-          git tag "${{ env.TAG }}"
-          git push origin main
-          git push origin main:develop --force
-
-      - name: Create GitHub release
-        uses: softprops/action-gh-release@v2
-        with:
-          tag_name: ${{ env.TAG }}
-          name: ${{ env.TAG }}
-          body_path: dist/changelog.md
-          files: |
-            dist/PKGBUILD
-            dist/rog-perf-tuner.install
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
