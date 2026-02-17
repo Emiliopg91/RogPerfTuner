@@ -6,6 +6,10 @@ on:
       - main
     tags:
       - "*"
+  workflow_run:
+    workflows: ["Release"]
+    types:
+      - completed
 
 jobs:
   compile_and_release:
