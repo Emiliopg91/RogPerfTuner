@@ -15,9 +15,6 @@
 #include "models/others/semantic_version.hpp"
 #include "utils/event_bus_wrapper.hpp"
 
-#ifdef DEV_MODE
-#endif
-
 ApplicationService::ApplicationService(std::optional<std::string> execPath) : Loggable("ApplicationService") {
 	logger->info("Initializing ApplicationService");
 	Logger::add_tab();
