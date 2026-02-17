@@ -1,10 +1,10 @@
-# pylint: disable=invalid-name
+# pylint: disable=invalid-name, redefined-outer-name, missing-function-docstring, consider-using-enumerate
 
 import os
 import re
 import subprocess
-import yaml
 from pathlib import Path
+import yaml
 
 PKGBUILD_FILE = os.path.abspath(
     os.path.join(os.path.dirname(__file__), "..", "..", "dist", "PKGBUILD")
@@ -169,7 +169,7 @@ if __name__ == "__main__":
     version = os.getenv("VERSION", version)
     release = os.getenv("RELEASE", "1")
 
-    with open(PKGBUILD_FILE, "r") as f:
+    with open(PKGBUILD_FILE, "r", encoding="utf8") as f:
         content = f.read()
 
     other_sufix = "-git"
@@ -183,7 +183,7 @@ if __name__ == "__main__":
         commit_count = subprocess.check_output(
             ["git", "rev-list", "--count", f"{version}-1..HEAD"], text=True
         ).strip()
-        version = version + ".r" + commit_count + ".g" + commit
+        version = version + ".r" + commit_count
         ref = f"commit={commit}"
         env = "GIT_RELEASE=1"
         other_sufix = ""
@@ -198,17 +198,9 @@ if __name__ == "__main__":
 
     if os.path.exists(PKGBUILD_FILE):
         os.unlink(PKGBUILD_FILE)
-    with open(PKGBUILD_FILE, "w") as f:
+    with open(PKGBUILD_FILE, "w", encoding="utf8") as f:
         f.write(content)
         f.flush()
-
-    """
-    if os.path.exists(PKGBUILD_TEST_FILE):
-        os.unlink(PKGBUILD_TEST_FILE)
-    with open(PKGBUILD_TEST_FILE, "w") as f:
-        f.write(content.replace("#tag=$pkgver",""))
-        f.flush()
-    """
 
     if os.path.exists(SRCINFO_FILE):
         os.unlink(SRCINFO_FILE)
