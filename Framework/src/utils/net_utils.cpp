@@ -7,6 +7,7 @@
 #include <stdexcept>
 
 #include "framework/logger/logger_provider.hpp"
+#include "framework/utils/time_utils.hpp"
 #include "httplib.h"
 
 bool NetUtils::isPortFree(int port) {
@@ -71,6 +72,7 @@ void NetUtils::download(const std::string url, const std::string dst) {
 	logger->info("Downloading {} into {}", url, dst);
 	Logger::add_tab();
 
+	auto t0			  = TimeUtils::now();
 	auto [host, path] = split_url(url);
 	if (host.empty()) {
 		Logger::rem_tab();
@@ -94,6 +96,7 @@ void NetUtils::download(const std::string url, const std::string dst) {
 	}
 
 	ofs << res->body;
+	logger->info("Download completed after {} ms", TimeUtils::getTimeDiff(t0, TimeUtils::now()));
 
 	Logger::rem_tab();
 }
@@ -103,6 +106,7 @@ std::string NetUtils::fetch(const std::string url) {
 	logger->info("Fetching {}", url);
 	Logger::add_tab();
 
+	auto t0			  = TimeUtils::now();
 	auto [host, path] = split_url(url);
 	if (host.empty()) {
 		Logger::rem_tab();
@@ -114,6 +118,8 @@ std::string NetUtils::fetch(const std::string url) {
 	client.set_follow_location(true);
 
 	auto res = client.Get(path.c_str());
+
+	logger->info("Fetch completed after {} ms with status {}", TimeUtils::getTimeDiff(t0, TimeUtils::now()), res->status);
 	if (!res || res->status != 200) {
 		Logger::rem_tab();
 		throw std::runtime_error("HTTP fetch failed");

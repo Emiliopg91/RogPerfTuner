@@ -8,6 +8,7 @@
 #include <QPushButton>
 #include <optional>
 
+#include "framework/utils/net_utils.hpp"
 #include "framework/utils/string_utils.hpp"
 #include "framework/utils/yaml_utils.hpp"
 #include "gui/yes_no_dialog.hpp"
@@ -193,17 +194,21 @@ GameConfigDialog::GameConfigDialog(unsigned int gid, bool onGameFirstRun, QWidge
 	setFixedSize(size());
 
 	if (onGameFirstRun) {
-		auto suggestions = YamlUtils::readYamlFile(Constants::SUGGESTIONS_FILE);
-		if (suggestions[gid]) {
-			auto reply =
-				YesNoDialog::showDialog(translator.translate("suggested.game.cfg.found"), translator.translate("apply.suggested.game.cfg"), this);
-			auto sugEntry = suggestions[gid].as<GameEntry>();
-			if (sugEntry.args.has_value()) {
-				paramsInput->setText(sugEntry.args.value().c_str());
+		try {
+			auto suggestions = YamlUtils::parseYaml(NetUtils::fetch(Constants::SUGGESTIONS_URL));
+			if (suggestions[gid]) {
+				auto reply =
+					YesNoDialog::showDialog(translator.translate("suggested.game.cfg.found"), translator.translate("apply.suggested.game.cfg"), this);
+				auto sugEntry = suggestions[gid].as<GameEntry>();
+				if (sugEntry.args.has_value()) {
+					paramsInput->setText(sugEntry.args.value().c_str());
+				}
+				if (sugEntry.env.has_value()) {
+					envInput->setText(sugEntry.env.value().c_str());
+				}
 			}
-			if (sugEntry.env.has_value()) {
-				envInput->setText(sugEntry.env.value().c_str());
-			}
+		} catch (std::exception& e) {
+			logger->error("Error while fetching suggestions: {}", e.what());
 		}
 	}
 }

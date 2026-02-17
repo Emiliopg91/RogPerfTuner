@@ -109,11 +109,6 @@ inline int startGui(int argc, char** argv) {
 
 	Shell::init(configuration.getPassword());
 
-	OpenRgbService::getInstance();
-	HardwareService::getInstance();
-	PerformanceService::getInstance();
-	SteamService::getInstance();
-
 	auto& applicationService = ApplicationService::init(execPath);
 
 	SocketServer::getInstance();

@@ -88,6 +88,5 @@ class Constants {
 	static const std::string RCDCC_SOCKET_PATH;
 
 	static const std::string TRANSLATIONS_FILE;
-	static const std::string SUGGESTIONS_FILE;
-	static const std::string CHANGELOG_URL;
+	static const std::string SUGGESTIONS_URL;
 };

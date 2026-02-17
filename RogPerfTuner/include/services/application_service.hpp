@@ -35,8 +35,6 @@ class ApplicationService : public Singleton<ApplicationService>, Loggable {
 
 	void setStartMinimized(bool enabled);
 
-	std::optional<std::string> getChangeLog();
-
   private:
 	friend class Singleton<ApplicationService>;
 	bool rccdcEnabled = false;

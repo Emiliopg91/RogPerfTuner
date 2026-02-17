@@ -24,9 +24,9 @@ class SteamService : public Singleton<SteamService>, Loggable {
 	IntelRaplUJClient& intelRaplUjClient   = IntelRaplUJClient::getInstance();
 	EventBusWrapper& eventBus			   = EventBusWrapper::getInstance();
 	ConfigurationWrapper& configuration	   = ConfigurationWrapper::getInstance();
-	PerformanceService& performanceService = PerformanceService::getInstance();
 	OpenRgbService& openRgbService		   = OpenRgbService::getInstance();
 	HardwareService& hardwareService	   = HardwareService::getInstance();
+	PerformanceService& performanceService = PerformanceService::getInstance();
 	SteamSocketClient& steamClient		   = SteamSocketClient::getInstance();
 	PipClient& pipClient				   = PipClient::getInstance();
 	Translator& translator				   = Translator::getInstance();

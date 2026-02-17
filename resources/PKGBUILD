@@ -95,12 +95,14 @@ package() {
     cd "$srcdir/RogPerfTuner"
 
     install -Dm755 build/RogPerfTuner/RogPerfTuner "$pkgdir/usr/bin/rog-perf-tuner"
-    
     install -d "$pkgdir/usr/share/rog-perf-tuner"
+    install -Dm644 "$pkgdir/usr/share/rog-perf-tuner/OpenRGB/60-openrgb.rules" "$pkgdir/usr/lib/udev/rules.d/60-rog-perf-tuner.rules"
+    install -Dm755 resources/RogPerfTuner.desktop "$pkgdir/usr/share/applications/rog-perf-tuner.desktop"
+
     cp -r build/assets/* "$pkgdir/usr/share/rog-perf-tuner/"
     chmod -R 755 "$pkgdir/usr/share/rog-perf-tuner/"
-    install -Dm644 "$pkgdir/usr/share/rog-perf-tuner/OpenRGB/60-openrgb.rules" "$pkgdir/usr/lib/udev/rules.d/60-rog-perf-tuner.rules"
+    
     rm "$pkgdir/usr/share/rog-perf-tuner/OpenRGB/60-openrgb.rules"
+    rm "$pkgdir/usr/share/rog-perf-tuner/suggestions.yaml"
 
-    install -Dm755 resources/RogPerfTuner.desktop "$pkgdir/usr/share/applications/rog-perf-tuner.desktop"
 }

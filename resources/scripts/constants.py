@@ -98,7 +98,7 @@ if (
 
         if exec_name_pattern.search(line):
             line = exec_name_pattern.sub(
-                lambda m: f"{m.group(1)}{parse_pkgbuild(pkgbuild_file)["pkgname"].replace("-git","")}{m.group(2)}",
+                lambda m: f"{m.group(1)}{parse_pkgbuild(pkgbuild_file)["pkgname"].replace("<sufix>","")}{m.group(2)}",
                 line,
             )
 

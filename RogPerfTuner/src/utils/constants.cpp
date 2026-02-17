@@ -41,7 +41,6 @@ const std::string Constants::ASSET_ICON_45_FILE = ASSETS_DIR + "/icons/icon-45x4
 const std::string Constants::ORGB_DIR			= ASSETS_DIR + "/OpenRGB";
 const std::string Constants::ORGB_PATH			= ASSETS_DIR + "/OpenRGB/openrgb";
 const std::string Constants::RCCDC_ASSET_PATH	= ASSETS_DIR + "/RccDeckyCompanion";
-const std::string Constants::SUGGESTIONS_FILE	= ASSETS_DIR + "/suggestions.yaml";
 const std::string Constants::TRANSLATIONS_FILE	= ASSETS_DIR + "/translations.yaml";
 
 const std::string Constants::HOME_DIR				  = std::getenv("HOME");
@@ -86,4 +85,4 @@ const std::vector<std::string> Constants::RCCDC_REQUIRED_PIP = {"asyncio", "pyya
 const std::string Constants::FLATPAK_MANGOHUD		   = "org.freedesktop.Platform.VulkanLayer.MangoHud/x86_64/25.08";
 const std::string Constants::FLATPAK_MANGOHUD_OVERRIDE = "--filesystem=xdg-config/MangoHud:ro";
 
-const std::string Constants::CHANGELOG_URL = "https://github.com/Emiliopg91/RogPerfTuner/raw/refs/heads/main/changelog.yaml";
+const std::string Constants::SUGGESTIONS_URL = "https://raw.githubusercontent.com/Emiliopg91/RogPerfTuner/refs/heads/main/resources/suggestions.yaml";
