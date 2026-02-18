@@ -1,4 +1,6 @@
 - version: 4.12.4-1
+  improvements:
+    - Restored fan curve edition for SMART mode
 
 - version: 4.12.3-1
   improvements:
