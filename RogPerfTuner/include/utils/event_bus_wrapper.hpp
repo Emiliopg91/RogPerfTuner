@@ -233,6 +233,9 @@ class EventBusWrapper : public Singleton<EventBusWrapper> {
 	 */
 	void emitScheduler(std::optional<std::string> scheduler);
 
+	void onSsdScheduler(std::function<void(std::string)>&& callback);
+	void emitSsdScheduler(std::string scheduler);
+
 	void emitUpdateStart();
 
 	void onUpdateStart(Callback&& callback);

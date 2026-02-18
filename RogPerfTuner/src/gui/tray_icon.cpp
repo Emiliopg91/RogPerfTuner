@@ -85,6 +85,15 @@ void TrayIcon::setScheduler(std::optional<std::string> scheduler) {
 		Qt::QueuedConnection);
 }
 
+void TrayIcon::setSsdScheduler(std::string scheduler) {
+	QMetaObject::invokeMethod(
+		this,
+		[=, this]() {
+			ssdSchedulerActions[scheduler]->setChecked(true);
+		},
+		Qt::QueuedConnection);
+}
+
 void TrayIcon::setBatteryThreshold(BatteryThreshold threshold) {
 	QMetaObject::invokeMethod(
 		this,
@@ -156,6 +165,10 @@ void TrayIcon::onSchedulerChanged(std::optional<std::string> scheduler) {
 	if (steamService.getRunningGames().empty()) {
 		performanceService.setScheduler(scheduler);
 	}
+}
+
+void TrayIcon::onSsdSchedulerChanged(std::string scheduler) {
+	performanceService.setSsdScheduler(scheduler);
 }
 
 // ==============================
@@ -398,6 +411,34 @@ TrayIcon::TrayIcon()
 	}
 	// -------------------------
 	// Scheduler submenu
+	// -------------------------
+	// -------------------------
+	// SSD Scheduler submenu
+	// -------------------------
+	if (!performanceService.getAvailableSsdSchedulers().empty()) {
+		ssdSchedulerMenu			= new QMenu(("    " + translator.translate("ssd.scheduler")).c_str(), menu);
+		QActionGroup* ssdSchedGroup = new QActionGroup(menu);
+
+		auto items2 = performanceService.getAvailableSsdSchedulers();
+		for (auto item : items2) {
+			auto literal = StringUtils::capitalize(item == "none" ? translator.translate("default") : item);
+			QAction* act = new QAction(literal.c_str(), ssdSchedGroup);
+			act->setCheckable(true);
+			act->setChecked(item == performanceService.getCurrentSsdScheduler());
+			QObject::connect(act, &QAction::triggered, [this, item]() {
+				onSsdSchedulerChanged(item);
+			});
+			ssdSchedulerMenu->addAction(act);
+			ssdSchedulerActions[item] = act;
+		}
+		menu->insertMenu(nullptr, ssdSchedulerMenu);
+
+		eventBus.onSsdScheduler([this](std::string scheduler) {
+			setSsdScheduler(scheduler);
+		});
+	}
+	// -------------------------
+	// SSD Scheduler submenu
 	// -------------------------
 	// -------------------------
 	// Fan curves menu

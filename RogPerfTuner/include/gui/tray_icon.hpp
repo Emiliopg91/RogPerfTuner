@@ -34,6 +34,7 @@ class TrayIcon : public QObject, public Singleton<TrayIcon> {
 	void onEffectChanged(std::string effect);
 	void onBrightnessChanged(RgbBrightness brightness);
 	void onSchedulerChanged(std::optional<std::string> scheduler);
+	void onSsdSchedulerChanged(std::string scheduler);
 
   private:
 	friend class Singleton<TrayIcon>;
@@ -45,10 +46,12 @@ class TrayIcon : public QObject, public Singleton<TrayIcon> {
 	std::unordered_map<std::string, QAction*> effectActions;
 	std::unordered_map<std::string, QAction*> perfProfileActions;
 	std::unordered_map<std::string, QAction*> schedulerActions;
+	std::unordered_map<std::string, QAction*> ssdSchedulerActions;
 	std::unordered_map<bool, QAction*> bootSoundActions;
 	QMenu* profileMenu;
 	QMenu* coolingMenu;
 	QMenu* schedulerMenu;
+	QMenu* ssdSchedulerMenu;
 	QMenu* colorMenu;
 	QAction* currentColorAction;
 	QAction* pickColorAction;
@@ -58,6 +61,7 @@ class TrayIcon : public QObject, public Singleton<TrayIcon> {
 	void setAuraColor(const std::optional<std::string>& color);
 	void setPerformanceProfile(PerformanceProfile profile);
 	void setScheduler(std::optional<std::string> scheduler);
+	void setSsdScheduler(std::string scheduler);
 	void setBatteryThreshold(BatteryThreshold threshold);
 	void setBootSound(bool value);
 	void setProfileMenuEnabled();

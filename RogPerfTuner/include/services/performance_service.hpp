@@ -15,6 +15,7 @@
 #include "clients/file/firmware/asus-armoury/nvidia/nv_boost_client.hpp"
 #include "clients/file/firmware/asus-armoury/nvidia/nv_temp_client.hpp"
 #include "clients/file/sched_bore_client.hpp"
+#include "clients/file/ssd_scheduler_client.hpp"
 #include "clients/shell/asusctl_client.hpp"
 #include "clients/shell/cpupower_client.hpp"
 #include "clients/shell/scxctl_client.hpp"
@@ -70,6 +71,28 @@ class PerformanceService : public Singleton<PerformanceService>, Loggable {
 	 * @param temporal If true, the scheduler is set temporarily.
 	 */
 	void setScheduler(std::optional<std::string> scheduler, bool temporal = false);
+
+	/**
+	 * @brief Gets the list of available schedulers.
+	 *
+	 * @return A vector of scheduler names.
+	 */
+	std::vector<std::string> getAvailableSsdSchedulers();
+
+	/**
+	 * @brief Gets the current scheduler if set.
+	 *
+	 * @return An optional string with the current scheduler name.
+	 */
+	std::optional<std::string> getCurrentSsdScheduler();
+
+	/**
+	 * @brief Sets the scheduler.
+	 *
+	 * @param scheduler The scheduler name to set (optional).
+	 * @param temporal If true, the scheduler is set temporarily.
+	 */
+	void setSsdScheduler(std::string scheduler, bool temporal = false);
 
 	/**
 	 * @brief Gets the list of available fans.
@@ -134,11 +157,12 @@ class PerformanceService : public Singleton<PerformanceService>, Loggable {
 	std::mutex perProfMutex;
 	std::mutex actProfMutex;
 
-	PerformanceProfile actualProfile			= PerformanceProfile::PERFORMANCE;
-	PerformanceProfile currentProfile			= PerformanceProfile::SMART;
-	std::optional<std::string> currentScheduler = std::nullopt;
-	std::optional<std::thread> smartThread		= std::nullopt;
-	std::atomic<bool> stopFlag					= false;
+	PerformanceProfile actualProfile			   = PerformanceProfile::PERFORMANCE;
+	PerformanceProfile currentProfile			   = PerformanceProfile::SMART;
+	std::optional<std::string> currentScheduler	   = std::nullopt;
+	std::optional<std::string> currentSsdScheduler = "none";
+	std::optional<std::thread> smartThread		   = std::nullopt;
+	std::atomic<bool> stopFlag					   = false;
 
 	PlatformClient& platformClient		   = PlatformClient::getInstance();
 	Pl1SpdClient& pl1SpdClient			   = Pl1SpdClient::getInstance();
@@ -155,6 +179,7 @@ class PerformanceService : public Singleton<PerformanceService>, Loggable {
 	EventBusWrapper& eventBus			   = EventBusWrapper::getInstance();
 	ConfigurationWrapper& configuration	   = ConfigurationWrapper::getInstance();
 	Translator& translator				   = Translator::getInstance();
+	SsdSchedulerClient& ssdSchedulerClient = SsdSchedulerClient::getInstance();
 	ScxCtlClient& scxCtlClient			   = ScxCtlClient::getInstance();
 	AsusCtlClient& asusCtlClient		   = AsusCtlClient::getInstance();
 	Shell& shell						   = Shell::getInstance();

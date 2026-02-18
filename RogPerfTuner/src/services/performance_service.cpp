@@ -358,6 +358,7 @@ void PerformanceService::restore() {
 	}
 
 	setScheduler(configuration.getConfiguration().platform.performance.scheduler);
+	setSsdScheduler(configuration.getConfiguration().platform.performance.ssdScheduler);
 }
 
 PerformanceProfile PerformanceService::nextPerformanceProfile() {
@@ -521,6 +522,37 @@ void PerformanceService::setScheduler(std::optional<std::string> scheduler, bool
 	}
 
 	eventBus.emitScheduler(scheduler);
+}
+
+std::vector<std::string> PerformanceService::getAvailableSsdSchedulers() {
+	if (!ssdSchedulerClient.available()) {
+		return {};
+	}
+
+	return ssdSchedulerClient.getAvailableSchedulers();
+}
+
+std::optional<std::string> PerformanceService::getCurrentSsdScheduler() {
+	if (!ssdSchedulerClient.available()) {
+		return std::nullopt;
+	}
+
+	return currentSsdScheduler;
+}
+
+void PerformanceService::setSsdScheduler(std::string scheduler, bool temporal) {
+	if (!scxCtlClient.available()) {
+		return;
+	}
+
+	ssdSchedulerClient.setSchedulers(scheduler);
+
+	if (!temporal) {
+		configuration.getConfiguration().platform.performance.ssdScheduler = scheduler;
+		configuration.saveConfig();
+	}
+
+	eventBus.emitSsdScheduler(scheduler);
 }
 
 std::vector<std::string> PerformanceService::getFans() {

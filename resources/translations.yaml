@@ -414,3 +414,11 @@ apply.suggested.game.cfg:
   en: Do you like to apply the suggested configuration for game?
   es: ¿Aplicar sugerencia de configuración para el juego?
   de: Möchten Sie die vorgeschlagene Konfiguration für das Spiel anwenden?
+ssd.scheduler:
+  en: SSD scheduler
+  es: Planificador SSD
+  de: SSD-Scheduler
+default:
+  en: default
+  es: Predeterminado
+  de: Standard

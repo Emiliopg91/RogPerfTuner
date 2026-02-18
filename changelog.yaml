@@ -1,3 +1,9 @@
+- version: 4.12.3-1
+  improvements:
+    - Refactor
+  features:
+    - SSD scheduler support
+
 - version: 4.12.1-1
   improvements:
     - Refactor

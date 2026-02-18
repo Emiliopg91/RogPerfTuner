@@ -10,6 +10,7 @@
 struct Performance {
 	PerformanceProfile profile			 = PerformanceProfile::SMART;
 	std::optional<std::string> scheduler = std::nullopt;
+	std::string ssdScheduler			 = "none";
 };
 
 // YAML-CPP serialization/deserialization
@@ -21,6 +22,9 @@ struct convert<Performance> {
 		node["profile"] = toString(perf.profile);
 		if (perf.scheduler.has_value()) {
 			node["scheduler"] = perf.scheduler.value();
+		}
+		if (perf.ssdScheduler != "none") {
+			node["ssdScheduler"] = perf.ssdScheduler;
 		}
 		return node;
 	}
@@ -37,6 +41,11 @@ struct convert<Performance> {
 			perf.scheduler = node["scheduler"].as<std::string>();
 		} else {
 			perf.scheduler = std::nullopt;
+		}
+		if (node["ssdScheduler"]) {
+			perf.ssdScheduler = node["ssdScheduler"].as<std::string>();
+		} else {
+			perf.ssdScheduler = "none";
 		}
 		return true;
 	}

@@ -38,6 +38,8 @@ class MainWindow : public QMainWindow, public Singleton<MainWindow> {
 
 	void setScheduler(std::optional<std::string> sched);
 
+	void setSsdScheduler(std::string sched);
+
 	void setBatteryChargeLimit(BatteryThreshold value);
 
 	void setAuraBrightness(RgbBrightness brightness);
@@ -53,6 +55,8 @@ class MainWindow : public QMainWindow, public Singleton<MainWindow> {
 	void onProfileChanged(int index);
 
 	void onSchedulerChanged(int index);
+
+	void onSsdSchedulerChanged(int index);
 
 	void onBatteryLimitChanged(int index);
 
@@ -86,6 +90,7 @@ class MainWindow : public QMainWindow, public Singleton<MainWindow> {
 
 	NoScrollComboBox* _profileDropdown;
 	NoScrollComboBox* _schedulerDropdown;
+	NoScrollComboBox* _ssdSchedulerDropdown;
 	QPushButton* _gameProfileButton;
 	NoScrollComboBox* _effectDropdown;
 	NoScrollComboBox* _brightnessDropdown;

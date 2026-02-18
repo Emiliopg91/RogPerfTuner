@@ -115,6 +115,15 @@ void EventBusWrapper::emitScheduler(std::optional<std::string> scheduler) {
 	this->eventBus.emit_event(toName(Events::PROFILE_SERVICE_ON_SCHEDULER), {scheduler});
 }
 
+void EventBusWrapper::onSsdScheduler(std::function<void(std::string)>&& callback) {
+	this->eventBus.on_with_data(toName(Events::PROFILE_SERVICE_ON_SSD_SCHEDULER), [cb = std::move(callback)](CallbackParam data) {
+		cb(std::any_cast<std::string>(data[0]));
+	});
+}
+void EventBusWrapper::emitSsdScheduler(std::string scheduler) {
+	this->eventBus.emit_event(toName(Events::PROFILE_SERVICE_ON_SSD_SCHEDULER), {scheduler});
+}
+
 void EventBusWrapper::onBootSound(std::function<void(bool)>&& callback) {
 	this->eventBus.on_with_data(toName(Events::HARDWARE_SERVICE_BOOT_SOUND_CHANGED), [cb = std::move(callback)](CallbackParam data) {
 		cb(std::any_cast<bool>(data[0]));

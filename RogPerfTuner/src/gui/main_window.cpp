@@ -94,6 +94,29 @@ MainWindow::MainWindow(QWidget* parent) : QMainWindow(parent) {
 	// Scheduler menu
 	// -------------------------
 	// -------------------------
+	// SSD Scheduler menu
+	// -------------------------
+	if (!performanceService.getAvailableSsdSchedulers().empty()) {
+		_ssdSchedulerDropdown = new NoScrollComboBox();
+		_ssdSchedulerDropdown->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Preferred);
+
+		auto items2 = performanceService.getAvailableSsdSchedulers();
+		for (auto item : items2) {
+			_ssdSchedulerDropdown->addItem(("  " + StringUtils::capitalize(item == "none" ? translator.translate("default") : item)).c_str(),
+										   item.c_str());
+		}
+		connect(_ssdSchedulerDropdown, QOverload<int>::of(&QComboBox::currentIndexChanged), this, &MainWindow::onSsdSchedulerChanged);
+		setSsdScheduler(performanceService.getCurrentSsdScheduler().value_or("none"));
+		performanceLayout->addRow(new QLabel((translator.translate("ssd.scheduler") + ":").c_str()), _ssdSchedulerDropdown);
+
+		eventBus.onSsdScheduler([this](std::string sched) {
+			setSsdScheduler(sched);
+		});
+	}
+	// -------------------------
+	// SSD Scheduler menu
+	// -------------------------
+	// -------------------------
 	// Fan curves menu
 	// -------------------------
 	if (!performanceService.getFans().empty()) {
@@ -344,6 +367,10 @@ void MainWindow::setScheduler(std::optional<std::string> sched) {
 	_schedulerDropdown->setCurrentIndex(_schedulerDropdown->findData(sched.value_or("").c_str()));
 }
 
+void MainWindow::setSsdScheduler(std::string sched) {
+	_ssdSchedulerDropdown->setCurrentIndex(_ssdSchedulerDropdown->findData(sched.c_str()));
+}
+
 void MainWindow::setBatteryChargeLimit(BatteryThreshold value) {
 	_thresholdDropdown->setCurrentIndex(_thresholdDropdown->findData(toInt(value)));
 }
@@ -378,6 +405,14 @@ void MainWindow::onSchedulerChanged(int) {
 
 	if (scheduler != performanceService.getCurrentScheduler() && steamService.getRunningGames().empty()) {
 		performanceService.setScheduler(scheduler);
+	}
+}
+
+void MainWindow::onSsdSchedulerChanged(int) {
+	std::string scheduler = (_ssdSchedulerDropdown->currentData().toString().toStdString());
+
+	if (scheduler != performanceService.getCurrentScheduler() && steamService.getRunningGames().empty()) {
+		performanceService.setSsdScheduler(scheduler);
 	}
 }
 
