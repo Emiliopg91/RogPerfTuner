@@ -2,8 +2,6 @@
 
 #include <yaml-cpp/yaml.h>
 
-#include "utils/constants.hpp"
-
 struct Application {
 	bool askedInstallRccdc = false;
 	bool startMinimized	   = true;
