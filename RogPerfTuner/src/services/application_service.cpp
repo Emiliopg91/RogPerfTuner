@@ -57,13 +57,6 @@ ApplicationService::ApplicationService(std::optional<std::string> execPath) : Lo
 		FileUtils::chmodRecursive(Constants::BIN_DIR, 0777);
 
 		Logger::rem_tab();
-
-		const auto currentVersion = configuration.getConfiguration().application.currentVersion;
-		if (currentVersion != Constants::APP_VERSION) {
-			configuration.getConfiguration().application.previousVersion = configuration.getConfiguration().application.currentVersion;
-			configuration.getConfiguration().application.currentVersion	 = Constants::APP_VERSION;
-			configuration.saveConfig();
-		}
 	}
 
 	Logger::rem_tab();
