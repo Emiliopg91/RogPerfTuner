@@ -124,7 +124,6 @@ MainWindow::MainWindow(QWidget* parent) : QMainWindow(parent) {
 		fanEdit->setText(translator.translate("edit.curve").c_str());
 		connect(fanEdit, &QPushButton::clicked, this, &MainWindow::openFanEditor);
 		fanEdit->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Preferred);
-		fanEdit->setEnabled(performanceService.getPerformanceProfile() != PerformanceProfile::SMART);
 
 		performanceLayout->addRow(new QLabel((translator.translate("fan.curves") + ":").c_str()), fanEdit);
 	}
@@ -146,7 +145,6 @@ MainWindow::MainWindow(QWidget* parent) : QMainWindow(parent) {
 
 	eventBus.onPerformanceProfile([this](PerformanceProfile profile) {
 		setPerformanceProfile(profile);
-		fanEdit->setEnabled(profile != PerformanceProfile::SMART);
 	});
 	// -------------------------
 	// Performance group

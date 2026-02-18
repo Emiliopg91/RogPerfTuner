@@ -452,7 +452,6 @@ TrayIcon::TrayIcon()
 			openFanEditor();
 		});
 		coolingMenu->addAction(act);
-		coolingMenu->setEnabled(performanceService.getPerformanceProfile() != PerformanceProfile::SMART);
 	}
 	// -------------------------
 	// Fan curves menu
@@ -570,7 +569,6 @@ TrayIcon::TrayIcon()
 
 	eventBus.onPerformanceProfile([this](PerformanceProfile profile) {
 		setPerformanceProfile(profile);
-		setCoolingMenuEnabled(profile != PerformanceProfile::SMART);
 	});
 
 	eventBus.onGameEvent([this](size_t runningGames) {

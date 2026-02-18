@@ -4,6 +4,7 @@
 #include "framework/abstracts/singleton.hpp"
 #include "framework/configuration/configuration.hpp"
 #include "models/settings/root_config.hpp"
+#include "utils/constants.hpp"
 
 class ConfigurationWrapper : public Singleton<ConfigurationWrapper>, Loggable {
   public:

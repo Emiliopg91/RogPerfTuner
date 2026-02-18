@@ -327,9 +327,9 @@ edit.curve:
   es: Editar curvas
   de: Kurven bearbeiten
 edit.fan.profile:
-  en: Edit curves for {prof} profile
-  es: Editar curvas para perfil {prof}
-  de: Kurven für Profil {prof} bearbeiten
+  en: Edit fan curves
+  es: Editar curvas de refrigeracion
+  de: Lüfterkurven bearbeiten
 reset:
   en: Reset
   es: Restablecer

@@ -49,6 +49,7 @@ class PerformanceService : public Singleton<PerformanceService>, Loggable {
 	 * @brief Restores the last saved performance settings.
 	 */
 	void restore();
+	void restoreFanCurves();
 
 	/**
 	 * @brief Gets the list of available schedulers.
