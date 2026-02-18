@@ -541,11 +541,12 @@ std::optional<std::string> PerformanceService::getCurrentSsdScheduler() {
 }
 
 void PerformanceService::setSsdScheduler(std::string scheduler, bool temporal) {
-	if (!scxCtlClient.available()) {
+	if (!ssdSchedulerClient.available()) {
 		return;
 	}
 
 	ssdSchedulerClient.setSchedulers(scheduler);
+	currentSsdScheduler = scheduler;
 
 	if (!temporal) {
 		configuration.getConfiguration().platform.performance.ssdScheduler = scheduler;
