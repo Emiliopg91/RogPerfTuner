@@ -85,7 +85,6 @@ build() {
 
     export CFLAGS="${CFLAGS}"
     export CXXFLAGS="${CXXFLAGS}"
-    export RCC_VERSION="${pkgver}-${pkgrel}"
 
     cd "$srcdir/RogPerfTuner"
     <env> make pkgbuild

@@ -183,7 +183,9 @@ if __name__ == "__main__":
         commit_count = subprocess.check_output(
             ["git", "rev-list", "--count", f"{version}-1..HEAD"], text=True
         ).strip()
-        version = version + ".r" + commit_count
+        version_parts = version.split(".")
+        version_parts[-1] = str(int(version_parts[-1]) + 1)
+        version = ".".join(version_parts) + ".r" + commit_count
         ref = f"commit={commit}"
         env = "GIT_RELEASE=1"
         other_sufix = ""

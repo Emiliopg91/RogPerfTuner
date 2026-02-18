@@ -45,9 +45,9 @@ if os.environ.get("GIT_RELEASE", None) is not None:
     commit_count = subprocess.check_output(
         ["git", "rev-list", "--count", f"{version}-1..HEAD"], text=True
     ).strip()
-    version = version + ".r" + commit_count
-
-version = os.getenv("RCC_VERSION", version + "-1")
+    version_parts = version.split(".")
+    version_parts[-1] = str(int(version_parts[-1]) + 1)
+    version = ".".join(version_parts) + ".r" + commit_count
 
 
 with open(plugin_file, "r", encoding="utf-8") as f:
