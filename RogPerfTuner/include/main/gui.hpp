@@ -1,11 +1,13 @@
 #pragma once
 
 #include <linux/limits.h>
+#include <qmessagebox.h>
 
 #include <QApplication>
 #include <iostream>
 #include <string>
 
+#include "clients/file/proc_modules_client.hpp"
 #include "clients/unix_socket/rog_perf_tuner_client.hpp"
 #include "framework/gui/toaster.hpp"
 #include "framework/logger/logger_provider.hpp"
@@ -108,6 +110,19 @@ inline int startGui(int argc, char** argv) {
 	}
 
 	Shell::init(configuration.getPassword());
+
+	if (!ProcModulesClient::getInstance().isModuleLoaded("asus_armoury")) {
+		logger->critical("Missing 'asus_armoury' kernel module");
+		QMessageBox msg;
+		msg.setIcon(QMessageBox::Warning);
+		msg.setWindowTitle("Missing module");
+		msg.setText("Required Asus-Armoury module not loaded in kernel.");
+		msg.setStandardButtons(QMessageBox::Close);
+
+		int ret = msg.exec();
+
+		::_exit(1);
+	}
 
 	auto& applicationService = ApplicationService::init(execPath);
 
