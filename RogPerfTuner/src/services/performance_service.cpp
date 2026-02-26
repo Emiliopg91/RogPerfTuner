@@ -515,7 +515,7 @@ void PerformanceService::setScheduler(std::optional<std::string> scheduler, bool
 	}
 
 	if (scheduler.has_value()) {
-		scxCtlClient.start(scheduler.value());
+		scxCtlClient.start(scheduler.value(), onBattery);
 	} else {
 		scxCtlClient.stop();
 	}

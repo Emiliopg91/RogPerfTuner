@@ -10,7 +10,8 @@ class ScxCtlClient : public AbstractCmdClient, public Singleton<ScxCtlClient> {
 	friend class Singleton<ScxCtlClient>;
 
 	std::optional<std::string> current;
-	std::unordered_map<std::string, std::string> available_sched;
+	std::string current_powersave = "performance";
+	std::unordered_map<std::string, std::array<std::string, 2>> available_sched;
 
 	ScxCtlClient();
 
@@ -36,7 +37,7 @@ class ScxCtlClient : public AbstractCmdClient, public Singleton<ScxCtlClient> {
 	 *
 	 * @param name The name of the process or service to start.
 	 */
-	void start(std::string name);
+	void start(std::string name, bool powersave);
 	/** @brief Stops the current operation or process managed by the client.
 	 *
 	 * This function is typically used to halt any ongoing activities or services

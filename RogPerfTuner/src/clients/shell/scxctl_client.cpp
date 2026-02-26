@@ -6,15 +6,13 @@
 
 ScxCtlClient::ScxCtlClient() : AbstractCmdClient("scxctl", "ScxCtlClient") {
 	if (available()) {
-		std::array<std::array<std::string, 2>, 9> all = {{{"beerland", ""},
-														  {"bpfland", "-m performance"},
-														  {"cosmos", "-c 0 -p 0"},
-														  {"flash", "-m all"},
-														  {"lavd", "--performance"},
-														  {"p2dq", "--task-slice true -f --sched-mode performance"},
-														  {"rustland", "rustland"},
-														  {"rusty", ""},
-														  {"tickless", "-f 5000 -s 5000"}}};
+		std::array<std::array<std::string, 3>, 9> all = {{
+			{"bpfland", "-m performance -w", ""},
+			{"cosmos", "-c 0 -p 0", "-m powersave -d -p 5000"},
+			{"flash", "-m all", "-m powersave -I 10000 -t 10000 -s 10000 -S 1000"},
+			{"lavd", "--performance", "--powersave"},
+			{"p2dq", "--task-slice true -f --sched-mode performance", "--sched-mode efficiency"},
+		}};
 		logger->info("Initializing ScxCtlClient");
 		Logger::add_tab();
 
@@ -22,9 +20,9 @@ ScxCtlClient::ScxCtlClient() : AbstractCmdClient("scxctl", "ScxCtlClient") {
 		Logger::add_tab();
 		auto output = run_command("list").stdout_str;
 		std::vector<std::string> schedulers;
-		for (auto [sched, params] : all) {
+		for (auto [sched, perf, power] : all) {
 			if (StringUtils::isSubstring("\"" + sched + "\"", output)) {
-				available_sched[sched] = params;
+				available_sched[sched] = {perf, power};
 				schedulers.emplace_back(sched);
 			}
 		}
@@ -51,51 +49,50 @@ ScxCtlClient::ScxCtlClient() : AbstractCmdClient("scxctl", "ScxCtlClient") {
 	}
 }
 
-void ScxCtlClient::start(std::string name) {
-	auto it = available_sched.find(name);
+void ScxCtlClient::start(std::string name, bool powersave) {
+	auto newPowersaveLiteral = powersave ? "powersave" : "performance";
+	auto it					 = available_sched.find(name);
 	if (it == available_sched.end()) {
 		logger->error("Scheduler {} not available", name);
 		return;
 	}
 
-	if (name == current.value_or("")) {
-		logger->info("Scheduler {} already applied", name);
+	if (name == current.value_or("") && newPowersaveLiteral == current_powersave) {
+		logger->info("Scheduler {}-{} already applied", name, current_powersave);
 		return;
 	}
 
 	auto action = "start";
 
 	if (current.has_value()) {
-		if (name == current) {
-			return;
-		}
-
 		action = "switch";
-		logger->info("Switching scheduler from {} to {}", current.value(), name);
+		logger->info("Switching scheduler from {}-{} to {}-{}", current.value(), current_powersave, name, newPowersaveLiteral);
 	} else {
-		logger->info("Starting scheduler {}", name);
+		logger->info("Starting scheduler {}-{}", name, newPowersaveLiteral);
 	}
 
 	Logger::add_tab();
-	run_command(std::string(action) + " --sched " + name + " --args=\"" + it->second + "\"", false, true);
+	run_command(std::string(action) + " --sched " + name + " --args=\"" + it->second[powersave ? 1 : 0] + "\"", false, true);
 	logger->info("Scheduler applied succesfully");
 	Logger::rem_tab();
 
-	current = name;
+	current			  = name;
+	current_powersave = newPowersaveLiteral;
 }
 
 void ScxCtlClient::stop() {
 	if (!current.has_value()) {
 		return;
 	}
-	logger->info("Stopping scheduler {}", current.value());
+	logger->info("Stopping scheduler {}-{}", current.value(), current_powersave);
 
 	Logger::add_tab();
 	run_command("stop", false, true);
 
-	logger->info("Scheduler {} stopped succesfully", current.value());
+	logger->info("Scheduler stopped succesfully");
 	Logger::rem_tab();
-	current = std::nullopt;
+	current			  = std::nullopt;
+	current_powersave = "performance";
 }
 
 std::vector<std::string> ScxCtlClient::getAvailable() {
