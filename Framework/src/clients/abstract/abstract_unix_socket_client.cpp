@@ -98,7 +98,17 @@ void AbstractUnixSocketClient::connectionLoop() {
 		strncpy(addr.sun_path, path.c_str(), sizeof(addr.sun_path) - 1);
 
 		if (connect(sock, (sockaddr*)&addr, sizeof(addr)) < 0) {
-			logger->debug(std::string(strerror(errno)));
+			switch (errno) {
+				case ENOENT:
+					logger->debug("Socket '{}' not found", path);
+					break;
+				case ECONNREFUSED:
+					logger->debug("Server not listening");
+					break;
+				default:
+					logger->debug("Connect error: {}", strerror(errno));
+			}
+
 			close(sock);
 			sock = -1;
 			TimeUtils::sleep(3000);
@@ -123,8 +133,8 @@ void AbstractUnixSocketClient::connectionLoop() {
 		});
 
 		while (_connected) {
-			for (int i = 0; i < 20 && _connected && _running; i++) {
-				TimeUtils::sleep(250);
+			for (int i = 0; i < 10 && _connected && _running; i++) {
+				TimeUtils::sleep(500);
 			}
 			if (_connected && _running) {
 				try {
