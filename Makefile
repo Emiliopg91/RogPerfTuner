@@ -27,7 +27,7 @@ config:
 		cd submodules/OpenRGB-cppSDK && git apply ../patches/OpenRGB-cppSDK.diff && touch ../patches/OpenRGB-cppSDK.diff.applied; \
 	fi
 	
-	CXX=clang++ CC=clang cmake -B build -G Ninja -S . -DCMAKE_BUILD_TYPE=$(BUILD_TYPE) -DCMAKE_EXPORT_COMPILE_COMMANDS=ON $${DEV_MODE:+-DDEV_MODE=1} 
+	cmake -B build -G Ninja -DCMAKE_CXX_COMPILER=clang++ -DCMAKE_CXX_COMPILER_LAUNCHER=ccache -S . -DCMAKE_BUILD_TYPE=$(BUILD_TYPE) -DCMAKE_EXPORT_COMPILE_COMMANDS=ON $${DEV_MODE:+-DDEV_MODE=1} 
 
 	@if [ ! -f "compile_commands.json" ]; then \
 		ln -s build/compile_commands.json .; \
@@ -71,7 +71,7 @@ build_openrgb:
 		echo "#######################################################################" && \
 		echo "######################### Compiling OpenRGB ###########################" && \
 		echo "#######################################################################" && \
-		cd submodules/OpenRGB && ./build.sh && \
+		cd submodules/OpenRGB && env CMAKE_CXX_COMPILER_LAUNCHER=ccache ./build.sh && \
 		mkdir -p ../../build/assets/OpenRGB && \
 		cp build/OpenRGB ../../build/assets/OpenRGB/openrgb && \
 		cp 60-openrgb.rules ../../build/assets/OpenRGB/60-openrgb.rules; \

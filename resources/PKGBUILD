@@ -47,6 +47,7 @@ depends=(
 )
 makedepends=(
   'base-devel'
+  'ccache'
   'clang'
   'cmake'
   'git'
