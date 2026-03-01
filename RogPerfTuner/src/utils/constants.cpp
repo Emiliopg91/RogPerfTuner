@@ -13,7 +13,7 @@ const pid_t Constants::PID			   = getpid();
 
 const std::string Constants::APP_VERSION = "4.12.3";
 
-const std::string Constants::PLUGIN_VERSION = "1.2.7";
+const std::string Constants::PLUGIN_VERSION = "1.2.8";
 
 #ifdef DEV_MODE
 const std::string Constants::APP_DRAW_FILE = FileUtils::getCWD() + "/resources/" + Constants::APP_NAME + ".desktop";
@@ -31,8 +31,10 @@ const std::string Constants::LOG_ORGB_FILE_NAME	  = "OpenRGB";
 
 const std::string Constants::USR_SHARE_OCL_DIR = "/etc/OpenCL/vendors/";
 const std::string Constants::USR_SHARE_VK_DIR  = "/usr/share/vulkan/icd.d/";
-const std::string Constants::LOCK_FILE		   = "/tmp/" + APP_NAME + ".lock";
-const std::string Constants::SOCKET_FILE	   = "/tmp/" + APP_NAME + ".sock";
+
+const std::string Constants::LOCK_FILE		   = std::string(std::getenv("XDG_RUNTIME_DIR")) + "/" + APP_NAME + ".lock";
+const std::string Constants::SOCKET_FILE	   = std::string(std::getenv("XDG_RUNTIME_DIR")) + "/" + APP_NAME + ".sock";
+const std::string Constants::RCDCC_SOCKET_PATH = std::string(std::getenv("XDG_RUNTIME_DIR")) + "/RCCDeckyCompanion.sock";
 
 const std::string Constants::ASSETS_BIN_DIR		= ASSETS_DIR + "/bin";
 const std::string Constants::ASSET_ICONS_DIR	= ASSETS_DIR + "/icons";
@@ -67,7 +69,6 @@ const std::string Constants::LOG_OLD_DIR			  = HOME_DIR + "/." + APP_NAME + "/lo
 const std::string Constants::USER_PLUGIN_DIR		  = HOME_DIR + "/." + APP_NAME + "/plugin";
 const std::string Constants::AUTOSTART_FILE			  = HOME_DIR + "/.config/autostart/" + APP_NAME + ".desktop";
 const std::string Constants::STEAM_USERDATA_PATH	  = HOME_DIR + "/.steam/steam/userdata";
-const std::string Constants::RCDCC_SOCKET_PATH		  = HOME_DIR + "/homebrew/data/RCCDeckyCompanion/socket";
 const std::string Constants::PLUGINS_FOLDER			  = HOME_DIR + "/homebrew/plugins";
 const std::string Constants::RCCDC_PATH				  = HOME_DIR + "/homebrew/plugins/RCCDeckyCompanion";
 const std::string Constants::RCCDC_PACKAGE_FILE		  = HOME_DIR + "/homebrew/plugins/RCCDeckyCompanion/package.json";
