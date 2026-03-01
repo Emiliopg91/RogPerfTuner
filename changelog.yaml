@@ -3,6 +3,7 @@
     - Restored fan curve edition for SMART mode
     - Unix socket management in connection
     - SCX schedulers with powersave and performance options
+    - CCache for compilation
 
 - version: 4.12.3-1
   improvements:
