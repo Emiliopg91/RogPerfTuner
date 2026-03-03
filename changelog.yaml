@@ -1,3 +1,7 @@
+- version: 4.12.5-1
+  fixes:
+    - Compilation issue due to httplib.h
+
 - version: 4.12.4-1
   improvements:
     - Restored fan curve edition for SMART mode
