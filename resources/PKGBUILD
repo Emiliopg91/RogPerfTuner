@@ -26,7 +26,6 @@ conflicts=('rog-perf-tuner<other_sufix>')
 depends=(
   'asusctl'
   'coreutils'
-  'cpp-httplib'
   'hicolor-icon-theme'
   'hidapi'
   'libusb'
@@ -47,7 +46,6 @@ depends=(
 )
 makedepends=(
   'base-devel'
-  'ccache'
   'clang'
   'cmake'
   'git'

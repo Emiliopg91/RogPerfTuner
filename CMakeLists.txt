@@ -40,17 +40,17 @@ add_compile_options(
 
 add_library(httplib INTERFACE)
 target_include_directories(httplib INTERFACE
-    "submodules/httplib/include/httplib.h"
+    ${CMAKE_CURRENT_SOURCE_DIR}/submodules/httplib
 )
 
 add_library(magic_enum INTERFACE)
 target_include_directories(magic_enum INTERFACE
-    "submodules/magic_enum/include/magic_enum"
+    ${CMAKE_CURRENT_SOURCE_DIR}/submodules/magic_enum/include/magic_enum
 )
 
 add_library(nlohmann_json INTERFACE)
-target_include_directories(magic_enum INTERFACE
-    "submodules/nlohmann-json/include/nlohmann"
+target_include_directories(nlohmann_json INTERFACE
+    ${CMAKE_CURRENT_SOURCE_DIR}/submodules/nlohmann-json/include/nlohmann
 )
 
 add_subdirectory(submodules/yaml-cpp)

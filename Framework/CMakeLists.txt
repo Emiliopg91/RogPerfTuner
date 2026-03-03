@@ -25,7 +25,8 @@ set_target_properties(Framework PROPERTIES AUTOMOC ON)
 
 target_compile_definitions(Framework PRIVATE CPPHTTPLIB_OPENSSL_SUPPORT)
 
-target_link_libraries(Framework PUBLIC 
+target_link_libraries(Framework PUBLIC
+    httplib
     magic_enum
     nlohmann_json
     OpenSSL::SSL 
