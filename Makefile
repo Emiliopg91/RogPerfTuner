@@ -59,7 +59,7 @@ build:
 
 	@python3 resources/scripts/constants.py
 
-	make format
+	@make format
 
 	@cmake --build build -- -j$(NUM_CORES)
 

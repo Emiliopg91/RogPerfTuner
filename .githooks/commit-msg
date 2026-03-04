@@ -4,7 +4,7 @@ COMMIT_MSG_FILE="$1"
 FIRST_LINE=$(head -n 1 "$COMMIT_MSG_FILE")
 
 # Validar formato
-echo "$FIRST_LINE" | grep -qE "^(feature|fix|docs|test|chore|improve|version|changelog):" || {
+echo "$FIRST_LINE" | grep -qE "^(feature|fix|docs|test|chore|improve|version|changelog|refactor):" || {
   echo "Invalid commit message"
   exit 1
 }
@@ -14,6 +14,3 @@ if [[ "$FIRST_LINE" =~ ^changelog: ]]; then
   echo "Changelog commit detected — skipping build"
   exit 0
 fi
-
-# Para el resto, ejecutar build
-make build_debug || exit 1

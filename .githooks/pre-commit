@@ -1,6 +1,6 @@
 #!/bin/bash
 
-make format
+make build_debug || exit 1
 
 FILES=$(git diff --cached --name-only --diff-filter=ACM | grep -E '\.(cpp|h)$')
 if [ -n "$FILES" ]; then
