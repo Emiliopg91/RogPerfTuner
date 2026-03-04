@@ -38,6 +38,11 @@ config:
 
 	@touch .$(BUILD_TYPE);\
 
+format:
+	@echo "Formatting code..."
+	@clang-format -i $$(find RogPerfTuner -name '*.cpp' -o -name '*.hpp')
+	@clang-format -i $$(find Framework -name '*.cpp' -o -name '*.hpp')
+
 build:
 	@if [ ! -f ".$(BUILD_TYPE)" ]; then \
 		make config; \
@@ -54,8 +59,7 @@ build:
 
 	@python3 resources/scripts/constants.py
 
-	@echo "Formatting code..."
-	@clang-format -i $$(find RogPerfTuner -name '*.cpp' -o -name '*.hpp')
+	make format
 
 	@cmake --build build -- -j$(NUM_CORES)
 

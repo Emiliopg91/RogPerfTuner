@@ -1,0 +1,10 @@
+#!/bin/bash
+
+make format
+
+FILES=$(git diff --cached --name-only --diff-filter=ACM | grep -E '\.(cpp|h)$')
+if [ -n "$FILES" ]; then
+    git add $FILES
+fi
+
+exit 0
