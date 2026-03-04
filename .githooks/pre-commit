@@ -1,8 +1,8 @@
 #!/bin/bash
 
-make build_debug || exit 1
+make format
 
-FILES=$(git diff --cached --name-only --diff-filter=ACM | grep -E '\.(cpp|h)$')
+FILES=$(git diff --cached --name-only --diff-filter=ACM | grep -E '\.(cpp|hpp)$')
 if [ -n "$FILES" ]; then
     git add $FILES
 fi
