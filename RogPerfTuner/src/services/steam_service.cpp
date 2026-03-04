@@ -251,7 +251,6 @@ void SteamService::installRccDC() {
 #endif
 					logger->info("Installing plugin for first time");
 					Logger::add_tab();
-					installPipDeps();
 					copyPlugin();
 					Logger::rem_tab();
 #ifndef DEV_MODE
@@ -263,7 +262,6 @@ void SteamService::installRccDC() {
 				if (checkIfRequiredInstallation()) {
 					logger->info("Updating Decky plugin");
 					Logger::add_tab();
-					installPipDeps();
 					copyPlugin();
 					Logger::rem_tab();
 				} else {
@@ -297,14 +295,6 @@ void SteamService::copyPlugin() {
 			shell.run_elevated_command(cmd);
 		}
 	});
-	Logger::rem_tab();
-}
-
-void SteamService::installPipDeps() {
-	auto depStr = StringUtils::join(Constants::RCCDC_REQUIRED_PIP, " ");
-	logger->info("Installing PIP dependencies {}", depStr);
-	Logger::add_tab();
-	pipClient.installPackage(depStr);
 	Logger::rem_tab();
 }
 

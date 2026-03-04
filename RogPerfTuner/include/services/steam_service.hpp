@@ -3,7 +3,6 @@
 #include <optional>
 
 #include "clients/file/intel_rapl_uj_client.hpp"
-#include "clients/shell/pip_client.hpp"
 #include "clients/unix_socket/steam_client.hpp"
 #include "models/steam/steam_game_config.hpp"
 #include "services/hardware_service.hpp"
@@ -28,7 +27,6 @@ class SteamService : public Singleton<SteamService>, Loggable {
 	HardwareService& hardwareService	   = HardwareService::getInstance();
 	PerformanceService& performanceService = PerformanceService::getInstance();
 	SteamSocketClient& steamClient		   = SteamSocketClient::getInstance();
-	PipClient& pipClient				   = PipClient::getInstance();
 	Translator& translator				   = Translator::getInstance();
 
 	SteamService();
@@ -41,7 +39,6 @@ class SteamService : public Singleton<SteamService>, Loggable {
 	void setProfileForGames(bool onConnect = false);
 	void installRccDC();
 	void copyPlugin();
-	void installPipDeps();
 	std::optional<std::string> getImagePath(uint gid, std::string sufix);
 	bool checkIfRequiredInstallation();
 
