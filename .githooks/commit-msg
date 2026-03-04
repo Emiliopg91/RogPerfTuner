@@ -10,8 +10,8 @@ echo "$FIRST_LINE" | grep -qE "^(feature|fix|docs|test|chore|improve|version):" 
 }
 
 # Si es docs: no compilar
-if [[ "$FIRST_LINE" =~ ^docs: ]]; then
-  echo "Documentation commit detected — skipping build"
+if [[ "$FIRST_LINE" =~ ^changelog: ]]; then
+  echo "Changelog commit detected — skipping build"
   exit 0
 fi
 
