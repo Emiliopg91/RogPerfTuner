@@ -44,6 +44,8 @@ elif ARG.startswith("improve:"):
     if entry.get("improvements", None) is None:
         entry["improvements"] = []
     entry["improvements"].append(ARG.replace("improve:", "").strip())
+else:
+    sys.exit(0)
 
 data = [reorder(e) for e in data]
 
