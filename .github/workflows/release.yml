@@ -14,6 +14,10 @@ on:
         type: string
         default: "1"
 
+concurrency:
+  group: ${{ github.workflow }}
+  cancel-in-progress: true
+
 jobs:
   compile_and_release:
     runs-on: ubuntu-latest

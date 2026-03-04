@@ -11,6 +11,10 @@ on:
     types:
       - completed
 
+concurrency:
+  group: ${{ github.workflow }}
+  cancel-in-progress: true
+
 jobs:
   compile_and_release:
     runs-on: ubuntu-latest
