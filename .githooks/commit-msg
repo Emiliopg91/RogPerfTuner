@@ -6,6 +6,7 @@ FIRST_LINE=$(head -n 1 "$COMMIT_MSG_FILE")
 # Validar formato
 echo "$FIRST_LINE" | grep -qE "^(feature|fix|docs|test|chore|improve|version|changelog|refactor):" || {
   echo "Invalid commit message"
+  echo "Valid prefixes: feature fix docs test chore improve version changelog refactor"
   exit 1
 }
 
