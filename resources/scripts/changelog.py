@@ -28,22 +28,25 @@ if ARG.startswith("version:"):
     data = [{"version": ARG.replace("version:", "").strip()}] + data
 elif ARG.startswith("fix:"):
     entry = data[0]
-    print(f"{entry}")
     if entry.get("fixes", None) is None:
         entry["fixes"] = []
-    entry["fixes"].append(ARG.replace("fix:", "").strip())
+    msg = ARG.replace("fix:", "").strip()
+    if msg not in entry["fixes"]:
+        entry["fixes"].append(msg)
 elif ARG.startswith("feat:"):
     entry = data[0]
-    print(f"{entry}")
     if entry.get("features", None) is None:
         entry["features"] = []
-    entry["features"].append(ARG.replace("feat:", "").strip())
+    msg = ARG.replace("feat:", "").strip()
+    if msg not in entry["features"]:
+        entry["features"].append(msg)
 elif ARG.startswith("improve:"):
     entry = data[0]
-    print(f"{entry}")
     if entry.get("improvements", None) is None:
         entry["improvements"] = []
-    entry["improvements"].append(ARG.replace("improve:", "").strip())
+    msg = ARG.replace("improve:", "").strip()
+    if msg not in entry["improvements"]:
+        entry["improvements"].append(msg)
 else:
     sys.exit(0)
 
