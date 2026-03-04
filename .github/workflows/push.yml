@@ -28,9 +28,9 @@ jobs:
           git config user.name "GitHub Actions"
           git config user.email "actions@github.com"
 
-      - name: Process release
+      - name: Test
         run: |
-          GIT_RELEASE=1 make release
+          make test
 
       - name: Publish to AUR
         env:
@@ -53,7 +53,7 @@ jobs:
           echo "Copying files..."
           cp ../dist/PKGBUILD .
           cp ../dist/.SRCINFO .
-          cp ../dist/rog-perf-tuner.install rog-perf-tuner-git.install
+          cp ../dist/rog-perf-tuner-git.install rog-perf-tuner-git.install
 
           echo "Committing changes..."
           git add PKGBUILD .SRCINFO rog-perf-tuner-git.install
