@@ -61,7 +61,7 @@ jobs:
           if [[ -n $(git status --porcelain) ]]; then
             git add .
             git commit -m "version: ${VERSION}"
-            bash .githooks/post-commit
+            python ./resources/scripts/changelog.py "version: ${VERSION}"
           fi
 
       - name: Validate version
