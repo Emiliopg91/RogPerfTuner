@@ -39,7 +39,6 @@ config:
 	@touch .$(BUILD_TYPE);\
 
 format:
-	@echo "Formatting code..."
 	@clang-format -i $$(find RogPerfTuner -name '*.cpp' -o -name '*.hpp')
 	@clang-format -i $$(find Framework -name '*.cpp' -o -name '*.hpp')
 
