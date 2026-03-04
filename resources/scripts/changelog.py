@@ -54,4 +54,4 @@ with open(YAML_PATH, "w", encoding="utf-8") as f:
 
 
 subprocess.run(["git", "add", os.path.basename(YAML_PATH)], check=False)
-subprocess.run(["git", "commit", "-m", "chore: Changelog"], check=False)
+subprocess.run(["git", "commit", "-m", "docs: Changelog"], check=False)
