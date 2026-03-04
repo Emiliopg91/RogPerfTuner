@@ -91,7 +91,6 @@ subprocess.run(
     [
         "docker",
         "run",
-        "-it",
         "-v",
         os.path.join(os.getcwd(), "dist:/pkg"),
         "epulidogil/rog-perf-tuner-installer-test:latest",
