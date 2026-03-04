@@ -32,6 +32,10 @@ jobs:
         run: |
           make test
 
+      - name: Perform release
+        run: |
+          GIT_RELEASE=1 make clean release
+
       - name: Publish to AUR
         env:
           AUR_SSH_PRIVATE_KEY: ${{ secrets.AUR_SSH_PRIVATE_KEY }}
