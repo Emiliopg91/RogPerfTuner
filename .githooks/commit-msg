@@ -4,7 +4,7 @@ COMMIT_MSG_FILE="$1"
 FIRST_LINE=$(head -n 1 "$COMMIT_MSG_FILE")
 
 # Validar formato
-echo "$FIRST_LINE" | grep -qE "^(feature|fix|docs|test|chore|improve|version):" || {
+echo "$FIRST_LINE" | grep -qE "^(feature|fix|docs|test|chore|improve|version|changelog):" || {
   echo "Invalid commit message"
   exit 1
 }

@@ -1,6 +1,7 @@
 - version: 4.12.6-1
   improvements:
   - Automatice changelog
+  - Changelog description
   fixes:
   - Tests pre push
 - version: 4.12.5-1
