@@ -1,0 +1,6 @@
+#!/bin/bash
+
+grep -qE "^(feature|fix|docs|test|chore|improve|version):" "$1" || {
+  echo "Invalid commit message"
+  exit 1
+}

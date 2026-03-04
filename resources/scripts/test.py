@@ -40,7 +40,7 @@ if os.getenv("GITHUB_ACTIONS", "false").lower() == "false":
         && echo "builder ALL=(ALL) NOPASSWD: ALL" >> /etc/sudoers
 
     # Crear directorio donde se montarán los paquetes (como root)
-    RUN mkdir -p /pkg && chmod 777 /pkg
+    RUN mkdir -p /pkg /tmp/pkg && chmod 777 /pkg /tmp/pkg
 
     # Cambiar a usuario builder
     USER builder
@@ -54,12 +54,11 @@ if os.getenv("GITHUB_ACTIONS", "false").lower() == "false":
         && cd .. \
         && rm -rf paru \
         && paru -S --noconfirm {dependencies} \
-        && sudo pacman -Scc --noconfirm
-
-    WORKDIR /pkg
+        && sudo paru -Scc --noconfirm
+    WORKDIR /tmp/pkg
 
     # Ejecutar paru -U por defecto
-    CMD ["bash", "-c", "paru -U --noconfirm --nocheck --noinstall && sudo rm -rf /pkg/{{*,.*}} 2>/dev/null"]
+    CMD ["bash", "-c", "cp -R /pkg/* . && paru -U --noconfirm --nocheck --noinstall"]
     """
 
     with open("Dockerfile", "w", encoding="utf-8") as f:
