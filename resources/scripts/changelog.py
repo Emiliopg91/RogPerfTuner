@@ -24,10 +24,12 @@ def reorder(map_entry):
 with open(YAML_PATH, "r", encoding="utf-8") as f:
     data = yaml.safe_load(f)
 
+modified = False
 msg = None
 if ARG.startswith("version:"):
     msg = ARG.replace("version:", "").strip()
     data = [{"version": msg}] + data
+    modified = True
 elif ARG.startswith("fix:"):
     entry = data[0]
     if entry.get("fixes", None) is None:
@@ -35,6 +37,7 @@ elif ARG.startswith("fix:"):
     msg = ARG.replace("fix:", "").strip()
     if msg not in entry["fixes"]:
         entry["fixes"].append(msg)
+        modified = True
 elif ARG.startswith("feat:"):
     entry = data[0]
     if entry.get("features", None) is None:
@@ -42,6 +45,7 @@ elif ARG.startswith("feat:"):
     msg = ARG.replace("feat:", "").strip()
     if msg not in entry["features"]:
         entry["features"].append(msg)
+        modified = True
 elif ARG.startswith("improve:"):
     entry = data[0]
     if entry.get("improvements", None) is None:
@@ -49,10 +53,11 @@ elif ARG.startswith("improve:"):
     msg = ARG.replace("improve:", "").strip()
     if msg not in entry["improvements"]:
         entry["improvements"].append(msg)
+        modified = True
 else:
     sys.exit(0)
 
-if msg is not None:
+if modified:
     data = [reorder(e) for e in data]
 
     with open(YAML_PATH, "w", encoding="utf-8") as f:
