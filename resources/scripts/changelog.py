@@ -1,3 +1,5 @@
+# pylint: disable=invalid-name, missing-function-docstring
+
 import os
 import subprocess
 import sys
@@ -28,6 +30,11 @@ modified = False
 msg = None
 if ARG.startswith("version:"):
     msg = ARG.replace("version:", "").strip()
+    version, rel = msg.split("-")
+    major, minor, patch = version.split(".")
+    patch = str(int(patch) + 1)
+    msg = f"{major}.{minor}.{patch}-{rel}"
+
     data = [{"version": msg}] + data
     modified = True
 elif ARG.startswith("fix:"):
