@@ -4,6 +4,7 @@
   - Changelog description
   - Format
   - Git hooks
+  - Workflows
   fixes:
   - Tests pre push
 - version: 4.12.5-1
