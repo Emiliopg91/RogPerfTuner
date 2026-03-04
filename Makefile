@@ -119,3 +119,7 @@ increase_version:
 
 install: clean release
 	@cd dist && makepkg -si
+
+test: 
+	export GIT_RELEASE=1 && make release && mv dist/rog-perf-tuner.install dist/rog-perf-tuner-git.install
+	@python3 ./resources/scripts/test.py
