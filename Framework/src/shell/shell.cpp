@@ -20,32 +20,9 @@ void set_nonblocking(int fd) {
 }
 }  // namespace
 
-Shell::Shell(const std::string& sudo_password) : Loggable("Shell") {
+Shell::Shell(const std::string& sudo_password) : Loggable("Shell"), terminalCfg({{"konsole", "-e", nullptr}}) {
 	logger->info("Initializing shells");
 	Logger::add_tab();
-
-	logger->info("Initializing terminal");
-	Logger::add_tab();
-	const std::unordered_map<std::string, std::vector<const char*>> terminals = {
-		{"gnome-terminal", {"gnome-terminal", "--wait", "--", nullptr}},
-		{"konsole", {"konsole", "--nofork", "-e", nullptr}},
-		{"xfce4-terminal", {"xfce4-terminal", "--disable-server", "--hold=no", "--command", nullptr}},
-		{"kitty", {"kitty", "--wait-for-child", "--hold=no", nullptr}},
-		{"xterm", {"xterm", "-e", nullptr}}};
-
-	terminalCfg = std::nullopt;
-	for (const auto& [term, args] : terminals) {
-		std::string check = "command -v " + term + " >/dev/null 2>&1";
-		if (system(check.c_str()) == 0) {
-			logger->info("Using terminal {}", term);
-			terminalCfg = args;
-			break;
-		}
-	}
-
-	if (!terminalCfg.has_value()) {
-		logger->warn("No terminal emulator found");
-	}
 
 	Logger::rem_tab();
 
@@ -229,7 +206,7 @@ std::vector<std::string> Shell::copyEnviron() {
 	return envCopy;
 }
 
-pid_t Shell::launch_process(const char* command, char* const argv[], char* const env[], std::optional<std::string> outFile) {
+pid_t Shell::launch_process(const char* command, char* const argv[], char* const env[], std::optional<std::string> outFile, bool detach) {
 	std::string cmd_str = command;
 	cmd_str += " ";
 
@@ -257,7 +234,11 @@ pid_t Shell::launch_process(const char* command, char* const argv[], char* const
 			}
 			close(fd);
 		}
-		prctl(PR_SET_PDEATHSIG, SIGTERM);
+		if (!detach) {
+			prctl(PR_SET_PDEATHSIG, SIGTERM);
+		} else {
+			setsid();
+		}
 		execve(command, argv, env);
 		logger->error("Error on process launch: {}", std::strerror(errno));
 		_exit(1);
@@ -268,15 +249,21 @@ pid_t Shell::launch_process(const char* command, char* const argv[], char* const
 	return pid;
 }
 
-pid_t Shell::launch_in_terminal(const std::string& userCommand) {
-	if (!terminalCfg.has_value()) {
-		throw std::runtime_error("No terminal emulator available");
-	}
-
+pid_t Shell::launch_in_terminal(const std::string& userCommand, bool detatch, bool hold) {
 	std::vector<char*> argv;
-	for (const char* arg : *terminalCfg) {
+	int i = 0;
+	for (const char* arg : terminalCfg) {
 		if (arg) {
 			argv.push_back(const_cast<char*>(arg));
+			if (i == 0) {
+				if (detatch) {
+					argv.push_back(const_cast<char*>("--nofork"));
+				}
+				if (hold) {
+					argv.push_back(const_cast<char*>("--hold"));
+				}
+			}
+			i++;
 		}
 	}
 
@@ -287,7 +274,7 @@ pid_t Shell::launch_in_terminal(const std::string& userCommand) {
 	argv.push_back(const_cast<char*>(cmd.c_str()));
 	argv.push_back(nullptr);
 
-	return launch_process((*which(argv[0])).data(), argv.data(), environ);
+	return launch_process((*which(argv[0])).data(), argv.data(), environ, std::nullopt, detatch);
 }
 
 uint8_t Shell::wait_for(pid_t pid) {

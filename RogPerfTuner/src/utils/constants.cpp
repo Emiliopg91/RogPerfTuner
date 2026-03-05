@@ -44,6 +44,7 @@ const std::string Constants::ORGB_DIR			= ASSETS_DIR + "/OpenRGB";
 const std::string Constants::ORGB_PATH			= ASSETS_DIR + "/OpenRGB/openrgb";
 const std::string Constants::RCCDC_ASSET_PATH	= ASSETS_DIR + "/RccDeckyCompanion";
 const std::string Constants::TRANSLATIONS_FILE	= ASSETS_DIR + "/translations.yaml";
+const std::string Constants::DEV_MODE_FILE		= ASSETS_DIR + "/dev-mode.sh";
 
 const std::string Constants::HOME_DIR				  = std::getenv("HOME");
 const std::string Constants::BIN_DIR				  = HOME_DIR + "/." + APP_NAME + "/bin";

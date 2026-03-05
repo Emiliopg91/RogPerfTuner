@@ -65,6 +65,8 @@ build:
 	@mkdir build/assets/bin build/assets/bin/rgb  build/assets/bin/performance build/assets/bin/steam
 	@cp resources/suggestions.yaml build/assets/suggestions.yaml
 	@cp resources/translations.yaml build/assets/translations.yaml
+	@cp resources/dev-mode.sh build/assets/dev-mode.sh
+	@chmod +x build/assets/dev-mode.sh
 
 build_openrgb:
 	@if [ ! -f "submodules/patches/OpenRGB.diff.applied" ]; then \

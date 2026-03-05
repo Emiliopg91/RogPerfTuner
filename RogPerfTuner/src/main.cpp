@@ -1,5 +1,6 @@
 #include <iostream>
 
+#include "main/dev.hpp"
 #include "main/flatpak.hpp"
 #include "main/gui.hpp"
 #include "main/rgb.hpp"
@@ -80,6 +81,10 @@ int main(int argc, char** argv) {
 			case hashStr("-s"):
 			case hashStr("--show"):
 				showGui();
+				break;
+
+			case hashStr("--dev-mode"):
+				runDevMode();
 				break;
 
 			case hashStr("-h"):

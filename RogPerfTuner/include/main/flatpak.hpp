@@ -11,7 +11,6 @@
 
 #include "clients/shell/flatpak.hpp"
 #include "framework/logger/logger_provider.hpp"
-#include "framework/shell/shell.hpp"
 #include "framework/utils/file_utils.hpp"
 #include "utils/constants.hpp"
 

@@ -5,6 +5,7 @@
 
 #include <QApplication>
 #include <iostream>
+#include <optional>
 #include <string>
 
 #include "clients/file/proc_modules_client.hpp"
@@ -62,7 +63,9 @@ inline std::string getExecutablePath(const char* argv0) {
 }
 
 inline int startGui(int argc, char** argv) {
-	auto t0 = TimeUtils::now();
+	auto t0						   = TimeUtils::now();
+	std::optional<std::string> val = std::nullopt;
+	val.value();
 	std::set_terminate(terminateHandler);
 
 	auto execPath = getExecutablePath(argv[0]);
