@@ -74,6 +74,8 @@ inline int startGui(int argc, char** argv) {
 	std::cout << "Running application with PID " << Constants::PID << std::endl;
 	std::cout << "Executable path: " << execPath << std::endl;
 	std::cout << "Assets directory: " << Constants::ASSETS_DIR << std::endl;
+	std::optional<std::string> opt = std::nullopt;
+	opt.value().c_str();
 
 	LoggerProvider::initialize(Constants::LOG_FILE_NAME, Constants::LOG_DIR);
 	Translator::init(Constants::TRANSLATIONS_FILE);

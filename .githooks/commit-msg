@@ -4,9 +4,9 @@ COMMIT_MSG_FILE="$1"
 FIRST_LINE=$(head -n 1 "$COMMIT_MSG_FILE")
 
 # Validar formato
-echo "$FIRST_LINE" | grep -qE "^(feature|fix|docs|test|chore|improve|version|changelog|refactor):" || {
+echo "$FIRST_LINE" | grep -qE "^(\[ci skip\]feature|fix|docs|test|chore|improve|version|changelog|refactor):" || {
   echo "Invalid commit message"
-  echo "Valid prefixes: feature fix docs test chore improve version changelog refactor"
+  echo "Valid prefixes: [ci skip] feature fix docs test chore improve version changelog refactor"
   exit 1
 }
 
