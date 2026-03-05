@@ -21,27 +21,27 @@
     - CCache for compilation
     - Sockets location
 - version: 4.12.3-1
-  feat:
+  feature:
     - SSD scheduler support
   improve:
     - Refactor
 - version: 4.12.1-1
-  feat:
+  feature:
     - Git veresion for aur
   improve:
     - Refactor
     - Game suggestions from remote
     - Fan curves normalization
 - version: 4.12.0-1
-  feat:
+  feature:
     - Game configuration suggestions
   improve:
     - Proton detection on first run
 - version: 4.11.6-1
-  feat:
+  feature:
     - Customization on cooling removed
 - version: 4.11.5-1
-  feat:
+  feature:
     - Show GUI shortcut
   fix:
     - No binaries folder/scripts generated
@@ -60,7 +60,7 @@
   fix:
     - Missing Git push
 - version: 4.11.0-1
-  feat:
+  feature:
     - Smart performance mode
   improve:
     - Refactor
@@ -93,7 +93,7 @@
     - Intel CPU power drain
     - Source optimizations and build flags
 - version: 4.10.1-1
-  feat:
+  feature:
     - systemd-inhibit integration
   improve:
     - Remove enrolment
@@ -105,7 +105,7 @@
   improve:
     - Default scheduler detection
 - version: 4.9.2-1
-  feat:
+  feature:
     - Added Beerland CPU scheduler
     - Option to enable/disable minimized startup
   improve:
@@ -123,7 +123,7 @@
   fix:
     - Solved file descriptor leak
 - version: 4.8.8-1
-  feat:
+  feature:
     - Ready for Steam Machine when release
   improve:
     - Redesign of game config dialog
@@ -131,7 +131,7 @@
   fix:
     - Fixed (again) reload after update
 - version: 4.8.6-1
-  feat:
+  feature:
     - CLI help menu
   fix:
     - Wait for update finished to reload application
@@ -160,7 +160,7 @@
   fix:
     - Missing cpp-httplib-compiled and nlohmann-json dependencies
 - version: 4.8.0-1
-  feat:
+  feature:
     - Support for AMD CPUs and GPUs
   improve:
     - DBus armoury interface migrated to asus-armoury module firmware-attributes
@@ -168,7 +168,7 @@
   improve:
     - Changelog for releases
 - version: 4.7.1-1
-  feat:
+  feature:
     - New version of Decky plugin
     - Games artwork in list and settings view
     - Showing changelog when update is available

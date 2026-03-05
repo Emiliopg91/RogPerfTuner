@@ -38,7 +38,7 @@ if ARG.startswith("version:"):
     data = [{"version": msg}] + data
     modified = True
 else:
-    options = ["fix", "feat", "improve"]
+    options = ["fix", "feature", "improve"]
     prefix = ARG.split(":")
 
     if prefix in options:
