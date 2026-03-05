@@ -12,15 +12,24 @@ endif()
 if(CMAKE_BUILD_TYPE STREQUAL "Release")
     add_compile_options(
         -O3
+        -flto
         -march=native
         -funroll-loops
         -fstrict-aliasing
-        -flto
+        -ffunction-sections
+        -fdata-sections
+        -fvisibility=hidden
+        -fno-unwind-tables
+        -fno-asynchronous-unwind-tables
     )
 
     add_link_options(
-        -flto=full
         -s
+        -flto=full
+        -fuse-ld=lld
+        -Wl,--icf=all
+        -Wl,--gc-sections
+
     )
 elseif(CMAKE_BUILD_TYPE STREQUAL "Debug")
     add_compile_options(
