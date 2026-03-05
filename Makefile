@@ -120,5 +120,18 @@ increase_version:
 	@awk '{if ($$0 ~ /project\(.*VERSION/) {match($$0, /([0-9]+)\.([0-9]+)\.([0-9]+)/, v); patch = v[3] + 1; sub(/[0-9]+\.[0-9]+\.[0-9]+/, v[1] "." v[2] "." patch);} print}' CMakeLists.txt > CMakeLists.txt.tmp && mv CMakeLists.txt.tmp CMakeLists.txt
 
 test: 
-	export GIT_RELEASE=1 && make release && mv dist/rog-perf-tuner.install dist/rog-perf-tuner-git.install
+	@export GIT_RELEASE=1 && make release && mv dist/rog-perf-tuner.install dist/rog-perf-tuner-git.install
 	@python3 ./resources/scripts/test.py
+
+install: clean
+	@export GIT_RELEASE=1 && make release
+	@printf '\nprepare() {\n' >> dist/PKGBUILD
+	@printf '    rm -Rf "$$srcdir/RogPerfTuner/*"\n' >> dist/PKGBUILD
+	@printf "    rsync -a --exclude='dist' /var/mnt/Datos/Desarrollo/Workspace/VSCode/RogPerfTuner/ \"\$$srcdir/RogPerfTuner/\"\n" >> dist/PKGBUILD
+	@printf '    cur=$$(pwd)\n' >> dist/PKGBUILD
+	@printf '    cd "$$srcdir/RogPerfTuner/"\n' >> dist/PKGBUILD
+	@printf '    rm -Rf "$$srcdir/RogPerfTuner/submodules/RccDeckyCompanion/node_modules"\n' >> dist/PKGBUILD
+	@printf '    make clean\n' >> dist/PKGBUILD
+	@printf '    cd $$cur\n' >> dist/PKGBUILD
+	@printf '}\n' >> dist/PKGBUILD
+	@cd dist && mv rog-perf-tuner.install rog-perf-tuner-git.install && makepkg -si
