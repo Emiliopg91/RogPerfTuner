@@ -74,10 +74,6 @@ build_openrgb:
 		echo "#######################################################################" && \
 		echo "######################### Compiling OpenRGB ###########################" && \
 		echo "#######################################################################" && \
-		sed -i '/find_package(httplib CONFIG REQUIRED)/d' submodules/OpenRGB/CMakeLists.txt && \
-		sed -i '/pkg_check_modules(NLOHMANN_JSON REQUIRED nlohmann_json)/d' submodules/OpenRGB/CMakeLists.txt && \
-		sed -i '/-fprefetch-loop-arrays/d' submodules/OpenRGB/CMakeLists.txt && \
-		sed -i '/-G Ninja/ s|cmake |cmake -DCMAKE_CXX_COMPILER=clang++ |' submodules/OpenRGB/build.sh && \
 		cd submodules/OpenRGB && ./build.sh && \
 		mkdir -p ../../build/assets/OpenRGB && \
 		cp build/OpenRGB ../../build/assets/OpenRGB/openrgb && \
