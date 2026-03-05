@@ -1,4 +1,6 @@
 - version: 4.12.8-1
+  improvements:
+  - Force clang++ for OpenRGB
 - version: 4.12.6-1
   improvements:
   - Automatice changelog
