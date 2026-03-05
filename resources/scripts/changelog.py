@@ -37,32 +37,20 @@ if ARG.startswith("version:"):
 
     data = [{"version": msg}] + data
     modified = True
-elif ARG.startswith("fix:"):
-    entry = data[0]
-    if entry.get("fixes", None) is None:
-        entry["fixes"] = []
-    msg = ARG.replace("fix:", "").strip()
-    if msg not in entry["fixes"]:
-        entry["fixes"].append(msg)
-        modified = True
-elif ARG.startswith("feat:"):
-    entry = data[0]
-    if entry.get("features", None) is None:
-        entry["features"] = []
-    msg = ARG.replace("feat:", "").strip()
-    if msg not in entry["features"]:
-        entry["features"].append(msg)
-        modified = True
-elif ARG.startswith("improve:"):
-    entry = data[0]
-    if entry.get("improvements", None) is None:
-        entry["improvements"] = []
-    msg = ARG.replace("improve:", "").strip()
-    if msg not in entry["improvements"]:
-        entry["improvements"].append(msg)
-        modified = True
 else:
-    sys.exit(0)
+    options = ["fix", "feat", "improve"]
+    prefix = ARG.split(":")
+
+    if prefix in options:
+        msg = ARG[len(prefix) + 1 :]
+        entry = data[0]
+        if entry.get(prefix, None) is None:
+            entry[prefix] = []
+        if msg not in entry[prefix]:
+            entry[prefix].append(msg)
+            modified = True
+    else:
+        sys.exit(0)
 
 if modified:
     data = [reorder(e) for e in data]
