@@ -15,17 +15,21 @@ if [ -z "$AUR_HELPER" ]; then
 fi
 echo "Detected $AUR_HELPER AUR helper"
 
-echo "Installing build dependencies..."
-$AUR_HELPER -Syu base-devel clang cmake gdb git ninja npm pkgconf pnpm qtcreator unzip zip
+if ! command -v rog-perf-tuner &> /dev/null; then
+    $AUR_HELPER -S rog-perf-tuner-git
+fi
 
-echo "Installing dependencies..."
-$AUR_HELPER -Syu asusctl coreutils hicolor-icon-theme hidapi libusb mangohud-git nlohmann-json power-profiles-daemon python python-pip python-yaml qt6-base qt6-charts qt6-svg qtermwidget qtkeychain-qt6 scx-scheds openssl switcheroo-control upower
+if ! command -v gdb &> /dev/null; then
+    $AUR_HELPER -S gdb
+fi
 
-if [ ! -d "~/RogPerfTuner-Debug" ]; then
+if [ ! -d "$HOME/RogPerfTuner-Debug" ]; then
     echo "Downloading source code..."
-    git clone https://github.com/Emiliopg91/RogPerfTuner "~/RogPerfTuner-Debug"
+    git clone https://github.com/Emiliopg91/RogPerfTuner "$HOME/RogPerfTuner-Debug"
+    cd $HOME/RogPerfTuner-Debug
+    git submodule update --init --recursive
 else
-    cd ~/RogPerfTuner-Debug
+    cd $HOME/RogPerfTuner-Debug
     echo "Cleaning and updating project..."
     make clean
     git reset --hard
