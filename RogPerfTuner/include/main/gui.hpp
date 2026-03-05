@@ -63,9 +63,7 @@ inline std::string getExecutablePath(const char* argv0) {
 }
 
 inline int startGui(int argc, char** argv) {
-	auto t0						   = TimeUtils::now();
-	std::optional<std::string> val = std::nullopt;
-	val.value();
+	auto t0 = TimeUtils::now();
 	std::set_terminate(terminateHandler);
 
 	auto execPath = getExecutablePath(argv[0]);
