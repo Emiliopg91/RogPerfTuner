@@ -28,6 +28,7 @@ depends=(
   'coreutils'
   'hicolor-icon-theme'
   'hidapi'
+  'konsole'
   'libusb'
   'mangohud-git'
   'nlohmann-json'
