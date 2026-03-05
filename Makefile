@@ -1,4 +1,4 @@
-.PHONY: config build build_release build_debug run clean release
+.PHONY: clean config format build build_openrgb build_rccdc pkgbuild release build_debug run increase_version test
 
 NUM_CORES := $(shell nproc)
 BUILD_TYPE ?= Release
@@ -27,7 +27,13 @@ config:
 		cd submodules/OpenRGB-cppSDK && git apply ../patches/OpenRGB-cppSDK.diff && touch ../patches/OpenRGB-cppSDK.diff.applied; \
 	fi
 	
-	cmake -B build -G Ninja -DCMAKE_CXX_COMPILER=clang++ -S . -DCMAKE_BUILD_TYPE=$(BUILD_TYPE) -DCMAKE_EXPORT_COMPILE_COMMANDS=ON $${DEV_MODE:+-DDEV_MODE=1} 
+	@if [ "$(BUILD_TYPE)" = "Debug" ] && command -v ccache >/dev/null 2>&1; then \
+		echo "Using ccache to speed up Debug compilation"; \
+		CCACHE_ARG="-DCMAKE_C_COMPILER_LAUNCHER=ccache -DCMAKE_CXX_COMPILER_LAUNCHER=ccache"; \
+	else \
+		CCACHE_ARG=""; \
+	fi; \
+	cmake -B build -G Ninja -DCMAKE_CXX_COMPILER=clang++ -S . -DCMAKE_BUILD_TYPE=$(BUILD_TYPE) -DCMAKE_EXPORT_COMPILE_COMMANDS=ON $$CCACHE_ARG $${DEV_MODE:+-DDEV_MODE=1} 
 
 	@if [ ! -f "compile_commands.json" ]; then \
 		ln -s build/compile_commands.json .; \
@@ -119,9 +125,6 @@ run: build_debug
 
 increase_version:
 	@awk '{if ($$0 ~ /project\(.*VERSION/) {match($$0, /([0-9]+)\.([0-9]+)\.([0-9]+)/, v); patch = v[3] + 1; sub(/[0-9]+\.[0-9]+\.[0-9]+/, v[1] "." v[2] "." patch);} print}' CMakeLists.txt > CMakeLists.txt.tmp && mv CMakeLists.txt.tmp CMakeLists.txt
-
-install: clean release
-	@cd dist && makepkg -si
 
 test: 
 	export GIT_RELEASE=1 && make release && mv dist/rog-perf-tuner.install dist/rog-perf-tuner-git.install
