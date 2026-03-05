@@ -9,5 +9,5 @@ inline void runDevMode() {
 	LoggerProvider::initialize(Constants::LOG_FILE_NAME, Constants::LOG_DIR);
 
 	Shell& shell = Shell::getInstance();
-	shell.launch_in_terminal(Constants::DEV_MODE_FILE, true, true);
+	shell.launch_in_terminal(Constants::DEV_MODE_FILE, true, false);
 }

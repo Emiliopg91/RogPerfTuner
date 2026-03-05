@@ -38,9 +38,12 @@ RCC_LOG_LEVEL=DEBUG make clean run
 EXIT_CODE=$?
 
 if [[ $EXIT_CODE -ne 0 && $EXIT_CODE -ne 130 ]]; then
-    echo "Exited with error. Gathering information..."
-    cd ~/.RogPerfTuner/
-    mkdir dump
+    echo ""
+    echo "Exited with exit code $EXIT_CODE. Gathering information..."
+    
+    mkdir -p ~/.RogPerfTuner/dump
+    cd ~/.RogPerfTuner
+
     if [ -f "config/config.yaml" ]; then
         cp config/config.yaml dump/config.yaml
     fi
@@ -49,13 +52,14 @@ if [[ $EXIT_CODE -ne 0 && $EXIT_CODE -ne 130 ]]; then
         cp logs/RogPerfTuner.log dump/RogPerfTuner.log
     fi
     
-    pid=$(cat /run/user/$UID/RogPerfTuner.lock | tr -d '\r\n')
-    echo "bt" | coredumpctl gdb $pid > dump/gdb.txt
-
+    echo "bt" | coredumpctl gdb > dump/gdb.txt
 
     tar czf dump.tar.gz -C ~/.RogPerfTuner dump
     cp dump.tar.gz ~/rog-perf-tuner-dump.tar.gz
 
+    echo ""
     echo "Dump report packaged in $HOME/rog-perf-tuner-dump.tar.gz"
-    read -p 'Press Enter to exit...'
 fi
+read -p 'Press Enter to exit...'
+exit
+
