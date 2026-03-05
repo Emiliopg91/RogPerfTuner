@@ -83,6 +83,7 @@ int main(int argc, char** argv) {
 				showGui();
 				break;
 
+			case hashStr("-m"):
 			case hashStr("--dev-mode"):
 				runDevMode();
 				break;
@@ -105,6 +106,7 @@ int main(int argc, char** argv) {
 						  << "  Application" << std::endl
 						  << "    -s, --show           Show GUI" << std::endl
 						  << "    -k, --kill           Kill existing instance" << std::endl
+						  << "    -m, --dev-mode           Run in dev mode with bug report generation" << std::endl
 						  << "    -v, --version        Show version information" << std::endl
 						  << "    -h, --help           Show this help message" << std::endl;
 				break;

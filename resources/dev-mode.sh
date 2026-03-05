@@ -59,7 +59,9 @@ if [[ $EXIT_CODE -ne 0 && $EXIT_CODE -ne 130 ]]; then
 
     echo ""
     echo "Dump report packaged in $HOME/rog-perf-tuner-dump.tar.gz"
+    echo "Create an issue in https://github.com/Emiliopg91/RogPerfTuner/issues and attach the file to it"
 fi
+echo ""
 read -p 'Press Enter to exit...'
 exit
 
