@@ -48,6 +48,10 @@ if [[ $EXIT_CODE -ne 0 && $EXIT_CODE -ne 130 ]]; then
     if [ -f "config/config.yaml" ]; then
         cp config/config.yaml dump/config.yaml
     fi
+
+    if [ -f "logs/RogPerfTuner.log" ]; then
+        cp logs/RogPerfTuner.log dump/RogPerfTuner.log
+    fi
     
     pid=$(cat /run/user/$UID/RogPerfTuner.lock | tr -d '\r\n')
     echo "bt" | coredumpctl gdb $pid > dump/gdb.txt
