@@ -5,6 +5,7 @@
   improve:
   - Force clang++ for OpenRGB
   - Changelog generation
+  - Optimization flags
 - version: 4.12.6-1
   fix:
   - Tests pre push
