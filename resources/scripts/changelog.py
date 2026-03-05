@@ -12,7 +12,7 @@ ARG = sys.argv[1]
 
 PROJ_PATH = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", ".."))
 YAML_PATH = os.path.join(PROJ_PATH, "changelog.yaml")
-ORDER = ["version", "features", "improvements", "fixes"]
+ORDER = ["version", "fix", "feature", "improve"]
 
 
 def reorder(map_entry):
@@ -38,11 +38,10 @@ if ARG.startswith("version:"):
     data = [{"version": msg}] + data
     modified = True
 else:
-    options = ["fix", "feature", "improve"]
-    prefix = ARG.split(":")
+    prefix = ARG.split(":")[0]
 
-    if prefix in options:
-        msg = ARG[len(prefix) + 1 :]
+    if prefix in ORDER[1:]:
+        msg = ARG[len(prefix) + 1 :].strip()
         entry = data[0]
         if entry.get(prefix, None) is None:
             entry[prefix] = []

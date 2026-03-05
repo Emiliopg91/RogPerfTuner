@@ -2,6 +2,16 @@
     "version": "0.2.0",
     "configurations": [
         {
+            "name": "Changelog generator",
+            "type": "debugpy",
+            "request": "launch",
+            "program": "${workspaceFolder}/resources/scripts/changelog.py",
+            "console": "integratedTerminal",
+            "args": [
+                "improve: chagasdsd"
+            ]
+        },
+        {
             "name": "Debug MiProyecto",
             "type": "lldb",
             "request": "launch",
