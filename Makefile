@@ -27,13 +27,7 @@ config:
 		cd submodules/OpenRGB-cppSDK && git apply ../patches/OpenRGB-cppSDK.diff && touch ../patches/OpenRGB-cppSDK.diff.applied; \
 	fi
 	
-	@if [ "$(BUILD_TYPE)" = "Debug" ] && command -v ccache >/dev/null 2>&1; then \
-		echo "Using ccache to speed up Debug compilation"; \
-		CCACHE_ARG="-DCMAKE_C_COMPILER_LAUNCHER=ccache -DCMAKE_CXX_COMPILER_LAUNCHER=ccache"; \
-	else \
-		CCACHE_ARG=""; \
-	fi; \
-	cmake -B build -G Ninja -DCMAKE_CXX_COMPILER=clang++ -S . -DCMAKE_BUILD_TYPE=$(BUILD_TYPE) -DCMAKE_EXPORT_COMPILE_COMMANDS=ON $$CCACHE_ARG $${DEV_MODE:+-DDEV_MODE=1} 
+	@cmake -B build -G Ninja -DCMAKE_CXX_COMPILER=clang++ -S . -DCMAKE_BUILD_TYPE=$(BUILD_TYPE) -DCMAKE_EXPORT_COMPILE_COMMANDS=ON $${DEV_MODE:+-DDEV_MODE=1} 
 
 	@if [ ! -f "compile_commands.json" ]; then \
 		ln -s build/compile_commands.json .; \
@@ -81,6 +75,7 @@ build_openrgb:
 		echo "######################### Compiling OpenRGB ###########################" && \
 		echo "#######################################################################" && \
 		sed -i '/find_package(httplib CONFIG REQUIRED)/d' submodules/OpenRGB/CMakeLists.txt && \
+		sed -i '/pkg_check_modules(NLOHMANN_JSON REQUIRED nlohmann_json)/d' submodules/OpenRGB/CMakeLists.txt && \
 		sed -i '/-fprefetch-loop-arrays/d' submodules/OpenRGB/CMakeLists.txt && \
 		sed -i '/-G Ninja/ s|cmake |cmake -DCMAKE_CXX_COMPILER=clang++ |' submodules/OpenRGB/build.sh && \
 		cd submodules/OpenRGB && ./build.sh && \
