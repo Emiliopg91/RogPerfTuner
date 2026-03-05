@@ -1,4 +1,6 @@
 - version: 4.12.9-1
+  feature:
+  - Dev mode with bug report
 - version: 4.12.8-1
   fix:
   - OpenRGB compilation failures
