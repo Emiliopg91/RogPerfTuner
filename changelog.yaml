@@ -1,6 +1,7 @@
 - version: 4.12.8-1
   fix:
   - OpenRGB compilation failures
+  - OpenRGB patch
   improve:
   - Force clang++ for OpenRGB
   - Changelog generation
