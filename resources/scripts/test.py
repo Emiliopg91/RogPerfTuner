@@ -78,6 +78,15 @@ if os.getenv("GITHUB_ACTIONS", "false").lower() == "false":
     subprocess.run(
         [
             "docker",
+            "login",
+            "docker.io",
+        ],
+        check=True,
+    )
+
+    subprocess.run(
+        [
+            "docker",
             "push",
             "epulidogil/rog-perf-tuner-installer-test:latest",
         ],
