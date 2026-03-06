@@ -1,5 +1,6 @@
-.PHONY: clean config format build build_openrgb build_rccdc pkgbuild release build_debug run increase_version test
+.PHONY: clean config format build build_openrgb build_rccdc pkgbuild release build_debug run increase_version test install
 
+MAKEFLAGS += --no-print-directory
 NUM_CORES := $(shell nproc)
 BUILD_TYPE ?= Release
 MAKEFILE_DIR := $(dir $(realpath $(lastword $(MAKEFILE_LIST))))

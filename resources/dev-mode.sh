@@ -1,9 +1,13 @@
 #!/bin/bash
 
-echo "Identifying AUR helper..."
-helpers=("yay" "paru")
+HELPERS=("yay" "paru")
 AUR_HELPER=""
-for h in "${helpers[@]}"; do
+RPT_FOLDER="$HOME/.RogPerfTuner"
+DEV_FOLDER="$RPT_FOLDER/dev"
+
+echo "Identifying AUR helper..."
+
+for h in "${HELPERS[@]}"; do
     if command -v "$h" >/dev/null 2>&1; then
         AUR_HELPER="$h"
         break
@@ -19,31 +23,35 @@ if ! command -v gdb &> /dev/null; then
     $AUR_HELPER -S gdb
 fi
 
-if [ ! -d "$HOME/RogPerfTuner-Debug" ]; then
+if [ ! -d "$DEV_FOLDER" ]; then
     echo "Downloading source code..."
-    git clone https://github.com/Emiliopg91/RogPerfTuner "$HOME/RogPerfTuner-Debug"
-    cd $HOME/RogPerfTuner-Debug
+    git clone https://github.com/Emiliopg91/RogPerfTuner "$DEV_FOLDER"
+    cd "$DEV_FOLDER"
     git submodule update --init --recursive
 else
-    cd $HOME/RogPerfTuner-Debug
-    echo "Cleaning and updating project..."
-    make clean
-    git reset --hard
-    git pull
+    if [ "$1" = "true" ]; then
+        cd "$DEV_FOLDER"
+        echo "Cleaning and updating project..."
+        make clean
+        git reset --hard
+        git pull
+    fi
 fi
 
 echo "Compiling and running application..."
-cd ~/RogPerfTuner-Debug
-RCC_LOG_LEVEL=DEBUG make clean run
+cd "$DEV_FOLDER"
+
+make run
 EXIT_CODE=$?
 
-if [[ $EXIT_CODE -ne 0 && $EXIT_CODE -ne 130 ]]; then
-    echo ""
-    echo "Exited with exit code $EXIT_CODE. Gathering information..."
-    
-    mkdir -p ~/.RogPerfTuner/dump
-    cd ~/.RogPerfTuner
+echo ""
+echo "RogPerfTuner finished with status $EXIT_CODE"
+echo ""
 
+if [[ $EXIT_CODE -ne 0 && $EXIT_CODE -ne 130 ]]; then
+    echo "Exited with error. Gathering information..."
+    cd "$RPT_FOLDER"
+    mkdir dump
     if [ -f "config/config.yaml" ]; then
         cp config/config.yaml dump/config.yaml
     fi
@@ -54,14 +62,10 @@ if [[ $EXIT_CODE -ne 0 && $EXIT_CODE -ne 130 ]]; then
     
     echo "bt" | coredumpctl gdb > dump/gdb.txt
 
-    tar czf dump.tar.gz -C ~/.RogPerfTuner dump
-    cp dump.tar.gz ~/rog-perf-tuner-dump.tar.gz
+    tar czf ~/rog-perf-tuner-dump.tar.gz -C ~/.RogPerfTuner dump
 
-    echo ""
     echo "Dump report packaged in $HOME/rog-perf-tuner-dump.tar.gz"
-    echo "Create an issue in https://github.com/Emiliopg91/RogPerfTuner/issues and attach the file to it"
+    echo ""
 fi
-echo ""
-read -p 'Press Enter to exit...'
-exit
 
+read -p 'Press Enter to exit...'
