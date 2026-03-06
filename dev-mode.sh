@@ -29,18 +29,24 @@ if [ ! -d "$DEV_FOLDER" ]; then
     cd "$DEV_FOLDER"
     git submodule update --init --recursive
 else
-    cd "$DEV_FOLDER"
-    echo "Cleaning and updating project..."
-    make clean
-    git reset --hard
-    git pull
+    if [ "$1" = "true" ]; then
+        cd "$DEV_FOLDER"
+        echo "Cleaning and updating project..."
+        make clean
+        git reset --hard
+        git pull
+    fi
 fi
 
 echo "Compiling and running application..."
-cd "$RPT_FOLDER"
+cd "$DEV_FOLDER"
 
-RCC_LOG_LEVEL=DEBUG make clean run
+make run
 EXIT_CODE=$?
+
+echo ""
+echo "RogPerfTuner finished with status $EXIT_CODE"
+echo ""
 
 if [[ $EXIT_CODE -ne 0 && $EXIT_CODE -ne 130 ]]; then
     echo "Exited with error. Gathering information..."
@@ -59,5 +65,7 @@ if [[ $EXIT_CODE -ne 0 && $EXIT_CODE -ne 130 ]]; then
     tar czf ~/rog-perf-tuner-dump.tar.gz -C ~/.RogPerfTuner dump
 
     echo "Dump report packaged in $HOME/rog-perf-tuner-dump.tar.gz"
-    read -p 'Press Enter to exit...'
+    echo ""
 fi
+
+read -p 'Press Enter to exit...'
