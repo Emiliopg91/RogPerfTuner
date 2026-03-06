@@ -9,7 +9,7 @@ if [[ "$FIRST_LINE" =~ ^Merge ]]; then
 fi
 
 # Regex: opcional [ci skip], luego [prefijo obligatorio], luego espacio y mensaje no vacío
-if [[ "$FIRST_LINE" =~ ^(\[ci skip\])?\s*\[($REQUIRED_PREFIXES)\]\ .+ ]]; then
+if [[ "$FIRST_LINE" =~ ^(\[ci skip\])?\[($REQUIRED_PREFIXES)\]\ .+ ]]; then
     exit 0
 else
     echo "Invalid commit message"
