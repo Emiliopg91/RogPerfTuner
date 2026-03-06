@@ -60,7 +60,7 @@ jobs:
 
           if [[ -n $(git status --porcelain) ]]; then
             git add .
-            git commit -m "version: ${VERSION}-${RELEASE}"
+            git commit -m "[version] ${VERSION}-${RELEASE}"
             bash .githooks/post-commit
           fi
 

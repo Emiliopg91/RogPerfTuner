@@ -9,6 +9,8 @@ if len(sys.argv) != 2:
     sys.exit(1)
 
 ARG = sys.argv[1]
+if ARG.startswith("[ci skip]"):
+    ARG = ARG[9:]
 
 PROJ_PATH = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", ".."))
 YAML_PATH = os.path.join(PROJ_PATH, "changelog.yaml")
@@ -28,8 +30,8 @@ with open(YAML_PATH, "r", encoding="utf-8") as f:
 
 modified = False
 msg = None
-if ARG.startswith("version:"):
-    msg = ARG.replace("version:", "").strip()
+if ARG.startswith("[version]"):
+    msg = ARG[9:].strip()
     version, rel = msg.split("-")
     major, minor, patch = version.split(".")
     patch = str(int(patch) + 1)
@@ -38,10 +40,9 @@ if ARG.startswith("version:"):
     data = [{"version": msg}] + data
     modified = True
 else:
-    prefix = ARG.split(":")[0]
-
+    prefix = ARG.split(" ")[0][1:-1]
     if prefix in ORDER[1:]:
-        msg = ARG[len(prefix) + 1 :].strip()
+        msg = ARG[len(prefix) + 3 :].strip()
         entry = data[0]
         if entry.get(prefix, None) is None:
             entry[prefix] = []
