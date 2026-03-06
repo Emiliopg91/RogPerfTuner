@@ -29,13 +29,11 @@ if [ ! -d "$DEV_FOLDER" ]; then
     cd "$DEV_FOLDER"
     git submodule update --init --recursive
 else
-    if [ "$1" = "true" ]; then
-        cd "$DEV_FOLDER"
-        echo "Cleaning and updating project..."
-        make clean
-        git reset --hard
-        git pull
-    fi
+    cd "$DEV_FOLDER"
+    echo "Cleaning and updating project..."
+    make clean
+    git reset --hard
+    git pull
 fi
 
 echo "Compiling and running application..."
