@@ -34,3 +34,5 @@ compile_commands.json
 build-scan/
 
 *.pyc
+
+Dockerfile

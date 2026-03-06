@@ -1,17 +1,22 @@
-#!/bin/bash
-
 COMMIT_MSG_FILE="$1"
 FIRST_LINE=$(head -n 1 "$COMMIT_MSG_FILE")
 
-# Validar formato de commit
-echo "$FIRST_LINE" | grep -qE "^(\\[ci skip\\]|feature|fix|docs|test|chore|improve|version|changelog|refactor):" || {
-  echo "Invalid commit message"
-  echo "Valid prefixes: [ci skip] feature fix docs test chore improve version changelog refactor"
-  exit 1
-}
+REQUIRED_PREFIXES="fix|feature|docs|test|chore|improve|version|changelog|refactor"
 
-# Si es docs: no compilar
-if [[ "$FIRST_LINE" =~ ^changelog: ]]; then
-  echo "Changelog commit detected — skipping build"
-  exit 0
+# Si empieza por Merge -> válido
+if [[ "$FIRST_LINE" =~ ^Merge ]]; then
+    exit 0
+fi
+
+# Regex: opcional [ci skip], luego [prefijo obligatorio], luego espacio y mensaje no vacío
+if [[ "$FIRST_LINE" =~ ^(\[ci skip\])?\s*\[($REQUIRED_PREFIXES)\]\ .+ ]]; then
+    exit 0
+else
+    echo "Invalid commit message"
+    echo "Rules:"
+    echo " - Optional [ci skip] at the beginning"
+    echo " - Mandatory prefix: [fix], [feature], [docs], [test], [chore], [improve], [version], [changelog], [refactor]"
+    echo " - A space and a non-empty message after the mandatory prefix"
+    echo " - Commits starting with 'Merge' are valid"
+    exit 1
 fi
