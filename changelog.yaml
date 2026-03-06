@@ -3,6 +3,8 @@
   - Removed test
   feature:
   - Dev mode with bug report
+  improve:
+  - Dev mode script
 - version: 4.12.8-1
   fix:
   - OpenRGB compilation failures
