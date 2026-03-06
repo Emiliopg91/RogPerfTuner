@@ -9,8 +9,10 @@ if len(sys.argv) != 2:
     sys.exit(1)
 
 ARG = sys.argv[1]
+ci_skip = False
 if ARG.startswith("[ci skip]"):
     ARG = ARG[9:]
+    ci_skip = True
 
 PROJ_PATH = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", ".."))
 YAML_PATH = os.path.join(PROJ_PATH, "changelog.yaml")
@@ -58,5 +60,10 @@ if modified:
     with open(YAML_PATH, "w", encoding="utf-8") as f:
         yaml.dump(data, f, sort_keys=False)
 
+    commit_msg = "[changelog]"
+    if ci_skip:
+        commit_msg = "[ci skip]" + commit_msg
+    commit_msg = commit_msg + " " + msg
+
     subprocess.run(["git", "add", os.path.basename(YAML_PATH)], check=False)
-    subprocess.run(["git", "commit", "-m", f"[changelog] {msg}"], check=False)
+    subprocess.run(["git", "commit", "-m", commit_msg], check=False)
