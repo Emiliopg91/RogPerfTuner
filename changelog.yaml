@@ -1,191 +1,192 @@
 - version: 4.12.9-1
   fix:
-    - Removed test
+  - Removed test
   feature:
-    - Dev mode with bug report
+  - Dev mode with bug report
   improve:
-    - Dev mode script
+  - Dev mode script
+  - Test, hooks and changelog
 - version: 4.12.8-1
   fix:
-    - OpenRGB compilation failures
-    - OpenRGB patch
+  - OpenRGB compilation failures
+  - OpenRGB patch
   improve:
-    - Force clang++ for OpenRGB
-    - Changelog generation
-    - Optimization flags
+  - Force clang++ for OpenRGB
+  - Changelog generation
+  - Optimization flags
 - version: 4.12.6-1
   fix:
-    - Tests pre push
+  - Tests pre push
   improve:
-    - Automatice changelog
-    - Changelog description
-    - Format
-    - Git hooks
-    - Workflows
+  - Automatice changelog
+  - Changelog description
+  - Format
+  - Git hooks
+  - Workflows
 - version: 4.12.5-1
   fix:
-    - Compilation issue due to httplib.h
+  - Compilation issue due to httplib.h
 - version: 4.12.4-1
   improve:
-    - Restored fan curve edition for SMART mode
-    - Unix socket management in connection
-    - SCX schedulers with powersave and performance options
-    - CCache for compilation
-    - Sockets location
+  - Restored fan curve edition for SMART mode
+  - Unix socket management in connection
+  - SCX schedulers with powersave and performance options
+  - CCache for compilation
+  - Sockets location
 - version: 4.12.3-1
   feature:
-    - SSD scheduler support
+  - SSD scheduler support
   improve:
-    - Refactor
+  - Refactor
 - version: 4.12.1-1
   feature:
-    - Git veresion for aur
+  - Git veresion for aur
   improve:
-    - Refactor
-    - Game suggestions from remote
-    - Fan curves normalization
+  - Refactor
+  - Game suggestions from remote
+  - Fan curves normalization
 - version: 4.12.0-1
   feature:
-    - Game configuration suggestions
+  - Game configuration suggestions
   improve:
-    - Proton detection on first run
+  - Proton detection on first run
 - version: 4.11.6-1
   feature:
-    - Customization on cooling removed
+  - Customization on cooling removed
 - version: 4.11.5-1
   fix:
-    - No binaries folder/scripts generated
+  - No binaries folder/scripts generated
   feature:
-    - Show GUI shortcut
+  - Show GUI shortcut
 - version: 4.11.4-1
   improve:
-    - Adjustments on SMART profile ramp
-    - Refactor
+  - Adjustments on SMART profile ramp
+  - Refactor
 - version: 4.11.3-1
   fix:
-    - Disable cooler settings on SMART mode
+  - Disable cooler settings on SMART mode
 - version: 4.11.2-1
   fix:
-    - Force mangohud-git to fix some metrics level on Vulkan games
-    - Regression for flatpak wrapper
+  - Force mangohud-git to fix some metrics level on Vulkan games
+  - Regression for flatpak wrapper
 - version: 4.11.0-2
   fix:
-    - Missing Git push
+  - Missing Git push
 - version: 4.11.0-1
   feature:
-    - Smart performance mode
+  - Smart performance mode
   improve:
-    - Refactor
+  - Refactor
 - version: 4.10.9-1
   improve:
-    - Refactor
+  - Refactor
 - version: 4.10.8-1
   fix:
-    - Fallback DETAILED in MangoHud
+  - Fallback DETAILED in MangoHud
   improve:
-    - Refactor
+  - Refactor
 - version: 4.10.7-1
   improve:
-    - Optimizations
+  - Optimizations
 - version: 4.10.6-1
   improve:
-    - Optimizations
+  - Optimizations
 - version: 4.10.5-1
   improve:
-    - Enums refactor
+  - Enums refactor
 - version: 4.10.4-1
   improve:
-    - Build optimizations
+  - Build optimizations
 - version: 4.10.3-1
   improve:
-    - Build optimizations
+  - Build optimizations
 - version: 4.10.2-1
   improve:
-    - Smart pointer refactor
-    - Intel CPU power drain
-    - Source optimizations and build flags
+  - Smart pointer refactor
+  - Intel CPU power drain
+  - Source optimizations and build flags
 - version: 4.10.1-1
   feature:
-    - systemd-inhibit integration
+  - systemd-inhibit integration
   improve:
-    - Remove enrolment
-    - Curl as HTTP client
+  - Remove enrolment
+  - Curl as HTTP client
 - version: 4.10.0-1
   improve:
-    - Embeded dependencies
+  - Embeded dependencies
 - version: 4.9.3-1
   improve:
-    - Default scheduler detection
+  - Default scheduler detection
 - version: 4.9.2-1
   feature:
-    - Added Beerland CPU scheduler
-    - Option to enable/disable minimized startup
+  - Added Beerland CPU scheduler
+  - Option to enable/disable minimized startup
   improve:
-    - Code cleanup and refactor
+  - Code cleanup and refactor
 - version: 4.9.1-1
   fix:
-    - Elevated authentication on scxctl commands
+  - Elevated authentication on scxctl commands
 - version: 4.9.0-1
   improve:
-    - Refactor of changelog view
-    - Stats
+  - Refactor of changelog view
+  - Stats
 - version: 4.8.9-1
   fix:
-    - Solved file descriptor leak
+  - Solved file descriptor leak
   improve:
-    - Removed debug traces
+  - Removed debug traces
 - version: 4.8.8-1
   feature:
-    - Ready for Steam Machine when release
+  - Ready for Steam Machine when release
   improve:
-    - Redesign of game config dialog
+  - Redesign of game config dialog
 - version: 4.8.7-1
   fix:
-    - Fixed (again) reload after update
+  - Fixed (again) reload after update
 - version: 4.8.6-1
   fix:
-    - Wait for update finished to reload application
-    - Fix CMake error on OpenRGB-cppSDK when doxygen is installed
+  - Wait for update finished to reload application
+  - Fix CMake error on OpenRGB-cppSDK when doxygen is installed
   feature:
-    - CLI help menu
+  - CLI help menu
 - version: 4.8.5-1
   improve:
-    - Ensure proper pipe lifecycle
+  - Ensure proper pipe lifecycle
 - version: 4.8.4-1
   fix:
-    - Fix broken pipe with Decky plugin
+  - Fix broken pipe with Decky plugin
 - version: 4.8.3-1
   fix:
-    - Fix changelog view on update
+  - Fix changelog view on update
 - version: 4.8.2-1
   fix:
-    - Battery limit error if not supported
+  - Battery limit error if not supported
   improve:
-    - UI auto-adjustment
+  - UI auto-adjustment
 - version: 4.8.1-1
   fix:
-    - Restored Gaming effect functionality on laptops
+  - Restored Gaming effect functionality on laptops
   improve:
-    - Battery charge limit moved from DBus to file
-    - Refactor to ensure code quality
+  - Battery charge limit moved from DBus to file
+  - Refactor to ensure code quality
 - version: 4.8.0-2
   fix:
-    - Missing cpp-httplib-compiled and nlohmann-json dependencies
+  - Missing cpp-httplib-compiled and nlohmann-json dependencies
 - version: 4.8.0-1
   feature:
-    - Support for AMD CPUs and GPUs
+  - Support for AMD CPUs and GPUs
   improve:
-    - DBus armoury interface migrated to asus-armoury module firmware-attributes
+  - DBus armoury interface migrated to asus-armoury module firmware-attributes
 - version: 4.7.2-1
   improve:
-    - Changelog for releases
+  - Changelog for releases
 - version: 4.7.1-1
   feature:
-    - New version of Decky plugin
-    - Games artwork in list and settings view
-    - Showing changelog when update is available
+  - New version of Decky plugin
+  - Games artwork in list and settings view
+  - Showing changelog when update is available
   improve:
-    - Hide OpenRGB warning on compile related to usage of --pipe and --save-temps
+  - Hide OpenRGB warning on compile related to usage of --pipe and --save-temps
 - version: 4.7.0-2
   fix:
-    - Prevent RGB hangs when reconnecting devices
+  - Prevent RGB hangs when reconnecting devices
