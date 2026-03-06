@@ -49,8 +49,12 @@ class Configuration : public Singleton<Configuration<T>>, Loggable {
 				LoggerProvider::setConfigMap(config->logger);
 			} catch (const std::exception& e) {
 				logger->error("Error loading settings: {}", e.what());
+				logger->error("Creating new config file");
+				FileUtils::copy(configFile, configFile + ".bk");
+				FileUtils::remove(configFile);
 			}
-		} else {
+		}
+		if (!FileUtils::exists(configFile)) {
 			logger->debug("Settings file not found, creating new");
 			FileUtils::createDirectory(configDir);
 
