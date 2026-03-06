@@ -59,4 +59,4 @@ if modified:
         yaml.dump(data, f, sort_keys=False)
 
     subprocess.run(["git", "add", os.path.basename(YAML_PATH)], check=False)
-    subprocess.run(["git", "commit", "-m", f"changelog: {msg}"], check=False)
+    subprocess.run(["git", "commit", "-m", f"[changelog] {msg}"], check=False)
