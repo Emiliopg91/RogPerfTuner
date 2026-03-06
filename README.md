@@ -103,7 +103,11 @@ Do you want something similar for Asus Rog Ally/Ally X? Check [AllyDeckyCompanio
 
 ### AUR
 
-AUR package is available as rog-perf-tuner.
+Mainline AUR package is available as **rog-perf-tuner**.
+
+If you prefer bleeding-edge version with latest features, fixes and improvements you can install **rog-perf-tuner-git**.
+
+
 Install it using your favourite AUR helper and you'll get every dependency installed.
 
 ### Steam and DeckyLoader integration
