@@ -1,6 +1,8 @@
 - version: 4.12.10-1
   fix:
   - FanCurve preset configuration fix and fallback if failure
+  improve:
+  - updated submodules
 - version: 4.12.9-1
   fix:
   - Removed test
