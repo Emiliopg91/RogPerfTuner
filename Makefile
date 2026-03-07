@@ -150,6 +150,6 @@ update_submodules: clean
 			echo "#### Updating $$path"; \
 			branch=$$(git config --file .gitmodules --get submodule.$$path.branch); \
 			[ -z "$$branch" ] && branch="main"; \
-			cd $$path && git checkout $$branch && git pull && cd - >/dev/null; \
+			cd $$path && git checkout $$branch >/dev/null && git pull >/dev/null && cd - >/dev/null; \
 		fi; \
 	done
