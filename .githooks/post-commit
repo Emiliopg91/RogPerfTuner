@@ -1,4 +1,0 @@
-#!/bin/sh
-
-COMMIT_MSG=$(git log -1 --pretty=%B)
-python ./resources/scripts/changelog.py "$COMMIT_MSG"
