@@ -11,12 +11,16 @@
 [submodule "submodules/yaml-cpp"]
 	path = submodules/yaml-cpp
 	url = https://github.com/jbeder/yaml-cpp
+	branch = master
 [submodule "submodules/magic_enum"]
 	path = submodules/magic_enum
 	url = https://github.com/Neargye/magic_enum
+	branch = master
 [submodule "submodules/nlohmann-json"]
 	path = submodules/nlohmann-json
 	url = https://github.com/nlohmann/json
+	branch = develop
 [submodule "submodules/httplib"]
 	path = submodules/httplib
 	url = https://github.com/yhirose/cpp-httplib
+	branch = master

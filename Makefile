@@ -6,6 +6,7 @@ BUILD_TYPE ?= Release
 MAKEFILE_DIR := $(dir $(realpath $(lastword $(MAKEFILE_LIST))))
 PATCH_DIR := patches
 SUBMODULE_DIR := submodules
+EXCLUDED_SUBMODULES := submodules/OpenRGB-cppSDK submodules/OpenRGB submodules/RccDeckyCompanion 
 
 clean:
 	@echo "#######################################################################"
@@ -138,3 +139,17 @@ install: clean
 	@printf '    cd $$cur\n' >> dist/PKGBUILD
 	@printf '}\n' >> dist/PKGBUILD
 	@cd dist && mv rog-perf-tuner.install rog-perf-tuner-git.install && makepkg -si
+
+update_submodules: clean
+	@for path in $$(git config --file .gitmodules --get-regexp path | awk '{print $$2}'); do \
+		skip=0; \
+		for ex in $(EXCLUDED_SUBMODULES); do \
+			if [ "$$path" = "$$ex" ]; then skip=1; fi; \
+		done; \
+		if [ $$skip -eq 0 ]; then \
+			echo "#### Updating $$path"; \
+			branch=$$(git config --file .gitmodules --get submodule.$$path.branch); \
+			[ -z "$$branch" ] && branch="main"; \
+			cd $$path && git checkout $$branch && git pull && cd - >/dev/null; \
+		fi; \
+	done
