@@ -8,6 +8,7 @@
 [submodule "submodules/RccDeckyCompanion"]
 	path = submodules/RccDeckyCompanion
 	url = https://github.com/Emiliopg91/RccDeckyCompanion
+	branch = main
 [submodule "submodules/yaml-cpp"]
 	path = submodules/yaml-cpp
 	url = https://github.com/jbeder/yaml-cpp
