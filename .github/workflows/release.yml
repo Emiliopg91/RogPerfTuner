@@ -1,77 +1,54 @@
-name: Release
-run-name: Release ${{ inputs.version }}-${{ inputs.release }}
-
 on:
-  workflow_dispatch:
-    inputs:
-      version:
-        description: "Version to publish"
-        required: false
-        type: string
-      release:
-        description: "Release version"
-        required: false
-        type: string
-        default: "1"
-
-concurrency:
-  group: ${{ github.workflow }}
-  cancel-in-progress: true
+  push:
+    tags:
+      - "*.*.*-*"
 
 jobs:
-  compile_and_release:
+  release:
     runs-on: ubuntu-latest
-    outputs:
-      version: ${{ steps.get_version.outputs.version }}
+
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
         with:
-          submodules: recursive
           fetch-depth: 0
 
-      - name: Configure Git user
+      - name: Validate tag and extract version
         run: |
-          git config user.name "GitHub Actions"
-          git config user.email "actions@github.com"
+          TAG="${GITHUB_REF_NAME}"
 
-      - name: Test
-        run: |
-          make test
+          if [[ "$TAG" =~ ^([0-9]+\.[0-9]+\.[0-9]+)-([0-9]+)$ ]]; then
+            VERSION="${BASH_REMATCH[1]}"
+            RELEASE="${BASH_REMATCH[2]}"
+          else
+            echo "Invalid tag format: $TAG"
+            echo "Expected: x.y.z-r (numeric)"
+            exit 1
+          fi
+
+          echo "VERSION=$VERSION" >> "$GITHUB_ENV"
+          echo "RELEASE=$RELEASE" >> "$GITHUB_ENV"
+          echo "TAG=$TAG" >> "$GITHUB_ENV"
+
+          echo "VERSION=$VERSION"
+          echo "RELEASE=$RELEASE"
 
       - name: Version bump
         run: |
-          if [ -n "${{ github.event.inputs.version }}" ]; then
-            echo "Updating version in CMakeLists.txt to '${{ github.event.inputs.version }}'..."
-            sed -i -E "s/(project\\([^)]*VERSION )[0-9]+\\.[0-9]+\\.[0-9]+/\\1${{ github.event.inputs.version }}/" CMakeLists.txt
-            VERSION="${{ github.event.inputs.version }}"
-          else
-            echo "No version provided — running 'make increase_version'..."
-            make increase_version
-            VERSION=$(grep -oP '(?<=VERSION )\d+\.\d+\.\d+' CMakeLists.txt)
-          fi
+          echo "Updating version in CMakeLists.txt to '${VERSION}'..."
 
-          RELEASE="${{ github.event.inputs.release }}"
-          TAG="${VERSION}-${RELEASE}"
+          sed -i -E "s/(project\([^)]*VERSION )[0-9]+\.[0-9]+\.[0-9]+/\1${VERSION}/" CMakeLists.txt
 
-          echo "VERSION=$VERSION" >> $GITHUB_ENV
-          echo "RELEASE=$RELEASE" >> $GITHUB_ENV
-          echo "TAG=$TAG" >> $GITHUB_ENV
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
 
           if [[ -n $(git status --porcelain) ]]; then
             git add .
-            git commit -m "[version] ${VERSION}-${RELEASE}"
-            bash .githooks/post-commit
+            git commit -m "[chore] ${VERSION}-${RELEASE}"
           fi
 
-      - name: Validate version
-        run: |
-          if git rev-parse "refs/tags/${VERSION}-${RELEASE}" >/dev/null 2>&1; then
-            echo "❌ Tag '${VERSION}-${RELEASE}' already exists. Please bump the version."
-            exit 1
-          else
-            echo "✅ Tag '${VERSION}-${RELEASE}' does not exist. Continuing..."
-          fi
+          git push origin HEAD:main
+          git push origin HEAD:develop --force
 
       - name: Process release
         run: |
@@ -85,13 +62,18 @@ jobs:
           mkdir -p ~/.ssh
           echo "$AUR_SSH_PRIVATE_KEY" > ~/.ssh/aur
           chmod 600 ~/.ssh/aur
-          echo -e "Host aur.archlinux.org\n\tIdentityFile ~/.ssh/aur\n\tUser aur\n\tStrictHostKeyChecking no" >> ~/.ssh/config
+
+          cat >> ~/.ssh/config <<EOF
+          Host aur.archlinux.org
+            IdentityFile ~/.ssh/aur
+            User aur
+            StrictHostKeyChecking no
+          EOF
 
           echo "Cloning AUR repository..."
           git clone ssh://aur@aur.archlinux.org/rog-perf-tuner.git aur_repo
           cd aur_repo
 
-          echo "Configuring Git identity..."
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
 
@@ -102,14 +84,8 @@ jobs:
 
           echo "Committing changes..."
           git add PKGBUILD .SRCINFO rog-perf-tuner.install
-          git diff-index --quiet HEAD || git commit -m "Release ${GITHUB_REF_NAME}"
+          git diff-index --quiet HEAD || git commit -m "Release ${TAG}"
           git push
-
-      - name: Create tag
-        run: |
-          git tag "${{ env.TAG }}"
-          git push origin main
-          git push origin main:develop --force
 
       - name: Create GitHub release
         uses: softprops/action-gh-release@v2
@@ -117,8 +93,5 @@ jobs:
           tag_name: ${{ env.TAG }}
           name: ${{ env.TAG }}
           body_path: dist/changelog.md
-          files: |
-            dist/PKGBUILD
-            dist/rog-perf-tuner.install
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

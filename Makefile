@@ -131,7 +131,7 @@ install: clean
 	@export GIT_RELEASE=1 && make release
 	@printf '\nprepare() {\n' >> dist/PKGBUILD
 	@printf '    rm -Rf "$$srcdir/RogPerfTuner/*"\n' >> dist/PKGBUILD
-	@printf "    rsync -a --exclude='dist' /var/mnt/Datos/Desarrollo/Workspace/VSCode/RogPerfTuner/ \"\$$srcdir/RogPerfTuner/\"\n" >> dist/PKGBUILD
+	@printf "    rsync -a --exclude='dist' $(MAKEFILE_DIR) \"\$$srcdir/RogPerfTuner/\"\n" >> dist/PKGBUILD
 	@printf '    cur=$$(pwd)\n' >> dist/PKGBUILD
 	@printf '    cd "$$srcdir/RogPerfTuner/"\n' >> dist/PKGBUILD
 	@printf '    rm -Rf "$$srcdir/RogPerfTuner/submodules/RccDeckyCompanion/node_modules"\n' >> dist/PKGBUILD

@@ -26,41 +26,75 @@ CHANGELOG_MD_FILE = os.path.abspath(
 
 
 def generate_changelog(rel_version, rel_release):
-    with open(CHANGELOG_YAML_FILE, "r", encoding="utf-8") as f:
-        releases = yaml.safe_load(f)
+    TAG_REGEX = re.compile(r"^\d+\.\d+\.\d+-\d+$")
+
+    def run_git(cmd):
+        return subprocess.check_output(cmd, text=True).strip()
+
+    def get_last_version_tag():
+        tags = run_git(["git", "tag", "--sort=-creatordate"]).splitlines()
+
+        for tag in tags:
+            if TAG_REGEX.match(tag):
+                return tag
+        return None
+
+    def get_commits_since_tag(tag):
+        if not tag:
+            cmd = ["git", "log", "--pretty=format:%H %s"]
+        else:
+            cmd = ["git", "log", f"{tag}..HEAD", "--pretty=format:%H----%s"]
+
+        return run_git(cmd).splitlines()
+
+    tag = get_last_version_tag()
+    commits = get_commits_since_tag(tag)
+
+    entries = {"feature": [], "improve": [], "fix": []}
+
+    for c in commits:
+        commit_hash, msg = c.split("----")
+        msg = msg.replace("[ci skip]", "").strip()
+
+        for typeEntry, typeEntries in entries.items():
+            if msg.startswith(f"[{typeEntry}]"):
+                typeEntries.append(
+                    f"[`{commit_hash[0:7]}`](https://github.com/Emiliopg91/RogPerfTuner/commit/{commit_hash})|{msg.replace(f"[{typeEntry}]", "").strip().capitalize()}"
+                )
+
+    lines: list[str] = [
+        (
+            f"# Changes for {rel_version}-{rel_release}"
+            if len(entries.get("feature")) > 0
+            or len(entries.get("improve")) > 0
+            or len(entries.get("fix")) > 0
+            else "# No changelog available"
+        )
+    ]
+
+    if len(entries.get("feature")) > 0:
+        lines.append("## New features")
+        lines.append("| Commit | Description |")
+        lines.append("|-------|---------|")
+        for f in entries.get("feature"):
+            lines.append(f"{f}")
+
+    if len(entries.get("improve")) > 0:
+        lines.append("## Improvements")
+        lines.append("| Commit | Description |")
+        lines.append("|-------|---------|")
+        for f in entries.get("improve"):
+            lines.append(f"{f}")
+
+    if len(entries.get("fix")) > 0:
+        lines.append("## Bug fixes")
+        lines.append("| Commit | Description |")
+        lines.append("|-------|---------|")
+        for f in entries.get("fix"):
+            lines.append(f"{f}")
 
     if os.path.exists(CHANGELOG_MD_FILE):
         os.unlink(CHANGELOG_MD_FILE)
-
-    lines: list[str] = ["No changelog available"]
-
-    for i in range(len(releases)):
-        if releases[i].get("version") == f"{rel_version}-{rel_release}":
-            lines.clear()
-
-            if (
-                releases[i].get("feature") is not None
-                and len(releases[i].get("feature")) > 0
-            ):
-                lines.append("# New features")
-                for f in releases[i].get("feature"):
-                    lines.append(f"- {f}")
-
-            if (
-                releases[i].get("improve") is not None
-                and len(releases[i].get("improve")) > 0
-            ):
-                lines.append("# Improvements")
-                for f in releases[i].get("improve"):
-                    lines.append(f"- {f}")
-
-            if releases[i].get("fix") is not None and len(releases[i].get("fix")) > 0:
-                lines.append("# Bug fixes")
-                for f in releases[i].get("fix"):
-                    lines.append(f"- {f}")
-
-            break
-
     with open(CHANGELOG_MD_FILE, "w", encoding="utf-8") as f:
         f.write("\n".join(lines))
 
