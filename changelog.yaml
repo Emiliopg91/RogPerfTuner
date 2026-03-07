@@ -1,3 +1,4 @@
+- version: 4.12.11-1
 - version: 4.12.10-1
   fix:
   - FanCurve preset configuration fix and fallback if failure
