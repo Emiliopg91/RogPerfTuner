@@ -36,6 +36,10 @@ jobs:
           echo "VERSION=$VERSION"
           echo "RELEASE=$RELEASE"
 
+      - name: Test
+        run: |
+          make test clean
+
       - name: Version bump
         run: |
           echo "Updating version in CMakeLists.txt to '${VERSION}'..."
@@ -46,7 +50,7 @@ jobs:
           git config user.email "github-actions[bot]@users.noreply.github.com"
 
           if [[ -n $(git status --porcelain) ]]; then
-            git add .
+            git add CMakeLists.txt
             git commit -m "[chore] ${VERSION}-${RELEASE}"
           fi
 
@@ -55,7 +59,7 @@ jobs:
 
       - name: Process release
         run: |
-          make release
+          make clean release
 
       - name: Publish to AUR
         env:
