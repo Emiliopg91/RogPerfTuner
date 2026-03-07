@@ -34,7 +34,7 @@ Translator::Translator(const std::string& translation_file) : Loggable("Translat
 
 	for (auto it = root.begin(); it != root.end(); ++it) {
 		const std::string key = it->first.as<std::string>();
-		const auto& value	  = it->second;
+		const auto value	  = it->second;
 
 		std::string val = key;
 		if (value[toString(currentLang)]) {
