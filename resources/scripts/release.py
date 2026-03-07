@@ -31,12 +31,14 @@ def generate_changelog(rel_version, rel_release):
     def run_git(cmd):
         return subprocess.check_output(cmd, text=True).strip()
 
-    def get_last_version_tag():
+    def get_previous_version_tag():
         tags = run_git(["git", "tag", "--sort=-creatordate"]).splitlines()
 
-        for tag in tags:
-            if TAG_REGEX.match(tag):
-                return tag
+        matched_tags = [tag for tag in tags if TAG_REGEX.match(tag)]
+
+        if len(matched_tags) >= 2:
+            print(matched_tags[1])
+            return matched_tags[1]
         return None
 
     def get_commits_since_tag(tag):
@@ -47,7 +49,7 @@ def generate_changelog(rel_version, rel_release):
 
         return run_git(cmd).splitlines()
 
-    tag = get_last_version_tag()
+    tag = get_previous_version_tag()
     commits = get_commits_since_tag(tag)
 
     entries = {"feature": [], "improve": [], "fix": []}
