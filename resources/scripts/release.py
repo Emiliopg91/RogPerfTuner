@@ -39,27 +39,24 @@ def generate_changelog(rel_version, rel_release):
             lines.clear()
 
             if (
-                releases[i].get("features") is not None
-                and len(releases[i].get("features")) > 0
+                releases[i].get("feature") is not None
+                and len(releases[i].get("feature")) > 0
             ):
                 lines.append("# New features")
-                for f in releases[i].get("features"):
+                for f in releases[i].get("feature"):
                     lines.append(f"- {f}")
 
             if (
-                releases[i].get("improvements") is not None
-                and len(releases[i].get("improvements")) > 0
+                releases[i].get("improve") is not None
+                and len(releases[i].get("improve")) > 0
             ):
                 lines.append("# Improvements")
-                for f in releases[i].get("improvements"):
+                for f in releases[i].get("improve"):
                     lines.append(f"- {f}")
 
-            if (
-                releases[i].get("fixes") is not None
-                and len(releases[i].get("fixes")) > 0
-            ):
+            if releases[i].get("fix") is not None and len(releases[i].get("fix")) > 0:
                 lines.append("# Bug fixes")
-                for f in releases[i].get("fixes"):
+                for f in releases[i].get("fix"):
                     lines.append(f"- {f}")
 
             break
