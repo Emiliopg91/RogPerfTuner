@@ -31,7 +31,7 @@ jobs:
       - name: Test
         if: github.event_name != 'workflow_run'
         run: |
-          make clean test
+          GIT_RELEASE=1 make clean test
 
       - name: Perform release
         run: |
