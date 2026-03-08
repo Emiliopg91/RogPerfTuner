@@ -48,8 +48,11 @@ jobs:
           RUN_ID=$GITHUB_RUN_ID
           REPO=$GITHUB_REPOSITORY
 
-          gh api -X PATCH /repos/$REPO/actions/runs/$RUN_ID \
-            -F name="Release rog-perf-tuner $TAG"
+          curl -s -X PATCH \
+            -H "Accept: application/vnd.github+json" \
+            -H "Authorization: Bearer $GITHUB_TOKEN" \
+            https://api.github.com/repos/$REPO/actions/runs/$RUN_ID \
+            -d "{\"name\": \"Release rog-perf-tuner v$VERSION\"}"
 
       - name: Test
         run: |
