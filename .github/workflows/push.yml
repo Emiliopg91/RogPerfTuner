@@ -16,8 +16,6 @@ concurrency:
 jobs:
   compile_and_release:
     runs-on: ubuntu-latest
-    outputs:
-      version: ${{ steps.get_version.outputs.version }}
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -29,28 +27,6 @@ jobs:
         run: |
           git config user.name "GitHub Actions"
           git config user.email "actions@github.com"
-
-      - name: Get version
-        id: get_version
-        run: |
-          GIT_RELEASE=1 make release
-          VERSION=$(grep pkgver dist/PKGBUILD | cut -d'=' -f2)
-          echo "version=$VERSION" >> $GITHUB_OUTPUT
-
-      - name: Rename workflow run
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          VERSION: ${{ steps.get_version.outputs.version }}
-        run: |
-          echo "Renaming workflow run to include version $VERSION..."
-          RUN_ID=$GITHUB_RUN_ID
-          REPO=$GITHUB_REPOSITORY
-
-          curl -s -X PATCH \
-            -H "Accept: application/vnd.github+json" \
-            -H "Authorization: Bearer $GITHUB_TOKEN" \
-            https://api.github.com/repos/$REPO/actions/runs/$RUN_ID \
-            -d "{\"name\": \"Release rog-perf-tuner-git v$VERSION\"}"
 
       - name: Test
         if: github.event_name != 'workflow_run'
@@ -65,8 +41,6 @@ jobs:
         env:
           AUR_SSH_PRIVATE_KEY: ${{ secrets.AUR_SSH_PRIVATE_KEY }}
         run: |
-          VERSION="${{ steps.get_version.outputs.version }}"
-
           echo "Setting SSH key for AUR..."
           mkdir -p ~/.ssh
           echo "$AUR_SSH_PRIVATE_KEY" > ~/.ssh/aur

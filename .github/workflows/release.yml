@@ -40,20 +40,6 @@ jobs:
           echo "VERSION=$VERSION"
           echo "RELEASE=$RELEASE"
 
-      - name: Rename workflow run
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: |
-          echo "Renaming workflow run to include version $TAG..."
-          RUN_ID=$GITHUB_RUN_ID
-          REPO=$GITHUB_REPOSITORY
-
-          curl -s -X PATCH \
-            -H "Accept: application/vnd.github+json" \
-            -H "Authorization: Bearer $GITHUB_TOKEN" \
-            https://api.github.com/repos/$REPO/actions/runs/$RUN_ID \
-            -d "{\"name\": \"Release rog-perf-tuner v$VERSION\"}"
-
       - name: Test
         run: |
           make test clean
