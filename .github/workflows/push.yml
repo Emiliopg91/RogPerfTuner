@@ -41,6 +41,8 @@ jobs:
         env:
           AUR_SSH_PRIVATE_KEY: ${{ secrets.AUR_SSH_PRIVATE_KEY }}
         run: |
+          VERSION=$(grep pkgver dist/PKGBUILD | cut -d'=' -f2)
+
           echo "Setting SSH key for AUR..."
           mkdir -p ~/.ssh
           echo "$AUR_SSH_PRIVATE_KEY" > ~/.ssh/aur
@@ -62,5 +64,5 @@ jobs:
 
           echo "Committing changes..."
           git add PKGBUILD .SRCINFO rog-perf-tuner-git.install
-          git diff-index --quiet HEAD || git commit -m "Release $VERSION-1"
+          git diff-index --quiet HEAD || git commit -m "Release ${VERSION}-1"
           git push
