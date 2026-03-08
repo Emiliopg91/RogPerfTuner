@@ -1,8 +1,9 @@
-name: Release
+name: Release rog-perf-tuner
 
 on:
   push:
     tags:
+      - "*.*.*"
       - "*.*.*-*"
 
 jobs:
@@ -23,9 +24,12 @@ jobs:
           if [[ "$TAG" =~ ^([0-9]+\.[0-9]+\.[0-9]+)-([0-9]+)$ ]]; then
             VERSION="${BASH_REMATCH[1]}"
             RELEASE="${BASH_REMATCH[2]}"
+          elif [[ "$TAG" =~ ^([0-9]+\.[0-9]+\.[0-9]+)$ ]]; then
+            VERSION="${BASH_REMATCH[1]}"
+            RELEASE=1
           else
             echo "Invalid tag format: $TAG"
-            echo "Expected: x.y.z-r (numeric)"
+            echo "Expected: x.y.z or x.y.z-r (numeric)"
             exit 1
           fi
 
@@ -35,6 +39,17 @@ jobs:
 
           echo "VERSION=$VERSION"
           echo "RELEASE=$RELEASE"
+
+      - name: Rename workflow run
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          echo "Renaming workflow run to include version $TAG..."
+          RUN_ID=$GITHUB_RUN_ID
+          REPO=$GITHUB_REPOSITORY
+
+          gh api -X PATCH /repos/$REPO/actions/runs/$RUN_ID \
+            -F name="Release rog-perf-tuner $TAG"
 
       - name: Test
         run: |
