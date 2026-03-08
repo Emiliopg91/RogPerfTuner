@@ -64,5 +64,5 @@ jobs:
 
           echo "Committing changes..."
           git add PKGBUILD .SRCINFO rog-perf-tuner-git.install
-          git diff-index --quiet HEAD || git commit -m "Release ${VERSION}-1"
+          git diff-index --quiet HEAD || git commit -m "Release $VERSION-1"
           git push
