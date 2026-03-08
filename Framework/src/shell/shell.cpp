@@ -269,8 +269,6 @@ pid_t Shell::launch_in_terminal(const std::string& userCommand, bool detatch, bo
 
 	auto cmd = userCommand;
 
-	argv.push_back(const_cast<char*>("/bin/bash"));
-	argv.push_back(const_cast<char*>("-c"));
 	argv.push_back(const_cast<char*>(cmd.c_str()));
 	argv.push_back(nullptr);
 

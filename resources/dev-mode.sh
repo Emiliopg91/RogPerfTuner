@@ -3,7 +3,7 @@
 HELPERS=("yay" "paru")
 AUR_HELPER=""
 RPT_FOLDER="$HOME/.RogPerfTuner"
-DEV_FOLDER="$RPT_FOLDER/dev"
+DEV_FOLDER="/tmp/rog-perf-tuner-dev"
 
 echo "Identifying AUR helper..."
 
@@ -39,7 +39,7 @@ fi
 echo "Compiling and running application..."
 cd "$DEV_FOLDER"
 
-make run
+RCC_LOG_LEVEL=DEBUG make run
 EXIT_CODE=$?
 
 echo ""
