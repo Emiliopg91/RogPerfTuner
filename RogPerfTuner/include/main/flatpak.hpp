@@ -1,3 +1,6 @@
+#pragma once
+#ifdef STEAM_SUPPORT
+
 #include <fcntl.h>
 #include <linux/prctl.h>
 #include <sys/prctl.h>
@@ -87,3 +90,4 @@ inline int runFlatpakWrapping(int argc, char* argv[]) {
 
 	return WEXITSTATUS(result);
 }
+#endif

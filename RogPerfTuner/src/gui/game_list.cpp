@@ -1,3 +1,5 @@
+#ifdef STEAM_SUPPORT
+
 #include "gui/game_list.hpp"
 
 #include <qcontainerfwd.h>
@@ -115,3 +117,4 @@ void GameList::closeEvent(QCloseEvent* event) {
 	}
 	QDialog::closeEvent(event);
 }
+#endif

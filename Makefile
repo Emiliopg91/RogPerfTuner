@@ -29,7 +29,16 @@ config:
 		cd submodules/OpenRGB-cppSDK && git apply ../patches/OpenRGB-cppSDK.diff && touch ../patches/OpenRGB-cppSDK.diff.applied; \
 	fi
 	
-	@cmake -B build -G Ninja -DCMAKE_CXX_COMPILER=clang++ -S . -DCMAKE_BUILD_TYPE=$(BUILD_TYPE) -DCMAKE_EXPORT_COMPILE_COMMANDS=ON $${DEV_MODE:+-DDEV_MODE=1} 
+	@cmake -B build -G Ninja \
+		-DCMAKE_CXX_COMPILER=clang++ \
+		-S . \
+		-DCMAKE_BUILD_TYPE=$(BUILD_TYPE) \
+		-DCMAKE_EXPORT_COMPILE_COMMANDS=ON \
+		$${DEV_MODE:+-DDEV_MODE=1} \
+		$$(command -v steam >/dev/null 2>&1 && echo "-DSTEAM_SUPPORT=1") \
+		$$(command -v scxctl >/dev/null 2>&1 && echo "-DSCX_SUPPORT=1") \
+		$$(command -v mangohud >/dev/null 2>&1 && echo "-DMANGOHUD_SUPPORT=1") \
+		$$(command -v switcherooctl >/dev/null 2>&1 && echo "-DSWITCHEROO_SUPPORT=1")
 
 	@if [ ! -f "compile_commands.json" ]; then \
 		ln -s build/compile_commands.json .; \

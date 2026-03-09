@@ -1,3 +1,4 @@
+#ifdef STEAM_SUPPORT
 #include "gui/game_config_dialog.hpp"
 
 #include <qcontainerfwd.h>
@@ -54,6 +55,7 @@ GameConfigDialog::GameConfigDialog(unsigned int gid, bool onGameFirstRun, QWidge
 	QFormLayout* performanceLayout = new QFormLayout();
 	performanceLayout->setContentsMargins(20, 10, 20, 10);
 
+#ifdef SWITCHEROO_SUPPORT
 	// --- GPU ---
 	gpuCombo = new NoScrollComboBox();
 	gpuCombo->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Preferred);
@@ -72,8 +74,10 @@ GameConfigDialog::GameConfigDialog(unsigned int gid, bool onGameFirstRun, QWidge
 	}
 	gpuCombo->setCurrentIndex(index);
 	performanceLayout->addRow(new QLabel((translator.translate("used.gpu") + ":").c_str()), gpuCombo);
-	// --- GPU ---
+// --- GPU ---
+#endif
 
+#ifdef SCX_SUPPORT
 	// --- Scheduler ---
 	schedulerCombo = new NoScrollComboBox();
 	schedulerCombo->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Preferred);
@@ -94,7 +98,9 @@ GameConfigDialog::GameConfigDialog(unsigned int gid, bool onGameFirstRun, QWidge
 	schedulerCombo->setEnabled(!performanceService.getAvailableSchedulers().empty());
 	performanceLayout->addRow(new QLabel((translator.translate("scheduler") + ":").c_str()), schedulerCombo);
 	// --- Scheduler ---
+#endif
 
+#ifdef MANGOHUD_SUPPORT
 	// --- Metrics ---
 	metricsCombo = new NoScrollComboBox();
 	metricsCombo->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Preferred);
@@ -109,7 +115,8 @@ GameConfigDialog::GameConfigDialog(unsigned int gid, bool onGameFirstRun, QWidge
 	}
 	metricsCombo->setEnabled(steamService.metricsEnabled());
 	performanceLayout->addRow(new QLabel((translator.translate("metrics") + ":").c_str()), metricsCombo);
-	// --- Metrics ---
+// --- Metrics ---
+#endif
 
 	performanceGroup->setLayout(performanceLayout);
 	windowLayout->addWidget(performanceGroup);
@@ -224,10 +231,12 @@ void GameConfigDialog::onAccept() {
 		scheduler = std::nullopt;
 	}
 
+#ifdef MANGOHUD_SUPPORT
 	MangoHudLevel level = MangoHudLevel::NO_DISPLAY;
 	if (steamService.metricsEnabled()) {
 		level = fromString<MangoHudLevel>(metricsCombo->currentData().toString().toStdString());
 	}
+#endif
 
 	WineSyncOption sync = WineSyncOption::AUTO;
 	ComputerType device = ComputerType::COMPUTER;
@@ -236,14 +245,16 @@ void GameConfigDialog::onAccept() {
 		sync   = fromString<WineSyncOption>(wineSyncCombo->currentData().toString().toStdString());
 	}
 
-	gameEntry.args			= paramsInput->text().toStdString();
-	gameEntry.env			= envInput->text().toStdString();
-	gameEntry.wrappers		= wrappersInput->text().toStdString();
-	gameEntry.scheduler		= scheduler;
-	gameEntry.gpu			= gpu;
+	gameEntry.args		= paramsInput->text().toStdString();
+	gameEntry.env		= envInput->text().toStdString();
+	gameEntry.wrappers	= wrappersInput->text().toStdString();
+	gameEntry.scheduler = scheduler;
+	gameEntry.gpu		= gpu;
+#ifdef MANGOHUD_SUPPORT
 	gameEntry.metrics_level = level;
-	gameEntry.device		= device;
-	gameEntry.sync			= sync;
+#endif
+	gameEntry.device = device;
+	gameEntry.sync	 = sync;
 
 	steamService.saveGameConfig(gid, gameEntry);
 
@@ -269,3 +280,5 @@ void GameConfigDialog::closeEvent(QCloseEvent* event) {
 		}
 	}
 }
+
+#endif

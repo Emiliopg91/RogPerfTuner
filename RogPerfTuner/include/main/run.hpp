@@ -1,3 +1,6 @@
+#pragma once
+#ifdef STEAM_SUPPORT
+
 #include <fcntl.h>
 #include <linux/prctl.h>
 #include <sys/prctl.h>
@@ -177,3 +180,5 @@ inline int runSteamWrapping(int argc, char* argv[]) {
 
 	return run_command(logger, command, wrappers, parameters);
 }
+
+#endif

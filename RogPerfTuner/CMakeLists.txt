@@ -40,5 +40,26 @@ target_link_libraries(RogPerfTuner PRIVATE
 )
 
 if(DEV_MODE)
+    message("Dev mode enabled")
     add_compile_definitions(DEV_MODE)
+endif()
+
+if(STEAM_SUPPORT)
+    message("Steam support enabled")
+    add_compile_definitions(STEAM_SUPPORT)
+endif()
+
+if(SCX_SUPPORT)
+    message("Scx support enabled")
+    add_compile_definitions(SCX_SUPPORT)
+endif()
+
+if(MANGOHUD_SUPPORT)
+    message("MangoHud support enabled")
+    add_compile_definitions(MANGOHUD_SUPPORT)
+endif()
+
+if(SWITCHEROO_SUPPORT)
+    message("Switcheroo support enabled")
+    add_compile_definitions(SWITCHEROO_SUPPORT)
 endif()

@@ -1,4 +1,5 @@
 #pragma once
+#ifdef STEAM_SUPPORT
 
 #include <yaml-cpp/yaml.h>
 
@@ -46,3 +47,4 @@ struct convert<SteamGameDetails> {
 	}
 };
 }  // namespace YAML
+#endif

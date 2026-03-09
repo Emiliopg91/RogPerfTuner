@@ -14,11 +14,13 @@
 #include "clients/file/firmware/asus-armoury/intel/pl3_fppt_client.hpp"
 #include "clients/file/firmware/asus-armoury/nvidia/nv_boost_client.hpp"
 #include "clients/file/firmware/asus-armoury/nvidia/nv_temp_client.hpp"
-#include "clients/file/sched_bore_client.hpp"
 #include "clients/file/ssd_scheduler_client.hpp"
 #include "clients/shell/asusctl_client.hpp"
 #include "clients/shell/cpupower_client.hpp"
+#ifdef SCX_SUPPORT
+#include "clients/file/sched_bore_client.hpp"
 #include "clients/shell/scxctl_client.hpp"
+#endif
 #include "framework/gui/toaster.hpp"
 #include "framework/shell/shell.hpp"
 #include "framework/translator/translator.hpp"
@@ -51,6 +53,7 @@ class PerformanceService : public Singleton<PerformanceService>, Loggable {
 	void restore();
 	void restoreFanCurves();
 
+#ifdef SCX_SUPPORT
 	/**
 	 * @brief Gets the list of available schedulers.
 	 *
@@ -72,6 +75,7 @@ class PerformanceService : public Singleton<PerformanceService>, Loggable {
 	 * @param temporal If true, the scheduler is set temporarily.
 	 */
 	void setScheduler(std::optional<std::string> scheduler, bool temporal = false);
+#endif
 
 	/**
 	 * @brief Gets the list of available schedulers.
@@ -142,7 +146,9 @@ class PerformanceService : public Singleton<PerformanceService>, Loggable {
 	 */
 	PerformanceProfile nextPerformanceProfile();
 
+#ifdef SCX_SUPPORT
 	std::string getDefaultSchedulerName();
+#endif
 
   private:
 	inline static const uint8_t CPU_PRIORITY = -17;
@@ -174,16 +180,20 @@ class PerformanceService : public Singleton<PerformanceService>, Loggable {
 	UPowerClient& uPowerClient			   = UPowerClient::getInstance();
 	PowerProfileClient& powerProfileClient = PowerProfileClient::getInstance();
 	Toaster& toaster					   = Toaster::getInstance();
-	SchedBoreClient& schedBoreClient	   = SchedBoreClient::getInstance();
+#ifdef SCX_SUPPORT
+	SchedBoreClient& schedBoreClient = SchedBoreClient::getInstance();
+#endif
 	CpuPowerClient& cpuPowerClient		   = CpuPowerClient::getInstance();
 	BoostControlClient& boostControlClient = BoostControlClient::getInstance();
 	EventBusWrapper& eventBus			   = EventBusWrapper::getInstance();
 	ConfigurationWrapper& configuration	   = ConfigurationWrapper::getInstance();
 	Translator& translator				   = Translator::getInstance();
 	SsdSchedulerClient& ssdSchedulerClient = SsdSchedulerClient::getInstance();
-	ScxCtlClient& scxCtlClient			   = ScxCtlClient::getInstance();
-	AsusCtlClient& asusCtlClient		   = AsusCtlClient::getInstance();
-	Shell& shell						   = Shell::getInstance();
+#ifdef SCX_SUPPORT
+	ScxCtlClient& scxCtlClient = ScxCtlClient::getInstance();
+#endif
+	AsusCtlClient& asusCtlClient = AsusCtlClient::getInstance();
+	Shell& shell				 = Shell::getInstance();
 
 	void setPlatformProfile(const PerformanceProfile& profile);
 	void setFanCurves(const PerformanceProfile& profile);

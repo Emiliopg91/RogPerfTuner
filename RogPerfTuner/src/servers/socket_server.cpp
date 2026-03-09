@@ -182,6 +182,7 @@ void SocketServer::handleRequest(const int& clientFd, const UnixCommunicationMes
 					mainWindow.activateWindow();
 				},
 				Qt::QueuedConnection);
+#ifdef STEAM_SUPPORT
 		} else if (req.name == Constants::GAME_CFG) {
 			std::string idStr;
 			try {
@@ -190,6 +191,7 @@ void SocketServer::handleRequest(const int& clientFd, const UnixCommunicationMes
 				idStr = std::to_string(std::any_cast<uint64_t>(req.data[0]));
 			}
 			res.data.emplace_back(YamlUtils::writeYaml(steamService.getConfiguration(idStr)));
+#endif
 		} else {
 			res.error = "No such method";
 		}

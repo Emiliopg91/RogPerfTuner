@@ -5,7 +5,9 @@
 #include "services/hardware_service.hpp"
 #include "services/open_rgb_service.hpp"
 #include "services/performance_service.hpp"
+#ifdef STEAM_SUPPORT
 #include "services/steam_service.hpp"
+#endif
 #include "utils/event_bus_wrapper.hpp"
 
 class SocketServer : public Singleton<SocketServer>, Loggable {
@@ -19,8 +21,10 @@ class SocketServer : public Singleton<SocketServer>, Loggable {
 	PerformanceService& performanceService = PerformanceService::getInstance();
 	OpenRgbService& openRgbService		   = OpenRgbService::getInstance();
 	HardwareService& hardwareService	   = HardwareService::getInstance();
-	SteamService& steamService			   = SteamService::getInstance();
-	MainWindow& mainWindow				   = MainWindow::getInstance();
+#ifdef STEAM_SUPPORT
+	SteamService& steamService = SteamService::getInstance();
+#endif
+	MainWindow& mainWindow = MainWindow::getInstance();
 
 	void run();
 

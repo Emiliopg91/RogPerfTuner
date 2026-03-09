@@ -33,7 +33,9 @@ class TrayIcon : public QObject, public Singleton<TrayIcon> {
 	void onPerformanceProfileChanged(PerformanceProfile value);
 	void onEffectChanged(std::string effect);
 	void onBrightnessChanged(RgbBrightness brightness);
+#ifdef SCX_SUPPORT
 	void onSchedulerChanged(std::optional<std::string> scheduler);
+#endif
 	void onSsdSchedulerChanged(std::string scheduler);
 
   private:
@@ -69,7 +71,9 @@ class TrayIcon : public QObject, public Singleton<TrayIcon> {
 	void setCoolingMenuEnabled(bool enabled);
 	void openMainWindow();
 	void openFanEditor();
+#ifdef STEAM_SUPPORT
 	void openGameList();
+#endif
 
 	Shell& shell						   = Shell::getInstance();
 	EventBusWrapper& eventBus			   = EventBusWrapper::getInstance();
@@ -79,8 +83,10 @@ class TrayIcon : public QObject, public Singleton<TrayIcon> {
 	ApplicationService& applicationService = ApplicationService::init(std::nullopt);
 	Translator& translator				   = Translator::getInstance();
 	ConfigurationWrapper& configuration	   = ConfigurationWrapper::getInstance();
-	SteamService& steamService			   = SteamService::getInstance();
-	UPowerClient& uPowerClient			   = UPowerClient::getInstance();
+#ifdef STEAM_SUPPORT
+	SteamService& steamService = SteamService::getInstance();
+#endif
+	UPowerClient& uPowerClient = UPowerClient::getInstance();
 	MainWindow& mainWindow;
 
 	int runningGames;

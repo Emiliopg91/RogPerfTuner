@@ -1,3 +1,4 @@
+#ifdef STEAM_SUPPORT
 #include "clients/unix_socket/steam_client.hpp"
 
 #include "framework/utils/yaml_utils.hpp"
@@ -41,3 +42,5 @@ void SteamSocketClient::setLaunchOptions(const int& appid, const std::string& la
 std::string SteamSocketClient::getIcon(const int& appid) {
 	return std::any_cast<std::string>(invoke("get_icon", {appid})[0]);
 }
+
+#endif

@@ -1,4 +1,6 @@
 #pragma once
+#ifdef SWITCHEROO_SUPPORT
+#ifdef STEAM_SUPPORT
 
 #include <string>
 #include <vector>
@@ -24,3 +26,5 @@ class SwitcherooCtlClient : AbstractCmdClient, public Singleton<SwitcherooCtlCli
 	 */
 	const std::vector<GPUInfo> getGpus();
 };
+#endif
+#endif

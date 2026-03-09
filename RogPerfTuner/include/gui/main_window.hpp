@@ -17,7 +17,9 @@
 #include "services/hardware_service.hpp"
 #include "services/open_rgb_service.hpp"
 #include "services/performance_service.hpp"
+#ifdef STEAM_SUPPORT
 #include "services/steam_service.hpp"
+#endif
 #include "utils/event_bus_wrapper.hpp"
 
 class MainWindow : public QMainWindow, public Singleton<MainWindow> {
@@ -36,7 +38,9 @@ class MainWindow : public QMainWindow, public Singleton<MainWindow> {
 
 	void setPerformanceProfile(PerformanceProfile value);
 
+#ifdef SCX_SUPPORT
 	void setScheduler(std::optional<std::string> sched);
+#endif
 
 	void setSsdScheduler(std::string sched);
 
@@ -54,7 +58,9 @@ class MainWindow : public QMainWindow, public Singleton<MainWindow> {
 
 	void onProfileChanged(int index);
 
+#ifdef SCX_SUPPORT
 	void onSchedulerChanged(int index);
+#endif
 
 	void onSsdSchedulerChanged(int index);
 
@@ -68,7 +74,9 @@ class MainWindow : public QMainWindow, public Singleton<MainWindow> {
 
 	void onBrightnessChange(int index);
 
+#ifdef STEAM_SUPPORT
 	void openGameList();
+#endif
 
 	void openFanEditor();
 
@@ -83,13 +91,17 @@ class MainWindow : public QMainWindow, public Singleton<MainWindow> {
 	PerformanceService& performanceService = PerformanceService::getInstance();
 	OpenRgbService& openRgbService		   = OpenRgbService::getInstance();
 	HardwareService& hardwareService	   = HardwareService::getInstance();
-	SteamService& steamService			   = SteamService::getInstance();
+#ifdef STEAM_SUPPORT
+	SteamService& steamService = SteamService::getInstance();
+#endif
 	Translator& translator				   = Translator::getInstance();
 	ApplicationService& applicationService = ApplicationService::init(std::nullopt);
 	UPowerClient& uPowerClient			   = UPowerClient::getInstance();
 
 	NoScrollComboBox* _profileDropdown;
+#ifdef SCX_SUPPORT
 	NoScrollComboBox* _schedulerDropdown;
+#endif
 	NoScrollComboBox* _ssdSchedulerDropdown;
 	QPushButton* _gameProfileButton;
 	NoScrollComboBox* _effectDropdown;

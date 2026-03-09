@@ -1,4 +1,5 @@
 #pragma once
+#ifdef STEAM_SUPPORT
 
 #include <QDialog>
 #include <QFormLayout>
@@ -8,6 +9,7 @@
 #include "framework/shell/shell.hpp"
 #include "framework/translator/translator.hpp"
 #include "services/hardware_service.hpp"
+#include "services/performance_service.hpp"
 #include "services/steam_service.hpp"
 #include "utils/configuration_wrapper.hpp"
 
@@ -52,3 +54,5 @@ class GameConfigDialog : public QDialog, Loggable {
   protected:
 	void closeEvent(QCloseEvent*);
 };
+
+#endif

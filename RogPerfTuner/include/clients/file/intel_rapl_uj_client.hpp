@@ -1,4 +1,5 @@
 #pragma once
+#ifdef STEAM_SUPPORT
 
 #include "framework/abstracts/singleton.hpp"
 #include "framework/clients/abstract/abstract_file_client.hpp"
@@ -11,3 +12,4 @@ class IntelRaplUJClient : public AbstractFileClient, public Singleton<IntelRaplU
   public:
 	void enableRead();
 };
+#endif

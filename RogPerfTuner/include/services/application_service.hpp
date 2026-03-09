@@ -4,7 +4,6 @@
 
 #include "framework/translator/translator.hpp"
 #include "services/performance_service.hpp"
-#include "services/steam_service.hpp"
 #include "utils/event_bus_wrapper.hpp"
 
 class ApplicationService : public Singleton<ApplicationService>, Loggable {
@@ -44,7 +43,6 @@ class ApplicationService : public Singleton<ApplicationService>, Loggable {
 
 	Shell& shell						   = Shell::getInstance();
 	EventBusWrapper& eventBus			   = EventBusWrapper::getInstance();
-	SteamService& steamService			   = SteamService::getInstance();
 	Translator& translator				   = Translator::getInstance();
 	Toaster& toaster					   = Toaster::getInstance();
 	ConfigurationWrapper& configuration	   = ConfigurationWrapper::getInstance();

@@ -1,4 +1,5 @@
 #pragma once
+#ifdef STEAM_SUPPORT
 
 #include "framework/abstracts/singleton.hpp"
 #include "framework/clients/abstract/abstract_unix_socket_client.hpp"
@@ -63,3 +64,5 @@ class SteamSocketClient : public AbstractUnixSocketClient, public Singleton<Stea
 	 */
 	std::string getIcon(const int& appid);
 };
+
+#endif

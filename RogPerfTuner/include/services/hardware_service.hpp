@@ -16,7 +16,11 @@
 #include "clients/file/firmware/asus-armoury/other/boot_sound_client.hpp"
 #include "clients/file/firmware/asus-armoury/other/panel_overdrive_client.hpp"
 #include "clients/lib/lsusb_client.hpp"
+#ifdef SWITCHEROO_SUPPORT
+#ifdef STEAM_SUPPORT
 #include "clients/shell/switcherooctl_client.hpp"
+#endif
+#endif
 #include "framework/gui/toaster.hpp"
 #include "framework/translator/translator.hpp"
 #include "models/hardware/battery_charge_threshold.hpp"
@@ -70,6 +74,8 @@ class HardwareService : public Singleton<HardwareService>, Loggable {
 	 */
 	void setPanelOverdrive(const bool& enabled);
 
+#ifdef SWITCHEROO_SUPPORT
+#ifdef STEAM_SUPPORT
 	/**
 	 * @brief Gets the environment variables required for GPU selection.
 	 *
@@ -84,6 +90,8 @@ class HardwareService : public Singleton<HardwareService>, Loggable {
 	 * @return A map where the key is the GPU identifier and the value is its description.
 	 */
 	std::unordered_map<std::string, std::string> getGpus();
+#endif
+#endif
 
   private:
 	friend class Singleton<HardwareService>;
@@ -110,11 +118,15 @@ class HardwareService : public Singleton<HardwareService>, Loggable {
 	UPowerClient& uPowerClient						   = UPowerClient::getInstance();
 	CPUInfoClient& cpuInfoClient					   = CPUInfoClient::getInstance();
 	BoostControlClient& boostControlClient			   = BoostControlClient::getInstance();
-	SwitcherooCtlClient& switcherooCtlClient		   = SwitcherooCtlClient::getInstance();
-	PanelOverdriveClient& panelOverdriveClient		   = PanelOverdriveClient::getInstance();
-	PMKeyboardBrightness& pmKeyboardBrightnessClient   = PMKeyboardBrightness::getInstance();
-	LsUsbClient& udevClient							   = LsUsbClient::getInstance();
-	ConfigurationWrapper& configuration				   = ConfigurationWrapper::getInstance();
+#ifdef SWITCHEROO_SUPPORT
+#ifdef STEAM_SUPPORT
+	SwitcherooCtlClient& switcherooCtlClient = SwitcherooCtlClient::getInstance();
+#endif
+#endif
+	PanelOverdriveClient& panelOverdriveClient		 = PanelOverdriveClient::getInstance();
+	PMKeyboardBrightness& pmKeyboardBrightnessClient = PMKeyboardBrightness::getInstance();
+	LsUsbClient& udevClient							 = LsUsbClient::getInstance();
+	ConfigurationWrapper& configuration				 = ConfigurationWrapper::getInstance();
 
 	std::unordered_map<std::string, std::string> gpus;
 	std::vector<UsbIdentifier> connectedDevices;

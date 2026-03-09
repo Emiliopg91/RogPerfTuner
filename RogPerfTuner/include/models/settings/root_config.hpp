@@ -6,13 +6,17 @@
 #include "framework/utils/enum_utils.hpp"
 #include "models/settings/application.hpp"
 #include "models/settings/aura.hpp"
+#ifdef STEAM_SUPPORT
 #include "models/settings/game_entry.hpp"
+#endif
 #include "models/settings/platform.hpp"
 
 struct RootConfig {
-	Aura aura								  = Aura();
-	Application application					  = Application();
-	std::map<uint, GameEntry> games			  = {};
+	Aura aura				= Aura();
+	Application application = Application();
+#ifdef STEAM_SUPPORT
+	std::map<uint, GameEntry> games = {};
+#endif
 	std::map<std::string, LoggerLevel> logger = {};
 	Platform platform						  = Platform();
 };
@@ -27,7 +31,9 @@ struct convert<RootConfig> {
 		node["application"] = config.application;
 		node["aura"]		= config.aura;
 
+#ifdef STEAM_SUPPORT
 		node["games"] = config.games;
+#endif
 
 		Node loggerNode(NodeType::Map);
 		if (!config.logger.empty()) {
@@ -43,11 +49,13 @@ struct convert<RootConfig> {
 	}
 
 	static bool decode(const Node& node, RootConfig& config) {
+#ifdef STEAM_SUPPORT
 		if (node["games"]) {
 			config.games = node["games"].as<std::map<uint, GameEntry>>();
 		} else {
 			config.games = std::map<uint, GameEntry>{};
 		}
+#endif
 
 		if (node["logger"]) {
 			auto loggerNode = node["logger"];

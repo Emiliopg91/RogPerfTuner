@@ -1,3 +1,5 @@
+#ifdef SWITCHEROO_SUPPORT
+#ifdef STEAM_SUPPORT
 #include "clients/shell/switcherooctl_client.hpp"
 
 #include <sstream>
@@ -51,3 +53,5 @@ const std::vector<GPUInfo> SwitcherooCtlClient::getGpus() {
 
 	return gpus;
 }
+#endif
+#endif

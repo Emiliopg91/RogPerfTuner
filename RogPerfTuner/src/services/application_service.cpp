@@ -1,19 +1,24 @@
 #include "services/application_service.hpp"
 
-#include <signal.h>
 #include <unistd.h>
 
-#include <exception>
 #include <optional>
 #include <sstream>
-#include <vector>
 
 #include "framework/utils/file_utils.hpp"
+#include "models/others/release_entry.hpp"
+#include "utils/event_bus_wrapper.hpp"
+
+#ifdef STEAM_SUPPORT
+#include <signal.h>
+
+#include <exception>
+#include <vector>
+
 #include "framework/utils/net_utils.hpp"
 #include "framework/utils/time_utils.hpp"
-#include "models/others/release_entry.hpp"
 #include "models/others/semantic_version.hpp"
-#include "utils/event_bus_wrapper.hpp"
+#endif
 
 ApplicationService::ApplicationService(std::optional<std::string> execPath) : Loggable("ApplicationService") {
 	logger->info("Initializing ApplicationService");
@@ -47,10 +52,11 @@ ApplicationService::ApplicationService(std::optional<std::string> execPath) : Lo
 		createScriptFile(Constants::INCREASE_BRIGHTNESS_PATH, *execPath, "-i");
 		createScriptFile(Constants::DECREASE_BRIGHTNESS_PATH, *execPath, "-d");
 
+#ifdef STEAM_SUPPORT
 		FileUtils::mkdirs(Constants::BIN_STEAM_DIR);
 		createWrapperScriptFile(Constants::STEAM_WRAPPER_PATH, *execPath, "-r");
 		createWrapperScriptFile(Constants::FLATPAK_WRAPPER_PATH, *execPath, "-f");
-
+#endif
 		FileUtils::mkdirs(Constants::BIN_APPLICATION_DIR);
 		createWrapperScriptFile(Constants::SHOW_GUI_PATH, *execPath, "-s");
 

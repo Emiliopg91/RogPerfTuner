@@ -1,4 +1,5 @@
 #pragma once
+#ifdef STEAM_SUPPORT
 
 #include "framework/abstracts/singleton.hpp"
 #include "framework/clients/abstract/abstract_cmd_client.hpp"
@@ -43,3 +44,5 @@ class FlatpakClient : public AbstractCmdClient, public Singleton<FlatpakClient> 
 	 */
 	bool override(const std::string& name, bool userland);
 };
+
+#endif

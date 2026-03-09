@@ -13,7 +13,9 @@
 #include "framework/utils/enum_utils.hpp"
 #include "framework/utils/string_utils.hpp"
 #include "gui/fan_curve_editor.hpp"
+#ifdef STEAM_SUPPORT
 #include "gui/game_list.hpp"
+#endif
 #include "models/performance/performance_profile.hpp"
 
 void TrayIcon::openMainWindow() {
@@ -22,12 +24,14 @@ void TrayIcon::openMainWindow() {
 	mainWindow.activateWindow();
 }
 
+#ifdef STEAM_SUPPORT
 void TrayIcon::openGameList() {
 	if (GameList::INSTANCE == nullptr) {
 		GameList::INSTANCE = new GameList(&mainWindow);
 	}
 	GameList::INSTANCE->show();
 }
+#endif
 
 void TrayIcon::openFanEditor() {
 	auto profile		= toString(performanceService.getPerformanceProfile());
@@ -156,16 +160,26 @@ void TrayIcon::onBrightnessChanged(RgbBrightness brightness) {
 }
 
 void TrayIcon::onPerformanceProfileChanged(PerformanceProfile value) {
+#ifdef STEAM_SUPPORT
 	if (steamService.getRunningGames().empty()) {
+#endif
 		performanceService.setPerformanceProfile(value);
+#ifdef STEAM_SUPPORT
 	}
+#endif
 }
 
+#ifdef SCX_SUPPORT
 void TrayIcon::onSchedulerChanged(std::optional<std::string> scheduler) {
+#ifdef STEAM_SUPPORT
 	if (steamService.getRunningGames().empty()) {
+#endif
 		performanceService.setScheduler(scheduler);
+#ifdef STEAM_SUPPORT
 	}
+#endif
 }
+#endif
 
 void TrayIcon::onSsdSchedulerChanged(std::string scheduler) {
 	performanceService.setSsdScheduler(scheduler);
@@ -184,8 +198,10 @@ TrayIcon::TrayIcon()
 
 	QMenu* menu = tray_menu_;
 
-	onBattery	 = uPowerClient.isOnBattery();
+	onBattery = uPowerClient.isOnBattery();
+#ifdef STEAM_SUPPORT
 	runningGames = steamService.getRunningGames().size();
+#endif
 
 	// -------------------------
 	// Hardware menu
@@ -372,6 +388,7 @@ TrayIcon::TrayIcon()
 	// -------------------------
 	// Profile submenu
 	// -------------------------
+#ifdef SCX_SUPPORT
 	// -------------------------
 	// Scheduler submenu
 	// -------------------------
@@ -412,6 +429,7 @@ TrayIcon::TrayIcon()
 	// -------------------------
 	// Scheduler submenu
 	// -------------------------
+#endif
 	// -------------------------
 	// SSD Scheduler submenu
 	// -------------------------
@@ -456,6 +474,7 @@ TrayIcon::TrayIcon()
 	// -------------------------
 	// Fan curves menu
 	// -------------------------
+#ifdef STEAM_SUPPORT
 	// -------------------------
 	// Game submenu
 	// -------------------------
@@ -471,6 +490,7 @@ TrayIcon::TrayIcon()
 	// -------------------------
 	// Game submenu
 	// -------------------------
+#endif
 	// -------------------------
 	// Performance menu
 	// -------------------------
@@ -571,11 +591,13 @@ TrayIcon::TrayIcon()
 		setPerformanceProfile(profile);
 	});
 
+#ifdef STEAM_SUPPORT
 	eventBus.onGameEvent([this](size_t runningGames) {
 		this->runningGames = runningGames;
 		setProfileMenuEnabled();
 		setSchedulerMenuEnabled();
 	});
+#endif
 
 	eventBus.onBattery([this](bool onBattery) {
 		this->onBattery = onBattery;

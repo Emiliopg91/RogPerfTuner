@@ -363,7 +363,9 @@ void PerformanceService::restore() {
 		setPerformanceProfile(configuration.getConfiguration().platform.performance.profile, false, true);
 	}
 
+#ifdef SCX_SUPPORT
 	setScheduler(configuration.getConfiguration().platform.performance.scheduler);
+#endif
 	setSsdScheduler(configuration.getConfiguration().platform.performance.ssdScheduler);
 }
 
@@ -493,6 +495,7 @@ int PerformanceService::acTdpToBatteryTdp(int tdp, int minTdp) {
 	return std::max(minTdp, static_cast<int>(std::round(tdp * 0.6)));
 }
 
+#ifdef SCX_SUPPORT
 std::vector<std::string> PerformanceService::getAvailableSchedulers() {
 	if (!scxCtlClient.available()) {
 		return {};
@@ -529,6 +532,7 @@ void PerformanceService::setScheduler(std::optional<std::string> scheduler, bool
 
 	eventBus.emitScheduler(scheduler);
 }
+#endif
 
 std::vector<std::string> PerformanceService::getAvailableSsdSchedulers() {
 	if (!ssdSchedulerClient.available()) {
@@ -587,9 +591,11 @@ void PerformanceService::saveFanCurves(std::string profile, std::unordered_map<s
 	logger->info("Fan curved updated succesfully");
 }
 
+#ifdef SCX_SUPPORT
 std::string PerformanceService::getDefaultSchedulerName() {
 	if (schedBoreClient.available()) {
 		return "BORE";
 	}
 	return "EEVDF";
 }
+#endif

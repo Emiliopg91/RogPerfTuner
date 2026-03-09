@@ -72,6 +72,7 @@ void EventBusWrapper::emitPerformanceProfile(const PerformanceProfile& profile) 
 	this->eventBus.emit_event(toName(Events::PROFILE_SERVICE_ON_PROFILE), {profile});
 }
 
+#ifdef STEAM_SUPPORT
 void EventBusWrapper::onGameEvent(std::function<void(size_t)>&& callback) {
 	this->eventBus.on_with_data(toName(Events::STEAM_SERVICE_GAME_EVENT), [cb = std::move(callback)](CallbackParam data) {
 		cb(std::any_cast<size_t>(data[0]));
@@ -80,6 +81,7 @@ void EventBusWrapper::onGameEvent(std::function<void(size_t)>&& callback) {
 void EventBusWrapper::emitGameEvent(const size_t& runningGames) {
 	this->eventBus.emit_event(toName(Events::STEAM_SERVICE_GAME_EVENT), {runningGames});
 }
+#endif
 
 void EventBusWrapper::onUsbAdded(Callback&& callback) {
 	this->eventBus.on_without_data(toName(Events::HARDWARE_SERVICE_USB_ADDED), callback);
@@ -106,6 +108,7 @@ void EventBusWrapper::emitBattery(const bool& onBat) {
 	this->eventBus.emit_event(toName(Events::HARDWARE_SERVICE_ON_BATTERY), {onBat});
 }
 
+#ifdef SCX_SUPPORT
 void EventBusWrapper::onScheduler(std::function<void(std::optional<std::string>)>&& callback) {
 	this->eventBus.on_with_data(toName(Events::PROFILE_SERVICE_ON_SCHEDULER), [cb = std::move(callback)](CallbackParam data) {
 		cb(std::any_cast<std::optional<std::string>>(data[0]));
@@ -114,6 +117,7 @@ void EventBusWrapper::onScheduler(std::function<void(std::optional<std::string>)
 void EventBusWrapper::emitScheduler(std::optional<std::string> scheduler) {
 	this->eventBus.emit_event(toName(Events::PROFILE_SERVICE_ON_SCHEDULER), {scheduler});
 }
+#endif
 
 void EventBusWrapper::onSsdScheduler(std::function<void(std::string)>&& callback) {
 	this->eventBus.on_with_data(toName(Events::PROFILE_SERVICE_ON_SSD_SCHEDULER), [cb = std::move(callback)](CallbackParam data) {

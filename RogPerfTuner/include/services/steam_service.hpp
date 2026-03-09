@@ -1,4 +1,5 @@
 #pragma once
+#ifdef STEAM_SUPPORT
 
 #include <optional>
 
@@ -99,3 +100,5 @@ class SteamService : public Singleton<SteamService>, Loggable {
 
 	std::optional<std::string> getBanner(uint gid);
 };
+
+#endif

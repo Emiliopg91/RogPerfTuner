@@ -1,3 +1,4 @@
+#ifdef STEAM_SUPPORT
 #include "clients/shell/flatpak.hpp"
 
 bool FlatpakClient::checkInstalled(const std::string& name, bool userland) {
@@ -34,3 +35,4 @@ bool FlatpakClient::override(const std::string& name, bool userland) {
 
 	return run_command(args, false).exit_code == 0;
 }
+#endif
