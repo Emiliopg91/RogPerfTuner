@@ -1,5 +1,12 @@
 #!/bin/bash
 
+grep -R -nP --exclude-dir={build,.git} '//\s*TODO:' RogPerfTuner Framework
+
+if [ "$?" != "0" ]; then
+    echo "Pending TODOs found in code"
+    exit 1;
+fi
+
 make format
 
 FILES=$(git diff --cached --name-only --diff-filter=ACM | grep -E '\.(cpp|hpp)$')
