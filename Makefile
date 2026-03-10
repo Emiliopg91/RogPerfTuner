@@ -1,4 +1,4 @@
-.PHONY: clean config format build build_openrgb build_rccdc pkgbuild release build_debug run increase_version test install
+.PHONY: clean config format build build_openrgb build_rccdc pkgbuild release build_debug run increase_version test install 
 
 MAKEFLAGS += --no-print-directory
 NUM_CORES := $(shell nproc)
@@ -18,6 +18,7 @@ clean:
 	@cd submodules/RccDeckyCompanion && git reset --hard > /dev/null
 	@rm -Rf dist logs out build
 
+
 config:
 	@rm -rf build dist .Debug .Release CMakeCache.txt **/cmake_install.cmake CMakeFiles **/CMakeFiles
 
@@ -29,16 +30,11 @@ config:
 		cd submodules/OpenRGB-cppSDK && git apply ../patches/OpenRGB-cppSDK.diff && touch ../patches/OpenRGB-cppSDK.diff.applied; \
 	fi
 	
-	@cmake -B build -G Ninja \
+	@CMAKE_COLOR=1 cmake -B build -G Ninja \
 		-DCMAKE_CXX_COMPILER=clang++ \
 		-S . \
 		-DCMAKE_BUILD_TYPE=$(BUILD_TYPE) \
-		-DCMAKE_EXPORT_COMPILE_COMMANDS=ON \
-		$${DEV_MODE:+-DDEV_MODE=1} \
-		$$(command -v steam >/dev/null 2>&1 && echo "-DSTEAM_SUPPORT=1") \
-		$$(command -v scxctl >/dev/null 2>&1 && echo "-DSCX_SUPPORT=1") \
-		$$(command -v mangohud >/dev/null 2>&1 && echo "-DMANGOHUD_SUPPORT=1") \
-		$$(command -v switcherooctl >/dev/null 2>&1 && echo "-DSWITCHEROO_SUPPORT=1")
+		-DCMAKE_EXPORT_COMPILE_COMMANDS=ON 
 
 	@if [ ! -f "compile_commands.json" ]; then \
 		ln -s build/compile_commands.json .; \

@@ -3,11 +3,6 @@ cmake_minimum_required(VERSION 3.16)
 set(CMAKE_CXX_STANDARD 23)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
-#if(CMAKE_BUILD_TYPE STREQUAL "Release")
-#    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -flto=full")
-#    set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -flto=full")
-#endif()
-
 find_package(Qt6 REQUIRED COMPONENTS Core DBus Gui Widgets Charts)
 find_package(Qt6Keychain REQUIRED)
 
@@ -35,31 +30,68 @@ target_link_libraries(RogPerfTuner PRIVATE
     Qt6::Widgets
     Qt6::DBus
     Qt6::Charts
-    udev
+    udev 
     yaml-cpp::yaml-cpp
 )
 
-if(DEV_MODE)
-    message("Dev mode enabled")
-    add_compile_definitions(DEV_MODE)
+string(ASCII 27 Esc)
+if(DEFINED ENV{CMAKE_COLOR} AND "$ENV{CMAKE_COLOR}" STREQUAL "1")
+    set(GREEN "${Esc}[32m")
+    set(RED   "${Esc}[31m")
+    set(RESET "${Esc}[0m")
+    set(BOLD  "${Esc}[1m")
+else()
+    set(GREEN "")
+    set(RED "")
+    set(RESET "")
+    set(BOLD  "")
 endif()
 
-if(STEAM_SUPPORT)
-    message("Steam support enabled")
-    add_compile_definitions(STEAM_SUPPORT)
+function(handle_feature NAME VAR)
+    if(${VAR})
+        message("│ ${NAME} │   ${GREEN}YES${RESET}   │")
+        add_compile_definitions(${VAR})
+    else()
+        message("│ ${NAME} │   ${RED}NO${RESET}    │")
+    endif()
+endfunction()
+
+
+find_program(STEAM_CMD steam)
+set(STEAM_SUPPORT OFF)
+if(STEAM_CMD)
+    set(STEAM_SUPPORT ON)
 endif()
 
-if(SCX_SUPPORT)
-    message("Scx support enabled")
-    add_compile_definitions(SCX_SUPPORT)
+find_program(SCXCTL_CMD scxctl)
+set(SCX_SUPPORT OFF)
+if(SCXCTL_CMD)
+    set(SCX_SUPPORT ON)
 endif()
 
-if(MANGOHUD_SUPPORT)
-    message("MangoHud support enabled")
-    add_compile_definitions(MANGOHUD_SUPPORT)
+find_program(MANGOHUD_CMD mangohud)
+set(MANGOHUD_SUPPORT OFF)
+if(MANGOHUD_CMD)
+    set(MANGOHUD_SUPPORT ON)
 endif()
 
-if(SWITCHEROO_SUPPORT)
-    message("Switcheroo support enabled")
-    add_compile_definitions(SWITCHEROO_SUPPORT)
+find_program(SWITCHEROOCTL_CMD switcherooctl)
+set(SWITCHEROO_SUPPORT OFF)
+if(SWITCHEROOCTL_CMD)
+    set(SWITCHEROO_SUPPORT ON)
 endif()
+
+set(DEV_MODE OFF)
+if(DEFINED ENV{DEV_MODE})
+    set(DEV_MODE ON) 
+endif() 
+
+message("┌────────────┬─────────┐")
+message("│  ${BOLD}Feature${RESET}   │ ${BOLD}Enabled${RESET} │")
+message("├────────────┼─────────┤")
+handle_feature("Dev mode  " DEV_MODE)
+handle_feature("MangoHud  " MANGOHUD_SUPPORT)
+handle_feature("SCX       " SCX_SUPPORT)
+handle_feature("Steam     " STEAM_SUPPORT)
+handle_feature("Switcheroo" SWITCHEROO_SUPPORT)
+message("└────────────┴─────────┘")

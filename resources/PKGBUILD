@@ -57,7 +57,7 @@ makedepends=(
   'zip'
 )
 optdepends=(
-  'mangohud-git: A Vulkan overlay layer for monitoring FPS, temperatures, CPU/GPU load and more'
+  'mangohud-git: Monitoring FPS, temperatures, CPU/GPU load and more'
   'scx-scheds: Use sched-ext schedulers'
   'switcheroo-control: Allow GPU selector for games'
   'steam: Define and apply automatically performance configurations for games'
@@ -66,13 +66,13 @@ optdepends=(
 install=rog-perf-tuner<sufix>.install
 
 prepare() {
+    cd "$srcdir/RogPerfTuner"
+    git submodule update --init --recursive
+
     if [[ ! -d "${HOME}/.local/share/pnpm" ]]; then
         echo "Setup for pnpm..."
         SHELL=/bin/bash pnpm setup
     fi
-
-    cd "$srcdir/RogPerfTuner"
-    git submodule update --init --recursive
 }
 
 build() {

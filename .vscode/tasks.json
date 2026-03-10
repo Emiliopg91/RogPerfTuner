@@ -9,8 +9,12 @@
                 "kind": "build",
                 "isDefault": true
             },
-            "problemMatcher": ["$gcc"],
-            "dependsOn": ["CMake Configure"]
+            "problemMatcher": [
+                "$gcc"
+            ],
+            "dependsOn": [
+                "CMake Configure"
+            ]
         }
     ]
 }
