@@ -129,7 +129,7 @@ increase_version:
 	@awk '{if ($$0 ~ /project\(.*VERSION/) {match($$0, /([0-9]+)\.([0-9]+)\.([0-9]+)/, v); patch = v[3] + 1; sub(/[0-9]+\.[0-9]+\.[0-9]+/, v[1] "." v[2] "." patch);} print}' CMakeLists.txt > CMakeLists.txt.tmp && mv CMakeLists.txt.tmp CMakeLists.txt
 
 test: 
-	@export GIT_RELEASE=1 && make release && mv dist/rog-perf-tuner.install dist/rog-perf-tuner-git.install
+	@GIT_RELEASE=1 make release && mv dist/rog-perf-tuner.install dist/rog-perf-tuner-git.install
 	@python3 ./resources/scripts/test.py
 
 install: clean

@@ -27,7 +27,7 @@ if os.getenv("GITHUB_ACTIONS", "false").lower() == "false":
             continue
         content.append(line.replace("'", ""))
 
-    dependencies = " ".join(content)
+    dependencies = " ".join(content[:-1])
 
     dockerfile_content = f"""
     FROM archlinux:latest
@@ -53,12 +53,15 @@ if os.getenv("GITHUB_ACTIONS", "false").lower() == "false":
         && makepkg -si --noconfirm \
         && cd .. \
         && rm -rf paru \
-        && paru -S --noconfirm {dependencies} \
         && sudo paru -Scc --noconfirm
+    
+    RUN paru -S --noconfirm {dependencies} \
+        && sudo paru -Scc --noconfirm
+
     WORKDIR /tmp/pkg
 
     # Ejecutar paru -U por defecto
-    CMD ["bash", "-c", "cp -R /pkg/* . && paru -U --noconfirm --nocheck --noinstall"]
+    CMD ["bash", "-c", "cp -R /pkg/* . && export IN_TEST=1 && paru -U --noconfirm --nocheck --noinstall"]
     """
 
     with open("Dockerfile", "w", encoding="utf-8") as f:
