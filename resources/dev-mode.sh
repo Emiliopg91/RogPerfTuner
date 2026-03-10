@@ -23,18 +23,15 @@ if ! command -v gdb &> /dev/null; then
     $AUR_HELPER -S gdb
 fi
 
-if [ ! -d "$DEV_FOLDER" ]; then
-    echo "Downloading source code..."
-    git clone https://github.com/Emiliopg91/RogPerfTuner "$DEV_FOLDER"
-    cd "$DEV_FOLDER"
-    git submodule update --init --recursive
-else
-    cd "$DEV_FOLDER"
-    echo "Cleaning and updating project..."
-    make clean
-    git reset --hard
-    git pull
+if [ -d "$DEV_FOLDER" ]; then
+    sudo rm -Rf "$DEV_FOLDER"
 fi
+
+echo "Downloading source code..."
+git clone https://github.com/Emiliopg91/RogPerfTuner "$DEV_FOLDER"
+cd "$DEV_FOLDER"
+git checkout develop
+git submodule update --init --recursive
 
 echo "Compiling and running application..."
 cd "$DEV_FOLDER"
