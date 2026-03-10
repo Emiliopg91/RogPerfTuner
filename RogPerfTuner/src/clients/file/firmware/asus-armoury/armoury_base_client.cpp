@@ -12,7 +12,13 @@ ArmouryBaseClient::ArmouryBaseClient(std::string attribute, bool required)
 }
 
 int ArmouryBaseClient::getCurrentValue() {
-	return stoi(read());
+	auto value_str = read();
+	try {
+		return std::stoi(StringUtils::trim(value_str));
+	} catch (const std::exception& e) {
+		logger->error("stoi failed for value '{}': {}", value_str, e.what());
+		throw;
+	}
 }
 
 void ArmouryBaseClient::setCurrentValue(int value) {
@@ -27,24 +33,41 @@ void ArmouryBaseClient::setCurrentValue(int value) {
 }
 
 int ArmouryBaseClient::getMaxValue() {
-	if (FileUtils::exists(attributePath + "/max_value")) {
-		return stoi(FileUtils::readFileContent(attributePath + "/max_value"));
+	std::string content;
+	try {
+		if (FileUtils::exists(attributePath + "/max_value")) {
+			content = FileUtils::readFileContent(attributePath + "/max_value");
+			return stoi(StringUtils::trim(content));
+		}
+		if (FileUtils::exists(attributePath + "/possible_values")) {
+			const auto splitted = StringUtils::split(FileUtils::readFileContent(attributePath + "/possible_values"), ';');
+			content				= splitted[splitted.size() - 1];
+			return stoi(StringUtils::trim(content));
+		}
+		return 0;
+	} catch (const std::exception& e) {
+		logger->error("stoi failed for max_value '{}': {}", content, e.what());
+		throw;
 	}
-	if (FileUtils::exists(attributePath + "/possible_values")) {
-		const auto splitted = StringUtils::split(FileUtils::readFileContent(attributePath + "/possible_values"), ';');
-		return stoi(splitted[splitted.size() - 1]);
-	}
-	return 0;
 }
 
 int ArmouryBaseClient::getMinValue() {
-	if (FileUtils::exists(attributePath + "/min_value")) {
-		return stoi(FileUtils::readFileContent(attributePath + "/min_value"));
+	std::string content;
+	try {
+		if (FileUtils::exists(attributePath + "/min_value")) {
+			content = FileUtils::readFileContent(attributePath + "/min_value");
+			return stoi(StringUtils::trim(content));
+		}
+		if (FileUtils::exists(attributePath + "/possible_values")) {
+			const auto splitted = StringUtils::split(FileUtils::readFileContent(attributePath + "/possible_values"), ';');
+			content				= splitted[0];
+			return stoi(StringUtils::trim(content));
+		}
+		return 0;
+	} catch (const std::exception& e) {
+		logger->error("stoi failed for min_value '{}': {}", content, e.what());
+		throw;
 	}
-	if (FileUtils::exists(attributePath + "/possible_values")) {
-		return stoi(StringUtils::split(FileUtils::readFileContent(attributePath + "/possible_values"), ';')[0]);
-	}
-	return 0;
 }
 
 // TODO: restore previous
@@ -55,7 +78,7 @@ bool ArmouryBaseClient::available() {
 			getMaxValue();
 			getCurrentValue();
 		} catch (std::exception& e) {
-			logger->debug("Not available due to {}", e.what());
+			logger->error("Attribute {} not available due to {}", attributePath, e.what());
 			return true;
 		}
 	}
