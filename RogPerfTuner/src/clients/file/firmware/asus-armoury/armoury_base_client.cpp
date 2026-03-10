@@ -47,6 +47,17 @@ int ArmouryBaseClient::getMinValue() {
 	return 0;
 }
 
+// TODO: restore previous
 bool ArmouryBaseClient::available() {
-	return AbstractFileClient::available();
+	if (AbstractFileClient::available()) {
+		try {
+			getMinValue();
+			getMaxValue();
+			getCurrentValue();
+		} catch (std::exception& e) {
+			logger->debug("Not available due to {}", e.what());
+			return true;
+		}
+	}
+	return false;
 }
