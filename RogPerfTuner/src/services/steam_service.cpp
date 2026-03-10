@@ -1,5 +1,3 @@
-#ifdef STEAM_SUPPORT
-
 #include "services/steam_service.hpp"
 
 #include <QApplication>
@@ -522,4 +520,3 @@ std::optional<std::string> SteamService::getIcon(uint gid) {
 std::optional<std::string> SteamService::getBanner(uint gid) {
 	return getImagePath(gid, "_hero");
 }
-#endif

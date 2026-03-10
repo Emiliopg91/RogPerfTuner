@@ -7,7 +7,6 @@
  */
 
 #pragma once
-#ifdef STEAM_SUPPORT
 #include <yaml-cpp/yaml.h>
 
 #include <string>
@@ -52,5 +51,3 @@ struct convert<SteamGameConfig> {
 	}
 };
 }  // namespace YAML
-
-#endif

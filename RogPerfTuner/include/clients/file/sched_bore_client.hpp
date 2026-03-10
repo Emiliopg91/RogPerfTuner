@@ -1,5 +1,4 @@
 #pragma once
-#ifdef SCX_SUPPORT
 
 #include "framework/abstracts/singleton.hpp"
 #include "framework/clients/abstract/abstract_file_client.hpp"
@@ -9,5 +8,3 @@ class SchedBoreClient : public AbstractFileClient, public Singleton<SchedBoreCli
 	SchedBoreClient();
 	friend class Singleton<SchedBoreClient>;
 };
-
-#endif

@@ -1,5 +1,4 @@
 #pragma once
-#ifdef STEAM_SUPPORT
 
 #include <QDialog>
 
@@ -23,4 +22,3 @@ class GameList : public QDialog {
 	Translator& translator	   = Translator::getInstance();
 	SteamService& steamService = SteamService::getInstance();
 };
-#endif

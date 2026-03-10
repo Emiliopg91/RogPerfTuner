@@ -1,5 +1,4 @@
 #include "clients/shell/scxctl_client.hpp"
-#ifdef SCX_SUPPORT
 
 #include <optional>
 
@@ -107,5 +106,3 @@ std::vector<std::string> ScxCtlClient::getAvailable() {
 std::optional<std::string> ScxCtlClient::getCurrent() {
 	return current;
 }
-
-#endif

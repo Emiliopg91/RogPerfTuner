@@ -1,5 +1,4 @@
 #pragma once
-#ifdef STEAM_SUPPORT
 
 #include <yaml-cpp/yaml.h>
 
@@ -133,5 +132,3 @@ struct convert<GameEntry> {
 	}
 };
 }  // namespace YAML
-
-#endif

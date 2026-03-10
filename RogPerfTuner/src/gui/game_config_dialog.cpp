@@ -1,4 +1,3 @@
-#ifdef STEAM_SUPPORT
 #include "gui/game_config_dialog.hpp"
 
 #include <qcontainerfwd.h>
@@ -280,5 +279,3 @@ void GameConfigDialog::closeEvent(QCloseEvent* event) {
 		}
 	}
 }
-
-#endif

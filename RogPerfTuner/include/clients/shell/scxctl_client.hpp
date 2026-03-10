@@ -1,5 +1,4 @@
 #pragma once
-#ifdef SCX_SUPPORT
 
 #include <unordered_map>
 
@@ -46,5 +45,3 @@ class ScxCtlClient : public AbstractCmdClient, public Singleton<ScxCtlClient> {
 	 */
 	void stop();
 };
-
-#endif

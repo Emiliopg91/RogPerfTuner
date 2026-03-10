@@ -1,10 +1,10 @@
 #pragma once
-#ifdef STEAM_SUPPORT
 
 #include <optional>
 
 #include "clients/file/intel_rapl_uj_client.hpp"
 #include "clients/unix_socket/steam_client.hpp"
+#include "models/settings/game_entry.hpp"
 #include "models/steam/steam_game_config.hpp"
 #include "services/hardware_service.hpp"
 #include "services/open_rgb_service.hpp"
@@ -100,5 +100,3 @@ class SteamService : public Singleton<SteamService>, Loggable {
 
 	std::optional<std::string> getBanner(uint gid);
 };
-
-#endif

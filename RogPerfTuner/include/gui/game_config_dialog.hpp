@@ -1,5 +1,4 @@
 #pragma once
-#ifdef STEAM_SUPPORT
 
 #include <QDialog>
 #include <QFormLayout>
@@ -54,5 +53,3 @@ class GameConfigDialog : public QDialog, Loggable {
   protected:
 	void closeEvent(QCloseEvent*);
 };
-
-#endif
