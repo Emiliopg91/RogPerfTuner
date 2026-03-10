@@ -29,12 +29,14 @@ Shell::Shell(const std::string& sudo_password) : Loggable("Shell"), terminalCfg(
 	logger->info("Initializing standard");
 	Logger::add_tab();
 	normal_bash = start_bash({"bash"});
+	send_command(normal_bash, false, "pwd", false, 0);
 	Logger::rem_tab();
 
 	if (!sudo_password.empty()) {
 		logger->info("Initializing admin");
 		Logger::add_tab();
 		elevated_bash = start_bash({"sudo", "-kS", "bash"}, sudo_password + "\n");
+		send_command(elevated_bash.value(), true, "pwd", false, 0);
 		Logger::rem_tab();
 	}
 

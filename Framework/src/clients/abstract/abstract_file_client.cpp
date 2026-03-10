@@ -1,6 +1,8 @@
 
 #include "framework/clients/abstract/abstract_file_client.hpp"
 
+#include "framework/utils/file_utils.hpp"
+
 std::string AbstractFileClient::read(const int& head, const int& tail) {
 	if (!available_) {
 		throw std::runtime_error("File " + path_ + " doesn't exist");
@@ -36,7 +38,7 @@ bool AbstractFileClient::available() {
 
 AbstractFileClient::AbstractFileClient(const std::string& path, const std::string& name, const bool& sudo, const bool& required)
 	: Loggable(name), path_(path), sudo_(sudo) {
-	available_ = shell.run_command("ls " + path, false).exit_code == 0;
+	available_ = FileUtils::exists(path);
 	if (!available_ && required) {
 		throw std::runtime_error("File " + path_ + " doesn't exist");
 	}

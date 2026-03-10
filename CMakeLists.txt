@@ -4,6 +4,17 @@ project(RogPerfTuner VERSION 4.13.2 LANGUAGES CXX)
 
 set(CMAKE_CXX_FLAGS_RELEASE "-DNDEBUG" CACHE STRING "" FORCE)
 
+find_program(CCACHE_PROGRAM ccache)
+
+if(CCACHE_PROGRAM)
+    message(STATUS "CCache found: ${CCACHE_PROGRAM}")
+
+    set(CMAKE_C_COMPILER_LAUNCHER   ${CCACHE_PROGRAM})
+    set(CMAKE_CXX_COMPILER_LAUNCHER ${CCACHE_PROGRAM})
+else()
+    message(STATUS "ccache not found")
+endif()
+
 message(STATUS "Build type: ${CMAKE_BUILD_TYPE}")
 if(NOT CMAKE_BUILD_TYPE)
     set(CMAKE_BUILD_TYPE Debug CACHE STRING "Choose the type of build." FORCE)

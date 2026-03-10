@@ -26,10 +26,6 @@ constexpr uint64_t hashStr(const char* str, uint64_t hash = 14695981039346656037
 }
 
 int main(int argc, char** argv) {
-#ifdef DEV_MODE
-	std::cout << "DEV MODE enabled" << std::endl;
-#endif
-
 	if (geteuid() == 0) {
 		std::cerr << "This program must not be run as root (sudo). Please run it as a regular user." << std::endl;
 		return 1;

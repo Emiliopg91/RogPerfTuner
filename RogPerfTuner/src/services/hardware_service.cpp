@@ -59,7 +59,6 @@ HardwareService::HardwareService() : Loggable("HardwareService") {
 	Logger::rem_tab();
 
 #ifdef SWITCHEROO_SUPPORT
-#ifdef STEAM_SUPPORT
 	logger->info("Detecting GPUs");
 	Logger::add_tab();
 	auto detected_gpus = switcherooCtlClient.getGpus();
@@ -129,7 +128,6 @@ HardwareService::HardwareService() : Loggable("HardwareService") {
 		}
 	}
 	Logger::rem_tab();
-#endif
 #endif
 
 	if (batteryChargeLimitClient.available()) {
@@ -261,7 +259,6 @@ void HardwareService::setPanelOverdrive(const bool& enable) {
 }
 
 #ifdef SWITCHEROO_SUPPORT
-#ifdef STEAM_SUPPORT
 std::unordered_map<std::string, std::string> HardwareService::getGpuSelectorEnv(const std::string& gpu) {
 	std::unordered_map<std::string, std::string> env;
 
@@ -293,7 +290,6 @@ std::unordered_map<std::string, std::string> HardwareService::getGpuSelectorEnv(
 std::unordered_map<std::string, std::string> HardwareService::getGpus() {
 	return gpus;
 }
-#endif
 #endif
 
 bool HardwareService::getBootSoundAvailable() {

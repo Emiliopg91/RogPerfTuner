@@ -72,12 +72,8 @@ inline int startGui(int argc, char** argv) {
 	argv[0][std::strlen(argv[0])] = '\0';
 
 	SingleInstance::getInstance().acquire(Constants::LOCK_FILE);
-	std::cout << "Running application with PID " << Constants::PID << std::endl;
-	std::cout << "Executable path: " << execPath << std::endl;
-	std::cout << "Assets directory: " << Constants::ASSETS_DIR << std::endl;
 
 	LoggerProvider::initialize(Constants::LOG_FILE_NAME, Constants::LOG_DIR);
-	Translator::init(Constants::TRANSLATIONS_FILE);
 
 	auto logger = LoggerProvider::getLogger();
 
@@ -90,17 +86,20 @@ inline int startGui(int argc, char** argv) {
 	logger->info("###################################################");
 	logger->info("Version {}", Constants::APP_VERSION);
 #ifdef DEV_MODE
+	logger->info("Running application with PID {}", Constants::PID);
+	logger->info("Executable path: {}", execPath);
+	logger->info("Assets directory: {}", Constants::ASSETS_DIR);
 	logger->info("Starting initialization in dev mode");
 #else
 	logger->info("Starting initialization");
 #endif
 	Logger::add_tab();
 
-	Translator::getInstance();
-
 	logger->info("Creating QT application");
 	QApplication app(argc, argv);
 	app.setDesktopFileName(Constants::APP_DRAW_FILE.c_str());
+
+	Translator::init(Constants::TRANSLATIONS_FILE);
 
 	Toaster::init(Constants::APP_NAME, Constants::ASSET_ICON_FILE);
 	Toaster::getInstance().showToast(Translator::getInstance().translate("initializing"));

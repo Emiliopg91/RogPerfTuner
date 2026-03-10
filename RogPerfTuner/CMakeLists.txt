@@ -37,15 +37,24 @@ function(handle_feature NAME VAR)
 endfunction()
 
 set(IN_TEST_MODE OFF)
+set(DEV_MODE OFF)
+set(MANGOHUD_SUPPORT OFF)
+set(SCX_SUPPORT OFF)
+set(STEAM_SUPPORT OFF)
+set(SWITCHEROO_SUPPORT OFF)
+
 if(DEFINED ENV{IN_TEST})
     message("CONFIGURING FOR TESTS")
     set(IN_TEST_MODE ON)
 endif()
 
 find_program(STEAM_CMD steam)
-set(STEAM_SUPPORT OFF)
 if(STEAM_CMD OR IN_TEST_MODE)
     set(STEAM_SUPPORT ON)
+
+    find_program(MANGOHUD_CMD mangohud)
+    find_program(SWITCHEROOCTL_CMD switcherooctl)
+
 else()
     list(REMOVE_ITEM HEADERS_RCC
         "${CMAKE_CURRENT_SOURCE_DIR}/include/clients/shell/flatpak.hpp"
@@ -75,8 +84,26 @@ else()
     )
 endif()
 
+if(SWITCHEROOCTL_CMD OR IN_TEST_MODE)
+    set(SWITCHEROO_SUPPORT ON)
+else()
+    list(REMOVE_ITEM HEADERS_RCC
+        "${CMAKE_CURRENT_SOURCE_DIR}/include/clients/shell/switcherooctl_client.hpp"
+    )
+    list(REMOVE_ITEM SOURCES_RCC
+        "${CMAKE_CURRENT_SOURCE_DIR}/src/clients/shell/switcherooctl_client.cpp"
+    )
+endif()
+
+if(MANGOHUD_CMD OR IN_TEST_MODE)
+    set(MANGOHUD_SUPPORT ON)
+else()
+    list(REMOVE_ITEM HEADERS_RCC
+        "${CMAKE_CURRENT_SOURCE_DIR}/include/models/steam/mangohud_level.hpp"
+    )
+endif()
+
 find_program(SCXCTL_CMD scxctl)
-set(SCX_SUPPORT OFF)
 if(SCXCTL_CMD OR IN_TEST_MODE)
     set(SCX_SUPPORT ON)
 else()
@@ -90,30 +117,6 @@ else()
     )
 endif()
 
-find_program(MANGOHUD_CMD mangohud)
-set(MANGOHUD_SUPPORT OFF)
-if(MANGOHUD_CMD OR IN_TEST_MODE)
-    set(MANGOHUD_SUPPORT ON)
-else()
-    list(REMOVE_ITEM HEADERS_RCC
-        "${CMAKE_CURRENT_SOURCE_DIR}/include/models/steam/mangohud_level.hpp"
-    )
-endif()
-
-find_program(SWITCHEROOCTL_CMD switcherooctl)
-set(SWITCHEROO_SUPPORT OFF)
-if(SWITCHEROOCTL_CMD OR IN_TEST_MODE)
-    set(SWITCHEROO_SUPPORT ON)
-else()
-    list(REMOVE_ITEM HEADERS_RCC
-        "${CMAKE_CURRENT_SOURCE_DIR}/include/clients/shell/switcherooctl_client.hpp"
-    )
-    list(REMOVE_ITEM SOURCES_RCC
-        "${CMAKE_CURRENT_SOURCE_DIR}/src/clients/shell/switcherooctl_client.cpp"
-    )
-endif()
-
-set(DEV_MODE OFF)
 if(DEFINED ENV{DEV_MODE} OR IN_TEST_MODE)
     set(DEV_MODE ON)
 endif()
