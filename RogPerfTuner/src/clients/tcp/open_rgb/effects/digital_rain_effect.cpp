@@ -50,18 +50,23 @@ std::vector<std::vector<DigitalRainEffect::LedStatus>> DigitalRainEffect::_dev_t
 
 void DigitalRainEffect::_decrement_matrix(std::vector<std::vector<LedStatus>>& zone_status) {
 	for (int r = static_cast<int>(zone_status.size()) - 1; r >= 0; --r) {
-		for (size_t c = 0; c < zone_status[r].size(); ++c) {
-			if (r == 0) {
+		if (r == 0) {
+			for (size_t c = 0; c < zone_status[r].size(); ++c) {
 				if (zone_status[r][c].cur_val > 0) {
 					zone_status[r][c].cur_val--;
 				} else if (zone_status[r][c].cur_val < 0) {
 					zone_status[r][c].cur_val++;
 				}
-			} else {
-				int pos					  = zone_status[r][c].pos_idx;
-				zone_status[r][c]		  = zone_status[r - 1][c].clone();
-				zone_status[r][c].pos_idx = pos;
 			}
+			continue;
+		}
+
+		size_t cols = std::min(zone_status[r].size(), zone_status[r - 1].size());
+
+		for (size_t c = 0; c < cols; ++c) {
+			int pos					  = zone_status[r][c].pos_idx;
+			zone_status[r][c]		  = zone_status[r - 1][c].clone();
+			zone_status[r][c].pos_idx = pos;
 		}
 	}
 }
