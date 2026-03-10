@@ -7,7 +7,7 @@
 ScxCtlClient::ScxCtlClient() : AbstractCmdClient("scxctl", "ScxCtlClient") {
 	if (available()) {
 		std::array<std::array<std::string, 3>, 9> all = {{
-			{"bpfland", "-m performance -w", ""},
+			{"bpfland", "", "-s 20000 -m powersave -I 100 -t 100"},
 			{"cosmos", "-c 0 -p 0", "-m powersave -d -p 5000"},
 			{"flash", "-m all", "-m powersave -I 10000 -t 10000 -s 10000 -S 1000"},
 			{"lavd", "--performance", "--powersave"},
