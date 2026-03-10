@@ -1,15 +1,18 @@
-#!/bin/bash
+#!/usr/bin/env bash
+set -e
 
-grep -R -nP --exclude-dir={build,.git} '//\s*TODO:' RogPerfTuner Framework
-
-if [ "$?" != "0" ]; then
-    echo "Pending TODOs found in code"
-    exit 1;
+if [ "$(git rev-parse --abbrev-ref HEAD)" = "main" ] &&
+    grep -R -nP --exclude-dir={build,.git} '//\s*TODO:' RogPerfTuner Framework; then
+    echo "❌ Pending TODOs found in code"
+    exit 1
 fi
 
+# Format code
 make format
 
-FILES=$(git diff --cached --name-only --diff-filter=ACM | grep -E '\.(cpp|hpp)$')
+# Re-add formatted files
+FILES=$(git diff --cached --name-only --diff-filter=ACM | grep -E '\.(cpp|hpp)$' || true)
+
 if [ -n "$FILES" ]; then
     git add $FILES
 fi
