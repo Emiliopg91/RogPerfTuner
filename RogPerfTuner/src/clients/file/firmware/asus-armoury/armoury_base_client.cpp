@@ -72,15 +72,5 @@ int ArmouryBaseClient::getMinValue() {
 
 // TODO: restore previous
 bool ArmouryBaseClient::available() {
-	if (AbstractFileClient::available()) {
-		try {
-			getMinValue();
-			getMaxValue();
-			getCurrentValue();
-		} catch (std::exception& e) {
-			logger->error("Attribute {} not available due to {}", attributePath, e.what());
-			return true;
-		}
-	}
-	return false;
+	return AbstractFileClient::available();
 }
