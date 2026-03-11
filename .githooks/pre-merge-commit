@@ -1,0 +1,12 @@
+#!/usr/bin/env bash
+set -e
+
+if [ "$(git rev-parse --abbrev-ref HEAD)" = "main" ]; then
+    todos=$(grep -R -nP --exclude-dir={build,.git} '//\s*TODO:' RogPerfTuner Framework)
+    if [ -n "$todos" ]; then
+        # Formateamos la salida si quieres
+        echo "$todos" | sed 's/^\([^:]*:[^:]*\):/  \1\n    /'
+        echo "❌ Pending TODOs found in code"
+        exit 1
+    fi
+fi

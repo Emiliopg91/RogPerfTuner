@@ -6,8 +6,6 @@
 #include "framework/utils/file_utils.hpp"
 #include "framework/utils/string_utils.hpp"
 
-// TODO: restore previous
-
 ArmouryBaseClient::ArmouryBaseClient(std::string attribute, bool required)
 	: AbstractFileClient("/sys/class/firmware-attributes/asus-armoury/attributes/" + attribute + "/current_value", attribute, true, required),
 	  attributePath("/sys/class/firmware-attributes/asus-armoury/attributes/" + attribute) {

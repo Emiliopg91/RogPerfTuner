@@ -1,12 +1,13 @@
 #!/usr/bin/env bash
 set -e
 
-if [ "$(git rev-parse --abbrev-ref HEAD)" = "main" ] &&
-    grep -R -nP --exclude-dir={build,.git} '//\s*TODO:' RogPerfTuner Framework \
-    | sed 's/^\([^:]*:[^:]*\):/  \1\n    /'
-then
-    echo "❌ Pending TODOs found in code"
-    exit 1
+if [ "$(git rev-parse --abbrev-ref HEAD)" = "main" ]; then
+    if grep -R -nP --exclude-dir={build,.git} '//\s*TODO:' RogPerfTuner Framework > /tmp/todos.txt; then
+        # grep encontró TODOs
+        sed 's/^\([^:]*:[^:]*\):/  \1\n    /' /tmp/todos.txt
+        echo "❌ Pending TODOs found in code"
+        exit 1
+    fi
 fi
 
 # Format code
