@@ -6,7 +6,9 @@
 #include "framework/utils/file_utils.hpp"
 #include "framework/utils/string_utils.hpp"
 
-ArmouryBaseClient::ArmouryBaseClient(std::string attribute, bool required)
+// TODO: restore previous
+
+::ArmouryBaseClient(std::string attribute, bool required)
 	: AbstractFileClient("/sys/class/firmware-attributes/asus-armoury/attributes/" + attribute + "/current_value", attribute, true, required),
 	  attributePath("/sys/class/firmware-attributes/asus-armoury/attributes/" + attribute) {
 }
@@ -70,7 +72,16 @@ int ArmouryBaseClient::getMinValue() {
 	}
 }
 
-// TODO: restore previous
 bool ArmouryBaseClient::available() {
-	return AbstractFileClient::available();
+	if (AbstractFileClient::available()) {
+		try {
+			getMinValue();
+			getMaxValue();
+			getCurrentValue();
+		} catch (std::exception& e) {
+			logger->error("firmware attribute {} not available due to {}", attributePath, e.what());
+			return true;
+		}
+	}
+	return false;
 }
