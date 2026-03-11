@@ -61,39 +61,38 @@ def generate_changelog(rel_version, rel_release):
         for typeEntry, typeEntries in entries.items():
             if msg.startswith(f"[{typeEntry}]"):
                 typeEntries.append(
-                    f"[`{commit_hash[0:7]}`](https://github.com/Emiliopg91/RogPerfTuner/commit/{commit_hash})|{msg.replace(f"[{typeEntry}]", "").strip().capitalize()}"
+                    f'<td><a href="https://github.com/Emiliopg91/RogPerfTuner/commit/{commit_hash}">{commit_hash[0:7]}</a></td><td>{msg.replace(f"[{typeEntry}]", "").strip().capitalize()}</td>'
                 )
 
-    lines: list[str] = [
-        (
-            f"# Changes for {rel_version}-{rel_release}"
-            if len(entries.get("feature")) > 0
-            or len(entries.get("improve")) > 0
-            or len(entries.get("fix")) > 0
-            else "# No changelog available"
-        )
-    ]
+    print(f"{entries}")
 
-    if len(entries.get("feature")) > 0:
-        lines.append("## New features")
-        lines.append("| Commit | Description |")
-        lines.append("|-------|---------|")
-        for f in entries.get("feature"):
-            lines.append(f"{f}")
+    lines: list[str] = ["# No changelog available"]
 
-    if len(entries.get("improve")) > 0:
-        lines.append("## Improvements")
-        lines.append("| Commit | Description |")
-        lines.append("|-------|---------|")
-        for f in entries.get("improve"):
-            lines.append(f"{f}")
+    if (
+        len(entries.get("feature")) > 0
+        or len(entries.get("improve")) > 0
+        or len(entries.get("fix")) > 0
+    ):
+        lines: list[str] = [
+            "# Changes for release",
+            "<table>",
+            "<tr><th>Category</th><th>Commit</th><th>Message</th></tr>",
+        ]
 
-    if len(entries.get("fix")) > 0:
-        lines.append("## Bug fixes")
-        lines.append("| Commit | Description |")
-        lines.append("|-------|---------|")
-        for f in entries.get("fix"):
-            lines.append(f"{f}")
+        for category in [
+            ("feature", "New Features"),
+            ("improve", "Improvements"),
+            ("fix", "Fixes"),
+        ]:
+            entry, title = category
+            for i in range(len(entries.get(entry))):
+                line = "<tr>"
+                if i == 0:
+                    line = f'{line}<td rowspan="{len(entries.get(entry))}" style="vertical-align: top;"><b>{title}</b></td>'
+                line = f"{line}{entries.get(entry)[i]}</tr>"
+                lines.append(line)
+
+        lines.append("</table>")
 
     if os.path.exists(CHANGELOG_MD_FILE):
         os.unlink(CHANGELOG_MD_FILE)
