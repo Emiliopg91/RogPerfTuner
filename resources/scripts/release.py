@@ -65,8 +65,6 @@ def generate_changelog(rel_version, rel_release):
                     f'<td><a href="https://github.com/Emiliopg91/RogPerfTuner/commit/{commit_hash}">{commit_hash[0:7]}</a></td><td>{msg.replace(f"[{typeEntry}]", "").strip().capitalize()}</td>'
                 )
 
-    print(f"{entries}")
-
     lines: list[str] = ["# No changelog available"]
 
     if (
