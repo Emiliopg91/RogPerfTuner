@@ -1,6 +1,12 @@
 #!/usr/bin/env bash
 set -e
 
+if [ "$(git rev-parse --abbrev-ref HEAD)" = "main" ] &&
+    grep -R -nP --exclude-dir={build,.git} '//\s*TODO:' RogPerfTuner Framework; then
+    echo "❌ Pending TODOs found in code"
+    exit 1
+fi
+
 # Format code
 make format
 
