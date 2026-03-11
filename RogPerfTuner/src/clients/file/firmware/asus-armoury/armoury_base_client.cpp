@@ -21,7 +21,7 @@ ArmouryBaseClient::ArmouryBaseClient(std::string attribute, bool required)
 			available_ = true;
 		} catch (std::exception& e) {
 			if (required) {
-				throw std::runtime_error(std::format("Firmware attribute {} not available due to {}", attribute, e.what()));
+				throw std::runtime_error(std::format("Attribute {} not available due to {}", attribute, e.what()));
 			}
 		}
 	}
