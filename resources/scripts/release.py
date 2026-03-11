@@ -51,6 +51,7 @@ def generate_changelog(rel_version, rel_release):
 
     tag = get_previous_version_tag()
     commits = get_commits_since_tag(tag)
+    commits.reverse()
 
     entries = {"feature": [], "improve": [], "fix": []}
 
