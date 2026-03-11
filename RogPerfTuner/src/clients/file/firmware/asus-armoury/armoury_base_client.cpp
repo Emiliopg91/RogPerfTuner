@@ -8,7 +8,7 @@
 
 // TODO: restore previous
 
-::ArmouryBaseClient(std::string attribute, bool required)
+ArmouryBaseClient::ArmouryBaseClient(std::string attribute, bool required)
 	: AbstractFileClient("/sys/class/firmware-attributes/asus-armoury/attributes/" + attribute + "/current_value", attribute, true, required),
 	  attributePath("/sys/class/firmware-attributes/asus-armoury/attributes/" + attribute) {
 }
@@ -79,7 +79,7 @@ bool ArmouryBaseClient::available() {
 			getMaxValue();
 			getCurrentValue();
 		} catch (std::exception& e) {
-			logger->error("firmware attribute {} not available due to {}", attributePath, e.what());
+			logger->error("Firmware attribute {} not available due to {}", attributePath, e.what());
 			return true;
 		}
 	}
