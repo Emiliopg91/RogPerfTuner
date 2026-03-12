@@ -74,6 +74,7 @@ target_include_directories(nlohmann_json INTERFACE
     ${CMAKE_CURRENT_SOURCE_DIR}/submodules/nlohmann-json/include/nlohmann
 )
 
+set(YAML_CPP_BUILD_TOOLS OFF CACHE BOOL "Disable yaml-cpp tools" FORCE)
 add_subdirectory(submodules/yaml-cpp)
 
 add_subdirectory(submodules/OpenRGB-cppSDK)
