@@ -64,32 +64,28 @@ optdepends=(
   'steam: Define and apply automatically performance configurations for games'
   'switcheroo-control: Allow GPU selector for games'
 )
-install=rog-perf-tuner.install
+install=rog-perf-tuner<sufix>.install
 
+_handle_dep() {
+    for pkg in "$@"; do
+        depends+=("$pkg")
 
-_check_dep() {
-    local cmd=$1
-    shift
-
-    if command -v "$cmd" >/dev/null 2>&1; then
-        for pkg in "$@"; do
-            # Añade a depends
-            depends+=("$pkg")
-
-            # Filtra optdepends eliminando cualquier entrada del paquete
-            local new_opt=()
-            for dep in "${optdepends[@]}"; do
-                [[ $dep == "$pkg:"* ]] || new_opt+=("$dep")
-            done
-            optdepends=("${new_opt[@]}")
+        local new_opt=()
+        for dep in "${optdepends[@]}"; do
+            [[ $dep == "$pkg:"* ]] || new_opt+=("$dep")
         done
-    fi
+        optdepends=("${new_opt[@]}")
+    done
 }
-_check_dep steam steam
-_check_dep mangohud mangohud-git
-_check_dep switcherooctl switcheroo-control
-_check_dep scxctl scx-manager scx-scheds scx-tools
 
+_check_cmd() {
+    command -v "$1" >/dev/null 2>&1
+}
+
+_check_cmd steam && _handle_dep steam
+_check_cmd mangohud && _handle_dep mangohud-git
+_check_cmd switcherooctl &&_handle_dep switcheroo-control
+_check_cmd scxctl && _handle_dep scx-manager scx-scheds scx-tools
 
 prepare() {
     cd "$srcdir/RogPerfTuner"
@@ -129,6 +125,7 @@ package() {
     install -Dm755 build/RogPerfTuner/RogPerfTuner "$pkgdir/usr/bin/rog-perf-tuner"
     
     install -d "$pkgdir/usr/share/rog-perf-tuner"
+    _check_cmd steams || rm -Rf build/assets/RccDeckyCompanion
     cp -r build/assets/* "$pkgdir/usr/share/rog-perf-tuner/"
     chmod -R 755 "$pkgdir/usr/share/rog-perf-tuner/"
     install -Dm644 "$pkgdir/usr/share/rog-perf-tuner/OpenRGB/60-openrgb.rules" "$pkgdir/usr/lib/udev/rules.d/60-rog-perf-tuner.rules"
