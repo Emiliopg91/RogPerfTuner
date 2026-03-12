@@ -5,7 +5,6 @@ import json
 from pathlib import Path
 import re
 import subprocess
-import sys
 from release import parse_pkgbuild
 
 print("Generating constants preloads")
@@ -41,12 +40,18 @@ match = re.search(
 
 name, version = match.groups()
 ref = "tag=$pkgver-$pkgrel"
-if os.environ.get("GIT_RELEASE", None) is not None:
-    commit_count = subprocess.check_output(
-        ["git", "rev-list", "--count", f"{version}-1..HEAD"], text=True
-    ).strip()
-    version = version + ".r" + commit_count
 
+branch = subprocess.check_output(
+    ["git", "rev-parse", "--abbrev-ref", "HEAD"], text=True
+).strip()
+if branch == "main":
+    if os.environ.get("GIT_RELEASE", None) is not None:
+        commit_count = subprocess.check_output(
+            ["git", "rev-list", "--count", f"{version}-1..HEAD"], text=True
+        ).strip()
+        version = version + ".r" + commit_count
+else:
+    version = version + "-" + branch
 
 with open(plugin_file, "r", encoding="utf-8") as f:
     plugin = json.load(f)
