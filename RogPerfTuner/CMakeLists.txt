@@ -140,7 +140,7 @@ else()
 endif()
 
 if(EXISTS "/sys/class/firmware-attributes/asus-armoury/attributes/nv_dynamic_boost/current_value")
-    message("Nvidia Dynamic Boost enabled via /sys/class/firmware-attributes/asus-armoury/attributes/nv_temp_target/current_value")
+    message("Nvidia TGP enabled via /sys/class/firmware-attributes/asus-armoury/attributes/nv_temp_target/current_value")
     set(NV_TGP ON)
 else()
     list(REMOVE_ITEM HEADERS_RCC
