@@ -101,16 +101,10 @@ int main(int argc, char** argv) {
 						  << "    -i, --incBrightness  Increase keyboard brightness" << std::endl
 						  << "    -d, --decBrightness  Decrease keyboard brightness" << std::endl
 						  << std::endl
-#ifdef STEAM_SUPPORT
-						  << "  Command wrapping" << std::endl
-						  << "    -f, --flatpak        Wrap Flatpak execution" << std::endl
-						  << "    -r, --run            Wrap Steam execution" << std::endl
-						  << std::endl
-#endif
 						  << "  Application" << std::endl
 						  << "    -s, --show           Show GUI" << std::endl
 						  << "    -k, --kill           Kill existing instance" << std::endl
-						  << "    -m, --dev-mode           Run in dev mode with bug report generation" << std::endl
+						  << "    -m, --dev-mode       Run in dev mode with bug report generation" << std::endl
 						  << "    -v, --version        Show version information" << std::endl
 						  << "    -h, --help           Show this help message" << std::endl;
 				break;

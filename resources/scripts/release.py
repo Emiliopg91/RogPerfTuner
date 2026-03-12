@@ -4,7 +4,6 @@ import os
 import re
 import subprocess
 from pathlib import Path
-import yaml
 
 PKGBUILD_FILE = os.path.abspath(
     os.path.join(os.path.dirname(__file__), "..", "..", "dist", "PKGBUILD")
@@ -37,7 +36,6 @@ def generate_changelog(rel_version, rel_release):
         matched_tags = [tag for tag in tags if TAG_REGEX.match(tag)]
 
         if len(matched_tags) >= 2:
-            print(matched_tags[1])
             return matched_tags[1]
         return None
 
