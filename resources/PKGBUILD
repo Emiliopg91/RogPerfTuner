@@ -110,4 +110,8 @@ package() {
     rm "$pkgdir/usr/share/rog-perf-tuner/suggestions.yaml"
 
     install -Dm755 resources/RogPerfTuner.desktop "$pkgdir/usr/share/applications/rog-perf-tuner.desktop"
+
+    python resources/scripts/completion.py
+    install -Dm644 dist/completion-bash \
+        "$pkgdir/usr/share/bash-completion/completions/rog-perf-tuner"
 }
