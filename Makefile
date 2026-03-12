@@ -1,3 +1,5 @@
+SHELL := /bin/bash
+
 .PHONY: clean config format build build_openrgb build_rccdc pkgbuild release build_debug run increase_version test install 
 
 MAKEFLAGS += --no-print-directory
@@ -167,4 +169,4 @@ update_submodules: clean
 			[ -z "$$branch" ] && branch="main"; \
 			cd $$path && git checkout $$branch &>/dev/null && git pull >/dev/null && cd - >/dev/null; \
 		fi; \
-	done   
+	done  
