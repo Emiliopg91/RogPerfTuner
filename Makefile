@@ -150,7 +150,7 @@ install: clean
 	@printf '    make clean\n' >> dist/PKGBUILD
 	@printf '    cd $$cur\n' >> dist/PKGBUILD
 	@printf '}\n' >> dist/PKGBUILD
-	@cd dist && mv rog-perf-tuner.install rog-perf-tuner-git.install && makepkg -si
+	@cd dist && makepkg -si
 
 update_submodules: clean
 	@echo "#######################################################################"
