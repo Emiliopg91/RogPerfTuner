@@ -7,8 +7,10 @@
 #include "models/settings/performance.hpp"
 
 struct Platform {
-	Performance performance										  = Performance{};
-	BatteryThreshold chargeLimit								  = BatteryThreshold::CT_100;
+	Performance performance = Performance{};
+#ifdef BAT_LIMIT
+	BatteryThreshold chargeLimit = BatteryThreshold::CT_100;
+#endif
 	std::map<std::string, std::map<std::string, FanCurve>> curves = {};
 };
 
@@ -18,7 +20,9 @@ template <>
 struct convert<Platform> {
 	static Node encode(const Platform& platform) {
 		Node node;
+#ifdef BAT_LIMIT
 		node["chargeLimit"] = toInt(platform.chargeLimit);
+#endif
 		if (!platform.curves.empty()) {
 			node["curves"] = platform.curves;
 		}
@@ -30,9 +34,11 @@ struct convert<Platform> {
 		if (node["performance"]) {
 			platform.performance = node["performance"].as<Performance>();
 		}
+#ifdef BAT_LIMIT
 		if (node["chargeLimit"]) {
 			platform.chargeLimit = fromInt<BatteryThreshold>(node["chargeLimit"].as<int>());
 		}
+#endif
 		if (node["curves"]) {
 			platform.curves = node["curves"].as<std::map<std::string, std::map<std::string, FanCurve>>>();
 		}

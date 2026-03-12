@@ -10,7 +10,9 @@
 
 #include "framework/gui/no_scroll_combo_box.hpp"
 #include "framework/translator/translator.hpp"
+#ifdef BAT_LIMIT
 #include "models/hardware/battery_charge_threshold.hpp"
+#endif
 #include "models/hardware/rgb_brightness.hpp"
 #include "models/performance/performance_profile.hpp"
 #include "services/application_service.hpp"
@@ -40,8 +42,6 @@ class MainWindow : public QMainWindow, public Singleton<MainWindow> {
 
 	void setSsdScheduler(std::string sched);
 
-	void setBatteryChargeLimit(BatteryThreshold value);
-
 	void setAuraBrightness(RgbBrightness brightness);
 
 	void setAuraColor(std::optional<std::string> color);
@@ -58,11 +58,17 @@ class MainWindow : public QMainWindow, public Singleton<MainWindow> {
 
 	void onSsdSchedulerChanged(int index);
 
+#ifdef BAT_LIMIT
 	void onBatteryLimitChanged(int index);
 
+	void setBatteryChargeLimit(BatteryThreshold value);
+#endif
+
+#ifdef BOOT_SOUND
 	void onBootSoundChanged(int index);
 
 	void onBootSoundEvent(bool enabled);
+#endif
 
 	void onEffectChange();
 
@@ -95,9 +101,13 @@ class MainWindow : public QMainWindow, public Singleton<MainWindow> {
 	NoScrollComboBox* _effectDropdown;
 	NoScrollComboBox* _brightnessDropdown;
 	QPushButton* _colorButton;
-	NoScrollComboBox* _thresholdDropdown;
 	QCheckBox* _autostart;
 	QCheckBox* _minimized;
+#ifdef BOOT_SOUND
 	NoScrollComboBox* _bootSoundDropdown;
+#endif
+#ifdef BAT_LIMIT
+	NoScrollComboBox* _thresholdDropdown;
+#endif
 	QPushButton* fanEdit;
 };

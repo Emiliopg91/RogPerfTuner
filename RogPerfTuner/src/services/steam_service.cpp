@@ -56,10 +56,12 @@ SteamService::SteamService() : Loggable("SteamService") {
 	if (whichMangohud.has_value()) {
 		logger->info("Metric level service available");
 		Logger::add_tab();
+#ifdef INTEL_RAPL_UJ
 		if (intelRaplUjClient.available()) {
 			logger->info("Enabling Intel CPU Wattage report...");
 			intelRaplUjClient.enableRead();
 		}
+#endif
 		Logger::rem_tab();
 	}
 
@@ -366,7 +368,9 @@ void SteamService::onGameStop(unsigned int gid, std::string name) {
 
 void SteamService::setProfileForGames(bool onConnect) {
 	if (!runningGames.empty()) {
+#ifdef PANEL_OD
 		hardwareService.setPanelOverdrive(true);
+#endif
 		openRgbService.setEffect("Gaming", true);
 		PerformanceProfile p = PerformanceProfile::PERFORMANCE;
 		performanceService.setPerformanceProfile(p, true, true);
@@ -380,7 +384,9 @@ void SteamService::setProfileForGames(bool onConnect) {
 		}
 		performanceService.setScheduler(sched, true);
 	} else if (!onConnect) {
+#ifdef PANEL_OD
 		hardwareService.setPanelOverdrive(false);
+#endif
 		openRgbService.restoreAura();
 		performanceService.restore();
 	}

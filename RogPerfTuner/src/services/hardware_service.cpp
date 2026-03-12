@@ -5,16 +5,12 @@
 
 #include "clients/dbus/linux/power_management_kb_brightness.hpp"
 #include "clients/dbus/linux/upower_client.hpp"
-#include "clients/file/boost_control_client.hpp"
 #include "clients/file/cpuinfo_client.hpp"
 #include "clients/lib/lsusb_client.hpp"
 #include "clients/shell/switcherooctl_client.hpp"
-#include "framework/gui/toaster.hpp"
-#include "framework/translator/translator.hpp"
 #include "framework/utils/file_utils.hpp"
 #include "framework/utils/string_utils.hpp"
 #include "framework/utils/time_utils.hpp"
-#include "models/hardware/battery_charge_threshold.hpp"
 #include "models/hardware/gpu_brand.hpp"
 #include "services/open_rgb_service.hpp"
 #include "utils/event_bus_wrapper.hpp"
@@ -45,12 +41,12 @@ HardwareService::HardwareService() : Loggable("HardwareService") {
 	}
 
 	Logger::add_tab();
-	if (pl1SpdClient.available()) {
-		logger->info("TDP control available");
-	}
-	if (boostControlClient.available()) {
-		logger->info("Boost control available");
-	}
+#ifdef PPT_PL1_SPL
+	logger->info("TDP control available");
+#endif
+#ifdef BOOST_CONTROL
+	logger->info("Boost control available");
+#endif
 	Logger::rem_tab();
 
 	Logger::rem_tab();
@@ -111,33 +107,34 @@ HardwareService::HardwareService() : Loggable("HardwareService") {
 			gpus[toString(brand)] = env;
 
 			Logger::add_tab();
-			if (brand == GpuBrand::NVIDIA) {
-				if (nvBoostClient.available()) {
-					logger->info("Dynamic boost control available");
-				}
-				if (nvTempClient.available()) {
-					logger->info("Throttle temperature control available");
-				}
-			}
+#ifdef NV_BOOST
+			logger->info("Dynamic boost control available");
+#endif
+#ifdef NV_TGP
+			logger->info("Throttle temperature control available");
+#endif
+			Logger::rem_tab();
 
 			Logger::rem_tab();
 		}
 	}
 	Logger::rem_tab();
 
-	if (batteryChargeLimitClient.available()) {
-		logger->info("Getting battery charge limit");
-		Logger::add_tab();
-		charge_limit = configuration.getConfiguration().platform.chargeLimit;
-		batteryChargeLimitClient.setChargeLimit(charge_limit);
-		logger->info(std::to_string(toInt(charge_limit)) + "%");
-		Logger::rem_tab();
-	}
+#ifdef BAT_LIMIT
+	logger->info("Getting battery charge limit");
+	Logger::add_tab();
+	charge_limit = configuration.getConfiguration().platform.chargeLimit;
+	batteryChargeLimitClient.setChargeLimit(charge_limit);
+	logger->info(std::to_string(toInt(charge_limit)) + "%");
+	Logger::rem_tab();
+#endif
 
 	setupDeviceLoop();
 
 	runningGames = 0;
+#ifdef PANEL_OD
 	setPanelOverdrive(false);
+#endif
 
 	if (uPowerClient.available()) {
 		onBattery = uPowerClient.isOnBattery();
@@ -198,6 +195,7 @@ void HardwareService::onDeviceEvent() {
 	connectedDevices = current;
 }
 
+#ifdef BAT_LIMIT
 BatteryThreshold HardwareService::getChargeThreshold() {
 	return charge_limit;
 }
@@ -220,11 +218,14 @@ void HardwareService::setChargeThreshold(const BatteryThreshold& threshold) {
 		eventBus.emitChargeThreshold(threshold);
 	}
 }
+#endif
 
 void HardwareService::onBatteryEvent(const bool& onBat, const bool& muted) {
 	onBattery = onBat;
 
+#ifdef PANEL_OD
 	setPanelOverdrive(runningGames > 0 && !onBattery);
+#endif
 
 	if (runningGames == 0) {
 		if (!muted) {
@@ -240,6 +241,7 @@ void HardwareService::onBatteryEvent(const bool& onBat, const bool& muted) {
 	}
 }
 
+#ifdef PANEL_OD
 void HardwareService::setPanelOverdrive(const bool& enable) {
 	if (panelOverdriveClient.available()) {
 		logger->info("Panel Overdrive: {}", enable ? "Enabled" : "Disabled");
@@ -252,6 +254,7 @@ void HardwareService::setPanelOverdrive(const bool& enable) {
 		Logger::rem_tab();
 	}
 }
+#endif
 
 std::unordered_map<std::string, std::string> HardwareService::getGpuSelectorEnv(const std::string& gpu) {
 	std::unordered_map<std::string, std::string> env;
@@ -285,14 +288,7 @@ std::unordered_map<std::string, std::string> HardwareService::getGpus() {
 	return gpus;
 }
 
-bool HardwareService::getBootSoundAvailable() {
-	return bootSoundClient.available();
-}
-
-bool HardwareService::getBatteryLimitAvailable() {
-	return batteryChargeLimitClient.available();
-}
-
+#ifdef BOOT_SOUND
 bool HardwareService::getBootSound() {
 	return bootSoundClient.getCurrentValue();
 }
@@ -312,3 +308,4 @@ void HardwareService::setBootSound(bool enable) {
 	logger->info("Boot sound setted after {} seconds", TimeUtils::format_seconds(TimeUtils::getTimeDiff(t0, t1)));
 	eventBus.emitBootSound(enable);
 }
+#endif

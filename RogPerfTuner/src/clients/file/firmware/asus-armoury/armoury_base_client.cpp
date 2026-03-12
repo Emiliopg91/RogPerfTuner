@@ -9,20 +9,6 @@
 ArmouryBaseClient::ArmouryBaseClient(std::string attribute, bool required)
 	: AbstractFileClient("/sys/class/firmware-attributes/asus-armoury/attributes/" + attribute + "/current_value", attribute, true, required),
 	  attributePath("/sys/class/firmware-attributes/asus-armoury/attributes/" + attribute) {
-	available_ = false;
-
-	if (AbstractFileClient::available()) {
-		try {
-			getMinValue();
-			getMaxValue();
-			getCurrentValue();
-			available_ = true;
-		} catch (std::exception& e) {
-			if (required) {
-				throw std::runtime_error(std::format("Attribute {} not available due to {}", attribute, e.what()));
-			}
-		}
-	}
 }
 
 int ArmouryBaseClient::getCurrentValue() {

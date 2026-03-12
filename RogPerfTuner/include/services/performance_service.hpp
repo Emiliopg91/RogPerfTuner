@@ -8,12 +8,25 @@
 #include "clients/dbus/asus/core/platform_client.hpp"
 #include "clients/dbus/linux/power_profile_client.hpp"
 #include "clients/dbus/linux/upower_client.hpp"
+#include "services/hardware_service.hpp"
+#ifdef BOOST_CONTROL
 #include "clients/file/boost_control_client.hpp"
+#endif
+#ifdef PPT_PL1_SPL
 #include "clients/file/firmware/asus-armoury/intel/pl1_spd_client.hpp"
+#endif
+#ifdef PPT_PL2_SPPT
 #include "clients/file/firmware/asus-armoury/intel/pl2_sppt_client.hpp"
+#endif
+#ifdef PPT_PL3_FPPT
 #include "clients/file/firmware/asus-armoury/intel/pl3_fppt_client.hpp"
+#endif
+#ifdef NV_BOOST
 #include "clients/file/firmware/asus-armoury/nvidia/nv_boost_client.hpp"
+#endif
+#ifdef NV_TGP
 #include "clients/file/firmware/asus-armoury/nvidia/nv_temp_client.hpp"
+#endif
 #include "clients/file/sched_bore_client.hpp"
 #include "clients/file/ssd_scheduler_client.hpp"
 #include "clients/shell/asusctl_client.hpp"
@@ -165,18 +178,31 @@ class PerformanceService : public Singleton<PerformanceService>, Loggable {
 	std::optional<std::thread> smartThread		   = std::nullopt;
 	std::atomic<bool> stopFlag					   = false;
 
-	PlatformClient& platformClient		   = PlatformClient::getInstance();
-	Pl1SpdClient& pl1SpdClient			   = Pl1SpdClient::getInstance();
-	Pl2SpptClient& pl2SpptClient		   = Pl2SpptClient::getInstance();
-	Pl3FpptClient& pl3FpptClient		   = Pl3FpptClient::getInstance();
-	NvBoostClient& nvBoostClient		   = NvBoostClient::getInstance();
-	NvTempClient& nvTempClient			   = NvTempClient::getInstance();
+	PlatformClient& platformClient = PlatformClient::getInstance();
+#ifdef PPT_PL1_SPL
+	Pl1SpdClient& pl1SpdClient = Pl1SpdClient::getInstance();
+#endif
+#ifdef PPT_PL2_SPPT
+	Pl2SpptClient& pl2SpptClient = Pl2SpptClient::getInstance();
+#endif
+#ifdef PPT_PL3_FPPT
+	Pl3FpptClient& pl3FpptClient = Pl3FpptClient::getInstance();
+#endif
+#ifdef NV_BOOST
+	NvBoostClient& nvBoostClient = NvBoostClient::getInstance();
+#endif
+#ifdef NV_TGP
+	NvTempClient& nvTempClient = NvTempClient::getInstance();
+#endif
 	UPowerClient& uPowerClient			   = UPowerClient::getInstance();
 	PowerProfileClient& powerProfileClient = PowerProfileClient::getInstance();
 	Toaster& toaster					   = Toaster::getInstance();
 	SchedBoreClient& schedBoreClient	   = SchedBoreClient::getInstance();
+	HardwareService& hardwareService	   = HardwareService::getInstance();
 	CpuPowerClient& cpuPowerClient		   = CpuPowerClient::getInstance();
+#ifdef BOOST_CONTROL
 	BoostControlClient& boostControlClient = BoostControlClient::getInstance();
+#endif
 	EventBusWrapper& eventBus			   = EventBusWrapper::getInstance();
 	ConfigurationWrapper& configuration	   = ConfigurationWrapper::getInstance();
 	Translator& translator				   = Translator::getInstance();
@@ -187,24 +213,48 @@ class PerformanceService : public Singleton<PerformanceService>, Loggable {
 
 	void setPlatformProfile(const PerformanceProfile& profile);
 	void setFanCurves(const PerformanceProfile& profile);
-	void setBoost(const PerformanceProfile& profile);
-	void setCpuGovernor(const PerformanceProfile& profile);
-	void setPowerProfile(PerformanceProfile& profile);
-	void setTdps(const PerformanceProfile& profile);
-	void setTgp(const PerformanceProfile& profile);
 
-	int acIntelPl1Spl(PerformanceProfile profile);
-	int batteryIntelPl1Spl(PerformanceProfile profile);
-	int acIntelPl2Sppt(PerformanceProfile profile);
-	int batteryIntelPl2Sppt(PerformanceProfile profile);
-	int acIntelPl3Fppt(PerformanceProfile profile);
-	int batteryIntelPl3Fppt(PerformanceProfile profile);
-	int acNvBoost(PerformanceProfile profile);
-	int batteryNvBoost(PerformanceProfile profile);
-	int acNvTemp();
-	int batteryNvTemp(PerformanceProfile profile);
+#ifdef BOOST_CONTROL
+	void setBoost(const PerformanceProfile& profile);
 	bool acBoost();
 	bool batteryBoost();
+#endif
+
+	void setCpuGovernor(const PerformanceProfile& profile);
+	void setPowerProfile(PerformanceProfile& profile);
+
+#ifdef PPT_PL1_SPL
+	void setTdps(const PerformanceProfile& profile);
+#endif
+
+#ifdef PPT_PL1_SPL
+	int acIntelPl1Spl(PerformanceProfile profile);
+	int batteryIntelPl1Spl(PerformanceProfile profile);
+#endif
+
+#ifdef PPT_PL2_SPPT
+	int acIntelPl2Sppt(PerformanceProfile profile);
+	int batteryIntelPl2Sppt(PerformanceProfile profile);
+#endif
+
+#ifdef PPT_PL3_FPPT
+	int acIntelPl3Fppt(PerformanceProfile profile);
+	int batteryIntelPl3Fppt(PerformanceProfile profile);
+#endif
+
+#ifdef NV_BOOST
+	int acNvBoost(PerformanceProfile profile);
+	int batteryNvBoost(PerformanceProfile profile);
+#endif
+
+#ifdef NV_TGP
+	int acNvTemp();
+	int batteryNvTemp(PerformanceProfile profile);
+#endif
+
+#if defined(NV_TGP) || defined(NV_BOOST)
+	void setNvidiaProfile(const PerformanceProfile& profile);
+#endif
 	CpuGovernor acGovernor(PerformanceProfile profile);
 	CpuGovernor batteryGovernor();
 	int acTdpToBatteryTdp(int tdp, int minTdp);

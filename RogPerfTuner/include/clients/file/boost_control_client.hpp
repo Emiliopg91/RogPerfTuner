@@ -1,28 +1,9 @@
 #pragma once
 
-#include <memory>
-
 #include "framework/abstracts/singleton.hpp"
 #include "framework/clients/abstract/abstract_file_client.hpp"
 
-class BoostControlClientImpl : public AbstractFileClient {
-  public:
-	void set_boost(bool& enabled) {
-		write(enabled ? on : off);
-	}
-
-	BoostControlClientImpl(const std::string& path, const std::string& on, const std::string& off)
-		: AbstractFileClient(path, "BoostControlClientImpl", true), on(on), off(off) {
-	}
-
-  private:
-	std::string on;
-	std::string off;
-
-	friend class BoostControlClient;
-};
-
-class BoostControlClient : public Singleton<BoostControlClient> {
+class BoostControlClient : public AbstractFileClient, public Singleton<BoostControlClient> {
   public:
 	/**
 	 * @brief Enables or disables the boost mode.
@@ -42,6 +23,5 @@ class BoostControlClient : public Singleton<BoostControlClient> {
   private:
 	BoostControlClient();
 
-	std::unique_ptr<BoostControlClientImpl> client;
 	friend class Singleton<BoostControlClient>;
 };

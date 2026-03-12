@@ -5,6 +5,7 @@
 
 #include <QApplication>
 #include <iostream>
+#include <memory>
 #include <optional>
 #include <string>
 
@@ -62,6 +63,48 @@ inline std::string getExecutablePath(const char* argv0) {
 	return input;
 }
 
+inline void printFeatureTable(std::shared_ptr<Logger> logger) {
+	Logger::add_tab();
+	logger->info("┌─────────────────┐");
+	logger->info("│    Features     │");
+	logger->info("├─────────────────┤");
+#ifdef DEV_MODE
+	logger->info("│ Dev mode        │");
+#endif
+#ifdef BOOST_CONTROL
+	logger->info("│ Boost control   │");
+#endif
+#ifdef INTEL_RAPL_UJ
+	logger->info("│ Intel Rapl UJ   │");
+#endif
+#ifdef PPT_PL1_SPL
+	logger->info("│ TDP PL1 SPD     │");
+#endif
+#ifdef PPT_PL2_SPPT
+	logger->info("│ TDP PL2 SPPT    │");
+#endif
+#ifdef PPT_PL3_FPPT
+	logger->info("│ TDP PL3 FPPT    │");
+#endif
+#ifdef NV_BOOST
+	logger->info("│ Nvidia Boost    │");
+#endif
+#ifdef NV_TGP
+	logger->info("│ Nvidia TGP      │");
+#endif
+#ifdef BOOT_SOUND
+	logger->info("│ Boot sound      │");
+#endif
+#ifdef PANEL_OD
+	logger->info("│ Panel Overdrive │");
+#endif
+#ifdef BAT_LIMIT
+	logger->info("│ Battery limit   │");
+#endif
+	logger->info("└─────────────────┘");
+	Logger::rem_tab();
+}
+
 inline int startGui(int argc, char** argv) {
 	auto t0 = TimeUtils::now();
 	std::set_terminate(terminateHandler);
@@ -89,10 +132,11 @@ inline int startGui(int argc, char** argv) {
 	logger->info("Running application with PID {}", Constants::PID);
 	logger->info("Executable path: {}", execPath);
 	logger->info("Assets directory: {}", Constants::ASSETS_DIR);
-	logger->info("Starting initialization in dev mode");
-#else
-	logger->info("Starting initialization");
 #endif
+
+	printFeatureTable(logger);
+
+	logger->info("Starting initialization");
 	Logger::add_tab();
 
 	logger->info("Creating QT application");

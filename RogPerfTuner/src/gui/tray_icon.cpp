@@ -103,6 +103,7 @@ void TrayIcon::setBatteryThreshold(BatteryThreshold threshold) {
 		Qt::QueuedConnection);
 }
 
+#ifdef BOOT_SOUND
 void TrayIcon::setBootSound(bool value) {
 	QMetaObject::invokeMethod(
 		this,
@@ -111,6 +112,7 @@ void TrayIcon::setBootSound(bool value) {
 		},
 		Qt::QueuedConnection);
 }
+#endif
 
 void TrayIcon::setProfileMenuEnabled() {
 	QMetaObject::invokeMethod(
@@ -143,9 +145,11 @@ void TrayIcon::setSchedulerMenuEnabled() {
 // Implementación de slots
 // ==============================
 
+#ifdef BAT_LIMIT
 void TrayIcon::onBatteryLimitChanged(BatteryThreshold value) {
 	hardwareService.setChargeThreshold(value);
 }
+#endif
 
 void TrayIcon::onEffectChanged(std::string effect) {
 	openRgbService.setEffect(effect);
@@ -187,71 +191,70 @@ TrayIcon::TrayIcon()
 	onBattery	 = uPowerClient.isOnBattery();
 	runningGames = steamService.getRunningGames().size();
 
+#if defined(BAT_LIMIT) || defined(BOOT_SOUND)
 	// -------------------------
 	// Hardware menu
 	// -------------------------
-
-	if (hardwareService.getBatteryLimitAvailable() || hardwareService.getBootSoundAvailable()) {
-		QAction* hardwareTitle = new QAction(translator.translate("hardware").c_str(), menu);
-		hardwareTitle->setEnabled(false);
-		menu->addAction(hardwareTitle);
-		// -------------------------
-		// BatteryThreshold submenu
-		// -------------------------
-		if (hardwareService.getBatteryLimitAvailable()) {
-			QMenu* chargeLimitMenu	  = new QMenu(("    " + translator.translate("charge.threshold")).c_str(), menu);
-			QActionGroup* chargeGroup = new QActionGroup(menu);
-			for (BatteryThreshold bct : values<BatteryThreshold, true>()) {
-				QAction* act = new QAction((std::to_string(toInt(bct)) + "%").c_str(), chargeGroup);
-				act->setCheckable(true);
-				act->setChecked(bct == hardwareService.getChargeThreshold());
-				QObject::connect(act, &QAction::triggered, [this, bct]() {
-					onBatteryLimitChanged(bct);
-				});
-				chargeLimitMenu->addAction(act);
-				thresholdActions[toString(bct)] = act;
-			}
-			menu->insertMenu(nullptr, chargeLimitMenu);
-
-			eventBus.onChargeThreshold([this](BatteryThreshold threshold) {
-				setBatteryThreshold(threshold);
-			});
-		}
-		// -------------------------
-		// BatteryThreshold submenu
-		// -------------------------
-		// -------------------------
-		// Boot sound submenu
-		// -------------------------
-		if (hardwareService.getBootSoundAvailable()) {
-			QMenu* bootSoundMenu		 = new QMenu(("    " + translator.translate("boot.sound")).c_str(), menu);
-			QActionGroup* bootSoundGroup = new QActionGroup(menu);
-
-			const std::array<bool, 2> vals = {true, false};
-			for (auto v : vals) {
-				QAction* bsAct = new QAction(translator.translate(v ? "enabled" : "disabled").c_str(), bootSoundGroup);
-				bsAct->setCheckable(true);
-				bsAct->setChecked(v == hardwareService.getBootSound());
-				QObject::connect(bsAct, &QAction::triggered, [this, v]() {
-					onBootSoundChanged(v);
-				});
-				bootSoundMenu->addAction(bsAct);
-				bootSoundActions[v] = bsAct;
-			}
-
-			menu->insertMenu(nullptr, bootSoundMenu);
-
-			eventBus.onBootSound([this](bool value) {
-				setBootSound(value);
-			});
-		}
-		// -------------------------
-		// Boot sound submenu
-		// -------------------------
+	QAction* hardwareTitle = new QAction(translator.translate("hardware").c_str(), menu);
+	hardwareTitle->setEnabled(false);
+	menu->addAction(hardwareTitle);
+#ifdef BAT_LIMIT
+	// -------------------------
+	// BatteryThreshold submenu
+	// -------------------------
+	QMenu* chargeLimitMenu	  = new QMenu(("    " + translator.translate("charge.threshold")).c_str(), menu);
+	QActionGroup* chargeGroup = new QActionGroup(menu);
+	for (BatteryThreshold bct : values<BatteryThreshold, true>()) {
+		QAction* act = new QAction((std::to_string(toInt(bct)) + "%").c_str(), chargeGroup);
+		act->setCheckable(true);
+		act->setChecked(bct == hardwareService.getChargeThreshold());
+		QObject::connect(act, &QAction::triggered, [this, bct]() {
+			onBatteryLimitChanged(bct);
+		});
+		chargeLimitMenu->addAction(act);
+		thresholdActions[toString(bct)] = act;
 	}
+	menu->insertMenu(nullptr, chargeLimitMenu);
+
+	eventBus.onChargeThreshold([this](BatteryThreshold threshold) {
+		setBatteryThreshold(threshold);
+	});
+	// -------------------------
+	// BatteryThreshold submenu
+	// -------------------------
+#endif
+#ifdef BOOT_SOUND
+	// -------------------------
+	// Boot sound submenu
+	// -------------------------
+	QMenu* bootSoundMenu		 = new QMenu(("    " + translator.translate("boot.sound")).c_str(), menu);
+	QActionGroup* bootSoundGroup = new QActionGroup(menu);
+
+	const std::array<bool, 2> vals = {true, false};
+	for (auto v : vals) {
+		QAction* bsAct = new QAction(translator.translate(v ? "enabled" : "disabled").c_str(), bootSoundGroup);
+		bsAct->setCheckable(true);
+		bsAct->setChecked(v == hardwareService.getBootSound());
+		QObject::connect(bsAct, &QAction::triggered, [this, v]() {
+			onBootSoundChanged(v);
+		});
+		bootSoundMenu->addAction(bsAct);
+		bootSoundActions[v] = bsAct;
+	}
+
+	menu->insertMenu(nullptr, bootSoundMenu);
+
+	eventBus.onBootSound([this](bool value) {
+		setBootSound(value);
+	});
+	// -------------------------
+	// Boot sound submenu
+	// -------------------------
+#endif
 	// -------------------------
 	// Hardware menu
 	// -------------------------
+#endif
 
 	menu->addSeparator();
 
@@ -587,6 +590,8 @@ void TrayIcon::show() {
 	tray_icon_->show();
 }
 
+#ifdef BOOT_SOUND
 void TrayIcon::onBootSoundChanged(bool enable) {
 	hardwareService.setBootSound(enable);
 }
+#endif

@@ -219,63 +219,63 @@ MainWindow::MainWindow(QWidget* parent) : QMainWindow(parent) {
 	// Aura group
 	// -------------------------
 
+#if defined(BAT_LIMIT) || defined(BOOT_SOUND)
 	// -------------------------
 	// Hardware group
 	// -------------------------
-	if (hardwareService.getBatteryLimitAvailable() || hardwareService.getBootSoundAvailable()) {
-		QGroupBox* hardwareGroup	= new QGroupBox(translator.translate("hardware").c_str());
-		QFormLayout* hardwareLayout = new QFormLayout();
-		hardwareLayout->setContentsMargins(20, 10, 20, 10);
-		// -------------------------
-		// Battery menu
-		// -------------------------
-		if (hardwareService.getBatteryLimitAvailable()) {
-			_thresholdDropdown = new NoScrollComboBox();
-			_thresholdDropdown->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Preferred);
-			for (BatteryThreshold t : values<BatteryThreshold, true>()) {
-				const auto intVal = toInt(t);
-				_thresholdDropdown->addItem("  " + QString::number(intVal) + "%", intVal);
-			}
-			connect(_thresholdDropdown, QOverload<int>::of(&QComboBox::currentIndexChanged), this, &MainWindow::onBatteryLimitChanged);
-			setBatteryChargeLimit(hardwareService.getChargeThreshold());
-			hardwareLayout->addRow(new QLabel((translator.translate("charge.threshold") + ":").c_str()), _thresholdDropdown);
-
-			eventBus.onChargeThreshold([this](BatteryThreshold threshold) {
-				setBatteryChargeLimit(threshold);
-			});
-		}
-		// -------------------------
-		// Battery menu
-		// -------------------------
-		// -------------------------
-		// Boot sound menu
-		// -------------------------
-		if (hardwareService.getBootSoundAvailable()) {
-			_bootSoundDropdown = new NoScrollComboBox();
-			_bootSoundDropdown->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Preferred);
-
-			auto vals = std::array<bool, 2>{true, false};
-			for (size_t i = 0; i < vals.size(); i++) {
-				_bootSoundDropdown->addItem(("  " + translator.translate(vals[i] ? "enabled" : "disabled")).c_str(), vals[i]);
-			}
-			onBootSoundEvent(hardwareService.getBootSound());
-
-			connect(_bootSoundDropdown, QOverload<int>::of(&QComboBox::currentIndexChanged), this, &MainWindow::onBootSoundChanged);
-			hardwareLayout->addRow(new QLabel(translator.translate("boot.sound").c_str()), _bootSoundDropdown);
-
-			eventBus.onBootSound([this](bool value) {
-				onBootSoundEvent(value);
-			});
-		}
-		// -------------------------
-		// Boot sound menu
-		// -------------------------
-		hardwareGroup->setLayout(hardwareLayout);
-		mainLayout->addWidget(hardwareGroup);
+	QGroupBox* hardwareGroup	= new QGroupBox(translator.translate("hardware").c_str());
+	QFormLayout* hardwareLayout = new QFormLayout();
+	hardwareLayout->setContentsMargins(20, 10, 20, 10);
+#ifdef BAT_LIMIT
+	// -------------------------
+	// Battery menu
+	// -------------------------
+	_thresholdDropdown = new NoScrollComboBox();
+	_thresholdDropdown->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Preferred);
+	for (BatteryThreshold t : values<BatteryThreshold, true>()) {
+		const auto intVal = toInt(t);
+		_thresholdDropdown->addItem("  " + QString::number(intVal) + "%", intVal);
 	}
+	connect(_thresholdDropdown, QOverload<int>::of(&QComboBox::currentIndexChanged), this, &MainWindow::onBatteryLimitChanged);
+	setBatteryChargeLimit(hardwareService.getChargeThreshold());
+	hardwareLayout->addRow(new QLabel((translator.translate("charge.threshold") + ":").c_str()), _thresholdDropdown);
+
+	eventBus.onChargeThreshold([this](BatteryThreshold threshold) {
+		setBatteryChargeLimit(threshold);
+	});
+	// -------------------------
+	// Battery menu
+	// -------------------------
+#endif
+#ifdef BOOT_SOUND
+	// -------------------------
+	// Boot sound menu
+	// -------------------------
+	_bootSoundDropdown = new NoScrollComboBox();
+	_bootSoundDropdown->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Preferred);
+
+	auto vals = std::array<bool, 2>{true, false};
+	for (size_t i = 0; i < vals.size(); i++) {
+		_bootSoundDropdown->addItem(("  " + translator.translate(vals[i] ? "enabled" : "disabled")).c_str(), vals[i]);
+	}
+	onBootSoundEvent(hardwareService.getBootSound());
+
+	connect(_bootSoundDropdown, QOverload<int>::of(&QComboBox::currentIndexChanged), this, &MainWindow::onBootSoundChanged);
+	hardwareLayout->addRow(new QLabel(translator.translate("boot.sound").c_str()), _bootSoundDropdown);
+
+	eventBus.onBootSound([this](bool value) {
+		onBootSoundEvent(value);
+	});
+	// -------------------------
+	// Boot sound menu
+	// -------------------------
+#endif
+	hardwareGroup->setLayout(hardwareLayout);
+	mainLayout->addWidget(hardwareGroup);
 	// -------------------------
 	// Hardware group
 	// -------------------------
+#endif
 
 	// -------------------------
 	// Settings group
@@ -353,10 +353,6 @@ void MainWindow::onBatteryEvent() {
 	_profileDropdown->setEnabled(runningGames == 0 && !onBattery);
 }
 
-void MainWindow::onBootSoundEvent(bool value) {
-	_bootSoundDropdown->setCurrentIndex(_bootSoundDropdown->findData(value));
-}
-
 void MainWindow::setPerformanceProfile(PerformanceProfile value) {
 	_profileDropdown->setCurrentIndex(_profileDropdown->findData(toString(value).c_str()));
 }
@@ -367,10 +363,6 @@ void MainWindow::setScheduler(std::optional<std::string> sched) {
 
 void MainWindow::setSsdScheduler(std::string sched) {
 	_ssdSchedulerDropdown->setCurrentIndex(_ssdSchedulerDropdown->findData(sched.c_str()));
-}
-
-void MainWindow::setBatteryChargeLimit(BatteryThreshold value) {
-	_thresholdDropdown->setCurrentIndex(_thresholdDropdown->findData(toInt(value)));
 }
 
 void MainWindow::setAuraBrightness(RgbBrightness brightness) {
@@ -418,12 +410,18 @@ void MainWindow::onSsdSchedulerChanged(int) {
 	}
 }
 
+#ifdef BAT_LIMIT
 void MainWindow::onBatteryLimitChanged(int) {
 	auto threshold = fromInt<BatteryThreshold>(_thresholdDropdown->currentData().toInt());
 	if (hardwareService.getChargeThreshold() != threshold) {
 		hardwareService.setChargeThreshold(threshold);
 	}
 }
+
+void MainWindow::setBatteryChargeLimit(BatteryThreshold value) {
+	_thresholdDropdown->setCurrentIndex(_thresholdDropdown->findData(toInt(value)));
+}
+#endif
 
 void MainWindow::showColorPicker() {
 	QColor initial = QColor(openRgbService.getColor().value().c_str());
@@ -467,9 +465,14 @@ void MainWindow::onStartMinimizedChanged(bool enabled) {
 	applicationService.setStartMinimized(enabled);
 }
 
+#ifdef BOOT_SOUND
 void MainWindow::onBootSoundChanged(int) {
 	auto enabled = _bootSoundDropdown->currentData().toBool();
 	if (hardwareService.getBootSound() != enabled) {
 		hardwareService.setBootSound(enabled);
 	}
 }
+void MainWindow::onBootSoundEvent(bool value) {
+	_bootSoundDropdown->setCurrentIndex(_bootSoundDropdown->findData(value));
+}
+#endif

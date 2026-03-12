@@ -2,7 +2,9 @@
 
 #include <optional>
 
+#ifdef INTEL_RAPL_UJ
 #include "clients/file/intel_rapl_uj_client.hpp"
+#endif
 #include "clients/unix_socket/steam_client.hpp"
 #include "models/settings/game_entry.hpp"
 #include "models/steam/steam_game_config.hpp"
@@ -20,8 +22,10 @@ class SteamService : public Singleton<SteamService>, Loggable {
 	std::optional<std::string> whichMangohud;
 	std::optional<std::string> whichSystemdInhibit;
 
-	Shell& shell						   = Shell::getInstance();
-	IntelRaplUJClient& intelRaplUjClient   = IntelRaplUJClient::getInstance();
+	Shell& shell = Shell::getInstance();
+#ifdef INTEL_RAPL_UJ
+	IntelRaplUJClient& intelRaplUjClient = IntelRaplUJClient::getInstance();
+#endif
 	EventBusWrapper& eventBus			   = EventBusWrapper::getInstance();
 	ConfigurationWrapper& configuration	   = ConfigurationWrapper::getInstance();
 	OpenRgbService& openRgbService		   = OpenRgbService::getInstance();
