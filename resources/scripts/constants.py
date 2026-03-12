@@ -44,12 +44,11 @@ ref = "tag=$pkgver-$pkgrel"
 branch = subprocess.check_output(
     ["git", "rev-parse", "--abbrev-ref", "HEAD"], text=True
 ).strip()
-if branch == "main":
-    if os.environ.get("GIT_RELEASE", None) is not None:
-        commit_count = subprocess.check_output(
-            ["git", "rev-list", "--count", f"{version}-1..HEAD"], text=True
-        ).strip()
-        version = version + ".r" + commit_count
+if os.environ.get("GIT_RELEASE", None) is not None:
+    commit_count = subprocess.check_output(
+        ["git", "rev-list", "--count", f"{version}-1..HEAD"], text=True
+    ).strip()
+    version = version + ".r" + commit_count
 else:
     version = version + "-" + branch
 

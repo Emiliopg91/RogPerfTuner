@@ -11,7 +11,7 @@ const std::string Constants::APP_NAME  = "RogPerfTuner";
 const std::string Constants::EXEC_NAME = "rog-perf-tuner";
 const pid_t Constants::PID			   = getpid();
 
-const std::string Constants::APP_VERSION = "4.13.4-develop";
+const std::string Constants::APP_VERSION = "4.13.4-main";
 
 #ifdef DEV_MODE
 const std::string Constants::APP_DRAW_FILE = FileUtils::getCWD() + "/resources/" + Constants::APP_NAME + ".desktop";
