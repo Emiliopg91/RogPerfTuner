@@ -55,7 +55,7 @@ jobs:
           echo "Copying files..."
           cp ../dist/PKGBUILD .
           cp ../dist/.SRCINFO .
-          cp ../dist/rog-perf-tuner.install rog-perf-tuner-git.install
+          cp ../dist/rog-perf-tuner-git.install .
 
           echo "Committing changes..."
           git add PKGBUILD .SRCINFO rog-perf-tuner-git.install
