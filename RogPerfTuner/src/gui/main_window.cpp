@@ -18,16 +18,12 @@
 #include "OpenRGB/Color.hpp"
 #include "framework/utils/string_utils.hpp"
 #include "gui/fan_curve_editor.hpp"
-#ifdef STEAM_SUPPORT
 #include "gui/game_list.hpp"
-#endif
 #include "models/performance/performance_profile.hpp"
 
 MainWindow::MainWindow(QWidget* parent) : QMainWindow(parent) {
-	onBattery = uPowerClient.isOnBattery();
-#ifdef STEAM_SUPPORT
+	onBattery	 = uPowerClient.isOnBattery();
 	runningGames = steamService.getRunningGames().size();
-#endif
 
 	setWindowTitle((Constants::APP_NAME + " | " + Constants::APP_VERSION).c_str());
 	setWindowIcon(QIcon(Constants::ASSET_ICON_45_FILE.c_str()));
@@ -72,7 +68,6 @@ MainWindow::MainWindow(QWidget* parent) : QMainWindow(parent) {
 	// -------------------------
 	// Profile menu
 	// -------------------------
-#ifdef SCX_SUPPORT
 	// -------------------------
 	// Scheduler menu
 	// -------------------------
@@ -98,7 +93,6 @@ MainWindow::MainWindow(QWidget* parent) : QMainWindow(parent) {
 	// -------------------------
 	// Scheduler menu
 	// -------------------------
-#endif
 	// -------------------------
 	// SSD Scheduler menu
 	// -------------------------
@@ -136,7 +130,6 @@ MainWindow::MainWindow(QWidget* parent) : QMainWindow(parent) {
 	// -------------------------
 	// Fan curves menu
 	// -------------------------
-#ifdef STEAM_SUPPORT
 	// -------------------------
 	// Games menu
 	// -------------------------
@@ -147,7 +140,6 @@ MainWindow::MainWindow(QWidget* parent) : QMainWindow(parent) {
 	// -------------------------
 	// Games menu
 	// -------------------------
-#endif
 	performanceGroup->setLayout(performanceLayout);
 	mainLayout->addWidget(performanceGroup);
 
@@ -341,12 +333,10 @@ MainWindow::MainWindow(QWidget* parent) : QMainWindow(parent) {
 		onBatteryEvent();
 	});
 
-#ifdef STEAM_SUPPORT
 	eventBus.onGameEvent([this](size_t runningGames) {
 		this->runningGames = runningGames;
 		onGameEvent();
 	});
-#endif
 }
 
 void MainWindow::closeEvent(QCloseEvent* event) {
@@ -356,9 +346,7 @@ void MainWindow::closeEvent(QCloseEvent* event) {
 
 void MainWindow::onGameEvent() {
 	_profileDropdown->setEnabled(runningGames == 0 && !onBattery);
-#ifdef SCX_SUPPORT
 	_schedulerDropdown->setEnabled(runningGames == 0);
-#endif
 }
 
 void MainWindow::onBatteryEvent() {
@@ -373,11 +361,9 @@ void MainWindow::setPerformanceProfile(PerformanceProfile value) {
 	_profileDropdown->setCurrentIndex(_profileDropdown->findData(toString(value).c_str()));
 }
 
-#ifdef SCX_SUPPORT
 void MainWindow::setScheduler(std::optional<std::string> sched) {
 	_schedulerDropdown->setCurrentIndex(_schedulerDropdown->findData(sched.value_or("").c_str()));
 }
-#endif
 
 void MainWindow::setSsdScheduler(std::string sched) {
 	_ssdSchedulerDropdown->setCurrentIndex(_ssdSchedulerDropdown->findData(sched.c_str()));
@@ -402,18 +388,13 @@ void MainWindow::setAuraEffect(std::string effect) {
 
 void MainWindow::onProfileChanged(int) {
 	PerformanceProfile profile = fromString<PerformanceProfile>(_profileDropdown->currentData().toString().toStdString());
-#ifdef STEAM_SUPPORT
 	if (steamService.getRunningGames().empty()) {
-#endif
 		if (performanceService.getPerformanceProfile() != profile) {
 			performanceService.setPerformanceProfile(profile);
 		}
-#ifdef STEAM_SUPPORT
 	}
-#endif
 }
 
-#ifdef SCX_SUPPORT
 void MainWindow::onSchedulerChanged(int) {
 	std::optional<std::string> scheduler = (_schedulerDropdown->currentData().toString().toStdString());
 	if (scheduler.value_or("").empty()) {
@@ -421,28 +402,19 @@ void MainWindow::onSchedulerChanged(int) {
 	}
 
 	if (scheduler != performanceService.getCurrentScheduler()) {
-#ifdef STEAM_SUPPORT
 		if (steamService.getRunningGames().empty()) {
-#endif
 			performanceService.setScheduler(scheduler);
-#ifdef STEAM_SUPPORT
 		}
-#endif
 	}
 }
-#endif
 
 void MainWindow::onSsdSchedulerChanged(int) {
 	std::string scheduler = (_ssdSchedulerDropdown->currentData().toString().toStdString());
 
 	if (scheduler != performanceService.getCurrentSsdScheduler()) {
-#ifdef STEAM_SUPPORT
 		if (steamService.getRunningGames().empty()) {
-#endif
 			performanceService.setSsdScheduler(scheduler);
-#ifdef STEAM_SUPPORT
 		}
-#endif
 	}
 }
 
@@ -476,12 +448,10 @@ void MainWindow::onBrightnessChange(int) {
 	}
 }
 
-#ifdef STEAM_SUPPORT
 void MainWindow::openGameList() {
 	GameList* list = new GameList(this);
 	list->show();
 }
-#endif
 
 void MainWindow::openFanEditor() {
 	auto profile		= _profileDropdown->currentData().toString().toStdString();

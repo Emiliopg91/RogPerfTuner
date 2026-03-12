@@ -58,34 +58,12 @@ makedepends=(
 )
 optdepends=(
   'mangohud-git: Monitoring FPS, temperatures, CPU/GPU load and more'
-  "scx-manager: Manager for sched-ext schedulers"
-  "scx-scheds: Use sched-ext schedulers"
-  "scx-tools: Tools to use sched-ext schedulers"
-  'steam: Define and apply automatically performance configurations for games'
+  'scx-scheds: Use sched-ext schedulers'
   'switcheroo-control: Allow GPU selector for games'
+  'steam: Define and apply automatically performance configurations for games'
 )
+
 install=rog-perf-tuner<sufix>.install
-
-_handle_dep() {
-    for pkg in "$@"; do
-        depends+=("$pkg")
-
-        local new_opt=()
-        for dep in "${optdepends[@]}"; do
-            [[ $dep == "$pkg:"* ]] || new_opt+=("$dep")
-        done
-        optdepends=("${new_opt[@]}")
-    done
-}
-
-_check_cmd() {
-    command -v "$1" >/dev/null 2>&1
-}
-
-_check_cmd steam && _handle_dep steam
-_check_cmd mangohud && _handle_dep mangohud-git
-_check_cmd switcherooctl &&_handle_dep switcheroo-control
-_check_cmd scxctl && _handle_dep scx-manager scx-scheds scx-tools
 
 prepare() {
     cd "$srcdir/RogPerfTuner"
@@ -116,7 +94,7 @@ build() {
     export CXXFLAGS="${CXXFLAGS}"
 
     cd "$srcdir/RogPerfTuner"
-     make pkgbuild
+    <env> make pkgbuild
 }
 
 package() {
@@ -125,7 +103,6 @@ package() {
     install -Dm755 build/RogPerfTuner/RogPerfTuner "$pkgdir/usr/bin/rog-perf-tuner"
     
     install -d "$pkgdir/usr/share/rog-perf-tuner"
-    _check_cmd steams || rm -Rf build/assets/RccDeckyCompanion
     cp -r build/assets/* "$pkgdir/usr/share/rog-perf-tuner/"
     chmod -R 755 "$pkgdir/usr/share/rog-perf-tuner/"
     install -Dm644 "$pkgdir/usr/share/rog-perf-tuner/OpenRGB/60-openrgb.rules" "$pkgdir/usr/lib/udev/rules.d/60-rog-perf-tuner.rules"
@@ -133,8 +110,4 @@ package() {
     rm "$pkgdir/usr/share/rog-perf-tuner/suggestions.yaml"
 
     install -Dm755 resources/RogPerfTuner.desktop "$pkgdir/usr/share/applications/rog-perf-tuner.desktop"
-
-    python resources/scripts/completion.py
-    install -Dm644 dist/completion-bash \
-        "$pkgdir/usr/share/bash-completion/completions/rog-perf-tuner"
 }

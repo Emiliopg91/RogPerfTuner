@@ -62,7 +62,6 @@ const std::string Constants::INC_BRIGHT				  = "incRgbBrightness";
 const std::string Constants::NEXT_EFF				  = "nextRgbEffect";
 const std::string Constants::SHOW_GUI				  = "showGui";
 
-#ifdef STEAM_SUPPORT
 const std::string Constants::PLUGIN_VERSION			   = "1.2.8";
 const std::string Constants::USR_SHARE_OCL_DIR		   = "/etc/OpenCL/vendors/";
 const std::string Constants::USR_SHARE_VK_DIR		   = "/usr/share/vulkan/icd.d/";
@@ -83,4 +82,3 @@ const std::string Constants::GAME_CFG				   = "gameConfig";
 const std::string Constants::FLATPAK_MANGOHUD		   = "org.freedesktop.Platform.VulkanLayer.MangoHud/x86_64/25.08";
 const std::string Constants::FLATPAK_MANGOHUD_OVERRIDE = "--filesystem=xdg-config/MangoHud:ro";
 const std::string Constants::SUGGESTIONS_URL = "https://raw.githubusercontent.com/Emiliopg91/RogPerfTuner/refs/heads/main/resources/suggestions.yaml";
-#endif

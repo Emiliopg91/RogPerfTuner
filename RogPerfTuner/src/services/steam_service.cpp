@@ -153,9 +153,7 @@ void SteamService::onFirstGameRun(unsigned int gid, std::string name, bool proto
 					env,
 					std::nullopt,
 					std::nullopt,
-#ifdef MANGOHUD_SUPPORT
 					MangoHudLevel::NO_DISPLAY,
-#endif
 					name,
 					details.is_shortcut ? std::optional<std::string>{encodedAppId} : std::nullopt,
 					proton,
@@ -355,11 +353,9 @@ void SteamService::onGameStop(unsigned int gid, std::string name) {
 		runningGames.erase(gid);
 		Logger::add_tab();
 
-#ifdef SCX_SUPPORT
 		if (it->second.scheduler.has_value() && performanceService.getCurrentScheduler() == it->second.scheduler) {
 			performanceService.setScheduler(std::nullopt);
 		}
-#endif
 
 		setProfileForGames();
 
@@ -375,7 +371,6 @@ void SteamService::setProfileForGames(bool onConnect) {
 		PerformanceProfile p = PerformanceProfile::PERFORMANCE;
 		performanceService.setPerformanceProfile(p, true, true);
 
-#ifdef SCX_SUPPORT
 		std::optional<std::string> sched = configuration.getConfiguration().platform.performance.scheduler;
 		for (const auto& [key, value] : runningGames) {
 			if (value.scheduler.has_value() && value.scheduler != performanceService.getCurrentScheduler()) {
@@ -384,7 +379,6 @@ void SteamService::setProfileForGames(bool onConnect) {
 			}
 		}
 		performanceService.setScheduler(sched, true);
-#endif
 	} else if (!onConnect) {
 		hardwareService.setPanelOverdrive(false);
 		openRgbService.restoreAura();
@@ -471,24 +465,19 @@ const SteamGameConfig SteamService::getConfiguration(const std::string& id) {
 			}
 		}
 
-#ifdef SWITCHEROO_SUPPORT
 		if (gameEntry.gpu.has_value()) {
 			auto gpuEnv = hardwareService.getGpuSelectorEnv(gameEntry.gpu.value());
 			for (const auto& [key, val] : gpuEnv) {
 				cfg.environment[key] = val;
 			}
 		}
-#endif
 
-#ifdef MANGOHUD_SUPPORT
 		if (whichMangohud.has_value() && gameEntry.metrics_level != MangoHudLevel::NO_DISPLAY) {
 			cfg.environment["MANGOHUD_CONFIG"] = "preset=" + std::to_string(toInt(gameEntry.metrics_level));
 			cfg.environment["MANGOHUD_DLSYM"]  = "1";
 			cfg.environment["MANGOHUD"]		   = "1";
 			cfg.wrappers.emplace_back(whichMangohud.value());
 		}
-#endif
-
 		if (gameEntry.wrappers.has_value()) {
 			auto wraps = StringUtils::split(gameEntry.wrappers.value(), ' ');
 			for (auto wrap : wraps) {

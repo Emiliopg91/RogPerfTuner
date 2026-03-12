@@ -90,7 +90,7 @@ build_openrgb:
 	fi
 
 build_rccdc:
-	@if [[ -n "$$IN_TEST" ]] || [[ -f ".Debug" ]] || command -v steam >/dev/null 2>&1; then \
+	@if [[ -f ".Debug" ]] || command -v steam >/dev/null 2>&1; then \
 	    if [ ! -d "build/assets/RccDeckyCompanion" ]; then \
 	        echo "#######################################################################"; \
 	        echo "#################### Compiling RccDeckyCompanion ######################"; \
@@ -116,7 +116,11 @@ release:
 	@echo "######################### Generating Release ##########################"
 	@echo "#######################################################################"
 	@cp resources/PKGBUILD dist/PKGBUILD
-	@cp resources/rog-perf-tuner.sh dist/rog-perf-tuner.install
+	@if [[ -n "$$GIT_RELEASE" ]]; then \
+	    cp resources/rog-perf-tuner.sh dist/rog-perf-tuner-git.install; \
+	else \
+	    cp resources/rog-perf-tuner.sh dist/rog-perf-tuner.install; \
+	fi
 	@python resources/scripts/release.py
 
 build_debug:
@@ -132,7 +136,7 @@ increase_version:
 	@awk '{if ($$0 ~ /project\(.*VERSION/) {match($$0, /([0-9]+)\.([0-9]+)\.([0-9]+)/, v); patch = v[3] + 1; sub(/[0-9]+\.[0-9]+\.[0-9]+/, v[1] "." v[2] "." patch);} print}' CMakeLists.txt > CMakeLists.txt.tmp && mv CMakeLists.txt.tmp CMakeLists.txt
 
 test: 
-	@GIT_RELEASE=1 make release && mv dist/rog-perf-tuner.install dist/rog-perf-tuner-git.install
+	@GIT_RELEASE=1 make release
 	@python3 ./resources/scripts/test.py
 
 install: clean

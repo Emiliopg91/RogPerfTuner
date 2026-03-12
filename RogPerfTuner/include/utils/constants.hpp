@@ -63,7 +63,6 @@ class Constants {
 	static const std::string TRANSLATIONS_FILE;
 	static const std::string DEV_MODE_FILE;
 
-#ifdef STEAM_SUPPORT
 	static const std::string PLUGIN_VERSION;
 	static const std::string USR_SHARE_OCL_DIR;
 	static const std::string USR_SHARE_VK_DIR;
@@ -87,5 +86,4 @@ class Constants {
 	static const std::string FLATPAK_MANGOHUD;
 	static const std::string FLATPAK_MANGOHUD_OVERRIDE;
 	static const std::string RCDCC_SOCKET_PATH;
-#endif
 };

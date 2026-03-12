@@ -1,12 +1,10 @@
 #include <iostream>
 
 #include "main/dev.hpp"
-#ifdef STEAM_SUPPORT
 #include "main/flatpak.hpp"
-#include "main/run.hpp"
-#endif
 #include "main/gui.hpp"
 #include "main/rgb.hpp"
+#include "main/run.hpp"
 
 inline void shiftArgv(int& argc, char** argv) {
 	if (argc <= 2) {
@@ -40,9 +38,7 @@ int main(int argc, char** argv) {
 			case hashStr("-v"):
 			case hashStr("--version"):
 				std::cout << "RogPerfTuner v" << Constants::APP_VERSION << std::endl;
-#ifdef STEAM_SUPPORT
 				std::cout << "Decky plugin v" << Constants::PLUGIN_VERSION << std::endl;
-#endif
 				break;
 
 			case hashStr("-p"):
@@ -68,7 +64,6 @@ int main(int argc, char** argv) {
 			case hashStr("--kill"):
 				return killInstance();
 
-#ifdef STEAM_SUPPORT
 			case hashStr("-f"):
 			case hashStr("--flatpak"):
 				shiftArgv(argc, argv);
@@ -78,7 +73,6 @@ int main(int argc, char** argv) {
 			case hashStr("--run"):
 				shiftArgv(argc, argv);
 				return runSteamWrapping(argc, argv);
-#endif
 
 			case hashStr("-s"):
 			case hashStr("--show"):

@@ -8,19 +8,16 @@
 #include "clients/file/boost_control_client.hpp"
 #include "clients/file/cpuinfo_client.hpp"
 #include "clients/lib/lsusb_client.hpp"
+#include "clients/shell/switcherooctl_client.hpp"
 #include "framework/gui/toaster.hpp"
 #include "framework/translator/translator.hpp"
+#include "framework/utils/file_utils.hpp"
 #include "framework/utils/string_utils.hpp"
 #include "framework/utils/time_utils.hpp"
 #include "models/hardware/battery_charge_threshold.hpp"
+#include "models/hardware/gpu_brand.hpp"
 #include "services/open_rgb_service.hpp"
 #include "utils/event_bus_wrapper.hpp"
-
-#ifdef STEAM_SUPPORT
-#include "clients/shell/switcherooctl_client.hpp"
-#include "framework/utils/file_utils.hpp"
-#include "models/hardware/gpu_brand.hpp"
-#endif
 
 HardwareService::HardwareService() : Loggable("HardwareService") {
 	logger->info("Initializing HardwareService");
@@ -58,7 +55,6 @@ HardwareService::HardwareService() : Loggable("HardwareService") {
 
 	Logger::rem_tab();
 
-#ifdef SWITCHEROO_SUPPORT
 	logger->info("Detecting GPUs");
 	Logger::add_tab();
 	auto detected_gpus = switcherooCtlClient.getGpus();
@@ -128,7 +124,6 @@ HardwareService::HardwareService() : Loggable("HardwareService") {
 		}
 	}
 	Logger::rem_tab();
-#endif
 
 	if (batteryChargeLimitClient.available()) {
 		logger->info("Getting battery charge limit");
@@ -258,7 +253,6 @@ void HardwareService::setPanelOverdrive(const bool& enable) {
 	}
 }
 
-#ifdef SWITCHEROO_SUPPORT
 std::unordered_map<std::string, std::string> HardwareService::getGpuSelectorEnv(const std::string& gpu) {
 	std::unordered_map<std::string, std::string> env;
 
@@ -290,7 +284,6 @@ std::unordered_map<std::string, std::string> HardwareService::getGpuSelectorEnv(
 std::unordered_map<std::string, std::string> HardwareService::getGpus() {
 	return gpus;
 }
-#endif
 
 bool HardwareService::getBootSoundAvailable() {
 	return bootSoundClient.available();

@@ -6,26 +6,20 @@
 
 #include "framework/utils/enum_utils.hpp"
 #include "models/steam/computer_type.hpp"
-#ifdef MANGOHUD_SUPPORT
 #include "models/steam/mangohud_level.hpp"
-#endif
 #include "models/steam/wine_sync_option.hpp"
 
 struct GameEntry {
-#ifdef MANGOHUD_SUPPORT
 	inline static const MangoHudLevel DEFAULT_METRICS_LEVEL = MangoHudLevel::NO_DISPLAY;
-#endif
-	inline static const ComputerType DEFAULT_DEVICE = ComputerType::COMPUTER;
-	inline static const WineSyncOption DEFAULT_SYNC = WineSyncOption::AUTO;
-	inline static const bool DEFAULT_PROTON			= true;
+	inline static const ComputerType DEFAULT_DEVICE			= ComputerType::COMPUTER;
+	inline static const WineSyncOption DEFAULT_SYNC			= WineSyncOption::AUTO;
+	inline static const bool DEFAULT_PROTON					= true;
 
 	std::optional<std::string> args		 = std::nullopt;
 	std::optional<std::string> env		 = std::nullopt;
 	std::optional<std::string> gpu		 = std::nullopt;
 	std::optional<std::string> scheduler = std::nullopt;
-#ifdef MANGOHUD_SUPPORT
-	MangoHudLevel metrics_level = DEFAULT_METRICS_LEVEL;
-#endif
+	MangoHudLevel metrics_level			 = DEFAULT_METRICS_LEVEL;
 	std::string name;
 	std::optional<std::string> overlayId;
 	bool proton							= DEFAULT_PROTON;
@@ -52,11 +46,9 @@ struct convert<GameEntry> {
 		if (game.gpu && !game.gpu->empty()) {
 			node["gpu"] = *game.gpu;
 		}
-#ifdef MANGOHUD_SUPPORT
 		if (game.metrics_level != GameEntry::DEFAULT_METRICS_LEVEL) {
 			node["metrics"] = toString(game.metrics_level);
 		}
-#endif
 		if (game.overlayId && !game.overlayId->empty()) {
 			node["overlayId"] = *game.overlayId;
 		}
@@ -118,11 +110,9 @@ struct convert<GameEntry> {
 			game.sync = fromString<WineSyncOption>(node["sync"].as<std::string>());
 		}
 
-#ifdef MANGOHUD_SUPPORT
 		if (node["metrics"]) {
 			game.metrics_level = fromString<MangoHudLevel>(node["metrics"].as<std::string>());
 		}
-#endif
 
 		if (node["name"]) {
 			game.name = node["name"].as<std::string>();
