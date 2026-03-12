@@ -58,12 +58,38 @@ makedepends=(
 )
 optdepends=(
   'mangohud-git: Monitoring FPS, temperatures, CPU/GPU load and more'
-  'scx-scheds: Use sched-ext schedulers'
-  'switcheroo-control: Allow GPU selector for games'
+  "scx-manager: Manager for sched-ext schedulers"
+  "scx-scheds: Use sched-ext schedulers"
+  "scx-tools: Tools to use sched-ext schedulers"
   'steam: Define and apply automatically performance configurations for games'
+  'switcheroo-control: Allow GPU selector for games'
 )
+install=rog-perf-tuner.install
 
-install=rog-perf-tuner<sufix>.install
+
+_check_dep() {
+    local cmd=$1
+    shift
+
+    if command -v "$cmd" >/dev/null 2>&1; then
+        for pkg in "$@"; do
+            # Añade a depends
+            depends+=("$pkg")
+
+            # Filtra optdepends eliminando cualquier entrada del paquete
+            local new_opt=()
+            for dep in "${optdepends[@]}"; do
+                [[ $dep == "$pkg:"* ]] || new_opt+=("$dep")
+            done
+            optdepends=("${new_opt[@]}")
+        done
+    fi
+}
+_check_dep steam steam
+_check_dep mangohud mangohud-git
+_check_dep switcherooctl switcheroo-control
+_check_dep scxctl scx-manager scx-scheds scx-tools
+
 
 prepare() {
     cd "$srcdir/RogPerfTuner"
@@ -94,7 +120,7 @@ build() {
     export CXXFLAGS="${CXXFLAGS}"
 
     cd "$srcdir/RogPerfTuner"
-    <env> make pkgbuild
+     make pkgbuild
 }
 
 package() {

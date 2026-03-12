@@ -90,13 +90,16 @@ build_openrgb:
 	fi
 
 build_rccdc:
-	@if [ ! -d "build/assets/RccDeckyCompanion" ]; then \
-		echo "#######################################################################" && \
-		echo "#################### Compiling RccDeckyCompanion ######################" && \
-		echo "#######################################################################" && \
-	    cd submodules/RccDeckyCompanion && ./cli/decky.py build && mkdir -p ../../build/assets && cp -r out/RccDeckyCompanion ../../build/assets/RccDeckyCompanion; \
+	@if [[ -n "$$IN_TEST" ]] || [[ -f ".Debug" ]] || command -v steam >/dev/null 2>&1; then \
+	    if [ ! -d "build/assets/RccDeckyCompanion" ]; then \
+	        echo "#######################################################################"; \
+	        echo "#################### Compiling RccDeckyCompanion ######################"; \
+	        echo "#######################################################################"; \
+	        cd submodules/RccDeckyCompanion && ./cli/decky.py build; \
+	        mkdir -p ../../build/assets; \
+	        cp -r out/RccDeckyCompanion ../../build/assets/RccDeckyCompanion; \
+	    fi; \
 	fi
-
 
 pkgbuild:
 	@export BUILD_TYPE=Release

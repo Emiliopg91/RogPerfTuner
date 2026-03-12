@@ -209,10 +209,13 @@ if __name__ == "__main__":
         commit = subprocess.check_output(
             ["git", "log", "-1", "--format=%h"], text=True
         ).strip()
+        print(f"Commit {commit}")
         commit_count = subprocess.check_output(
             ["git", "rev-list", "--count", f"{version}-1..HEAD"], text=True
         ).strip()
+        print(f"Commit count {commit_count}")
         version = version + ".r" + commit_count
+        print(f"Version {version}")
         ref = f"commit={commit}"
         env = "GIT_RELEASE=1"
         other_sufix = ""
@@ -234,7 +237,17 @@ if __name__ == "__main__":
     if os.path.exists(SRCINFO_FILE):
         os.unlink(SRCINFO_FILE)
 
-    with open(SRCINFO_FILE, "w", encoding="utf-8") as f:
-        f.write(generate_srcinfo(parse_pkgbuild(PKGBUILD_FILE), version))
+    print("Updating .SRCINFO file...")
+    subprocess.run(
+        [
+            "docker",
+            "run",
+            "--rm",
+            "-v",
+            f"{os.getcwd()}/dist:/repo",
+            "epulidogil/arch-srcinfo:latest",
+        ],
+        check=True,
+    )
 
     generate_changelog(version, release)
