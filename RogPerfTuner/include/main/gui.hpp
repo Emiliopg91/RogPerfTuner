@@ -9,6 +9,7 @@
 #include <optional>
 #include <string>
 
+#include "clients/file/battery_status_client.hpp"
 #include "clients/file/proc_modules_client.hpp"
 #include "clients/unix_socket/rog_perf_tuner_client.hpp"
 #include "framework/gui/toaster.hpp"
@@ -100,6 +101,9 @@ inline void printFeatureTable(std::shared_ptr<Logger> logger) {
 #endif
 #ifdef BAT_LIMIT
 	logger->info("│ Battery limit   │");
+#endif
+#ifdef BAT_STATUS
+	logger->info("│ Battery status  │");
 #endif
 #ifdef FAN_CONTROL
 	logger->info("│ Fan control     │");

@@ -108,6 +108,15 @@ void EventBusWrapper::emitBattery(const bool& onBat) {
 	this->eventBus.emit_event(toName(Events::HARDWARE_SERVICE_ON_BATTERY), {onBat});
 }
 
+void EventBusWrapper::onBatteryStatus(std::function<void(bool)>&& callback) {
+	this->eventBus.on_with_data(toName(Events::BATTERY_STATUS), [cb = std::move(callback)](CallbackParam data) {
+		cb(std::any_cast<bool>(data[0]));
+	});
+}
+void EventBusWrapper::emitBatteryStatus(const bool& onBat) {
+	this->eventBus.emit_event(toName(Events::BATTERY_STATUS), {onBat});
+}
+
 void EventBusWrapper::onScheduler(std::function<void(std::optional<std::string>)>&& callback) {
 	this->eventBus.on_with_data(toName(Events::PROFILE_SERVICE_ON_SCHEDULER), [cb = std::move(callback)](CallbackParam data) {
 		cb(std::any_cast<std::optional<std::string>>(data[0]));

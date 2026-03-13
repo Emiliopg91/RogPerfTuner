@@ -90,9 +90,11 @@ class TrayIcon : public QObject, public Singleton<TrayIcon> {
 	Translator& translator				   = Translator::getInstance();
 	ConfigurationWrapper& configuration	   = ConfigurationWrapper::getInstance();
 	SteamService& steamService			   = SteamService::getInstance();
-	UPowerClient& uPowerClient			   = UPowerClient::getInstance();
+#ifdef BAT_STATUS
+	BatteryStatusClient& batteryStatusClient = BatteryStatusClient::getInstance();
+	bool onBattery;
+#endif
 	MainWindow& mainWindow;
 
 	int runningGames;
-	bool onBattery;
 };

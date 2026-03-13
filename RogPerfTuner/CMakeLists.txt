@@ -46,14 +46,18 @@ set(NV_BOOST OFF)
 set(NV_THERMAL OFF)
 set(BOOT_SOUND OFF)
 set(BAT_LIMIT OFF)
+set(BAT_STATUS OFF)
 set(PANEL_OD OFF)
 set(FAN_CONTROL OFF)
 
-message("Checking features...")
+message("┌──────────────────┬─────────┐")
+message("│     ${BOLD}Feature${RESET}      │ ${BOLD}Enabled${RESET} │")
+message("├──────────────────┼─────────┤")
 
 if(DEFINED ENV{DEV_MODE})
     set(DEV_MODE ON)
 endif()
+handle_feature("Dev mode        " DEV_MODE)
 
 if(EXISTS "/sys/devices/system/cpu/intel_pstate/no_turbo")
     set(BOOST_CONTROL ON)
@@ -73,6 +77,7 @@ else()
         "${CMAKE_CURRENT_SOURCE_DIR}/src/clients/file/boost_control_client.cpp"
     )
 endif()
+handle_feature("Boost control   " BOOST_CONTROL)
 
 if(EXISTS "/sys/class/powercap/intel-rapl:0/energy_uj")
     set(INTEL_RAPL_UJ ON)
@@ -84,6 +89,7 @@ else()
         "${CMAKE_CURRENT_SOURCE_DIR}/src/clients/file/intel_rapl_uj_client.cpp"
     )
 endif()
+handle_feature("Intel Rapl UJ   " INTEL_RAPL_UJ)
 
 if(EXISTS "/sys/class/firmware-attributes/asus-armoury/attributes/ppt_pl1_spl/current_value")
     set(PPT_PL1_SPL ON)
@@ -123,6 +129,9 @@ else()
         "${CMAKE_CURRENT_SOURCE_DIR}/src/clients/file/firmware/asus-armoury/intel/pl3_fppt_client.cpp"
     )
 endif()
+handle_feature("TDP PL1 SPD     " PPT_PL1_SPL)
+handle_feature("TDP PL2 SPPT    " PPT_PL2_SPPT)
+handle_feature("TDP PL3 FPPT    " PPT_PL3_FPPT)
 
 if(EXISTS "/sys/class/firmware-attributes/asus-armoury/attributes/nv_dynamic_boost/current_value")
     set(NV_BOOST ON)
@@ -134,6 +143,7 @@ else()
         "${CMAKE_CURRENT_SOURCE_DIR}/src/clients/file/firmware/asus-armoury/nvidia/nv_boost_client.cpp"
     )
 endif()
+handle_feature("Nvidia Boost    " NV_BOOST)
 
 if(EXISTS "/sys/class/firmware-attributes/asus-armoury/attributes/nv_dynamic_boost/current_value")
     set(NV_THERMAL ON)
@@ -145,6 +155,7 @@ else()
         "${CMAKE_CURRENT_SOURCE_DIR}/src/clients/file/firmware/asus-armoury/nvidia/nv_temp_client.cpp"
     )
 endif()
+handle_feature("Nvidia Thermal  " NV_THERMAL)
 
 if(EXISTS "/sys/class/firmware-attributes/asus-armoury/attributes/boot_sound/current_value")
     set(BOOT_SOUND ON)
@@ -156,6 +167,7 @@ else()
         "${CMAKE_CURRENT_SOURCE_DIR}/src/clients/file/firmware/asus-armoury/other/boot_sound_client.cpp"
     )
 endif()
+handle_feature("Boot sound      " BOOT_SOUND)
 
 if(EXISTS "/sys/class/firmware-attributes/asus-armoury/attributes/panel_overdrive/current_value")
     set(PANEL_OD ON)
@@ -167,6 +179,7 @@ else()
         "${CMAKE_CURRENT_SOURCE_DIR}/src/clients/file/firmware/asus-armoury/other/panel_overdrive_client.cpp"
     )
 endif()
+handle_feature("Panel Overdrive " PANEL_OD)
 
 if(EXISTS "/sys/class/power_supply/BAT0/charge_control_end_threshold")
     set(BAT_LIMIT ON)
@@ -178,6 +191,19 @@ else()
         "${CMAKE_CURRENT_SOURCE_DIR}/src/clients/file/battery_charge_limit_client.cpp"
     )
 endif()
+handle_feature("Battery limit   " BAT_LIMIT)
+
+if(EXISTS "/sys/class/power_supply/BAT0/status")
+    set(BAT_STATUS ON)
+else()
+    list(REMOVE_ITEM HEADERS_RCC
+        "${CMAKE_CURRENT_SOURCE_DIR}/include/clients/file/battery_status_client.hpp"
+    )
+    list(REMOVE_ITEM SOURCES_RCC
+        "${CMAKE_CURRENT_SOURCE_DIR}/src/clients/file/battery_status_client.cpp"
+    )
+endif()
+handle_feature("Battery status  " BAT_STATUS)
 
 execute_process(
     COMMAND bash -c "asusctl fan-curve --get-enabled | wc -l"
@@ -201,23 +227,8 @@ else()
         "${CMAKE_CURRENT_SOURCE_DIR}/src/models/settings/fan_curve.cpp"
     )
 endif()
-
-
-message("┌──────────────────┬─────────┐")
-message("│     ${BOLD}Feature${RESET}      │ ${BOLD}Enabled${RESET} │")
-message("├──────────────────┼─────────┤")
-handle_feature("Dev mode        " DEV_MODE)
-handle_feature("Boost control   " BOOST_CONTROL)
-handle_feature("Intel Rapl UJ   " INTEL_RAPL_UJ)
-handle_feature("TDP PL1 SPD     " PPT_PL1_SPL)
-handle_feature("TDP PL2 SPPT    " PPT_PL2_SPPT)
-handle_feature("TDP PL3 FPPT    " PPT_PL3_FPPT)
-handle_feature("Nvidia Boost    " NV_BOOST)
-handle_feature("Nvidia Thermal  " NV_THERMAL)
-handle_feature("Boot sound      " BOOT_SOUND)
-handle_feature("Panel Overdrive " PANEL_OD)
-handle_feature("Battery limit   " BAT_LIMIT)
 handle_feature("Fan control     " FAN_CONTROL)
+
 message("└──────────────────┴─────────┘")
 
 

@@ -7,7 +7,9 @@
 
 #include "clients/dbus/asus/core/platform_client.hpp"
 #include "clients/dbus/linux/power_profile_client.hpp"
-#include "clients/dbus/linux/upower_client.hpp"
+#ifdef BAT_STATUS
+#include "clients/file/battery_status_client.hpp"
+#endif
 #include "services/hardware_service.hpp"
 #ifdef BOOST_CONTROL
 #include "clients/file/boost_control_client.hpp"
@@ -195,7 +197,9 @@ class PerformanceService : public Singleton<PerformanceService>, Loggable {
 #ifdef NV_THERMAL
 	NvTempClient& nvTempClient = NvTempClient::getInstance();
 #endif
-	UPowerClient& uPowerClient			   = UPowerClient::getInstance();
+#ifdef BAT_STATUS
+	BatteryStatusClient& batteryStatusClient = BatteryStatusClient::getInstance();
+#endif
 	PowerProfileClient& powerProfileClient = PowerProfileClient::getInstance();
 	Toaster& toaster					   = Toaster::getInstance();
 	SchedBoreClient& schedBoreClient	   = SchedBoreClient::getInstance();

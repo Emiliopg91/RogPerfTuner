@@ -85,7 +85,6 @@ class MainWindow : public QMainWindow, public Singleton<MainWindow> {
   private:
 	friend class Singleton<MainWindow>;
 	int runningGames;
-	bool onBattery;
 
 	EventBusWrapper& eventBus			   = EventBusWrapper::getInstance();
 	PerformanceService& performanceService = PerformanceService::getInstance();
@@ -94,7 +93,10 @@ class MainWindow : public QMainWindow, public Singleton<MainWindow> {
 	SteamService& steamService			   = SteamService::getInstance();
 	Translator& translator				   = Translator::getInstance();
 	ApplicationService& applicationService = ApplicationService::init(std::nullopt);
-	UPowerClient& uPowerClient			   = UPowerClient::getInstance();
+#ifdef BAT_STATUS
+	BatteryStatusClient& batteryStatusClient = BatteryStatusClient::getInstance();
+	bool onBattery;
+#endif
 
 	NoScrollComboBox* _profileDropdown;
 	NoScrollComboBox* _schedulerDropdown;

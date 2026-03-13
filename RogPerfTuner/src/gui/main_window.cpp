@@ -22,7 +22,9 @@
 #include "models/performance/performance_profile.hpp"
 
 MainWindow::MainWindow(QWidget* parent) : QMainWindow(parent) {
-	onBattery	 = uPowerClient.isOnBattery();
+#ifdef BAT_STATUS
+	onBattery = batteryStatusClient.isOnBattery();
+#endif
 	runningGames = steamService.getRunningGames().size();
 
 	setWindowTitle((Constants::APP_NAME + " | " + Constants::APP_VERSION).c_str());
@@ -63,7 +65,11 @@ MainWindow::MainWindow(QWidget* parent) : QMainWindow(parent) {
 	}
 	connect(_profileDropdown, QOverload<int>::of(&QComboBox::currentIndexChanged), this, &MainWindow::onProfileChanged);
 	setPerformanceProfile(performanceService.getPerformanceProfile());
+#ifdef BAT_STATUS
 	_profileDropdown->setEnabled(runningGames == 0 && !onBattery);
+#else
+	_profileDropdown->setEnabled(runningGames == 0);
+#endif
 	performanceLayout->addRow(new QLabel((translator.translate("profile") + ":").c_str()), _profileDropdown);
 	// -------------------------
 	// Profile menu
@@ -328,10 +334,12 @@ MainWindow::MainWindow(QWidget* parent) : QMainWindow(parent) {
 		move(x, y);
 	}
 
+#ifdef BAT_STATUS
 	eventBus.onBattery([this](bool onBattery) {
 		this->onBattery = onBattery;
 		onBatteryEvent();
 	});
+#endif
 
 	eventBus.onGameEvent([this](size_t runningGames) {
 		this->runningGames = runningGames;
@@ -345,12 +353,20 @@ void MainWindow::closeEvent(QCloseEvent* event) {
 }
 
 void MainWindow::onGameEvent() {
+#ifdef BAT_STATUS
 	_profileDropdown->setEnabled(runningGames == 0 && !onBattery);
+#else
+	_profileDropdown->setEnabled(runningGames == 0);
+#endif
 	_schedulerDropdown->setEnabled(runningGames == 0);
 }
 
 void MainWindow::onBatteryEvent() {
+#ifdef BAT_STATUS
 	_profileDropdown->setEnabled(runningGames == 0 && !onBattery);
+#else
+	_profileDropdown->setEnabled(runningGames == 0);
+#endif
 }
 
 void MainWindow::setPerformanceProfile(PerformanceProfile value) {

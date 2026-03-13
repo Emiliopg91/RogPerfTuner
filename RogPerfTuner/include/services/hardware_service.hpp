@@ -4,9 +4,11 @@
 
 #include "clients/dbus/asus/core/platform_client.hpp"
 #include "clients/dbus/linux/power_management_kb_brightness.hpp"
-#include "clients/dbus/linux/upower_client.hpp"
 #ifdef BAT_LIMIT
 #include "clients/file/battery_charge_limit_client.hpp"
+#endif
+#ifdef BAT_STATUS
+#include "clients/file/battery_status_client.hpp"
 #endif
 #include "clients/file/cpuinfo_client.hpp"
 #ifdef BOOT_SOUND
@@ -103,7 +105,9 @@ class HardwareService : public Singleton<HardwareService>, Loggable {
 #ifdef BOOT_SOUND
 	BootSoundClient& bootSoundClient = BootSoundClient::getInstance();
 #endif
-	UPowerClient& uPowerClient				 = UPowerClient::getInstance();
+#ifdef BAT_STATUS
+	BatteryStatusClient& batteryStatusClient = BatteryStatusClient::getInstance();
+#endif
 	CPUInfoClient& cpuInfoClient			 = CPUInfoClient::getInstance();
 	SwitcherooCtlClient& switcherooCtlClient = SwitcherooCtlClient::getInstance();
 #ifdef PANEL_OD

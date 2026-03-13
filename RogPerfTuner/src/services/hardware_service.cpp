@@ -4,7 +4,6 @@
 #include <string>
 
 #include "clients/dbus/linux/power_management_kb_brightness.hpp"
-#include "clients/dbus/linux/upower_client.hpp"
 #include "clients/file/cpuinfo_client.hpp"
 #include "clients/lib/lsusb_client.hpp"
 #include "clients/shell/switcherooctl_client.hpp"
@@ -136,12 +135,12 @@ HardwareService::HardwareService() : Loggable("HardwareService") {
 	setPanelOverdrive(false);
 #endif
 
-	if (uPowerClient.available()) {
-		onBattery = uPowerClient.isOnBattery();
-		uPowerClient.onBatteryChange([this](CallbackAnyParam data) {
-			this->onBatteryEvent(std::any_cast<bool>(data));
-		});
-	}
+#ifdef BAT_STATUS
+	onBattery = batteryStatusClient.isOnBattery();
+	batteryStatusClient.onBatteryChange([this](CallbackAnyParam data) {
+		this->onBatteryEvent(std::any_cast<bool>(data));
+	});
+#endif
 
 	if (pmKeyboardBrightnessClient.available()) {
 		pmKeyboardBrightnessClient.onBrightnessChange([this]() {

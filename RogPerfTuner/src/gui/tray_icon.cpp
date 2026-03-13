@@ -122,7 +122,11 @@ void TrayIcon::setProfileMenuEnabled() {
 	QMetaObject::invokeMethod(
 		this,
 		[=, this]() {
+#ifdef BAT_STATUS
 			profileMenu->setEnabled(!onBattery && runningGames == 0);
+#else
+			profileMenu->setEnabled(runningGames == 0);
+#endif
 		},
 		Qt::QueuedConnection);
 }
@@ -192,7 +196,9 @@ TrayIcon::TrayIcon()
 
 	QMenu* menu = tray_menu_;
 
-	onBattery	 = uPowerClient.isOnBattery();
+#ifdef BAT_STATUS
+	onBattery = batteryStatusClient.isOnBattery();
+#endif
 	runningGames = steamService.getRunningGames().size();
 
 #if defined(BAT_LIMIT) || defined(BOOT_SOUND)
@@ -374,7 +380,11 @@ TrayIcon::TrayIcon()
 		perfProfileActions[toName(item)] = act;
 	}
 
+#ifdef BAT_STATUS
 	profileMenu->setEnabled(runningGames == 0 && !onBattery);
+#else
+	profileMenu->setEnabled(runningGames == 0);
+#endif
 	menu->insertMenu(nullptr, profileMenu);
 	// -------------------------
 	// Profile submenu
@@ -585,10 +595,12 @@ TrayIcon::TrayIcon()
 		setSchedulerMenuEnabled();
 	});
 
+#ifdef BAT_STATUS
 	eventBus.onBattery([this](bool onBattery) {
 		this->onBattery = onBattery;
 		setProfileMenuEnabled();
 	});
+#endif
 }
 
 void TrayIcon::show() {

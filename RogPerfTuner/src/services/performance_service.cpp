@@ -23,17 +23,17 @@ PerformanceService::PerformanceService() : Loggable("PerformanceService") {
 	currentProfile	 = configuration.getConfiguration().platform.performance.profile;
 	currentScheduler = configuration.getConfiguration().platform.performance.scheduler;
 
-	if (uPowerClient.available()) {
-		onBattery		 = uPowerClient.isOnBattery();
+#ifdef BAT_STATUS
+	if (batteryStatusClient.available()) {
+		onBattery		 = batteryStatusClient.isOnBattery();
 		std::string mode = onBattery ? "battery" : "AC";
 		logger->info("Laptop on {} mode", mode);
 	}
+#endif
 
-	if (platformClient.available()) {
-		platformClient.setChangePlatformProfileOnAc(false);
-		platformClient.setChangePlatformProfileOnBattery(false);
-		platformClient.setPlatformProfileLinkedEpp(true);
-	}
+	platformClient.setChangePlatformProfileOnAc(false);
+	platformClient.setChangePlatformProfileOnBattery(false);
+	platformClient.setPlatformProfileLinkedEpp(true);
 
 	eventBus.onBattery([this](bool onBat) {
 		onBattery = onBat;

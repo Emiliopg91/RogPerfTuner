@@ -218,4 +218,8 @@ class EventBusWrapper : public Singleton<EventBusWrapper> {
 	void onSsdScheduler(std::function<void(std::string)>&& callback);
 
 	void emitSsdScheduler(std::string scheduler);
+
+	void onBatteryStatus(std::function<void(bool)>&& callback);
+
+	void emitBatteryStatus(const bool& onBat);
 };

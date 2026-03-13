@@ -3,7 +3,6 @@
 #include <mutex>
 #include <optional>
 
-#include "clients/dbus/linux/upower_client.hpp"
 #include "clients/tcp/open_rgb/open_rgb_client.hpp"
 #include "models/hardware/rgb_brightness.hpp"
 #include "models/hardware/usb_identifier.hpp"
@@ -113,7 +112,6 @@ class OpenRgbService : public Singleton<OpenRgbService>, Loggable {
 	std::string effect;
 	std::optional<std::string> _color = std::nullopt;
 
-	UPowerClient& uPowerClient			= UPowerClient::getInstance();
 	OpenRgbClient& openRgbClient		= OpenRgbClient::getInstance();
 	ConfigurationWrapper& configuration = ConfigurationWrapper::getInstance();
 	EventBusWrapper& eventBus			= EventBusWrapper::getInstance();
