@@ -2,8 +2,10 @@
 
 #include "framework/abstracts/singleton.hpp"
 #include "framework/clients/abstract/abstract_cmd_client.hpp"
+#ifdef FAN_CONTROL
 #include "models/hardware/fan_curve_data.hpp"
 #include "models/performance/platform_profile.hpp"
+#endif
 
 class AsusCtlClient : public AbstractCmdClient, public Singleton<AsusCtlClient> {
   private:
@@ -20,6 +22,7 @@ class AsusCtlClient : public AbstractCmdClient, public Singleton<AsusCtlClient> 
 	 */
 	void turnOffAura();
 
+#ifdef FAN_CONTROL
 	/**
 	 * @brief Resets the fan or performance curves to their default values for the specified platform profile.
 	 *
@@ -80,4 +83,5 @@ class AsusCtlClient : public AbstractCmdClient, public Singleton<AsusCtlClient> 
 	 *         A map where the key is the fan identifier (as a string) and the value is the associated FanCurveData.
 	 */
 	std::unordered_map<std::string, FanCurveData> getFanCurveData(PlatformProfile profile);
+#endif
 };

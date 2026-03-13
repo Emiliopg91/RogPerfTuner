@@ -101,6 +101,9 @@ inline void printFeatureTable(std::shared_ptr<Logger> logger) {
 #ifdef BAT_LIMIT
 	logger->info("│ Battery limit   │");
 #endif
+#ifdef FAN_CONTROL
+	logger->info("│ Fan control     │");
+#endif
 	logger->info("└─────────────────┘");
 	Logger::rem_tab();
 }

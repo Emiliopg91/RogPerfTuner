@@ -76,7 +76,9 @@ class TrayIcon : public QObject, public Singleton<TrayIcon> {
 	void setSchedulerMenuEnabled();
 	void setCoolingMenuEnabled(bool enabled);
 	void openMainWindow();
+#ifdef FAN_CONTROL
 	void openFanEditor();
+#endif
 	void openGameList();
 
 	Shell& shell						   = Shell::getInstance();

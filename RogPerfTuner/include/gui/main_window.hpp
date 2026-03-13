@@ -76,7 +76,9 @@ class MainWindow : public QMainWindow, public Singleton<MainWindow> {
 
 	void openGameList();
 
+#ifdef FAN_CONTROL
 	void openFanEditor();
+#endif
 
 	void showColorPicker();
 

@@ -47,6 +47,7 @@ set(NV_TGP OFF)
 set(BOOT_SOUND OFF)
 set(BAT_LIMIT OFF)
 set(PANEL_OD OFF)
+set(FAN_CONTROL OFF)
 
 if(DEFINED ENV{DEV_MODE})
     set(DEV_MODE ON)
@@ -187,6 +188,29 @@ else()
     )
 endif()
 
+execute_process(
+    COMMAND bash -c "asusctl fan-curve --get-enabled | wc -l"
+    OUTPUT_VARIABLE FAN_CURVE_COUNT
+    OUTPUT_STRIP_TRAILING_WHITESPACE
+)
+
+if(FAN_CURVE_COUNT GREATER 0)
+    message("Fan curve control available via asusctl")
+    set(FAN_CONTROL ON)
+else()
+    list(REMOVE_ITEM HEADERS_RCC
+        "${CMAKE_CURRENT_SOURCE_DIR}/include/gui/fan_curve_editor.hpp"
+        "${CMAKE_CURRENT_SOURCE_DIR}/include/gui/fan_curve_view.hpp"
+        "${CMAKE_CURRENT_SOURCE_DIR}/include/models/hardware/fan_curve_data.hpp"
+        "${CMAKE_CURRENT_SOURCE_DIR}/include/models/settings/fan_curve.hpp"
+    )
+    list(REMOVE_ITEM SOURCES_RCC
+        "${CMAKE_CURRENT_SOURCE_DIR}/src/gui/fan_curve_editor.cpp"
+        "${CMAKE_CURRENT_SOURCE_DIR}/src/gui/fan_curve_view.cpp"
+        "${CMAKE_CURRENT_SOURCE_DIR}/src/models/hardware/fan_curve_data.cpp"
+        "${CMAKE_CURRENT_SOURCE_DIR}/src/models/settings/fan_curve.cpp"
+    )
+endif()
 
 
 message("┌──────────────────┬─────────┐")
@@ -203,6 +227,7 @@ handle_feature("Nvidia TGP      " NV_TGP)
 handle_feature("Boot sound      " BOOT_SOUND)
 handle_feature("Panel Overdrive " PANEL_OD)
 handle_feature("Battery limit   " BAT_LIMIT)
+handle_feature("Fan control     " FAN_CONTROL)
 message("└──────────────────┴─────────┘")
 
 

@@ -108,6 +108,7 @@ class PerformanceService : public Singleton<PerformanceService>, Loggable {
 	 */
 	void setSsdScheduler(std::string scheduler, bool temporal = false);
 
+#ifdef FAN_CONTROL
 	/**
 	 * @brief Gets the list of available fans.
 	 *
@@ -140,7 +141,7 @@ class PerformanceService : public Singleton<PerformanceService>, Loggable {
 	 * @param curves A map of fan names to their FanCurveData.
 	 */
 	void saveFanCurves(std::string profile, std::unordered_map<std::string, FanCurveData> curves);
-
+#endif
 	/**
 	 * @brief Changes the scheduling priority of a process.
 	 *

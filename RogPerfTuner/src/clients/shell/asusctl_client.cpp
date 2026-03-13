@@ -1,11 +1,8 @@
 #include "clients/shell/asusctl_client.hpp"
 
+#ifdef FAN_CONTROL
 #include <regex>
 #include <unordered_map>
-
-void AsusCtlClient::turnOffAura() {
-	run_command("aura effect static --colour 000000", true, false);
-}
 
 std::unordered_map<std::string, FanCurveData> AsusCtlClient::getFanCurveData(PlatformProfile profile) {
 	auto output = run_command("fan-curve --mod-profile " + formatValue(profile)).stdout_str;
@@ -56,4 +53,9 @@ std::vector<std::string> AsusCtlClient::getFans(PlatformProfile profile) {
 	}
 
 	return result;
+}
+#endif
+
+void AsusCtlClient::turnOffAura() {
+	run_command("aura effect static --colour 000000", true, false);
 }

@@ -116,20 +116,20 @@ MainWindow::MainWindow(QWidget* parent) : QMainWindow(parent) {
 	// -------------------------
 	// SSD Scheduler menu
 	// -------------------------
+#ifdef FAN_CONTROL
 	// -------------------------
 	// Fan curves menu
 	// -------------------------
-	if (!performanceService.getFans().empty()) {
-		fanEdit = new QPushButton();
-		fanEdit->setText(translator.translate("edit.curve").c_str());
-		connect(fanEdit, &QPushButton::clicked, this, &MainWindow::openFanEditor);
-		fanEdit->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Preferred);
+	fanEdit = new QPushButton();
+	fanEdit->setText(translator.translate("edit.curve").c_str());
+	connect(fanEdit, &QPushButton::clicked, this, &MainWindow::openFanEditor);
+	fanEdit->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Preferred);
 
-		performanceLayout->addRow(new QLabel((translator.translate("fan.curves") + ":").c_str()), fanEdit);
-	}
+	performanceLayout->addRow(new QLabel((translator.translate("fan.curves") + ":").c_str()), fanEdit);
 	// -------------------------
 	// Fan curves menu
 	// -------------------------
+#endif
 	// -------------------------
 	// Games menu
 	// -------------------------
@@ -451,11 +451,13 @@ void MainWindow::openGameList() {
 	list->show();
 }
 
+#ifdef FAN_CONTROL
 void MainWindow::openFanEditor() {
 	auto profile		= _profileDropdown->currentData().toString().toStdString();
 	CurveEditor* editor = new CurveEditor(profile, this);
 	editor->show();
 }
+#endif
 
 void MainWindow::onAutostartChanged(bool enabled) {
 	applicationService.setAutostart(enabled);

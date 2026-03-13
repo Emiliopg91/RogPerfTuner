@@ -12,7 +12,9 @@
 
 #include "framework/utils/enum_utils.hpp"
 #include "framework/utils/string_utils.hpp"
+#ifdef FAN_CONTROL
 #include "gui/fan_curve_editor.hpp"
+#endif
 #include "gui/game_list.hpp"
 #include "models/performance/performance_profile.hpp"
 
@@ -29,11 +31,13 @@ void TrayIcon::openGameList() {
 	GameList::INSTANCE->show();
 }
 
+#ifdef FAN_CONTROL
 void TrayIcon::openFanEditor() {
 	auto profile		= toString(performanceService.getPerformanceProfile());
 	CurveEditor* editor = new CurveEditor(profile, &mainWindow);
 	editor->show();
 }
+#endif
 
 void TrayIcon::setAuraBrightness(RgbBrightness brightness) {
 	QMetaObject::invokeMethod(
@@ -443,33 +447,34 @@ TrayIcon::TrayIcon()
 	// -------------------------
 	// SSD Scheduler submenu
 	// -------------------------
+#ifdef FAN_CONTROL
 	// -------------------------
 	// Fan curves menu
 	// -------------------------
-	if (!performanceService.getFans().empty()) {
-		coolingMenu = new QMenu(("    " + translator.translate("fan.curves")).c_str(), menu);
-		menu->insertMenu(nullptr, coolingMenu);
+	coolingMenu = new QMenu(("    " + translator.translate("fan.curves")).c_str(), menu);
+	menu->insertMenu(nullptr, coolingMenu);
 
-		QAction* act = new QAction((translator.translate("edit.curve") + "...").c_str());
-		QObject::connect(act, &QAction::triggered, [this]() {
-			openFanEditor();
-		});
-		coolingMenu->addAction(act);
-	}
+	QAction* act = new QAction((translator.translate("edit.curve") + "...").c_str());
+	QObject::connect(act, &QAction::triggered, [this]() {
+		openFanEditor();
+	});
+	coolingMenu->addAction(act);
+
 	// -------------------------
 	// Fan curves menu
 	// -------------------------
+#endif
 	// -------------------------
 	// Game submenu
 	// -------------------------
 	QMenu* gamesMenu = new QMenu(("    " + translator.translate("games")).c_str(), menu);
 	menu->insertMenu(nullptr, gamesMenu);
 
-	QAction* act = new QAction((translator.translate("label.game.configure") + "...").c_str());
-	QObject::connect(act, &QAction::triggered, [this]() {
+	QAction* actFan = new QAction((translator.translate("label.game.configure") + "...").c_str());
+	QObject::connect(actFan, &QAction::triggered, [this]() {
 		openGameList();
 	});
-	gamesMenu->addAction(act);
+	gamesMenu->addAction(actFan);
 
 	// -------------------------
 	// Game submenu
