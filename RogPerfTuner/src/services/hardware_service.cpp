@@ -110,7 +110,7 @@ HardwareService::HardwareService() : Loggable("HardwareService") {
 #ifdef NV_BOOST
 			logger->info("Dynamic boost control available");
 #endif
-#ifdef NV_TGP
+#ifdef NV_THERMAL
 			logger->info("Throttle temperature control available");
 #endif
 			Logger::rem_tab();

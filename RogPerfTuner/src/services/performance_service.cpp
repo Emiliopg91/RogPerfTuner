@@ -83,7 +83,7 @@ void PerformanceService::setActualPerformanceProfile(PerformanceProfile& profile
 #ifdef PPT_PL1_SPL
 		setTdps(profile);
 #endif
-#if defined(NV_TGP) || defined(NV_BOOST)
+#if defined(NV_THERMAL) || defined(NV_BOOST)
 		setNvidiaProfile(profile);
 #endif
 #ifdef FAN_CONTROL
@@ -292,7 +292,7 @@ void PerformanceService::setTdps(const PerformanceProfile& profile) {
 }
 #endif
 
-#if defined(NV_TGP) || defined(NV_BOOST)
+#if defined(NV_THERMAL) || defined(NV_BOOST)
 void PerformanceService::setNvidiaProfile(const PerformanceProfile& profile) {
 	logger->info("Nvidia GPU");
 	Logger::add_tab();
@@ -307,7 +307,7 @@ void PerformanceService::setNvidiaProfile(const PerformanceProfile& profile) {
 		logger->error("Error setting Nvidia Boost: {}", e.what());
 	}
 #endif
-#ifdef NV_TGP
+#ifdef NV_THERMAL
 	try {
 		auto nvt = onBattery ? batteryNvTemp(profile) : acNvTemp();
 		logger->info("Throttle temp: {}ºC", nvt);
@@ -427,7 +427,7 @@ int PerformanceService::batteryNvBoost(PerformanceProfile profile) {
 }
 #endif
 
-#ifdef NV_TGP
+#ifdef NV_THERMAL
 int PerformanceService::acNvTemp() {
 	return nvTempClient.getMaxValue();
 }

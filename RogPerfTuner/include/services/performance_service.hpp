@@ -24,7 +24,7 @@
 #ifdef NV_BOOST
 #include "clients/file/firmware/asus-armoury/nvidia/nv_boost_client.hpp"
 #endif
-#ifdef NV_TGP
+#ifdef NV_THERMAL
 #include "clients/file/firmware/asus-armoury/nvidia/nv_temp_client.hpp"
 #endif
 #include "clients/file/sched_bore_client.hpp"
@@ -192,7 +192,7 @@ class PerformanceService : public Singleton<PerformanceService>, Loggable {
 #ifdef NV_BOOST
 	NvBoostClient& nvBoostClient = NvBoostClient::getInstance();
 #endif
-#ifdef NV_TGP
+#ifdef NV_THERMAL
 	NvTempClient& nvTempClient = NvTempClient::getInstance();
 #endif
 	UPowerClient& uPowerClient			   = UPowerClient::getInstance();
@@ -248,12 +248,12 @@ class PerformanceService : public Singleton<PerformanceService>, Loggable {
 	int batteryNvBoost(PerformanceProfile profile);
 #endif
 
-#ifdef NV_TGP
+#ifdef NV_THERMAL
 	int acNvTemp();
 	int batteryNvTemp(PerformanceProfile profile);
 #endif
 
-#if defined(NV_TGP) || defined(NV_BOOST)
+#if defined(NV_THERMAL) || defined(NV_BOOST)
 	void setNvidiaProfile(const PerformanceProfile& profile);
 #endif
 	CpuGovernor acGovernor(PerformanceProfile profile);

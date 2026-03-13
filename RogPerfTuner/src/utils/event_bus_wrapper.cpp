@@ -45,6 +45,7 @@ void EventBusWrapper::emitRgbColor(std::optional<std::string> color) {
 	this->eventBus.emit_event(toName(Events::ORGB_SERVICE_ON_COLOR), {color});
 }
 
+#ifdef BAT_LIMIT
 void EventBusWrapper::onChargeThreshold(std::function<void(BatteryThreshold)>&& callback) {
 	this->eventBus.on_with_data(toName(Events::HARDWARE_SERVICE_THRESHOLD_CHANGED), [cb = std::move(callback)](CallbackParam data) {
 		cb(std::any_cast<BatteryThreshold>(data[0]));
@@ -53,6 +54,7 @@ void EventBusWrapper::onChargeThreshold(std::function<void(BatteryThreshold)>&& 
 void EventBusWrapper::emitChargeThreshold(const BatteryThreshold& threshold) {
 	this->eventBus.emit_event(toName(Events::HARDWARE_SERVICE_THRESHOLD_CHANGED), {threshold});
 }
+#endif
 
 void EventBusWrapper::onRgbEffect(std::function<void(std::string)>&& callback) {
 	this->eventBus.on_with_data(toName(Events::ORGB_SERVICE_ON_EFFECT), [cb = std::move(callback)](CallbackParam data) {
@@ -124,6 +126,7 @@ void EventBusWrapper::emitSsdScheduler(std::string scheduler) {
 	this->eventBus.emit_event(toName(Events::PROFILE_SERVICE_ON_SSD_SCHEDULER), {scheduler});
 }
 
+#ifdef BOOT_SOUND
 void EventBusWrapper::onBootSound(std::function<void(bool)>&& callback) {
 	this->eventBus.on_with_data(toName(Events::HARDWARE_SERVICE_BOOT_SOUND_CHANGED), [cb = std::move(callback)](CallbackParam data) {
 		cb(std::any_cast<bool>(data[0]));
@@ -132,6 +135,7 @@ void EventBusWrapper::onBootSound(std::function<void(bool)>&& callback) {
 void EventBusWrapper::emitBootSound(bool value) {
 	this->eventBus.emit_event(toName(Events::HARDWARE_SERVICE_BOOT_SOUND_CHANGED), {value});
 }
+#endif
 
 void EventBusWrapper::emitServerSocketEvent(std::string event, CallbackParam value) {
 	this->eventBus.emit_event("socket.server.event." + event, value);

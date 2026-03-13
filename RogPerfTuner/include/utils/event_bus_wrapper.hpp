@@ -21,28 +21,6 @@ class EventBusWrapper : public Singleton<EventBusWrapper> {
 	void emitApplicationStop();
 
 	/**
-	 * Emit a notification that a new software update is available.
-	 *
-	 * Broadcasts an "update available" event to all listeners/subscribers registered
-	 * with the event bus, carrying the provided version identifier.
-	 *
-	 * @param version
-	 *   A string identifying the new version.
-	 */
-	void emitUpdateAvailable(std::string version);
-
-	/**
-	 * @brief Register a handler to be invoked when an update becomes available.
-	 *
-	 * Registers a callback that will be invoked each time an update event is
-	 * emitted.
-	 *
-	 * @param callback Callable accepting a std::string; ownership of the callable
-	 *                 is transferred to the event bus (moved).
-	 */
-	void onUpdateAvailable(std::function<void(std::string)>&& callback);
-
-	/**
 	 * @brief Emits a server socket event with the specified event name and associated value.
 	 *
 	 * This function triggers an event on the server socket, passing the event name and a parameter
@@ -95,6 +73,7 @@ class EventBusWrapper : public Singleton<EventBusWrapper> {
 	 */
 	void emitRgbBrightness(const RgbBrightness& brightness);
 
+#ifdef BAT_LIMIT
 	/**
 	 * @brief Registers a callback for battery charge threshold events.
 	 * @param callback The callback function to be called with the new battery threshold.
@@ -106,7 +85,9 @@ class EventBusWrapper : public Singleton<EventBusWrapper> {
 	 * @param threshold The new battery threshold value.
 	 */
 	void emitChargeThreshold(const BatteryThreshold& threshold);
+#endif
 
+#ifdef BOOT_SOUND
 	/**
 	 * @brief Registers a callback to be invoked when the boot sound event occurs.
 	 *
@@ -125,6 +106,7 @@ class EventBusWrapper : public Singleton<EventBusWrapper> {
 	 * @param enabled Set to true to enable the boot sound, or false to disable it.
 	 */
 	void emitBootSound(bool enabled);
+#endif
 
 	/**
 	 * @brief Registers a callback for RGB effect events.
@@ -234,9 +216,6 @@ class EventBusWrapper : public Singleton<EventBusWrapper> {
 	void emitScheduler(std::optional<std::string> scheduler);
 
 	void onSsdScheduler(std::function<void(std::string)>&& callback);
+
 	void emitSsdScheduler(std::string scheduler);
-
-	void emitUpdateStart();
-
-	void onUpdateStart(Callback&& callback);
 };

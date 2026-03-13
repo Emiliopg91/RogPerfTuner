@@ -89,8 +89,8 @@ inline void printFeatureTable(std::shared_ptr<Logger> logger) {
 #ifdef NV_BOOST
 	logger->info("│ Nvidia Boost    │");
 #endif
-#ifdef NV_TGP
-	logger->info("│ Nvidia TGP      │");
+#ifdef NV_THERMAL
+	logger->info("│ Nvidia Thermal  │");
 #endif
 #ifdef BOOT_SOUND
 	logger->info("│ Boot sound      │");
