@@ -233,23 +233,19 @@ class PerformanceService : public Singleton<PerformanceService>, Loggable {
 #endif
 
 #ifdef PPT_PL1_SPL
-	int acIntelPl1Spl(PerformanceProfile profile);
-	int batteryIntelPl1Spl(PerformanceProfile profile);
+	int pl1Spl(PerformanceProfile profile);
 #endif
 
 #ifdef PPT_PL2_SPPT
-	int acIntelPl2Sppt(PerformanceProfile profile);
-	int batteryIntelPl2Sppt(PerformanceProfile profile);
+	int pl2Sppt(PerformanceProfile profile);
 #endif
 
 #ifdef PPT_PL3_FPPT
-	int acIntelPl3Fppt(PerformanceProfile profile);
-	int batteryIntelPl3Fppt(PerformanceProfile profile);
+	int pl3Fppt(PerformanceProfile profile);
 #endif
 
 #ifdef NV_BOOST
-	int acNvBoost(PerformanceProfile profile);
-	int batteryNvBoost(PerformanceProfile profile);
+	int nvBoost(PerformanceProfile profile);
 #endif
 
 #ifdef NV_THERMAL

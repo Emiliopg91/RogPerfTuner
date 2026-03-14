@@ -196,7 +196,7 @@ void PerformanceService::setPerformanceProfile(PerformanceProfile& profile, cons
 }
 
 void PerformanceService::setPlatformProfile(const PerformanceProfile& profile) {
-	if (platformClient.available()) {
+	if (!onBattery) {
 		auto platformProfile = getPlatformProfile(profile);
 		logger->info("Platform profile: {}", toName<PlatformProfile>(platformProfile));
 		Logger::add_tab();
@@ -207,24 +207,23 @@ void PerformanceService::setPlatformProfile(const PerformanceProfile& profile) {
 			logger->error("Error while setting platform profile: {}", e.what());
 		}
 		Logger::rem_tab();
+	} else {
+		logger->info("Platform profile: Not available on battery");
 	}
 }
 
 #ifdef BOOST_CONTROL
 void PerformanceService::setBoost(const PerformanceProfile&) {
-	if (boostControlClient.available()) {
-		bool enabled = onBattery ? batteryBoost() : acBoost();
-		logger->info("CPU boost: {}", enabled ? "ON" : "OFF");
-		Logger::add_tab();
-		try {
-			boostControlClient.set_boost(enabled);
-		} catch (std::exception& e) {
-			logger->error("Error while setting CPU boost: {}", e.what());
-		}
-		Logger::rem_tab();
+	bool enabled = onBattery ? batteryBoost() : acBoost();
+	logger->info("CPU boost: {}", enabled ? "ON" : "OFF");
+	Logger::add_tab();
+	try {
+		boostControlClient.set_boost(enabled);
+	} catch (std::exception& e) {
+		logger->error("Error while setting CPU boost: {}", e.what());
 	}
+	Logger::rem_tab();
 }
-
 bool PerformanceService::acBoost() {
 	return true;
 }
@@ -266,20 +265,20 @@ void PerformanceService::setTdps(const PerformanceProfile& profile) {
 	try {
 		logger->info("TDP values");
 		Logger::add_tab();
-		auto pl1 = onBattery ? batteryIntelPl1Spl(profile) : acIntelPl1Spl(profile);
+		auto pl1 = pl1Spl(profile);
 		logger->info("PL1: {}W", pl1);
 		pl1SpdClient.setCurrentValue(pl1);
 		TimeUtils::sleep(25);
 
 #ifdef PPT_PL2_SPPT
-		auto pl2 = onBattery ? batteryIntelPl2Sppt(profile) : acIntelPl2Sppt(profile);
+		auto pl2 = pl2Sppt(profile);
 		logger->info("PL2: {}W", pl2);
 		pl2SpptClient.setCurrentValue(pl2);
 		TimeUtils::sleep(25);
 #endif
 
 #ifdef PPT_PL3_FPPT
-		auto pl3 = onBattery ? batteryIntelPl3Fppt(profile) : acIntelPl3Fppt(profile);
+		auto pl3 = pl3Fppt(profile);
 		logger->info("PL3: {}W", pl3);
 		pl3FpptClient.setCurrentValue(pl3);
 		TimeUtils::sleep(25);
@@ -298,13 +297,17 @@ void PerformanceService::setNvidiaProfile(const PerformanceProfile& profile) {
 	Logger::add_tab();
 
 #ifdef NV_BOOST
-	try {
-		auto nvb = onBattery ? batteryNvBoost(profile) : acNvBoost(profile);
-		logger->info("Dynamic Boost: {}W", nvb);
-		nvBoostClient.setCurrentValue(nvb);
-		TimeUtils::sleep(25);
-	} catch (std::exception& e) {
-		logger->error("Error setting Nvidia Boost: {}", e.what());
+	if (!onBattery || nvBoostClient.getMinValue() != nvBoostClient.getMaxValue()) {
+		try {
+			auto nvb = nvBoost(profile);
+			logger->info("Dynamic Boost: {}W", nvb);
+			nvBoostClient.setCurrentValue(nvb);
+			TimeUtils::sleep(25);
+		} catch (std::exception& e) {
+			logger->error("Error setting Nvidia Boost: {}", e.what());
+		}
+	} else {
+		logger->info("Dynamic Boost: Not available on battery");
 	}
 #endif
 #ifdef NV_THERMAL
@@ -340,7 +343,7 @@ PerformanceProfile PerformanceService::nextPerformanceProfile() {
 }
 
 #ifdef PPT_PL1_SPL
-int PerformanceService::acIntelPl1Spl(PerformanceProfile profile) {
+int PerformanceService::pl1Spl(PerformanceProfile profile) {
 	if (profile == PerformanceProfile::PERFORMANCE) {
 		return pl1SpdClient.getMaxValue();
 	}
@@ -353,16 +356,12 @@ int PerformanceService::acIntelPl1Spl(PerformanceProfile profile) {
 
 	return pl1SpdClient.getCurrentValue();
 }
-
-int PerformanceService::batteryIntelPl1Spl(PerformanceProfile profile) {
-	return acTdpToBatteryTdp(acIntelPl1Spl(profile), pl1SpdClient.getMinValue());
-}
 #endif
 
 #ifdef PPT_PL2_SPPT
-int PerformanceService::acIntelPl2Sppt(PerformanceProfile profile) {
+int PerformanceService::pl2Sppt(PerformanceProfile profile) {
 	if (!acBoost()) {
-		return acIntelPl1Spl(profile);
+		return pl1Spl(profile);
 	}
 
 	if (profile == PerformanceProfile::PERFORMANCE) {
@@ -377,38 +376,30 @@ int PerformanceService::acIntelPl2Sppt(PerformanceProfile profile) {
 
 	return pl2SpptClient.getCurrentValue();
 }
-
-int PerformanceService::batteryIntelPl2Sppt(PerformanceProfile profile) {
-	return acTdpToBatteryTdp(acIntelPl2Sppt(profile), pl2SpptClient.getMinValue());
-}
 #endif
 
 #ifdef PPT_PL3_FPPT
-int PerformanceService::acIntelPl3Fppt(PerformanceProfile profile) {
+int PerformanceService::pl3Fppt(PerformanceProfile profile) {
 	if (!acBoost()) {
-		return acIntelPl1Spl(profile);
+		return pl1Spl(profile);
 	}
 
 	if (profile == PerformanceProfile::PERFORMANCE) {
-		return pl2SpptClient.getMaxValue();
+		return pl3FpptClient.getMaxValue();
 	}
 	if (profile == PerformanceProfile::BALANCED) {
-		return pl2SpptClient.getMaxValue() * 0.9;
+		return pl3FpptClient.getMaxValue() * 0.9;
 	}
 	if (profile == PerformanceProfile::QUIET) {
-		return pl2SpptClient.getMaxValue() * 0.8;
+		return pl3FpptClient.getMaxValue() * 0.8;
 	}
 
-	return pl2SpptClient.getCurrentValue();
-}
-
-int PerformanceService::batteryIntelPl3Fppt(PerformanceProfile profile) {
-	return acTdpToBatteryTdp(acIntelPl2Sppt(profile), pl3FpptClient.getMinValue());
+	return pl3FpptClient.getCurrentValue();
 }
 #endif
 
 #ifdef NV_BOOST
-int PerformanceService::acNvBoost(PerformanceProfile profile) {
+int PerformanceService::nvBoost(PerformanceProfile profile) {
 	if (profile == PerformanceProfile::PERFORMANCE) {
 		return nvBoostClient.getMaxValue();
 	}
@@ -420,10 +411,6 @@ int PerformanceService::acNvBoost(PerformanceProfile profile) {
 	}
 
 	return nvBoostClient.getCurrentValue();
-}
-
-int PerformanceService::batteryNvBoost(PerformanceProfile profile) {
-	return acTdpToBatteryTdp(acNvBoost(profile), nvBoostClient.getMinValue());
 }
 #endif
 

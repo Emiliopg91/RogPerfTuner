@@ -25,7 +25,7 @@ AbstractDbusClient::AbstractDbusClient(bool systemBus, const QString& service, c
 															objectPath_,  // objeto remoto
 															"org.freedesktop.DBus.Introspectable",	// interfaz estándar
 															"Introspect"							// método
-		  );
+		);
 		QDBusMessage reply = QDBusConnection::systemBus().call(msg, QDBus::Block, 200);
 
 		if (reply.type() == QDBusMessage::ErrorMessage) {
