@@ -57,10 +57,8 @@ SteamService::SteamService() : Loggable("SteamService") {
 		logger->info("Metric level service available");
 		Logger::add_tab();
 #ifdef INTEL_RAPL_UJ
-		if (intelRaplUjClient.available()) {
-			logger->info("Enabling Intel CPU Wattage report...");
-			intelRaplUjClient.enableRead();
-		}
+		logger->info("Enabling Intel CPU Wattage report...");
+		intelRaplUjClient.enableRead();
 #endif
 		Logger::rem_tab();
 	}

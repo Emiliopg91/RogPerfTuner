@@ -233,16 +233,14 @@ void HardwareService::onBatteryEvent(const bool& onBat, const bool& muted) {
 
 #ifdef PANEL_OD
 void HardwareService::setPanelOverdrive(const bool& enable) {
-	if (panelOverdriveClient.available()) {
-		logger->info("Panel Overdrive: {}", enable ? "Enabled" : "Disabled");
-		Logger::add_tab();
-		try {
-			panelOverdriveClient.setCurrentValue(enable);
-		} catch (std::exception& e) {
-			logger->error(e.what());
-		}
-		Logger::rem_tab();
+	logger->info("Panel Overdrive: {}", enable ? "Enabled" : "Disabled");
+	Logger::add_tab();
+	try {
+		panelOverdriveClient.setCurrentValue(enable);
+	} catch (std::exception& e) {
+		logger->error(e.what());
 	}
+	Logger::rem_tab();
 }
 #endif
 

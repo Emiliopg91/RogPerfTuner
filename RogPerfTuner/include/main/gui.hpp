@@ -76,7 +76,7 @@ inline void printFeatureTable(std::shared_ptr<Logger> logger) {
 	logger->info("│ Boost control   │");
 #endif
 #ifdef INTEL_RAPL_UJ
-	logger->info("│ Intel Rapl UJ   │");
+	logger->info("│ Intel rapl UJ   │");
 #endif
 #ifdef PPT_PL1_SPL
 	logger->info("│ TDP PL1 SPD     │");
@@ -88,16 +88,16 @@ inline void printFeatureTable(std::shared_ptr<Logger> logger) {
 	logger->info("│ TDP PL3 FPPT    │");
 #endif
 #ifdef NV_BOOST
-	logger->info("│ Nvidia Boost    │");
+	logger->info("│ Nvidia boost    │");
 #endif
 #ifdef NV_THERMAL
-	logger->info("│ Nvidia Thermal  │");
+	logger->info("│ Nvidia thermal  │");
 #endif
 #ifdef BOOT_SOUND
 	logger->info("│ Boot sound      │");
 #endif
 #ifdef PANEL_OD
-	logger->info("│ Panel Overdrive │");
+	logger->info("│ Panel overdrive │");
 #endif
 #ifdef BAT_LIMIT
 	logger->info("│ Battery limit   │");
@@ -107,6 +107,9 @@ inline void printFeatureTable(std::shared_ptr<Logger> logger) {
 #endif
 #ifdef FAN_CONTROL
 	logger->info("│ Fan control     │");
+#endif
+#ifdef ACPI_PROFILE
+	logger->info("│ ACPI profiles   │");
 #endif
 	logger->info("└─────────────────┘");
 	Logger::rem_tab();

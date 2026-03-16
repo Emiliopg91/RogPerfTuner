@@ -47,7 +47,7 @@ inline PlatformProfile getPlatformProfile(const PerformanceProfile& value) {
 inline PowerProfile getPowerProfile(const PerformanceProfile& value) {
 	switch (value) {
 		case PerformanceProfile::QUIET:
-			return PowerProfile::POWER_SAVER;
+			return PowerProfile::QUIET;
 		case PerformanceProfile::BALANCED:
 			return PowerProfile::BALANCED;
 		default:

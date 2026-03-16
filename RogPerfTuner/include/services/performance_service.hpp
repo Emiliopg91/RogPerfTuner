@@ -6,7 +6,9 @@
 #include <thread>
 
 #include "clients/dbus/asus/core/platform_client.hpp"
-#include "clients/dbus/linux/power_profile_client.hpp"
+#ifdef ACPI_PROFILE
+#include "clients/file/power_profile_client.hpp"
+#endif
 #ifdef BAT_STATUS
 #include "clients/file/battery_status_client.hpp"
 #endif
@@ -200,11 +202,13 @@ class PerformanceService : public Singleton<PerformanceService>, Loggable {
 #ifdef BAT_STATUS
 	BatteryStatusClient& batteryStatusClient = BatteryStatusClient::getInstance();
 #endif
+#ifdef ACPI_PROFILE
 	PowerProfileClient& powerProfileClient = PowerProfileClient::getInstance();
-	Toaster& toaster					   = Toaster::getInstance();
-	SchedBoreClient& schedBoreClient	   = SchedBoreClient::getInstance();
-	HardwareService& hardwareService	   = HardwareService::getInstance();
-	CpuPowerClient& cpuPowerClient		   = CpuPowerClient::getInstance();
+#endif
+	Toaster& toaster				 = Toaster::getInstance();
+	SchedBoreClient& schedBoreClient = SchedBoreClient::getInstance();
+	HardwareService& hardwareService = HardwareService::getInstance();
+	CpuPowerClient& cpuPowerClient	 = CpuPowerClient::getInstance();
 #ifdef BOOST_CONTROL
 	BoostControlClient& boostControlClient = BoostControlClient::getInstance();
 #endif
@@ -226,7 +230,10 @@ class PerformanceService : public Singleton<PerformanceService>, Loggable {
 #endif
 
 	void setCpuGovernor(const PerformanceProfile& profile);
+
+#ifdef ACPI_PROFILE
 	void setPowerProfile(PerformanceProfile& profile);
+#endif
 
 #ifdef PPT_PL1_SPL
 	void setTdps(const PerformanceProfile& profile);

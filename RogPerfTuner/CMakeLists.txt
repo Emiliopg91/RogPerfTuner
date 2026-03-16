@@ -49,6 +49,7 @@ set(BAT_LIMIT OFF)
 set(BAT_STATUS OFF)
 set(PANEL_OD OFF)
 set(FAN_CONTROL OFF)
+set(ACPI_PROFILE OFF)
 
 message("┌──────────────────┬─────────┐")
 message("│     ${BOLD}Feature${RESET}      │ ${BOLD}Enabled${RESET} │")
@@ -228,6 +229,18 @@ else()
     )
 endif()
 handle_feature("Fan control     " FAN_CONTROL)
+
+if(EXISTS "/sys/firmware/acpi/platform_profile")
+    set(ACPI_PROFILE ON)
+else()
+    list(REMOVE_ITEM HEADERS_RCC
+        "${CMAKE_CURRENT_SOURCE_DIR}/include/clients/file/power_profile_client.hpp"
+    )
+    list(REMOVE_ITEM SOURCES_RCC
+        "${CMAKE_CURRENT_SOURCE_DIR}/src/clients/file/power_profile_client.cpp"
+    )
+endif()
+handle_feature("ACPI Profiles   " ACPI_PROFILE)
 
 message("└──────────────────┴─────────┘")
 

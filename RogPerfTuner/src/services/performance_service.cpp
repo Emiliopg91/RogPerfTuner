@@ -24,11 +24,9 @@ PerformanceService::PerformanceService() : Loggable("PerformanceService") {
 	currentScheduler = configuration.getConfiguration().platform.performance.scheduler;
 
 #ifdef BAT_STATUS
-	if (batteryStatusClient.available()) {
-		onBattery		 = batteryStatusClient.isOnBattery();
-		std::string mode = onBattery ? "battery" : "AC";
-		logger->info("Laptop on {} mode", mode);
-	}
+	onBattery		 = batteryStatusClient.isOnBattery();
+	std::string mode = onBattery ? "battery" : "AC";
+	logger->info("Laptop on {} mode", mode);
 #endif
 
 	platformClient.setChangePlatformProfileOnAc(false);
@@ -79,7 +77,9 @@ void PerformanceService::setActualPerformanceProfile(PerformanceProfile& profile
 		setBoost(profile);
 #endif
 		setCpuGovernor(profile);
+#ifdef ACPI_PROFILE
 		setPowerProfile(profile);
+#endif
 #ifdef PPT_PL1_SPL
 		setTdps(profile);
 #endif
@@ -246,19 +246,19 @@ void PerformanceService::setCpuGovernor(const PerformanceProfile& profile) {
 	}
 }
 
+#ifdef ACPI_PROFILE
 void PerformanceService::setPowerProfile(PerformanceProfile& profile) {
-	if (powerProfileClient.available()) {
-		PowerProfile powerProfile = getPowerProfile(profile);
-		logger->info("Power profile: {}", toName(powerProfile));
-		Logger::add_tab();
-		try {
-			powerProfileClient.setPowerProfile(powerProfile);
-		} catch (std::exception& e) {
-			logger->error("Error while setting power profile: {}", e.what());
-		}
-		Logger::rem_tab();
+	PowerProfile powerProfile = getPowerProfile(profile);
+	logger->info("Power profile: {}", toName(powerProfile));
+	Logger::add_tab();
+	try {
+		powerProfileClient.setPowerProfile(powerProfile);
+	} catch (std::exception& e) {
+		logger->error("Error while setting power profile: {}", e.what());
 	}
+	Logger::rem_tab();
 }
+#endif
 
 #ifdef PPT_PL1_SPL
 void PerformanceService::setTdps(const PerformanceProfile& profile) {
@@ -275,7 +275,6 @@ void PerformanceService::setTdps(const PerformanceProfile& profile) {
 		logger->info("PL2: {}W", pl2);
 		pl2SpptClient.setCurrentValue(pl2);
 		TimeUtils::sleep(25);
-#endif
 
 #ifdef PPT_PL3_FPPT
 		auto pl3 = pl3Fppt(profile);
@@ -284,6 +283,7 @@ void PerformanceService::setTdps(const PerformanceProfile& profile) {
 		TimeUtils::sleep(25);
 #endif
 
+#endif
 		Logger::rem_tab();
 	} catch (std::exception& e) {
 		logger->error("Error setting CPU TDPs: {}", e.what());

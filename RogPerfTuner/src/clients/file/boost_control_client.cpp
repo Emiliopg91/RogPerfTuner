@@ -8,7 +8,3 @@ BoostControlClient::BoostControlClient() : AbstractFileClient(BOOST_CONTROL_FILE
 void BoostControlClient::set_boost(bool& enabled) {
 	write(enabled ? BOOST_CONTROL_ON : BOOST_CONTROL_OFF);
 }
-
-bool BoostControlClient::available() {
-	return AbstractFileClient::available();
-}
