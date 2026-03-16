@@ -3,7 +3,6 @@
 #include <exception>
 #include <string>
 
-#include "clients/dbus/linux/power_management_kb_brightness.hpp"
 #include "clients/file/cpuinfo_client.hpp"
 #include "clients/lib/lsusb_client.hpp"
 #include "clients/shell/switcherooctl_client.hpp"
@@ -141,14 +140,6 @@ HardwareService::HardwareService() : Loggable("HardwareService") {
 		this->onBatteryEvent(std::any_cast<bool>(data));
 	});
 #endif
-
-	if (pmKeyboardBrightnessClient.available()) {
-		pmKeyboardBrightnessClient.onBrightnessChange([this]() {
-			if (pmKeyboardBrightnessClient.getKeyboardBrightness() != 2) {
-				pmKeyboardBrightnessClient.setKeyboardBrightnessSilent(2);
-			}
-		});
-	}
 
 	Logger::rem_tab();
 }

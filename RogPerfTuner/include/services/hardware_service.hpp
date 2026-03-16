@@ -3,7 +3,6 @@
 #include <mutex>
 
 #include "clients/dbus/asus/core/platform_client.hpp"
-#include "clients/dbus/linux/power_management_kb_brightness.hpp"
 #ifdef BAT_LIMIT
 #include "clients/file/battery_charge_limit_client.hpp"
 #endif
@@ -113,9 +112,8 @@ class HardwareService : public Singleton<HardwareService>, Loggable {
 #ifdef PANEL_OD
 	PanelOverdriveClient& panelOverdriveClient = PanelOverdriveClient::getInstance();
 #endif
-	PMKeyboardBrightness& pmKeyboardBrightnessClient = PMKeyboardBrightness::getInstance();
-	LsUsbClient& udevClient							 = LsUsbClient::getInstance();
-	ConfigurationWrapper& configuration				 = ConfigurationWrapper::getInstance();
+	LsUsbClient& udevClient				= LsUsbClient::getInstance();
+	ConfigurationWrapper& configuration = ConfigurationWrapper::getInstance();
 
 	std::unordered_map<std::string, std::string> gpus;
 	std::vector<UsbIdentifier> connectedDevices;

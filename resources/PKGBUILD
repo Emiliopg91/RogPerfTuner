@@ -41,7 +41,6 @@ depends=(
   'qtermwidget'
   'qtkeychain-qt6'
   'openssl'
-  'upower'
 )
 makedepends=(
   'base-devel'
