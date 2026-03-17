@@ -106,6 +106,7 @@ build_rccdc:
 pkgbuild:
 	@export BUILD_TYPE=Release
 	@make build BUILD_TYPE=Release
+	@mkdir -p dist
 	@cp resources/completion-bash dist/completion-bash
 
 release:
