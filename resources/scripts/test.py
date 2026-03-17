@@ -58,7 +58,7 @@ if os.getenv("GITHUB_ACTIONS", "false").lower() == "false":
     WORKDIR /tmp/pkg
 
     # Ejecutar paru -U por defecto
-    CMD ["bash", "-c", "cp -R /pkg/* . && paru -U --noconfirm --nocheck --noinstall && cp $(ls *.pkg.tar.zst) /pkg"]
+    CMD ["bash", "-c", "cp -R /pkg/* . && export IN_TEST=1 && paru -U --noconfirm --nocheck --noinstall && cp $(ls *.pkg.tar.zst) /pkg"]
     """
 
     with open("Dockerfile", "w", encoding="utf-8") as f:

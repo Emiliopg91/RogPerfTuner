@@ -2,6 +2,7 @@
 
 import os
 import re
+import shutil
 import subprocess
 from pathlib import Path
 
@@ -238,16 +239,26 @@ if __name__ == "__main__":
         os.unlink(SRCINFO_FILE)
 
     print("Updating .SRCINFO file...")
-    subprocess.run(
-        [
-            "docker",
-            "run",
-            "--rm",
-            "-v",
-            f"{os.getcwd()}/dist:/repo",
-            "epulidogil/arch-srcinfo:latest",
-        ],
-        check=True,
-    )
+    if shutil.which("makepkg") is not None:
+        print("  Using current system makepkg...")
+        subprocess.run(
+            "makepkg --printsrcinfo > .SRCINFO",
+            check=True,
+            shell=True,
+            cwd=f"{os.getcwd()}/dist",
+        )
+    else:
+        print("  Using containerized makepkg...")
+        subprocess.run(
+            [
+                "docker",
+                "run",
+                "--rm",
+                "-v",
+                f"{os.getcwd()}/dist:/repo",
+                "epulidogil/arch-srcinfo:latest",
+            ],
+            check=True,
+        )
 
     generate_changelog(version, release)
