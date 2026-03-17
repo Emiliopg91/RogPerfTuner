@@ -110,7 +110,6 @@ package() {
 
     install -Dm755 resources/RogPerfTuner.desktop "$pkgdir/usr/share/applications/rog-perf-tuner.desktop"
 
-    make release
     install -Dm644 dist/completion-bash \
         "$pkgdir/usr/share/bash-completion/completions/rog-perf-tuner"
 }
