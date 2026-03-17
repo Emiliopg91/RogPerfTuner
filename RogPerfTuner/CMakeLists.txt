@@ -37,7 +37,7 @@ function(handle_feature NAME VAR)
 endfunction()
 
 if(DEFINED ENV{IN_TEST})
-    set(IN_TEST ON)
+    set(IN_TEST_FLAG ON)
 endif()
 
 set(DEV_MODE ${IN_TEST_FLAG})
