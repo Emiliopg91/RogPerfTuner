@@ -46,7 +46,7 @@ branch = subprocess.check_output(
 ).strip()
 if os.environ.get("GIT_RELEASE", None) is not None:
     commit_count = subprocess.check_output(
-        ["git", "rev-list", "--count", f"{version}-1..HEAD"], text=True
+        ["git", "rev-list", "--count", f"{version}..HEAD"], text=True
     ).strip()
     version = version + ".r" + commit_count
 else:

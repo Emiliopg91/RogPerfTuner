@@ -1,10 +1,12 @@
 #include <iostream>
 
+#include "framework/utils/string_utils.hpp"
 #include "main/dev.hpp"
 #include "main/flatpak.hpp"
 #include "main/gui.hpp"
 #include "main/rgb.hpp"
 #include "main/run.hpp"
+#include "models/others/app_options.hpp"
 
 inline void shiftArgv(int& argc, char** argv) {
 	if (argc <= 2) {
@@ -19,10 +21,6 @@ inline void shiftArgv(int& argc, char** argv) {
 	argc--;
 }
 
-constexpr uint64_t hashStr(const char* str, uint64_t hash = 14695981039346656037ull) {
-	return *str ? hashStr(str + 1, (hash ^ static_cast<unsigned char>(*str)) * 1099511628211ull) : hash;
-}
-
 int main(int argc, char** argv) {
 	if (geteuid() == 0) {
 		std::cerr << "This program must not be run as root (sudo). Please run it as a regular user." << std::endl;
@@ -32,81 +30,70 @@ int main(int argc, char** argv) {
 	if (argc < 2) {
 		return startGui(argc, argv);
 	} else {
-		uint64_t h = hashStr(argv[1]);
+		std::string arg = argv[1];
+		if (arg == getShortOption(AppOptions::version).value() || arg == getOption(AppOptions::version)) {
+			std::cout << "RogPerfTuner v" << Constants::APP_VERSION << std::endl;
+			std::cout << "Decky plugin v" << Constants::PLUGIN_VERSION << std::endl;
 
-		switch (h) {
-			case hashStr("-v"):
-			case hashStr("--version"):
-				std::cout << "RogPerfTuner v" << Constants::APP_VERSION << std::endl;
-				std::cout << "Decky plugin v" << Constants::PLUGIN_VERSION << std::endl;
-				break;
+		} else if (arg == getShortOption(AppOptions::performance).value() || arg == getOption(AppOptions::performance)) {
+			nextProfile();
 
-			case hashStr("-p"):
-			case hashStr("--profile"):
-				nextProfile();
-				break;
+		} else if (arg == getShortOption(AppOptions::effect).value() || arg == getOption(AppOptions::effect)) {
+			nextEffect();
 
-			case hashStr("-e"):
-			case hashStr("--effect"):
-				nextEffect();
+		} else if (arg == getShortOption(AppOptions::incBrightness).value() || arg == getOption(AppOptions::incBrightness)) {
+			increaseBrightness();
 
-			case hashStr("-i"):
-			case hashStr("--incBrightness"):
-				increaseBrightness();
-				break;
+		} else if (arg == getShortOption(AppOptions::decBrightness).value() || arg == getOption(AppOptions::decBrightness)) {
+			decreaseBrightness();
 
-			case hashStr("-d"):
-			case hashStr("--decBrightness"):
-				decreaseBrightness();
-				break;
+		} else if (arg == getShortOption(AppOptions::kill).value() || arg == getOption(AppOptions::kill)) {
+			return killInstance();
 
-			case hashStr("-k"):
-			case hashStr("--kill"):
-				return killInstance();
+		} else if (arg == getShortOption(AppOptions::flatpak).value() || arg == getOption(AppOptions::flatpak)) {
+			shiftArgv(argc, argv);
+			return runFlatpakWrapping(argc, argv);
 
-			case hashStr("-f"):
-			case hashStr("--flatpak"):
-				shiftArgv(argc, argv);
-				return runFlatpakWrapping(argc, argv);
+		} else if (arg == getShortOption(AppOptions::run).value() || arg == getOption(AppOptions::run)) {
+			shiftArgv(argc, argv);
+			return runSteamWrapping(argc, argv);
 
-			case hashStr("-r"):
-			case hashStr("--run"):
-				shiftArgv(argc, argv);
-				return runSteamWrapping(argc, argv);
+		} else if (arg == getShortOption(AppOptions::show).value() || arg == getOption(AppOptions::show)) {
+			showGui();
 
-			case hashStr("-s"):
-			case hashStr("--show"):
-				showGui();
-				break;
+		} else if (arg == getShortOption(AppOptions::dev_mode).value() || arg == getOption(AppOptions::dev_mode)) {
+			runDevMode();
 
-			case hashStr("-m"):
-			case hashStr("--dev-mode"):
-				runDevMode();
-				break;
+		} else if (arg == getOption(AppOptions::completion)) {
+			std::string line = "";
+			for (const auto& [key, vec] : getOptionGroups()) {
+				for (const auto& op : vec) {
+					line += getOption(op) + " ";
+				}
+			}
+			std::cout << StringUtils::trim(line) << std::endl;
+		} else if (arg == getShortOption(AppOptions::help).value() || arg == getOption(AppOptions::help)) {
+			std::cout << "Usage: " << argv[0] << " [option]" << std::endl;
+			for (const auto& [key, vec] : getOptionGroups()) {
+				std::cout << "  " << key << std::endl;
+				for (const auto& op : vec) {
+					std::string line			   = getOption(op);
+					std::optional<std::string> opt = getShortOption(op);
+					if (opt.has_value()) {
+						line = *opt + ", " + line;
+					}
+					opt = getDescription(op);
+					if (opt.has_value()) {
+						line = line + *opt;
+					}
+					std::cout << "    " << line << std::endl;
+				}
+			}
 
-			case hashStr("-h"):
-			case hashStr("--help"):
-				std::cout << "Usage: " << argv[0] << " [option]" << std::endl
-						  << "  Performance control" << std::endl
-						  << "    -p, --profile        Switch to next performance profile" << std::endl
-						  << std::endl
-						  << "  RGB lightning control" << std::endl
-						  << "    -e, --effect         Switch to next lighting effect" << std::endl
-						  << "    -i, --incBrightness  Increase keyboard brightness" << std::endl
-						  << "    -d, --decBrightness  Decrease keyboard brightness" << std::endl
-						  << std::endl
-						  << "  Application" << std::endl
-						  << "    -s, --show           Show GUI" << std::endl
-						  << "    -k, --kill           Kill existing instance" << std::endl
-						  << "    -m, --dev-mode       Run in dev mode with bug report generation" << std::endl
-						  << "    -v, --version        Show version information" << std::endl
-						  << "    -h, --help           Show this help message" << std::endl;
-				break;
-
-			default:
-				std::cerr << "Invalid argument '" << argv[1] << std::endl;
-				system((std::string(argv[0]) + " -h").c_str());
-				return 1;
+		} else {
+			std::cerr << "Invalid argument '" << arg << "'" << std::endl;
+			system((std::string(argv[0]) + " -h").c_str());
+			return 1;
 		}
 
 		return 0;

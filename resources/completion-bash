@@ -1,0 +1,10 @@
+_rog_perf_tuner() {
+    local completions
+    completions=$(COMP_WORDS="${COMP_WORDS[*]}" \
+                  COMP_CWORD="$COMP_CWORD" \
+                  rog-perf-tuner --completion)
+
+    COMPREPLY=($(compgen -W "$completions" -- "${COMP_WORDS[COMP_CWORD]}"))
+}
+
+complete -F _rog_perf_tuner rog-perf-tuner

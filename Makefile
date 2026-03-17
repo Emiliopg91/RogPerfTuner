@@ -123,6 +123,7 @@ release:
 	else \
 	    cp resources/rog-perf-tuner.sh dist/rog-perf-tuner.install; \
 	fi
+	@cp resources/completion-bash dist/completion-bash
 	@python resources/scripts/release.py
 
 build_debug:

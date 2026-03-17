@@ -211,7 +211,7 @@ if __name__ == "__main__":
         ).strip()
         print(f"Commit {commit}")
         commit_count = subprocess.check_output(
-            ["git", "rev-list", "--count", f"{version}-1..HEAD"], text=True
+            ["git", "rev-list", "--count", f"{version}..HEAD"], text=True
         ).strip()
         print(f"Commit count {commit_count}")
         version = version + ".r" + commit_count

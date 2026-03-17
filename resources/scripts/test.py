@@ -44,18 +44,15 @@ if os.getenv("GITHUB_ACTIONS", "false").lower() == "false":
 
     # Cambiar a usuario builder
     USER builder
-    WORKDIR /home/builder
+    WORKDIR /tmp
 
-    # Instalar paru desde AUR
     RUN sudo pacman -Sy --noconfirm base-devel git \
         && git clone https://aur.archlinux.org/paru.git \
         && cd paru \
         && makepkg -si --noconfirm \
         && cd .. \
         && rm -rf paru \
-        && sudo paru -Scc --noconfirm
-    
-    RUN paru -S --noconfirm {dependencies} \
+        && paru -S --noconfirm {dependencies} \
         && sudo paru -Scc --noconfirm
 
     WORKDIR /tmp/pkg
