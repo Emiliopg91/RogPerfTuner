@@ -29,37 +29,36 @@ if os.getenv("GITHUB_ACTIONS", "false").lower() == "false":
 
     dependencies = " ".join(content[:-1])
 
-    dockerfile_content = f"""
-    FROM archlinux:latest
+    dockerfile_content = f"""FROM archlinux:latest
 
-    RUN pacman -Sy --noconfirm sudo \
-        && pacman -Scc --noconfirm
-    
-    # Crear usuario no-root
-    RUN useradd -m -G wheel -s /bin/bash builder \
-        && echo "builder ALL=(ALL) NOPASSWD: ALL" >> /etc/sudoers
+RUN pacman -Sy --noconfirm sudo \\
+    && pacman -Scc --noconfirm
 
-    # Crear directorio donde se montarán los paquetes (como root)
-    RUN mkdir -p /pkg /tmp/pkg && chmod 777 /pkg /tmp/pkg
+# Crear usuario no-root
+RUN useradd -m -G wheel -s /bin/bash builder \\
+    && echo "builder ALL=(ALL) NOPASSWD: ALL" >> /etc/sudoers
 
-    # Cambiar a usuario builder
-    USER builder
-    WORKDIR /tmp
+# Crear directorio donde se montarán los paquetes (como root)
+RUN mkdir -p /pkg /tmp/pkg && chmod 777 /pkg /tmp/pkg
 
-    RUN sudo pacman -Sy --noconfirm base-devel git \
-        && git clone https://aur.archlinux.org/paru.git \
-        && cd paru \
-        && makepkg -si --noconfirm \
-        && cd .. \
-        && rm -rf paru \
-        && paru -S --noconfirm {dependencies} \
-        && sudo paru -Scc --noconfirm
+# Cambiar a usuario builder
+USER builder
+WORKDIR /tmp
 
-    WORKDIR /tmp/pkg
+RUN sudo pacman -Sy --noconfirm base-devel git \\
+    && git clone https://aur.archlinux.org/paru.git \\
+    && cd paru \\
+    && makepkg -si --noconfirm \\
+    && cd .. \\
+    && rm -rf paru \\
+    && paru -S --noconfirm {dependencies} \\
+    && sudo paru -Scc --noconfirm
 
-    # Ejecutar paru -U por defecto
-    CMD ["bash", "-c", "cp -R /pkg/* . && export IN_TEST=1 && paru -U --noconfirm --nocheck --noinstall && cp $(ls *.pkg.tar.zst) /pkg"]
-    """
+WORKDIR /tmp/pkg
+
+# Ejecutar paru -U por defecto
+CMD ["bash", "-c", "cp -R /pkg/* . && export IN_TEST=1 && paru -U --noconfirm --nocheck --noinstall && cp $(ls *.pkg.tar.zst) /pkg"]
+"""
 
     with open("Dockerfile", "w", encoding="utf-8") as f:
         f.write(dockerfile_content)
