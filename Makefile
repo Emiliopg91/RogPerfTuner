@@ -171,4 +171,4 @@ update_submodules: clean
 			[ -z "$$branch" ] && branch="main"; \
 			cd $$path && git checkout $$branch &>/dev/null && git pull >/dev/null && cd - >/dev/null; \
 		fi; \
-	done    
+	done     
