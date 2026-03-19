@@ -12,7 +12,7 @@
 #include "models/hardware/usb_identifier.hpp"
 #include "utils/event_bus_wrapper.hpp"
 
-class LsUsbClient : public Singleton<LsUsbClient> {
+class UdevClient : public Singleton<UdevClient> {
   private:
 	struct udev* udev;
 	struct udev_monitor* mon;
@@ -21,11 +21,11 @@ class LsUsbClient : public Singleton<LsUsbClient> {
 	std::atomic<bool> stop;
 	EventBusWrapper& eventBus = EventBusWrapper::getInstance();
 
-	LsUsbClient();
-	friend class Singleton<LsUsbClient>;
+	UdevClient();
+	friend class Singleton<UdevClient>;
 
   public:
-	~LsUsbClient();
+	~UdevClient();
 
 	/**
 	 * @brief Retrieves a list of USB devices, optionally filtered by a user-provided predicate.

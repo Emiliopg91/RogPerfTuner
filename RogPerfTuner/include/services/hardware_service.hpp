@@ -16,7 +16,7 @@
 #ifdef PANEL_OD
 #include "clients/file/firmware/asus-armoury/other/panel_overdrive_client.hpp"
 #endif
-#include "clients/lib/lsusb_client.hpp"
+#include "clients/lib/udev_client.hpp"
 #include "clients/shell/switcherooctl_client.hpp"
 #include "framework/gui/toaster.hpp"
 #include "framework/translator/translator.hpp"
@@ -112,7 +112,7 @@ class HardwareService : public Singleton<HardwareService>, Loggable {
 #ifdef PANEL_OD
 	PanelOverdriveClient& panelOverdriveClient = PanelOverdriveClient::getInstance();
 #endif
-	LsUsbClient& udevClient				= LsUsbClient::getInstance();
+	UdevClient& udevClient				= UdevClient::getInstance();
 	ConfigurationWrapper& configuration = ConfigurationWrapper::getInstance();
 
 	std::unordered_map<std::string, std::string> gpus;

@@ -1,6 +1,6 @@
-#include "clients/lib/lsusb_client.hpp"
+#include "clients/lib/udev_client.hpp"
 
-LsUsbClient::LsUsbClient() {
+UdevClient::UdevClient() {
 	udev = udev_new();
 	if (!udev) {
 		throw std::runtime_error("Couldn't initialize udev client");
@@ -31,7 +31,7 @@ LsUsbClient::LsUsbClient() {
 	});
 }
 
-LsUsbClient::~LsUsbClient() {
+UdevClient::~UdevClient() {
 	stop = true;
 	if (runner.joinable()) {
 		runner.join();
@@ -40,7 +40,7 @@ LsUsbClient::~LsUsbClient() {
 	udev_unref(udev);
 }
 
-const std::vector<UsbIdentifier> LsUsbClient::get_usb_dev(const std::function<bool(const UsbIdentifier&)>& dev_filter) {
+const std::vector<UsbIdentifier> UdevClient::get_usb_dev(const std::function<bool(const UsbIdentifier&)>& dev_filter) {
 	std::vector<UsbIdentifier> devices;
 
 	struct udev_enumerate* enumerate = udev_enumerate_new(udev);
@@ -76,7 +76,7 @@ const std::vector<UsbIdentifier> LsUsbClient::get_usb_dev(const std::function<bo
 	return devices;
 }
 
-const std::tuple<std::vector<UsbIdentifier>, std::vector<UsbIdentifier>, std::vector<UsbIdentifier>> LsUsbClient::compare_connected_devs(
+const std::tuple<std::vector<UsbIdentifier>, std::vector<UsbIdentifier>, std::vector<UsbIdentifier>> UdevClient::compare_connected_devs(
 	const std::vector<UsbIdentifier>& previous, const std::function<bool(const UsbIdentifier&)>& dev_filter) {
 	auto current_usb = get_usb_dev(dev_filter);
 	std::vector<UsbIdentifier> added;

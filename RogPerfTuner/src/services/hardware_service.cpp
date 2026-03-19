@@ -4,7 +4,6 @@
 #include <string>
 
 #include "clients/file/cpuinfo_client.hpp"
-#include "clients/lib/lsusb_client.hpp"
 #include "clients/shell/switcherooctl_client.hpp"
 #include "framework/utils/file_utils.hpp"
 #include "framework/utils/string_utils.hpp"

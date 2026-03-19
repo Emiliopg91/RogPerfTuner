@@ -58,8 +58,8 @@ build:
 		make config; \
 	fi
 
-	@make build_openrgb
-	@make build_rccdc
+	@$(MAKE) build_openrgb
+	@$(MAKE) build_rccdc
 
 	@echo "#######################################################################"
 	@echo "####################### Compiling RogPerfTuner #######################"
@@ -69,7 +69,7 @@ build:
 
 	@python3 resources/scripts/constants.py
 
-	@make format
+	@$(MAKE) format
 
 	@cmake --build build -- -j$(NUM_CORES)
 
@@ -107,7 +107,7 @@ build_rccdc:
 
 pkgbuild:
 	@export BUILD_TYPE=Release
-	@make build BUILD_TYPE=Release
+	@$(MAKE) build BUILD_TYPE=Release
 	@mkdir -p dist
 	@cp resources/completion-bash dist/completion-bash
 
@@ -130,7 +130,7 @@ release:
 	@python resources/scripts/release.py
 
 build_debug:
-	@DEV_MODE=1 make build BUILD_TYPE=Debug
+	@DEV_MODE=1 $(MAKE) build BUILD_TYPE=Debug
 
 run: build_debug
 	@touch -t 201510220000 build/RogPerfTuner/RogPerfTuner
@@ -142,11 +142,11 @@ increase_version:
 	@awk '{if ($$0 ~ /project\(.*VERSION/) {match($$0, /([0-9]+)\.([0-9]+)\.([0-9]+)/, v); patch = v[3] + 1; sub(/[0-9]+\.[0-9]+\.[0-9]+/, v[1] "." v[2] "." patch);} print}' CMakeLists.txt > CMakeLists.txt.tmp && mv CMakeLists.txt.tmp CMakeLists.txt
 
 test: 
-	@GIT_RELEASE=1 make release
+	@GIT_RELEASE=1 $(MAKE) release
 	@python3 ./resources/scripts/test.py
 
 install: clean
-	@export GIT_RELEASE=1 && make release
+	@export GIT_RELEASE=1 && $(MAKE) release
 	@printf '\nprepare() {\n' >> dist/PKGBUILD
 	@printf '    rm -Rf "$$srcdir/RogPerfTuner/*"\n' >> dist/PKGBUILD
 	@printf "    rsync -a --exclude='dist' $(MAKEFILE_DIR) \"\$$srcdir/RogPerfTuner/\"\n" >> dist/PKGBUILD
