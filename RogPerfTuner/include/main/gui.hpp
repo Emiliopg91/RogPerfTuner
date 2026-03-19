@@ -6,10 +6,8 @@
 #include <QApplication>
 #include <iostream>
 #include <memory>
-#include <optional>
 #include <string>
 
-#include "clients/file/battery_status_client.hpp"
 #include "clients/file/proc_modules_client.hpp"
 #include "clients/unix_socket/rog_perf_tuner_client.hpp"
 #include "framework/gui/toaster.hpp"
@@ -23,10 +21,6 @@
 #include "models/settings/root_config.hpp"
 #include "servers/socket_server.hpp"
 #include "services/application_service.hpp"
-#include "services/hardware_service.hpp"
-#include "services/open_rgb_service.hpp"
-#include "services/performance_service.hpp"
-#include "services/steam_service.hpp"
 #include "utils/configuration_wrapper.hpp"
 #include "utils/constants.hpp"
 #include "utils/event_bus_wrapper.hpp"
