@@ -14,7 +14,7 @@ clean:
 	@echo "#######################################################################"
 	@echo "######################### Cleaning workspace ##########################"
 	@echo "#######################################################################"
-	@rm -rf build dist .Debug .Release .qt CMakeCache.txt **/cmake_install.cmake CMakeFiles submodules/patches/*.diff.applied assets/scripts assets/bin assets/OpenRGB assets/RccDeckyCompanion **/CMakeFiles
+	@rm -rf build dist .Debug .Release .qt CMakeCache.txt **/cmake_install.cmake CMakeFiles submodules/patches/*.diff.applied assets/scripts assets/bin assets/OpenRGB assets/RccDeckyCompanion **/CMakeFiles **/config.cmake
 	@cd submodules/OpenRGB-cppSDK && git reset --hard > /dev/null && git submodule foreach git reset --hard > /dev/null
 	@cd submodules/OpenRGB && git reset --hard > /dev/null && git clean -fdx > /dev/null && rm -f CMakeLists.txt
 	@cd submodules/RccDeckyCompanion && git reset --hard > /dev/null
@@ -31,6 +31,8 @@ config:
 	@if [ ! -f "submodules/patches/OpenRGB-cppSDK.diff.applied" ]; then \
 		cd submodules/OpenRGB-cppSDK && git apply ../patches/OpenRGB-cppSDK.diff && touch ../patches/OpenRGB-cppSDK.diff.applied; \
 	fi
+
+	@python resources/scripts/cmake_cfg.py
 	
 	@CMAKE_COLOR=1 cmake -B build -G Ninja \
 		-DCMAKE_CXX_COMPILER=clang++ \

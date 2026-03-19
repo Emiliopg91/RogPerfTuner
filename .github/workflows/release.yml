@@ -36,6 +36,10 @@ jobs:
           echo "VERSION=$VERSION"
           echo "RELEASE=$RELEASE"
 
+      - name: Test
+        run: |
+          make test clean
+
       - name: Version bump
         run: |
           echo "Updating version in CMakeLists.txt to '${VERSION}'..."

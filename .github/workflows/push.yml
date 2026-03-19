@@ -28,6 +28,11 @@ jobs:
           git config user.name "GitHub Actions"
           git config user.email "actions@github.com"
 
+      - name: Test
+        if: github.event_name != 'workflow_run'
+        run: |
+          make test
+
       - name: Perform release
         run: |
           GIT_RELEASE=1 make clean release
