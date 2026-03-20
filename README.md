@@ -38,9 +38,9 @@ RogPerfTuner is here to simplify your life and help you enjoy gaming on your Asu
 
 Do you want something similar for Asus Rog Ally/Ally X? Check [AllyDeckyCompanion](https://github.com/Emiliopg91/AllyDeckyCompanion/)
 
-| ![Main Window](./resources/screenshots/main_window.png)     | ![Schedulers](./resources/screenshots/schedulers.png)              |
-| ----------------------------------------------------------- | ------------------------------------------------------------------ |
-| ![Fan curve editor](./resources/screenshots/fan_editor.png) | ![Game configuration editor](./resources/screenshots/game_cfg.png) |
+| ![Main Window](./.github/screenshots/main_window.png)     | ![Schedulers](./github/screenshots/schedulers.png)              |
+| --------------------------------------------------------- | --------------------------------------------------------------- |
+| ![Fan curve editor](./.github/screenshots/fan_editor.png) | ![Game configuration editor](./github/screenshots/game_cfg.png) |
 
 ## Features
 
@@ -107,7 +107,6 @@ Do you want something similar for Asus Rog Ally/Ally X? Check [AllyDeckyCompanio
 Mainline AUR package is available as **rog-perf-tuner**.
 
 If you prefer bleeding-edge version with latest features, fixes and improvements you can install **rog-perf-tuner-git**.
-
 
 Install it using your favourite AUR helper and you'll get every dependency installed.
 
