@@ -38,9 +38,9 @@ RogPerfTuner is here to simplify your life and help you enjoy gaming on your Asu
 
 Do you want something similar for Asus Rog Ally/Ally X? Check [AllyDeckyCompanion](https://github.com/Emiliopg91/AllyDeckyCompanion/)
 
-| ![Main Window](./.github/screenshots/main_window.png)     | ![Schedulers](./github/screenshots/schedulers.png)              |
-| --------------------------------------------------------- | --------------------------------------------------------------- |
-| ![Fan curve editor](./.github/screenshots/fan_editor.png) | ![Game configuration editor](./github/screenshots/game_cfg.png) |
+| ![Main Window](./.github/screenshots/main_window.png)     | ![Schedulers](./.github/screenshots/schedulers.png)              |
+| --------------------------------------------------------- | ---------------------------------------------------------------- |
+| ![Fan curve editor](./.github/screenshots/fan_editor.png) | ![Game configuration editor](./github/.screenshots/game_cfg.png) |
 
 ## Features
 
