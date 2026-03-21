@@ -44,6 +44,8 @@ Do you want something similar for Asus Rog Ally/Ally X? Check [AllyDeckyCompanio
 
 ## Features
 
+- [x] Dynamic features on build based on your laptop capabilities
+
 - [x] Choose the performance profile that best fits your needs:
   - Smart: Automatically switches between profiles depending on system load.
   - Performance: Maximizes system performance with no compromises.
@@ -55,7 +57,7 @@ Do you want something similar for Asus Rog Ally/Ally X? Check [AllyDeckyCompanio
   - CPU Boost
   - CPU Governor
   - CPU Scheduler
-  - GPU TGP
+  - GPU Boost
   - GPU Thermal throttling policy
   - Fan curves, customizable via charts
   - Power profile
@@ -97,8 +99,6 @@ Do you want something similar for Asus Rog Ally/Ally X? Check [AllyDeckyCompanio
   - Support for flatpak added
 
 - [x] Start on boot
-
-- [x] PKGBUILD for AUR
 
 ## Installation
 
