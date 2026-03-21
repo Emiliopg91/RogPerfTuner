@@ -116,7 +116,6 @@ To enable Steam integration, you should install Steam and DeckyLoader previous t
 
 ## Compatibility
 
-- Tested on CachyOS and Bazzite with KDE desktop environment
 - Only tested on Laptops with Intel+Nvidia settings
 
 ## Attribution
