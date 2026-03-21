@@ -10,6 +10,8 @@ PATCH_DIR := patches
 SUBMODULE_DIR := submodules
 FROZEN_SUBMODULES := submodules/OpenRGB-cppSDK submodules/OpenRGB 
 
+all: run
+
 clean:
 	@echo "#######################################################################"
 	@echo "######################### Cleaning workspace ##########################"

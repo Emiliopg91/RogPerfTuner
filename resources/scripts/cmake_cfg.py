@@ -103,7 +103,9 @@ definitions: dict[str, str] = {
 }
 
 if __name__ == "__main__":
-    print("Looking for header and source files...")
+    print("Creating CMake config file...")
+
+    print("  Looking for header and source files...")
     header_files = [
         f.replace(PROJECT_DIR + "/", "")
         for f in glob.glob(
@@ -120,9 +122,9 @@ if __name__ == "__main__":
     ]
     source_files = sorted(source_files)
 
-    print("Checking for features...")
+    print("  Checking for features...")
     if os.environ.get("IN_TEST"):
-        print("  Test mode active, activating every feature")
+        print("    Test mode active, activating every feature")
         enabled_features = {f: True for f in Feature}
     else:
         if os.environ.get("DEV_MODE"):
@@ -192,7 +194,7 @@ if __name__ == "__main__":
                 ):
                     enabled_features[Feature.PPT_PL3_FPPT] = True
 
-    print("Removing unused files...")
+    print("  Removing unused files...")
     for feature, enabled in enabled_features.items():
         if not enabled and feature in FEATURE_FILES:
             for file in FEATURE_FILES[feature]:
@@ -204,22 +206,22 @@ if __name__ == "__main__":
                     source_files.remove(file)
                     removed = True
                 if removed:
-                    print(f"  Removed {file}")
+                    print(f"    Removed {file}")
                 else:
-                    print(f"  Missing file {file}")
+                    print(f"    Missing file {file}")
 
-    print("Generating config file...")
+    print("  Generating config file...")
     print(f"  Writting in {CMAKE_CFG}")
 
     with open(CMAKE_CFG, "w", encoding="utf-8") as f:
         f.write("set(HEADERS_RCC\n")
         for h in header_files:
-            f.write(f'    "${{CMAKE_CURRENT_SOURCE_DIR}}/{h}"\n')
+            f.write(f'      "${{CMAKE_CURRENT_SOURCE_DIR}}/{h}"\n')
         f.write(")\n")
         f.write("\n")
         f.write("set(SOURCES_RCC\n")
         for h in source_files:
-            f.write(f'    "${{CMAKE_CURRENT_SOURCE_DIR}}/{h}"\n')
+            f.write(f'      "${{CMAKE_CURRENT_SOURCE_DIR}}/{h}"\n')
         f.write(")\n")
 
         for deff, value in definitions.items():
@@ -227,3 +229,4 @@ if __name__ == "__main__":
         f.write("\n")
         for feat in enabled_features:
             f.write(f"set({feat.name} {"ON" if enabled_features[feat] else "OFF"})\n")
+    print("CMake config file created")
