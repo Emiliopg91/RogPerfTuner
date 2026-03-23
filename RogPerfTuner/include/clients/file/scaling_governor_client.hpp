@@ -1,15 +1,12 @@
 #pragma once
 
-#include <string>
-
 #include "framework/abstracts/singleton.hpp"
-#include "framework/clients/abstract/abstract_cmd_client.hpp"
+#include "framework/clients/abstract/abstract_glob_client.hpp"
 #include "models/performance/cpu_governor.hpp"
 
-class CpuPowerClient : public AbstractCmdClient, public Singleton<CpuPowerClient> {
+class ScalingGovernorClient : public AbstractGlobClient, public Singleton<ScalingGovernorClient> {
   private:
-	CpuPowerClient() : AbstractCmdClient("cpupower", "CpuPowerClient") {
-	}
+	ScalingGovernorClient();
 
   public:
 	/**
@@ -22,5 +19,5 @@ class CpuPowerClient : public AbstractCmdClient, public Singleton<CpuPowerClient
 	 */
 	void setGovernor(const CpuGovernor& governor);
 
-	friend class Singleton<CpuPowerClient>;
+	friend class Singleton<ScalingGovernorClient>;
 };

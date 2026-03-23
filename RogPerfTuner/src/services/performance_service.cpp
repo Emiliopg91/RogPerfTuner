@@ -10,7 +10,6 @@
 #include "framework/utils/process_utils.hpp"
 #include "framework/utils/string_utils.hpp"
 #include "framework/utils/time_utils.hpp"
-#include "models/performance/cpu_governor.hpp"
 #include "models/performance/performance_profile.hpp"
 #include "models/performance/power_profile.hpp"
 #include "utils/configuration_wrapper.hpp"
@@ -76,7 +75,9 @@ void PerformanceService::setActualPerformanceProfile(PerformanceProfile& profile
 #ifdef BOOST_CONTROL
 		setBoost(profile);
 #endif
+#ifdef SCALING_GOVERNOR
 		setCpuGovernor(profile);
+#endif
 #ifdef ACPI_PROFILE
 		setPowerProfile(profile);
 #endif
@@ -232,6 +233,7 @@ bool PerformanceService::batteryBoost() {
 }
 #endif
 
+#ifdef SCALING_GOVERNOR
 void PerformanceService::setCpuGovernor(const PerformanceProfile& profile) {
 	if (cpuPowerClient.available()) {
 		CpuGovernor cpuGovernor = onBattery ? batteryGovernor() : acGovernor(profile);
@@ -245,6 +247,7 @@ void PerformanceService::setCpuGovernor(const PerformanceProfile& profile) {
 		Logger::rem_tab();
 	}
 }
+#endif
 
 #ifdef ACPI_PROFILE
 void PerformanceService::setPowerProfile(PerformanceProfile& profile) {
@@ -434,6 +437,7 @@ int PerformanceService::batteryNvTemp(PerformanceProfile profile) {
 }
 #endif
 
+#ifdef SCALING_GOVERNOR
 CpuGovernor PerformanceService::acGovernor(PerformanceProfile profile) {
 	if (profile == PerformanceProfile::PERFORMANCE) {
 		return CpuGovernor::PERFORMANCE;
@@ -444,6 +448,7 @@ CpuGovernor PerformanceService::acGovernor(PerformanceProfile profile) {
 CpuGovernor PerformanceService::batteryGovernor() {
 	return CpuGovernor::POWERSAVE;
 }
+#endif
 
 int PerformanceService::acTdpToBatteryTdp(int tdp, int minTdp) {
 	return std::max(minTdp, static_cast<int>(std::round(tdp * 0.6)));

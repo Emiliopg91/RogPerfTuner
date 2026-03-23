@@ -60,52 +60,55 @@ inline std::string getExecutablePath(const char* argv0) {
 
 inline void printFeatureTable(std::shared_ptr<Logger> logger) {
 	Logger::add_tab();
-	logger->info("┌─────────────────┐");
-	logger->info("│    Features     │");
-	logger->info("├─────────────────┤");
+	logger->info("┌──────────────────┐");
+	logger->info("│     Features     │");
+	logger->info("├──────────────────┤");
 #ifdef DEV_MODE
-	logger->info("│ Dev mode        │");
+	logger->info("│ Dev mode         │");
 #endif
 #ifdef ACPI_PROFILE
-	logger->info("│ ACPI profiles   │");
+	logger->info("│ ACPI profiles    │");
 #endif
 #ifdef BAT_LIMIT
-	logger->info("│ Battery limit   │");
+	logger->info("│ Battery limit    │");
 #endif
 #ifdef BAT_STATUS
-	logger->info("│ Battery status  │");
+	logger->info("│ Battery status   │");
 #endif
 #ifdef BOOST_CONTROL
-	logger->info("│ Boost control   │");
+	logger->info("│ Boost control    │");
 #endif
 #ifdef BOOT_SOUND
-	logger->info("│ Boot sound      │");
+	logger->info("│ Boot sound       │");
 #endif
 #ifdef FAN_CONTROL
-	logger->info("│ Fan control     │");
+	logger->info("│ Fan control      │");
 #endif
 #ifdef INTEL_RAPL_UJ
-	logger->info("│ Intel rapl UJ   │");
+	logger->info("│ Intel rapl UJ    │");
 #endif
 #ifdef NV_BOOST
-	logger->info("│ Nvidia boost    │");
+	logger->info("│ Nvidia boost     │");
 #endif
 #ifdef NV_THERMAL
-	logger->info("│ Nvidia thermal  │");
+	logger->info("│ Nvidia thermal   │");
 #endif
 #ifdef PANEL_OD
-	logger->info("│ Panel overdrive │");
+	logger->info("│ Panel overdrive  │");
+#endif
+#ifdef SCALING_GOVERNOR
+	logger->info("│ Scaling governor │");
 #endif
 #ifdef PPT_PL1_SPL
-	logger->info("│ TDP PL1 SPD     │");
+	logger->info("│ TDP PL1 SPD      │");
 #endif
 #ifdef PPT_PL2_SPPT
-	logger->info("│ TDP PL2 SPPT    │");
+	logger->info("│ TDP PL2 SPPT     │");
 #endif
 #ifdef PPT_PL3_FPPT
-	logger->info("│ TDP PL3 FPPT    │");
+	logger->info("│ TDP PL3 FPPT     │");
 #endif
-	logger->info("└─────────────────┘");
+	logger->info("└──────────────────┘");
 	Logger::rem_tab();
 }
 

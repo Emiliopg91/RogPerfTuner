@@ -14,55 +14,29 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  compile_and_release:
-    runs-on: ubuntu-latest
+  release-local:
+    runs-on: [self-hosted, asus-rog-strix]
+    timeout-minutes: 1
+
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v4
         with:
           submodules: recursive
           fetch-depth: 0
 
-      - name: Configure Git user
-        run: |
-          git config user.name "GitHub Actions"
-          git config user.email "actions@github.com"
+      - name: Run release
+        uses: ./.github/workflows/reusable-push.yml
 
-      - name: Test
-        if: github.event_name != 'workflow_run'
-        run: |
-          make test
+  release-fallback:
+    runs-on: ubuntu-latest
+    needs: release-local
+    if: failure() || cancelled()
 
-      - name: Perform release
-        run: |
-          GIT_RELEASE=1 make clean release
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          submodules: recursive
+          fetch-depth: 0
 
-      - name: Publish to AUR
-        env:
-          AUR_SSH_PRIVATE_KEY: ${{ secrets.AUR_SSH_PRIVATE_KEY }}
-        run: |
-          VERSION=$(grep pkgver dist/PKGBUILD | cut -d'=' -f2)
-
-          echo "Setting SSH key for AUR..."
-          mkdir -p ~/.ssh
-          echo "$AUR_SSH_PRIVATE_KEY" > ~/.ssh/aur
-          chmod 600 ~/.ssh/aur
-          echo -e "Host aur.archlinux.org\n\tIdentityFile ~/.ssh/aur\n\tUser aur\n\tStrictHostKeyChecking no" >> ~/.ssh/config
-
-          echo "Cloning AUR repository..."
-          git clone ssh://aur@aur.archlinux.org/rog-perf-tuner-git.git aur_repo
-          cd aur_repo
-
-          echo "Configuring Git identity..."
-          git config user.name "github-actions[bot]"
-          git config user.email "github-actions[bot]@users.noreply.github.com"
-
-          echo "Copying files..."
-          cp ../dist/PKGBUILD .
-          cp ../dist/.SRCINFO .
-          cp ../dist/rog-perf-tuner-git.install .
-
-          echo "Committing changes..."
-          git add PKGBUILD .SRCINFO rog-perf-tuner-git.install
-          git diff-index --quiet HEAD || git commit -m "Release $VERSION-1"
-          git push
+      - name: Run release
+        uses: ./.github/workflows/reusable-push.yml

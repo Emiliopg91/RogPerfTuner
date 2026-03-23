@@ -31,10 +31,12 @@
 #ifdef NV_THERMAL
 #include "clients/file/firmware/asus-armoury/nvidia/nv_temp_client.hpp"
 #endif
+#ifdef SCALING_GOVERNOR
+#include "clients/file/scaling_governor_client.hpp"
+#endif
 #include "clients/file/sched_bore_client.hpp"
 #include "clients/file/ssd_scheduler_client.hpp"
 #include "clients/shell/asusctl_client.hpp"
-#include "clients/shell/cpupower_client.hpp"
 #include "clients/shell/scxctl_client.hpp"
 #include "framework/gui/toaster.hpp"
 #include "framework/shell/shell.hpp"
@@ -208,7 +210,9 @@ class PerformanceService : public Singleton<PerformanceService>, Loggable {
 	Toaster& toaster				 = Toaster::getInstance();
 	SchedBoreClient& schedBoreClient = SchedBoreClient::getInstance();
 	HardwareService& hardwareService = HardwareService::getInstance();
-	CpuPowerClient& cpuPowerClient	 = CpuPowerClient::getInstance();
+#ifdef SCALING_GOVERNOR
+	ScalingGovernorClient& cpuPowerClient = ScalingGovernorClient::getInstance();
+#endif
 #ifdef BOOST_CONTROL
 	BoostControlClient& boostControlClient = BoostControlClient::getInstance();
 #endif
@@ -229,7 +233,9 @@ class PerformanceService : public Singleton<PerformanceService>, Loggable {
 	bool batteryBoost();
 #endif
 
+#ifdef SCALING_GOVERNOR
 	void setCpuGovernor(const PerformanceProfile& profile);
+#endif
 
 #ifdef ACPI_PROFILE
 	void setPowerProfile(PerformanceProfile& profile);
@@ -263,8 +269,11 @@ class PerformanceService : public Singleton<PerformanceService>, Loggable {
 #if defined(NV_THERMAL) || defined(NV_BOOST)
 	void setNvidiaProfile(const PerformanceProfile& profile);
 #endif
+#ifdef SCALING_GOVERNOR
 	CpuGovernor acGovernor(PerformanceProfile profile);
 	CpuGovernor batteryGovernor();
+#endif
+
 	int acTdpToBatteryTdp(int tdp, int minTdp);
 
 	void smartWorker();

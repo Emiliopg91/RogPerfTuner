@@ -36,6 +36,7 @@ PPT_PL2_SPPT_PATH = (
 PPT_PL3_FPPT_PATH = (
     "/sys/class/firmware-attributes/asus-armoury/attributes/ppt_pl3_fppt"
 )
+SCALING_GOVERNOR_GLOB = "/sys/devices/system/cpu/cpu*/cpufreq/scaling_governor"
 
 
 class Feature(Enum):
@@ -53,6 +54,7 @@ class Feature(Enum):
     PPT_PL1_SPL = auto()
     PPT_PL2_SPPT = auto()
     PPT_PL3_FPPT = auto()
+    SCALING_GOVERNOR = auto()
 
 
 FEATURE_FILES: dict[Feature, list[str]] = {
@@ -62,7 +64,7 @@ FEATURE_FILES: dict[Feature, list[str]] = {
     ],
     Feature.BAT_LIMIT: [
         "include/clients/file/battery_charge_limit_client.hpp",
-        "include/models/hardware/battery_charge_threshold.hpp"
+        "include/models/hardware/battery_charge_threshold.hpp",
         "src/clients/file/battery_charge_limit_client.cpp",
     ],
     Feature.BAT_STATUS: [
@@ -113,6 +115,11 @@ FEATURE_FILES: dict[Feature, list[str]] = {
         "include/clients/file/firmware/asus-armoury/intel/pl3_fppt_client.hpp",
         "src/clients/file/firmware/asus-armoury/intel/pl3_fppt_client.cpp",
     ],
+    Feature.SCALING_GOVERNOR: [
+        "include/clients/file/scaling_governor_client.hpp",
+        "include/models/performance/cpu_governor.hpp",
+        "src/clients/file/scaling_governor_client.cpp",
+    ],
 }
 
 
@@ -131,7 +138,29 @@ class Definition(Enum):
     PPT_PL1_SPL_FILE = auto()
     PPT_PL2_SPPT_FILE = auto()
     PPT_PL3_FPPT_FILE = auto()
+    SCALING_GOVERNOR_FILE = auto()
 
+
+feature_definition_asoc: dict[Feature, list[Definition]] = {
+    Feature.DEV_MODE: [],
+    Feature.ACPI_PROFILE: [Definition.ACPI_PROFILE_FILE],
+    Feature.BAT_LIMIT: [Definition.BAT_LIMIT_FILE],
+    Feature.BAT_STATUS: [Definition.BAT_STATUS_FILE],
+    Feature.BOOT_SOUND: [Definition.BOOT_SOUND_FILE],
+    Feature.BOOST_CONTROL: [
+        Definition.BOOST_CONTROL_FILE,
+        Definition.BOOST_CONTROL_OFF,
+        Definition.BOOST_CONTROL_ON,
+    ],
+    Feature.INTEL_RAPL_UJ: [Definition.INTEL_RAPL_UJ_FILE],
+    Feature.NV_BOOST: [Definition.NVIDIA_BOOST_FILE],
+    Feature.NV_THERMAL: [Definition.NVIDIA_THERMAL_FILE],
+    Feature.PANEL_OD: [Definition.PANEL_OD_FILE],
+    Feature.PPT_PL1_SPL: [Definition.PPT_PL1_SPL_FILE],
+    Feature.PPT_PL2_SPPT: [Definition.PPT_PL2_SPPT_FILE],
+    Feature.PPT_PL3_FPPT: [Definition.PPT_PL3_FPPT_FILE],
+    Feature.SCALING_GOVERNOR: [Definition.SCALING_GOVERNOR_FILE],
+}
 
 enabled_features: dict[Feature, bool] = {f: False for f in Feature}
 definitions: dict[Definition, str] = {
@@ -149,26 +178,39 @@ definitions: dict[Definition, str] = {
     Definition.PPT_PL1_SPL_FILE: "",
     Definition.PPT_PL2_SPPT_FILE: "",
     Definition.PPT_PL3_FPPT_FILE: "",
+    Definition.SCALING_GOVERNOR_FILE: "",
 }
 
 if __name__ == "__main__":
     print("Creating CMake config file...")
 
     print("  Looking for header and source files...")
-    header_files = [
-        f.replace(PROJECT_DIR + "/", "")
-        for f in glob.glob(
-            os.path.join(PROJECT_DIR, "include", "**", "*.hpp"), recursive=True
-        )
-    ]
+    header_files = []
+    for f in glob.glob(
+        os.path.join(PROJECT_DIR, "include", "**", "*.hpp"), recursive=True
+    ):
+        f = f.replace(PROJECT_DIR + "/", "")
+        exclude = False
+        for _, files in FEATURE_FILES.items():
+            for fi in files:
+                if f.endswith(fi):
+                    exclude = True
+                    break
+        if not exclude:
+            header_files.append(f)
     header_files = sorted(header_files)
 
-    source_files = [
-        f.replace(PROJECT_DIR + "/", "")
-        for f in glob.glob(
-            os.path.join(PROJECT_DIR, "src", "**", "*.cpp"), recursive=True
-        )
-    ]
+    source_files = []
+    for f in glob.glob(os.path.join(PROJECT_DIR, "src", "**", "*.cpp"), recursive=True):
+        f = f.replace(PROJECT_DIR + "/", "")
+        exclude = False
+        for _, files in FEATURE_FILES.items():
+            for fi in files:
+                if f.endswith(fi):
+                    exclude = True
+                    break
+        if not exclude:
+            source_files.append(f)
     source_files = sorted(source_files)
 
     print("  Checking for features...")
@@ -259,21 +301,11 @@ if __name__ == "__main__":
                     definitions[Definition.PPT_PL3_FPPT_FILE] = PPT_PL3_FPPT_PATH
                     print(f"    - TDP PL3 FPPT via {PPT_PL3_FPPT_PATH}")
 
-    print("  Removing unused files...")
-    for feature, enabled in enabled_features.items():
-        if not enabled and feature in FEATURE_FILES:
-            for file in FEATURE_FILES[feature]:
-                removed = False
-                if file in header_files:
-                    header_files.remove(file)
-                    removed = True
-                elif file in source_files:
-                    source_files.remove(file)
-                    removed = True
-                if removed:
-                    print(f"    Removed {file}")
-                else:
-                    print(f"    Missing file {file}")
+        g = glob.glob(SCALING_GOVERNOR_GLOB)
+        if len(g) > 0:
+            enabled_features[Feature.SCALING_GOVERNOR] = True
+            definitions[Definition.SCALING_GOVERNOR_FILE] = SCALING_GOVERNOR_GLOB
+            print(f"    - Scaling governor via {SCALING_GOVERNOR_GLOB}")
 
     print("  Generating config file...")
     print(f"  Writting in {CMAKE_CFG}")
@@ -281,17 +313,49 @@ if __name__ == "__main__":
     with open(CMAKE_CFG, "w", encoding="utf-8") as f:
         f.write("set(HEADERS_RCC\n")
         for h in header_files:
-            f.write(f'      "${{CMAKE_CURRENT_SOURCE_DIR}}/{h}"\n')
+            f.write(f'    "${{CMAKE_CURRENT_SOURCE_DIR}}/{h}"\n')
         f.write(")\n")
         f.write("\n")
         f.write("set(SOURCES_RCC\n")
         for h in source_files:
-            f.write(f'      "${{CMAKE_CURRENT_SOURCE_DIR}}/{h}"\n')
-        f.write(")\n")
+            f.write(f'    "${{CMAKE_CURRENT_SOURCE_DIR}}/{h}"\n')
+        f.write(")\n\n")
 
-        for deff, value in definitions.items():
-            f.write(f'add_definitions(-D{deff.name}="{value}")\n')
-        f.write("\n")
         for feat in enabled_features:
-            f.write(f"set({feat.name} {"ON" if enabled_features[feat] else "OFF"})\n")
+            if enabled_features[feat]:
+                separator = "".ljust(22 + len(feat.name), "#")
+                f.write(f"{separator}\n")
+                f.write(f"########## {feat.name} ##########\n")
+                f.write(f"{separator}\n")
+                f.write(
+                    f"set({feat.name} {"ON" if enabled_features[feat] else "OFF"})\n"
+                )
+                if feat in feature_definition_asoc:
+                    for deff in feature_definition_asoc[feat]:
+                        f.write(
+                            f'add_definitions(-D{deff.name}="{definitions[deff]}")\n'
+                        )
+                if feat in FEATURE_FILES:
+                    sources = []
+                    headers = []
+
+                    for file in FEATURE_FILES[feat]:
+                        if file.startswith("src/"):
+                            sources.append(file)
+                        elif file.startswith("include/"):
+                            headers.append(file)
+
+                    if len(headers) > 0:
+                        f.write("list(APPEND HEADERS_RCC\n")
+                        for h in headers:
+                            f.write(f'    "${{CMAKE_CURRENT_SOURCE_DIR}}/{h}"\n')
+                        f.write(")\n")
+                    if len(sources) > 0:
+                        f.write("list(APPEND SOURCES_RCC\n")
+                        for s in sources:
+                            f.write(f'    "${{CMAKE_CURRENT_SOURCE_DIR}}/{s}"\n')
+                        f.write(")\n")
+
+                f.write("\n")
+
     print("CMake config file created")
