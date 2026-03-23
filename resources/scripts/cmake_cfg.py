@@ -17,6 +17,26 @@ BOOST_CONTROL_OPTS = {
     "/sys/devices/system/cpu/cpufreq/boost": {"on": "1", "off": "0"},
 }
 
+ACPI_PROFILE_PATH = "/sys/firmware/acpi/platform_profile"
+BAT_LIMIT_GLOB = "/sys/class/power_supply/BAT[0-9]*/charge_control_end_threshold"
+BAT_STATUS_GLOB = "/sys/class/power_supply/BAT[0-9]*/status"
+BOOT_SOUND_PATH = "/sys/class/firmware-attributes/asus-armoury/attributes/boot_sound"
+INTEL_RAPL_UJ_GLOB = "/sys/class/powercap/intel-rapl:[0-9]/energy_uj"
+NVIDIA_BOOST_PATH = (
+    "/sys/class/firmware-attributes/asus-armoury/attributes/nv_dynamic_boost"
+)
+NVIDIA_THERMAL_PATH = (
+    "/sys/class/firmware-attributes/asus-armoury/attributes/nv_temp_target"
+)
+PANEL_OD_PATH = "/sys/class/firmware-attributes/asus-armoury/attributes/panel_overdrive"
+PPT_PL1_SPL_PATH = "/sys/class/firmware-attributes/asus-armoury/attributes/ppt_pl1_spl"
+PPT_PL2_SPPT_PATH = (
+    "/sys/class/firmware-attributes/asus-armoury/attributes/ppt_pl2_sppt"
+)
+PPT_PL3_FPPT_PATH = (
+    "/sys/class/firmware-attributes/asus-armoury/attributes/ppt_pl3_fppt"
+)
+
 
 class Feature(Enum):
     DEV_MODE = auto()
@@ -95,11 +115,40 @@ FEATURE_FILES: dict[Feature, list[str]] = {
     ],
 }
 
+
+class Definition(Enum):
+    ACPI_PROFILE_FILE = auto()
+    BAT_LIMIT_FILE = auto()
+    BAT_STATUS_FILE = auto()
+    BOOT_SOUND_FILE = auto()
+    BOOST_CONTROL_FILE = auto()
+    BOOST_CONTROL_OFF = auto()
+    BOOST_CONTROL_ON = auto()
+    INTEL_RAPL_UJ_FILE = auto()
+    NVIDIA_BOOST_FILE = auto()
+    NVIDIA_THERMAL_FILE = auto()
+    PANEL_OD_FILE = auto()
+    PPT_PL1_SPL_FILE = auto()
+    PPT_PL2_SPPT_FILE = auto()
+    PPT_PL3_FPPT_FILE = auto()
+
+
 enabled_features: dict[Feature, bool] = {f: False for f in Feature}
-definitions: dict[str, str] = {
-    "BOOST_CONTROL_FILE": "",
-    "BOOST_CONTROL_OFF": "",
-    "BOOST_CONTROL_ON": "",
+definitions: dict[Definition, str] = {
+    Definition.ACPI_PROFILE_FILE: "",
+    Definition.BAT_LIMIT_FILE: "",
+    Definition.BAT_STATUS_FILE: "",
+    Definition.BOOT_SOUND_FILE: "",
+    Definition.BOOST_CONTROL_FILE: "",
+    Definition.BOOST_CONTROL_OFF: "",
+    Definition.BOOST_CONTROL_ON: "",
+    Definition.INTEL_RAPL_UJ_FILE: "",
+    Definition.NVIDIA_BOOST_FILE: "",
+    Definition.NVIDIA_THERMAL_FILE: "",
+    Definition.PANEL_OD_FILE: "",
+    Definition.PPT_PL1_SPL_FILE: "",
+    Definition.PPT_PL2_SPPT_FILE: "",
+    Definition.PPT_PL3_FPPT_FILE: "",
 }
 
 if __name__ == "__main__":
@@ -129,28 +178,38 @@ if __name__ == "__main__":
     else:
         if os.environ.get("DEV_MODE"):
             enabled_features[Feature.DEV_MODE] = True
+            print("    - Dev mode")
 
-        if os.path.isfile("/sys/firmware/acpi/platform_profile"):
+        if os.path.isfile(ACPI_PROFILE_PATH):
             enabled_features[Feature.ACPI_PROFILE] = True
+            definitions[Definition.ACPI_PROFILE_FILE] = ACPI_PROFILE_PATH
+            print(f"    - ACPI Profiles via {ACPI_PROFILE_PATH}")
 
-        if os.path.isfile("/sys/class/power_supply/BAT0/charge_control_end_threshold"):
+        g = glob.glob(BAT_LIMIT_GLOB)
+        if len(g) > 0:
             enabled_features[Feature.BAT_LIMIT] = True
+            definitions[Definition.BAT_LIMIT_FILE] = g[0]
+            print(f"    - Battery limit via {g[0]}")
 
-        if os.path.isfile("/sys/class/power_supply/BAT0/status"):
+        g = glob.glob(BAT_STATUS_GLOB)
+        if len(g) > 0:
             enabled_features[Feature.BAT_STATUS] = True
+            definitions[Definition.BAT_STATUS_FILE] = g[0]
+            print(f"    - Battery status via {g[0]}")
 
         for file, values in BOOST_CONTROL_OPTS.items():
             if os.path.isfile(file):
                 enabled_features[Feature.BOOST_CONTROL] = True
-                definitions["BOOST_CONTROL_FILE"] = file
-                definitions["BOOST_CONTROL_OFF"] = values["off"]
-                definitions["BOOST_CONTROL_ON"] = values["on"]
+                definitions[Definition.BOOST_CONTROL_FILE] = file
+                definitions[Definition.BOOST_CONTROL_OFF] = values["off"]
+                definitions[Definition.BOOST_CONTROL_ON] = values["on"]
+                print(f"    - Boost control via {file}")
                 break
 
-        if os.path.isfile(
-            "/sys/class/firmware-attributes/asus-armoury/attributes/boot_sound/current_value"
-        ):
+        if os.path.isdir(BOOT_SOUND_PATH):
             enabled_features[Feature.BOOT_SOUND] = True
+            definitions[Definition.BOOT_SOUND_FILE] = BOOT_SOUND_PATH
+            print(f"    - Boot sound via {BOOT_SOUND_PATH}")
 
         if shutil.which("asusctl"):
             result = subprocess.run(
@@ -162,37 +221,43 @@ if __name__ == "__main__":
             fan_curve_count = int(result.stdout.strip())
             if fan_curve_count > 0:
                 enabled_features[Feature.FAN_CONTROL] = True
+                print("    - Fan control via asusctl")
 
-        if os.path.isfile("/sys/class/powercap/intel-rapl:0/energy_uj"):
+        g = glob.glob(INTEL_RAPL_UJ_GLOB)
+        if len(g) > 0:
             enabled_features[Feature.INTEL_RAPL_UJ] = True
+            definitions[Definition.INTEL_RAPL_UJ_FILE] = g[0]
+            print(f"    - Intel Rapl UJ via {g[0]}")
 
-        if os.path.isfile(
-            "/sys/class/firmware-attributes/asus-armoury/attributes/nv_dynamic_boost/current_value"
-        ):
+        if os.path.isdir(NVIDIA_BOOST_PATH):
             enabled_features[Feature.NV_BOOST] = True
+            definitions[Definition.NVIDIA_BOOST_FILE] = NVIDIA_BOOST_PATH
+            print(f"    - Nvidia Boost via {NVIDIA_BOOST_PATH}")
 
-        if os.path.isfile(
-            "/sys/class/firmware-attributes/asus-armoury/attributes/nv_temp_target/current_value"
-        ):
+        if os.path.isdir(NVIDIA_THERMAL_PATH):
             enabled_features[Feature.NV_THERMAL] = True
+            definitions[Definition.NVIDIA_THERMAL_FILE] = NVIDIA_THERMAL_PATH
+            print(f"    - Nvidia Thermal via {NVIDIA_THERMAL_PATH}")
 
-        if os.path.isfile(
-            "/sys/class/firmware-attributes/asus-armoury/attributes/panel_overdrive/current_value"
-        ):
+        if os.path.isdir(PANEL_OD_PATH):
             enabled_features[Feature.PANEL_OD] = True
+            definitions[Definition.PANEL_OD_FILE] = PANEL_OD_PATH
+            print(f"    - Panel overdrive via {PANEL_OD_PATH}")
 
-        if os.path.isfile(
-            "/sys/class/firmware-attributes/asus-armoury/attributes/ppt_pl1_spl/current_value"
-        ):
+        if os.path.isdir(PPT_PL1_SPL_PATH):
             enabled_features[Feature.PPT_PL1_SPL] = True
-            if os.path.isfile(
-                "/sys/class/firmware-attributes/asus-armoury/attributes/ppt_pl2_sppt/current_value"
-            ):
+            definitions[Definition.PPT_PL1_SPL_FILE] = PPT_PL1_SPL_PATH
+            print(f"    - TDP PL1 SPD via {PPT_PL1_SPL_PATH}")
+
+            if os.path.isdir(PPT_PL2_SPPT_PATH):
                 enabled_features[Feature.PPT_PL2_SPPT] = True
-                if os.path.isfile(
-                    "/sys/class/firmware-attributes/asus-armoury/attributes/ppt_pl3_fppt/current_value"
-                ):
+                definitions[Definition.PPT_PL2_SPPT_FILE] = PPT_PL2_SPPT_PATH
+                print(f"    - TDP PL2 SPPT via {PPT_PL2_SPPT_PATH}")
+
+                if os.path.isdir(PPT_PL3_FPPT_PATH):
                     enabled_features[Feature.PPT_PL3_FPPT] = True
+                    definitions[Definition.PPT_PL3_FPPT_FILE] = PPT_PL3_FPPT_PATH
+                    print(f"    - TDP PL3 FPPT via {PPT_PL3_FPPT_PATH}")
 
     print("  Removing unused files...")
     for feature, enabled in enabled_features.items():
@@ -225,7 +290,7 @@ if __name__ == "__main__":
         f.write(")\n")
 
         for deff, value in definitions.items():
-            f.write(f'add_definitions(-D{deff}="{value}")\n')
+            f.write(f'add_definitions(-D{deff.name}="{value}")\n')
         f.write("\n")
         for feat in enabled_features:
             f.write(f"set({feat.name} {"ON" if enabled_features[feat] else "OFF"})\n")

@@ -1,6 +1,6 @@
 #include "clients/file/intel_rapl_uj_client.hpp"
 
-IntelRaplUJClient::IntelRaplUJClient() : AbstractFileClient("/sys/class/powercap/intel-rapl:0/energy_uj", "IntelRaplUJClient") {
+IntelRaplUJClient::IntelRaplUJClient() : AbstractFileClient(INTEL_RAPL_UJ_FILE, "IntelRaplUJClient") {
 }
 
 void IntelRaplUJClient::enableRead() {

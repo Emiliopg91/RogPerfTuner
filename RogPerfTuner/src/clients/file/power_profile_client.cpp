@@ -10,5 +10,5 @@ void PowerProfileClient::setPowerProfile(const PowerProfile& val) {
 	write(toString(val));
 }
 
-PowerProfileClient::PowerProfileClient() : AbstractFileClient("/sys/firmware/acpi/platform_profile", "PowerProfileClient", true) {
+PowerProfileClient::PowerProfileClient() : AbstractFileClient(ACPI_PROFILE_FILE, "PowerProfileClient", true) {
 }

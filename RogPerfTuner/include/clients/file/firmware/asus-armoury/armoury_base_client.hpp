@@ -4,7 +4,7 @@
 
 class ArmouryBaseClient : private AbstractFileClient {
   public:
-	ArmouryBaseClient(std::string attribute, bool required = false);
+	ArmouryBaseClient(std::string path, std::string name, bool required = false);
 
 	/**
 	 * @brief Retrieves the minimum value supported or configured by the client.

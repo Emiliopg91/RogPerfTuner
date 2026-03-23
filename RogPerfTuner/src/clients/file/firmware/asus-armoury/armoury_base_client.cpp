@@ -6,9 +6,8 @@
 #include "framework/utils/file_utils.hpp"
 #include "framework/utils/string_utils.hpp"
 
-ArmouryBaseClient::ArmouryBaseClient(std::string attribute, bool required)
-	: AbstractFileClient("/sys/class/firmware-attributes/asus-armoury/attributes/" + attribute + "/current_value", attribute, true, required),
-	  attributePath("/sys/class/firmware-attributes/asus-armoury/attributes/" + attribute) {
+ArmouryBaseClient::ArmouryBaseClient(std::string path, std::string name, bool required)
+	: AbstractFileClient(path + "/current_value", name, true, required), attributePath(path) {
 }
 
 int ArmouryBaseClient::getCurrentValue() {

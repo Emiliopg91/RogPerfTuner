@@ -4,8 +4,7 @@
 
 #include "framework/utils/enum_utils.hpp"
 
-BatteryChargeLimitClient::BatteryChargeLimitClient()
-	: AbstractFileClient("/sys/class/power_supply/BAT0/charge_control_end_threshold", "BatteryChargeLimitClient", true, false) {
+BatteryChargeLimitClient::BatteryChargeLimitClient() : AbstractFileClient(BAT_LIMIT_FILE, "BatteryChargeLimitClient", true, false) {
 }
 
 void BatteryChargeLimitClient::setChargeLimit(BatteryThreshold value) {

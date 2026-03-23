@@ -5,7 +5,7 @@
 
 #include "framework/utils/string_utils.hpp"
 
-BatteryStatusClient::BatteryStatusClient() : AbstractFileClient("/sys/class/power_supply/BAT0/status", "BatteryChargeLimitClient", true, false) {
+BatteryStatusClient::BatteryStatusClient() : AbstractFileClient(BAT_STATUS_FILE, "BatteryChargeLimitClient", true, false) {
 	lastState	  = isOnBattery();
 	running		  = true;
 	pollingThread = std::thread(&BatteryStatusClient::monitorLoop, this, 1000);
