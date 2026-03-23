@@ -25,7 +25,7 @@ jobs:
           fetch-depth: 0
 
       - name: Run release
-        uses: ./.github/actions/push.yml
+        uses: ./.github/actions/push
 
   release-fallback:
     runs-on: ubuntu-latest
@@ -39,4 +39,4 @@ jobs:
           fetch-depth: 0
 
       - name: Run release
-        uses: ./.github/actions/push.yml
+        uses: ./.github/actions/push
