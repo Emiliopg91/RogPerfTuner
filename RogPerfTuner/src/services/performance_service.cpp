@@ -69,6 +69,7 @@ void PerformanceService::setActualPerformanceProfile(PerformanceProfile& profile
 
 	std::string profileName = toName(profile);
 	logger->info("Applying {} profile", profileName);
+	auto t0 = TimeUtils::now();
 	Logger::add_tab();
 	try {
 		setPlatformProfile(profile);
@@ -91,7 +92,8 @@ void PerformanceService::setActualPerformanceProfile(PerformanceProfile& profile
 		setFanCurves(profile);
 #endif
 		Logger::rem_tab();
-		logger->info("Profile applied succesfully");
+		auto t1 = TimeUtils::now();
+		logger->info("Profile applied after {} seconds", TimeUtils::format_seconds(TimeUtils::getTimeDiff(t0, t1)));
 		actualProfile = profile;
 
 	} catch (std::exception& e) {

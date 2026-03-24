@@ -11,6 +11,8 @@
 #include "utils/event_bus_wrapper.hpp"
 
 HardwareService::HardwareService() : Loggable("HardwareService") {
+	runningGames = 0;
+
 	logger->info("Initializing HardwareService");
 	Logger::add_tab();
 
@@ -92,6 +94,7 @@ HardwareService::HardwareService() : Loggable("HardwareService") {
 	logger->info("Throttle temperature control available");
 #endif
 	Logger::rem_tab();
+	Logger::rem_tab();
 #endif
 
 #ifdef BAT_LIMIT
@@ -103,12 +106,11 @@ HardwareService::HardwareService() : Loggable("HardwareService") {
 	Logger::rem_tab();
 #endif
 
-	setupDeviceLoop();
-
-	runningGames = 0;
 #ifdef PANEL_OD
 	setPanelOverdrive(false);
 #endif
+
+	setupDeviceLoop();
 
 #ifdef BAT_STATUS
 	onBattery = batteryStatusClient.isOnBattery();
