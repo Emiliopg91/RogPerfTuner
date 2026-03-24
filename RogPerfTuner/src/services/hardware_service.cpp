@@ -49,7 +49,7 @@ HardwareService::HardwareService() : Loggable("HardwareService") {
 	std::string env = std::string(GPU_ENV) + " ";
 	auto icdName	= std::string(GPU_BRAND);
 	if (strcmp(GPU_BRAND, "amd") == 0) {
-		auto icdName = "radeon";
+		icdName = "radeon";
 	}
 	std::vector<std::string> vkIcd;
 	std::vector<std::string> vkIcdVariants = {icdName + "_icd.json", icdName + "_icd.i686.json", icdName + "_icd.x86_64.json"};
