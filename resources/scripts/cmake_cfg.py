@@ -372,19 +372,20 @@ if __name__ == "__main__":
     print(f"    Detected {cpu_name}")
     definitions[Definition.CPU_NAME] = cpu_name
 
-    print("  Detecting GPU...")
-    gpu_brand = gpu_name = gpu_env = None
-    gpus = get_gpus()
-    for gpu in gpus:
-        if not gpu.default_flag:
-            gpu_name = gpu.name.replace("Advanced Micro Devices, Inc.", "AMD")
-            gpu_brand = gpu_name.split(" ")[0].lower()
-            gpu_env = " ".join(gpu.environment)
-            print(f"    Detected {gpu_name}")
-            definitions[Definition.GPU_BRAND] = gpu_brand
-            definitions[Definition.GPU_NAME] = gpu_name
-            definitions[Definition.GPU_ENV] = gpu_env
-            break
+    if which("switcherooctl"):
+        print("  Detecting GPU...")
+        gpu_brand = gpu_name = gpu_env = None
+        gpus = get_gpus()
+        for gpu in gpus:
+            if not gpu.default_flag:
+                gpu_name = gpu.name.replace("Advanced Micro Devices, Inc.", "AMD")
+                gpu_brand = gpu_name.split(" ")[0].lower()
+                gpu_env = " ".join(gpu.environment)
+                print(f"    Detected {gpu_name}")
+                definitions[Definition.GPU_BRAND] = gpu_brand
+                definitions[Definition.GPU_NAME] = gpu_name
+                definitions[Definition.GPU_ENV] = gpu_env
+                break
 
     print("  Generating config file...")
     print(f"  Writting in {CMAKE_CFG}")
