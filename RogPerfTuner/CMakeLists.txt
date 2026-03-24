@@ -6,6 +6,11 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 find_package(Qt6 REQUIRED COMPONENTS Core DBus Gui Widgets Charts)
 find_package(Qt6Keychain REQUIRED)
 
+execute_process(
+    COMMAND python ${CMAKE_CURRENT_SOURCE_DIR}/../resources/scripts/cmake_cfg.py
+    ERROR_VARIABLE error
+    RESULT_VARIABLE result
+)
 include("${CMAKE_CURRENT_SOURCE_DIR}/config.cmake")
 
 string(ASCII 27 Esc)
@@ -34,16 +39,16 @@ message("┌───────────────────┬──�
 message("│      ${BOLD}Feature${RESET}      │ ${BOLD}Enabled${RESET} │")
 message("├───────────────────┼─────────┤")
 handle_feature("Dev mode         " DEV_MODE)
-handle_feature("ACPI Profiles    " ACPI_PROFILE)
+handle_feature("ACPI profiles    " ACPI_PROFILE)
 handle_feature("Battery limit    " BAT_LIMIT)
 handle_feature("Battery status   " BAT_STATUS)
 handle_feature("Boost control    " BOOST_CONTROL)
 handle_feature("Boot sound       " BOOT_SOUND)
 handle_feature("Fan control      " FAN_CONTROL)
-handle_feature("Intel Rapl UJ    " INTEL_RAPL_UJ)
-handle_feature("Nvidia Boost     " NV_BOOST)
-handle_feature("Nvidia Thermal   " NV_THERMAL)
-handle_feature("Panel Overdrive  " PANEL_OD)
+handle_feature("Intel RAPL UJ    " INTEL_RAPL_UJ)
+handle_feature("Nvidia boost     " NV_BOOST)
+handle_feature("Nvidia thermal   " NV_THERMAL)
+handle_feature("Panel overdrive  " PANEL_OD)
 handle_feature("Scaling governor " SCALING_GOVERNOR)
 handle_feature("TDP PL1 SPD      " PPT_PL1_SPL)
 handle_feature("TDP PL2 SPPT     " PPT_PL2_SPPT)

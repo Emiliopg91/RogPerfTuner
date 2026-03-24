@@ -34,8 +34,6 @@ config:
 		cd submodules/OpenRGB-cppSDK && git apply ../patches/OpenRGB-cppSDK.diff && touch ../patches/OpenRGB-cppSDK.diff.applied; \
 	fi
 
-	@python resources/scripts/cmake_cfg.py
-	
 	@CMAKE_COLOR=1 cmake -B build -G Ninja \
 		-DCMAKE_CXX_COMPILER=clang++ \
 		-S . \
@@ -52,8 +50,7 @@ config:
 	@touch .$(BUILD_TYPE);\
 
 format:
-	@clang-format -i $$(find RogPerfTuner -name '*.cpp' -o -name '*.hpp')
-	@clang-format -i $$(find Framework -name '*.cpp' -o -name '*.hpp')
+	@clang-format -i $$(find RogPerfTuner Framework -name '*.cpp' -o -name '*.hpp')
 
 build:
 	@if [ ! -f ".$(BUILD_TYPE)" ]; then \
@@ -96,7 +93,7 @@ build_openrgb:
 	fi
 
 build_rccdc:
-	@if [[ -f ".Debug" ]] || command -v steam >/dev/null 2>&1; then \
+	@if [[ -f ".Debug" ]]; then \
 	    if [ ! -d "build/assets/RccDeckyCompanion" ]; then \
 	        echo "#######################################################################"; \
 	        echo "#################### Compiling RccDeckyCompanion ######################"; \

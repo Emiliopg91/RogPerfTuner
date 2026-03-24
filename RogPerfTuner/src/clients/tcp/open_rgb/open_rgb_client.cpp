@@ -212,6 +212,7 @@ void OpenRgbClient::disableDevice(const std::string& devName) {
 	for (auto& dev : detectedDevices.devices()) {
 		if (dev->name == devName) {
 			dev->enabled = false;
+			break;
 		}
 	}
 }
