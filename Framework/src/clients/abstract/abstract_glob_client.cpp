@@ -3,7 +3,7 @@
 
 #include <glob.h>
 
-std::vector<std::string> AbstractGlobClient::read(const int& head, const int& tail) {
+std::vector<std::string> AbstractGlobClient::read() {
 	if (paths.empty()) {
 		throw std::runtime_error("Globbed path " + glob_ + " doesn't exist");
 	}
@@ -11,13 +11,6 @@ std::vector<std::string> AbstractGlobClient::read(const int& head, const int& ta
 	std::vector<std::string> results;
 	for (auto path : paths) {
 		std::string cmd = "cat " + path;
-		if (head > 0) {
-			cmd += " | head -n" + std::to_string(head);
-		}
-		if (tail > 0) {
-			cmd += " | tail -n" + std::to_string(tail);
-		}
-
 		results.emplace_back(sudo_ ? shell.run_elevated_command(cmd).stdout_str : shell.run_command(cmd).stdout_str);
 	}
 

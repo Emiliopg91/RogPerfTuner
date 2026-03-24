@@ -7,7 +7,7 @@
 
 class AbstractGlobClient : public Loggable {
   public:
-	std::vector<std::string> read(const int& head = 0, const int& tail = 0);
+	std::vector<std::string> read();
 
 	void write(const std::string& content);
 

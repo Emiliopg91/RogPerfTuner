@@ -39,14 +39,7 @@ void OpenRgbClient::initialize() {
 			std::string vendor_id = m[1].str();
 			if (vendor_id == "0b05") {
 				std::string product_id = m[2].str();
-				std::string name	   = m[3].str();
-
-				for (auto& c : name) {
-					if (c == '_') {
-						c = ' ';
-					}
-				}
-
+				std::string name	   = StringUtils::replace(m[3].str(), "_", " ");
 				compatibleDevices.emplace_back(UsbIdentifier{vendor_id, product_id, name});
 			}
 		}

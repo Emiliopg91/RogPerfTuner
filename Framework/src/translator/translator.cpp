@@ -61,7 +61,7 @@ std::string Translator::translate(const std::string& msg, const std::unordered_m
 
 	auto result = it->second;
 	for (const auto& [key, value] : replacement) {
-		std::string placeholder = "{" + key + "}";
+		std::string placeholder = std::format("{{{}}}", key);
 		std::string valStr;
 
 		try {

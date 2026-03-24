@@ -13,11 +13,13 @@ inline std::ostream& operator<<(std::ostream& os, const GPUInfo& gpu) {
 	os << "Name: " << gpu.name << "\n";
 	os << "Default: " << (gpu.default_flag ? "yes" : "no") << "\n";
 	os << "Environment: [";
-	for (size_t i = 0; i < gpu.environment.size(); ++i) {
-		os << gpu.environment[i];
-		if (i != gpu.environment.size() - 1) {
+	bool first = true;
+	for (const auto& e : gpu.environment) {
+		if (!first) {
 			os << ", ";
 		}
+		first = false;
+		os << e;
 	}
 	os << "]\n";
 	return os;
