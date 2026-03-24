@@ -3,8 +3,6 @@
 #include <exception>
 #include <string>
 
-#include "clients/file/cpuinfo_client.hpp"
-#include "clients/shell/switcherooctl_client.hpp"
 #include "framework/utils/file_utils.hpp"
 #include "framework/utils/string_utils.hpp"
 #include "framework/utils/time_utils.hpp"
@@ -16,26 +14,9 @@ HardwareService::HardwareService() : Loggable("HardwareService") {
 	logger->info("Initializing HardwareService");
 	Logger::add_tab();
 
-	logger->info("Detecting CPU");
+	logger->info("Detected CPU");
 	Logger::add_tab();
-	std::string cpuinfo_out = cpuInfoClient.read(5);
-	if (StringUtils::isSubstring("GenuineIntel", cpuinfo_out)) {
-		auto lines = StringUtils::splitLines(cpuinfo_out);
-		auto line  = lines[lines.size() - 1];
-		auto pos   = line.find(":");
-		if (pos != std::string::npos) {
-			line = line.substr(pos + 2);
-			logger->info(line);
-		}
-	} else if (StringUtils::isSubstring("AuthenticAMD", cpuinfo_out)) {
-		auto lines = StringUtils::splitLines(cpuinfo_out);
-		auto line  = lines[lines.size() - 1];
-		auto pos   = line.find(":");
-		if (pos != std::string::npos) {
-			line = line.substr(pos + 2);
-			logger->info(line);
-		}
-	}
+	logger->info(CPU_NAME);
 
 	Logger::add_tab();
 #ifdef PPT_PL1_SPL
@@ -48,74 +29,70 @@ HardwareService::HardwareService() : Loggable("HardwareService") {
 
 	Logger::rem_tab();
 
-	logger->info("Detecting GPUs");
+#ifdef GPU_NAME
+	logger->info("Detected GPU");
 	Logger::add_tab();
-	auto detected_gpus = switcherooCtlClient.getGpus();
-	for (auto gpu : detected_gpus) {
-		logger->info(gpu.name);
-		if (!gpu.default_flag) {
-			auto replaced_name = StringUtils::replace(gpu.name, "Advanced Micro Devices, Inc.", "AMD");
-			auto brand		   = fromString<GpuBrand>(StringUtils::toLowerCase(StringUtils::split(replaced_name, ' ')[0]));
-			std::string env;
-			if (!gpu.environment.empty()) {
-				for (auto gpu_env : gpu.environment) {
-					env = env + gpu_env + " ";
-				}
-			}
+	logger->info(GPU_NAME);
 
-			if (FileUtils::exists(Constants::LIB_VK_DIR)) {
-				FileUtils::remove(Constants::LIB_VK_DIR);
-			}
-			FileUtils::mkdirs(Constants::LIB_VK_DIR);
+	auto brand = fromString<GpuBrand>(GPU_BRAND);
 
-			if (FileUtils::exists(Constants::LIB_OCL_DIR)) {
-				FileUtils::remove(Constants::LIB_OCL_DIR);
-			}
-			FileUtils::mkdirs(Constants::LIB_OCL_DIR);
+	if (FileUtils::exists(Constants::LIB_VK_DIR)) {
+		FileUtils::remove(Constants::LIB_VK_DIR);
+	}
+	FileUtils::mkdirs(Constants::LIB_VK_DIR);
 
-			auto icdName = getIcdName(brand);
-			std::vector<std::string> vkIcd;
-			std::vector<std::string> vkIcdVariants = {icdName + "_icd.json", icdName + "_icd.i686.json", icdName + "_icd.x86_64.json"};
-			for (auto var : vkIcdVariants) {
-				if (FileUtils::exists(Constants::USR_SHARE_VK_DIR + var)) {
-					FileUtils::copy(Constants::USR_SHARE_VK_DIR + var, Constants::LIB_VK_DIR + var);
-					vkIcd.emplace_back(Constants::LIB_VK_DIR + var);
-				}
-			}
-			if (!vkIcd.empty()) {
-				std::ostringstream oss;
+	if (FileUtils::exists(Constants::LIB_OCL_DIR)) {
+		FileUtils::remove(Constants::LIB_OCL_DIR);
+	}
+	FileUtils::mkdirs(Constants::LIB_OCL_DIR);
 
-				for (size_t i = 0; i < vkIcd.size(); ++i) {
-					if (i > 0) {
-						oss << ":";
-					}
-					oss << vkIcd[i];
-				}
-
-				env = env + "VK_ICD_FILENAMES=" + oss.str() + " ";
-			}
-
-			auto ocdName = getOclName(brand);
-			if (FileUtils::exists(Constants::USR_SHARE_OCL_DIR + ocdName + ".icd")) {
-				FileUtils::copy(Constants::USR_SHARE_OCL_DIR + ocdName + ".icd", Constants::LIB_OCL_DIR + ocdName + ".icd");
-				env = env + "OCL_ICD_FILENAMES=" + Constants::LIB_OCL_DIR + ocdName + ".icd" + " ";
-			}
-			env					  = StringUtils::trim(env);
-			gpus[toString(brand)] = env;
-
-			Logger::add_tab();
-#ifdef NV_BOOST
-			logger->info("Dynamic boost control available");
-#endif
-#ifdef NV_THERMAL
-			logger->info("Throttle temperature control available");
-#endif
-			Logger::rem_tab();
-
-			Logger::rem_tab();
+	std::string env = std::string(GPU_ENV) + " ";
+	auto icdName	= std::string(GPU_BRAND);
+	if (strcmp(GPU_BRAND, "amd") == 0) {
+		auto icdName = "radeon";
+	}
+	std::vector<std::string> vkIcd;
+	std::vector<std::string> vkIcdVariants = {icdName + "_icd.json", icdName + "_icd.i686.json", icdName + "_icd.x86_64.json"};
+	for (auto var : vkIcdVariants) {
+		if (FileUtils::exists(Constants::USR_SHARE_VK_DIR + var)) {
+			FileUtils::copy(Constants::USR_SHARE_VK_DIR + var, Constants::LIB_VK_DIR + var);
+			vkIcd.emplace_back(Constants::LIB_VK_DIR + var);
 		}
 	}
+	if (!vkIcd.empty()) {
+		std::ostringstream oss;
+
+		for (size_t i = 0; i < vkIcd.size(); ++i) {
+			if (i > 0) {
+				oss << ":";
+			}
+			oss << vkIcd[i];
+		}
+
+		env = env + "VK_ICD_FILENAMES=" + oss.str() + " ";
+	}
+
+	auto ocdName = GPU_BRAND;
+	if (strcmp(GPU_BRAND, "amd") == 0) {
+		ocdName = "amdocl64";
+	}
+
+	if (FileUtils::exists(Constants::USR_SHARE_OCL_DIR + ocdName + ".icd")) {
+		FileUtils::copy(Constants::USR_SHARE_OCL_DIR + ocdName + ".icd", Constants::LIB_OCL_DIR + ocdName + ".icd");
+		env = env + "OCL_ICD_FILENAMES=" + Constants::LIB_OCL_DIR + ocdName + ".icd" + " ";
+	}
+	env					  = StringUtils::trim(env);
+	gpus[toString(brand)] = env;
+
+	Logger::add_tab();
+#ifdef NV_BOOST
+	logger->info("Dynamic boost control available");
+#endif
+#ifdef NV_THERMAL
+	logger->info("Throttle temperature control available");
+#endif
 	Logger::rem_tab();
+#endif
 
 #ifdef BAT_LIMIT
 	logger->info("Getting battery charge limit");

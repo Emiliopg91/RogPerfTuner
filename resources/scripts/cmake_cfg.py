@@ -1,10 +1,12 @@
 # pylint: disable=invalid-name
 
+from dataclasses import dataclass, field
 from enum import Enum, auto
 import subprocess
 
 import glob
 import os
+import re
 import shutil
 
 BASE_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", ".."))
@@ -139,6 +141,10 @@ class Definition(Enum):
     PPT_PL2_SPPT_FILE = auto()
     PPT_PL3_FPPT_FILE = auto()
     SCALING_GOVERNOR_FILE = auto()
+    GPU_BRAND = auto()
+    GPU_NAME = auto()
+    GPU_ENV = auto()
+    CPU_NAME = auto()
 
 
 feature_definition_asoc: dict[Feature, list[Definition]] = {
@@ -180,6 +186,53 @@ definitions: dict[Definition, str] = {
     Definition.PPT_PL3_FPPT_FILE: "",
     Definition.SCALING_GOVERNOR_FILE: "",
 }
+
+
+@dataclass
+class GPUInfo:
+    name: str = ""
+    default_flag: bool = False
+    environment: list[str] = field(default_factory=list)
+
+
+def get_gpus() -> list[GPUInfo]:
+    stdout_str = subprocess.run(
+        "LANG=C switcherooctl", shell=True, capture_output=True, text=True, check=True
+    ).stdout
+    gpus = []
+    lines = stdout_str.splitlines()
+
+    current_gpu = GPUInfo()
+    in_device_block = False
+
+    for line in lines:
+        line = line.strip()
+
+        if not line:
+            continue
+
+        if line.startswith("Device:"):
+            if in_device_block:
+                gpus.append(current_gpu)
+            current_gpu = GPUInfo()
+            in_device_block = True
+
+        elif line.startswith("Name:"):
+            current_gpu.name = line[5:].strip()
+
+        elif line.startswith("Default:"):
+            val = line[8:].strip()
+            current_gpu.default_flag = val == "yes"
+
+        elif line.startswith("Environment:"):
+            env = line[12:].strip()
+            current_gpu.environment.extend(env.split())
+
+    if in_device_block:
+        gpus.append(current_gpu)
+
+    return gpus
+
 
 if __name__ == "__main__":
     print("Creating CMake config file...")
@@ -307,6 +360,32 @@ if __name__ == "__main__":
             definitions[Definition.SCALING_GOVERNOR_FILE] = SCALING_GOVERNOR_GLOB
             print(f"    - Scaling governor via {SCALING_GOVERNOR_GLOB}")
 
+    print("  Detecting CPU...")
+    cpu_name = subprocess.run(
+        "LANG=C cat /proc/cpuinfo | grep \"model name\" | head -n1 | cut -d':' -f2",
+        check=True,
+        shell=True,
+        capture_output=True,
+        text=True,
+    ).stdout.strip()
+    cpu_name = re.sub(r"\s*\([^)]*\)", "", cpu_name)
+    print(f"    Detected {cpu_name}")
+    definitions[Definition.CPU_NAME] = cpu_name
+
+    print("  Detecting GPU...")
+    gpu_brand = gpu_name = gpu_env = None
+    gpus = get_gpus()
+    for gpu in gpus:
+        if not gpu.default_flag:
+            gpu_name = gpu.name.replace("Advanced Micro Devices, Inc.", "AMD")
+            gpu_brand = gpu_name.split(" ")[0].lower()
+            gpu_env = " ".join(gpu.environment)
+            print(f"    Detected {gpu_name}")
+            definitions[Definition.GPU_BRAND] = gpu_brand
+            definitions[Definition.GPU_NAME] = gpu_name
+            definitions[Definition.GPU_ENV] = gpu_env
+            break
+
     print("  Generating config file...")
     print(f"  Writting in {CMAKE_CFG}")
 
@@ -356,6 +435,30 @@ if __name__ == "__main__":
                             f.write(f'    "${{CMAKE_CURRENT_SOURCE_DIR}}/{s}"\n')
                         f.write(")\n")
 
+                f.write("\n")
+
+            if Definition.CPU_NAME in definitions:
+                f.write("#########################\n")
+                f.write("########## CPU ##########\n")
+                f.write("#########################\n")
+                f.write(
+                    f'add_definitions(-D{Definition.CPU_NAME.name}="{definitions[Definition.CPU_NAME]}")\n'
+                )
+                f.write("\n")
+
+            if Definition.GPU_BRAND in definitions:
+                f.write("#########################\n")
+                f.write("########## GPU ##########\n")
+                f.write("#########################\n")
+                f.write(
+                    f'add_definitions(-D{Definition.GPU_BRAND.name}="{definitions[Definition.GPU_BRAND]}")\n'
+                )
+                f.write(
+                    f'add_definitions(-D{Definition.GPU_NAME.name}="{definitions[Definition.GPU_NAME]}")\n'
+                )
+                f.write(
+                    f'add_definitions(-D{Definition.GPU_ENV.name}="{definitions[Definition.GPU_ENV]}")\n'
+                )
                 f.write("\n")
 
     print("CMake config file created")

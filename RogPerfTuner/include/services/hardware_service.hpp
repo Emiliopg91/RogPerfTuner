@@ -9,7 +9,6 @@
 #ifdef BAT_STATUS
 #include "clients/file/battery_status_client.hpp"
 #endif
-#include "clients/file/cpuinfo_client.hpp"
 #ifdef BOOT_SOUND
 #include "clients/file/firmware/asus-armoury/other/boot_sound_client.hpp"
 #endif
@@ -17,7 +16,6 @@
 #include "clients/file/firmware/asus-armoury/other/panel_overdrive_client.hpp"
 #endif
 #include "clients/lib/udev_client.hpp"
-#include "clients/shell/switcherooctl_client.hpp"
 #include "framework/gui/toaster.hpp"
 #include "framework/translator/translator.hpp"
 #include "models/hardware/battery_charge_threshold.hpp"
@@ -107,8 +105,6 @@ class HardwareService : public Singleton<HardwareService>, Loggable {
 #ifdef BAT_STATUS
 	BatteryStatusClient& batteryStatusClient = BatteryStatusClient::getInstance();
 #endif
-	CPUInfoClient& cpuInfoClient			 = CPUInfoClient::getInstance();
-	SwitcherooCtlClient& switcherooCtlClient = SwitcherooCtlClient::getInstance();
 #ifdef PANEL_OD
 	PanelOverdriveClient& panelOverdriveClient = PanelOverdriveClient::getInstance();
 #endif
