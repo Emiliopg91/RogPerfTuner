@@ -372,7 +372,7 @@ if __name__ == "__main__":
     print(f"    Detected {cpu_name}")
     definitions[Definition.CPU_NAME] = cpu_name
 
-    if which("switcherooctl"):
+    if shutil.which("switcherooctl"):
         print("  Detecting GPU...")
         gpu_brand = gpu_name = gpu_env = None
         gpus = get_gpus()
