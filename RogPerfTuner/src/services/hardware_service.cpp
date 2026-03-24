@@ -81,8 +81,8 @@ HardwareService::HardwareService() : Loggable("HardwareService") {
 		FileUtils::copy(Constants::USR_SHARE_OCL_DIR + ocdName + ".icd", Constants::LIB_OCL_DIR + ocdName + ".icd");
 		env = env + "OCL_ICD_FILENAMES=" + Constants::LIB_OCL_DIR + ocdName + ".icd" + " ";
 	}
-	env					  = StringUtils::trim(env);
-	gpus[toString(brand)] = env;
+	env				= StringUtils::trim(env);
+	gpus[GPU_BRAND] = env;
 
 	Logger::add_tab();
 #ifdef NV_BOOST
