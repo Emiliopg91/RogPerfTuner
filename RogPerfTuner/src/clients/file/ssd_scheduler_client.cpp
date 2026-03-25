@@ -9,9 +9,6 @@
 
 SsdSchedulerClient::SsdSchedulerClient() : AbstractGlobClient("/sys/block/nvme*n*/queue/scheduler", "SsdSchedulerClient", true, false) {
 	if (available()) {
-		logger->info("Initializing SsdSchedulerClient");
-		Logger::add_tab();
-
 		auto lines = read();
 		for (size_t i = 0; i < lines.size(); i++) {
 			auto cleaned = StringUtils::replace(StringUtils::trim(lines[i]), "[", "");
@@ -33,14 +30,7 @@ SsdSchedulerClient::SsdSchedulerClient() : AbstractGlobClient("/sys/block/nvme*n
 			}
 		}
 
-		logger->info("Available schedulers:");
-		Logger::add_tab();
-		logger->info(StringUtils::join(schedulers, ", "));
-		Logger::rem_tab();
-
 		currentScheduler = "none";
-
-		Logger::rem_tab();
 	}
 }
 

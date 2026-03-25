@@ -82,7 +82,8 @@ class PerformanceService : public Singleton<PerformanceService>, Loggable {
 	 *
 	 * @return An optional string with the current scheduler name.
 	 */
-	std::optional<std::string> getCurrentScheduler();
+	std::string getCurrentScheduler();
+	std::string getDefaultScheduler();
 
 	/**
 	 * @brief Sets the scheduler.
@@ -90,7 +91,7 @@ class PerformanceService : public Singleton<PerformanceService>, Loggable {
 	 * @param scheduler The scheduler name to set (optional).
 	 * @param temporal If true, the scheduler is set temporarily.
 	 */
-	void setScheduler(std::optional<std::string> scheduler, bool temporal = false);
+	void setScheduler(std::string scheduler, bool temporal = false);
 
 	/**
 	 * @brief Gets the list of available schedulers.
@@ -162,8 +163,6 @@ class PerformanceService : public Singleton<PerformanceService>, Loggable {
 	 */
 	PerformanceProfile nextPerformanceProfile();
 
-	std::string getDefaultSchedulerName();
-
   private:
 	inline static const uint8_t CPU_PRIORITY = -17;
 	inline static const uint8_t IO_PRIORITY	 = (CPU_PRIORITY + 20) / 5;
@@ -180,10 +179,12 @@ class PerformanceService : public Singleton<PerformanceService>, Loggable {
 
 	PerformanceProfile actualProfile			   = PerformanceProfile::PERFORMANCE;
 	PerformanceProfile currentProfile			   = PerformanceProfile::SMART;
-	std::optional<std::string> currentScheduler	   = std::nullopt;
 	std::optional<std::string> currentSsdScheduler = "none";
 	std::optional<std::thread> smartThread		   = std::nullopt;
 	std::atomic<bool> stopFlag					   = false;
+	std::string defaultScheduler;
+	std::string currentScheduler;
+	std::vector<std::string> availableSchedulers;
 
 	PlatformClient& platformClient = PlatformClient::getInstance();
 #ifdef PPT_PL1_SPL

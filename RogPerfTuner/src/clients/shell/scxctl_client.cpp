@@ -13,11 +13,7 @@ ScxCtlClient::ScxCtlClient() : AbstractCmdClient("scxctl", "ScxCtlClient") {
 			{"lavd", "--performance", "--powersave"},
 			{"p2dq", "--task-slice true -f --sched-mode performance", "--sched-mode efficiency"},
 		}};
-		logger->info("Initializing ScxCtlClient");
-		Logger::add_tab();
 
-		logger->info("Available schedulers:");
-		Logger::add_tab();
 		auto output = run_command("list").stdout_str;
 		std::vector<std::string> schedulers;
 		for (auto [sched, perf, power] : all) {
@@ -26,11 +22,7 @@ ScxCtlClient::ScxCtlClient() : AbstractCmdClient("scxctl", "ScxCtlClient") {
 				schedulers.emplace_back(sched);
 			}
 		}
-		logger->info(StringUtils::join(schedulers, ", "));
-		Logger::rem_tab();
 
-		logger->info("Getting current scheduler");
-		Logger::add_tab();
 		auto currentStr = run_command("get").stdout_str;
 		size_t pos		= currentStr.find(' ');
 		currentStr		= currentStr.substr(pos + 1);
@@ -39,13 +31,7 @@ ScxCtlClient::ScxCtlClient() : AbstractCmdClient("scxctl", "ScxCtlClient") {
 
 		if (current == "scx") {
 			current = std::nullopt;
-			logger->info("No active scheduler");
-		} else {
-			logger->info("Currently using {} scheduler", current.value());
 		}
-		Logger::rem_tab();
-
-		Logger::rem_tab();
 	}
 }
 
@@ -58,7 +44,7 @@ void ScxCtlClient::start(std::string name, bool powersave) {
 	}
 
 	if (name == current.value_or("") && newPowersaveLiteral == current_powersave) {
-		logger->info("Scheduler {}-{} already applied", name, current_powersave);
+		logger->debug("Scheduler {}-{} already applied", name, current_powersave);
 		return;
 	}
 
@@ -66,14 +52,14 @@ void ScxCtlClient::start(std::string name, bool powersave) {
 
 	if (current.has_value()) {
 		action = "switch";
-		logger->info("Switching scheduler from {}-{} to {}-{}", current.value(), current_powersave, name, newPowersaveLiteral);
+		logger->debug("Switching scheduler from {}-{} to {}-{}", current.value(), current_powersave, name, newPowersaveLiteral);
 	} else {
-		logger->info("Starting scheduler {}-{}", name, newPowersaveLiteral);
+		logger->debug("Starting scheduler {}-{}", name, newPowersaveLiteral);
 	}
 
 	Logger::add_tab();
 	run_command(std::string(action) + " --sched " + name + " --args=\"" + it->second[powersave ? 1 : 0] + "\"", false, true);
-	logger->info("Scheduler applied succesfully");
+	logger->debug("Scheduler applied succesfully");
 	Logger::rem_tab();
 
 	current			  = name;
@@ -84,12 +70,12 @@ void ScxCtlClient::stop() {
 	if (!current.has_value()) {
 		return;
 	}
-	logger->info("Stopping scheduler {}-{}", current.value(), current_powersave);
+	logger->debug("Stopping scheduler {}-{}", current.value(), current_powersave);
 
 	Logger::add_tab();
 	run_command("stop", false, true);
 
-	logger->info("Scheduler stopped succesfully");
+	logger->debug("Scheduler stopped succesfully");
 	Logger::rem_tab();
 	current			  = std::nullopt;
 	current_powersave = "performance";

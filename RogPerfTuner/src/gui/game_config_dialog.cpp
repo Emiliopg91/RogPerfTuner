@@ -77,14 +77,14 @@ GameConfigDialog::GameConfigDialog(unsigned int gid, bool onGameFirstRun, QWidge
 	schedulerCombo = new NoScrollComboBox();
 	schedulerCombo->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Preferred);
 
-	index = 0;
-	i	  = 1;
-
-	schedulerCombo->addItem(performanceService.getDefaultSchedulerName().c_str(), "");
+	index = i = 0;
+	if (!gameEntry.scheduler.has_value()) {
+		gameEntry.scheduler = performanceService.getDefaultScheduler();
+	}
 	auto scheds = performanceService.getAvailableSchedulers();
 	for (const auto& sched : scheds) {
 		schedulerCombo->addItem(StringUtils::capitalize(sched).c_str(), sched.c_str());
-		if (gameEntry.scheduler.has_value() && gameEntry.scheduler.value() == sched) {
+		if (gameEntry.scheduler.value() == sched) {
 			index = i;
 		}
 		i++;

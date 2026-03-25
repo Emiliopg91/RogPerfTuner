@@ -37,7 +37,7 @@ class TrayIcon : public QObject, public Singleton<TrayIcon> {
 	void onPerformanceProfileChanged(PerformanceProfile value);
 	void onEffectChanged(std::string effect);
 	void onBrightnessChanged(RgbBrightness brightness);
-	void onSchedulerChanged(std::optional<std::string> scheduler);
+	void onSchedulerChanged(std::string scheduler);
 	void onSsdSchedulerChanged(std::string scheduler);
 
   private:

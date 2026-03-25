@@ -20,13 +20,45 @@ PerformanceService::PerformanceService() : Loggable("PerformanceService") {
 	Logger::add_tab();
 
 	currentProfile	 = configuration.getConfiguration().platform.performance.profile;
-	currentScheduler = configuration.getConfiguration().platform.performance.scheduler;
+	currentScheduler = configuration.getConfiguration().platform.performance.scheduler.value_or("");
 
 #ifdef BAT_STATUS
 	onBattery		 = batteryStatusClient.isOnBattery();
 	std::string mode = onBattery ? "battery" : "AC";
 	logger->info("Laptop on {} mode", mode);
 #endif
+
+	availableSchedulers = {"EEVDF"};
+	if (schedBoreClient.available()) {
+		availableSchedulers.emplace_back("BORE");
+	}
+	if (scxCtlClient.available()) {
+		for (auto& sched : scxCtlClient.getAvailable()) {
+			availableSchedulers.emplace_back(StringUtils::capitalize(sched));
+		}
+	}
+
+	defaultScheduler = "EEVDF";
+	if (schedBoreClient.available() && StringUtils::trim(schedBoreClient.read()) == "1") {
+		defaultScheduler = "BORE";
+	}
+	if (currentScheduler.empty() ||
+		std::find(availableSchedulers.begin(), availableSchedulers.end(), currentScheduler) == availableSchedulers.end()) {
+		currentScheduler												= defaultScheduler;
+		configuration.getConfiguration().platform.performance.scheduler = currentScheduler;
+		configuration.saveConfig();
+	}
+	logger->info("Available schedulers:");
+	Logger::add_tab();
+	logger->info(StringUtils::join(availableSchedulers, ", "));
+	Logger::rem_tab();
+
+	if (ssdSchedulerClient.available()) {
+		logger->info("Available SSD schedulers:");
+		Logger::add_tab();
+		logger->info(StringUtils::join(getAvailableSsdSchedulers(), ", "));
+		Logger::rem_tab();
+	}
 
 	platformClient.setChangePlatformProfileOnAc(false);
 	platformClient.setChangePlatformProfileOnBattery(false);
@@ -91,7 +123,6 @@ void PerformanceService::setActualPerformanceProfile(PerformanceProfile& profile
 #ifdef FAN_CONTROL
 		setFanCurves(profile);
 #endif
-		Logger::rem_tab();
 		auto t1 = TimeUtils::now();
 		logger->info("Profile applied after {} seconds", TimeUtils::format_seconds(TimeUtils::getTimeDiff(t0, t1)));
 		actualProfile = profile;
@@ -337,7 +368,7 @@ void PerformanceService::restore() {
 		setPerformanceProfile(configuration.getConfiguration().platform.performance.profile, false, true);
 	}
 
-	setScheduler(configuration.getConfiguration().platform.performance.scheduler);
+	setScheduler(configuration.getConfiguration().platform.performance.scheduler.value_or(currentScheduler));
 	setSsdScheduler(configuration.getConfiguration().platform.performance.ssdScheduler);
 }
 
@@ -457,38 +488,54 @@ int PerformanceService::acTdpToBatteryTdp(int tdp, int minTdp) {
 }
 
 std::vector<std::string> PerformanceService::getAvailableSchedulers() {
-	if (!scxCtlClient.available()) {
-		return {};
-	}
-
-	return scxCtlClient.getAvailable();
+	return availableSchedulers;
 }
 
-std::optional<std::string> PerformanceService::getCurrentScheduler() {
-	if (!scxCtlClient.available()) {
-		return std::nullopt;
-	}
-
+std::string PerformanceService::getCurrentScheduler() {
 	return currentScheduler;
 }
 
-void PerformanceService::setScheduler(std::optional<std::string> scheduler, bool temporal) {
-	if (!scxCtlClient.available()) {
-		return;
-	}
+std::string PerformanceService::getDefaultScheduler() {
+	return defaultScheduler;
+}
 
-	if (scheduler.has_value()) {
-		scxCtlClient.start(scheduler.value(), onBattery);
+void PerformanceService::setScheduler(std::string scheduler, bool temporal) {
+	logger->info("Applying {} scheduler", scheduler);
+	Logger::add_tab();
+
+	if (scheduler == currentScheduler) {
+		logger->info("Scheduler already applied");
 	} else {
-		scxCtlClient.stop();
-	}
+		auto t0 = TimeUtils::now();
+		if (scheduler == "EEVDF" || scheduler == "BORE") {
+			if (currentScheduler == "EEVDF" || currentScheduler == "BORE") {
+				if (scxCtlClient.available()) {
+					scxCtlClient.stop();
+				}
+			}
+		}
 
-	currentScheduler = scheduler;
+		if (scheduler == "EEVDF") {
+			if (schedBoreClient.available()) {
+				schedBoreClient.write("0");
+			}
+		} else if (scheduler == "BORE") {
+			schedBoreClient.write("1");
+		} else {
+			scxCtlClient.start(StringUtils::toLowerCase(scheduler), onBattery);
+		}
 
-	if (!temporal) {
-		configuration.getConfiguration().platform.performance.scheduler = scheduler;
-		configuration.saveConfig();
+		currentScheduler = scheduler;
+
+		if (!temporal) {
+			configuration.getConfiguration().platform.performance.scheduler = scheduler;
+			configuration.saveConfig();
+		}
+
+		auto t1 = TimeUtils::now();
+		logger->info("Scheduler applied after {} seconds", TimeUtils::format_seconds(TimeUtils::getTimeDiff(t0, t1)));
 	}
+	Logger::rem_tab();
 
 	eventBus.emitScheduler(scheduler);
 }
@@ -514,22 +561,25 @@ void PerformanceService::setSsdScheduler(std::string scheduler, bool temporal) {
 		return;
 	}
 
-	ssdSchedulerClient.setSchedulers(scheduler);
-	currentSsdScheduler = scheduler;
+	logger->info("Applying {} SSD scheduler", scheduler);
+	Logger::add_tab();
+	if (scheduler == currentSsdScheduler) {
+		logger->info("Scheduler already applied");
+	} else {
+		auto t0 = TimeUtils::now();
+		ssdSchedulerClient.setSchedulers(scheduler);
+		currentSsdScheduler = scheduler;
 
-	if (!temporal) {
-		configuration.getConfiguration().platform.performance.ssdScheduler = scheduler;
-		configuration.saveConfig();
+		if (!temporal) {
+			configuration.getConfiguration().platform.performance.ssdScheduler = scheduler;
+			configuration.saveConfig();
+		}
+		auto t1 = TimeUtils::now();
+		logger->info("Scheduler applied after {} seconds", TimeUtils::format_seconds(TimeUtils::getTimeDiff(t0, t1)));
 	}
+	Logger::rem_tab();
 
 	eventBus.emitSsdScheduler(scheduler);
-}
-
-std::string PerformanceService::getDefaultSchedulerName() {
-	if (schedBoreClient.available()) {
-		return "BORE";
-	}
-	return "EEVDF";
 }
 
 #ifdef FAN_CONTROL

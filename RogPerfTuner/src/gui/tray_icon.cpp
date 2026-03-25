@@ -173,7 +173,7 @@ void TrayIcon::onPerformanceProfileChanged(PerformanceProfile value) {
 	}
 }
 
-void TrayIcon::onSchedulerChanged(std::optional<std::string> scheduler) {
+void TrayIcon::onSchedulerChanged(std::string scheduler) {
 	if (steamService.getRunningGames().empty()) {
 		performanceService.setScheduler(scheduler);
 	}
@@ -392,40 +392,28 @@ TrayIcon::TrayIcon()
 	// -------------------------
 	// Scheduler submenu
 	// -------------------------
-	if (!performanceService.getAvailableSchedulers().empty()) {
-		schedulerMenu			 = new QMenu(("    " + translator.translate("scheduler")).c_str(), menu);
-		QActionGroup* schedGroup = new QActionGroup(menu);
+	schedulerMenu			 = new QMenu(("    " + translator.translate("scheduler")).c_str(), menu);
+	QActionGroup* schedGroup = new QActionGroup(menu);
 
-		QAction* act = new QAction(performanceService.getDefaultSchedulerName().c_str(), schedGroup);
+	schedulerMenu->addSeparator();
+	schedulerMenu->setEnabled(runningGames == 0);
+
+	auto items2 = performanceService.getAvailableSchedulers();
+	for (auto item : items2) {
+		QAction* act = new QAction(item.c_str(), schedGroup);
 		act->setCheckable(true);
-		act->setChecked(std::nullopt == performanceService.getCurrentScheduler());
-		QObject::connect(act, &QAction::triggered, [this]() {
-			onSchedulerChanged(std::nullopt);
+		act->setChecked(item == performanceService.getCurrentScheduler());
+		QObject::connect(act, &QAction::triggered, [this, item]() {
+			onSchedulerChanged(item);
 		});
 		schedulerMenu->addAction(act);
-		schedulerActions[""] = act;
-		schedulerMenu->addSeparator();
-
-		schedulerMenu->setEnabled(runningGames == 0);
-
-		auto items2 = performanceService.getAvailableSchedulers();
-		std::reverse(items2.begin(), items2.end());
-		for (auto item : items2) {
-			act = new QAction(StringUtils::capitalize(item).c_str(), schedGroup);
-			act->setCheckable(true);
-			act->setChecked(item == performanceService.getCurrentScheduler());
-			QObject::connect(act, &QAction::triggered, [this, item]() {
-				onSchedulerChanged(item);
-			});
-			schedulerMenu->addAction(act);
-			schedulerActions[item] = act;
-		}
-		menu->insertMenu(nullptr, schedulerMenu);
-
-		eventBus.onScheduler([this](std::optional<std::string> scheduler) {
-			setScheduler(scheduler);
-		});
+		schedulerActions[item] = act;
 	}
+	menu->insertMenu(nullptr, schedulerMenu);
+
+	eventBus.onScheduler([this](std::optional<std::string> scheduler) {
+		setScheduler(scheduler);
+	});
 	// -------------------------
 	// Scheduler submenu
 	// -------------------------

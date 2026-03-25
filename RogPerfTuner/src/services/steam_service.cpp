@@ -299,7 +299,7 @@ void SteamService::copyPlugin() {
 }
 
 void SteamService::onGameLaunch(unsigned int gid, std::string name, int pid) {
-	logger->info("Launched {} () with PID {}", name, gid, pid);
+	logger->info("Launched {} ({}) with PID {}", name, gid, pid);
 	Logger::add_tab();
 
 	auto it = configuration.getConfiguration().games.find(gid);
@@ -353,8 +353,15 @@ void SteamService::onGameStop(unsigned int gid, std::string name) {
 		runningGames.erase(gid);
 		Logger::add_tab();
 
-		if (it->second.scheduler.has_value() && performanceService.getCurrentScheduler() == it->second.scheduler) {
-			performanceService.setScheduler(std::nullopt);
+		std::optional<std::string> sched = std::nullopt;
+		if (it->second.scheduler.has_value()) {
+			for (const auto& [key, value] : runningGames) {
+				if (value.scheduler.has_value()) {
+					sched = value.scheduler;
+					break;
+				}
+			}
+			performanceService.setScheduler(sched.value_or(performanceService.getCurrentScheduler()), sched.has_value());
 		}
 
 		setProfileForGames();
@@ -376,11 +383,11 @@ void SteamService::setProfileForGames(bool onConnect) {
 		std::optional<std::string> sched = configuration.getConfiguration().platform.performance.scheduler;
 		for (const auto& [key, value] : runningGames) {
 			if (value.scheduler.has_value() && value.scheduler != performanceService.getCurrentScheduler()) {
-				sched = value.scheduler;
+				sched = *value.scheduler;
 				break;
 			}
 		}
-		performanceService.setScheduler(sched, true);
+		performanceService.setScheduler(sched.value_or(performanceService.getDefaultScheduler()), true);
 	} else if (!onConnect) {
 #ifdef PANEL_OD
 		hardwareService.setPanelOverdrive(false);

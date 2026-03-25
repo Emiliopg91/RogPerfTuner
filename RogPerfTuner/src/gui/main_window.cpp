@@ -77,25 +77,21 @@ MainWindow::MainWindow(QWidget* parent) : QMainWindow(parent) {
 	// -------------------------
 	// Scheduler menu
 	// -------------------------
-	if (!performanceService.getAvailableSchedulers().empty()) {
-		_schedulerDropdown = new NoScrollComboBox();
-		_schedulerDropdown->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Preferred);
-		_schedulerDropdown->addItem(("  " + performanceService.getDefaultSchedulerName()).c_str(), "");
+	_schedulerDropdown = new NoScrollComboBox();
+	_schedulerDropdown->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Preferred);
 
-		auto items2 = performanceService.getAvailableSchedulers();
-		std::reverse(items2.begin(), items2.end());
-		for (auto item : items2) {
-			_schedulerDropdown->addItem(("  " + StringUtils::capitalize(item)).c_str(), item.c_str());
-		}
-		connect(_schedulerDropdown, QOverload<int>::of(&QComboBox::currentIndexChanged), this, &MainWindow::onSchedulerChanged);
-		setScheduler(performanceService.getCurrentScheduler());
-		_schedulerDropdown->setEnabled(runningGames == 0);
-		performanceLayout->addRow(new QLabel((translator.translate("scheduler") + ":").c_str()), _schedulerDropdown);
-
-		eventBus.onScheduler([this](std::optional<std::string> sched) {
-			setScheduler(sched);
-		});
+	auto items2 = performanceService.getAvailableSchedulers();
+	for (auto item : items2) {
+		_schedulerDropdown->addItem(("  " + item).c_str(), item.c_str());
 	}
+	connect(_schedulerDropdown, QOverload<int>::of(&QComboBox::currentIndexChanged), this, &MainWindow::onSchedulerChanged);
+	setScheduler(performanceService.getCurrentScheduler());
+	_schedulerDropdown->setEnabled(runningGames == 0);
+	performanceLayout->addRow(new QLabel((translator.translate("scheduler") + ":").c_str()), _schedulerDropdown);
+
+	eventBus.onScheduler([this](std::optional<std::string> sched) {
+		setScheduler(sched);
+	});
 	// -------------------------
 	// Scheduler menu
 	// -------------------------
@@ -404,10 +400,7 @@ void MainWindow::onProfileChanged(int) {
 }
 
 void MainWindow::onSchedulerChanged(int) {
-	std::optional<std::string> scheduler = (_schedulerDropdown->currentData().toString().toStdString());
-	if (scheduler.value_or("").empty()) {
-		scheduler = std::nullopt;
-	}
+	std::string scheduler = (_schedulerDropdown->currentData().toString().toStdString());
 
 	if (scheduler != performanceService.getCurrentScheduler()) {
 		if (steamService.getRunningGames().empty()) {
