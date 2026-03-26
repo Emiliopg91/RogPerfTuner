@@ -1,9 +1,7 @@
 name: Release rog-perf-tuner
 
 on:
-  push:
-    tags:
-      - "*.*.*"
+  workflow_dispatch:
 
 jobs:
   release:
@@ -16,48 +14,37 @@ jobs:
           submodules: recursive
           fetch-depth: 0
 
-      - name: Validate tag and extract version
+      - name: Configure Git
         run: |
-          TAG="${GITHUB_REF_NAME}"
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
 
-          if [[ "$TAG" =~ ^([0-9]+\.[0-9]+\.[0-9]+)$ ]]; then
-            VERSION="${BASH_REMATCH[1]}"
-            RELEASE=1
-          else
-            echo "Invalid tag format: $TAG"
-            echo "Expected: x.y.z or x.y.z-r (numeric)"
+      - name: Get CMake version
+        id: cmake_version
+        run: |
+          VERSION=$(grep -oP 'VERSION\s+\K[0-9]+\.[0-9]+\.[0-9]+' CMakeLists.txt)
+          echo "VERSION=$VERSION" >> $GITHUB_ENV
+          echo "VERSION=$VERSION"
+
+      - name: Fail if tag exists
+        run: |
+          git fetch --tags
+          if git rev-parse "$VERSION" >/dev/null 2>&1; then
+            echo "❌ Tag '$VERSION' already exists! Failing workflow."
             exit 1
           fi
-
-          echo "VERSION=$VERSION" >> "$GITHUB_ENV"
-          echo "RELEASE=$RELEASE" >> "$GITHUB_ENV"
-          echo "TAG=$TAG" >> "$GITHUB_ENV"
-
-          echo "VERSION=$VERSION"
-          echo "RELEASE=$RELEASE"
 
       - name: Test
         run: |
           make test clean
 
-      - name: Version bump
+      - name: Create Git tag
         run: |
-          echo "Updating version in CMakeLists.txt to '${VERSION}'..."
+          echo "Creating git tag $VERSION"
+          git tag "$VERSION"
+          git push origin "$VERSION"
 
-          sed -i -E "s/(project\([^)]*VERSION )[0-9]+\.[0-9]+\.[0-9]+/\1${VERSION}/" CMakeLists.txt
-
-          git config user.name "github-actions[bot]"
-          git config user.email "github-actions[bot]@users.noreply.github.com"
-
-          if [[ -n $(git status --porcelain) ]]; then
-            git add CMakeLists.txt
-            git commit -m "[chore] ${VERSION}-${RELEASE}"
-          fi
-
-          git push origin HEAD:main
-          git push origin HEAD:develop --force
-
-      - name: Process release
+      - name: Build Release
         run: |
           make clean release
 
@@ -77,28 +64,25 @@ jobs:
             StrictHostKeyChecking no
           EOF
 
-          echo "Cloning AUR repository..."
           git clone ssh://aur@aur.archlinux.org/rog-perf-tuner.git aur_repo
           cd aur_repo
 
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
 
-          echo "Copying files..."
           cp ../dist/PKGBUILD .
           cp ../dist/.SRCINFO .
           cp ../dist/rog-perf-tuner.install .
 
-          echo "Committing changes..."
           git add PKGBUILD .SRCINFO rog-perf-tuner.install
-          git diff-index --quiet HEAD || git commit -m "Release ${TAG}"
+          git diff-index --quiet HEAD || git commit -m "Release $VERSION-1"
           git push
 
       - name: Create GitHub release
         uses: softprops/action-gh-release@v2
         with:
-          tag_name: ${{ env.TAG }}
-          name: ${{ env.TAG }}
+          tag_name: ${{ env.VERSION }}
+          name: ${{ env.VERSION }}
           body_path: dist/changelog.md
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

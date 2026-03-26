@@ -16,6 +16,7 @@ concurrency:
 jobs:
   compile_and_release:
     runs-on: ubuntu-latest
+
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -28,8 +29,40 @@ jobs:
           git config user.name "GitHub Actions"
           git config user.email "actions@github.com"
 
+      - name: Get CMake version
+        id: cmake_version
+        run: |
+          VERSION=$(grep -oP 'VERSION\s+\K[0-9]+\.[0-9]+\.[0-9]+' CMakeLists.txt)
+          echo "version=$VERSION" >> $GITHUB_OUTPUT
+
+      - name: Get last git tag
+        id: git_tag
+        run: |
+          git fetch --tags
+          TAG=$(git describe --tags --abbrev=0 2>/dev/null || echo "none")
+          TAG=${TAG#v}
+          echo "tag=$TAG" >> $GITHUB_OUTPUT
+
+      - name: Check version vs tag
+        id: check_version
+        run: |
+          if [ "${{ steps.cmake_version.outputs.version }}" != "${{ steps.git_tag.outputs.tag }}" ]; then
+            echo "different=true" >> $GITHUB_OUTPUT
+          else
+            echo "different=false" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Trigger release workflow
+        if: github.event_name != 'workflow_run' && steps.check_version.outputs.different == 'true'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          echo "Version changed → triggering release workflow"
+          gh workflow run "Release rog-perf-tuner"
+          exit 0
+
       - name: Test
-        if: github.event_name != 'workflow_run'
+        if: github.event_name != 'workflow_run' && steps.check_version.outputs.different != 'true'
         run: |
           make test
 
