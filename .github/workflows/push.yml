@@ -121,7 +121,6 @@ jobs:
   publish_git:
     runs-on: ubuntu-latest
     needs: release
-    if: needs.release.outputs.different != 'true'
     env:
       AUR_SSH_PRIVATE_KEY: ${{ secrets.AUR_SSH_PRIVATE_KEY }}
     steps:
