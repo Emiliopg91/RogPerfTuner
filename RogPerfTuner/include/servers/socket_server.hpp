@@ -26,7 +26,7 @@ class SocketServer : public Singleton<SocketServer>, Loggable {
 
 	void handleClient(int client_fd);
 
-	void handleRequest(const int& clientFd, const UnixCommunicationMessage& req);
+	void handleRequest(int clientFd, const UnixCommunicationMessage& req);
 	void handleEvent(const UnixCommunicationMessage& req);
 
 	SocketServer();

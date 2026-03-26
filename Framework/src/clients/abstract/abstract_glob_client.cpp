@@ -30,7 +30,7 @@ bool AbstractGlobClient::available() {
 	return !paths.empty();
 }
 
-AbstractGlobClient::AbstractGlobClient(const std::string& path, const std::string& name, const bool& sudo, const bool& required)
+AbstractGlobClient::AbstractGlobClient(const std::string& path, const std::string& name, bool sudo, bool required)
 	: Loggable(name), sudo_(sudo), glob_(path) {
 	glob_t glob_result;
 

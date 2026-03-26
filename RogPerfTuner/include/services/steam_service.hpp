@@ -68,7 +68,7 @@ class SteamService : public Singleton<SteamService>, Loggable {
 	 * @param appid The app ID of the game.
 	 * @return true if the game is running, false otherwise.
 	 */
-	bool isRunning(const unsigned int& appid) const;
+	bool isRunning(unsigned int appid) const;
 
 	/**
 	 * @brief Checks if metrics collection is enabled.

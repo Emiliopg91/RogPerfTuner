@@ -104,7 +104,7 @@ void EventBusWrapper::onBattery(std::function<void(bool)>&& callback) {
 		cb(std::any_cast<bool>(data[0]));
 	});
 }
-void EventBusWrapper::emitBattery(const bool& onBat) {
+void EventBusWrapper::emitBattery(bool onBat) {
 	this->eventBus.emit_event(toName(Events::HARDWARE_SERVICE_ON_BATTERY), {onBat});
 }
 
@@ -113,7 +113,7 @@ void EventBusWrapper::onBatteryStatus(std::function<void(bool)>&& callback) {
 		cb(std::any_cast<bool>(data[0]));
 	});
 }
-void EventBusWrapper::emitBatteryStatus(const bool& onBat) {
+void EventBusWrapper::emitBatteryStatus(bool onBat) {
 	this->eventBus.emit_event(toName(Events::BATTERY_STATUS), {onBat});
 }
 

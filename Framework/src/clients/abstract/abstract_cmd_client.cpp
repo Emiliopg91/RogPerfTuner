@@ -3,7 +3,7 @@
 
 #include "framework/utils/string_utils.hpp"
 
-AbstractCmdClient::AbstractCmdClient(const std::string& command, const std::string& name, const bool& required)
+AbstractCmdClient::AbstractCmdClient(const std::string& command, const std::string& name, bool required)
 	: Loggable(name), command_(command), available_(true) {
 	if (!isCommandAvailable()) {
 		if (required) {
@@ -15,7 +15,7 @@ AbstractCmdClient::AbstractCmdClient(const std::string& command, const std::stri
 	}
 }
 
-CommandResult AbstractCmdClient::run_command(const std::string& args, const bool& check, const bool& sudo) {
+CommandResult AbstractCmdClient::run_command(const std::string& args, bool check, bool sudo) {
 	if (!available_) {
 		throw std::runtime_error("Command " + command_ + " not available");
 	}

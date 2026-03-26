@@ -63,7 +63,7 @@ class HardwareService : public Singleton<HardwareService>, Loggable {
 	 *
 	 * @param enabled Set to true to enable panel overdrive, false to disable it.
 	 */
-	void setPanelOverdrive(const bool& enabled);
+	void setPanelOverdrive(bool enabled);
 #endif
 
 	/**
@@ -86,7 +86,7 @@ class HardwareService : public Singleton<HardwareService>, Loggable {
 	HardwareService();
 
 	void setupDeviceLoop();
-	void onBatteryEvent(const bool& onBattery, const bool& muted = false);
+	void onBatteryEvent(bool onBattery, bool muted = false);
 	void onDeviceEvent();
 
 	std::mutex actionMutex;

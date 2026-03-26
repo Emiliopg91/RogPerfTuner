@@ -62,7 +62,7 @@ class PerformanceService : public Singleton<PerformanceService>, Loggable {
 	 * @param force If true, forces the profile to be set even if already active.
 	 * @param showToast If true, shows a notification toast.
 	 */
-	void setPerformanceProfile(PerformanceProfile& profile, const bool& temporal = false, const bool& force = false, const bool& showToast = true);
+	void setPerformanceProfile(PerformanceProfile& profile, bool temporal = false, bool force = false, bool showToast = true);
 
 	/**
 	 * @brief Restores the last saved performance settings.

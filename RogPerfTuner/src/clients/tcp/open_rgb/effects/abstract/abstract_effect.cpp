@@ -47,7 +47,7 @@ void AbstractEffect::stop() {
 	}
 }
 
-void AbstractEffect::_sleep(const double& seconds) {
+void AbstractEffect::_sleep(double seconds) {
 	double remaining = seconds * 1000;
 	while (_is_running && remaining > 0) {
 		double nap = std::min(100.0, remaining);

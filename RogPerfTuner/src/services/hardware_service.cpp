@@ -188,7 +188,7 @@ void HardwareService::setChargeThreshold(const BatteryThreshold& threshold) {
 }
 #endif
 
-void HardwareService::onBatteryEvent(const bool& onBat, const bool& muted) {
+void HardwareService::onBatteryEvent(bool onBat, bool muted) {
 	onBattery = onBat;
 
 #ifdef PANEL_OD
@@ -210,7 +210,7 @@ void HardwareService::onBatteryEvent(const bool& onBat, const bool& muted) {
 }
 
 #ifdef PANEL_OD
-void HardwareService::setPanelOverdrive(const bool& enable) {
+void HardwareService::setPanelOverdrive(bool enable) {
 	logger->info("Panel Overdrive: {}", enable ? "Enabled" : "Disabled");
 	Logger::add_tab();
 	try {

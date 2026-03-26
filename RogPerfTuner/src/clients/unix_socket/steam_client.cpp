@@ -35,10 +35,10 @@ const std::vector<SteamGameDetails> SteamSocketClient::getAppsDetails(const std:
 	return result;
 }
 
-void SteamSocketClient::setLaunchOptions(const int& appid, const std::string& launchOpts) {
+void SteamSocketClient::setLaunchOptions(int appid, const std::string& launchOpts) {
 	invoke("set_launch_options", {appid, launchOpts});
 }
 
-std::string SteamSocketClient::getIcon(const int& appid) {
+std::string SteamSocketClient::getIcon(int appid) {
 	return std::any_cast<std::string>(invoke("get_icon", {appid})[0]);
 }

@@ -65,7 +65,7 @@ class OpenRgbService : public Singleton<OpenRgbService>, Loggable {
 	 * @param newEffect The name of the effect to set.
 	 * @param temporal If true, the effect is set temporarily.
 	 */
-	void setEffect(const std::string& newEffect, const bool& temporal = false);
+	void setEffect(const std::string& newEffect, bool temporal = false);
 
 	/**
 	 * @brief Sets the RGB color.
@@ -116,6 +116,6 @@ class OpenRgbService : public Singleton<OpenRgbService>, Loggable {
 	ConfigurationWrapper& configuration = ConfigurationWrapper::getInstance();
 	EventBusWrapper& eventBus			= EventBusWrapper::getInstance();
 
-	void applyAura(const bool& temporal = false);
+	void applyAura(bool temporal = false);
 	void reload();
 };

@@ -51,7 +51,7 @@ class SteamSocketClient : public AbstractUnixSocketClient, public Singleton<Stea
 	 * @param appid The unique identifier of the Steam application.
 	 * @param launchOpts The launch options to be set for the application.
 	 */
-	void setLaunchOptions(const int& appid, const std::string& launchOpts);
+	void setLaunchOptions(int appid, const std::string& launchOpts);
 
 	/**
 	 * @brief Retrieves the icon associated with a given Steam application ID.
@@ -61,5 +61,5 @@ class SteamSocketClient : public AbstractUnixSocketClient, public Singleton<Stea
 	 * @param appid The unique identifier of the Steam application.
 	 * @return A string representing the icon for the specified app ID.
 	 */
-	std::string getIcon(const int& appid);
+	std::string getIcon(int appid);
 };

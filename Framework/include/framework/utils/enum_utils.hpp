@@ -71,7 +71,7 @@ constexpr int toInt(const E& e) {
 }
 
 template <EnumClassInt E>
-E fromInt(const int& i) {
+E fromInt(int i) {
 	if (auto v = magic_enum::enum_cast<E>(i)) {
 		return *v;
 	}

@@ -378,7 +378,7 @@ def update_submodules():
     paths = [Path(line.split()[1]) for line in out.splitlines()]
 
     for path in paths:
-        if (ROOT / path) in FROZEN_SUBMODULES:
+        if ROOT / path in FROZEN_SUBMODULES:
             continue
         print(f"Updating {path}")
         branch = subprocess.check_output(
@@ -396,42 +396,37 @@ def update_submodules():
         run(["git", "pull"], cwd=path)
 
 
-# ---------------- CLI ----------------
-
-
-def main():
-    cmd = sys.argv[1] if len(sys.argv) > 1 else "run"
-
-    commands = {
-        "clean": clean,
-        "patch": patch,
-        "config": config,
-        "build": build,
-        "build_openrgb": build_openrgb,
-        "build_rccdc": build_rccdc,
-        "format": format_code,
-        "pkgbuild": pkgbuild,
-        "release": release,
-        "build_debug": build_debug,
-        "run": run_app,
-        "increase_version": increase_version,
-        "test": test,
-        "install": install,
-        "update_submodules": update_submodules,
-    }
-
-    if cmd in commands:
-        try:
-            commands[cmd]()
-        except KeyboardInterrupt:
-            sys.exit(130)
-        except subprocess.CalledProcessError as e:
-            print(f"{e}")
-            sys.exit(e.returncode)
-    else:
-        print(f"Unknown command: {cmd}")
-        sys.exit(1)
-
+COMMANDS = {
+    "build": build,
+    "build_debug": build_debug,
+    "build_openrgb": build_openrgb,
+    "build_rccdc": build_rccdc,
+    "clean": clean,
+    "config": config,
+    "format": format_code,
+    "increase_version": increase_version,
+    "install": install,
+    "patch": patch,
+    "pkgbuild": pkgbuild,
+    "release": release,
+    "run": run_app,
+    "test": test,
+    "update_submodules": update_submodules,
+}
 
 if __name__ == "__main__":
-    main()
+    if len(sys.argv) > 1:
+        for cmd in sys.argv[1:]:
+            if cmd in COMMANDS:
+                try:
+                    COMMANDS[cmd]()
+                except KeyboardInterrupt:
+                    sys.exit(130)
+                except subprocess.CalledProcessError as e:
+                    print(f"{e}", file=sys.stderr)
+                    sys.exit(e.returncode)
+            else:
+                print(f"Unknown command: {cmd}", file=sys.stderr)
+                sys.exit(1)
+    else:
+        print(" ".join(COMMANDS.keys()))

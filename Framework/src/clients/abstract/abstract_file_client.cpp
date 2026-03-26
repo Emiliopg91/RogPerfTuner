@@ -3,7 +3,7 @@
 
 #include "framework/utils/file_utils.hpp"
 
-std::string AbstractFileClient::read(const int& head, const int& tail) {
+std::string AbstractFileClient::read(int head, int tail) {
 	if (!available_) {
 		throw std::runtime_error("File " + path_ + " doesn't exist");
 	}
@@ -36,7 +36,7 @@ bool AbstractFileClient::available() {
 	return available_;
 }
 
-AbstractFileClient::AbstractFileClient(const std::string& path, const std::string& name, const bool& sudo, const bool& required)
+AbstractFileClient::AbstractFileClient(const std::string& path, const std::string& name, bool sudo, bool required)
 	: Loggable(name), path_(path), sudo_(sudo) {
 	available_ = FileUtils::exists(path);
 	if (!available_ && required) {

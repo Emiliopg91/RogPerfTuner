@@ -96,7 +96,7 @@ void OpenRgbService::setBrightness(const RgbBrightness& newBrightness) {
 	}
 }
 
-void OpenRgbService::setEffect(const std::string& newEffect, const bool& temporal) {
+void OpenRgbService::setEffect(const std::string& newEffect, bool temporal) {
 	std::lock_guard<std::mutex> lock(actionMutex);
 	if (effect != newEffect) {
 		effect = newEffect;
@@ -139,7 +139,7 @@ void OpenRgbService::reload() {
 	logger->info("Reloaded after {} seconds", TimeUtils::format_seconds(TimeUtils::getTimeDiff(t0, t1)));
 }
 
-void OpenRgbService::applyAura(const bool& temporal) {
+void OpenRgbService::applyAura(bool temporal) {
 	logger->info("Applying aura settings");
 	Logger::add_tab();
 	auto t0 = TimeUtils::now();

@@ -1,5 +1,7 @@
 .PHONY: all
 
-# Catch-all target
+all:
+	@python3 resources/scripts/makefile.py
+	
 %:
 	@python3 resources/scripts/makefile.py $@

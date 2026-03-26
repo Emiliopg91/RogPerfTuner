@@ -7,9 +7,9 @@
 
 class AbstractCmdClient : public Loggable {
   protected:
-	AbstractCmdClient(const std::string& command, const std::string& name, const bool& required = false);
+	AbstractCmdClient(const std::string& command, const std::string& name, bool required = false);
 
-	CommandResult run_command(const std::string& args = "", const bool& check = true, const bool& sudo = false);
+	CommandResult run_command(const std::string& args = "", bool check = true, bool sudo = false);
 	bool isCommandAvailable();
 	Shell& shell = Shell::getInstance();
 

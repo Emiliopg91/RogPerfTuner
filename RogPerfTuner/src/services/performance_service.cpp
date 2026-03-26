@@ -185,7 +185,7 @@ void PerformanceService::smartWorker() {
 	}
 }
 
-void PerformanceService::setPerformanceProfile(PerformanceProfile& profile, const bool& temporal, const bool& force, const bool& showToast) {
+void PerformanceService::setPerformanceProfile(PerformanceProfile& profile, bool temporal, bool force, bool showToast) {
 	std::lock_guard<std::mutex> lock(perProfMutex);
 	std::string profileName = toName(profile);
 

@@ -7,14 +7,14 @@
 
 class AbstractFileClient : public Loggable {
   public:
-	std::string read(const int& head = 0, const int& tail = 0);
+	std::string read(int head = 0, int tail = 0);
 
 	void write(const std::string& content);
 
 	bool available();
 
   protected:
-	AbstractFileClient(const std::string& path, const std::string& name, const bool& sudo = false, const bool& required = true);
+	AbstractFileClient(const std::string& path, const std::string& name, bool sudo = false, bool required = true);
 	std::string path_;
 	bool sudo_;
 	bool available_;

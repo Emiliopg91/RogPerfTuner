@@ -18,7 +18,6 @@ UdevClient::UdevClient() {
 			FD_ZERO(&fds);
 			FD_SET(fd, &fds);
 
-			// select() bloquea hasta que haya datos o pasen 0.1 seg
 			int ret = select(fd + 1, &fds, NULL, NULL, NULL);
 			if (ret > 0 && FD_ISSET(fd, &fds)) {
 				struct udev_device* dev = udev_monitor_receive_device(mon);

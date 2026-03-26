@@ -143,7 +143,7 @@ class AbstractUnixSocketClient : Loggable {
 	bool connected();
 
   protected:
-	std::vector<std::any> invoke(std::string method, std::vector<std::any> data, const int& timeout_ms = 3000);
+	std::vector<std::any> invoke(std::string method, std::vector<std::any> data, int timeout_ms = 3000);
 
 	void on_without_params(const std::string& evName, Callback&& callback);
 

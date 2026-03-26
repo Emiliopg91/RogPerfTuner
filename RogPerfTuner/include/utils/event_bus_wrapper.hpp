@@ -177,7 +177,7 @@ class EventBusWrapper : public Singleton<EventBusWrapper> {
 	 * @brief Emits a battery status event.
 	 * @param onBattery True if running on battery, false otherwise.
 	 */
-	void emitBattery(const bool& onBattery);
+	void emitBattery(bool onBattery);
 
 	/**
 	 * @brief Registers a callback for RGB color events.
@@ -221,5 +221,5 @@ class EventBusWrapper : public Singleton<EventBusWrapper> {
 
 	void onBatteryStatus(std::function<void(bool)>&& callback);
 
-	void emitBatteryStatus(const bool& onBat);
+	void emitBatteryStatus(bool onBat);
 };

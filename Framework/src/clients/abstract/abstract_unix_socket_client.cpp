@@ -43,7 +43,7 @@ bool AbstractUnixSocketClient::connected() {
 	return _connected;
 }
 
-std::vector<std::any> AbstractUnixSocketClient::invoke(std::string method, std::vector<std::any> data, const int& timeout_ms) {
+std::vector<std::any> AbstractUnixSocketClient::invoke(std::string method, std::vector<std::any> data, int timeout_ms) {
 	UnixCommunicationMessage cm;
 	cm.type = "REQUEST";
 	cm.id	= StringUtils::generateUUIDv4();

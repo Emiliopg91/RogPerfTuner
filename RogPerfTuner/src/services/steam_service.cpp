@@ -29,7 +29,7 @@ bool SteamService::metricsEnabled() {
 	return whichMangohud.has_value();
 }
 
-bool SteamService::isRunning(const unsigned int& appid) const {
+bool SteamService::isRunning(unsigned int appid) const {
 	for (const auto& [key, val] : runningGames) {
 		if (key == appid) {
 			return true;

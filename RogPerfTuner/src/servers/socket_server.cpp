@@ -159,7 +159,7 @@ void SocketServer::handleEvent(const UnixCommunicationMessage& req) {
 	eventBus.emitServerSocketEvent(req.name, req.data);
 }
 
-void SocketServer::handleRequest(const int& clientFd, const UnixCommunicationMessage& req) {
+void SocketServer::handleRequest(int clientFd, const UnixCommunicationMessage& req) {
 	UnixCommunicationMessage res = UnixCommunicationMessage(req);
 	res.type					 = "RESPONSE";
 	res.data					 = {};

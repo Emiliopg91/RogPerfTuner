@@ -14,7 +14,7 @@ class AbstractGlobClient : public Loggable {
 	bool available();
 
   protected:
-	AbstractGlobClient(const std::string& path, const std::string& name, const bool& sudo = false, const bool& required = true);
+	AbstractGlobClient(const std::string& path, const std::string& name, bool sudo = false, bool required = true);
 	std::string glob_;
 	std::vector<std::string> paths;
 	bool sudo_;

@@ -47,7 +47,7 @@ class AbstractEffect : public Loggable {
 	bool supportsColor();
 
   protected:
-	void _sleep(const double& seconds);
+	void _sleep(double seconds);
 
 	void _set_colors(Device& dev, const std::vector<orgb::Color>& colors);
 	virtual void apply_effect(const DeviceList& devices) = 0;
