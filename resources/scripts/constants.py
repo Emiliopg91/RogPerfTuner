@@ -49,6 +49,8 @@ if os.environ.get("GIT_RELEASE", None) is not None:
         ["git", "rev-list", "--count", f"{version}..HEAD"], text=True
     ).strip()
     version = version + ".r" + commit_count
+elif os.environ.get("IN_TEST", None) is not None:
+    version = version + "-test"
 else:
     version = version + "-" + branch
 
