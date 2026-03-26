@@ -38,9 +38,6 @@ jobs:
         run: |
           echo "Creating git tag $VERSION"
           git tag "$VERSION"
-
-      - name: Push tag
-        run: |
           git push origin "$VERSION"
 
       - name: Build Release
