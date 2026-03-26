@@ -204,17 +204,9 @@ if __name__ == "__main__":
 
     other_sufix = "-git"
     sufix = ""
-    ref = "tag=$pkgver"
+    ref = "tag=$pkgver-$pkgrel"
     env = ""
     if os.environ.get("GIT_RELEASE", None) is not None:
-        if os.environ.get("IN_TEST", None) is not None:
-            env = f"{env} IN_TEST=1".strip()
-            version = subprocess.check_output(
-                "git tag --sort=-creatordate | head -n 1",
-                text=True,
-                shell=True,
-            ).strip()
-
         commit = subprocess.check_output(
             ["git", "log", "-1", "--format=%h"], text=True
         ).strip()
@@ -226,7 +218,7 @@ if __name__ == "__main__":
         version = version + ".r" + commit_count
         print(f"Version {version}")
         ref = f"commit={commit}"
-        env = f"{env} GIT_RELEASE=1".strip()
+        env = "GIT_RELEASE=1"
         other_sufix = ""
         sufix = "-git"
 

@@ -34,14 +34,17 @@ jobs:
             exit 1
           fi
 
-      - name: Test
-        run: |
-          make test clean
-
       - name: Create Git tag
         run: |
           echo "Creating git tag $VERSION"
           git tag "$VERSION"
+
+      - name: Test
+        run: |
+          make test clean
+
+      - name: Push tag
+        run: |
           git push origin "$VERSION"
 
       - name: Build Release
