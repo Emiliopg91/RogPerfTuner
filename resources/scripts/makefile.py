@@ -19,7 +19,7 @@ os.chdir(ROOT)
 
 # ---------------- Helpers ----------------
 def run(cmd, cwd=None):
-    subprocess.run(cmd, cwd=cwd, check=True)
+    subprocess.run(cmd, cwd=cwd, check=True, env=os.environ.copy())
 
 
 def safe_unlink(path: Path):
@@ -303,6 +303,7 @@ def increase_version():
 
 def test():
     os.environ["GIT_RELEASE"] = "1"
+    os.environ["IN_TEST"] = "1"
     release()
     run(["python3", "./resources/scripts/test.py"])
 

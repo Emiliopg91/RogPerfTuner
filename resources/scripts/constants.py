@@ -39,11 +39,15 @@ match = re.search(
 )
 
 name, version = match.groups()
-ref = "tag=$pkgver-$pkgrel"
+ref = "tag=$pkgver"
 
 branch = subprocess.check_output(
     ["git", "rev-parse", "--abbrev-ref", "HEAD"], text=True
 ).strip()
+if os.environ.get("IN_TEST", None) is not None:
+    version = subprocess.check_output(
+        "git tag --sort=-creatordate | head -n 1", shell=True, text=True
+    ).strip()
 if os.environ.get("GIT_RELEASE", None) is not None:
     commit_count = subprocess.check_output(
         ["git", "rev-list", "--count", f"{version}..HEAD"], text=True
