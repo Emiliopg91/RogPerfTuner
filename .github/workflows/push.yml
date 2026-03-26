@@ -103,7 +103,7 @@ jobs:
 
           cp ../dist/PKGBUILD .
           cp ../dist/.SRCINFO .
-          cp ../dist/rog-perf-tuner-git.install .
+          cp ../dist/rog-perf-tuner.install .
 
           git add PKGBUILD .SRCINFO rog-perf-tuner.install
           git diff-index --quiet HEAD || git commit -m "Release $VERSION-1"
