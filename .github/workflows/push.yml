@@ -35,6 +35,10 @@ jobs:
           VERSION=$(grep -oP 'VERSION\s+\K[0-9]+\.[0-9]+\.[0-9]+' CMakeLists.txt)
           echo "version=$VERSION" >> $GITHUB_OUTPUT
 
+      - name: Test
+        run: |
+          make test
+
       - name: Get last git tag
         id: git_tag
         run: |
@@ -60,11 +64,6 @@ jobs:
           echo "Version changed → triggering release workflow"
           gh workflow run "Release rog-perf-tuner"
           exit 0
-
-      - name: Test
-        if: github.event_name != 'workflow_run' && steps.check_version.outputs.different != 'true'
-        run: |
-          make test
 
       - name: Perform release
         if: github.event_name != 'workflow_run' && steps.check_version.outputs.different != 'true'
