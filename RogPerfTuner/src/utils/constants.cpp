@@ -11,7 +11,7 @@ const std::string Constants::APP_NAME  = "RogPerfTuner";
 const std::string Constants::EXEC_NAME = "rog-perf-tuner";
 const pid_t Constants::PID			   = getpid();
 
-const std::string Constants::APP_VERSION = "4.13.8.r15";
+const std::string Constants::APP_VERSION = M_APP_VERSION;
 
 #ifdef DEV_MODE
 const std::string Constants::APP_DRAW_FILE = FileUtils::getCWD() + "/resources/" + Constants::APP_NAME + ".desktop";
@@ -62,7 +62,7 @@ const std::string Constants::INC_BRIGHT				  = "incRgbBrightness";
 const std::string Constants::NEXT_EFF				  = "nextRgbEffect";
 const std::string Constants::SHOW_GUI				  = "showGui";
 
-const std::string Constants::PLUGIN_VERSION			   = "1.2.8";
+const std::string Constants::PLUGIN_VERSION			   = M_PLUGIN_VERSION;
 const std::string Constants::USR_SHARE_OCL_DIR		   = "/etc/OpenCL/vendors/";
 const std::string Constants::USR_SHARE_VK_DIR		   = "/usr/share/vulkan/icd.d/";
 const std::string Constants::RCDCC_SOCKET_PATH		   = std::string(std::getenv("XDG_RUNTIME_DIR")) + "/RCCDeckyCompanion.sock";

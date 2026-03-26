@@ -1,10 +1,12 @@
 # pylint: disable=invalid-name
 
 from dataclasses import dataclass, field
+from pathlib import Path
 from enum import Enum, auto
 import subprocess
 
 import glob
+import json
 import os
 import re
 import shutil
@@ -12,7 +14,8 @@ import shutil
 BASE_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", ".."))
 PROJECT_DIR = os.path.join(BASE_DIR, "RogPerfTuner")
 CMAKE_CFG = os.path.join(PROJECT_DIR, "config.cmake")
-
+PLUGIN_FILE = os.path.join(BASE_DIR, "submodules", "RccDeckyCompanion", "package.json")
+CMAKE_FILE = os.path.join(BASE_DIR, "CMakeLists.txt")
 
 BOOST_CONTROL_OPTS = {
     "/sys/devices/system/cpu/intel_pstate/no_turbo": {"on": "0", "off": "1"},
@@ -145,6 +148,8 @@ class Definition(Enum):
     GPU_NAME = auto()
     GPU_ENV = auto()
     CPU_NAME = auto()
+    M_APP_VERSION = auto()
+    M_PLUGIN_VERSION = auto()
 
 
 feature_definition_asoc: dict[Feature, list[Definition]] = {
@@ -360,6 +365,38 @@ if __name__ == "__main__":
             definitions[Definition.SCALING_GOVERNOR_FILE] = SCALING_GOVERNOR_GLOB
             print(f"    - Scaling governor via {SCALING_GOVERNOR_GLOB}")
 
+    print("  Getting application details...")
+    content = Path(CMAKE_FILE).read_text(encoding="utf-8")
+    match = re.search(
+        r"project\s*\(\s*([A-Za-z0-9_]+)\s+VERSION\s+([0-9]+\.[0-9]+\.[0-9]+)",
+        content,
+        re.IGNORECASE,
+    )
+
+    name, version = match.groups()
+    ref = "tag=$pkgver"
+
+    branch = subprocess.check_output(
+        ["git", "rev-parse", "--abbrev-ref", "HEAD"], text=True
+    ).strip()
+    if os.environ.get("IN_TEST", None) is not None:
+        version = subprocess.check_output(
+            "git tag --sort=-creatordate | head -n 1", shell=True, text=True
+        ).strip()
+    if os.environ.get("GIT_RELEASE", None) is not None:
+        commit_count = subprocess.check_output(
+            ["git", "rev-list", "--count", f"{version}..HEAD"], text=True
+        ).strip()
+        version = version + ".r" + commit_count
+    else:
+        version = version + "-" + branch
+    definitions[Definition.M_APP_VERSION] = version
+    print(f"    Application version: {definitions[Definition.M_APP_VERSION]}")
+
+    with open(PLUGIN_FILE, "r", encoding="utf-8") as f:
+        definitions[Definition.M_PLUGIN_VERSION] = json.load(f)["version"].strip()
+        print(f"    Plugin version: {definitions[Definition.M_PLUGIN_VERSION]}")
+
     print("  Detecting CPU...")
     cpu_name = subprocess.run(
         "LANG=C cat /proc/cpuinfo | grep \"model name\" | head -n1 | cut -d':' -f2",
@@ -437,6 +474,17 @@ if __name__ == "__main__":
                         f.write(")\n")
 
                 f.write("\n")
+
+            f.write("#########################\n")
+            f.write("###### Application ######\n")
+            f.write("#########################\n")
+            f.write(
+                f'add_definitions(-D{Definition.M_APP_VERSION.name}="{definitions[Definition.M_APP_VERSION]}")\n'
+            )
+            f.write(
+                f'add_definitions(-D{Definition.M_PLUGIN_VERSION.name}="{definitions[Definition.M_PLUGIN_VERSION]}")\n'
+            )
+            f.write("\n")
 
             if Definition.CPU_NAME in definitions:
                 f.write("#########################\n")

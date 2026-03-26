@@ -190,8 +190,6 @@ def build():
 
     shutil.rmtree("build/assets/bin", ignore_errors=True)
 
-    run(["python3", "resources/scripts/constants.py"])
-
     format_code()
 
     run(["cmake", "--build", "build", "--", f"-j{NUM_CORES}"])
@@ -315,8 +313,6 @@ def release():
     shutil.rmtree(ROOT / "dist", ignore_errors=True)
     ensure_dir(ROOT / "dist")
     os.chmod(ROOT / "dist", 0o777)
-
-    run(["python", "resources/scripts/constants.py"])
 
     shutil.copy(ROOT / "resources/PKGBUILD", ROOT / "dist/PKGBUILD")
     if os.environ.get("GIT_RELEASE"):
