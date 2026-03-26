@@ -26,6 +26,8 @@ jobs:
   release:
     runs-on: ubuntu-latest
     needs: test
+    outputs:
+      different: ${{ steps.check_version.outputs.different }}
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -37,15 +39,6 @@ jobs:
         run: |
           git config user.name "GitHub Actions"
           git config user.email "actions@github.com"
-
-      - name: Setup AUR SSH
-        env:
-          AUR_SSH_PRIVATE_KEY: ${{ secrets.AUR_SSH_PRIVATE_KEY }}
-        run: |
-          mkdir -p ~/.ssh
-          echo "$AUR_SSH_PRIVATE_KEY" > ~/.ssh/aur
-          chmod 600 ~/.ssh/aur
-          echo -e "Host aur.archlinux.org\n\tIdentityFile ~/.ssh/aur\n\tUser aur\n\tStrictHostKeyChecking no" >> ~/.ssh/config
 
       - name: Get CMake version
         id: cmake_version
@@ -95,7 +88,7 @@ jobs:
   publish_stable:
     runs-on: ubuntu-latest
     needs: release
-    if: needs.release.outputs.check_version_different == 'true'
+    if: needs.release.outputs.different == 'true'
     env:
       AUR_SSH_PRIVATE_KEY: ${{ secrets.AUR_SSH_PRIVATE_KEY }}
     steps:
@@ -108,21 +101,31 @@ jobs:
       - name: Publish stable AUR
         run: |
           VERSION=$(grep pkgver dist/PKGBUILD | cut -d'=' -f2)
+
+          mkdir -p ~/.ssh
+          echo "$AUR_SSH_PRIVATE_KEY" > ~/.ssh/aur
+          chmod 600 ~/.ssh/aur
+          echo -e "Host aur.archlinux.org\n\tIdentityFile ~/.ssh/aur\n\tUser aur\n\tStrictHostKeyChecking no" >> ~/.ssh/config
+
           git clone ssh://aur@aur.archlinux.org/rog-perf-tuner.git aur_repo
           cd aur_repo
+
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
+
           cp ../dist/PKGBUILD .
           cp ../dist/.SRCINFO .
           cp ../dist/rog-perf-tuner-git.install .
+
           git add PKGBUILD .SRCINFO rog-perf-tuner-git.install
           git diff-index --quiet HEAD || git commit -m "Release $VERSION-1"
+
           git push
 
   publish_git:
     runs-on: ubuntu-latest
     needs: release
-    if: needs.release.outputs.check_version_different == 'true'
+    if: needs.release.outputs.different == 'true'
     env:
       AUR_SSH_PRIVATE_KEY: ${{ secrets.AUR_SSH_PRIVATE_KEY }}
     steps:
@@ -135,13 +138,23 @@ jobs:
       - name: Publish git AUR
         run: |
           VERSION=$(grep pkgver dist/PKGBUILD | cut -d'=' -f2)
+
+          mkdir -p ~/.ssh
+          echo "$AUR_SSH_PRIVATE_KEY" > ~/.ssh/aur
+          chmod 600 ~/.ssh/aur
+          echo -e "Host aur.archlinux.org\n\tIdentityFile ~/.ssh/aur\n\tUser aur\n\tStrictHostKeyChecking no" >> ~/.ssh/config
+
           git clone ssh://aur@aur.archlinux.org/rog-perf-tuner-git.git aur_git_repo
           cd aur_git_repo
+
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
+
           cp ../dist/PKGBUILD .
           cp ../dist/.SRCINFO .
           cp ../dist/rog-perf-tuner-git.install .
+
           git add PKGBUILD .SRCINFO rog-perf-tuner-git.install
           git diff-index --quiet HEAD || git commit -m "Release $VERSION-1"
+
           git push
