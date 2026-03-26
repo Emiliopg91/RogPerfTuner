@@ -19,32 +19,7 @@ os.chdir(ROOT)
 
 # ---------------- Helpers ----------------
 def run(cmd, cwd=None):
-    master_fd, slave_fd = pty.openpty()
-
-    proc = subprocess.Popen(
-        cmd,
-        cwd=cwd,
-        stdout=slave_fd,
-        stderr=slave_fd,
-        stdin=subprocess.DEVNULL,
-    )
-    os.close(slave_fd)
-
-    try:
-        while True:
-            try:
-                data = os.read(master_fd, 1024)
-            except OSError:
-                break
-            if not data:
-                break
-            os.write(sys.stdout.fileno(), data)
-    finally:
-        os.close(master_fd)
-
-    retcode = proc.wait()
-    if retcode != 0:
-        raise subprocess.CalledProcessError(retcode, cmd)
+    subprocess.run(cmd, cwd=cwd, check=True)
 
 
 def safe_unlink(path: Path):
