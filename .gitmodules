@@ -1,11 +1,12 @@
 [submodule "submodules/OpenRGB-cppSDK"]
 	path = submodules/OpenRGB-cppSDK
 	url = https://github.com/Emiliopg91/Youda008-OpenRGB-cppSDK
+	branch = master
     ignore = dirty
 [submodule "submodules/OpenRGB"]
 	path = submodules/OpenRGB
 	url = https://github.com/Emiliopg91/OpenRGB
-	branch = main
+	branch = master
     ignore = dirty
 [submodule "submodules/RccDeckyCompanion"]
 	path = submodules/RccDeckyCompanion

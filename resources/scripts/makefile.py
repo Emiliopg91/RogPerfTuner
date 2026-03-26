@@ -378,10 +378,10 @@ def update_submodules():
     paths = [Path(line.split()[1]) for line in out.splitlines()]
 
     for path in paths:
-        if path in FROZEN_SUBMODULES:
+        if (ROOT / path) in FROZEN_SUBMODULES:
             continue
         print(f"Updating {path}")
-        branch_out = subprocess.run(
+        branch = subprocess.check_output(
             [
                 "git",
                 "config",
@@ -390,11 +390,8 @@ def update_submodules():
                 "--get",
                 f"submodule.{path}.branch",
             ],
-            capture_output=True,
             text=True,
-            check=True,
-        )
-        branch = branch_out.stdout.strip() or "main"
+        ).strip()
         run(["git", "checkout", branch], cwd=path)
         run(["git", "pull"], cwd=path)
 
@@ -429,6 +426,7 @@ def main():
         except KeyboardInterrupt:
             sys.exit(130)
         except subprocess.CalledProcessError as e:
+            print(f"{e}")
             sys.exit(e.returncode)
     else:
         print(f"Unknown command: {cmd}")
