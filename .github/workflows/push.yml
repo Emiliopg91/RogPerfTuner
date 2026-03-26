@@ -60,16 +60,6 @@ jobs:
             echo "different=false" >> $GITHUB_OUTPUT
           fi
 
-      - name: Fail if tag exists
-        if: steps.check_version.outputs.different == 'true'
-        run: |
-          VERSION=${{ steps.cmake_version.outputs.version }}
-          git fetch --tags
-          if git rev-parse "refs/tags/$VERSION" >/dev/null 2>&1; then
-            echo "❌ Tag '$VERSION' already exists! Failing workflow."
-            exit 1
-          fi
-
       - name: Create Git tag
         if: steps.check_version.outputs.different == 'true'
         run: |
