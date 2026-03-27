@@ -242,6 +242,65 @@ def get_gpus() -> list[GPUInfo]:
 if __name__ == "__main__":
     print("Creating CMake config file...")
 
+    print("  Getting application details...")
+    content = Path(CMAKE_FILE).read_text(encoding="utf-8")
+    match = re.search(
+        r"project\s*\(\s*([A-Za-z0-9_]+)\s+VERSION\s+([0-9]+\.[0-9]+\.[0-9]+)",
+        content,
+        re.IGNORECASE,
+    )
+
+    name, version = match.groups()
+    ref = "tag=$pkgver"
+
+    branch = subprocess.check_output(
+        ["git", "rev-parse", "--abbrev-ref", "HEAD"], text=True
+    ).strip()
+    if os.environ.get("IN_TEST", None) is not None:
+        version = subprocess.check_output(
+            "git tag --sort=-creatordate | head -n 1", shell=True, text=True
+        ).strip()
+    if os.environ.get("GIT_RELEASE", None) is not None:
+        commit_count = subprocess.check_output(
+            ["git", "rev-list", "--count", f"{version}..HEAD"], text=True
+        ).strip()
+        version = version + ".r" + commit_count
+    elif branch != "main":
+        version = version + "-" + branch
+    definitions[Definition.M_APP_VERSION] = version
+    print(f"    Application version: {definitions[Definition.M_APP_VERSION]}")
+
+    with open(PLUGIN_FILE, "r", encoding="utf-8") as f:
+        definitions[Definition.M_PLUGIN_VERSION] = json.load(f)["version"].strip()
+        print(f"    Plugin version: {definitions[Definition.M_PLUGIN_VERSION]}")
+
+    print("  Detecting CPU...")
+    cpu_name = subprocess.run(
+        "LANG=C cat /proc/cpuinfo | grep \"model name\" | head -n1 | cut -d':' -f2",
+        check=True,
+        shell=True,
+        capture_output=True,
+        text=True,
+    ).stdout.strip()
+    cpu_name = re.sub(r"\s*\([^)]*\)", "", cpu_name)
+    print(f"    Detected {cpu_name}")
+    definitions[Definition.CPU_NAME] = cpu_name
+
+    if shutil.which("switcherooctl"):
+        print("  Detecting GPU...")
+        gpu_brand = gpu_name = gpu_env = None
+        gpus = get_gpus()
+        for gpu in gpus:
+            if not gpu.default_flag:
+                gpu_name = gpu.name.replace("Advanced Micro Devices, Inc.", "AMD")
+                gpu_brand = gpu_name.split(" ")[0].lower()
+                gpu_env = " ".join(gpu.environment)
+                print(f"    Detected {gpu_name}")
+                definitions[Definition.GPU_BRAND] = gpu_brand
+                definitions[Definition.GPU_NAME] = gpu_name
+                definitions[Definition.GPU_ENV] = gpu_env
+                break
+
     print("  Looking for header and source files...")
     header_files = []
     for f in glob.glob(
@@ -323,11 +382,12 @@ if __name__ == "__main__":
                 enabled_features[Feature.FAN_CONTROL] = True
                 print("    - Fan control via asusctl")
 
-        g = glob.glob(INTEL_RAPL_UJ_GLOB)
-        if len(g) > 0:
-            enabled_features[Feature.INTEL_RAPL_UJ] = True
-            definitions[Definition.INTEL_RAPL_UJ_FILE] = g[0]
-            print(f"    - Intel Rapl UJ via {g[0]}")
+        if "intel" in definitions[Definition.CPU_NAME].lower():
+            g = glob.glob(INTEL_RAPL_UJ_GLOB)
+            if len(g) > 0:
+                enabled_features[Feature.INTEL_RAPL_UJ] = True
+                definitions[Definition.INTEL_RAPL_UJ_FILE] = g[0]
+                print(f"    - Intel Rapl UJ via {g[0]}")
 
         if os.path.isdir(NVIDIA_BOOST_PATH):
             enabled_features[Feature.NV_BOOST] = True
@@ -365,74 +425,57 @@ if __name__ == "__main__":
             definitions[Definition.SCALING_GOVERNOR_FILE] = SCALING_GOVERNOR_GLOB
             print(f"    - Scaling governor via {SCALING_GOVERNOR_GLOB}")
 
-    print("  Getting application details...")
-    content = Path(CMAKE_FILE).read_text(encoding="utf-8")
-    match = re.search(
-        r"project\s*\(\s*([A-Za-z0-9_]+)\s+VERSION\s+([0-9]+\.[0-9]+\.[0-9]+)",
-        content,
-        re.IGNORECASE,
-    )
-
-    name, version = match.groups()
-    ref = "tag=$pkgver"
-
-    branch = subprocess.check_output(
-        ["git", "rev-parse", "--abbrev-ref", "HEAD"], text=True
-    ).strip()
-    if os.environ.get("IN_TEST", None) is not None:
-        version = subprocess.check_output(
-            "git tag --sort=-creatordate | head -n 1", shell=True, text=True
-        ).strip()
-    if os.environ.get("GIT_RELEASE", None) is not None:
-        commit_count = subprocess.check_output(
-            ["git", "rev-list", "--count", f"{version}..HEAD"], text=True
-        ).strip()
-        version = version + ".r" + commit_count
-    else:
-        version = version + "-" + branch
-    definitions[Definition.M_APP_VERSION] = version
-    print(f"    Application version: {definitions[Definition.M_APP_VERSION]}")
-
-    with open(PLUGIN_FILE, "r", encoding="utf-8") as f:
-        definitions[Definition.M_PLUGIN_VERSION] = json.load(f)["version"].strip()
-        print(f"    Plugin version: {definitions[Definition.M_PLUGIN_VERSION]}")
-
-    print("  Detecting CPU...")
-    cpu_name = subprocess.run(
-        "LANG=C cat /proc/cpuinfo | grep \"model name\" | head -n1 | cut -d':' -f2",
-        check=True,
-        shell=True,
-        capture_output=True,
-        text=True,
-    ).stdout.strip()
-    cpu_name = re.sub(r"\s*\([^)]*\)", "", cpu_name)
-    print(f"    Detected {cpu_name}")
-    definitions[Definition.CPU_NAME] = cpu_name
-
-    if shutil.which("switcherooctl"):
-        print("  Detecting GPU...")
-        gpu_brand = gpu_name = gpu_env = None
-        gpus = get_gpus()
-        for gpu in gpus:
-            if not gpu.default_flag:
-                gpu_name = gpu.name.replace("Advanced Micro Devices, Inc.", "AMD")
-                gpu_brand = gpu_name.split(" ")[0].lower()
-                gpu_env = " ".join(gpu.environment)
-                print(f"    Detected {gpu_name}")
-                definitions[Definition.GPU_BRAND] = gpu_brand
-                definitions[Definition.GPU_NAME] = gpu_name
-                definitions[Definition.GPU_ENV] = gpu_env
-                break
-
     print("  Generating config file...")
-    print(f"  Writting in {CMAKE_CFG}")
+    print(f"    Writting in {CMAKE_CFG}")
 
     with open(CMAKE_CFG, "w", encoding="utf-8") as f:
+        f.write("#########################\n")
+        f.write("###### Application ######\n")
+        f.write("#########################\n")
+        f.write(
+            f'add_definitions(-D{Definition.M_APP_VERSION.name}="{definitions[Definition.M_APP_VERSION]}")\n'
+        )
+        f.write(
+            f'add_definitions(-D{Definition.M_PLUGIN_VERSION.name}="{definitions[Definition.M_PLUGIN_VERSION]}")\n'
+        )
+        f.write("\n")
+
+        if Definition.CPU_NAME in definitions:
+            f.write("#########################\n")
+            f.write("########## CPU ##########\n")
+            f.write("#########################\n")
+            f.write(
+                f'add_definitions(-D{Definition.CPU_NAME.name}="{definitions[Definition.CPU_NAME]}")\n'
+            )
+            f.write("\n")
+
+        if Definition.GPU_BRAND in definitions:
+            f.write("#########################\n")
+            f.write("########## GPU ##########\n")
+            f.write("#########################\n")
+            f.write(
+                f'add_definitions(-D{Definition.GPU_BRAND.name}="{definitions[Definition.GPU_BRAND]}")\n'
+            )
+            f.write(
+                f'add_definitions(-D{Definition.GPU_NAME.name}="{definitions[Definition.GPU_NAME]}")\n'
+            )
+            f.write(
+                f'add_definitions(-D{Definition.GPU_ENV.name}="{definitions[Definition.GPU_ENV]}")\n'
+            )
+            f.write("\n")
+
+        f.write("#########################\n")
+        f.write("######## HEADERS ########\n")
+        f.write("#########################\n")
         f.write("set(HEADERS_RCC\n")
         for h in header_files:
             f.write(f'    "${{CMAKE_CURRENT_SOURCE_DIR}}/{h}"\n')
         f.write(")\n")
         f.write("\n")
+
+        f.write("#########################\n")
+        f.write("######## SOURCES ########\n")
+        f.write("#########################\n")
         f.write("set(SOURCES_RCC\n")
         for h in source_files:
             f.write(f'    "${{CMAKE_CURRENT_SOURCE_DIR}}/{h}"\n')
@@ -473,41 +516,6 @@ if __name__ == "__main__":
                             f.write(f'    "${{CMAKE_CURRENT_SOURCE_DIR}}/{s}"\n')
                         f.write(")\n")
 
-                f.write("\n")
-
-            f.write("#########################\n")
-            f.write("###### Application ######\n")
-            f.write("#########################\n")
-            f.write(
-                f'add_definitions(-D{Definition.M_APP_VERSION.name}="{definitions[Definition.M_APP_VERSION]}")\n'
-            )
-            f.write(
-                f'add_definitions(-D{Definition.M_PLUGIN_VERSION.name}="{definitions[Definition.M_PLUGIN_VERSION]}")\n'
-            )
-            f.write("\n")
-
-            if Definition.CPU_NAME in definitions:
-                f.write("#########################\n")
-                f.write("########## CPU ##########\n")
-                f.write("#########################\n")
-                f.write(
-                    f'add_definitions(-D{Definition.CPU_NAME.name}="{definitions[Definition.CPU_NAME]}")\n'
-                )
-                f.write("\n")
-
-            if Definition.GPU_BRAND in definitions:
-                f.write("#########################\n")
-                f.write("########## GPU ##########\n")
-                f.write("#########################\n")
-                f.write(
-                    f'add_definitions(-D{Definition.GPU_BRAND.name}="{definitions[Definition.GPU_BRAND]}")\n'
-                )
-                f.write(
-                    f'add_definitions(-D{Definition.GPU_NAME.name}="{definitions[Definition.GPU_NAME]}")\n'
-                )
-                f.write(
-                    f'add_definitions(-D{Definition.GPU_ENV.name}="{definitions[Definition.GPU_ENV]}")\n'
-                )
                 f.write("\n")
 
     print("CMake config file created")
