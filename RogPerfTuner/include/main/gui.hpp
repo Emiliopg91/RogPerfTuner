@@ -24,6 +24,7 @@
 #include "utils/configuration_wrapper.hpp"
 #include "utils/constants.hpp"
 #include "utils/event_bus_wrapper.hpp"
+#include "utils/translations.hpp"
 
 inline void terminateHandler() {
 	std::cerr << "Unhandled exception detected\n";
@@ -150,7 +151,7 @@ inline int startGui(int argc, char** argv) {
 	QApplication app(argc, argv);
 	app.setDesktopFileName(Constants::APP_DRAW_FILE.c_str());
 
-	Translator::init(Constants::TRANSLATIONS_FILE);
+	Translator::init().loadTranslations(getTranslations());
 
 	Toaster::init(Constants::APP_NAME, Constants::ASSET_ICON_FILE);
 	Toaster::getInstance().showToast(Translator::getInstance().translate("initializing"));

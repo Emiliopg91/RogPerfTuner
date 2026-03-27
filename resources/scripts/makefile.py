@@ -189,6 +189,7 @@ def build():
     print("#######################################################################")
 
     shutil.rmtree("build/assets/bin", ignore_errors=True)
+    run(["python3", "./resources/scripts/translations.py"])
 
     format_code()
 
@@ -199,7 +200,6 @@ def build():
         ensure_dir(base / p)
 
     shutil.copy("resources/suggestions.yaml", "build/assets/suggestions.yaml")
-    shutil.copy("resources/translations.yaml", "build/assets/translations.yaml")
     shutil.copy("resources/dev-mode.sh", "build/assets/dev-mode.sh")
     Path("build/assets/dev-mode.sh").chmod(0o755)
 

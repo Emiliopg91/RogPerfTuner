@@ -6,7 +6,6 @@
 
 #include "framework/abstracts/loggable.hpp"
 #include "framework/abstracts/singleton.hpp"
-#include "framework/models/language.hpp"
 
 class Translator : public Singleton<Translator>, Loggable {
   public:
@@ -21,12 +20,10 @@ class Translator : public Singleton<Translator>, Loggable {
 	 * @return The translated string with replacements applied.
 	 */
 	std::string translate(const std::string& msg, const std::unordered_map<std::string, std::any>& replacement = {});
+	void loadTranslations(const std::unordered_map<std::string, std::string>& translations);
 
   private:
-	inline static Language FALLBACK_LANG = Language::EN;
-
 	friend class Singleton<Translator>;
-	Translator(const std::string& translation_file = "");
-	Language currentLang = Language::EN;
-	std::unordered_map<std::string, std::string> translations;
+	Translator();
+	std::unordered_map<std::string, std::string> translations = {};
 };

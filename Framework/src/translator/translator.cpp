@@ -1,65 +1,15 @@
 
 #include "framework/translator/translator.hpp"
 
-#include <string>
+Translator::Translator() : Loggable("Translator") {
+}
 
-#include "framework/utils/enum_utils.hpp"
-#include "framework/utils/string_utils.hpp"
-#include "framework/utils/yaml_utils.hpp"
-
-Translator::Translator(const std::string& translation_file) : Loggable("Translator") {
-	currentLang = [this]() -> Language {
-		const char* lang = std::getenv("LC_MESSAGES");
-		if (!lang || std::string(lang).empty()) {
-			lang = std::getenv("LANG");
-		}
-		if (!lang || std::string(lang).empty()) {
-			return FALLBACK_LANG;
-		}
-		std::string langStr(lang);
-
-		auto pos = langStr.find('_');
-		if (pos != std::string::npos) {
-			langStr = langStr.substr(0, pos);
-		}
-		try {
-			return fromString<Language>(StringUtils::toUpperCase(langStr));
-		} catch (std::exception& e) {
-			logger->warn("Unsupported language {}, fallback to {}", langStr, toString(FALLBACK_LANG));
-			return FALLBACK_LANG;
-		}
-	}();
-
-	auto root = YamlUtils::readYamlFile(translation_file);
-
-	for (auto it = root.begin(); it != root.end(); ++it) {
-		const std::string key = it->first.as<std::string>();
-		const auto value	  = it->second;
-
-		std::string val = key;
-		if (value[toString(currentLang)]) {
-			val = value[toString(currentLang)].as<std::string>();
-		} else if (value[toString(FALLBACK_LANG)]) {
-			logger->warn("Missing specific translation for {}", key);
-			val = value[toString(FALLBACK_LANG)].as<std::string>();
-		} else {
-			logger->warn("Missing specific and default translation for {}", key);
-		}
-
-		translations[key] = val;
-	}
-
-	logger->debug("User language: {}", toString(currentLang));
+void Translator::loadTranslations(const std::unordered_map<std::string, std::string>& translations) {
+	this->translations = translations;
 }
 
 std::string Translator::translate(const std::string& msg, const std::unordered_map<std::string, std::any>& replacement) {
-	auto it = translations.find(msg);
-	if (it == translations.end()) {
-		logger->warn("Missing translation for {}", msg);
-		return msg;
-	}
-
-	auto result = it->second;
+	auto result = translations.find(msg)->second;
 	for (const auto& [key, value] : replacement) {
 		std::string placeholder = std::format("{{{}}}", key);
 		std::string valStr;

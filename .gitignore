@@ -36,3 +36,5 @@ build-scan/
 *.pyc
 
 Dockerfile
+
+RogPerfTuner/include/utils/translations.hpp

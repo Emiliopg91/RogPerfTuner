@@ -36,7 +36,6 @@ const std::string Constants::ASSET_ICON_FILE	= ASSETS_DIR + "/icons/icon.svg";
 const std::string Constants::ASSET_ICON_45_FILE = ASSETS_DIR + "/icons/icon-45x45.png";
 const std::string Constants::ORGB_DIR			= ASSETS_DIR + "/OpenRGB";
 const std::string Constants::ORGB_PATH			= ASSETS_DIR + "/OpenRGB/openrgb";
-const std::string Constants::TRANSLATIONS_FILE	= ASSETS_DIR + "/translations.yaml";
 const std::string Constants::DEV_MODE_FILE		= ASSETS_DIR + "/dev-mode.sh";
 
 const std::string Constants::HOME_DIR				  = std::getenv("HOME");

@@ -60,7 +60,6 @@ class Constants {
 
 	static const std::string SOCKET_FILE;
 
-	static const std::string TRANSLATIONS_FILE;
 	static const std::string DEV_MODE_FILE;
 
 	static const std::string PLUGIN_VERSION;
