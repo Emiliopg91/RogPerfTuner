@@ -384,10 +384,10 @@ int PerformanceService::pl1Spl(PerformanceProfile profile) {
 		return pl1SpdClient.getMaxValue();
 	}
 	if (profile == PerformanceProfile::BALANCED) {
-		return pl1SpdClient.getMaxValue() * 0.75;
+		return pl1SpdClient.getMaxValue() * 0.8;
 	}
 	if (profile == PerformanceProfile::QUIET) {
-		return pl1SpdClient.getMaxValue() * 0.5;
+		return pl1SpdClient.getMaxValue() * 0.6;
 	}
 
 	return pl1SpdClient.getCurrentValue();
@@ -404,10 +404,10 @@ int PerformanceService::pl2Sppt(PerformanceProfile profile) {
 		return pl2SpptClient.getMaxValue();
 	}
 	if (profile == PerformanceProfile::BALANCED) {
-		return pl2SpptClient.getMaxValue() * 0.75;
+		return pl2SpptClient.getMaxValue() * 0.8;
 	}
 	if (profile == PerformanceProfile::QUIET) {
-		return pl2SpptClient.getMaxValue() * 0.5;
+		return pl2SpptClient.getMaxValue() * 0.6;
 	}
 
 	return pl2SpptClient.getCurrentValue();
@@ -424,10 +424,10 @@ int PerformanceService::pl3Fppt(PerformanceProfile profile) {
 		return pl3FpptClient.getMaxValue();
 	}
 	if (profile == PerformanceProfile::BALANCED) {
-		return pl3FpptClient.getMaxValue() * 0.75;
+		return pl3FpptClient.getMaxValue() * 0.8;
 	}
 	if (profile == PerformanceProfile::QUIET) {
-		return pl3FpptClient.getMaxValue() * 0.5;
+		return pl3FpptClient.getMaxValue() * 0.6;
 	}
 
 	return pl3FpptClient.getCurrentValue();
