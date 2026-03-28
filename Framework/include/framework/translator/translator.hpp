@@ -20,10 +20,10 @@ class Translator : public Singleton<Translator>, Loggable {
 	 * @return The translated string with replacements applied.
 	 */
 	std::string translate(const std::string& msg, const std::unordered_map<std::string, std::any>& replacement = {});
+	inline static std::unordered_map<std::string, std::string> translations = {};
 	void loadTranslations(const std::unordered_map<std::string, std::string>& translations);
 
   private:
 	friend class Singleton<Translator>;
 	Translator();
-	std::unordered_map<std::string, std::string> translations = {};
 };

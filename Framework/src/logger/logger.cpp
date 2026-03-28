@@ -5,6 +5,7 @@
 #include <iomanip>
 #include <memory>
 
+#include "framework/logger/sink/system_sink.hpp"
 #include "framework/utils/enum_utils.hpp"
 
 void Logger::setLevel(std::string level) {
@@ -25,10 +26,12 @@ void Logger::setLevel(LoggerLevel level) {
  *
  * @param name
  */
-Logger::Logger(std::shared_ptr<ConsoleSink> console_sink, std::optional<std::shared_ptr<FileSink>> fileSink, std::string name) {
+Logger::Logger(std::shared_ptr<ConsoleSink> console_sink, std::optional<std::shared_ptr<FileSink>> fileSink,
+			   std::optional<std::shared_ptr<SystemSink>> systemSink, std::string name) {
 	std::lock_guard<std::mutex> lock(mutex);
 	this->consoleSink = console_sink;
 	this->fileSink	  = fileSink;
+	this->systemSink  = systemSink;
 	this->name		  = StringUtils::rightPad(name, 20).substr(0, 20);
 }
 
@@ -109,6 +112,9 @@ void Logger::log(LoggerLevel msgLevel, const std::string& format) {
 	consoleSink->write(out, msgLevel);
 	if (fileSink.has_value()) {
 		fileSink.value()->write(out, msgLevel);
+	}
+	if (systemSink.has_value()) {
+		systemSink.value()->write(out, msgLevel);
 	}
 }
 

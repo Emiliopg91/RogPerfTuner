@@ -1,7 +1,9 @@
 #include "framework/logger/logger_provider.hpp"
 
 #include <filesystem>
+#include <memory>
 
+#include "framework/logger/sink/system_sink.hpp"
 #include "framework/utils/enum_utils.hpp"
 #include "framework/utils/file_utils.hpp"
 #include "framework/utils/string_utils.hpp"
@@ -69,7 +71,7 @@ static void rotate_log(const std::string& fileName, const std::filesystem::path&
 
 std::map<std::string, LoggerLevel> LoggerProvider::configMap{};
 
-void LoggerProvider::initialize(std::string fileName, std::string path) {
+void LoggerProvider::initialize(std::string fileName, std::string path, std::string appName) {
 	console_sink = std::make_shared<ConsoleSink>();
 
 	if (!fileName.empty() && !path.empty()) {
@@ -83,7 +85,12 @@ void LoggerProvider::initialize(std::string fileName, std::string path) {
 
 		file_sink = std::make_shared<FileSink>(path + "/" + fileName + ".log");
 	}
-	auto main_logger = std::make_shared<Logger>(console_sink, file_sink, DEFAULT_LOGGER_NAME);
+
+	if (!appName.empty()) {
+		sys_sink = std::make_shared<SystemSink>(appName);
+	}
+
+	auto main_logger = std::make_shared<Logger>(console_sink, file_sink, sys_sink, DEFAULT_LOGGER_NAME);
 	if (getenv("RCC_LOG_LEVEL")) {
 		defaultLevel = fromName<LoggerLevel>(StringUtils::toUpperCase(getenv("RCC_LOG_LEVEL")));
 	}
@@ -96,7 +103,7 @@ std::shared_ptr<Logger> LoggerProvider::getLogger(const std::string& name) {
 		return it->second;
 	}
 
-	auto logger = std::make_shared<Logger>(console_sink, file_sink, StringUtils::rightPad(name, 20).substr(0, 20));
+	auto logger = std::make_shared<Logger>(console_sink, file_sink, sys_sink, StringUtils::rightPad(name, 20).substr(0, 20));
 
 	auto level = defaultLevel;
 	auto it2   = LoggerProvider::configMap.find(name);

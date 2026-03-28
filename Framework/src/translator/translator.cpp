@@ -9,7 +9,12 @@ void Translator::loadTranslations(const std::unordered_map<std::string, std::str
 }
 
 std::string Translator::translate(const std::string& msg, const std::unordered_map<std::string, std::any>& replacement) {
-	auto result = translations.find(msg)->second;
+	auto it = translations.find(msg);
+	if (it == translations.end()) {
+		return msg;
+	}
+
+	auto result = it->second;
 	for (const auto& [key, value] : replacement) {
 		std::string placeholder = std::format("{{{}}}", key);
 		std::string valStr;
