@@ -71,7 +71,7 @@ static void rotate_log(const std::string& fileName, const std::filesystem::path&
 
 std::map<std::string, LoggerLevel> LoggerProvider::configMap{};
 
-void LoggerProvider::initialize(std::string fileName, std::string path, std::string appName) {
+void LoggerProvider::initialize(const std::string& fileName, const std::string& path, const std::string& appName) {
 	console_sink = std::make_shared<ConsoleSink>();
 
 	if (!fileName.empty() && !path.empty()) {
@@ -115,7 +115,7 @@ std::shared_ptr<Logger> LoggerProvider::getLogger(const std::string& name) {
 	loggers[name] = logger;
 	return logger;
 }
-void LoggerProvider::setConfigMap(std::map<std::string, LoggerLevel> configMap) {
+void LoggerProvider::setConfigMap(const std::map<std::string, LoggerLevel>& configMap) {
 	LoggerProvider::configMap = configMap;
 
 	for (const auto& [key, level] : LoggerProvider::configMap) {

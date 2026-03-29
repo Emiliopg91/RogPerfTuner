@@ -76,7 +76,7 @@ class Configuration : public Singleton<Configuration<T>>, Loggable {
 	}
 
   protected:
-	Configuration(std::string dir, std::string file) : Loggable("Configuration"), configDir(dir), configFile(dir + "/" + file) {
+	Configuration(const std::string& dir, const std::string& file) : Loggable("Configuration"), configDir(dir), configFile(dir + "/" + file) {
 		loadConfig();
 	}
 

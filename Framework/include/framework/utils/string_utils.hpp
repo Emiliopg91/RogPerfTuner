@@ -75,7 +75,7 @@ class StringUtils {
 	 * @param haystack The string to search in.
 	 * @return bool True if needle is found, false otherwise.
 	 */
-	static bool isSubstring(std::string needle, std::string haystack);
+	static bool isSubstring(const std::string& needle, const std::string& haystack);
 
 	/**
 	 * @brief Split lines into string vector
@@ -189,5 +189,5 @@ class StringUtils {
 		return oss.str();
 	}
 
-	static std::string replace(std::string original, std::string substring, std::string replacement, bool onlyFirst = false);
+	static std::string replace(const std::string& original, const std::string& substring, const std::string& replacement, bool onlyFirst = false);
 };

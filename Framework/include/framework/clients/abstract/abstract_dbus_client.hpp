@@ -132,13 +132,13 @@ class AbstractDbusClient : public QObject {
 		throw std::runtime_error(("DBus Get returned no value for property: " + prop.toStdString()));
 	}
 
-	void emitDbusPropertyEvent(EventBus& eventBus, std::string interface, std::string property, std::any value);
+	void emitDbusPropertyEvent(EventBus& eventBus, const std::string& interface, const std::string& property, const std::any& value);
 
-	void onDbusPropertyEvent(EventBus& eventBus, std::string interface, std::string property, CallbackWithAnyParam&& callback);
+	void onDbusPropertyEvent(EventBus& eventBus, const std::string& interface, const std::string& property, CallbackWithAnyParam&& callback);
 
-	void emitDbusSignalEvent(EventBus& eventBus, std::string interface, std::string property);
+	void emitDbusSignalEvent(EventBus& eventBus, const std::string& interface, const std::string& property);
 
-	void onDbusSignalEvent(EventBus& eventBus, std::string interface, std::string property, Callback&& callback);
+	void onDbusSignalEvent(EventBus& eventBus, const std::string& interface, const std::string& property, Callback&& callback);
 
 	void onPropertyChange(const std::string& propName, CallbackWithAnyParam&& callback);
 

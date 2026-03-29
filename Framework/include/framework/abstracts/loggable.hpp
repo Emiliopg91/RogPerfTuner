@@ -6,7 +6,7 @@
 class Loggable {
   public:
   protected:
-	Loggable(std::string name) : logger(LoggerProvider::getLogger(name)) {
+	Loggable(const std::string& name) : logger(LoggerProvider::getLogger(name)) {
 	}
 
   protected:

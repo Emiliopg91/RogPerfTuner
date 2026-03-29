@@ -7,12 +7,12 @@
 class YamlUtils {
   public:
 	template <typename T = YAML::Node>
-	inline static T parseYaml(std::string content) {
+	inline static T parseYaml(const std::string& content) {
 		return YAML::Load(content).as<T>();
 	}
 
 	template <typename T = YAML::Node>
-	inline static T readYamlFile(std::string path) {
+	inline static T readYamlFile(const std::string& path) {
 		auto content = FileUtils::readFileContent(path);
 		return parseYaml<T>(content);
 	}
@@ -25,7 +25,7 @@ class YamlUtils {
 	}
 
 	template <typename T>
-	inline static void writeYamlFile(const T& object, std::string path) {
+	inline static void writeYamlFile(const T& object, const std::string& path) {
 		FileUtils::writeFileContent(path, writeYaml(object));
 	}
 };

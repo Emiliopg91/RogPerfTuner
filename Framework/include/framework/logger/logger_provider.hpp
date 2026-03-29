@@ -28,7 +28,7 @@ class LoggerProvider {
 	 * @param fileName
 	 * @param path
 	 */
-	static void initialize(std::string fileName = "", std::string path = "", std::string appName = "");
+	static void initialize(const std::string& fileName = "", const std::string& path = "", const std::string& appName = "");
 
 	/**
 	 * @brief Get the Logger pointer object
@@ -43,7 +43,7 @@ class LoggerProvider {
 	 *
 	 * @param configMap
 	 */
-	static void setConfigMap(std::map<std::string, LoggerLevel> configMap);
+	static void setConfigMap(const std::map<std::string, LoggerLevel>& configMap);
 
   private:
 	inline static const std::string DEFAULT_LOGGER_NAME = "Default";

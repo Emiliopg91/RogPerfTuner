@@ -19,7 +19,7 @@ class NetUtils {
 	 */
 	static int getRandomFreePort();
 
-	static void download(std::string url, std::string dst);
+	static void download(const std::string& url, const std::string& dst);
 
-	static std::string fetch(std::string url);
+	static std::string fetch(const std::string& url);
 };

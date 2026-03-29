@@ -1,6 +1,6 @@
 #include "framework/gui/toaster.hpp"
 
-void Toaster::showToast(std::string message, bool can_be_hidden) {
+void Toaster::showToast(const std::string& message, bool can_be_hidden) {
 	if (notificationClient.available()) {
 		if (last_id > 0) {
 			notificationClient.close_notification(last_id);
@@ -13,7 +13,7 @@ void Toaster::showToast(std::string message, bool can_be_hidden) {
 	}
 }
 
-Toaster::Toaster(std::optional<std::string> appName, std::optional<std::string> icon) {
+Toaster::Toaster(const std::optional<std::string>& appName, const std::optional<std::string>& icon) {
 	if (appName.has_value()) {
 		this->appName = appName;
 	}

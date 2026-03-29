@@ -26,7 +26,7 @@ void FileUtils::createDirectory(const std::string& path) {
 	}
 }
 
-void FileUtils::writeFileContent(const std::string path, const std::string content) {
+void FileUtils::writeFileContent(const std::string& path, const std::string& content) {
 	std::ofstream file(path, std::ios::out | std::ios::trunc);
 	if (!file.is_open()) {
 		throw std::runtime_error("Couldn't open file " + path);
@@ -59,7 +59,7 @@ void FileUtils::mkdirs(const std::string& path) {
 	mkdirs(dirPath);
 }
 
-void FileUtils::mkdirs(std::filesystem::path dirPath) {
+void FileUtils::mkdirs(const std::filesystem::path& dirPath) {
 	if (!std::filesystem::exists(dirPath)) {
 		std::filesystem::create_directories(dirPath);
 	}
@@ -69,7 +69,7 @@ std::filesystem::file_time_type FileUtils::getMTime(const std::string& path) {
 	return getMTime(std::filesystem::path(path));
 }
 
-std::filesystem::file_time_type FileUtils::getMTime(std::filesystem::path path) {
+std::filesystem::file_time_type FileUtils::getMTime(const std::filesystem::path& path) {
 	return std::filesystem::last_write_time(path);
 }
 

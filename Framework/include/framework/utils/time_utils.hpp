@@ -23,8 +23,8 @@ class TimeUtils {
 	 * @param t1 The end time point.
 	 * @return The time difference in milliseconds.
 	 */
-	static long getTimeDiff(std::chrono::time_point<std::chrono::high_resolution_clock> t0,
-							std::chrono::time_point<std::chrono::high_resolution_clock> t1);
+	static long getTimeDiff(const std::chrono::time_point<std::chrono::high_resolution_clock>& t0,
+							const std::chrono::time_point<std::chrono::high_resolution_clock>& t1);
 
 	/**
 	 * @brief Sleeps for the specified number of milliseconds.

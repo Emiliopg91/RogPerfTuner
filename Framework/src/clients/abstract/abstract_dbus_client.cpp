@@ -57,21 +57,22 @@ void AbstractDbusClient::checkAvailable() const {
 	}
 }
 
-void AbstractDbusClient::emitDbusPropertyEvent(EventBus& eventBus, std::string interface, std::string property, std::any value) {
+void AbstractDbusClient::emitDbusPropertyEvent(EventBus& eventBus, const std::string& interface, const std::string& property, const std::any& value) {
 	eventBus.emit_event("dbus." + interface + ".property." + property, {value});
 }
 
-void AbstractDbusClient::onDbusPropertyEvent(EventBus& eventBus, std::string interface, std::string property, CallbackWithAnyParam&& callback) {
+void AbstractDbusClient::onDbusPropertyEvent(EventBus& eventBus, const std::string& interface, const std::string& property,
+											 CallbackWithAnyParam&& callback) {
 	eventBus.on_with_data("dbus." + interface + ".property." + property, [cb = std::move(callback)](CallbackParam data) {
 		cb(data[0]);
 	});
 }
 
-void AbstractDbusClient::emitDbusSignalEvent(EventBus& eventBus, std::string interface, std::string property) {
+void AbstractDbusClient::emitDbusSignalEvent(EventBus& eventBus, const std::string& interface, const std::string& property) {
 	eventBus.emit_event("dbus." + interface + ".signal." + property);
 }
 
-void AbstractDbusClient::onDbusSignalEvent(EventBus& eventBus, std::string interface, std::string property, Callback&& callback) {
+void AbstractDbusClient::onDbusSignalEvent(EventBus& eventBus, const std::string& interface, const std::string& property, Callback&& callback) {
 	eventBus.on_without_data("dbus." + interface + ".property." + property, [cb = std::move(callback)]() {
 		cb();
 	});

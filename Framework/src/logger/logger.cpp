@@ -8,7 +8,7 @@
 #include "framework/logger/sink/system_sink.hpp"
 #include "framework/utils/enum_utils.hpp"
 
-void Logger::setLevel(std::string level) {
+void Logger::setLevel(const std::string& level) {
 	this->setLevel(fromName<LoggerLevel>(level));
 }
 
@@ -42,7 +42,7 @@ Logger::Logger(std::shared_ptr<ConsoleSink> console_sink, std::optional<std::sha
  * @param fmt
  * @param args
  */
-void Logger::debug(std::string message) {
+void Logger::debug(const std::string& message) {
 	log(LoggerLevel::DEBUG, message);
 }
 
@@ -53,7 +53,7 @@ void Logger::debug(std::string message) {
  * @param fmt
  * @param args
  */
-void Logger::info(std::string message) {
+void Logger::info(const std::string& message) {
 	log(LoggerLevel::INFO, message);
 }
 
@@ -64,7 +64,7 @@ void Logger::info(std::string message) {
  * @param fmt
  * @param args
  */
-void Logger::warn(std::string message) {
+void Logger::warn(const std::string& message) {
 	log(LoggerLevel::WARN, message);
 }
 
@@ -75,7 +75,7 @@ void Logger::warn(std::string message) {
  * @param fmt
  * @param args
  */
-void Logger::error(std::string message) {
+void Logger::error(const std::string& message) {
 	log(LoggerLevel::ERROR, message);
 }
 
@@ -86,7 +86,7 @@ void Logger::error(std::string message) {
  * @param fmt
  * @param args
  */
-void Logger::critical(std::string message) {
+void Logger::critical(const std::string& message) {
 	log(LoggerLevel::CRITICAL, message);
 }
 

@@ -284,7 +284,7 @@ void PerformanceService::setCpuGovernor(const PerformanceProfile& profile) {
 
 #ifdef ACPI_PROFILE
 void PerformanceService::setPowerProfile(PerformanceProfile& profile) {
-	PowerProfile powerProfile = getPowerProfile(profile);
+	PowerProfile powerProfile = onBattery ? PowerProfile::PERFORMANCE : getPowerProfile(profile);
 	logger->info("Power profile: {}", toName(powerProfile));
 	Logger::add_tab();
 	try {
@@ -471,11 +471,8 @@ int PerformanceService::batteryNvTemp(PerformanceProfile profile) {
 #endif
 
 #ifdef SCALING_GOVERNOR
-CpuGovernor PerformanceService::acGovernor(PerformanceProfile profile) {
-	if (profile == PerformanceProfile::PERFORMANCE) {
-		return CpuGovernor::PERFORMANCE;
-	}
-	return CpuGovernor::POWERSAVE;
+CpuGovernor PerformanceService::acGovernor(PerformanceProfile _) {
+	return CpuGovernor::PERFORMANCE;
 }
 
 CpuGovernor PerformanceService::batteryGovernor() {

@@ -292,7 +292,7 @@ uint8_t Shell::wait_for(pid_t pid) {
 	}
 }
 
-std::optional<std::string> Shell::which(std::string cmd) {
+std::optional<std::string> Shell::which(const std::string& cmd) {
 	auto tmp = whichAll(cmd);
 	if (!tmp.empty()) {
 		return std::move(tmp[0]);
@@ -300,7 +300,7 @@ std::optional<std::string> Shell::which(std::string cmd) {
 	return std::nullopt;
 }
 
-std::vector<std::string> Shell::whichAll(std::string cmd) {
+std::vector<std::string> Shell::whichAll(const std::string& cmd) {
 	std::lock_guard<std::mutex> lock(which_mtx);
 
 	auto it = whichCache.find(cmd);

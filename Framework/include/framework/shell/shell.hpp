@@ -82,7 +82,7 @@ class Shell : public Singleton<Shell>, Loggable {
 	 * @param cmd
 	 * @return std::optional<std::string>
 	 */
-	std::optional<std::string> which(std::string cmd);
+	std::optional<std::string> which(const std::string& cmd);
 
 	/**
 	 * @brief Get all alternatives for command in path
@@ -90,7 +90,7 @@ class Shell : public Singleton<Shell>, Loggable {
 	 * @param cmd
 	 * @return std::vector<std::string>
 	 */
-	std::vector<std::string> whichAll(std::string cmd);
+	std::vector<std::string> whichAll(const std::string& cmd);
 
   private:
 	friend class Singleton<Shell>;

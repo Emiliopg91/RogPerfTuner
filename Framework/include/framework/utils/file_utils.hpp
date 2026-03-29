@@ -38,7 +38,7 @@ class FileUtils {
 	 * @param path The file path.
 	 * @param content The content to write.
 	 */
-	static void writeFileContent(const std::string path, const std::string content);
+	static void writeFileContent(const std::string& path, const std::string& content);
 
 	/**
 	 * @brief Read content from file.
@@ -76,7 +76,7 @@ class FileUtils {
 	 *
 	 * @param dirPath The filesystem path for which to create directories.
 	 */
-	static void mkdirs(std::filesystem::path dirPath);
+	static void mkdirs(const std::filesystem::path& dirPath);
 
 	/**
 	 * @brief Get modification time.
@@ -96,7 +96,7 @@ class FileUtils {
 	 * @param path The filesystem path.
 	 * @return The file modification time.
 	 */
-	static std::filesystem::file_time_type getMTime(std::filesystem::path path);
+	static std::filesystem::file_time_type getMTime(const std::filesystem::path& path);
 
 	/**
 	 * @brief Copy entry from source to destination.

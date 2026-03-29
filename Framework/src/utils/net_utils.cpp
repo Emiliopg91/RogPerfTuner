@@ -66,7 +66,7 @@ std::tuple<std::string, std::string> split_url(const std::string& url) {
 	return {"", ""};
 }
 
-void NetUtils::download(const std::string url, const std::string dst) {
+void NetUtils::download(const std::string& url, const std::string& dst) {
 	auto logger = LoggerProvider::getLogger("NetUtils");
 
 	logger->info("Downloading {} into {}", url, dst);
@@ -100,7 +100,7 @@ void NetUtils::download(const std::string url, const std::string dst) {
 
 	Logger::rem_tab();
 }
-std::string NetUtils::fetch(const std::string url) {
+std::string NetUtils::fetch(const std::string& url) {
 	auto logger = LoggerProvider::getLogger("NetUtils");
 
 	logger->info("Fetching {}", url);

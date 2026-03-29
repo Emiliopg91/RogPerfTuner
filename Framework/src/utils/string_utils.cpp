@@ -100,7 +100,7 @@ std::string StringUtils::generateUUIDv4() {
  * @param haystack
  * @return bool
  */
-bool StringUtils::isSubstring(std::string needle, std::string haystack) {
+bool StringUtils::isSubstring(const std::string& needle, const std::string& haystack) {
 	return haystack.find(needle) != std::string::npos;
 }
 
@@ -203,7 +203,7 @@ std::string StringUtils::replaceAll(const std::string& input, const std::string&
 	return result;
 }
 
-std::string StringUtils::replace(std::string original, std::string substring, std::string replacement, bool onlyFirst) {
+std::string StringUtils::replace(const std::string& original, const std::string& substring, const std::string& replacement, bool onlyFirst) {
 	auto result = std::string(original);
 
 	while (true) {

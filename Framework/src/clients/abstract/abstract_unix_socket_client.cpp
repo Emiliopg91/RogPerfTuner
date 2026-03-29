@@ -6,11 +6,12 @@
 #include "framework/utils/time_utils.hpp"
 #include "framework/utils/yaml_utils.hpp"
 
-void AbstractUnixSocketClient::emitUnixSocketEvent(EventBus& eventBus, std::string name, std::string event, CallbackParam value) {
+void AbstractUnixSocketClient::emitUnixSocketEvent(EventBus& eventBus, const std::string& name, const std::string& event, CallbackParam value) {
 	eventBus.emit_event("unix.socket." + name + ".event." + event, value);
 }
 
-void AbstractUnixSocketClient::onUnixSocketEvent(EventBus& eventBus, std::string name, std::string event, CallbackWithParams&& callback) {
+void AbstractUnixSocketClient::onUnixSocketEvent(EventBus& eventBus, const std::string& name, const std::string& event,
+												 CallbackWithParams&& callback) {
 	eventBus.on_with_data("unix.socket." + name + ".event." + event, [cb = std::move(callback)](CallbackParam data) {
 		cb(data);
 	});
@@ -43,7 +44,7 @@ bool AbstractUnixSocketClient::connected() {
 	return _connected;
 }
 
-std::vector<std::any> AbstractUnixSocketClient::invoke(std::string method, std::vector<std::any> data, int timeout_ms) {
+std::vector<std::any> AbstractUnixSocketClient::invoke(const std::string& method, const std::vector<std::any>& data, int timeout_ms) {
 	UnixCommunicationMessage cm;
 	cm.type = "REQUEST";
 	cm.id	= StringUtils::generateUUIDv4();
@@ -214,7 +215,7 @@ void AbstractUnixSocketClient::readLoop() {
 	}
 }
 
-void AbstractUnixSocketClient::handleResponse(UnixCommunicationMessage msg) {
+void AbstractUnixSocketClient::handleResponse(const UnixCommunicationMessage& msg) {
 	std::lock_guard<std::mutex> lock(mutex);
 	auto it = promises.find(msg.id);
 	if (it != promises.end()) {
@@ -224,7 +225,7 @@ void AbstractUnixSocketClient::handleResponse(UnixCommunicationMessage msg) {
 	}
 }
 
-void AbstractUnixSocketClient::handleEvent(UnixCommunicationMessage msg) {
+void AbstractUnixSocketClient::handleEvent(const UnixCommunicationMessage& msg) {
 	emitUnixSocketEvent(eventBus, name, msg.name, msg.data);
 }
 

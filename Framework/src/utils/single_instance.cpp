@@ -8,7 +8,7 @@
 
 #include "framework/utils/file_utils.hpp"
 
-void SingleInstance::acquire(std::string lockFile) {
+void SingleInstance::acquire(const std::string& lockFile) {
 	killRunningInstance(lockFile);
 
 	std::ofstream out(lockFile);
@@ -16,7 +16,7 @@ void SingleInstance::acquire(std::string lockFile) {
 	out.close();
 }
 
-bool SingleInstance::killRunningInstance(std::string lockFile) {
+bool SingleInstance::killRunningInstance(const std::string& lockFile) {
 	auto running = false;
 	if (FileUtils::exists(lockFile)) {
 		std::ifstream f(lockFile);
