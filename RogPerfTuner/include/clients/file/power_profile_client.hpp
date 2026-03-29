@@ -8,7 +8,7 @@ class PowerProfileClient : public AbstractFileClient, public Singleton<PowerProf
   public:
 	PowerProfile getPowerProfile();
 
-	void setPowerProfile(const PowerProfile& val);
+	void setPowerProfile(PowerProfile val);
 
   private:
 	friend class Singleton<PowerProfileClient>;

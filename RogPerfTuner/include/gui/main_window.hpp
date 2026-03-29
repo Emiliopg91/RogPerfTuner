@@ -38,15 +38,15 @@ class MainWindow : public QMainWindow, public Singleton<MainWindow> {
 
 	void setPerformanceProfile(PerformanceProfile value);
 
-	void setScheduler(std::optional<std::string> sched);
+	void setScheduler(const std::optional<std::string>& sched);
 
-	void setSsdScheduler(std::string sched);
+	void setSsdScheduler(const std::string& sched);
 
 	void setAuraBrightness(RgbBrightness brightness);
 
 	void setAuraColor(std::optional<std::string> color);
 
-	void setAuraEffect(std::string effect);
+	void setAuraEffect(const std::string& effect);
 
 	void onAutostartChanged(bool enabled);
 

@@ -6,7 +6,7 @@
 	return fromString<PowerProfile>(this->getProperty<QString>(QString("ActiveProfile")).toStdString(), {{"-", "_"}});
 }*/
 
-void PowerProfileClient::setPowerProfile(const PowerProfile& val) {
+void PowerProfileClient::setPowerProfile(PowerProfile val) {
 	write(toString(val));
 }
 

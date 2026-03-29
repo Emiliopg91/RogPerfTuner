@@ -96,7 +96,7 @@ PerformanceProfile PerformanceService::getPerformanceProfile() {
 	return currentProfile;
 }
 
-void PerformanceService::setActualPerformanceProfile(PerformanceProfile& profile) {
+void PerformanceService::setActualPerformanceProfile(PerformanceProfile profile) {
 	std::lock_guard<std::mutex> lock(actProfMutex);
 
 	std::string profileName = toName(profile);
@@ -185,7 +185,7 @@ void PerformanceService::smartWorker() {
 	}
 }
 
-void PerformanceService::setPerformanceProfile(PerformanceProfile& profile, bool temporal, bool force, bool showToast) {
+void PerformanceService::setPerformanceProfile(PerformanceProfile profile, bool temporal, bool force, bool showToast) {
 	std::lock_guard<std::mutex> lock(perProfMutex);
 	std::string profileName = toName(profile);
 
@@ -328,7 +328,7 @@ void PerformanceService::setTdps(const PerformanceProfile& profile) {
 #endif
 
 #if defined(NV_THERMAL) || defined(NV_BOOST)
-void PerformanceService::setNvidiaProfile(const PerformanceProfile& profile) {
+void PerformanceService::setNvidiaProfile(PerformanceProfile profile) {
 	logger->info("Nvidia GPU");
 	Logger::add_tab();
 
@@ -496,7 +496,7 @@ std::string PerformanceService::getDefaultScheduler() {
 	return defaultScheduler;
 }
 
-void PerformanceService::setScheduler(std::string scheduler, bool temporal) {
+void PerformanceService::setScheduler(const std::string& scheduler, bool temporal) {
 	logger->info("Applying {} scheduler", scheduler);
 	Logger::add_tab();
 
@@ -553,7 +553,7 @@ std::optional<std::string> PerformanceService::getCurrentSsdScheduler() {
 	return currentSsdScheduler;
 }
 
-void PerformanceService::setSsdScheduler(std::string scheduler, bool temporal) {
+void PerformanceService::setSsdScheduler(const std::string& scheduler, bool temporal) {
 	if (!ssdSchedulerClient.available()) {
 		return;
 	}
@@ -584,15 +584,15 @@ std::vector<std::string> PerformanceService::getFans() {
 	return asusCtlClient.getFans(getPlatformProfile(actualProfile));
 }
 
-FanCurveData PerformanceService::getFanCurve(std::string fan, std::string profile) {
+FanCurveData PerformanceService::getFanCurve(const std::string& fan, const std::string& profile) {
 	return FanCurveData::fromData(configuration.getConfiguration().platform.curves[profile][fan].current);
 }
 
-FanCurveData PerformanceService::getDefaultFanCurve(std::string fan, std::string profile) {
+FanCurveData PerformanceService::getDefaultFanCurve(const std::string& fan, const std::string& profile) {
 	return FanCurveData::fromData(configuration.getConfiguration().platform.curves[profile][fan].presets);
 }
 
-void PerformanceService::saveFanCurves(std::string profile, std::unordered_map<std::string, FanCurveData> curves) {
+void PerformanceService::saveFanCurves(const std::string& profile, std::unordered_map<std::string, FanCurveData> curves) {
 	logger->info("Saving curves for {}", profile);
 	Logger::add_tab();
 

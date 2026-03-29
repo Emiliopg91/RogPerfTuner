@@ -6,6 +6,6 @@
 ScalingGovernorClient::ScalingGovernorClient() : AbstractGlobClient(SCALING_GOVERNOR_FILE, "ScalingGovernorClient", true, false) {
 }
 
-void ScalingGovernorClient::setGovernor(const CpuGovernor& governor) {
+void ScalingGovernorClient::setGovernor(CpuGovernor governor) {
 	write(toString(governor));
 }

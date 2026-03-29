@@ -369,11 +369,11 @@ void MainWindow::setPerformanceProfile(PerformanceProfile value) {
 	_profileDropdown->setCurrentIndex(_profileDropdown->findData(toString(value).c_str()));
 }
 
-void MainWindow::setScheduler(std::optional<std::string> sched) {
+void MainWindow::setScheduler(const std::optional<std::string>& sched) {
 	_schedulerDropdown->setCurrentIndex(_schedulerDropdown->findData(sched.value_or("").c_str()));
 }
 
-void MainWindow::setSsdScheduler(std::string sched) {
+void MainWindow::setSsdScheduler(const std::string& sched) {
 	_ssdSchedulerDropdown->setCurrentIndex(_ssdSchedulerDropdown->findData(sched.c_str()));
 }
 
@@ -386,7 +386,7 @@ void MainWindow::setAuraColor(std::optional<std::string> color) {
 	_colorButton->setEnabled(color.has_value());
 }
 
-void MainWindow::setAuraEffect(std::string effect) {
+void MainWindow::setAuraEffect(const std::string& effect) {
 	_effectDropdown->setCurrentIndex(_effectDropdown->findData(effect.c_str()));
 }
 

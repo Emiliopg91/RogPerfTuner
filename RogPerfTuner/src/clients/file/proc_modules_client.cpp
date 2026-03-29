@@ -5,7 +5,7 @@
 ProcModulesClient::ProcModulesClient() : AbstractFileClient("/proc/modules", "ProcModulesClient") {
 }
 
-bool ProcModulesClient::isModuleLoaded(std::string module) {
+bool ProcModulesClient::isModuleLoaded(const std::string& module) {
 	auto content = read();
 	auto lines	 = StringUtils::splitLines(content);
 

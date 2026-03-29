@@ -16,5 +16,5 @@ class SsdSchedulerClient : public AbstractGlobClient, public Singleton<SsdSchedu
   public:
 	std::string getCurrentScheduler();
 	std::vector<std::string> getAvailableSchedulers();
-	void setSchedulers(std::string);
+	void setSchedulers(const std::string&);
 };

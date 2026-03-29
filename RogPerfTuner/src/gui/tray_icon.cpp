@@ -159,7 +159,7 @@ void TrayIcon::onBatteryLimitChanged(BatteryThreshold value) {
 }
 #endif
 
-void TrayIcon::onEffectChanged(std::string effect) {
+void TrayIcon::onEffectChanged(const std::string& effect) {
 	openRgbService.setEffect(effect);
 }
 
@@ -173,13 +173,13 @@ void TrayIcon::onPerformanceProfileChanged(PerformanceProfile value) {
 	}
 }
 
-void TrayIcon::onSchedulerChanged(std::string scheduler) {
+void TrayIcon::onSchedulerChanged(const std::string& scheduler) {
 	if (steamService.getRunningGames().empty()) {
 		performanceService.setScheduler(scheduler);
 	}
 }
 
-void TrayIcon::onSsdSchedulerChanged(std::string scheduler) {
+void TrayIcon::onSsdSchedulerChanged(const std::string& scheduler) {
 	performanceService.setSsdScheduler(scheduler);
 }
 

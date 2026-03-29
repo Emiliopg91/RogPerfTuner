@@ -4,5 +4,5 @@
 
 class AsusBaseClient : public AbstractDbusClient {
   public:
-	AsusBaseClient(std::string interface_sufix, std::string object_path_sufix = "", bool required = false);
+	AsusBaseClient(const std::string& interface_sufix, const std::string& object_path_sufix = "", bool required = false);
 };

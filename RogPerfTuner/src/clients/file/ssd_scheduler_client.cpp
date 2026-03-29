@@ -42,6 +42,6 @@ std::vector<std::string> SsdSchedulerClient::getAvailableSchedulers() {
 	return schedulers;
 }
 
-void SsdSchedulerClient::setSchedulers(std::string sched) {
+void SsdSchedulerClient::setSchedulers(const std::string& sched) {
 	write(sched);
 }

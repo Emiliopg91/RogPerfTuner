@@ -49,8 +49,8 @@ class ApplicationService : public Singleton<ApplicationService>, Loggable {
 	PerformanceService& performanceService = PerformanceService::getInstance();
 
 	const std::string buildDesktopFile();
-	void createScriptFile(std::string path, std::string execPath, std::string option);
-	void createWrapperScriptFile(std::string path, std::string execPath, std::string option);
+	void createScriptFile(const std::string& path, const std::string& execPath, const std::string& option);
+	void createWrapperScriptFile(const std::string& path, const std::string& execPath, const std::string& option);
 
 	ApplicationService(std::optional<std::string> execPath);
 };

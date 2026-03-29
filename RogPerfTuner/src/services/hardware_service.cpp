@@ -168,7 +168,7 @@ BatteryThreshold HardwareService::getChargeThreshold() {
 	return charge_limit;
 }
 
-void HardwareService::setChargeThreshold(const BatteryThreshold& threshold) {
+void HardwareService::setChargeThreshold(BatteryThreshold threshold) {
 	std::lock_guard<std::mutex> lock(actionMutex);
 	if (charge_limit != threshold) {
 		logger->info("Setting charge limit to {}%", toInt(threshold));

@@ -62,7 +62,7 @@ class PerformanceService : public Singleton<PerformanceService>, Loggable {
 	 * @param force If true, forces the profile to be set even if already active.
 	 * @param showToast If true, shows a notification toast.
 	 */
-	void setPerformanceProfile(PerformanceProfile& profile, bool temporal = false, bool force = false, bool showToast = true);
+	void setPerformanceProfile(PerformanceProfile profile, bool temporal = false, bool force = false, bool showToast = true);
 
 	/**
 	 * @brief Restores the last saved performance settings.
@@ -91,7 +91,7 @@ class PerformanceService : public Singleton<PerformanceService>, Loggable {
 	 * @param scheduler The scheduler name to set (optional).
 	 * @param temporal If true, the scheduler is set temporarily.
 	 */
-	void setScheduler(std::string scheduler, bool temporal = false);
+	void setScheduler(const std::string& scheduler, bool temporal = false);
 
 	/**
 	 * @brief Gets the list of available schedulers.
@@ -113,7 +113,7 @@ class PerformanceService : public Singleton<PerformanceService>, Loggable {
 	 * @param scheduler The scheduler name to set (optional).
 	 * @param temporal If true, the scheduler is set temporarily.
 	 */
-	void setSsdScheduler(std::string scheduler, bool temporal = false);
+	void setSsdScheduler(const std::string& scheduler, bool temporal = false);
 
 #ifdef FAN_CONTROL
 	/**
@@ -130,7 +130,7 @@ class PerformanceService : public Singleton<PerformanceService>, Loggable {
 	 * @param profile The profile name.
 	 * @return The FanCurveData for the specified fan and profile.
 	 */
-	FanCurveData getFanCurve(std::string fan, std::string profile);
+	FanCurveData getFanCurve(const std::string& fan, const std::string& profile);
 
 	/**
 	 * @brief Gets the default fan curve data for a given fan and profile.
@@ -139,7 +139,7 @@ class PerformanceService : public Singleton<PerformanceService>, Loggable {
 	 * @param profile The profile name.
 	 * @return The default FanCurveData for the specified fan and profile.
 	 */
-	FanCurveData getDefaultFanCurve(std::string fan, std::string profile);
+	FanCurveData getDefaultFanCurve(const std::string& fan, const std::string& profile);
 
 	/**
 	 * @brief Saves the fan curves for a given profile.
@@ -147,7 +147,7 @@ class PerformanceService : public Singleton<PerformanceService>, Loggable {
 	 * @param profile The profile name.
 	 * @param curves A map of fan names to their FanCurveData.
 	 */
-	void saveFanCurves(std::string profile, std::unordered_map<std::string, FanCurveData> curves);
+	void saveFanCurves(const std::string& profile, std::unordered_map<std::string, FanCurveData> curves);
 #endif
 	/**
 	 * @brief Changes the scheduling priority of a process.
@@ -268,7 +268,7 @@ class PerformanceService : public Singleton<PerformanceService>, Loggable {
 #endif
 
 #if defined(NV_THERMAL) || defined(NV_BOOST)
-	void setNvidiaProfile(const PerformanceProfile& profile);
+	void setNvidiaProfile(PerformanceProfile profile);
 #endif
 #ifdef SCALING_GOVERNOR
 	CpuGovernor acGovernor(PerformanceProfile profile);
@@ -280,5 +280,5 @@ class PerformanceService : public Singleton<PerformanceService>, Loggable {
 	void smartWorker();
 	PerformanceProfile getNextSmart(size_t samples = 5, int level = 2);
 
-	void setActualPerformanceProfile(PerformanceProfile& profile);
+	void setActualPerformanceProfile(PerformanceProfile profile);
 };

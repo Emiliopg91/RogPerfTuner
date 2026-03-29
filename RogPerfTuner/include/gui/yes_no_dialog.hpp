@@ -16,5 +16,5 @@ class YesNoDialog {
 	 * @param parent The parent widget of the dialog. Defaults to nullptr if not specified.
 	 * @return true if the user selects "Yes", false if "No" is selected or the dialog is closed.
 	 */
-	static bool showDialog(std::string title, std::string body, QWidget* parent = nullptr);
+	static bool showDialog(const std::string& title, const std::string& body, QWidget* parent = nullptr);
 };

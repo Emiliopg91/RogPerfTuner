@@ -29,7 +29,7 @@ class EventBusWrapper : public Singleton<EventBusWrapper> {
 	 * @param event The name or identifier of the event to emit.
 	 * @param value The parameter or data associated with the event, encapsulated in a CallbackParam object.
 	 */
-	void emitServerSocketEvent(std::string event, CallbackParam value);
+	void emitServerSocketEvent(const std::string& event, CallbackParam value);
 
 	/**
 	 * @brief Registers a callback function to be invoked when a specific server socket event occurs.
@@ -37,7 +37,7 @@ class EventBusWrapper : public Singleton<EventBusWrapper> {
 	 * @param event The name or identifier of the server socket event to listen for.
 	 * @param callback A callback function (with parameters) to be executed when the specified event is triggered.
 	 */
-	void onServerSocketEvent(std::string event, CallbackWithParams&& callback);
+	void onServerSocketEvent(const std::string& event, CallbackWithParams&& callback);
 
 	/**
 	 * @brief Registers a callback for device events.

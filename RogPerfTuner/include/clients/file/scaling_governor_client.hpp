@@ -17,7 +17,7 @@ class ScalingGovernorClient : public AbstractGlobClient, public Singleton<Scalin
 	 *
 	 * @param governor The desired CPU governor to set.
 	 */
-	void setGovernor(const CpuGovernor& governor);
+	void setGovernor(CpuGovernor governor);
 
 	friend class Singleton<ScalingGovernorClient>;
 };

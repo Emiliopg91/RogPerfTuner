@@ -91,7 +91,7 @@ class SteamService : public Singleton<SteamService>, Loggable {
 	 * @param gid The game ID as an unsigned integer.
 	 * @param entry The GameEntry containing the configuration to save.
 	 */
-	void saveGameConfig(uint gid, const GameEntry& entry);
+	void saveGameConfig(uint gid, GameEntry entry);
 
 	/**
 	 * @brief Launches a game by its ID.

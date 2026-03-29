@@ -10,7 +10,7 @@ class BoostControlClient : public AbstractFileClient, public Singleton<BoostCont
 	 *
 	 * @param enabled Reference to a boolean value. Set to true to enable boost mode, false to disable it.
 	 */
-	void set_boost(bool& enabled);
+	void set_boost(bool enabled);
 
   private:
 	BoostControlClient();

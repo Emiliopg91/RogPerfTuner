@@ -24,11 +24,11 @@ void AsusCtlClient::setFanCurvesEnabled(PlatformProfile profile, bool enabled) {
 	run_command("fan-curve --mod-profile " + formatValue(profile) + " --enable-fan-curves " + (enabled ? "true" : "false"));
 }
 
-void AsusCtlClient::setFanCurveData(PlatformProfile profile, std::string fanName, FanCurveData data) {
+void AsusCtlClient::setFanCurveData(PlatformProfile profile, const std::string& fanName, FanCurveData data) {
 	setFanCurveStringData(profile, fanName, data.toData());
 }
 
-void AsusCtlClient::setFanCurveStringData(PlatformProfile profile, std::string fanName, std::string data) {
+void AsusCtlClient::setFanCurveStringData(PlatformProfile profile, const std::string& fanName, const std::string& data) {
 	run_command("fan-curve --mod-profile " + formatValue(profile) + " --fan " + fanName + " --data " + data);
 }
 

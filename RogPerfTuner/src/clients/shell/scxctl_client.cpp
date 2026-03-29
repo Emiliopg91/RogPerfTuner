@@ -35,7 +35,7 @@ ScxCtlClient::ScxCtlClient() : AbstractCmdClient("scxctl", "ScxCtlClient") {
 	}
 }
 
-void ScxCtlClient::start(std::string name, bool powersave) {
+void ScxCtlClient::start(const std::string& name, bool powersave) {
 	auto newPowersaveLiteral = powersave ? "powersave" : "performance";
 	auto it					 = available_sched.find(name);
 	if (it == available_sched.end()) {

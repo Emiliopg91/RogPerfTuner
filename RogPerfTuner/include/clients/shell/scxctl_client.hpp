@@ -37,7 +37,7 @@ class ScxCtlClient : public AbstractCmdClient, public Singleton<ScxCtlClient> {
 	 *
 	 * @param name The name of the process or service to start.
 	 */
-	void start(std::string name, bool powersave);
+	void start(const std::string&, bool powersave);
 	/** @brief Stops the current operation or process managed by the client.
 	 *
 	 * This function is typically used to halt any ongoing activities or services

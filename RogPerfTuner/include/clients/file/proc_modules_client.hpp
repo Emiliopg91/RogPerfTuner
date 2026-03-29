@@ -8,5 +8,5 @@ class ProcModulesClient : private AbstractFileClient, public Singleton<ProcModul
 	friend class Singleton<ProcModulesClient>;
 
   public:
-	bool isModuleLoaded(std::string);
+	bool isModuleLoaded(const std::string&);
 };

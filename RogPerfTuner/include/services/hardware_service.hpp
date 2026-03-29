@@ -38,7 +38,7 @@ class HardwareService : public Singleton<HardwareService>, Loggable {
 	 *
 	 * @param threshold The new BatteryThreshold value to set.
 	 */
-	void setChargeThreshold(const BatteryThreshold& threshold);
+	void setChargeThreshold(BatteryThreshold threshold);
 #endif
 
 #ifdef BOOT_SOUND

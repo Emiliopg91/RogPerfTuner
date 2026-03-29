@@ -212,7 +212,7 @@ void SteamService::onFirstGameRun(unsigned int gid, std::string name, bool proto
 	Logger::rem_tab();
 }
 
-void SteamService::saveGameConfig(uint gid, const GameEntry& entry) {
+void SteamService::saveGameConfig(uint gid, GameEntry entry) {
 	logger->info("Saving configuration for {} ({})", entry.name, gid);
 	Logger::add_tab();
 

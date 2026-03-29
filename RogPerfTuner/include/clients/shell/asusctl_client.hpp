@@ -55,7 +55,7 @@ class AsusCtlClient : public AbstractCmdClient, public Singleton<AsusCtlClient> 
 	 * @param fanName The name or identifier of the fan to configure.
 	 * @param data The fan curve data containing the speed/temperature mapping.
 	 */
-	void setFanCurveData(PlatformProfile profile, std::string fanName, FanCurveData data);
+	void setFanCurveData(PlatformProfile profile, const std::string& fanName, FanCurveData data);
 
 	/**
 	 * @brief Sets the fan curve data for a specific fan and platform profile.
@@ -68,7 +68,7 @@ class AsusCtlClient : public AbstractCmdClient, public Singleton<AsusCtlClient> 
 	 * @param fanName The name or identifier of the fan to configure.
 	 * @param data The fan curve data string.
 	 */
-	void setFanCurveStringData(PlatformProfile profile, std::string fanName, std::string data);
+	void setFanCurveStringData(PlatformProfile profile, const std::string& fanName, const std::string& data);
 
 	std::vector<std::string> getFans(PlatformProfile profile);
 

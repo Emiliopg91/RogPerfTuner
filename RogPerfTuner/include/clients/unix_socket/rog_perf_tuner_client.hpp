@@ -18,5 +18,5 @@ class RogPerfTunerClient : public AbstractUnixSocketClient, public Singleton<Rog
 
 	void showGui();
 
-	SteamGameConfig getGameConfig(std::string steamId);
+	SteamGameConfig getGameConfig(const std::string& steamId);
 };

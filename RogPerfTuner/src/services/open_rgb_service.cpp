@@ -59,7 +59,7 @@ void OpenRgbService::restoreAura() {
 	eventBus.emitRgbColor(_color);
 }
 
-std::string OpenRgbService::getDeviceName(const UsbIdentifier& identifier) {
+std::string OpenRgbService::getDeviceName(UsbIdentifier identifier) {
 	for (auto dev : openRgbClient.getCompatibleDevices()) {
 		if (identifier == dev) {
 			return std::string(dev.name);
@@ -87,7 +87,7 @@ std::optional<std::string> OpenRgbService::getColor() {
 	return _color;
 }
 
-void OpenRgbService::setBrightness(const RgbBrightness& newBrightness) {
+void OpenRgbService::setBrightness(RgbBrightness newBrightness) {
 	std::lock_guard<std::mutex> lock(actionMutex);
 	if (brightness != newBrightness) {
 		brightness = newBrightness;
@@ -166,7 +166,7 @@ void OpenRgbService::applyAura(bool temporal) {
 	logger->info("Aura applied after {} seconds", TimeUtils::format_seconds(TimeUtils::getTimeDiff(t0, t1)));
 }
 
-void OpenRgbService::disableDevice(const UsbIdentifier& identifier) {
+void OpenRgbService::disableDevice(UsbIdentifier identifier) {
 	logger->info("Disabling {}", getDeviceName(identifier));
 	openRgbClient.disableDevice(getDeviceName(identifier));
 }

@@ -17,7 +17,7 @@ class OpenRgbService : public Singleton<OpenRgbService>, Loggable {
 	 * @param identifier The USB identifier of the device.
 	 * @return The name of the device as a string.
 	 */
-	std::string getDeviceName(const UsbIdentifier&);
+	std::string getDeviceName(UsbIdentifier);
 
 	/**
 	 * @brief Gets the list of available RGB effects.
@@ -57,7 +57,7 @@ class OpenRgbService : public Singleton<OpenRgbService>, Loggable {
 	 *
 	 * @param newBrightness The new brightness value to set.
 	 */
-	void setBrightness(const RgbBrightness& newBrightness);
+	void setBrightness(RgbBrightness newBrightness);
 
 	/**
 	 * @brief Sets the RGB effect.
@@ -79,7 +79,7 @@ class OpenRgbService : public Singleton<OpenRgbService>, Loggable {
 	 *
 	 * @param identifier The USB identifier of the device to disable.
 	 */
-	void disableDevice(const UsbIdentifier&);
+	void disableDevice(UsbIdentifier);
 
 	/**
 	 * @brief Increases the RGB brightness.

@@ -1,18 +1,12 @@
 #include "services/application_service.hpp"
 
-#include <signal.h>
 #include <unistd.h>
 
-#include <exception>
 #include <optional>
 #include <sstream>
-#include <vector>
 
 #include "framework/utils/file_utils.hpp"
-#include "framework/utils/net_utils.hpp"
-#include "framework/utils/time_utils.hpp"
 #include "models/others/release_entry.hpp"
-#include "models/others/semantic_version.hpp"
 #include "utils/event_bus_wrapper.hpp"
 
 ApplicationService::ApplicationService(std::optional<std::string> execPath) : Loggable("ApplicationService") {
@@ -76,7 +70,7 @@ const std::string ApplicationService::buildDesktopFile() {
 	return ss.str();
 }
 
-void ApplicationService::createScriptFile(std::string path, std::string execPath, std::string option) {
+void ApplicationService::createScriptFile(const std::string& path, const std::string& execPath, const std::string& option) {
 	std::ostringstream script;
 	script << "#!/bin/bash\n\n";
 	script << "set -e\n\n";
@@ -85,7 +79,7 @@ void ApplicationService::createScriptFile(std::string path, std::string execPath
 	FileUtils::writeFileContent(path, script.str());
 }
 
-void ApplicationService::createWrapperScriptFile(std::string path, std::string wrp, std::string option) {
+void ApplicationService::createWrapperScriptFile(const std::string& path, const std::string& wrp, const std::string& option) {
 	std::ostringstream script;
 	script << "#!/usr/bin/env bash\n\n";
 	script << "set -e\n\n";

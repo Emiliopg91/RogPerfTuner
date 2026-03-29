@@ -35,10 +35,10 @@ class TrayIcon : public QObject, public Singleton<TrayIcon> {
 	void onBatteryLimitChanged(BatteryThreshold value);
 #endif
 	void onPerformanceProfileChanged(PerformanceProfile value);
-	void onEffectChanged(std::string effect);
+	void onEffectChanged(const std::string& effect);
 	void onBrightnessChanged(RgbBrightness brightness);
-	void onSchedulerChanged(std::string scheduler);
-	void onSsdSchedulerChanged(std::string scheduler);
+	void onSchedulerChanged(const std::string& scheduler);
+	void onSsdSchedulerChanged(const std::string& scheduler);
 
   private:
 	friend class Singleton<TrayIcon>;

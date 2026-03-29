@@ -146,11 +146,11 @@ void EventBusWrapper::emitBootSound(bool value) {
 }
 #endif
 
-void EventBusWrapper::emitServerSocketEvent(std::string event, CallbackParam value) {
+void EventBusWrapper::emitServerSocketEvent(const std::string& event, CallbackParam value) {
 	this->eventBus.emit_event("socket.server.event." + event, value);
 }
 
-void EventBusWrapper::onServerSocketEvent(std::string event, CallbackWithParams&& callback) {
+void EventBusWrapper::onServerSocketEvent(const std::string& event, CallbackWithParams&& callback) {
 	this->eventBus.on_with_data("socket.server.event." + event, [cb = std::move(callback)](CallbackParam data) {
 		cb(data);
 	});
