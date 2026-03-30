@@ -158,6 +158,7 @@ CurveEditor::CurveEditor(const std::string& profile, QWidget* parent) : QDialog(
 				std::string fan		= fans[idx];
 				FanCurveView* chart = charts[profile][idx];
 				auto curve			= performanceService.getDefaultFanCurve(fan, profile);
+				curve.normalize();
 
 				for (int i = 0; i < series->count(); ++i) {
 					qreal x = curve.temp[i];
