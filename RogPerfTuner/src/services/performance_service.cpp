@@ -324,7 +324,7 @@ void PerformanceService::setCpuGovernor(PerformanceProfile profile) {
 
 #ifdef ACPI_PROFILE
 void PerformanceService::setPowerProfile(PerformanceProfile profile) {
-	PowerProfile powerProfile = onBattery ? PowerProfile::PERFORMANCE : getPowerProfile(profile);
+	PowerProfile powerProfile = !onBattery ? PowerProfile::PERFORMANCE : getPowerProfile(profile);
 	logger->info("Power profile: {}", toName(powerProfile));
 	Logger::add_tab();
 	try {
