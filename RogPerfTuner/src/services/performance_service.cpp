@@ -11,6 +11,7 @@
 #include "framework/utils/string_utils.hpp"
 #include "framework/utils/time_utils.hpp"
 #include "models/performance/performance_profile.hpp"
+#include "models/performance/platform_profile.hpp"
 #include "models/performance/power_profile.hpp"
 #include "utils/configuration_wrapper.hpp"
 #include "utils/event_bus_wrapper.hpp"
@@ -48,6 +49,45 @@ PerformanceService::PerformanceService() : Loggable("PerformanceService") {
 		configuration.getConfiguration().platform.performance.scheduler = currentScheduler;
 		configuration.saveConfig();
 	}
+
+#ifdef FAN_CONTROL
+	logger->info("Available fans:");
+	Logger::add_tab();
+	for (PerformanceProfile profile : values<PerformanceProfile>()) {
+		auto platformProfile = getPlatformProfile(profile);
+
+		auto it = configuration.getConfiguration().platform.curves.find(toString(profile));
+		if (it == configuration.getConfiguration().platform.curves.end()) {
+			configuration.getConfiguration().platform.curves[toString(profile)] = {};
+
+			asusCtlClient.setCurvesToDefaults(platformProfile);
+			auto data = asusCtlClient.getFanCurveData(platformProfile);
+			for (auto& [fan, curve] : data) {
+				configuration.getConfiguration().platform.curves[toString(profile)][fan].presets = curve.toData();
+				curve.normalize();
+				configuration.getConfiguration().platform.curves[toString(profile)][fan].current = curve.toData();
+			}
+
+			configuration.saveConfig();
+		} else {
+			for (const auto& [fan, curve] : it->second) {
+				asusCtlClient.setFanCurveStringData(platformProfile, fan, curve.current);
+			}
+		}
+	}
+	std::vector<std::string> fans = {};
+	if (configuration.getConfiguration().platform.curves.size() > 0) {
+		for (const auto& [_, curves] : configuration.getConfiguration().platform.curves) {
+			for (const auto& [fan, _] : curves) {
+				fans.emplace_back(fan);
+			}
+			break;
+		}
+	}
+	logger->info(StringUtils::join(fans, ", "));
+	Logger::rem_tab();
+#endif
+
 	logger->info("Available schedulers:");
 	Logger::add_tab();
 	logger->info(StringUtils::join(availableSchedulers, ", "));
@@ -62,7 +102,7 @@ PerformanceService::PerformanceService() : Loggable("PerformanceService") {
 
 	platformClient.setChangePlatformProfileOnAc(false);
 	platformClient.setChangePlatformProfileOnBattery(false);
-	platformClient.setPlatformProfileLinkedEpp(true);
+	platformClient.setPlatformProfileLinkedEpp(false);
 
 	eventBus.onBattery([this](bool onBat) {
 		onBattery = onBat;
@@ -121,7 +161,7 @@ void PerformanceService::setActualPerformanceProfile(PerformanceProfile profile)
 		setNvidiaProfile(profile);
 #endif
 #ifdef FAN_CONTROL
-		setFanCurves(profile);
+		setFanCurves(profile, actualProfile);
 #endif
 		auto t1 = TimeUtils::now();
 		logger->info("Profile applied after {} seconds", TimeUtils::format_seconds(TimeUtils::getTimeDiff(t0, t1)));
@@ -229,7 +269,7 @@ void PerformanceService::setPerformanceProfile(PerformanceProfile profile, bool 
 	eventBus.emitPerformanceProfile(profile);
 }
 
-void PerformanceService::setPlatformProfile(const PerformanceProfile& profile) {
+void PerformanceService::setPlatformProfile(PerformanceProfile profile) {
 	if (!onBattery) {
 		auto platformProfile = getPlatformProfile(profile);
 		logger->info("Platform profile: {}", toName<PlatformProfile>(platformProfile));
@@ -247,7 +287,7 @@ void PerformanceService::setPlatformProfile(const PerformanceProfile& profile) {
 }
 
 #ifdef BOOST_CONTROL
-void PerformanceService::setBoost(const PerformanceProfile&) {
+void PerformanceService::setBoost(PerformanceProfile) {
 	bool enabled = onBattery ? batteryBoost() : acBoost();
 	logger->info("CPU boost: {}", enabled ? "ON" : "OFF");
 	Logger::add_tab();
@@ -267,7 +307,7 @@ bool PerformanceService::batteryBoost() {
 #endif
 
 #ifdef SCALING_GOVERNOR
-void PerformanceService::setCpuGovernor(const PerformanceProfile& profile) {
+void PerformanceService::setCpuGovernor(PerformanceProfile profile) {
 	if (cpuPowerClient.available()) {
 		CpuGovernor cpuGovernor = onBattery ? batteryGovernor() : acGovernor(profile);
 		logger->info("CPU governor: {}", toName(cpuGovernor));
@@ -283,7 +323,7 @@ void PerformanceService::setCpuGovernor(const PerformanceProfile& profile) {
 #endif
 
 #ifdef ACPI_PROFILE
-void PerformanceService::setPowerProfile(PerformanceProfile& profile) {
+void PerformanceService::setPowerProfile(PerformanceProfile profile) {
 	PowerProfile powerProfile = onBattery ? PowerProfile::PERFORMANCE : getPowerProfile(profile);
 	logger->info("Power profile: {}", toName(powerProfile));
 	Logger::add_tab();
@@ -297,7 +337,7 @@ void PerformanceService::setPowerProfile(PerformanceProfile& profile) {
 #endif
 
 #ifdef PPT_PL1_SPL
-void PerformanceService::setTdps(const PerformanceProfile& profile) {
+void PerformanceService::setTdps(PerformanceProfile profile) {
 	try {
 		logger->info("TDP values");
 		Logger::add_tab();
@@ -592,66 +632,46 @@ FanCurveData PerformanceService::getDefaultFanCurve(const std::string& fan, cons
 	return FanCurveData::fromData(configuration.getConfiguration().platform.curves[profile][fan].presets);
 }
 
-void PerformanceService::saveFanCurves(const std::string& profile, std::unordered_map<std::string, FanCurveData> curves) {
-	logger->info("Saving curves for {}", profile);
+void PerformanceService::saveFanCurves(std::map<std::string, std::unordered_map<std::string, FanCurveData>> curves) {
+	logger->info("Saving curves");
 	Logger::add_tab();
-
-	for (const auto& [fan, curve] : curves) {
-		configuration.getConfiguration().platform.curves[profile][fan].current = curve.toData();
-	}
-	configuration.saveConfig();
-
-	Logger::rem_tab();
-	logger->info("Fan curved updated succesfully");
-}
-
-void PerformanceService::restoreFanCurves() {
-	logger->info("Restoring fan curve for {}", toName(actualProfile));
-	Logger::add_tab();
-	setFanCurves(actualProfile);
-	Logger::rem_tab();
-}
-
-void PerformanceService::setFanCurves(const PerformanceProfile& profile) {
-	if (asusCtlClient.available()) {
-		auto platformProfile = getPlatformProfile(profile);
-		logger->info("Fan profile: {}", toName<PlatformProfile>(platformProfile));
+	for (const auto& [profile, curves] : curves) {
+		logger->info("Saving curves for {}", StringUtils::toUpperCase(profile));
 		Logger::add_tab();
-		try {
-			auto it = configuration.getConfiguration().platform.curves.find(toString(profile));
 
-			if (it == configuration.getConfiguration().platform.curves.end()) {
-				configuration.getConfiguration().platform.curves[toString(profile)] = {};
-
-				asusCtlClient.setCurvesToDefaults(platformProfile);
-				auto data = asusCtlClient.getFanCurveData(platformProfile);
-				for (auto& [fan, curve] : data) {
-					configuration.getConfiguration().platform.curves[toString(profile)][fan].presets = curve.toData();
-					curve.normalize();
-					configuration.getConfiguration().platform.curves[toString(profile)][fan].current = curve.toData();
-				}
-
-				configuration.saveConfig();
-			}
-
-			for (PlatformProfile pp : values<PlatformProfile>()) {
-				Logger::add_tab();
-				asusCtlClient.setFanCurvesEnabled(pp, false);
-				Logger::rem_tab();
-			}
-
-			for (const auto& [fan, data] : configuration.getConfiguration().platform.curves[toString(profile)]) {
-				logger->info(fan + ": " + StringUtils::replaceAll(data.current, ",", " "));
-				Logger::add_tab();
-				asusCtlClient.setFanCurveStringData(platformProfile, fan, data.current);
-				Logger::rem_tab();
-			}
-
-			asusCtlClient.setFanCurvesEnabled(platformProfile, true);
-		} catch (std::exception& e) {
-			logger->error("Error while setting fan curve: {}", e.what());
+		for (const auto& [fan, curve] : curves) {
+			auto data = curve.toData();
+			logger->info("{}: {}", fan, data);
+			asusCtlClient.setFanCurveStringData(fromString<PlatformProfile>(profile), fan, data);
+			configuration.getConfiguration().platform.curves[profile][fan].current = data;
 		}
+		configuration.saveConfig();
+
 		Logger::rem_tab();
 	}
+	Logger::rem_tab();
+	logger->info("Fan curved updated succesfully");
+
+	logger->info("Applying curve");
+	Logger::add_tab();
+	setFanCurves(actualProfile, actualProfile);
+	Logger::rem_tab();
+	logger->info("Curve applied");
+}
+
+void PerformanceService::setFanCurves(PerformanceProfile profile, PerformanceProfile previous) {
+	auto platformProfile = getPlatformProfile(profile);
+	logger->info("Fan profile: {}", toName<PlatformProfile>(platformProfile));
+	Logger::add_tab();
+	try {
+		asusCtlClient.setFanCurvesEnabled(getPlatformProfile(previous), false);
+		for (const auto& [fan, data] : configuration.getConfiguration().platform.curves[toString(profile)]) {
+			logger->info(fan + ": " + StringUtils::replaceAll(data.current, ",", " "));
+		}
+		asusCtlClient.setFanCurvesEnabled(platformProfile, true);
+	} catch (std::exception& e) {
+		logger->error("Error while setting fan curve: {}", e.what());
+	}
+	Logger::rem_tab();
 }
 #endif

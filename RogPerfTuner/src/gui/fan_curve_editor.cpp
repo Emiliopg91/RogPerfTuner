@@ -110,6 +110,7 @@ CurveEditor::CurveEditor(const std::string& profile, QWidget* parent) : QDialog(
 	layout->addWidget(buttonGroup);
 
 	connect(saveBtn, &QPushButton::clicked, this, [this]() {
+		std::map<std::string, std::unordered_map<std::string, FanCurveData>> profCurves = {};
 		for (const auto& [profile, seriesEntry] : seriesList) {
 			std::unordered_map<std::string, FanCurveData> curves;
 			for (size_t idx = 0; idx < fans.size(); idx++) {
@@ -125,10 +126,9 @@ CurveEditor::CurveEditor(const std::string& profile, QWidget* parent) : QDialog(
 
 				curves[fan] = curve;
 			}
-
-			performanceService.saveFanCurves(profile, curves);
+			profCurves[profile] = curves;
 		}
-		performanceService.restoreFanCurves();
+		performanceService.saveFanCurves(profCurves);
 	});
 
 	connect(resetBtn, &QPushButton::clicked, this, [this]() {

@@ -139,7 +139,7 @@ void AbstractUnixSocketClient::connectionLoop() {
 			}
 			if (_connected && _running) {
 				try {
-					invoke("ping", {}, 100);
+					invoke("ping", {}, 1000);
 				} catch (std::exception& e) {
 					logger->debug("Lost connection");
 					stop(false);

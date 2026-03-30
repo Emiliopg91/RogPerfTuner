@@ -68,7 +68,6 @@ class PerformanceService : public Singleton<PerformanceService>, Loggable {
 	 * @brief Restores the last saved performance settings.
 	 */
 	void restore();
-	void restoreFanCurves();
 
 	/**
 	 * @brief Gets the list of available schedulers.
@@ -147,7 +146,8 @@ class PerformanceService : public Singleton<PerformanceService>, Loggable {
 	 * @param profile The profile name.
 	 * @param curves A map of fan names to their FanCurveData.
 	 */
-	void saveFanCurves(const std::string& profile, std::unordered_map<std::string, FanCurveData> curves);
+	void saveFanCurves(std::map<std::string, std::unordered_map<std::string, FanCurveData>> curves);
+	void setFanCurves(PerformanceProfile profile, PerformanceProfile previous);
 #endif
 	/**
 	 * @brief Changes the scheduling priority of a process.
@@ -225,25 +225,24 @@ class PerformanceService : public Singleton<PerformanceService>, Loggable {
 	AsusCtlClient& asusCtlClient		   = AsusCtlClient::getInstance();
 	Shell& shell						   = Shell::getInstance();
 
-	void setPlatformProfile(const PerformanceProfile& profile);
-	void setFanCurves(const PerformanceProfile& profile);
+	void setPlatformProfile(PerformanceProfile profile);
 
 #ifdef BOOST_CONTROL
-	void setBoost(const PerformanceProfile& profile);
+	void setBoost(PerformanceProfile profile);
 	bool acBoost();
 	bool batteryBoost();
 #endif
 
 #ifdef SCALING_GOVERNOR
-	void setCpuGovernor(const PerformanceProfile& profile);
+	void setCpuGovernor(PerformanceProfile profile);
 #endif
 
 #ifdef ACPI_PROFILE
-	void setPowerProfile(PerformanceProfile& profile);
+	void setPowerProfile(PerformanceProfile profile);
 #endif
 
 #ifdef PPT_PL1_SPL
-	void setTdps(const PerformanceProfile& profile);
+	void setTdps(const PerformanceProfile profile);
 #endif
 
 #ifdef PPT_PL1_SPL
