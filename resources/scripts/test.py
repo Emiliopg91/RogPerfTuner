@@ -31,35 +31,36 @@ try:
 
         dependencies = " ".join(content[:-1])
 
-        dockerfile_content = f"""FROM archlinux:latest
+        dockerfile_content = f"""FROM archlinux@sha256:237637c52069930ed7fc76c76f04b6b6b9cf82c5222ae002b7932df983cb69c1 AS base
 
-    RUN pacman -Sy --noconfirm sudo \\
-        && pacman -Scc --noconfirm
+RUN pacman -Sy --noconfirm sudo base-devel git \\
+    && pacman -Scc --noconfirm 
 
-    # Crear usuario no-root
-    RUN useradd -m -G wheel -s /bin/bash builder \\
-        && echo "builder ALL=(ALL) NOPASSWD: ALL" >> /etc/sudoers
+RUN useradd -m -G wheel -s /bin/bash builder \\
+    && echo "builder ALL=(ALL) NOPASSWD: ALL" >> /etc/sudoers
 
-    # Crear directorio donde se montarán los paquetes (como root)
-    RUN mkdir -p /pkg /tmp/pkg && chmod 777 /pkg /tmp/pkg
+RUN mkdir -p /pkg /tmp/pkg && chmod 777 /pkg /tmp/pkg
 
-    # Cambiar a usuario builder
-    USER builder
-    WORKDIR /tmp
+USER builder
+WORKDIR /pkg
 
-    RUN sudo pacman -Sy --noconfirm base-devel git \\
-        && git clone https://aur.archlinux.org/paru.git \\
-        && cd paru \\
-        && makepkg -si --noconfirm \\
-        && cd .. \\
-        && rm -rf paru \\
-        && paru -S --noconfirm {dependencies} \\
-        && sudo paru -Scc --noconfirm
+CMD ["bash", "-c", "makepkg --printsrcinfo > .SRCINFO"]
 
-    WORKDIR /tmp/pkg
+FROM base AS builder
 
-    # Ejecutar paru -U por defecto
-    CMD ["bash", "-c", "cp -R /pkg/* . && export IN_TEST=1 && paru -U --noconfirm --nocheck --noinstall && cp $(ls *.pkg.tar.zst) /pkg"]
+WORKDIR /tmp
+
+RUN git clone https://aur.archlinux.org/paru.git \\
+    && cd paru \\
+    && makepkg -si --noconfirm \\
+    && cd .. \\
+    && rm -rf paru
+
+RUN paru -S --noconfirm {dependencies} && sudo paru -Scc --noconfirm
+
+WORKDIR /tmp/pkg
+
+CMD ["bash", "-c", "cp -R /pkg/* . && export IN_TEST=1 && paru -U --noconfirm --nocheck --noinstall && cp $(ls *.pkg.tar.zst) /pkg"]
     """
 
         with open("Dockerfile", "w", encoding="utf-8") as f:
@@ -69,8 +70,23 @@ try:
             [
                 "docker",
                 "build",
+                "--target",
+                "base",
                 "-t",
-                "epulidogil/rog-perf-tuner-installer-test:latest",
+                "epulidogil/rog-perf-tuner-srcinfo:latest",
+                ".",
+            ],
+            check=True,
+        )
+
+        subprocess.run(
+            [
+                "docker",
+                "build",
+                "--target",
+                "builder",
+                "-t",
+                "epulidogil/rog-perf-tuner-test-installer:latest",
                 ".",
             ],
             check=True,
@@ -89,7 +105,16 @@ try:
             [
                 "docker",
                 "push",
-                "epulidogil/rog-perf-tuner-installer-test:latest",
+                "epulidogil/rog-perf-tuner-srcinfo:latest",
+            ],
+            check=True,
+        )
+
+        subprocess.run(
+            [
+                "docker",
+                "push",
+                "epulidogil/rog-perf-tuner-test-installer:latest",
             ],
             check=True,
         )
@@ -102,10 +127,10 @@ try:
             "run",
             "--rm",
             "--name",
-            "rog-perf-tuner-installer-test",
+            "rog-perf-tuner-test-installer",
             "-v",
             os.path.join(os.getcwd(), "dist:/pkg"),
-            "epulidogil/rog-perf-tuner-installer-test:latest",
+            "epulidogil/rog-perf-tuner-test-installer:latest",
         ],
         check=True,
     )
