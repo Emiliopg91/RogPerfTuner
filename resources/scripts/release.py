@@ -259,7 +259,7 @@ if __name__ == "__main__":
                 "run",
                 "--rm",
                 "-v",
-                f"{os.getcwd()}/dist:/repo",
+                f"{os.getcwd()}/dist:/pkg",
                 "epulidogil/rog-perf-tuner-srcinfo:latest",
             ],
             check=True,
