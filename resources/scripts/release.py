@@ -260,7 +260,7 @@ if __name__ == "__main__":
                 "--rm",
                 "-v",
                 f"{os.getcwd()}/dist:/repo",
-                "epulidogil/arch-srcinfo:latest",
+                "epulidogil/rog-perf-tuner-installer-test:latest",
             ],
             check=True,
         )
