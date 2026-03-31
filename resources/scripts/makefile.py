@@ -243,26 +243,19 @@ def build_openrgb():
 
 
 def build_rccdc():
-    if Path(".Debug").exists():
-        target = Path("build/assets/RccDeckyCompanion")
-        if not target.exists():
-            print(
-                "#######################################################################"
-            )
-            print(
-                "#################### Compiling RccDeckyCompanion ######################"
-            )
-            print(
-                "#######################################################################"
-            )
+    target = Path("build/assets/RccDeckyCompanion")
+    if not target.exists():
+        print("#######################################################################")
+        print("#################### Compiling RccDeckyCompanion ######################")
+        print("#######################################################################")
 
-            run(["./cli/decky.py", "build"], cwd=SUBMODULE_DIR / "RccDeckyCompanion")
-            ensure_dir(target)
-            shutil.copytree(
-                SUBMODULE_DIR / "RccDeckyCompanion/out/RccDeckyCompanion",
-                target,
-                dirs_exist_ok=True,
-            )
+        run(["./cli/decky.py", "build"], cwd=SUBMODULE_DIR / "RccDeckyCompanion")
+        ensure_dir(target)
+        shutil.copytree(
+            SUBMODULE_DIR / "RccDeckyCompanion/out/RccDeckyCompanion",
+            target,
+            dirs_exist_ok=True,
+        )
 
 
 # ---------------- run ----------------
