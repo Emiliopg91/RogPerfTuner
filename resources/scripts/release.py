@@ -26,7 +26,7 @@ CHANGELOG_MD_FILE = os.path.abspath(
 
 
 def generate_changelog(rel_version, rel_release):
-    TAG_REGEX = re.compile(r"^\d+\.\d+\.\d+-\d+$")
+    TAG_REGEX = re.compile(r"^\d+\.\d+\.\d+(-\d)?+$")
 
     def run_git(cmd):
         return subprocess.check_output(cmd, text=True).strip()
@@ -36,8 +36,8 @@ def generate_changelog(rel_version, rel_release):
 
         matched_tags = [tag for tag in tags if TAG_REGEX.match(tag)]
 
-        if len(matched_tags) >= 2:
-            return matched_tags[1]
+        if len(matched_tags) > 0:
+            return matched_tags[0]
         return None
 
     def get_commits_since_tag(tag):
@@ -45,7 +45,7 @@ def generate_changelog(rel_version, rel_release):
             cmd = ["git", "log", "--pretty=format:%H %s"]
         else:
             cmd = ["git", "log", f"{tag}..HEAD", "--pretty=format:%H----%s"]
-
+        print(f"Obteniendo commits desde {tag}")
         return run_git(cmd).splitlines()
 
     tag = get_previous_version_tag()

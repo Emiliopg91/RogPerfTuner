@@ -78,7 +78,6 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
         with:
-          submodules: recursive
           fetch-depth: 0
 
       - name: Perform release
@@ -119,7 +118,6 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
         with:
-          submodules: recursive
           fetch-depth: 0
 
       - name: Perform release
@@ -128,7 +126,7 @@ jobs:
 
       - name: Publish stable AUR
         run: |
-          VERSION=$(grep pkgver dist/PKGBUILD | cut -d'=' -f2)
+          VERSION=$(grep pkgver dist/PKGBUILD | head -n1 | cut -d'=' -f2)
 
           mkdir -p ~/.ssh
           echo "$AUR_SSH_PRIVATE_KEY" > ~/.ssh/aur
@@ -149,3 +147,12 @@ jobs:
           git diff-index --quiet HEAD || git commit -m "Release $VERSION-1"
 
           git push
+
+      - name: Create GitHub release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ env.VERSION }}
+          name: ${{ env.VERSION }}
+          body_path: dist/changelog.md
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
