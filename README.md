@@ -4,7 +4,6 @@
   RogPerfTuner
   <br>  
   <p align="center">
-    <a href="https://github.com/Emiliopg91/RogPerfTuner/releases"><img src="https://img.shields.io/github/downloads/Emiliopg91/RogPerfTuner/total" /></a>
     <a href="https://github.com/Emiliopg91/RogPerfTuner/actions/workflows/push.yml"><img src="https://github.com/Emiliopg91/RogPerfTuner/actions/workflows/push.yml/badge.svg" /></a>
     <a href="https://deepwiki.com/Emiliopg91/RogPerfTuner"><img src="https://deepwiki.com/badge.svg" /></a>
     <br>
