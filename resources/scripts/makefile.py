@@ -231,6 +231,12 @@ def build_openrgb():
         print("######################### Compiling OpenRGB ###########################")
         print("#######################################################################")
 
+        if not os.path.exists(SUBMODULE_DIR / "OpenRGB" / "nlohmann-json"):
+            os.symlink(
+                SUBMODULE_DIR / "nlohmann-json",
+                SUBMODULE_DIR / "OpenRGB" / "nlohmann-json",
+            )
+
         run(["./build.sh"], cwd=SUBMODULE_DIR / "OpenRGB")
         ensure_dir(target)
         shutil.copy(SUBMODULE_DIR / "OpenRGB/build/OpenRGB", target / "openrgb")

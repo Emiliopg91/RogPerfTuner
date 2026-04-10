@@ -71,7 +71,7 @@ target_include_directories(magic_enum INTERFACE
 
 add_library(nlohmann_json INTERFACE)
 target_include_directories(nlohmann_json INTERFACE
-    ${CMAKE_CURRENT_SOURCE_DIR}/submodules/nlohmann-json/include/nlohmann
+    ${CMAKE_CURRENT_SOURCE_DIR}/submodules/nlohmann-json/include
 )
 
 set(YAML_CPP_BUILD_TOOLS OFF CACHE BOOL "Disable yaml-cpp tools" FORCE)
