@@ -289,16 +289,6 @@ def increase_version():
     tmp_file.replace(ROOT / "CMakeLists.txt")
 
 
-# ---------------- test ----------------
-
-
-def test():
-    os.environ["GIT_RELEASE"] = "1"
-    os.environ["IN_TEST"] = "1"
-    release()
-    run(["python3", "./resources/scripts/test.py"])
-
-
 # ---------------- release ----------------
 
 
@@ -403,7 +393,6 @@ COMMANDS = {
     "pkgbuild": pkgbuild,
     "release": release,
     "run": run_app,
-    "test": test,
     "update_submodules": update_submodules,
 }
 
