@@ -12,7 +12,7 @@ license=(
   'GPL2'
 )
 source=(
-  "git+$url.git#<git_ref>?recursive=1"
+  "git+$url.git#<git_ref>"
 )
 sha256sums=(
   'SKIP'
@@ -66,6 +66,10 @@ install=rog-perf-tuner<sufix>.install
 
 prepare() {
     cd "$srcdir/RogPerfTuner"
+
+    git submodule init
+    git submodule sync
+    git submodule update --init --recursive --depth 1
 
     if [[ ! -d "${HOME}/.local/share/pnpm" ]]; then
         echo "Setup for pnpm..."
