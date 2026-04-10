@@ -107,7 +107,10 @@ struct convert<GameEntry> {
 		}
 
 		if (node["sync"]) {
-			game.sync = fromString<WineSyncOption>(node["sync"].as<std::string>());
+			try {
+				game.sync = fromString<WineSyncOption>(node["sync"].as<std::string>());
+			} catch (std::exception& e) {
+			}
 		}
 
 		if (node["metrics"]) {

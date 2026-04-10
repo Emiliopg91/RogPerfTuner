@@ -31,7 +31,6 @@ depends=(
   'hidapi'
   'konsole'
   'libusb'
-  'nlohmann-json'
   'power-profiles-daemon'
   'python'
   'python-pip'

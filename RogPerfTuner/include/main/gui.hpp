@@ -88,6 +88,9 @@ inline void printFeatureTable(std::shared_ptr<Logger> logger) {
 #ifdef INTEL_RAPL_UJ
 	logger->info("│ Intel rapl UJ    │");
 #endif
+#ifdef NTSYNC_MOD
+	logger->info("│ NTSync           │");
+#endif
 #ifdef NV_BOOST
 	logger->info("│ Nvidia boost     │");
 #endif

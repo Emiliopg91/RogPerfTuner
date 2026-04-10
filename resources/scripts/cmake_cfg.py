@@ -42,6 +42,7 @@ PPT_PL3_FPPT_PATH = (
     "/sys/class/firmware-attributes/asus-armoury/attributes/ppt_pl3_fppt"
 )
 SCALING_GOVERNOR_GLOB = "/sys/devices/system/cpu/cpu*/cpufreq/scaling_governor"
+NTSYNC_PATH = "/dev/ntsync"
 
 
 class Feature(Enum):
@@ -53,6 +54,7 @@ class Feature(Enum):
     BOOT_SOUND = auto()
     FAN_CONTROL = auto()
     INTEL_RAPL_UJ = auto()
+    NTSYNC_MOD = auto()
     NV_BOOST = auto()
     NV_THERMAL = auto()
     PANEL_OD = auto()
@@ -388,6 +390,10 @@ if __name__ == "__main__":
                 enabled_features[Feature.INTEL_RAPL_UJ] = True
                 definitions[Definition.INTEL_RAPL_UJ_FILE] = g[0]
                 print(f"    - Intel Rapl UJ via {g[0]}")
+
+        if os.path.exists(NTSYNC_PATH):
+            enabled_features[Feature.NTSYNC_MOD] = True
+            print(f"    - NTSync via {NTSYNC_PATH}")
 
         if os.path.isdir(NVIDIA_BOOST_PATH):
             enabled_features[Feature.NV_BOOST] = True
