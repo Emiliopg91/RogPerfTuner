@@ -127,7 +127,7 @@ inline int startGui(int argc, char** argv) {
 
 	SingleInstance::getInstance().acquire(Constants::LOCK_FILE);
 
-	LoggerProvider::initialize(Constants::LOG_FILE_NAME, Constants::LOG_DIR, Constants::APP_NAME);
+	LoggerProvider::initialize(Constants::LOG_FILE_NAME, Constants::LOG_DIR);
 
 	auto logger = LoggerProvider::getLogger();
 

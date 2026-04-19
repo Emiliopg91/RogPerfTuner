@@ -14,7 +14,6 @@
 
 #include "framework/logger/sink/console_sink.hpp"
 #include "framework/logger/sink/file_sink.hpp"
-#include "framework/logger/sink/system_sink.hpp"
 #include "framework/models/logger_level.hpp"
 
 template <typename... Args>
@@ -41,8 +40,7 @@ class Logger {
 	 *
 	 * @param name
 	 */
-	Logger(std::shared_ptr<ConsoleSink> console_sink, std::optional<std::shared_ptr<FileSink>> fileSink,
-		   std::optional<std::shared_ptr<SystemSink>> systemSink, std::string name);
+	Logger(std::shared_ptr<ConsoleSink> console_sink, std::optional<std::shared_ptr<FileSink>> fileSink, std::string name);
 
 	/**
 	 * @brief  Send debug log line
@@ -159,7 +157,6 @@ class Logger {
 
 	std::shared_ptr<ConsoleSink> consoleSink;
 	std::optional<std::shared_ptr<FileSink>> fileSink;
-	std::optional<std::shared_ptr<SystemSink>> systemSink;
 	std::string name;
 	LoggerLevel level = LoggerLevel::INFO;
 

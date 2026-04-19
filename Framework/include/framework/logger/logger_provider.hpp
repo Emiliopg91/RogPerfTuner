@@ -18,7 +18,6 @@
 #include "framework/logger/logger.hpp"
 #include "framework/logger/sink/console_sink.hpp"
 #include "framework/logger/sink/file_sink.hpp"
-#include "framework/logger/sink/system_sink.hpp"
 
 class LoggerProvider {
   public:
@@ -28,7 +27,7 @@ class LoggerProvider {
 	 * @param fileName
 	 * @param path
 	 */
-	static void initialize(const std::string& fileName = "", const std::string& path = "", const std::string& appName = "");
+	static void initialize(const std::string& fileName = "", const std::string& path = "");
 
 	/**
 	 * @brief Get the Logger pointer object
@@ -48,8 +47,7 @@ class LoggerProvider {
   private:
 	inline static const std::string DEFAULT_LOGGER_NAME = "Default";
 	inline static std::shared_ptr<ConsoleSink> console_sink{};
-	inline static std::optional<std::shared_ptr<FileSink>> file_sink  = std::nullopt;
-	inline static std::optional<std::shared_ptr<SystemSink>> sys_sink = std::nullopt;
+	inline static std::optional<std::shared_ptr<FileSink>> file_sink = std::nullopt;
 	inline static std::unordered_map<std::string, std::shared_ptr<Logger>> loggers{};
 
 	inline static LoggerLevel defaultLevel = LoggerLevel::INFO;
