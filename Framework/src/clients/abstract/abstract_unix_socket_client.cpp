@@ -134,8 +134,8 @@ void AbstractUnixSocketClient::connectionLoop() {
 		});
 
 		while (_connected) {
-			for (int i = 0; i < 10 && _connected && _running; i++) {
-				TimeUtils::sleep(500);
+			for (int i = 0; i < 50 && _connected && _running; i++) {
+				TimeUtils::sleep(100);
 			}
 			if (_connected && _running) {
 				try {

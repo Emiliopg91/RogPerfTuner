@@ -10,11 +10,11 @@ class RogPerfTunerClient : public AbstractUnixSocketClient, public Singleton<Rog
 	friend class Singleton<RogPerfTunerClient>;
 
   public:
-	void nextEffect();
-	void decreaseBrightness();
-	void increaseBrightness();
+	std::string nextEffect();
+	std::string decreaseBrightness();
+	std::string increaseBrightness();
 
-	void nextProfile();
+	std::string nextProfile();
 
 	void showGui();
 

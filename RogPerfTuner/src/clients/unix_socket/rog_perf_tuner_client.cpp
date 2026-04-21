@@ -9,20 +9,20 @@
 RogPerfTunerClient::RogPerfTunerClient() : AbstractUnixSocketClient(Constants::SOCKET_FILE, "RogPerfTunerClient") {
 }
 
-void RogPerfTunerClient::nextEffect() {
-	invoke(Constants::NEXT_EFF, {});
+std::string RogPerfTunerClient::nextEffect() {
+	return std::any_cast<std::string>(invoke(Constants::NEXT_EFF, {})[0]);
 }
 
-void RogPerfTunerClient::increaseBrightness() {
-	invoke(Constants::INC_BRIGHT, {});
+std::string RogPerfTunerClient::increaseBrightness() {
+	return std::any_cast<std::string>(invoke(Constants::INC_BRIGHT, {})[0]);
 }
 
-void RogPerfTunerClient::decreaseBrightness() {
-	invoke(Constants::DEC_BRIGHT, {});
+std::string RogPerfTunerClient::decreaseBrightness() {
+	return std::any_cast<std::string>(invoke(Constants::DEC_BRIGHT, {})[0]);
 }
 
-void RogPerfTunerClient::nextProfile() {
-	invoke(Constants::PERF_PROF, {});
+std::string RogPerfTunerClient::nextProfile() {
+	return std::any_cast<std::string>(invoke(Constants::PERF_PROF, {})[0]);
 }
 
 void RogPerfTunerClient::showGui() {
