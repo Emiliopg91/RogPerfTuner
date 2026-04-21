@@ -4,8 +4,8 @@
 #include "main/dev.hpp"
 #include "main/flatpak.hpp"
 #include "main/gui.hpp"
-#include "main/rgb.hpp"
 #include "main/run.hpp"
+#include "main/socket.hpp"
 #include "models/others/app_options.hpp"
 
 inline void shiftArgv(int& argc, char** argv) {
