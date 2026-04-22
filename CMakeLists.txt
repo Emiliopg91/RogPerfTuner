@@ -36,13 +36,12 @@ if(CMAKE_BUILD_TYPE STREQUAL "Release")
     )
 
     add_link_options(
-        -flto=thin
+        -flto=full
         -fuse-ld=lld
-        -ffunction-sections
-        -fdata-sections
-        -Wl,--gc-sections
         -Wl,--icf=all
-        -Wl,--threads
+        -Wl,--gc-sections
+        -Wl,-O3
+        -Wl,--threads=8
     )
 elseif(CMAKE_BUILD_TYPE STREQUAL "Debug")
     add_compile_options(
