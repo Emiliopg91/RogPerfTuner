@@ -147,16 +147,12 @@ def config():
     (openrgb / "configure.sh").chmod(0o755)
     run(["./configure.sh"], cwd=openrgb)
 
-    cc_file = ROOT / "compile_commands.json"
-    if not cc_file.exists():
-        cc_file.symlink_to("build/compile_commands.json")
-
     ensure_dir(ROOT / "build/assets")
     shutil.copytree(
         ROOT / "resources/icons", ROOT / "build/assets/icons", dirs_exist_ok=True
     )
 
-    Path(f".{BUILD_TYPE}").touch()
+    Path(f"build/.{BUILD_TYPE}").touch()
 
 
 # ---------------- format ----------------
@@ -178,8 +174,13 @@ def format_code():
 
 
 def build():
-    if not Path(f".{BUILD_TYPE}").exists():
+    if not Path(f"build/.{BUILD_TYPE}").exists():
         config()
+
+    os.environ["CCACHE_BASEDIR"] = str(ROOT)
+    os.environ["CCACHE_MAXSIZE"] = "500M"
+    os.environ["CCACHE_SLOPPINESS"] = "time_macros"
+    os.environ["CCACHE_DIR"] = str(ROOT / ".ccache")
 
     build_openrgb()
     build_rccdc()

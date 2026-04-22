@@ -2,6 +2,7 @@
 build/.qt/
 
 .cache/
+.ccache/
 
 .Debug
 

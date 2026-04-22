@@ -46,8 +46,15 @@ if(CMAKE_BUILD_TYPE STREQUAL "Release")
     )
 elseif(CMAKE_BUILD_TYPE STREQUAL "Debug")
     add_compile_options(
-        -O0
-        -pg
+        -O0 
+        -g3 
+        -ggdb 
+        -pipe 
+        -fno-omit-frame-pointer
+    )
+    
+    add_link_options(
+        -fuse-ld=lld
     )
 endif()
 
