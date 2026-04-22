@@ -293,7 +293,7 @@ if __name__ == "__main__":
         gpu_brand = gpu_name = gpu_env = None
         gpus = get_gpus()
         for gpu in gpus:
-            if not gpu.default_flag:
+            if "Advanced Micro Devices" in gpu.name or "NVIDIA" in gpu.name.upper():
                 gpu_name = gpu.name.replace("Advanced Micro Devices, Inc.", "AMD")
                 gpu_brand = gpu_name.split(" ")[0].lower()
                 gpu_env = " ".join(gpu.environment)
