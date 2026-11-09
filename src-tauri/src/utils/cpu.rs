@@ -1,6 +1,9 @@
 //! CPU usage sampling.
 
-use std::fs;
+use std::{
+    fs,
+    sync::atomic::{AtomicBool, Ordering},
+};
 
 use crate::utils::sleep_ms;
 
@@ -27,4 +30,38 @@ pub fn cpu_use_rate(interval_ms: u64) -> f64 {
         return 0.0;
     }
     (a2.saturating_sub(a1)) as f64 / (t2 - t1) as f64
+}
+
+/// Like `cpu_use_rate`, but checks `stop` every 100ms and returns `None` as soon as it is set.
+pub fn cpu_use_rate_until(interval_ms: u64, stop: &AtomicBool) -> Option<f64> {
+    let (a1, t1) = read_cpu();
+    let mut remaining = interval_ms;
+    while remaining > 0 {
+        if stop.load(Ordering::SeqCst) {
+            return None;
+        }
+        let nap = remaining.min(100);
+        sleep_ms(nap);
+        remaining -= nap;
+    }
+    let (a2, t2) = read_cpu();
+    if t2 <= t1 {
+        return Some(0.0);
+    }
+    Some((a2.saturating_sub(a1)) as f64 / (t2 - t1) as f64)
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn interruptible_sampling_stops_quickly() {
+        let stop = AtomicBool::new(true);
+        let t0 = std::time::Instant::now();
+        assert!(cpu_use_rate_until(1000, &stop).is_none());
+        assert!(t0.elapsed().as_millis() < 50);
+        let rate = cpu_use_rate_until(100, &AtomicBool::new(false)).unwrap();
+        assert!((0.0..=1.0).contains(&rate));
+    }
 }

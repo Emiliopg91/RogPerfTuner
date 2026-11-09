@@ -317,12 +317,18 @@ pub struct OrgbConnection {
     version: u32,
 }
 
-fn write_packet(stream: &mut TcpStream, device: u32, kind: u32, body: &[u8]) -> Result<(), String> {
-    let mut pkt = Vec::with_capacity(16 + body.len());
+/// Packet buffer with its header already written, sized for a body of `body_len` bytes.
+fn packet(device: u32, kind: u32, body_len: usize) -> Vec<u8> {
+    let mut pkt = Vec::with_capacity(16 + body_len);
     pkt.extend_from_slice(b"ORGB");
     put_u32(&mut pkt, device);
     put_u32(&mut pkt, kind);
-    put_u32(&mut pkt, body.len() as u32);
+    put_u32(&mut pkt, body_len as u32);
+    pkt
+}
+
+fn write_packet(stream: &mut TcpStream, device: u32, kind: u32, body: &[u8]) -> Result<(), String> {
+    let mut pkt = packet(device, kind, body.len());
     pkt.extend_from_slice(body);
     stream.write_all(&pkt).map_err(|e| e.to_string())
 }
@@ -395,13 +401,15 @@ impl OrgbConnection {
     }
 
     pub fn set_device_colors(&self, device: &Device, colors: &[Color]) -> Result<(), String> {
-        let mut body = vec![];
-        put_u32(&mut body, (4 + 2 + colors.len() * 4) as u32);
-        put_u16(&mut body, colors.len() as u16);
+        // Sent on every effect frame: built in place in a single buffer
+        let body_len = 4 + 2 + colors.len() * 4;
+        let mut pkt = packet(device.idx, RGBCONTROLLER_UPDATELEDS, body_len);
+        put_u32(&mut pkt, body_len as u32);
+        put_u16(&mut pkt, colors.len() as u16);
         for c in colors {
-            put_color(&mut body, c);
+            put_color(&mut pkt, c);
         }
-        write_packet(&mut self.stream.lock().unwrap(), device.idx, RGBCONTROLLER_UPDATELEDS, &body)
+        self.stream.lock().unwrap().write_all(&pkt).map_err(|e| e.to_string())
     }
 
     pub fn set_device_color(&self, device: &Device, color: Color) -> Result<(), String> {
@@ -424,6 +432,22 @@ mod tests {
         assert_eq!(Color::from_hex("#00ff00"), Color::GREEN);
         assert_eq!(Color::RED.to_hex(), "#ff0000");
         assert_eq!(Color::WHITE.scale(0.5), Color::new(128, 128, 128));
+    }
+
+    #[test]
+    fn update_leds_packet_layout() {
+        let colors = [Color::RED, Color::GREEN];
+        let body_len = 4 + 2 + colors.len() * 4;
+        let mut pkt = packet(7, RGBCONTROLLER_UPDATELEDS, body_len);
+        put_u32(&mut pkt, body_len as u32);
+        put_u16(&mut pkt, colors.len() as u16);
+        colors.iter().for_each(|c| put_color(&mut pkt, c));
+        assert_eq!(&pkt[0..4], b"ORGB");
+        assert_eq!(u32::from_le_bytes(pkt[4..8].try_into().unwrap()), 7);
+        assert_eq!(u32::from_le_bytes(pkt[8..12].try_into().unwrap()), RGBCONTROLLER_UPDATELEDS);
+        assert_eq!(u32::from_le_bytes(pkt[12..16].try_into().unwrap()) as usize, body_len);
+        assert_eq!(pkt.len(), 16 + body_len);
+        assert_eq!(&pkt[22..26], &[255, 0, 0, 0]);
     }
 
     #[test]

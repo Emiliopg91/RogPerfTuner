@@ -3,7 +3,7 @@
 
 use std::{
     fs,
-    sync::{LazyLock, RwLock},
+    sync::{LazyLock, Mutex, RwLock},
 };
 
 use log::{error, info};
@@ -13,6 +13,8 @@ use crate::{models::settings::RootConfig, utils::constants};
 const LOG: &str = "ConfigurationWrapper";
 
 static CONFIG: LazyLock<RwLock<RootConfig>> = LazyLock::new(|| RwLock::new(load_from_disk()));
+/// Last YAML written to (or read from) disk, to skip writes that wouldn't change anything
+static LAST_SAVED: Mutex<String> = Mutex::new(String::new());
 
 fn config_path() -> String {
     format!("{}/{}", *constants::CONFIG_DIR, constants::CONFIG_FILE)
@@ -21,10 +23,14 @@ fn config_path() -> String {
 fn load_from_disk() -> RootConfig {
     let path = config_path();
     match fs::read_to_string(&path) {
-        Ok(content) => noyalib::from_str(&content).unwrap_or_else(|e| {
-            error!(target: LOG, "Error parsing {path}: {e}, using defaults");
-            RootConfig::default()
-        }),
+        Ok(content) => {
+            let cfg: RootConfig = noyalib::from_str(&content).unwrap_or_else(|e| {
+                error!(target: LOG, "Error parsing {path}: {e}, using defaults");
+                RootConfig::default()
+            });
+            *LAST_SAVED.lock().unwrap() = noyalib::to_string(&cfg).unwrap_or_default();
+            cfg
+        }
         Err(_) => {
             info!(target: LOG, "No configuration found, creating defaults");
             let cfg = RootConfig::default();
@@ -38,8 +44,13 @@ fn write_to_disk(cfg: &RootConfig) {
     let _ = fs::create_dir_all(constants::CONFIG_DIR.as_str());
     match noyalib::to_string(cfg) {
         Ok(yaml) => {
-            if let Err(e) = fs::write(config_path(), yaml) {
-                error!(target: LOG, "Error saving configuration: {e}");
+            let mut last = LAST_SAVED.lock().unwrap();
+            if *last == yaml {
+                return;
+            }
+            match fs::write(config_path(), &yaml) {
+                Ok(()) => *last = yaml,
+                Err(e) => error!(target: LOG, "Error saving configuration: {e}"),
             }
         }
         Err(e) => error!(target: LOG, "Error serializing configuration: {e}"),
@@ -51,7 +62,7 @@ pub fn read<T>(f: impl FnOnce(&RootConfig) -> T) -> T {
     f(&CONFIG.read().unwrap())
 }
 
-/// Modifies the configuration and saves it.
+/// Modifies the configuration and saves it (only when something actually changed).
 pub fn update<T>(f: impl FnOnce(&mut RootConfig) -> T) -> T {
     let mut cfg = CONFIG.write().unwrap();
     let res = f(&mut cfg);

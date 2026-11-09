@@ -38,7 +38,7 @@ use crate::{
     services::configuration,
     utils::{
         self, capitalize, elapsed_secs,
-        cpu::cpu_use_rate,
+        cpu::cpu_use_rate_until,
         event_bus::{self, Event},
         logger::{add_tab, rem_tab, tabbed},
         sleep_ms, translator,
@@ -146,25 +146,33 @@ impl PerformanceService {
         tabbed(|| {
             for profile in PerformanceProfile::ALL {
                 let platform = profile.platform_profile();
-                let existing = configuration::read(|c| c.platform.curves.get(profile.as_str()).cloned());
-                match existing {
-                    None => {
-                        let _ = ASUSCTL.set_curves_to_defaults(platform);
-                        let data = ASUSCTL.fan_curve_data(platform).unwrap_or_default();
-                        configuration::update(|c| {
-                            let entry = c.platform.curves.entry(profile.as_str().to_string()).or_default();
-                            for (fan, mut curve) in data {
-                                let fc = entry.entry(fan).or_default();
-                                fc.presets = curve.to_data();
-                                curve.normalize();
-                                fc.current = curve.to_data();
-                            }
-                        });
-                    }
-                    Some(curves) => {
-                        for (fan, curve) in curves {
-                            let _ = ASUSCTL.set_fan_curve_string_data(platform, &fan, &curve.current);
+                let missing = configuration::read(|c| !c.platform.curves.contains_key(profile.as_str()));
+                if missing {
+                    let _ = ASUSCTL.set_curves_to_defaults(platform);
+                    let data = ASUSCTL.fan_curve_data(platform).unwrap_or_default();
+                    configuration::update(|c| {
+                        let entry = c.platform.curves.entry(profile.as_str().to_string()).or_default();
+                        for (fan, mut curve) in data {
+                            let fc = entry.entry(fan).or_default();
+                            fc.presets = curve.to_data();
+                            curve.normalize();
+                            fc.current = curve.to_data();
                         }
+                    });
+                }
+            }
+            // Smart uses the Performance platform profile: write each platform profile once, and only the
+            // fans whose curve differs from what asusd already has (each asusctl call takes ~40ms)
+            for profile in [PerformanceProfile::Performance, PerformanceProfile::Balanced, PerformanceProfile::Quiet] {
+                let platform = profile.platform_profile();
+                let live = ASUSCTL.fan_curve_data(platform).unwrap_or_default();
+                let wanted = configuration::read(|c| c.platform.curves.get(profile.as_str()).cloned().unwrap_or_default());
+                for (fan, curve) in wanted {
+                    let matches = live
+                        .get(&fan)
+                        .is_some_and(|l| l.approx_eq(&FanCurveData::from_data(&curve.current)));
+                    if !matches {
+                        let _ = ASUSCTL.set_fan_curve_string_data(platform, &fan, &curve.current);
                     }
                 }
                 // Keep custom curves enabled on every profile: asusctl >= 6.4 needs them for PPT tuning
@@ -199,9 +207,11 @@ impl PerformanceService {
     pub fn renice(&self, pid: i32) {
         info!(target: LOG, "Renicing process {pid}");
         tabbed(|| loop {
-            let ion = utils::process::renice_hierarchy(pid, CPU_PRIORITY);
-            let ren = utils::process::ionice_hierarchy(pid, IO_CLASS, IO_PRIORITY);
-            if ion == ren {
+            // Repeat while the game keeps spawning processes/threads
+            let pids = utils::process::all_pids_of_hierarchy(pid);
+            utils::process::renice_pids(&pids, CPU_PRIORITY);
+            utils::process::ionice_pids(&pids, IO_CLASS, IO_PRIORITY);
+            if utils::process::all_pids_of_hierarchy(pid) == pids {
                 break;
             }
         });
@@ -238,10 +248,11 @@ impl PerformanceService {
         let actual = *self.actual_profile.lock().unwrap();
         let mut buffer = vec![];
         for _ in 0..samples {
-            if self.stop_flag.load(Ordering::SeqCst) {
-                return actual;
+            // Interruptible, so leaving SMART doesn't wait for the current sample
+            match cpu_use_rate_until(1000, &self.stop_flag) {
+                Some(rate) => buffer.push((rate * 100.0).round()),
+                None => return actual,
             }
-            buffer.push((cpu_use_rate(1000) * 100.0).round());
         }
         let avg = (buffer.iter().sum::<f64>() / samples as f64).round();
         debug!(target: LOG, "Average CPU usage: {avg}%");
@@ -611,6 +622,8 @@ impl PerformanceService {
     /// profile -> fan -> curve
     pub fn save_fan_curves(&self, curves: BTreeMap<String, HashMap<String, FanCurveData>>) {
         info!(target: LOG, "Saving curves");
+        let stored = configuration::read(|c| c.platform.curves.clone());
+        let mut changed: Vec<(String, String, String)> = vec![];
         tabbed(|| {
             for (profile, curves) in &curves {
                 info!(target: LOG, "Saving curves for {}", profile.to_uppercase());
@@ -618,19 +631,21 @@ impl PerformanceService {
                     let platform = PlatformProfile::from_str(profile).unwrap_or(PlatformProfile::Performance);
                     for (fan, curve) in curves {
                         let data = curve.to_data();
+                        let current = stored.get(profile).and_then(|m| m.get(fan)).map(|fc| fc.current.as_str());
+                        if current == Some(data.as_str()) {
+                            continue;
+                        }
                         info!(target: LOG, "{fan}: {data}");
                         let _ = ASUSCTL.set_fan_curve_string_data(platform, fan, &data);
-                        configuration::update(|c| {
-                            c.platform
-                                .curves
-                                .entry(profile.clone())
-                                .or_default()
-                                .entry(fan.clone())
-                                .or_default()
-                                .current = data.clone();
-                        });
+                        changed.push((profile.clone(), fan.clone(), data));
                     }
                 });
+            }
+        });
+        // A single configuration write for every change
+        configuration::update(|c| {
+            for (profile, fan, data) in changed {
+                c.platform.curves.entry(profile).or_default().entry(fan).or_default().current = data;
             }
         });
         info!(target: LOG, "Fan curved updated succesfully");

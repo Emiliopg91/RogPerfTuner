@@ -43,13 +43,7 @@ impl FileClient {
         if !self.available {
             return Err(ClientError::Missing(self.path.clone()));
         }
-        let cmd = format!("cat {}", shell_quote(&self.path));
-        let res = if self.sudo {
-            Shell::get().run_elevated_command(&cmd, true)?
-        } else {
-            Shell::get().run_command(&cmd, true)?
-        };
-        Ok(res.stdout)
+        read_file(&self.path, self.sudo)
     }
 
     pub fn write(&self, content: &str) -> ClientResult<()> {
@@ -91,18 +85,7 @@ impl GlobClient {
         if self.paths.is_empty() {
             return Err(ClientError::Missing(self.pattern.clone()));
         }
-        self.paths
-            .iter()
-            .map(|p| {
-                let cmd = format!("cat {}", shell_quote(p));
-                let res = if self.sudo {
-                    Shell::get().run_elevated_command(&cmd, true)?
-                } else {
-                    Shell::get().run_command(&cmd, true)?
-                };
-                Ok(res.stdout)
-            })
-            .collect()
+        self.paths.iter().map(|p| read_file(p, self.sudo)).collect()
     }
 
     pub fn write(&self, content: &str) -> ClientResult<()> {
@@ -114,5 +97,38 @@ impl GlobClient {
             Shell::get().run_command(&cmd, true)?;
         }
         Ok(())
+    }
+}
+
+/// Reads a file directly when possible (most sysfs attributes are world readable), falling back to the
+/// shell (elevated when `sudo`) only when permission is denied.
+fn read_file(path: &str, sudo: bool) -> ClientResult<String> {
+    match std::fs::read_to_string(path) {
+        Ok(content) => Ok(content),
+        Err(e) if e.kind() == std::io::ErrorKind::PermissionDenied => {
+            let cmd = format!("cat {}", shell_quote(path));
+            let res = if sudo {
+                Shell::get().run_elevated_command(&cmd, true)?
+            } else {
+                Shell::get().run_command(&cmd, true)?
+            };
+            Ok(res.stdout)
+        }
+        Err(_) => Err(ClientError::Missing(path.to_string())),
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn reads_world_readable_files_without_shell() {
+        let client = FileClient::new("/proc/sys/kernel/osrelease", true);
+        let t0 = std::time::Instant::now();
+        let value = client.read().unwrap();
+        assert!(!value.trim().is_empty());
+        // Far below a shell round trip
+        assert!(t0.elapsed().as_millis() < 5);
     }
 }

@@ -1,7 +1,8 @@
 //! Persistent bash sessions (regular and elevated through `sudo -kS bash`).
 //!
-//! Commands are written to the session's stdin followed by an `echo __END__$?` marker, and the output is
-//! read until the marker shows up, which avoids spawning (and authenticating) a process per command.
+//! Commands are written to the session's stdin followed by an `echo __END__$?` marker on stdout and an
+//! `__END__` marker on stderr; both outputs are read until their marker shows up, which avoids spawning
+//! (and authenticating) a process per command and waiting for stderr by guesswork.
 
 use std::{
     collections::HashMap,
@@ -9,10 +10,11 @@ use std::{
     os::unix::process::CommandExt,
     process::{Child, ChildStdin, Command, Stdio},
     sync::{
-        Arc, Mutex, OnceLock,
+        Arc, Condvar, Mutex, OnceLock,
         mpsc::{Receiver, channel},
     },
     thread,
+    time::Duration,
 };
 
 use log::{debug, error, info};
@@ -47,7 +49,8 @@ struct BashSession {
     child: Child,
     stdin: ChildStdin,
     stdout_rx: Receiver<String>,
-    stderr_buf: Arc<Mutex<String>>,
+    /// Accumulated stderr, notified on every chunk
+    stderr_buf: Arc<(Mutex<String>, Condvar)>,
 }
 
 impl BashSession {
@@ -88,16 +91,21 @@ impl BashSession {
             }
         });
 
-        let stderr_buf = Arc::new(Mutex::new(String::new()));
+        let stderr_buf = Arc::new((Mutex::new(String::new()), Condvar::new()));
         let buf = stderr_buf.clone();
         thread::spawn(move || {
             let mut chunk = [0u8; 4096];
             loop {
                 match stderr.read(&mut chunk) {
                     Ok(0) | Err(_) => break,
-                    Ok(n) => buf.lock().unwrap().push_str(&String::from_utf8_lossy(&chunk[..n])),
+                    Ok(n) => {
+                        buf.0.lock().unwrap().push_str(&String::from_utf8_lossy(&chunk[..n]));
+                        buf.1.notify_all();
+                    }
                 }
             }
+            // Wake up any waiter when the session dies
+            buf.1.notify_all();
         });
 
         if let Some(input) = initial_input {
@@ -114,8 +122,8 @@ impl BashSession {
     }
 
     fn run(&mut self, cmd: &str) -> ShellResult<CommandResult> {
-        self.stderr_buf.lock().unwrap().clear();
-        let full = format!("{cmd}\necho {MARKER}$?\n");
+        self.stderr_buf.0.lock().unwrap().clear();
+        let full = format!("{cmd}\necho {MARKER}$?\necho {MARKER} >&2\n");
         self.stdin.write_all(full.as_bytes())?;
         self.stdin.flush()?;
 
@@ -125,9 +133,7 @@ impl BashSession {
             if let Some(pos) = line.find(MARKER) {
                 out.push_str(&line[..pos]);
                 let code = line[pos + MARKER.len()..].trim().parse::<i32>().unwrap_or(-1);
-                // Give the stderr reader a chance to catch up
-                thread::sleep(std::time::Duration::from_millis(1));
-                let stderr = self.stderr_buf.lock().unwrap().clone();
+                let stderr = self.wait_stderr();
                 return Ok(CommandResult {
                     exit_code: code,
                     stdout: out,
@@ -136,6 +142,23 @@ impl BashSession {
             }
             out.push_str(&line);
         }
+    }
+}
+
+impl BashSession {
+    /// Waits for the stderr marker, which comes after all the command's stderr output.
+    fn wait_stderr(&self) -> String {
+        let (lock, cvar) = &*self.stderr_buf;
+        let guard = lock.lock().unwrap();
+        let (mut guard, _) = cvar
+            .wait_timeout_while(guard, Duration::from_secs(2), |buf| !buf.contains(MARKER))
+            .unwrap();
+        let stderr = match guard.find(MARKER) {
+            Some(pos) => guard[..pos].to_string(),
+            None => guard.clone(),
+        };
+        guard.clear();
+        stderr
     }
 }
 
@@ -294,4 +317,35 @@ impl Shell {
 /// Escapes a value to be safely embedded inside single quotes in a bash command.
 pub fn shell_quote(value: &str) -> String {
     format!("'{}'", value.replace('\'', "'\\''"))
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn splits_stdout_stderr_and_exit_code() {
+        let mut s = BashSession::start(&["bash"], None).unwrap();
+        let res = s.run("echo out; echo err >&2; false").unwrap();
+        assert_eq!(res.stdout, "out\n");
+        assert_eq!(res.stderr, "err\n");
+        assert_eq!(res.exit_code, 1);
+        // stderr of one command never leaks into the next
+        let res = s.run("printf 'no-newline'").unwrap();
+        assert_eq!(res.stdout, "no-newline");
+        assert_eq!(res.stderr, "");
+        assert_eq!(res.exit_code, 0);
+    }
+
+    #[test]
+    fn command_latency() {
+        let mut s = BashSession::start(&["bash"], None).unwrap();
+        let t0 = std::time::Instant::now();
+        for _ in 0..200 {
+            s.run("true").unwrap();
+        }
+        let per_cmd = t0.elapsed().as_micros() / 200;
+        println!("{per_cmd} µs per command");
+        assert!(per_cmd < 2000, "{per_cmd} µs per command");
+    }
 }

@@ -10,22 +10,24 @@ use std::{
     path::Path,
     sync::{
         Mutex, OnceLock,
-        atomic::{AtomicUsize, Ordering},
     },
     time::SystemTime,
 };
 
 use log::{Level, LevelFilter, Log, Metadata, Record};
 
-static TABS: AtomicUsize = AtomicUsize::new(0);
+thread_local! {
+    /// Indentation level, per thread so concurrent initialization logs stay readable
+    static TABS: std::cell::Cell<usize> = const { std::cell::Cell::new(0) };
+}
 static LOGGER: OnceLock<AppLogger> = OnceLock::new();
 
 pub fn add_tab() {
-    TABS.fetch_add(1, Ordering::SeqCst);
+    TABS.with(|t| t.set(t.get() + 1));
 }
 
 pub fn rem_tab() {
-    let _ = TABS.try_update(Ordering::SeqCst, Ordering::SeqCst, |t| Some(t.saturating_sub(1)));
+    TABS.with(|t| t.set(t.get().saturating_sub(1)));
 }
 
 /// Runs `f` with one extra indentation level.
@@ -71,7 +73,7 @@ impl Log for AppLogger {
             chrono::Local::now().format("%Y-%m-%d %H:%M:%S%.3f"),
             level,
             name,
-            "  ".repeat(TABS.load(Ordering::SeqCst)),
+            "  ".repeat(TABS.with(|t| t.get())),
             record.args()
         );
         print!("{line}");

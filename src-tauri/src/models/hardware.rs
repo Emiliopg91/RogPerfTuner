@@ -174,6 +174,13 @@ impl FanCurveData {
             .join(",")
     }
 
+    /// Same curve, allowing 1% of difference: asusd stores PWM (0-255) and reports it back rounded to %.
+    pub fn approx_eq(&self, other: &FanCurveData) -> bool {
+        self.temp == other.temp
+            && self.perc.len() == other.perc.len()
+            && self.perc.iter().zip(&other.perc).all(|(a, b)| (a - b).abs() <= 1)
+    }
+
     /// Spreads out consecutive points with the same temperature (asusctl rejects them)
     pub fn normalize(&mut self) {
         for i in 1..self.temp.len() {
@@ -201,6 +208,16 @@ mod tests {
         assert_eq!(curve.to_data(), data);
         curve.normalize();
         assert_eq!(curve.to_data(), "63c:0%,65c:4%,67c:8%,71c:10%,75c:14%,77c:19%,79c:24%,83c:30%");
+    }
+
+    #[test]
+    fn approx_eq_tolerates_pwm_rounding() {
+        let wanted = FanCurveData::from_data("50c:0%,62c:8%,66c:14%");
+        // 8% -> pwm 20 -> reported 7%, 14% -> pwm 36 -> reported 14%
+        let live = FanCurveData { temp: vec![50, 62, 66], perc: vec![0, 7, 14] };
+        assert!(live.approx_eq(&wanted));
+        let other = FanCurveData { temp: vec![50, 62, 66], perc: vec![0, 20, 14] };
+        assert!(!other.approx_eq(&wanted));
     }
 
     #[test]

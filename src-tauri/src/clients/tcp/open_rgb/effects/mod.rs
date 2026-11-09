@@ -12,6 +12,7 @@ pub mod starry_night_effect;
 pub mod static_effect;
 
 use std::{
+    collections::HashMap,
     sync::{
         Arc, Mutex,
         atomic::{AtomicBool, Ordering},
@@ -35,7 +36,8 @@ pub struct EffectCtx {
     running: Arc<AtomicBool>,
     brightness: f64,
     color: Option<Color>,
-    lock: Mutex<()>,
+    /// Last frame sent to each device (by index); also serializes the writes
+    last_frames: Mutex<HashMap<u32, Vec<Color>>>,
 }
 
 impl EffectCtx {
@@ -59,10 +61,13 @@ impl EffectCtx {
 
     pub fn set_colors(&self, dev: &Device, colors: &[Color]) {
         if dev.enabled() && self.running() {
-            let _guard = self.lock.lock().unwrap();
+            let mut last_frames = self.last_frames.lock().unwrap();
             if self.running() {
                 let dimmed: Vec<Color> = colors.iter().map(|c| c.scale(self.brightness)).collect();
-                let _ = self.conn.set_device_colors(dev, &dimmed);
+                // Identical frames (static effects, idle digital rain...) aren't sent again
+                if last_frames.get(&dev.idx) != Some(&dimmed) && self.conn.set_device_colors(dev, &dimmed).is_ok() {
+                    last_frames.insert(dev.idx, dimmed);
+                }
             }
         }
     }
@@ -156,7 +161,7 @@ impl Effect {
             running: self.running.clone(),
             brightness: brightness.value() as f64 / 100.0,
             color,
-            lock: Mutex::new(()),
+            last_frames: Mutex::new(HashMap::new()),
         };
         let kind = self.kind;
         let handle = thread::spawn(move || {

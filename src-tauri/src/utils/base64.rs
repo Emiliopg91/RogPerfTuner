@@ -1,6 +1,14 @@
 //! Base64 encoding, used to send game artwork to the webview.
 
-use std::fs;
+use std::{
+    collections::HashMap,
+    fs,
+    sync::{LazyLock, Mutex},
+    time::SystemTime,
+};
+
+/// Encoded images by path, with the modification time they were read at
+static IMAGE_CACHE: LazyLock<Mutex<HashMap<String, (SystemTime, String)>>> = LazyLock::new(Default::default);
 
 pub fn base64_encode(data: &[u8]) -> String {
     const TABLE: &[u8; 64] = b"ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
@@ -16,11 +24,20 @@ pub fn base64_encode(data: &[u8]) -> String {
     out
 }
 
-/// Reads an image into a `data:` URL.
+/// Reads an image into a `data:` URL, cached until the file changes (the games list asks for every icon on each
+/// refresh).
 pub fn image_data_url(path: &str) -> Option<String> {
+    let mtime = fs::metadata(path).and_then(|m| m.modified()).ok()?;
+    if let Some((cached_mtime, url)) = IMAGE_CACHE.lock().unwrap().get(path)
+        && *cached_mtime == mtime
+    {
+        return Some(url.clone());
+    }
     let data = fs::read(path).ok()?;
     let mime = if path.ends_with(".png") { "image/png" } else { "image/jpeg" };
-    Some(format!("data:{mime};base64,{}", base64_encode(&data)))
+    let url = format!("data:{mime};base64,{}", base64_encode(&data));
+    IMAGE_CACHE.lock().unwrap().insert(path.to_string(), (mtime, url.clone()));
+    Some(url)
 }
 
 #[cfg(test)]

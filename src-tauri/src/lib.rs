@@ -12,6 +12,7 @@ mod utils;
 
 use std::{
     sync::{
+        atomic::{AtomicBool, Ordering},
         Mutex, OnceLock,
         mpsc::{Sender, channel},
     },
@@ -85,6 +86,23 @@ pub(crate) fn quit(app: &AppHandle) {
     app.exit(0);
 }
 
+static REFRESH_PENDING: AtomicBool = AtomicBool::new(false);
+
+/// Refreshes the frontend state and the tray once per burst of events: one action usually emits several
+/// (e.g. effect + color), and every refresh reloads the whole state.
+fn schedule_state_refresh(app: &AppHandle) {
+    if REFRESH_PENDING.swap(true, Ordering::SeqCst) {
+        return;
+    }
+    let app = app.clone();
+    thread::spawn(move || {
+        thread::sleep(std::time::Duration::from_millis(50));
+        REFRESH_PENDING.store(false, Ordering::SeqCst);
+        events::emit_state_changed(&app);
+        tray::refresh();
+    });
+}
+
 /// Forwards bus events to the frontend and the tray.
 fn bridge_events(app: AppHandle) {
     event_bus::subscribe(move |e| match e {
@@ -96,14 +114,10 @@ fn bridge_events(app: AppHandle) {
         | Event::RgbColor(_)
         | Event::ChargeThreshold(_)
         | Event::BootSound(_)
-        | Event::OnBattery(_) => {
-            events::emit_state_changed(&app);
-            tray::refresh();
-        }
+        | Event::OnBattery(_) => schedule_state_refresh(&app),
         Event::GamesChanged(_) => {
-            events::emit_state_changed(&app);
+            schedule_state_refresh(&app);
             events::emit_games_changed(&app);
-            tray::refresh();
         }
         Event::OpenGameConfig { gid, first_run } => {
             show_main_window(&app, None);
@@ -140,7 +154,8 @@ fn initialize(app: AppHandle, exec_path: String, t0: Instant) {
         password = rx.recv().unwrap_or_default();
         set_status(InitStatus::Loading);
     }
-    Shell::init(Some(&password)).set_password(&password);
+    // A single elevated session (`Shell::init(Some(..))` would also open one)
+    Shell::get().set_password(&password);
 
     if !is_module_loaded("asus_armoury") {
         log::error!(target: LOG, "Missing 'asus_armoury' kernel module");
