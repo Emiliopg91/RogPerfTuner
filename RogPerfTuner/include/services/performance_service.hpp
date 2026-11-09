@@ -147,7 +147,7 @@ class PerformanceService : public Singleton<PerformanceService>, Loggable {
 	 * @param curves A map of fan names to their FanCurveData.
 	 */
 	void saveFanCurves(std::map<std::string, std::unordered_map<std::string, FanCurveData>> curves);
-	void setFanCurves(PerformanceProfile profile, PerformanceProfile previous);
+	void setFanCurves(PerformanceProfile profile);
 #endif
 	/**
 	 * @brief Changes the scheduling priority of a process.

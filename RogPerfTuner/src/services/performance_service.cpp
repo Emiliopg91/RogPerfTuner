@@ -74,6 +74,7 @@ PerformanceService::PerformanceService() : Loggable("PerformanceService") {
 				asusCtlClient.setFanCurveStringData(platformProfile, fan, curve.current);
 			}
 		}
+		asusCtlClient.setFanCurvesEnabled(platformProfile, true);
 	}
 	std::vector<std::string> fans = {};
 	if (configuration.getConfiguration().platform.curves.size() > 0) {
@@ -144,6 +145,16 @@ void PerformanceService::setActualPerformanceProfile(PerformanceProfile profile)
 	auto t0 = TimeUtils::now();
 	Logger::add_tab();
 	try {
+#ifdef FAN_CONTROL
+		// Fan curves must be enabled before changing platform profile: newer asusd/kernel
+		// require an active custom fan curve to enable PPT tuning and accept PPT writes
+		setFanCurves(profile);
+#endif
+#ifdef ACPI_PROFILE
+		// power-profiles-daemon may write platform_profile, which makes the kernel disable custom
+		// fan curves. Apply it before the platform profile so asusd's re-apply of fan curves comes last
+		setPowerProfile(profile);
+#endif
 		setPlatformProfile(profile);
 #ifdef BOOST_CONTROL
 		setBoost(profile);
@@ -151,17 +162,11 @@ void PerformanceService::setActualPerformanceProfile(PerformanceProfile profile)
 #ifdef SCALING_GOVERNOR
 		setCpuGovernor(profile);
 #endif
-#ifdef ACPI_PROFILE
-		setPowerProfile(profile);
-#endif
 #ifdef PPT_PL1_SPL
 		setTdps(profile);
 #endif
 #if defined(NV_THERMAL) || defined(NV_BOOST)
 		setNvidiaProfile(profile);
-#endif
-#ifdef FAN_CONTROL
-		setFanCurves(profile, actualProfile);
 #endif
 		auto t1 = TimeUtils::now();
 		logger->info("Profile applied after {} seconds", TimeUtils::format_seconds(TimeUtils::getTimeDiff(t0, t1)));
@@ -276,9 +281,13 @@ void PerformanceService::setPlatformProfile(PerformanceProfile profile) {
 		Logger::add_tab();
 		try {
 			platformClient.setPlatformProfile(platformProfile);
-			platformClient.setEnablePptGroup(true);
 		} catch (std::exception& e) {
 			logger->error("Error while setting platform profile: {}", e.what());
+		}
+		try {
+			platformClient.setEnablePptGroup(true);
+		} catch (std::exception& e) {
+			logger->warn("Error while enabling PPT tuning: {}", e.what());
 		}
 		Logger::rem_tab();
 	} else {
@@ -654,17 +663,16 @@ void PerformanceService::saveFanCurves(std::map<std::string, std::unordered_map<
 
 	logger->info("Applying curve");
 	Logger::add_tab();
-	setFanCurves(actualProfile, actualProfile);
+	setFanCurves(actualProfile);
 	Logger::rem_tab();
 	logger->info("Curve applied");
 }
 
-void PerformanceService::setFanCurves(PerformanceProfile profile, PerformanceProfile previous) {
+void PerformanceService::setFanCurves(PerformanceProfile profile) {
 	auto platformProfile = getPlatformProfile(profile);
 	logger->info("Fan profile: {}", toName<PlatformProfile>(platformProfile));
 	Logger::add_tab();
 	try {
-		asusCtlClient.setFanCurvesEnabled(getPlatformProfile(previous), false);
 		for (const auto& [fan, data] : configuration.getConfiguration().platform.curves[toString(profile)]) {
 			logger->info(fan + ": " + StringUtils::replaceAll(data.current, ",", " "));
 		}

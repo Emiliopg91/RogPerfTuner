@@ -1,6 +1,7 @@
 #include "framework/shell/shell.hpp"
 
 #include <fcntl.h>
+#include <signal.h>
 #include <sys/prctl.h>
 #include <sys/wait.h>
 #include <unistd.h>
@@ -23,6 +24,8 @@ void set_nonblocking(int fd) {
 Shell::Shell(const std::string& sudo_password) : Loggable("Shell"), terminalCfg({{"konsole", "-e", nullptr}}) {
 	logger->info("Initializing shells");
 	Logger::add_tab();
+	// Avoid being killed by SIGPIPE if a shell process dies; write() will return EPIPE instead
+	signal(SIGPIPE, SIG_IGN);
 
 	Logger::rem_tab();
 
@@ -36,7 +39,12 @@ Shell::Shell(const std::string& sudo_password) : Loggable("Shell"), terminalCfg(
 		logger->info("Initializing admin");
 		Logger::add_tab();
 		elevated_bash = start_bash({"sudo", "-kS", "bash"}, sudo_password + "\n");
-		send_command(elevated_bash.value(), true, "pwd", false, 0);
+		auto res	  = send_command(elevated_bash.value(), true, "pwd", false, 0);
+		if (res.exit_code != 0) {
+			logger->error("Could not start elevated shell: {}", StringUtils::trim(res.stderr_str));
+			Logger::rem_tab();
+			throw std::runtime_error("Could not start elevated shell: " + StringUtils::trim(res.stderr_str));
+		}
 		Logger::rem_tab();
 	}
 
@@ -132,18 +140,35 @@ CommandResult Shell::send_command(BashSession& session, bool elevated, const std
 	if (timeout > 0) {
 		full_cmd = "timeout " + std::to_string(timeout / 1000) + " " + full_cmd;
 	}
-	write(session.stdin_fd, full_cmd.c_str(), full_cmd.size());
+	if (write(session.stdin_fd, full_cmd.c_str(), full_cmd.size()) < 0) {
+		std::string error = strerror(errno);
+		logger->error("Error writing command '{}' to shell: {}", cmd, error);
+		if (check) {
+			throw std::runtime_error("Error writing command '" + cmd + "' to shell: " + error);
+		}
+		return {static_cast<uint8_t>(-1), "", error};
+	}
 
 	std::string out, err;
 	bool done		  = false;
+	bool out_eof	  = false;
+	bool err_eof	  = false;
 	uint8_t exit_code = -1;
 
 	char buf[4096];
 	fd_set readfds;
 	while (!done) {
+		if (out_eof && err_eof) {
+			logger->error("Shell process exited before command '{}' completed", cmd);
+			break;
+		}
 		FD_ZERO(&readfds);
-		FD_SET(session.stdout_fd, &readfds);
-		FD_SET(session.stderr_fd, &readfds);
+		if (!out_eof) {
+			FD_SET(session.stdout_fd, &readfds);
+		}
+		if (!err_eof) {
+			FD_SET(session.stderr_fd, &readfds);
+		}
 		int maxfd = std::max(session.stdout_fd, session.stderr_fd) + 1;
 
 		if (select(maxfd, &readfds, nullptr, nullptr, nullptr) == -1) {
@@ -165,6 +190,8 @@ CommandResult Shell::send_command(BashSession& session, bool elevated, const std
 					out.erase(pos);	 // remove marker and code from stdout
 					done = true;
 				}
+			} else if (n == 0) {
+				out_eof = true;
 			}
 		}
 
@@ -172,6 +199,8 @@ CommandResult Shell::send_command(BashSession& session, bool elevated, const std
 			ssize_t n = read(session.stderr_fd, buf, sizeof(buf));
 			if (n > 0) {
 				err.append(buf, n);
+			} else if (n == 0) {
+				err_eof = true;
 			}
 		}
 	}
