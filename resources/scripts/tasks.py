@@ -77,7 +77,17 @@ def build_rccdc():
     if target.exists():
         return
     banner("Compiling RccDeckyCompanion")
-    run(["./cli/decky.py", "build"], cwd=RCCDC_DIR)
+    # The plugin pins pnpm 9, which walks up to the repository's pnpm-workspace.yaml and fails with
+    # "packages field missing or empty". A workspace file of its own keeps it standalone while building.
+    workspace = RCCDC_DIR / "pnpm-workspace.yaml"
+    created = not workspace.exists()
+    if created:
+        workspace.write_text("packages:\n  - .\n", encoding="utf-8")
+    try:
+        run(["./cli/decky.py", "build"], cwd=RCCDC_DIR)
+    finally:
+        if created:
+            workspace.unlink(missing_ok=True)
     shutil.copytree(RCCDC_DIR / "out/RccDeckyCompanion", target, dirs_exist_ok=True)
 
 
