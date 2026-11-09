@@ -1,0 +1,48 @@
+[package]
+name = "rog-perf-tuner"
+version = "4.14.10"
+description = "An utility to manage Asus Rog laptop performance"
+authors = ["Emiliopg91 <ojosdeserbio@gmail.com>"]
+edition = "2024"
+repository = "https://github.com/Emiliopg91/RogPerfTuner"
+categories = ["Utilities"]
+
+[lints.rust]
+linker_messages = "allow"
+
+[lib]
+# The `_lib` suffix avoids a name clash between the lib and the bin targets
+name = "rog_perf_tuner_lib"
+crate-type = ["staticlib", "cdylib", "rlib"]
+
+[build-dependencies]
+tauri-build = { version = "^2", features = [] }
+
+[dependencies]
+chrono = "^0.4"
+glob = "^0.3"
+keyring = { version = "^3", features = ["sync-secret-service", "crypto-rust"] }
+libc = "^0.2"
+log = { version = "^0.4", features = ["std"] }
+noyalib = "=0.0.58"
+regex = "^1"
+serde = { version = "^1", features = ["derive"] }
+serde_json = "^1"
+tauri = { version = "^2", features = ["tray-icon", "image-png"] }
+tauri-rs-ts-ipc = "^0"
+thiserror = "^2"
+zbus = { version = "^5", default-features = false, features = ["blocking-api", "async-io"] }
+# Not used directly: enables tray-icon's KSNI backend through feature unification so
+# left-click events reach the app on Linux. Must match the version tauri depends on.
+tray-icon = { version = "0.25", default-features = false, features = ["ksni"] }
+
+[profile.release]
+lto = "fat"
+codegen-units = 1
+strip = "symbols"
+opt-level = 3
+
+[profile.dev]
+opt-level = 0
+debug = true
+incremental = true

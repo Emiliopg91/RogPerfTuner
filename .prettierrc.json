@@ -1,0 +1,8 @@
+{
+  "overrides": [
+    {
+      "files": ["*.ts", "*.tsx"],
+      "options": { "tabWidth": 4 }
+    }
+  ]
+}

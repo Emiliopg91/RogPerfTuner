@@ -15,7 +15,7 @@ jobs:
     runs-on: ubuntu-latest
     outputs:
       different: ${{ steps.check_version.outputs.different }}
-      version: ${{ steps.cmake_version.outputs.version }}
+      version: ${{ steps.app_version.outputs.version }}
     steps:
       - name: Checkout repository
         uses: actions/checkout@v6
@@ -28,9 +28,9 @@ jobs:
           git config user.email "actions@github.com"
 
       - name: Get version
-        id: cmake_version
+        id: app_version
         run: |
-          VERSION=$(grep -oP 'VERSION\s+\K[0-9]+\.[0-9]+\.[0-9]+' CMakeLists.txt)
+          VERSION=$(sed -n 's/^version = "\(.*\)"/\1/p' src-tauri/Cargo.toml | head -n1)
           echo "version=$VERSION" >> $GITHUB_OUTPUT
 
       - name: Get last git tag
@@ -44,7 +44,7 @@ jobs:
       - name: Check version vs tag
         id: check_version
         run: |
-          if [ "${{ steps.cmake_version.outputs.version }}" != "${{ steps.git_tag.outputs.tag }}" ]; then
+          if [ "${{ steps.app_version.outputs.version }}" != "${{ steps.git_tag.outputs.tag }}" ]; then
             echo "different=true" >> $GITHUB_OUTPUT
           else
             echo "different=false" >> $GITHUB_OUTPUT
@@ -53,7 +53,7 @@ jobs:
       - name: Create Git tag
         if: steps.check_version.outputs.different == 'true'
         run: |
-          VERSION=${{ steps.cmake_version.outputs.version }}
+          VERSION=${{ steps.app_version.outputs.version }}
           git tag "$VERSION"
           git push origin "$VERSION"
 

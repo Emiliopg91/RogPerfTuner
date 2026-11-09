@@ -15,7 +15,7 @@ PKGBUILD_TEST_FILE = os.path.abspath(
 SRCINFO_FILE = os.path.abspath(
     os.path.join(os.path.dirname(__file__), "..", "..", "dist", ".SRCINFO")
 )
-CMAKE_FILE = os.path.abspath(os.path.dirname(__file__) + "/../../CMakeLists.txt")
+CARGO_FILE = os.path.abspath(os.path.dirname(__file__) + "/../../src-tauri/Cargo.toml")
 
 CHANGELOG_YAML_FILE = os.path.abspath(
     os.path.join(os.path.dirname(__file__), "..", "..", "changelog.yaml")
@@ -188,14 +188,8 @@ def generate_srcinfo(data, version):
 
 
 if __name__ == "__main__":
-    content = Path(CMAKE_FILE).read_text(encoding="utf-8")
-    match = re.search(
-        r"project\s*\(\s*([A-Za-z0-9_]+)\s+VERSION\s+([0-9]+\.[0-9]+\.[0-9]+)",
-        content,
-        re.IGNORECASE,
-    )
-
-    name, version = match.groups()
+    content = Path(CARGO_FILE).read_text(encoding="utf-8")
+    version = re.search(r'^version\s*=\s*"([^"]+)"', content, re.MULTILINE).group(1)
     version = os.getenv("VERSION", version)
     release = os.getenv("RELEASE", "1")
 

@@ -2,22 +2,11 @@
 set -e
 
 if [ "$(git rev-parse --abbrev-ref HEAD)" = "main" ]; then
-    if grep -R -nP --exclude-dir={build,.git} '//\s*TODO:' RogPerfTuner Framework > /tmp/todos.txt; then
-        # grep encontró TODOs
+    if grep -R -nP --exclude-dir={node_modules,target,backend} '//\s*TODO:' src src-tauri/src > /tmp/todos.txt; then
         sed 's/^\([^:]*:[^:]*\):/  \1\n    /' /tmp/todos.txt
         echo "❌ Pending TODOs found in code"
         exit 1
     fi
-fi
-
-# Format code
-make format
-
-# Re-add formatted files
-FILES=$(git diff --cached --name-only --diff-filter=ACM | grep -E '\.(cpp|hpp)$' || true)
-
-if [ -n "$FILES" ]; then
-    git add $FILES
 fi
 
 exit 0
